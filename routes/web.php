@@ -294,9 +294,7 @@ Route::post('/incomplete-order', [IncompleteOrderController::class, 'store'])->n
 
 Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'TrackInstallation'])->name('admin.')->group(function () {
     // Dashboard Routes
-    Route::get('/dashboard', function() {
-        return "Hello World from routes/web.php (Dashboard)";
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'admin'])->name('dashboard');
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
 
     // Users Management

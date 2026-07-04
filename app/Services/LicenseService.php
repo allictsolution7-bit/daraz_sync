@@ -911,6 +911,27 @@ class LicenseService
      */
     public function getLicenseStatus(): array
     {
+        // LOCAL DEV MODE — set LICENSE_DEV_MODE=true in .env to use local license
+        if (env('LICENSE_DEV_MODE', false)) {
+            return [
+                'valid'                   => true,
+                'license_key'             => 'local-dev',
+                'domain'                  => request()->getHost(),
+                'expected_domain'         => request()->getHost(),
+                'modules'                 => ['core', 'pos', 'landing_page'],
+                'expiry_date'             => '2099-12-31',
+                'status'                  => 'active',
+                'landing_page_limit'      => 999,
+                'landing_page_used'       => 0,
+                'landing_page_remaining'  => 999,
+                'last_synced'             => 'local',
+                'last_synced_at'          => now()->toDateTimeString(),
+                'needs_sync'              => false,
+                'support_status'          => ['active' => true, 'status' => 'active', 'remaining_days' => 999],
+                'update_status'           => ['active' => true, 'status' => 'active', 'remaining_days' => 999],
+            ];
+        }
+
         // Look for any license, not just active ones
         $license = License::first();
         
@@ -935,7 +956,9 @@ class LicenseService
         }
 
         // Check for recent updates (use TTL, not host drift)
-        if ($this->shouldSyncLicense($license)) {
+        // Skip remote sync on localhost / local dev environments
+        $isLocalDev = in_array(request()->getHost(), ['localhost', '127.0.0.1', '::1']);
+        if (!$isLocalDev && $this->shouldSyncLicense($license)) {
             $this->validateLicense($license->license_key, true);
             $license->refresh();
         }
@@ -960,7 +983,13 @@ class LicenseService
             'update_status' => $license->getUpdateStatus(),
         ];
 
-        // If current host doesn’t match the licensed domain, block access without mutating status
+        // On localhost, always allow access (local development mode)
+        if ($isLocalDev) {
+            $status['valid'] = true;
+            return $status;
+        }
+
+        // If current host doesn't match the licensed domain, block access without mutating status
         $currentDomainNormalized = $this->normalizeDomain(request()->getHost());
         if ($currentDomainNormalized !== 'localhost' && $currentDomainNormalized !== '127.0.0.1' && $canonicalDomain && $currentDomainNormalized && $canonicalDomain !== $currentDomainNormalized) {
             $status['valid'] = false;
