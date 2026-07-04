@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('licenses', function (Blueprint $table) {
+            $table->id();
+            $table->string('license_key')->unique();
+            $table->string('domain')->nullable();
+            $table->json('modules')->nullable(); // ["core","pos","landing_page"]
+            $table->integer('landing_page_limit')->default(0);
+            $table->date('expiry_date')->nullable();
+            $table->enum('status', ['active', 'suspended', 'expired'])->default('active');
+            $table->timestamp('last_synced_at')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('licenses');
+    }
+};

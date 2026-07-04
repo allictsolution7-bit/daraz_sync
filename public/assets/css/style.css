@@ -1,0 +1,250 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+  font-family: "Montserrat", sans-serif;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  border: none;
+  box-sizing: border-box;
+  text-decoration: none;
+  list-style: none;
+}
+
+:root {
+  --header-height: 3rem;
+
+  /* ---------color-------- */
+  --main-color: #4B49AC;
+  --second-color: rgb(7, 3, 45);
+  /* --main-gradient: linear-gradient(121deg, rgba(194,13,90, 1) 25%,rgb(255 0 194/42%) 100%); */
+  --main-gradient: linear-gradient(121deg, #1E3A8A  25%, #10B981 100%);
+  --dar-bg: #383848;
+  --main-color-alt: #d624b0;
+  --text-color: #707070;
+  --white-color: #ffffff;
+  --white-alt: #e6e6e6;
+
+  /* ----------font & typhography-----  */
+  --biggest-font-s: 2.25rem;
+  --h1-font-s: 1.5rem;
+  --h2-font-s: 1.25rem;
+  --h3-font-s: 1rem;
+  --normal-font-s: .938rem;
+  --small-font-s: .813rem;
+  --smaller-font-s: .75rem;
+
+  /* -----font-weight-------- */
+  --font-medium: 500;
+  --font-semi-bold: 600;
+  --font-bold: 700;
+
+  /* ------padding----- */
+  --pd-1: .5rem;
+  --pd-2: 1rem;
+  --pd-3: 1.5rem;
+  --pd-4: 2rem;
+  --pd-5: 2.5rem;
+  --pd-6: 3rem;
+
+  /* -----margin----- */
+  --mg-1: .5rem;
+  --mg-2: 1rem;
+  --mg-3: 1.5rem;
+  --mg-4: 2rem;
+  --mg-5: 2.5rem;
+  --mg-6: 3rem;
+
+  /* ------z-index---- */
+  --z-toolpit: 10;
+  --z-fixed: 100;
+
+}
+
+
+/* -----------------------------css-variable-end----------------------- */
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+  color: var(--second-color);
+  background: #FAFAFC;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 28px;
+}
+
+img {
+  vertical-align: middle;
+  height: auto;
+}
+
+button:focus {
+  outline: none;
+}
+
+
+a {
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* --------------ganeral-style-end------------- */
+
+
+h1,
+h2.h3,
+h4,
+h5,
+h6,
+p,
+span,
+label,
+ul,
+li {
+  margin: 0;
+}
+
+
+table.table {
+  white-space: nowrap;
+}
+
+.di-btn {
+  color: aliceblue;
+  padding: .7rem var(--pd-2);
+  font-weight: 500;
+  border-radius: 3px;
+  box-shadow: 0px 6px 19px 1px #06041d4a;
+}
+
+.purple-gradient {
+  background: var(--main-gradient);
+}
+
+.bg-cla {
+  background: var(--main-color);
+}
+
+.bg-clc {
+  background: linear-gradient(121deg, rgb(92 26 195) 25%, rgb(136 25 206 / 95%) 100%);
+}
+
+.bg-clc-2 {
+  background: linear-gradient(121deg, rgb(26 179 195) 25%, rgb(25 97 206 / 95%) 100%);
+}
+
+.bg-clc-3 {
+  background: linear-gradient(121deg, rgb(232 202 53) 25%, rgb(206 125 25 / 95%) 100%);
+}
+
+/* css */
+
+.content-wrapper {
+  margin-left: 250px;
+  margin-top: 65px;
+  transition: .5s;
+}
+
+.content-wrapper.hide {
+  margin-left: 0;
+}
+
+.sm-chart-sec .revinue .w-title {
+  background: var(--main-gradient);
+  padding: 15px;
+  border-radius: 7px;
+  align-items: center;
+  gap: 20px;
+}
+
+
+/* -----------------form------ */
+
+.registration-form {
+  max-width: 450px;
+  margin: 50px auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+}
+
+.registration-form h2 {
+  font-size: 26px;
+}
+
+.form-group input::placeholder {
+  font-size: 13px;
+}
+
+.form-group label {
+  font-weight: 500;
+}
+
+.form-group input {
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.users {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+
+}
+
+.user-information {
+  display: flex;
+  gap: 20px;
+  align-items: end;
+  padding: 52px 20px;
+  /* background-image: url('http://127.0.0.1:8000/assets/img/Tawfiq.jpeg'); */
+  background-color: #caecf756;
+  
+}
+
+.user-information .user-image img {
+  height: 12rem;
+  width: 16rem;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.user-information .user-data h6 {
+  font-size: 13px;
+}
+
+.user-information .social-link a {
+  height: 30px;
+  width: 30px;
+  line-height: 30px;
+  text-align: center;
+  background: var(--main-gradient);
+  border-radius: 50%;
+  color: var(--white-color);
+}
+
+/* Bootstrap Button Overrides - New Color Scheme */
+.btn-outline-primary {
+  --bs-btn-color: #197A94;
+  --bs-btn-border-color: #197A94;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #197A94;
+  --bs-btn-hover-border-color: #197A94;
+  --bs-btn-focus-shadow-rgb: 25, 122, 148;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #197A94;
+  --bs-btn-active-border-color: #197A94;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: #197A94;
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: #197A94;
+  --bs-gradient: none;
+}

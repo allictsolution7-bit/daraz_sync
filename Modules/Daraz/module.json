@@ -1,0 +1,17 @@
+{
+    "name": "Daraz",
+    "alias": "daraz",
+    "description": "Daraz marketplace stock synchronization for multiple stores. Supports bidirectional sync between Thikana and Daraz seller accounts.",
+    "version": "1.0.0",
+    "license_key": null,
+    "keywords": ["daraz", "marketplace", "stock-sync", "inventory", "multi-channel"],
+    "priority": 0,
+    "is_premium": false,
+    "requires_support": false,
+    "providers": [
+        "Modules\\Daraz\\Providers\\DarazServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+    font-family: "Montserrat", "sans-serif";
+}
+
+
+/* ------------------- */
+
+.hero-slider .swiper-button-prev:after, .swiper-rtl .swiper-button-next:after {
+    content: 'prev'; 
+    font-size: 25px;
+    font-weight: 800;
+    color: navy;
+}
+.hero-slider .swiper-button-next:after, .swiper-rtl .swiper-button-prev:after {
+    content: 'next';
+    font-size: 25px;
+    font-weight: 800;
+    color: navy;
+}
+
+.swiper-button-prev:after, .swiper-rtl .swiper-button-next:after {
+    content: 'prev'; 
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    background: #00061e49;
+     padding: 8px 12px;
+     border-radius: 5px;
+}
+.swiper-button-next:after, .swiper-rtl .swiper-button-prev:after {
+    content: 'next';
+    font-size: 16px;
+    font-weight: 800; 
+    color: #ffffff;
+    background: #00061e49;
+     padding: 8px 12px;
+     border-radius: 5px;
+} 
+
+@media(max-width:450px){
+    
+.swiper-button-next::after,
+.swiper-button-prev::after{ 
+    font-size: 12px;
+}
+
+}
+
+
+/* ----------------- */
+
+.testimonial .swiper-button-prev:after, .swiper-rtl .swiper-button-next:after {
+    content: 'prev'; 
+    font-size: 25px;
+    font-weight: 800; 
+    color: navy;
+}
+
+/* ------------------- */
+
+.dropdown{
+    position: relative;
+}
+
+.dropdown ul{
+    position: absolute;
+    top: 100%;
+    padding: 7px 20px;
+    background: white;
+    color: red;
+    transition: .3s ease-in;
+    display: none;
+}
+
+.dropdown:hover ul{
+display: block;
+}
+
+#additional_information{
+    width: 30rem;
+}
+
+#additional_information div{
+    display: flex;
+    flex-wrap: wrap; 
+}
+#additional_information div p{
+    flex: 1 1 30%;
+}
+
+
+/* ----------------------------- */
+
+#cart-table tr:nth-child(even){
+    background: #F2F2F2;
+}
+
+
+ 

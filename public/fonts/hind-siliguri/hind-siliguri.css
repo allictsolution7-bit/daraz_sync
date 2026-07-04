@@ -1,0 +1,32 @@
+@font-face {
+    font-family: 'Hind Siliguri';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/hind-siliguri/hind-siliguri-v13-bengali-regular.woff2') format('woff2');
+  }
+  
+  @font-face {
+    font-family: 'Hind Siliguri';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/hind-siliguri/hind-siliguri-v13-bengali-500.woff2') format('woff2');
+  }
+  
+  @font-face {
+    font-family: 'Hind Siliguri';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/hind-siliguri/hind-siliguri-v13-bengali-600.woff2') format('woff2');
+  }
+  
+  @font-face {
+    font-family: 'Hind Siliguri';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/hind-siliguri/hind-siliguri-v13-bengali-700.woff2') format('woff2');
+  }
+  

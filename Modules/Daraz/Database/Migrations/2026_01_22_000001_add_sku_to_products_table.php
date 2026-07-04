@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     * Adds SKU field to products table for simple product identification.
+     */
+    public function up(): void
+    {
+        if (!Schema::hasColumn('products', 'sku')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->string('sku')->nullable()->after('slug');
+                $table->index('sku');
+            });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        if (Schema::hasColumn('products', 'sku')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->dropIndex(['sku']);
+                $table->dropColumn('sku');
+            });
+        }
+    }
+};
