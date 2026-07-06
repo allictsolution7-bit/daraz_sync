@@ -1214,89 +1214,95 @@
         }
     </script>
 
-    <script>
-        // Simulated data (replace with actual data fetching logic)
-        const totalUsersData = [100, 150, 200, 250, 300, 350, 400];
-        const totalOrdersData = [50, 75, 100, 125, 150, 175, 200];
-        const totalRevenueData = [5000, 7500, 10000, 12500, 15000, 17500, 20000];
-
-        // Total Users Chart
-        var totalUsersChart = new Chart(document.getElementById('totalUsersChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-                datasets: [{
-                    label: 'Total Users',
-                    data: totalUsersData,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            }
-        });
-
-        // Total Orders Chart
         document.addEventListener("DOMContentLoaded", function() {
+            // Simulated data (replace with actual data fetching logic)
+            const totalUsersData = [100, 150, 200, 250, 300, 350, 400];
+            const totalOrdersData = [50, 75, 100, 125, 150, 175, 200];
+            const totalRevenueData = [5000, 7500, 10000, 12500, 15000, 17500, 20000];
+
+            // Total Users Chart
+            const totalUsersCanvas = document.getElementById('totalUsersChart');
+            if (totalUsersCanvas) {
+                var totalUsersChart = new Chart(totalUsersCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        datasets: [{
+                            label: 'Total Users',
+                            data: totalUsersData,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
             // Data passed from Laravel controller to JavaScript
             var labels = @json($labels); // Labels for the months
             var data = @json($data); // Total orders data for each month
 
             // Total Orders Chart
-            var totalOrdersChart = new Chart(document.getElementById('totalOrdersChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: labels, // dynamically generated labels from the controller
-                    datasets: [{
-                        label: 'Total Orders',
-                        data: data, // dynamically generated data from the controller
-                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+            const totalOrdersCanvas = document.getElementById('totalOrdersChart');
+            if (totalOrdersCanvas) {
+                var totalOrdersChart = new Chart(totalOrdersCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels, // dynamically generated labels from the controller
+                        datasets: [{
+                            label: 'Total Orders',
+                            data: data, // dynamically generated data from the controller
+                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
-            });
-        });
+                });
+            }
 
-        // Total Revenue Chart
-        var totalRevenueChart = new Chart(document.getElementById('totalRevenueChart').getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-                datasets: [{
-                    label: 'Total Revenue',
-                    data: totalRevenueData,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
+            // Total Revenue Chart
+            const totalRevenueCanvas = document.getElementById('totalRevenueChart');
+            if (totalRevenueCanvas) {
+                var totalRevenueChart = new Chart(totalRevenueCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        datasets: [{
+                            label: 'Total Revenue',
+                            data: totalRevenueData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
                         }
-                    }]
-                }
+                    }
+                });
             }
         });
-    </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
