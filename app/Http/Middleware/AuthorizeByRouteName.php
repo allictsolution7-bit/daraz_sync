@@ -149,7 +149,7 @@ class AuthorizeByRouteName
             }
         }
 
-        if ($user->can($permission) || (method_exists($user, 'hasRole') && $user->hasRole('super_admin'))) {
+        if ($user->can($permission) || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
             return $next($request);
         }
 

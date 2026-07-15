@@ -1456,6 +1456,7 @@
                         @endcan
 
                         {{-- Fraud Protection --}}
+                        @can('fraud_protection.view')
                         <li class="sub-menu {{ request()->is('admin/fraud-protection*') ? 'active' : '' }}">
                             <a href="#">
                                 <span class="menu-content">
@@ -1484,6 +1485,7 @@
                                 </li>
                             </ul>
                         </li>
+                        @endcan
 
                         {{-- Backup System --}}
                         @can('backup.settings.view')
@@ -1532,6 +1534,7 @@
                         @endcan
 
                         {{-- WooCommerce Migration --}}
+                        @can('woocommerce_migration.view')
                         <li class="{{ request()->is('admin/woocommerce-migration*') ? 'active' : '' }}">
                             <a href="{{ route('admin.woocommerce-migration.index') }}">
                                 <span class="menu-content">
@@ -1540,6 +1543,7 @@
                                 </span>
                             </a>
                         </li>
+                        @endcan
 
                         @can('contacts.view')
                         <li class="sub-menu {{ request()->is('admin/contacts*') ? 'active' : '' }}">
@@ -1576,6 +1580,7 @@
                         </li>
                         @endcan
 
+                        @can('telegram_settings.view')
                         <li class="{{ request()->routeIs('admin.telegram-settings.*') ? 'active' : '' }}">
                             <a href="{{ route('admin.telegram-settings.index') }}">
                                 <span class="menu-content">
@@ -1584,8 +1589,10 @@
                                 </span>
                             </a>
                         </li>
+                        @endcan
 
                         {{-- Delayed Purchase Events --}}
+                        @can('delayed_events.view')
                         <li class="sub-menu {{ request()->is('admin/delayed-events*') ? 'active' : '' }}">
                             <a href="#">
                                 <span class="menu-content">
@@ -1622,6 +1629,7 @@
                                 </li>
                             </ul>
                         </li>
+                        @endcan
 
                         @can('settings.view')
                         <li

@@ -222,7 +222,7 @@
                                                     <h6 class="mb-0 d-flex align-items-center justify-content-between">
                                                         <span class="text-capitalize">{{ str_replace('_',' ', $group) }}</span>
                                                         <span class="ml-2 badge badge-light">{{ $subgroups->flatten()->count() }}</span>
-                                                        <label class="m-0 small">
+                                                        <label class="m-0 small" onclick="event.stopPropagation()">
                                                             <input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all
                                                         </label>
                                                     </h6>
@@ -356,7 +356,7 @@
                                         <h6 class="mb-0 d-flex align-items-center justify-content-between">
                                             <span class="text-capitalize">{{ str_replace('_',' ', $group) }}</span>
                                             <span class="ml-2 badge badge-light">{{ $subgroups->flatten()->count() }}</span>
-                                            <label class="m-0 small"><input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all</label>
+                                            <label class="m-0 small" onclick="event.stopPropagation()"><input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all</label>
                                         </h6>
                                     </a>
                                 </div>

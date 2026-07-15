@@ -813,7 +813,7 @@ if (!module_enabled('MultiVendor')) {
     // ==========================================
     // ADMIN VENDOR MANAGEMENT ROUTES
     // ==========================================
-    Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:admin|super_admin'])->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:admin|super_admin|super admin'])->group(function () {
 
         // Vendor Management
         Route::resource('vendors', AdminVendorController::class);
@@ -856,7 +856,7 @@ if (!module_enabled('MultiVendor')) {
 // ==========================================
 // ADMIN ROUTES (Non-Vendor)
 // ==========================================
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:admin|super_admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:admin|super_admin|super admin'])->group(function () {
     // Backup System
     Route::prefix('backup')->name('backup.')->group(function () {
         // Settings

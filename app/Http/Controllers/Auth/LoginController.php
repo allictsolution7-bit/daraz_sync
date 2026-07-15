@@ -30,7 +30,7 @@ class LoginController extends Controller
     public function redirectTo()
     {
         $user = Auth::user();
-        if ($user && ($user->hasRole('admin') || $user->hasRole('super_admin'))) {
+        if ($user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('super admin'))) {
             return route('admin.dashboard');
         }
         return '/account/profile';
