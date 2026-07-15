@@ -23,7 +23,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Allow super_admin to bypass all permission checks
         Gate::before(function ($user, $ability) {
             return method_exists($user, 'hasRole') && $user->hasRole('super_admin') ? true : null;
         });

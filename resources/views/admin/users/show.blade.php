@@ -65,13 +65,8 @@
                         <tr>
                             <th>Roles</th>
                             <td>
-                                @if($user->hasRole('super_admin'))
-                                    <span class="badge bg-danger">Super Admin</span>
-                                @endif
                                 @foreach($user->getRoleNames() as $role)
-                                    @if($role !== 'super_admin')
-                                        <span class="badge bg-info">{{ $role }}</span>
-                                    @endif
+                                    <span class="badge bg-info">{{ $role }}</span>
                                 @endforeach
                                 @if(!$user->hasAnyRole($user->getRoleNames()->toArray()))
                                     <span class="badge bg-secondary">No Roles</span>

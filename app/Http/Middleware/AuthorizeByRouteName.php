@@ -136,6 +136,19 @@ class AuthorizeByRouteName
 
         $permission = $resourceKey . '.' . $suffix;
 
+        // Special mapping for roles and permissions routes to align with database seeds
+        if (str_starts_with($resourceKey, 'roles_permissions')) {
+            if (str_contains($resourceKey, 'role')) {
+                $permission = 'roles.manage';
+            } elseif (str_contains($resourceKey, 'permission')) {
+                $permission = 'permissions.manage';
+            } elseif (str_contains($resourceKey, 'user_roles') || str_contains($resourceKey, 'user')) {
+                $permission = 'user_roles.assign';
+            } else {
+                $permission = 'roles_permissions.view';
+            }
+        }
+
         if ($user->can($permission) || (method_exists($user, 'hasRole') && $user->hasRole('super_admin'))) {
             return $next($request);
         }

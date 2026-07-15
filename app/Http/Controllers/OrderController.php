@@ -493,8 +493,8 @@ class OrderController extends Controller
     {
         $order->load(['order_items.product', 'order_items.variationCombination']);
 
-        // Users who can manage orders (assign/update), including super_admin
-        $users = User::role('super_admin')->orWhereHas('permissions', function($q){
+        // Users who can manage orders (assign/update), including admin and super_admin
+        $users = User::role(['admin', 'super_admin'])->orWhereHas('permissions', function($q){
             $q->whereIn('name', ['orders.update','orders.update_status','orders.update_item']);
         })->get();
         return view("admin.orders.edit", compact("order", "users"));

@@ -181,8 +181,14 @@
             @forelse($roles as $role)
                 <tr>
                     <td class="align-middle"><strong>{{ $role->name }}</strong></td>
-                    <td class="align-middle">
-                        <div class="small text-muted">{{ $role->permissions->pluck('name')->join(', ') ?: 'None' }}</div>
+                    <td class="align-middle" style="max-width: 600px;">
+                        <div class="d-flex flex-wrap" style="gap: 4px;">
+                            @forelse($role->permissions as $perm)
+                                <span class="badge bg-light text-secondary border" style="font-size: 10px; padding: 4px 6px; font-weight: normal;">{{ $perm->name }}</span>
+                            @empty
+                                <span class="text-muted small">None</span>
+                            @endforelse
+                        </div>
                     </td>
                     <td class="align-middle text-end role-actions">
                         <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editRoleModal{{ $role->id }}">Edit</button>

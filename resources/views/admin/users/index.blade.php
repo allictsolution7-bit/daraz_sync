@@ -53,9 +53,7 @@
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
                         <td>
-                            @if ($user->hasRole('super_admin'))
-                                <span class="badge bg-danger">Super Admin</span>
-                            @elseif($user->getRoleNames()->count())
+                            @if($user->getRoleNames()->count())
                                 @foreach($user->getRoleNames() as $role)
                                     <span class="badge bg-info">{{ $role }}</span>
                                 @endforeach
