@@ -89,6 +89,7 @@ class AuthorizeByRouteName
             'reports' => 'view',
             'results' => 'results',
             'result-details' => 'result_details',
+            'payment-gateway' => 'view',
             // create
             'create' => 'create',
             'store' => 'create',

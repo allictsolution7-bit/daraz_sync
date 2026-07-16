@@ -448,6 +448,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
 
     // Site Settings
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::get('/settings/payment-gateway', [SettingController::class, 'paymentGateway'])->name('settings.payment-gateway');
     Route::post('/settings/update', [SettingController::class, 'update'])->name('settings.update');
     Route::post('/settings/sitemap/generate', [SettingController::class, 'generateSitemap'])->name('sitemap.generate');
 

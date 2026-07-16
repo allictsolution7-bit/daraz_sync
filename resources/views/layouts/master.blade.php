@@ -1587,6 +1587,14 @@
                                         </span>
                                     </a>
                                 </li>
+                                <li class="{{ request()->routeIs('admin.settings.payment-gateway') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.settings.payment-gateway') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-credit-card"></i>
+                                            Payment Gateway
+                                        </span>
+                                    </a>
+                                </li>
                                 @endcan
 
                                 {{-- License Management --}}

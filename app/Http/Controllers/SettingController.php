@@ -438,6 +438,16 @@ class SettingController extends Controller
     }
 
     /**
+     * Display the payment gateway settings page.
+     */
+    public function paymentGateway()
+    {
+        SettingsService::clearCache();
+        $ecommerce = SettingsService::group('ecommerce');
+        return view('admin.settings.payment_gateway', compact('ecommerce'));
+    }
+
+    /**
      * Create slug from text
      */
     private function createSlug($text)
