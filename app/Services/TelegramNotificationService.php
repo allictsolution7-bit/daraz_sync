@@ -216,6 +216,24 @@ class TelegramNotificationService
     }
 
     /**
+     * Send general message to Telegram API using bot configurations
+     */
+    public function sendGeneralMessage(string $message): bool
+    {
+        try {
+            $settings = TelegramSetting::getSettings();
+            if (!$settings->enabled || !$settings->bot_token || !$settings->chat_id) {
+                return false;
+            }
+            $this->sendToTelegram($settings, $message);
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('Telegram general notification failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Send message to Telegram API
      */
     private function sendToTelegram($settings, $message, $parseMode = 'HTML')
