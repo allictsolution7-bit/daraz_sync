@@ -450,9 +450,9 @@
                         <span class="fas fa-bars"></span>
                     </a>
                 </div>
-                <div class="searchBar">
+                <!-- <div class="searchBar">
                     <input type="search" name="search" placeholder="Search..." id="">
-                </div>
+                </div> -->
                 <!-- ... existing code ... -->
                 <div class="search-bar">
                     <form class="search-form d-flex align-items-center" method="POST" action="#">
@@ -468,11 +468,11 @@
                         <i class="bi bi-eye"></i> View Site
                     </a>
                 </div>
-                <!-- ... existing code ... -->
+
                 <ul class="navbar-item flex-row  align-items-center py-2 ml-auto ">
                     <li class="nav-item dropdown user-profile-dropdown">
-                        <a href="" class="nav-link user" id="notify" data-bs-toggle="dropdown">
-                            <img src="{{ asset('assets/img/notification.png') }}" alt="" class="icon">
+                        <a href="#" class="nav-link user" id="notificationDropdown" data-bs-toggle="dropdown">
+                            <i class="fa-regular fa-bell" style="font-size: 20px; color: #ffaa00;"></i>
                             {{-- <p class="count">5</p> --}}
                         </a>
 
@@ -558,8 +558,8 @@
                     </li> --}}
 
                     <li class="nav-item dropdown user-profile-dropdown">
-                        <a href="" class="nav-link user" id="notify" data-bs-toggle="dropdown">
-                            <img src="{{ asset('profile.svg') }}" width="38" alt="" class="icon">
+                        <a href="#" class="nav-link user" id="profileDropdown" data-bs-toggle="dropdown">
+                            <i class="fa-regular fa-user" style="font-size: 20px; color: #ff3366;"></i>
                         </a>
 
                         <div class="dropdown-menu usr">
@@ -600,8 +600,8 @@
 
                     </li>
                     <li class="nav-item dropdown user-profile-dropdown">
-                        <a href="" class="nav-link user" id="notify" data-bs-toggle="dropdown">
-                            <img src="{{ asset('assets/img/settings.png') }}" alt="" class="icon">
+                        <a href="#" class="nav-link user" id="settingsDropdown" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-gear" style="font-size: 20px; color: #007bff;"></i>
                         </a>
                         <div class="dropdown-menu setting">
                             <div class="dp-main-menu">
@@ -617,9 +617,7 @@
                             </div>
                         </div>
                     </li>
-                    <a href="#" id="toggleSidebarMobile" class="sidebarCollapse" data-placement="button">
-                        <span class="fas fa-bars"></span>
-                    </a>
+
                 </ul>
 
             </header>
