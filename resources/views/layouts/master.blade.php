@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ asset('css/combo-offer.css') }}">
 
     <!-- Push styles section -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     @stack('styles')
 
     <style>
@@ -1641,7 +1642,7 @@
                                     <a href="{{ route('admin.subscriptions.index') }}">
                                         <span class="menu-content">
                                             <i class="fas fa-bell" style="color:#ffca28;"></i>
-                                            Subscription
+                                            News Subscription
                                         </span>
                                     </a>
                                 </li>
@@ -1838,6 +1839,110 @@
         });
     </script>
 
+
+    <!-- SweetAlert2 Global Interceptor -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Override global window.alert
+            window.alert = function(message) {
+                Swal.fire({
+                    text: message,
+                    icon: 'info',
+                    confirmButtonColor: '#4f46e5',
+                    customClass: {
+                        popup: 'premium-swal-popup'
+                    }
+                });
+            };
+
+            // Intercept all submit events that contain inline confirm(...)
+            document.addEventListener('submit', function(e) {
+                let target = e.target;
+                let onsubmitAttr = target.getAttribute('onsubmit');
+                if (!onsubmitAttr || !onsubmitAttr.includes('confirm(')) return;
+                
+                if (target.dataset.swalConfirmed === 'true') {
+                    delete target.dataset.swalConfirmed;
+                    return;
+                }
+                
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                
+                let message = "Are you sure you want to proceed?";
+                let match = onsubmitAttr.match(/confirm\s*\(\s*['"`](.*?)['"`]\s*\)/);
+                if (match && match[1]) {
+                    message = match[1];
+                }
+                
+                Swal.fire({
+                    title: 'Confirmation Required',
+                    text: message,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4f46e5',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Yes, proceed',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        popup: 'premium-swal-popup'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        target.dataset.swalConfirmed = 'true';
+                        target.submit();
+                    }
+                });
+            }, true);
+
+            // Intercept all click events that contain inline confirm(...)
+            document.addEventListener('click', function(e) {
+                let target = e.target.closest('[onclick*="confirm("]');
+                if (!target) return;
+                
+                if (target.dataset.swalConfirmed === 'true') {
+                    delete target.dataset.swalConfirmed;
+                    return;
+                }
+                
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                
+                let onclickAttr = target.getAttribute('onclick');
+                let message = "Are you sure you want to proceed?";
+                let match = onclickAttr.match(/confirm\s*\(\s*['"`](.*?)['"`]\s*\)/);
+                if (match && match[1]) {
+                    message = match[1];
+                }
+                
+                Swal.fire({
+                    title: 'Confirmation Required',
+                    text: message,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4f46e5',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Yes, proceed',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        popup: 'premium-swal-popup'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        target.dataset.swalConfirmed = 'true';
+                        target.click();
+                    }
+                });
+            }, true);
+        });
+    </script>
+    <style>
+        .premium-swal-popup {
+            font-family: 'Outfit', sans-serif !important;
+            border-radius: 16px !important;
+        }
+    </style>
 
     <!-- Push scripts section -->
     @stack('scripts')

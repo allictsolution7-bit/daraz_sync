@@ -583,18 +583,59 @@
         <div class="container-fluid">
             <!-- Redesigned Portal Header -->
             <div class="portal-header">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-4">
                     <div>
-                        <h1>Command & Control Center</h1>
-                        <p>Real-time telemetry, transaction flows, and operational analytics</p>
+                        <h1>Bazarei Store Control Hub</h1>
+                        <p>Welcome back, {{ Auth::user()->name ?? 'Administrator' }}. Monitoring live sales, store performance metrics, and active channels.</p>
                     </div>
-                    <div>
-                        <span class="badge bg-white text-dark px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">
-                            Active Environment
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <div class="system-status-pill d-flex align-items-center gap-2 px-3 py-2 bg-white bg-opacity-10 rounded-3 shadow-sm text-white" style="backdrop-filter: blur(5px); font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.15);">
+                            <span class="status-indicator-dot" style="width: 8px; height: 8px; display: inline-block; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981; animation: pulse-green 2s infinite;"></span>
+                            <span class="fw-semibold">System Online</span>
+                        </div>
+                        <div class="system-status-pill d-flex align-items-center gap-2 px-3 py-2 bg-white bg-opacity-10 rounded-3 shadow-sm text-white" style="backdrop-filter: blur(5px); font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.15);">
+                            <i class="far fa-clock"></i>
+                            <span id="live-digital-clock" class="fw-semibold">--:--:--</span>
+                        </div>
+                        <span class="badge bg-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px; color: #1e1b4b;">
+                            Production Mode
                         </span>
                     </div>
                 </div>
             </div>
+            <style>
+                @keyframes pulse-green {
+                    0% {
+                        transform: scale(0.95);
+                        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+                    }
+                    70% {
+                        transform: scale(1);
+                        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+                    }
+                    100% {
+                        transform: scale(0.95);
+                        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+                    }
+                }
+            </style>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    function updateClock() {
+                        const clock = document.getElementById('live-digital-clock');
+                        if (!clock) return;
+                        const now = new Date();
+                        clock.textContent = now.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: true
+                        });
+                    }
+                    updateClock();
+                    setInterval(updateClock, 1000);
+                });
+            </script>
 
             <!-- Analytics Control Bar -->
             <div class="analytics-control-bar">

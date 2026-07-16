@@ -1,245 +1,642 @@
 @extends('layouts.master')
 
 @section('styles')
+    <!-- Google Fonts for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/datetime/1.5.0/css/dataTables.dateTime.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/colreorder/1.7.0/css/colReorder.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
     <style>
-        .filter-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #dee2e6;
+        /* Modern Design Tokens */
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --font: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-        .filter-row {
+
+        body {
+            font-family: var(--font) !important;
+            background-color: #f1f5f9;
+        }
+
+        .dashboard-container {
+            padding: 2rem 1.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Breadcrumb Styling */
+        .modern-breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+        .modern-breadcrumb .breadcrumb-item {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .modern-breadcrumb .breadcrumb-item a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .modern-breadcrumb .breadcrumb-item a:hover {
+            color: var(--primary);
+        }
+        .modern-breadcrumb .breadcrumb-item.active {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        /* Header / Title block */
+        .page-header-block {
             display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
-            gap:5px;
-            align-items: end;
+            gap: 1rem;
         }
-        .filter-group {
-            flex: 1;
-            min-width: 150px;
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0;
+            letter-spacing: -0.02em;
         }
-        .filter-group label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            display: block;
+        .page-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
         }
-        .filter-group select,
-        .filter-group input {
-            width: 100%;
-            height: 38px;
-            padding: 8px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+
+        /* Sleek Cards */
+        .modern-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-        .filter-actions {
-            display: flex;
-            gap: 10px;
-            align-items: end;
+        .modern-card:hover {
+            box-shadow: var(--shadow);
         }
-        .btn-filter {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .btn-clear {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-apply {
-            background: #197A94;
-            color: white;
-        }
-        .btn-apply:hover {
-            background: #0056b3;
-        }
-        .btn-clear:hover {
-            background: #545b62;
-        }
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .price-high {
-            color: #28a745;
-            font-weight: 600;
-        }
-        .price-medium {
-            color: #ffc107;
-            font-weight: 600;
-        }
-        .price-low {
-            color: #dc3545;
-            font-weight: 600;
-        }
-        .dataTables_wrapper .dt-buttons {
-            margin-bottom: 10px;
-        }
-        .dt-button {
-            background: #197A94 !important;
-            color: white !important;
-            border: none !important;
-            padding: 8px 16px !important;
-            border-radius: 4px !important;
-            margin-right: 5px !important;
-        }
-        .dt-button:hover {
-            background: #0056b3 !important;
-        }
-        .bottom {
+
+        /* Beautiful Filters Panel */
+        .filter-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: -10px;
+            cursor: pointer;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--border);
+            margin-bottom: 1rem;
         }
-        .dataTables_length{
-           margin-top: 10px;
-           margin-bottom: 0 !important;
+        .filter-header h6 {
+            margin: 0;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .dataTables_info{
-            margin-top: 0 !important;
+        .filter-toggle-icon {
+            transition: transform 0.3s;
+            color: #64748b;
         }
-        
-        /* Action buttons styling */
-        .btn-outline-info {
-            margin-right: 5px;
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.25rem;
+            transition: all 0.3s ease-in-out;
         }
-        
-        .btn-outline-primary {
-            margin-right: 5px;
+        .filter-grid.collapsed {
+            display: none;
         }
-        
-        .btn-outline-secondary {
-            margin-right: 5px;
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
-        
-        .btn-outline-danger {
-            margin-right: 5px;
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
         }
-        
-        /* Copy link button success state */
-        .copy-link-btn.btn-success {
-            border-color: #28a745;
-            color: #28a745;
+        .filter-group select,
+        .filter-group input {
+            height: 42px;
+            padding: 0.5rem 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--dark);
+            background-color: var(--light);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        
-        .copy-link-btn.btn-success:hover {
-            background-color: #28a745;
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+            background-color: #ffffff;
+        }
+        .filter-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .btn-modern {
+            height: 42px;
+            padding: 0 1.25rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-modern-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+        .btn-modern-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+        .btn-modern-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+        .btn-modern-secondary:hover {
+            background-color: #cbd5e1;
+        }
+        .btn-modern-danger {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+        .btn-modern-danger:hover {
+            background-color: var(--danger);
             color: white;
+            transform: translateY(-1px);
+        }
+        .btn-modern-warning {
+            background-color: var(--warning-light);
+            color: var(--warning);
+        }
+        .btn-modern-warning:hover {
+            background-color: var(--warning);
+            color: white;
+            transform: translateY(-1px);
+        }
+        .btn-modern-success {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+        .btn-modern-success:hover {
+            background-color: var(--success);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Action bar */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .left-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* DataTable Customizations */
+        .table-responsive-wrapper {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+        table.dataTable {
+            border-collapse: separate !important;
+            border-spacing: 0 0.5rem !important;
+            width: 100% !important;
+            margin-top: 1rem !important;
+        }
+        table.dataTable thead th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.05em !important;
+            border-bottom: 2px solid var(--border) !important;
+            padding: 12px 16px !important;
+        }
+        table.dataTable tbody tr {
+            background-color: #ffffff !important;
+            transition: all 0.2s ease;
+        }
+        table.dataTable tbody tr:hover {
+            background-color: #f8fafc !important;
+            transform: scale(1.002);
+            box-shadow: var(--shadow-sm);
+        }
+        table.dataTable tbody td {
+            padding: 14px 16px !important;
+            border-bottom: 1px solid var(--border) !important;
+            font-size: 0.875rem !important;
+            color: var(--dark) !important;
+            vertical-align: middle !important;
+        }
+
+        /* Custom Checkbox */
+        .custom-control-input {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .custom-control-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Badges Styling */
+        .badge-modern {
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .badge-simple { background: #dbeafe; color: #1e40af; }
+        .badge-variable { background: #f3e8ff; color: #6b21a8; }
+        .badge-digital { background: #d1fae5; color: #065f46; }
+        .badge-affiliate { background: #fef3c7; color: #92400e; }
+        .badge-unknown { background: #e2e8f0; color: #475569; }
+
+        .status-badge-modern {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            display: inline-flex;
+        }
+        .status-active-modern {
+            background-color: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+        .status-inactive-modern {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* Product image */
+        .product-thumbnail {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+        .product-thumbnail:hover {
+            transform: scale(1.1);
+        }
+
+        /* Price text */
+        .price-modern {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        /* Views Display */
+        .views-display {
+            font-size: 0.825rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .views-icon {
+            color: #94a3b8;
+            margin-right: 4px;
+        }
+
+        /* Datatables controls restyling */
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 1.5rem;
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            height: 40px;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            width: 260px;
+            outline: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+        .dataTables_wrapper .dt-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .dt-button-modern {
+            background: #ffffff !important;
+            color: #475569 !important;
+            border: 1px solid var(--border) !important;
+            padding: 8px 14px !important;
+            border-radius: 8px !important;
+            font-size: 0.825rem !important;
+            font-weight: 600 !important;
+            transition: all 0.2s !important;
+            box-shadow: var(--shadow-sm) !important;
+        }
+        .dt-button-modern:hover {
+            background: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: var(--dark) !important;
+        }
+        .bottom-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .dataTables_info {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .dataTables_length select {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-weight: 500;
+            outline: none;
+        }
+
+        /* Action Buttons */
+        .action-buttons-group {
+            display: flex;
+            gap: 0.35rem;
+        }
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            text-decoration: none;
+        }
+        .action-btn-copy {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+        .action-btn-copy:hover {
+            background-color: #cbd5e1;
+            color: var(--dark);
+        }
+        .action-btn-edit {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+        .action-btn-edit:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        .action-btn-delete {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+        .action-btn-delete:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+        .action-btn-view {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+        .action-btn-view:hover {
+            background-color: var(--success);
+            color: white;
+        }
+
+        /* SweetAlert2 Premium Customizations */
+        .swal2-popup {
+            font-family: var(--font) !important;
+            border-radius: 16px !important;
+            padding: 2rem !important;
+        }
+        .swal2-title {
+            font-weight: 800 !important;
+            color: var(--dark) !important;
+            font-size: 1.5rem !important;
+        }
+        .swal2-html-container {
+            font-size: 0.95rem !important;
+            color: #475569 !important;
+            font-weight: 500 !important;
+        }
+        .swal2-confirm {
+            background-color: var(--primary) !important;
+            border-radius: 10px !important;
+            font-weight: 600 !important;
+            padding: 10px 24px !important;
+        }
+        .swal2-cancel {
+            border-radius: 10px !important;
+            font-weight: 600 !important;
+            padding: 10px 24px !important;
         }
     </style>
 @endsection
 
 @section('content')
-    <div class="container-flud mt-5">
+    <div class="dashboard-container">
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb">
+        <nav aria-label="breadcrumb" class="modern-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('admin') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Products</li>
+                <li class="breadcrumb-item active" aria-current="page">Product Catalog</li>
             </ol>
         </nav>
-        <h5 class="mb-2">All Products</h5>
 
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <select id="primary-category-filter">
-                        <option value="">All Categories</option>
-                        @foreach(\App\Models\ProductCategory::where('status', 'active')->orderBy('name')->get() as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <select id="subcategory-filter" disabled>
-                        <option value="">Select a primary category first</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <select id="third-category-filter" disabled>
-                        <option value="">Select a subcategory first</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <select id="status-filter">
-                        <option value="">All Status</option>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <select id="product-type-filter">
-                        <option value="">All Types</option>
-                        <option value="simple">Simple</option>
-                        <option value="variable">Variable</option>
-                        <option value="digital">Digital</option>
-                        <option value="affiliate">Affiliate</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <input type="number" id="price-min" placeholder="Min Price" min="0">
-                </div>
-                <div class="filter-group">
-                    <input type="number" id="price-max" placeholder="Max Price" min="0">
-                </div>
-                <div class="filter-group">
-                    <input type="date" id="date-from">
-                </div>
-                <div class="filter-group">
-                    <input type="date" id="date-to">
-                </div>
-                <div class="filter-actions">
-                    <button class="btn-filter btn-apply" id="apply-filters"><i class="fas fa-filter"></i> Apply Filters</button>
-                    <button class="btn-filter btn-clear" id="clear-filters"><i class="fas fa-times"></i> Clear All</button>
+        <!-- Page Header Block -->
+        <div class="page-header-block">
+            <div>
+                <h1 class="page-title">Product Inventory</h1>
+                <p class="page-subtitle">Manage, filter, and export all digital and physical store products.</p>
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="modern-card">
+            <div class="filter-header" id="toggleFilterBtn">
+                <h6><i class="fas fa-sliders-h text-primary"></i> Advanced Filter Options</h6>
+                <i class="fas fa-chevron-down filter-toggle-icon" id="filterChevron"></i>
+            </div>
+            <div id="filterCollapseBody">
+                <div class="filter-grid mt-3">
+                    <div class="filter-group">
+                        <label>Primary Category</label>
+                        <select id="primary-category-filter">
+                            <option value="">All Categories</option>
+                            @foreach(\App\Models\ProductCategory::where('status', 'active')->orderBy('name')->get() as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Subcategory</label>
+                        <select id="subcategory-filter" disabled>
+                            <option value="">Select a primary category first</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Third Category</label>
+                        <select id="third-category-filter" disabled>
+                            <option value="">Select a subcategory first</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="status-filter">
+                            <option value="">All Statuses</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Product Type</label>
+                        <select id="product-type-filter">
+                            <option value="">All Types</option>
+                            <option value="simple">Simple</option>
+                            <option value="variable">Variable</option>
+                            <option value="digital">Digital</option>
+                            <option value="affiliate">Affiliate</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Min Price</label>
+                        <input type="number" id="price-min" placeholder="Min ৳" min="0">
+                    </div>
+                    <div class="filter-group">
+                        <label>Max Price</label>
+                        <input type="number" id="price-max" placeholder="Max ৳" min="0">
+                    </div>
+                    <div class="filter-group">
+                        <label>Date From</label>
+                        <input type="date" id="date-from">
+                    </div>
+                    <div class="filter-group">
+                        <label>Date To</label>
+                        <input type="date" id="date-to">
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn-modern btn-modern-secondary" id="clear-filters">
+                            <i class="fas fa-undo-alt"></i> Reset
+                        </button>
+                        <button class="btn-modern btn-modern-primary" id="apply-filters">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-            <a href="{{route ("admin.product.create")}}" class="btn btn-primary rounded">Add Product</a>
-            <button id="bulk-delete-products" class="btn btn-danger rounded"><i class="fas fa-trash-alt"></i> Bulk Delete</button>
-            <button id="bulk-status-toggle" class="btn btn-warning rounded"><i class="fas fa-toggle-on"></i> Toggle Status</button>
-            <button id="export-selected" class="btn btn-success rounded"><i class="fas fa-download"></i> Export Selected</button>
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div class="left-actions">
+                <a href="{{route ('admin.product.create')}}" class="btn-modern btn-modern-primary">
+                    <i class="fas fa-plus"></i> Add Product
+                </a>
+                <button id="bulk-status-toggle" class="btn-modern btn-modern-warning">
+                    <i class="fas fa-toggle-on"></i> Toggle Status
+                </button>
+                <button id="export-selected" class="btn-modern btn-modern-success">
+                    <i class="fas fa-file-export"></i> Export Selected
+                </button>
+                <button id="bulk-delete-products" class="btn-modern btn-modern-danger">
+                    <i class="fas fa-trash-alt"></i> Bulk Delete
+                </button>
+            </div>
         </div>
-        
-        <table class="table table-striped" id="Products" style="width:100%">
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="select-all-products"></th>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Image</th>
-                    <th>Category</th>
-                    <th>Type</th>
-                    <th>Price</th>
-                    <th>Views (T/U)</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+
+        <!-- Table Container -->
+        <div class="table-responsive-wrapper">
+            <table class="table table-hover" id="Products" style="width:100%">
+                <thead>
+                    <tr>
+                        <th width="30"><input type="checkbox" class="custom-control-input" id="select-all-products"></th>
+                        <th>#</th>
+                        <th>Product Details</th>
+                        <th>Image</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Views (T/U)</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th width="150">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 @endsection
 
@@ -255,9 +652,24 @@
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function() {
+            // Collapse filter card animation
+            $('#toggleFilterBtn').click(function() {
+                const grid = $('#filterCollapseBody');
+                const chevron = $('#filterChevron');
+                if (grid.is(':visible')) {
+                    grid.slideUp(200);
+                    chevron.css('transform', 'rotate(-90deg)');
+                } else {
+                    grid.slideDown(200);
+                    chevron.css('transform', 'rotate(0deg)');
+                }
+            });
+
             const selectedProductIds = new Set();
             let customFilters = {};
 
@@ -268,60 +680,59 @@
                     url: '{{ route('admin.products.data') }}',
                     type: 'GET',
                     data: function(d) {
-                        // Add custom filters to the request
                         return $.extend({}, d, customFilters);
                     }
                 },
                 columns: [
-                    { data: 'checkbox', orderable: false, searchable: false },
+                    { data: 'checkbox', orderable: false, searchable: false, render: function(data, type, row) {
+                        return `<input type="checkbox" class="custom-control-input product-checkbox" value="${row.id}">`;
+                    }},
                     { data: 'id' },
                     { data: 'title', render: function(data) {
                         if (!data) return '<span class="text-muted">N/A</span>';
-                        const maxLength = 30;
+                        const maxLength = 40;
                         if (data.length > maxLength) {
-                            return `<span title="${data}">${data.substring(0, maxLength)}...</span>`;
+                            return `<span class="fw-semibold" title="${data}">${data.substring(0, maxLength)}...</span>`;
                         }
-                        return data;
+                        return `<span class="fw-semibold">${data}</span>`;
                     }},
                     { data: 'thumb_image', orderable: false, searchable: false, render: function(path){
                         if (!path) return '<span class="text-muted">No Image</span>';
                         const url = path.startsWith('http') ? path : `{{ asset('storage') }}/${path}`;
-                        return `<img src="${url}" width="28" class="rounded">`;
+                        return `<img src="${url}" class="product-thumbnail">`;
                     }},
                     { data: 'category_display', render: function(data) {
                         return data || '<span class="text-muted">N/A</span>';
                     }},
                     { data: 'product_type', render: function(data) {
                         const types = {
-                            'simple': '<span class="badge bg-primary">Simple</span>',
-                            'variable': '<span class="badge bg-info">Variable</span>',
-                            'digital': '<span class="badge bg-success">Digital</span>',
-                            'affiliate': '<span class="badge bg-warning">Affiliate</span>'
+                            'simple': '<span class="badge-modern badge-simple"><i class="fas fa-cube"></i> Simple</span>',
+                            'variable': '<span class="badge-modern badge-variable"><i class="fas fa-boxes"></i> Variable</span>',
+                            'digital': '<span class="badge-modern badge-digital"><i class="fas fa-download"></i> Digital</span>',
+                            'affiliate': '<span class="badge-modern badge-affiliate"><i class="fas fa-link"></i> Affiliate</span>'
                         };
-                        return types[data] || '<span class="badge bg-secondary">Unknown</span>';
+                        return types[data] || '<span class="badge-modern badge-unknown">Unknown</span>';
                     }},
                     { data: 'price_display', render: function(data, type, row) {
                         if (!data) return '<span class="text-muted">N/A</span>';
                         
-                        // Check if it's a price range (contains '-')
                         if (typeof data === 'string' && data.includes(' - ')) {
-                            return `<span class="price-high">৳${data}</span>`;
+                            return `<span class="price-modern">৳${data}</span>`;
                         }
                         
-                        // Single price
                         const price = parseFloat(data);
                         if (isNaN(price)) return '<span class="text-muted">N/A</span>';
                         
-                        return `<span class="price-high">৳${price.toFixed(2)}</span>`;
+                        return `<span class="price-modern">৳${price.toFixed(2)}</span>`;
                     }},
                     { data: 'views', orderable: false, searchable: false, render: function(data) {
                         if (!data) return '<span class="text-muted">0 / 0</span>';
-                        return data;
+                        return `<span class="views-display"><i class="far fa-eye views-icon"></i>${data}</span>`;
                     }},
                     { data: 'status', render: function(data) {
                         return data == 1 ? 
-                            '<span class="status-badge status-active">Active</span>' : 
-                            '<span class="status-badge status-inactive">Inactive</span>';
+                            '<span class="status-badge-modern status-active-modern"><i class="fas fa-check-circle me-1"></i> Active</span>' : 
+                            '<span class="status-badge-modern status-inactive-modern"><i class="fas fa-times-circle me-1"></i> Inactive</span>';
                     }},
                     { data: 'created_at', render: function(data) {
                         if (!data) return '<span class="text-muted">N/A</span>';
@@ -331,39 +742,41 @@
                             day: 'numeric'
                         });
                     }},
-                    { data: 'actions', orderable: false, searchable: false }
+                    { data: 'actions', orderable: false, searchable: false, render: function(data, type, row) {
+                        return data;
+                    }}
                 ],
-                dom: '<"top"Bf>rt<"bottom"lip>',
+                dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"Bf>rt<"bottom-controls"lip>',
                 buttons: [
                     {
                         extend: 'copy',
                         text: '<i class="fas fa-copy"></i> Copy',
-                        className: 'btn btn-sm btn-outline-secondary'
+                        className: 'dt-button-modern'
                     },
                     {
                         extend: 'csv',
                         text: '<i class="fas fa-file-csv"></i> CSV',
-                        className: 'btn btn-sm btn-outline-secondary'
+                        className: 'dt-button-modern'
                     },
                     {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel"></i> Excel',
-                        className: 'btn btn-sm btn-outline-secondary'
+                        className: 'dt-button-modern'
                     },
                     {
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf"></i> PDF',
-                        className: 'btn btn-sm btn-outline-secondary'
+                        className: 'dt-button-modern'
                     },
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print"></i> Print',
-                        className: 'btn btn-sm btn-outline-secondary'
+                        className: 'dt-button-modern'
                     },
                     {
                         extend: 'colvis',
                         text: '<i class="fas fa-columns"></i> Columns',
-                        className: 'btn btn-sm btn-outline-secondary'
+                        className: 'dt-button-modern'
                     }
                 ],
                 responsive: true,
@@ -503,6 +916,13 @@
                     const id = $(this).val();
                     $(this).prop('checked', selectedProductIds.has(id));
                 });
+                
+                // Add modern button styling to the action buttons loaded dynamically
+                $('a.btn-outline-info', rows).removeClass('btn btn-outline-info').addClass('action-btn action-btn-view').html('<i class="fas fa-eye"></i>');
+                $('a.btn-outline-primary', rows).removeClass('btn btn-outline-primary').addClass('action-btn action-btn-edit').html('<i class="fas fa-edit"></i>');
+                $('button.copy-link-btn', rows).removeClass('btn btn-outline-secondary').addClass('action-btn action-btn-copy');
+                $('a.btn-outline-danger', rows).removeClass('btn btn-outline-danger').addClass('action-btn action-btn-delete').html('<i class="fas fa-trash-alt"></i>');
+                
                 $('input.product-checkbox', rows).off('change').on('change', function() {
                     const id = $(this).val();
                     if (this.checked) selectedProductIds.add(id); else selectedProductIds.delete(id);
@@ -528,42 +948,71 @@
                     const selected = Array.from(selectedProductIds);
 
                     if (selected.length === 0) {
-                        alert('Please select at least one product to delete.');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'No Selection',
+                            text: 'Please select at least one product to delete.',
+                            confirmButtonColor: '#4f46e5'
+                        });
                         return;
                     }
 
-                    if (!confirm('Are you sure you want to delete the selected products? This action cannot be undone.')) {
-                        return;
-                    }
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'Are you sure you want to delete the selected products? This action cannot be undone.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Yes, delete them!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            bulkDeleteBtn.disabled = true;
+                            const originalHtml = bulkDeleteBtn.innerHTML;
+                            bulkDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
 
-                    bulkDeleteBtn.disabled = true;
-                    const originalHtml = bulkDeleteBtn.innerHTML;
-                    bulkDeleteBtn.innerHTML = 'Deleting...';
-
-                    fetch("{{ route('admin.products.bulk-delete') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ product_ids: selected })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message || 'Selected products deleted successfully!');
-                            selectedProductIds.clear();
-                            table.ajax.reload();
-                        } else {
-                            alert(data.message || 'Failed to delete selected products.');
+                            fetch("{{ route('admin.products.bulk-delete') }}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({ product_ids: selected })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Deleted!',
+                                        text: data.message || 'Selected products deleted successfully!',
+                                        confirmButtonColor: '#4f46e5'
+                                    });
+                                    selectedProductIds.clear();
+                                    table.ajax.reload();
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Failed',
+                                        text: data.message || 'Failed to delete selected products.',
+                                        confirmButtonColor: '#4f46e5'
+                                    });
+                                }
+                            })
+                            .catch(() => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'An error occurred while deleting products.',
+                                    confirmButtonColor: '#4f46e5'
+                                });
+                            })
+                            .finally(() => {
+                                bulkDeleteBtn.disabled = false;
+                                bulkDeleteBtn.innerHTML = originalHtml;
+                            });
                         }
-                    })
-                    .catch(() => {
-                        alert('An error occurred while deleting products.');
-                    })
-                    .finally(() => {
-                        bulkDeleteBtn.disabled = false;
-                        bulkDeleteBtn.innerHTML = originalHtml;
                     });
                 });
             }
@@ -575,42 +1024,83 @@
                     const selected = Array.from(selectedProductIds);
 
                     if (selected.length === 0) {
-                        alert('Please select at least one product to toggle status.');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'No Selection',
+                            text: 'Please select at least one product to toggle status.',
+                            confirmButtonColor: '#4f46e5'
+                        });
                         return;
                     }
 
-                    const newStatus = confirm('Toggle status for selected products? Click OK for Active, Cancel for Inactive.') ? 1 : 0;
-
-                    bulkStatusToggleBtn.disabled = true;
-                    const originalHtml = bulkStatusToggleBtn.innerHTML;
-                    bulkStatusToggleBtn.innerHTML = 'Updating...';
-
-                    fetch("{{ route('admin.products.bulk-status-toggle') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ 
-                            product_ids: selected,
-                            status: newStatus
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message || 'Status updated successfully!');
-                            table.ajax.reload();
+                    Swal.fire({
+                        title: 'Select Status',
+                        text: 'Toggle status for selected products. Choose the new state:',
+                        icon: 'question',
+                        showCancelButton: true,
+                        showDenyButton: true,
+                        confirmButtonColor: '#10b981',
+                        denyButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Active',
+                        denyButtonText: 'Inactive',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        let newStatus;
+                        if (result.isConfirmed) {
+                            newStatus = 1;
+                        } else if (result.isDenied) {
+                            newStatus = 0;
                         } else {
-                            alert(data.message || 'Failed to update status.');
+                            return; // Cancelled
                         }
-                    })
-                    .catch(() => {
-                        alert('An error occurred while updating status.');
-                    })
-                    .finally(() => {
-                        bulkStatusToggleBtn.disabled = false;
-                        bulkStatusToggleBtn.innerHTML = originalHtml;
+
+                        bulkStatusToggleBtn.disabled = true;
+                        const originalHtml = bulkStatusToggleBtn.innerHTML;
+                        bulkStatusToggleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+                        fetch("{{ route('admin.products.bulk-status-toggle') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ 
+                                product_ids: selected,
+                                status: newStatus
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Updated!',
+                                    text: data.message || 'Status updated successfully!',
+                                    confirmButtonColor: '#4f46e5'
+                                });
+                                table.ajax.reload();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed',
+                                    text: data.message || 'Failed to update status.',
+                                    confirmButtonColor: '#4f46e5'
+                                });
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                    title: 'Error',
+                                    text: 'An error occurred while updating status.',
+                                    confirmButtonColor: '#4f46e5'
+                            });
+                        })
+                        .finally(() => {
+                            bulkStatusToggleBtn.disabled = false;
+                            bulkStatusToggleBtn.innerHTML = originalHtml;
+                        });
                     });
                 });
             }
@@ -622,11 +1112,15 @@
                     const selected = Array.from(selectedProductIds);
 
                     if (selected.length === 0) {
-                        alert('Please select at least one product to export.');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'No Selection',
+                            text: 'Please select at least one product to export.',
+                            confirmButtonColor: '#4f46e5'
+                        });
                         return;
                     }
 
-                    // Create a temporary form to download the export
                     const form = document.createElement('form');
                     form.method = 'POST';
                     form.action = "{{ route('admin.products.export-selected') }}";
@@ -655,19 +1149,26 @@
                 const button = $(this);
                 const originalHtml = button.html();
                 
-                // Copy to clipboard
                 navigator.clipboard.writeText(url).then(function() {
-                    // Show success feedback
                     button.html('<i class="fas fa-check"></i>');
-                    button.removeClass('btn-outline-secondary').addClass('btn-success');
+                    button.css('background-color', '#10b981').css('color', '#ffffff');
                     
-                    // Reset button after 2 seconds
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copied!',
+                        text: 'Product link copied to clipboard.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+
                     setTimeout(function() {
                         button.html(originalHtml);
-                        button.removeClass('btn-success').addClass('btn-outline-secondary');
+                        button.css('background-color', '').css('color', '');
                     }, 2000);
                 }).catch(function() {
-                    // Fallback for older browsers
                     const textArea = document.createElement('textarea');
                     textArea.value = url;
                     document.body.appendChild(textArea);
@@ -675,14 +1176,23 @@
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
                     
-                    // Show success feedback
                     button.html('<i class="fas fa-check"></i>');
-                    button.removeClass('btn-outline-secondary').addClass('btn-success');
+                    button.css('background-color', '#10b981').css('color', '#ffffff');
                     
-                    // Reset button after 2 seconds
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copied!',
+                        text: 'Product link copied to clipboard.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+
                     setTimeout(function() {
                         button.html(originalHtml);
-                        button.removeClass('btn-success').addClass('btn-outline-secondary');
+                        button.css('background-color', '').css('color', '');
                     }, 2000);
                 });
             });
