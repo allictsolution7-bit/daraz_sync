@@ -145,6 +145,20 @@
                 padding: 3px 5px;
             }
         }
+
+        /* Global breadcrumb styling and top space reduction */
+        .breadcrumb {
+            justify-content: flex-end !important;
+            background: transparent !important;
+            padding: 0 !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .dashboard-container, .container-fluid, .content-wrapper > div {
+            padding-top: 0.75rem !important;
+        }
+        .page-header-block {
+            margin-bottom: 1rem !important;
+        }
     </style>
     <style>
         .dataTables_wrapper tbody tr,

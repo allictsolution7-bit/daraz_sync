@@ -39,7 +39,7 @@
         }
 
         .dashboard-container {
-            padding: 2rem 1.5rem;
+            padding: 0.75rem 1.5rem;
             max-width: 1600px;
             margin: 0 auto;
         }
@@ -48,7 +48,7 @@
         .modern-breadcrumb {
             background: transparent;
             padding: 0;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0;
         }
         .modern-breadcrumb .breadcrumb-item {
             font-size: 0.875rem;
@@ -72,31 +72,31 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
         .page-title {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: var(--dark);
             margin: 0;
             letter-spacing: -0.02em;
         }
         .page-subtitle {
-            font-size: 0.875rem;
+            font-size: 0.825rem;
             color: #64748b;
-            margin-top: 0.25rem;
+            margin-top: 0.15rem;
         }
 
         /* Sleek Cards */
         .modern-card {
             background: #ffffff;
-            border-radius: 16px;
+            border-radius: 12px;
             border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
             transition: transform 0.3s, box-shadow 0.3s;
         }
         .modern-card:hover {
@@ -109,9 +109,9 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            padding-bottom: 1rem;
+            padding-bottom: 0.5rem;
             border-bottom: 1px dashed var(--border);
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
         .filter-header h6 {
             margin: 0;
@@ -120,6 +120,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.9rem;
         }
         .filter-toggle-icon {
             transition: transform 0.3s;
@@ -128,7 +129,7 @@
         .filter-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1.25rem;
+            gap: 0.75rem;
             transition: all 0.3s ease-in-out;
         }
         .filter-grid.collapsed {
@@ -137,10 +138,10 @@
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.35rem;
         }
         .filter-group label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -148,11 +149,11 @@
         }
         .filter-group select,
         .filter-group input {
-            height: 42px;
-            padding: 0.5rem 0.875rem;
+            height: 36px;
+            padding: 0.35rem 0.75rem;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 0.875rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
             font-weight: 500;
             color: var(--dark);
             background-color: var(--light);
@@ -512,30 +513,29 @@
 
 @section('content')
     <div class="dashboard-container">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="modern-breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('admin') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Product Catalog</li>
-            </ol>
-        </nav>
-
         <!-- Page Header Block -->
         <div class="page-header-block">
             <div>
                 <h1 class="page-title">Product Inventory</h1>
                 <p class="page-subtitle">Manage, filter, and export all digital and physical store products.</p>
             </div>
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="modern-breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('admin') }}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Product Catalog</li>
+                </ol>
+            </nav>
         </div>
 
         <!-- Filter Card -->
         <div class="modern-card">
             <div class="filter-header" id="toggleFilterBtn">
                 <h6><i class="fas fa-sliders-h text-primary"></i> Advanced Filter Options</h6>
-                <i class="fas fa-chevron-down filter-toggle-icon" id="filterChevron"></i>
+                <i class="fas fa-chevron-down filter-toggle-icon" id="filterChevron" style="transform: rotate(-90deg);"></i>
             </div>
-            <div id="filterCollapseBody">
-                <div class="filter-grid mt-3">
+            <div id="filterCollapseBody" style="display: none;">
+                <div class="filter-grid mt-2">
                     <div class="filter-group">
                         <label>Primary Category</label>
                         <select id="primary-category-filter">
