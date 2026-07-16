@@ -421,6 +421,15 @@
         #sidebar>li:first-child {
             margin-top: 0;
         }
+
+        .header-container {
+            position: fixed !important;
+            z-index: 2000 !important;
+        }
+
+        .user-profile-dropdown .dropdown-menu {
+            z-index: 3000 !important;
+        }
     </style>
     @yield('styles')
 </head>
