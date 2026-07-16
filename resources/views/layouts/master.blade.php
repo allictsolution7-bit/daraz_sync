@@ -630,7 +630,7 @@
 
         @php
         $coreShopActive = request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/inventory*') || request()->is('admin/landing-pages*');
-        $ordersSalesActive = request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/incomplete-orders*') || request()->is('admin/pos*');
+        $ordersSalesActive = request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/my-assigned-orders*') || request()->is('admin/incomplete-orders*') || request()->is('admin/pos*');
         $shippingDeliveryActive = request()->is('admin/basic-shipping*') || request()->is('admin/shipping/rules*') || request()->is('admin/delivery*');
         $reportsAnalyticsActive = request()->routeIs('admin.orders.reports*') || request()->routeIs('admin.customers.reports*');
         $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/woocommerce-migration*') || request()->routeIs('admin.telegram-settings.*') || request()->is('admin/delayed-events*');
@@ -943,7 +943,7 @@
                             <ul class="left-menu-dp menu-section-list" style="{{ $ordersSalesActive ? 'display: block;' : 'display: none;' }}">
                                 @can('orders.view')
                                 <li
-                                    class="sub-menu {{ request()->is('admin/orders*') || request()->is('admin/asigned*') ? 'active' : '' }}">
+                                    class="sub-menu {{ request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/my-assigned-orders*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-box" style="color:#1d600c;"></i>
@@ -952,7 +952,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/orders*') || request()->is('admin/asigned*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/my-assigned-orders*') ? 'display: block;' : '' }}">
                                         @can('orders.view')
                                         <li class="{{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.orders.index') }}">

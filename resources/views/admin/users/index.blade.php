@@ -751,9 +751,48 @@
                 renderWorkspace();
             });
         </script>
-    @else
         <script>
+            window.deleteMockAdmin = function(id) {
+                if (confirm('Are you sure you want to delete this mock registered admin?')) {
+                    let admins = JSON.parse(localStorage.getItem('registered_admins') || '[]');
+                    admins = admins.filter(a => a.id !== id);
+                    localStorage.setItem('registered_admins', JSON.stringify(admins));
+                    location.reload();
+                }
+            };
+
             $(document).ready(function() {
+                // Dynamically inject mock registered admins
+                const mockAdmins = JSON.parse(localStorage.getItem('registered_admins') || '[]');
+                const tbody = document.querySelector('#users tbody');
+                if (tbody && mockAdmins.length > 0) {
+                    mockAdmins.forEach(adm => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <input type="checkbox" class="user-checkbox" value="${adm.id}" onchange="updateDeleteButton()">
+                            </td>
+                            <td>${adm.id}</td>
+                            <td></td>
+                            <td>${adm.name}</td>
+                            <td>${adm.email}</td>
+                            <td>
+                                <span class="badge bg-danger">admin</span>
+                                <span class="badge bg-success" style="font-size: 11px;">${adm.packageName} (${adm.billingCycle})</span>
+                            </td>
+                            <td>${adm.created_at}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-danger" title="Delete Mock Admin" onclick="deleteMockAdmin('${adm.id}')">
+                                        <img src="{{ asset('delete.svg') }}" alt="Delete" width="20">
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.insertBefore(tr, tbody.firstChild);
+                    });
+                }
+
                 $('#users').DataTable({
                     dom: 'Bfrtip',
                     buttons: [
