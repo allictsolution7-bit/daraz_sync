@@ -28,7 +28,33 @@
     .permissions-group .text-uppercase { letter-spacing: .02em; }
     .form-check-input[type=checkbox] { border-radius: .25em; margin-top: 9px; }
     .table-hover tbody tr:hover { background: #f8fafc; }
-    .role-actions .btn { margin-left: 6px; }
+    .nav-tabs-custom {
+        border-bottom: 2px solid var(--rp-border);
+        margin-bottom: 20px;
+        display: flex;
+        gap: 8px;
+    }
+    .nav-tabs-custom .nav-link {
+        border: none;
+        color: var(--rp-muted);
+        font-weight: 600;
+        padding: 10px 16px;
+        border-radius: 8px 8px 0 0;
+        transition: all 0.2s;
+        background: transparent;
+    }
+    .nav-tabs-custom .nav-link:hover {
+        color: var(--rp-primary);
+        background: #f1f5f9;
+        border: none;
+    }
+    .nav-tabs-custom .nav-link.active {
+        color: var(--rp-primary);
+        background: #fff;
+        border: 1px solid var(--rp-border);
+        border-bottom: 2px solid #fff;
+        margin-bottom: -2px;
+    }
 </style>
 @endsection
 
@@ -162,8 +188,23 @@
             ->sortKeys();
     @endphp
 
-    <!-- Roles Section -->
-    <div class="rp-card mb-3">
+    <ul class="nav nav-tabs nav-tabs-custom mb-3" id="rolesPermissionsTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="roles-tab" data-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="true"><i class="fas fa-user-shield mr-1"></i> Roles</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false"><i class="fas fa-users mr-1"></i> Users Overview</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="assign-tab" data-toggle="tab" href="#assign" role="tab" aria-controls="assign" aria-selected="false"><i class="fas fa-user-tag mr-1"></i> Assign Roles</a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="rolesPermissionsTabsContent">
+        <!-- Roles Tab -->
+        <div class="tab-pane fade show active" id="roles" role="tabpanel" aria-labelledby="roles-tab">
+            <!-- Roles Section -->
+            <div class="rp-card mb-3">
         <div class="rp-card-header d-flex justify-content-between align-items-center">
             <strong>Roles</strong>
             <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addRoleModal"><i class="fas fa-plus"></i> Add Role</button>
@@ -275,11 +316,14 @@
             @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
-    <!-- Users overview: who has roles + latest created users with quick search -->
-    <div class="rp-card mb-3">
+        <!-- Users Overview Tab -->
+        <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+            <!-- Users overview: who has roles + latest created users with quick search -->
+            <div class="rp-card mb-3">
         <div class="rp-card-header d-flex align-items-center justify-content-between">
             <strong>Users</strong>
             <div class="d-flex align-items-center" style="gap:8px;">
@@ -325,12 +369,64 @@
                             <li class="list-group-item text-muted">No users found.</li>
                         @endforelse
                     </ul>
-                </div>
             </div>
         </div>
     </div>
+</div>
+</div>
+
+        <!-- Assign Roles Tab -->
+        <div class="tab-pane fade" id="assign" role="tabpanel" aria-labelledby="assign-tab">
+            <!-- Assign Roles to Users Section -->
+            <div class="rp-card mb-3">
+        <div class="rp-card-header"><strong>Assign Roles to Users</strong></div>
+        <ul class="list-group list-group-flush">
+            @forelse($users as $user)
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ $user->name }}</strong> <span class="text-muted small">({{ $user->email }})</span><br>
+                        <span class="small">Roles:
+                            @forelse ($user->roles as $role)
+                                <span class="badge bg-primary rounded-pill">{{ $role->name }}</span>
+                            @empty
+                                <span class="badge bg-primary rounded-pill">None</span>
+                            @endforelse
+                        </span>
+                    </div>
+                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editUserRolesModal{{ $user->id }}">Edit Roles</button>
+                </li>
+                <!-- Edit User Roles Modal -->
+                <div class="modal fade" id="editUserRolesModal{{ $user->id }}" tabindex="-1">
+                    <div class="modal-dialog"><div class="modal-content">
+                        <form method="POST" action="{{ route('admin.roles_permissions.user_roles.update', $user) }}">
+                            @csrf
+                            <div class="modal-header"><h5 class="modal-title">Assign Roles to {{ $user->name }}</h5>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                @foreach($roles as $role)
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="roles[]" value="{{ $role->name }}" id="userrole_{{ $user->id }}_{{ $role->id }}" {{ $user->roles->pluck('name')->contains($role->name) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="userrole_{{ $user->id }}_{{ $role->id }}">{{ $role->name }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success">Update Roles</button>
+                            </div>
+                        </form>
+                    </div></div>
+                </div>
+            @empty
+                <li class="list-group-item text-muted">No users found.</li>
+            @endforelse
+        </ul>
+    </div>
+</div>
+    </div>
+
     <!-- Add Role Modal -->
-                <div class="modal fade" id="addRoleModal" tabindex="-1">
+    <div class="modal fade" id="addRoleModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
             <form method="POST" action="{{ route('admin.roles_permissions.role.store') }}">
                 @csrf
@@ -386,52 +482,6 @@
                 </div>
             </form>
         </div></div>
-    </div>
-
-    <!-- Assign Roles to Users Section -->
-    <div class="rp-card mb-3">
-        <div class="rp-card-header"><strong>Assign Roles to Users</strong></div>
-        <ul class="list-group list-group-flush">
-            @forelse($users as $user)
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>{{ $user->name }}</strong> <span class="text-muted small">({{ $user->email }})</span><br>
-                        <span class="small">Roles:
-                            @forelse ($user->roles as $role)
-                                <span class="badge bg-primary rounded-pill">{{ $role->name }}</span>
-                            @empty
-                                <span class="badge bg-primary rounded-pill">None</span>
-                            @endforelse
-                        </span>
-                    </div>
-                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editUserRolesModal{{ $user->id }}">Edit Roles</button>
-                </li>
-                <!-- Edit User Roles Modal -->
-                <div class="modal fade" id="editUserRolesModal{{ $user->id }}" tabindex="-1">
-                    <div class="modal-dialog"><div class="modal-content">
-                        <form method="POST" action="{{ route('admin.roles_permissions.user_roles.update', $user) }}">
-                            @csrf
-                            <div class="modal-header"><h5 class="modal-title">Assign Roles to {{ $user->name }}</h5>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body">
-                                @foreach($roles as $role)
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" name="roles[]" value="{{ $role->name }}" id="userrole_{{ $user->id }}_{{ $role->id }}" {{ $user->roles->pluck('name')->contains($role->name) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="userrole_{{ $user->id }}_{{ $role->id }}">{{ $role->name }}</label>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-success">Update Roles</button>
-                            </div>
-                        </form>
-                    </div></div>
-                </div>
-            @empty
-                <li class="list-group-item text-muted">No users found.</li>
-            @endforelse
-        </ul>
     </div>
 </div>
 @endsection 
