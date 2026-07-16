@@ -619,15 +619,15 @@
         <!-- --sidebar-start-- -->
 
         @php
-        $coreShopActive = request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/inventory*') || request()->is('admin/sliders*') || request()->is('admin/pages*') || request()->is('admin/menus*') || request()->is('admin/landing-pages*');
-        $ordersSalesActive = request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/incomplete-orders*') || request()->is('admin/pos*') || request()->is('admin/contacts*') || request()->is('admin/subscriptions*');
+        $coreShopActive = request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/inventory*') || request()->is('admin/landing-pages*');
+        $ordersSalesActive = request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/incomplete-orders*') || request()->is('admin/pos*');
         $shippingDeliveryActive = request()->is('admin/basic-shipping*') || request()->is('admin/shipping/rules*') || request()->is('admin/delivery*');
         $reportsAnalyticsActive = request()->routeIs('admin.orders.reports*') || request()->routeIs('admin.customers.reports*');
         $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/woocommerce-migration*') || request()->routeIs('admin.telegram-settings.*') || request()->is('admin/delayed-events*');
         $securityTrustActive = request()->is('admin/fraud-checker*') || request()->is('admin/fraud-protection*') || request()->is('admin/backup*');
-        $blogContentActive = request()->is('admin/post*') || request()->is('admin/category*') || request()->is('admin/postsubcategory*') || request()->is('admin/comments*');
+        $contentPagesActive = request()->is('admin/sliders*') || request()->is('admin/pages*') || request()->is('admin/menus*') || request()->is('admin/post*') || request()->is('admin/category*') || request()->is('admin/postsubcategory*') || request()->is('admin/comments*');
         $vendorsActive = request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-settings*');
-        $controlSystemActive = request()->is('admin/users*') || request()->routeIs('admin.roles_permissions.*') || request()->is('admin/modules*') || request()->is('admin/settings*') || request()->is('admin/socials*');
+        $controlSystemActive = request()->is('admin/users*') || request()->routeIs('admin.roles_permissions.*') || request()->is('admin/modules*') || request()->is('admin/settings*') || request()->is('admin/socials*') || request()->is('admin/contacts*') || request()->routeIs('admin.subscriptions.index');
         @endphp
 
         <style>
@@ -860,87 +860,6 @@
                                 </li>
                                 @endcan
 
-                                @can('sliders.view')
-                                <li class="sub-menu {{ request()->is('admin/sliders*') ? 'active' : '' }}">
-                                    <a href="#">
-                                        <span class="menu-content">
-                                            <i class="fas fa-images" style="color:#e83e8c;"></i>
-                                            Sliders
-                                        </span>
-                                        <span class="fas fa-caret-down right"></span>
-                                    </a>
-                                    <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/sliders*') ? 'display: block;' : '' }}">
-                                        @can('sliders.view')
-                                        <li class="{{ request()->routeIs('admin.sliders.index') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.sliders.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-list"></i>
-                                                    All Sliders
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('sliders.create')
-                                        <li class="{{ request()->routeIs('admin.sliders.create') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.sliders.create') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-plus-circle"></i>
-                                                    Add Slider
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                    </ul>
-                                </li>
-                                @endcan
-
-                                @can('pages.view')
-                                <li class="sub-menu {{ request()->is('admin/pages*') ? 'active' : '' }}">
-                                    <a href="#">
-                                        <span class="menu-content">
-                                            <i class="fas fa-copy" style="color:#28a745;"></i>
-                                            Pages
-                                        </span>
-                                        <span class="fas fa-caret-down right"></span>
-                                    </a>
-                                    <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/pages*') ? 'display: block;' : '' }}">
-                                        @can('pages.view')
-                                        <li class="{{ request()->routeIs('admin.pages.index') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.pages.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-file-alt"></i>
-                                                    All Pages
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('pages.create')
-                                        <li class="{{ request()->routeIs('admin.pages.create') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.pages.create') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-file-medical"></i>
-                                                    Create Page
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                    </ul>
-                                </li>
-                                @endcan
-
-                                @can('menus.view')
-                                <li class="{{ request()->is('admin/menus*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.menus.index') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-bars" style="color:#197A94;"></i>
-                                            Menu Management
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
-
                                 @can('landing_pages.view')
                                 <x-license-feature module="landing_page">
                                     <li class="sub-menu {{ request()->is('admin/landing-pages*') ? 'active' : '' }}">
@@ -1068,52 +987,6 @@
                                     </li>
                                 </x-license-feature>
                                 @endif
-                                @endcan
-
-                                @can('contacts.view')
-                                <li class="sub-menu {{ request()->is('admin/contacts*') ? 'active' : '' }}">
-                                    <a href="#">
-                                        <span class="menu-content">
-                                            <i class="fas fa-envelope" style="color:#6610f2;"></i>
-                                            Contact Messages
-                                        </span>
-                                        <span class="fas fa-caret-down right"></span>
-                                    </a>
-                                    <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/contacts*') ? 'display: block;' : '' }}">
-                                        @can('contacts.view')
-                                        <li class="{{ request()->routeIs('admin.contacts.index') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.contacts.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-inbox"></i>
-                                                    All Messages
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('contacts.unread')
-                                        <li class="{{ request()->routeIs('admin.contacts.unread') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.contacts.unread') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-envelope"></i>
-                                                    Unread Messages
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                    </ul>
-                                </li>
-                                @endcan
-
-                                @can('subscriptions.view')
-                                <li class="{{ request()->routeIs('admin.subscriptions.index') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.subscriptions.index') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-bell" style="color:#ffca28;"></i>
-                                            Subscripton
-                                        </span>
-                                    </a>
-                                </li>
                                 @endcan
                             </ul>
                         </li>
@@ -1470,95 +1343,163 @@
                             </ul>
                         </li>
 
-                        <!-- BLOG & CONTENT SECTION -->
-                        <li class="menu-section {{ $blogContentActive ? 'expanded' : 'collapsed' }}">
+                        <!-- CONTENT & PAGES SECTION -->
+                        <li class="menu-section {{ $contentPagesActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Blog & Content</span>
+                                <span>Content & Pages</span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
-                            <ul class="left-menu-dp menu-section-list" style="{{ $blogContentActive ? 'display: block;' : 'display: none;' }}">
-                                @can('blog.view')
-                                <li
-                                    class="sub-menu {{ request()->is('admin/post*') || request()->is('admin/category*') || request()->is('admin/postsubcategory*') || request()->is('admin/comments*') ? 'active' : '' }}">
+                            <ul class="left-menu-dp menu-section-list" style="{{ $contentPagesActive ? 'display: block;' : 'display: none;' }}">
+                                @can('sliders.view')
+                                <li class="sub-menu {{ request()->is('admin/sliders*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
-                                            <i class="fas fa-blog" style="color:#fd7e14;"></i>
-                                            Blog & Categories
+                                            <i class="fas fa-images" style="color:#e83e8c;"></i>
+                                            Sliders
                                         </span>
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/post*') || request()->is('admin/category*') || request()->is('admin/postsubcategory*') || request()->is('admin/comments*') ? 'display: block;' : '' }}">
-                                        <li class="{{ request()->routeIs('admin.post.index') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.post.index') }}">
+                                        style="{{ request()->is('admin/sliders*') ? 'display: block;' : '' }}">
+                                        @can('sliders.view')
+                                        <li class="{{ request()->routeIs('admin.sliders.index') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.sliders.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-list"></i>
-                                                    All Posts
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @can('blog.create')
-                                        <li class="{{ request()->routeIs('admin.post.add') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.post.add') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-pencil-alt"></i>
-                                                    Create Post
+                                                    All Sliders
                                                 </span>
                                             </a>
                                         </li>
                                         @endcan
-                                        @can('categories.create')
-                                        <li class="{{ request()->routeIs('admin.category.add') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.category.add') }}">
+                                        @can('sliders.create')
+                                        <li class="{{ request()->routeIs('admin.sliders.create') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.sliders.create') }}">
                                                 <span class="menu-content">
-                                                    <i class="fas fa-tags"></i>
-                                                    Add Category
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('categories.view')
-                                        <li class="{{ request()->routeIs('admin.category.index') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.category.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-tags"></i>
-                                                    All Category
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('sub_categories.create')
-                                        <li class="{{ request()->routeIs('admin.postsubcategory.add') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.postsubcategory.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-tags"></i>
-                                                    Add Sub Category
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('sub_categories.view')
-                                        <li class="{{ request()->routeIs('admin.postsubcategory.index') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.postsubcategory.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-tags"></i>
-                                                    All Sub Category
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('comments.view')
-                                        <li class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.comments.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-comments"></i>
-                                                    Comments
+                                                    <i class="fas fa-plus-circle"></i>
+                                                    Add Slider
                                                 </span>
                                             </a>
                                         </li>
                                         @endcan
                                     </ul>
                                 </li>
+                                @endcan
+
+                                @can('pages.view')
+                                <li class="sub-menu {{ request()->is('admin/pages*') ? 'active' : '' }}">
+                                    <a href="#">
+                                        <span class="menu-content">
+                                            <i class="fas fa-copy" style="color:#28a745;"></i>
+                                            Pages
+                                        </span>
+                                        <span class="fas fa-caret-down right"></span>
+                                    </a>
+                                    <ul class="left-menu-dp"
+                                        style="{{ request()->is('admin/pages*') ? 'display: block;' : '' }}">
+                                        @can('pages.view')
+                                        <li class="{{ request()->routeIs('admin.pages.index') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.pages.index') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-file-alt"></i>
+                                                    All Pages
+                                                </span>
+                                            </a>
+                                        </li>
+                                        @endcan
+                                        @can('pages.create')
+                                        <li class="{{ request()->routeIs('admin.pages.create') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.pages.create') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-file-medical"></i>
+                                                    Create Page
+                                                </span>
+                                            </a>
+                                        </li>
+                                        @endcan
+                                    </ul>
+                                </li>
+                                @endcan
+
+                                @can('menus.view')
+                                <li class="{{ request()->is('admin/menus*') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.menus.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-bars" style="color:#197A94;"></i>
+                                            Menu Management
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+
+                                @can('blog.view')
+                                <li class="{{ request()->routeIs('admin.post.index') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.post.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-list"></i>
+                                            All Posts
+                                        </span>
+                                    </a>
+                                </li>
+                                @can('blog.create')
+                                <li class="{{ request()->routeIs('admin.post.add') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.post.add') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-pencil-alt"></i>
+                                            Create Post
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('categories.create')
+                                <li class="{{ request()->routeIs('admin.category.add') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.category.add') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-tags"></i>
+                                            Add Category
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('categories.view')
+                                <li class="{{ request()->routeIs('admin.category.index') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.category.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-tags"></i>
+                                            All Category
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('sub_categories.create')
+                                <li class="{{ request()->routeIs('admin.postsubcategory.add') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.postsubcategory.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-tags"></i>
+                                            Add Sub Category
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('sub_categories.view')
+                                <li class="{{ request()->routeIs('admin.postsubcategory.index') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.postsubcategory.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-tags"></i>
+                                            All Sub Category
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('comments.view')
+                                <li class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.comments.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-comments"></i>
+                                            Comments
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
                                 @endcan
                             </ul>
                         </li>
@@ -1573,70 +1514,55 @@
                             <ul class="left-menu-dp menu-section-list" style="{{ $vendorsActive ? 'display: block;' : 'display: none;' }}">
                                 @can('admin.vendors.view')
                                 <li
-                                    class="sub-menu {{ request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-settings*') ? 'active' : '' }}">
-                                    <a href="#">
+                                    class="{{ request()->routeIs('admin.vendors.index') || request()->routeIs('admin.vendors.show') || request()->routeIs('admin.vendors.edit') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.vendors.index') }}">
                                         <span class="menu-content">
-                                            <i class="fas fa-store" style="color:#ff6f00;"></i>
-                                            Vendor Management
+                                            <i class="fas fa-users"></i>
+                                            All Vendors
                                         </span>
-                                        <span class="fas fa-caret-down right"></span>
                                     </a>
-                                    <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-settings*') ? 'display: block;' : '' }}">
-                                        @can('admin.vendors.view')
-                                        <li
-                                            class="{{ request()->routeIs('admin.vendors.index') || request()->routeIs('admin.vendors.show') || request()->routeIs('admin.vendors.edit') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.vendors.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-users"></i>
-                                                    All Vendors
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('admin.vendors.edit')
-                                        <li class="{{ request()->routeIs('admin.vendors.create') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.vendors.create') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-user-plus"></i>
-                                                    Add Vendor
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('admin.products.view-all')
-                                        <li
-                                            class="{{ request()->routeIs('admin.vendor-products.index') || request()->routeIs('admin.vendor-products.show') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.vendor-products.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-box-open"></i>
-                                                    Product Approval
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('admin.withdrawals.view')
-                                        <li
-                                            class="{{ request()->routeIs('admin.vendor-withdrawals.index') || request()->routeIs('admin.vendor-withdrawals.show') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.vendor-withdrawals.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-money-bill-wave"></i>
-                                                    Withdrawal Requests
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('admin.commissions.view')
-                                        <li class="{{ request()->routeIs('admin.vendor-settings.global') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.vendor-settings.global') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-cog"></i>
-                                                    Global Settings
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                    </ul>
+                                </li>
+                                @endcan
+                                @can('admin.vendors.edit')
+                                <li class="{{ request()->routeIs('admin.vendors.create') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.vendors.create') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-user-plus"></i>
+                                            Add Vendor
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('admin.products.view-all')
+                                <li
+                                    class="{{ request()->routeIs('admin.vendor-products.index') || request()->routeIs('admin.vendor-products.show') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.vendor-products.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-box-open"></i>
+                                            Product Approval
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('admin.withdrawals.view')
+                                <li
+                                    class="{{ request()->routeIs('admin.vendor-withdrawals.index') || request()->routeIs('admin.vendor-withdrawals.show') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.vendor-withdrawals.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                            Withdrawal Requests
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('admin.commissions.view')
+                                <li class="{{ request()->routeIs('admin.vendor-settings.global') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.vendor-settings.global') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-cog"></i>
+                                            Global Settings
+                                        </span>
+                                    </a>
                                 </li>
                                 @endcan
                             </ul>
@@ -1656,6 +1582,52 @@
                                         <span class="menu-content">
                                             <i class="fas fa-users" style="color:#20c997;"></i>
                                             Customers & Users
+                                        </span>
+                                    </a>
+                                </li>
+                                @endcan
+
+                                @can('contacts.view')
+                                <li class="sub-menu {{ request()->is('admin/contacts*') ? 'active' : '' }}">
+                                    <a href="#">
+                                        <span class="menu-content">
+                                            <i class="fas fa-envelope" style="color:#6610f2;"></i>
+                                            Contact Messages
+                                        </span>
+                                        <span class="fas fa-caret-down right"></span>
+                                    </a>
+                                    <ul class="left-menu-dp"
+                                        style="{{ request()->is('admin/contacts*') ? 'display: block;' : '' }}">
+                                        @can('contacts.view')
+                                        <li class="{{ request()->routeIs('admin.contacts.index') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.contacts.index') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-inbox"></i>
+                                                    All Messages
+                                                </span>
+                                            </a>
+                                        </li>
+                                        @endcan
+                                        @can('contacts.unread')
+                                        <li class="{{ request()->routeIs('admin.contacts.unread') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.contacts.unread') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-envelope"></i>
+                                                    Unread Messages
+                                                </span>
+                                            </a>
+                                        </li>
+                                        @endcan
+                                    </ul>
+                                </li>
+                                @endcan
+
+                                @can('subscriptions.view')
+                                <li class="{{ request()->routeIs('admin.subscriptions.index') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.subscriptions.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-bell" style="color:#ffca28;"></i>
+                                            Subscription
                                         </span>
                                     </a>
                                 </li>
@@ -1760,13 +1732,6 @@
                                 </li>
                                 @endcan
                             </ul>
-                        </li>
-
-                        <li class="sidebar-bottom-info">
-                            <a href="https://uddoktaecommerce.com" target="_blank" rel="noopener">
-                                <i class="fas fa-copyright"></i>
-                                <span>Uddokta Ecommerce</span>
-                            </a>
                         </li>
 
                     </ul>
