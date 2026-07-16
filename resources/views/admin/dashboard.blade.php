@@ -134,13 +134,13 @@
         /* Modern Dashboard Header */
         .portal-header {
             background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 12px;
+            padding: 12px 20px;
             color: #ffffff;
             position: relative;
             overflow: hidden;
-            box-shadow: var(--shadow-lg);
-            margin-bottom: 30px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -156,10 +156,10 @@
         }
 
         .portal-header h1 {
-            font-size: 2.2rem;
+            font-size: 1.35rem;
             font-weight: 800;
             letter-spacing: -0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
             background: linear-gradient(to right, #ffffff, #c7d2fe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -167,7 +167,7 @@
 
         .portal-header p {
             color: #a5b4fc;
-            font-size: 1.05rem;
+            font-size: 0.825rem;
             margin-bottom: 0;
             font-weight: 400;
         }
@@ -178,15 +178,15 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 10px 16px;
             box-shadow: var(--shadow-md);
-            margin-bottom: 30px;
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
             position: relative;
             z-index: 1000;
         }
@@ -205,8 +205,8 @@
         .kpi-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-            margin-bottom: 30px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
         .kpi-card {
@@ -214,8 +214,8 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 24px;
+            border-radius: 14px;
+            padding: 16px 20px;
             box-shadow: var(--shadow-md);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -270,11 +270,11 @@
         }
 
         .kpi-value {
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-weight: 800;
             color: #0f172a;
             line-height: 1.2;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .kpi-subtext {
@@ -301,10 +301,10 @@
 
         /* Custom Status Matrix Grid */
         .status-matrix-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #0f172a;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -313,8 +313,8 @@
         .status-matrix-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 35px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .matrix-card {
@@ -322,8 +322,8 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(var(--status-rgb), 0.1);
-            border-radius: 24px;
-            padding: 22px 20px;
+            border-radius: 14px;
+            padding: 12px 16px;
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.02);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
@@ -331,7 +331,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
             text-align: left;
         }
 
@@ -583,22 +583,37 @@
         <div class="container-fluid">
             <!-- Redesigned Portal Header -->
             <div class="portal-header">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
-                        <h1>Bazarei Store Control Hub</h1>
-                        <p>Welcome back, {{ Auth::user()->name ?? 'Administrator' }}. Monitoring live sales, store performance metrics, and active channels.</p>
+                        <h1 class="m-0">Bazarei Store Control Hub</h1>
+                        <p class="mt-1 mb-0">Welcome back, {{ Auth::user()->name ?? 'Administrator' }}. Monitoring live sales and store metrics.</p>
                     </div>
-                    <div class="d-flex align-items-center gap-3 flex-wrap">
-                        <div class="system-status-pill d-flex align-items-center gap-2 px-3 py-2 bg-white bg-opacity-10 rounded-3 shadow-sm text-white" style="backdrop-filter: blur(5px); font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.15);">
-                            <span class="status-indicator-dot" style="width: 8px; height: 8px; display: inline-block; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981; animation: pulse-green 2s infinite;"></span>
-                            <span class="fw-semibold">System Online</span>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <!-- Package Details -->
+                        <div class="package-details-card d-flex align-items-center gap-3 px-3 py-2 bg-white bg-opacity-10 rounded-3 text-white" style="backdrop-filter: blur(5px); font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.15);">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="color: #c7d2fe; font-weight: 500; font-size: 0.75rem;">Plan:</span>
+                                <span class="fw-bold" style="font-size: 0.8rem;">Enterprise Package</span>
+                            </div>
+                            <div style="width: 1px; height: 16px; background: rgba(255,255,255,0.25);"></div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="color: #c7d2fe; font-weight: 500; font-size: 0.75rem;">Expires:</span>
+                                <span class="fw-bold" style="font-size: 0.8rem;">Dec 31, 2026</span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-light fw-bold text-indigo-900 px-3 ms-1" style="border-radius: 6px; color: #1e1b4b; background-color: #ffffff; transition: transform 0.2s; font-size: 0.75rem; height: 26px; padding: 0 10px; display: inline-flex; align-items: center;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">Renew Plan</button>
                         </div>
-                        <div class="system-status-pill d-flex align-items-center gap-2 px-3 py-2 bg-white bg-opacity-10 rounded-3 shadow-sm text-white" style="backdrop-filter: blur(5px); font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.15);">
+
+                        <!-- System Status & Clock -->
+                        <div class="system-status-pill d-flex align-items-center gap-2 px-3 py-1 bg-white bg-opacity-10 rounded-3 text-white" style="backdrop-filter: blur(5px); font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.15); height: 38px;">
+                            <span class="status-indicator-dot" style="width: 6px; height: 6px; display: inline-block; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-green 2s infinite;"></span>
+                            <span class="fw-semibold">Online</span>
+                        </div>
+                        <div class="system-status-pill d-flex align-items-center gap-2 px-3 py-1 bg-white bg-opacity-10 rounded-3 text-white" style="backdrop-filter: blur(5px); font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.15); height: 38px;">
                             <i class="far fa-clock"></i>
-                            <span id="live-digital-clock" class="fw-semibold">--:--:--</span>
+                            <span id="live-digital-clock" class="fw-semibold" style="display: inline-block; min-width: 82px; text-align: left; font-variant-numeric: tabular-nums;">--:--:--</span>
                         </div>
-                        <span class="badge bg-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px; color: #1e1b4b;">
-                            Production Mode
+                        <span class="badge bg-white px-3 py-1 fw-bold shadow-sm d-flex align-items-center" style="border-radius: 8px; color: #1e1b4b; height: 38px; font-size: 0.75rem;">
+                            Live
                         </span>
                     </div>
                 </div>
