@@ -70,6 +70,14 @@ class PermissionSeeder extends Seeder
             'roles_permissions.view','roles.manage','permissions.manage','user_roles.assign',
             // dashboard
             'dashboard.view',
+            // missing sidebar & utility permissions
+            'users.view', 'users.create', 'users.update', 'users.delete',
+            'blog.view',
+            'fraud_protection.view',
+            'telegram_settings.view',
+            'delayed_events.view',
+            'woocommerce_migration.view',
+            'basic_shipping.view',
         ];
 
         foreach ($permissions as $p) {
