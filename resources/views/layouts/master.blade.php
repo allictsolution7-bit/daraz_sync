@@ -1040,55 +1040,13 @@
                         @endcan
 
                         @can('users.view')
-                        <li class="sub-menu {{ request()->is('admin/users*') ? 'active' : '' }}">
-                            <a href="#">
+                        <li class="{{ request()->is('admin/users*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.users') }}">
                                 <span class="menu-content">
                                     <i class="fas fa-users" style="color:#20c997;"></i>
                                     Customers & Users
                                 </span>
-                                <span class="fas fa-caret-down right"></span>
                             </a>
-                            <ul class="left-menu-dp"
-                                style="{{ request()->is('admin/users*') ? 'display: block;' : '' }}">
-                                @can('users.view')
-                                <li class="{{ request()->routeIs('admin.users') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.users') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-user-circle"></i>
-                                            All Users
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
-                                @can('users.create')
-                                {{-- <li>
-                                            <a href="#">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-fingerprint"></i>
-                                                    Security &amp; Privacy
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-key"></i>
-                                                    Password
-                                                </span>
-                                            </a>
-                                        </li> --}}
-                                @endcan
-                                @can('users.notification')
-                                {{-- <li>
-                                            <a href="#">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-bell"></i>
-                                                    Notification
-                                                </span>
-                                            </a>
-                                        </li> --}}
-                                @endcan
-                            </ul>
                         </li>
                         @endcan
 
@@ -1386,37 +1344,13 @@
                         @endcan
 
                         @can('menus.view')
-                        <li class="sub-menu {{ request()->is('admin/menus*') ? 'active' : '' }}">
-                            <a href="#" class="">
+                        <li class="{{ request()->is('admin/menus*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.menus.index') }}">
                                 <span class="menu-content">
                                     <i class="fas fa-bars" style="color:#197A94;"></i>
                                     Menu Management
                                 </span>
-                                <span class="fas fa-caret-down right"></span>
                             </a>
-                            <ul class="left-menu-dp"
-                                style="{{ request()->is('admin/menus*') ? 'display: block;' : '' }}">
-                                @can('menus.view')
-                                <li class="nav-item {{ request()->routeIs('admin.menus.index') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.menus.index') }}" class="nav-link">
-                                        <span class="menu-content">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            All Menus
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
-                                @can('menus.create')
-                                <li class="nav-item {{ request()->routeIs('admin.menus.create') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.menus.create') }}" class="nav-link">
-                                        <span class="menu-content">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            Create Menu
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
-                            </ul>
                         </li>
                         @endcan
 
