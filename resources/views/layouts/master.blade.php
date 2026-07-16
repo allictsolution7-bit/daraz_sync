@@ -631,6 +631,11 @@
         @endphp
 
         <style>
+            .left-menu {
+                overflow-y: auto !important;
+                height: 100vh !important;
+                padding-bottom: 80px !important;
+            }
             .menu-section-toggle {
                 padding: 10px 18px !important;
                 display: flex !important;
