@@ -3,334 +3,307 @@
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
 <style>
+    /* Premium Glassmorphic Design System */
+    :root {
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --primary-light: rgba(99, 102, 241, 0.1);
+        --primary-glow: rgba(99, 102, 241, 0.15);
+        --success: #10b981;
+        --success-light: rgba(16, 185, 129, 0.1);
+        --warning: #f59e0b;
+        --warning-light: rgba(245, 158, 11, 0.1);
+        --danger: #ef4444;
+        --danger-light: rgba(239, 68, 68, 0.1);
+        --dark: #0f172a;
+        --light: #f8fafc;
+        --border: #e2e8f0;
+        --font: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+        font-family: var(--font) !important;
+        background: radial-gradient(circle at 10% 20%, rgba(243, 244, 246, 1) 0%, rgba(229, 231, 235, 1) 90%);
+        color: #334155;
+    }
+
+    .container-fluid {
+        max-width: 1440px;
+        padding: 2.5rem 2rem;
+    }
+
+    /* Page Header */
+    .d-flex.justify-content-between.align-items-center.mb-4 {
+        margin-bottom: 2rem !important;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(12px);
+        padding: 1.5rem 2rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    .d-flex.justify-content-between.align-items-center.mb-4 h4 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--dark);
+    }
+
+    /* Form Container Grid */
     .product-form-container {
         display: grid;
-        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .main-content,
-    .side-content {
-        margin-bottom: 20px;
+        grid-template-columns: minmax(0, 2fr) minmax(360px, 1fr);
+        gap: 28px;
     }
 
     .side-content {
-        min-width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
     }
 
-    /* Responsive behavior for smaller screens */
-    @media (max-width: 1200px) {
-        .product-form-container {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .side-content {
-            min-width: auto;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-    }
-
-    /* Ensure side content doesn't get too narrow on very wide screens */
-    @media (min-width: 1400px) {
-        .product-form-container {
-            grid-template-columns: minmax(0, 3fr) minmax(320px, 1fr);
-        }
-
-        .side-content {
-            min-width: 320px;
-        }
-    }
-
+    /* Glassmorphic Cards */
     .form-section {
-        background: #fff;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        padding: 28px;
+        margin-bottom: 0 !important; /* Managed by grid gap */
+        border-radius: 24px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .form-section:hover {
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.07);
+        border-color: rgba(255, 255, 255, 0.8);
     }
 
     .form-section h4 {
-        margin-bottom: 15px;
-        color: #333;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 10px;
-        font-weight: 600;
-    }
-
-    .variation {
-        background: #f8f9fa;
-        padding: 20px;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        border: 1px solid #dee2e6;
-    }
-
-    .option {
-        background: #fff;
-        padding: 15px;
-        margin: 10px 0;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-    }
-
-    /* .publish-section {
-                                                                            position: sticky;
-                                                                            top: 5px;
-                                                                        } */
-
-    .dropzone {
-        border: 2px dashed #0087F7;
-        border-radius: 5px;
-        background: #f8fafc;
-        min-height: 150px;
-        padding: 20px;
-        margin-bottom: 15px;
-    }
-
-    .image-preview {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .image-preview-item {
-        width: 100px;
-        height: 100px;
-        border-radius: 4px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .image-preview-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .image-preview-item .remove-btn {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
+        margin-top: 0;
+        margin-bottom: 24px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--dark);
         display: flex;
         align-items: center;
-        justify-content: center;
-        cursor: pointer;
+        gap: 12px;
+    }
+
+    .form-section h4::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 20px;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        border-radius: 3px;
+    }
+
+    /* Premium inputs and floating fields */
+    .form-control, .form-select {
+        height: auto;
+        padding: 12px 16px;
+        font-size: 0.925rem;
+        font-weight: 500;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        background-color: rgba(255, 255, 255, 0.8);
+        color: var(--dark);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px var(--primary-glow);
+        background-color: #ffffff;
+        outline: none;
     }
 
     .form-floating {
-        margin-bottom: 1rem;
+        position: relative;
+        margin-bottom: 1.5rem;
     }
 
-    .form-floating>label {
-        padding: 0.5rem 0.75rem;
+    .form-floating > .form-control {
+        height: 56px;
+        padding: 20px 16px 6px 16px;
     }
 
-    .form-floating>.form-control {
-        padding: 0.5rem 0.75rem;
-        height: calc(3.5rem + 2px);
-    }
-
-    .form-floating>textarea.form-control {
-        height: auto;
-        min-height: 100px;
-    }
-
-    .card-header-tabs {
-        margin-bottom: -0.5rem;
-    }
-
-    .nav-tabs .nav-link {
-        border: none;
-        color: #6c757d;
-        padding: 0.5rem 1rem;
+    .form-floating > label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        padding: 16px;
+        pointer-events: none;
+        transform-origin: 0 0;
+        transition: all .2s ease-in-out;
+        color: #64748b;
+        font-size: 0.925rem;
         font-weight: 500;
     }
 
-    .nav-tabs .nav-link.active {
-        color: #197A94;
-        border-bottom: 2px solid #197A94;
-        background: transparent;
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        transform: scale(.8) translateY(-10px) translateX(4px);
+        color: var(--primary);
+        font-weight: 700;
     }
 
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    /* Product Type Selection Cards */
     .product-type-selector {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
     }
 
     .product-type-card {
-        flex: 1;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 15px;
+        border: 2px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 20px 14px;
         text-align: center;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(255, 255, 255, 0.6);
     }
 
     .product-type-card:hover {
-        border-color: #197A94;
-        background: #f8f9fa;
+        border-color: var(--primary);
+        background: rgba(255, 255, 255, 0.9);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.08);
     }
 
     .product-type-card.active {
-        border-color: #197A94;
-        background: #f0f7ff;
+        border-color: var(--primary);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(79, 70, 229, 0.08) 100%);
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.12);
+        transform: translateY(-2px);
     }
 
     .product-type-card i {
-        font-size: 24px;
-        margin-bottom: 10px;
-        color: #6c757d;
+        font-size: 28px;
+        margin-bottom: 12px;
+        color: #64748b;
+        display: block;
+        transition: color 0.25s;
     }
 
     .product-type-card.active i {
-        color: #197A94;
+        color: var(--primary);
     }
 
-    .btn-add-variation {
-        background: #f8f9fa;
-        border: 1px dashed #dee2e6;
-        border-radius: 8px;
-        padding: 15px;
-        width: 100%;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
+    .product-type-card h6 {
+        margin: 0 0 6px 0;
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: var(--dark);
     }
 
-    .btn-add-variation:hover {
-        background: #f0f7ff;
-        border-color: #197A94;
+    .product-type-card small {
+        font-size: 0.75rem;
+        color: #64748b;
+        display: block;
+        line-height: 1.3;
     }
 
-    /* WordPress/WooCommerce Style Category Multi-Select */
+    /* WooCommerce Style Category Multi-Select Redesign */
     .category-multiselect-container {
-        background: #fff;
-        border: 1px solid #c3c4c7;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+        background: rgba(255, 255, 255, 0.8);
+        border: 1.5px solid #e2e8f0;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
     }
 
     .category-panel-header {
-        padding: 12px 16px;
-        border-bottom: 1px solid #dcdcde;
-        background: #f6f7f7;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        background: rgba(248, 250, 252, 0.8);
     }
 
     .category-panel-title {
-        font-weight: 600;
-        font-size: 13px;
-        color: #23282d;
+        font-weight: 800;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #475569;
         margin: 0;
-    }
-
-    .category-controls {
-        display: flex;
-        gap: 4px;
-    }
-
-    .category-control-btn {
-        width: 24px;
-        height: 24px;
-        border: 1px solid #8c8f94;
-        background: #fff;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        color: #50575e;
-    }
-
-    .category-control-btn:hover {
-        background: #f0f0f1;
     }
 
     .category-tabs {
         display: flex;
-        border-bottom: 1px solid #dcdcde;
-        background: #fff;
-        padding: 0;
-        margin: 0;
-        list-style: none;
+        border-bottom: 1px solid #e2e8f0;
+        background: #ffffff;
     }
 
     .category-tab {
+        flex: 1;
         padding: 12px 16px;
-        margin: 0;
         cursor: pointer;
         border: none;
         background: none;
-        color: #2271b1;
-        font-size: 13px;
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s;
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border-bottom: 3px solid transparent;
+        transition: all 0.25s;
+        text-align: center;
     }
 
     .category-tab:hover {
-        color: #135e96;
-        background: #f6f7f7;
+        color: var(--primary);
     }
 
     .category-tab.active {
-        border-bottom-color: #2271b1;
-        color: #23282d;
-        font-weight: 600;
+        border-bottom-color: var(--primary);
+        color: var(--primary);
+        background: #ffffff;
     }
 
     .category-search-box {
         padding: 12px 16px;
-        border-bottom: 1px solid #dcdcde;
-        background: #fff;
+        border-bottom: 1px solid #e2e8f0;
     }
 
     .category-search-box input {
         width: 100%;
-        padding: 6px 8px;
-        border: 1px solid #8c8f94;
-        border-radius: 0;
-        font-size: 13px;
-        background: #fff;
-    }
-
-    .category-search-box input:focus {
-        border-color: #2271b1;
-        box-shadow: 0 0 0 1px #2271b1;
-        outline: 2px solid transparent;
+        padding: 10px 14px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        background: #ffffff;
     }
 
     .category-list-wrapper {
-        max-height: 300px;
+        max-height: 260px;
         overflow-y: auto;
         padding: 8px 0;
-        background: #fff;
     }
 
     .category-list-item {
         display: flex;
         align-items: center;
-        padding: 4px 16px;
-        min-height: 28px;
+        padding: 8px 20px;
+        min-height: 34px;
+        transition: background 0.25s;
     }
 
-    .category-list-item.hidden {
-        display: none;
+    .category-list-item:hover {
+        background: rgba(241, 245, 249, 0.6);
     }
 
     .category-list-item label {
@@ -339,214 +312,206 @@
         cursor: pointer;
         width: 100%;
         margin: 0;
-        font-size: 13px;
-        line-height: 1.8;
+        font-size: 0.9rem;
         user-select: none;
     }
 
     .category-list-item input[type="checkbox"] {
-        margin-right: 8px;
+        margin-right: 12px;
         cursor: pointer;
-        width: 16px;
-        height: 16px;
-        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        border-radius: 6px;
+        accent-color: var(--primary);
     }
 
     .category-name-text {
-        color: #23282d;
+        color: var(--dark);
+        font-weight: 600;
     }
 
-    /* Indentation levels */
-    .category-level-0 {
-        padding-left: 16px;
-    }
-
-    .category-level-1 {
-        padding-left: 40px;
-    }
-
-    .category-level-2 {
-        padding-left: 64px;
-    }
+    .category-level-0 { padding-left: 20px; }
+    .category-level-1 { padding-left: 40px; border-left: 2px solid var(--primary-light); margin-left: 24px; }
+    .category-level-2 { padding-left: 60px; border-left: 2px solid var(--primary-light); margin-left: 24px; }
 
     .category-selected-count {
-        padding: 12px 16px;
-        border-top: 1px solid #dcdcde;
-        background: #f6f7f7;
-        font-size: 12px;
-        color: #646970;
+        padding: 12px 20px;
+        border-top: 1px solid #e2e8f0;
+        background: rgba(248, 250, 252, 0.8);
+        font-size: 0.8rem;
+        color: #64748b;
+        font-weight: 700;
     }
 
-    /* Combination table styling */
-    #combinationsTable .table {
-        margin-bottom: 0;
+    /* Variation and Combinations list styling */
+    .variation {
+        background: rgba(248, 250, 252, 0.7);
+        padding: 24px;
+        margin-bottom: 20px;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
     }
 
-    #combinationsTable .combination-regular-price,
-    #combinationsTable .combination-offer-price,
-    #combinationsTable .combination-stock,
-    #combinationsTable .combination-description,
-    #combinationsTable .combination-image,
-    #combinationsTable .combination-gallery {
-        border: 2px solid #e9ecef;
-        border-radius: 6px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        font-size: 13px;
+    .option {
+        background: #ffffff;
+        padding: 20px;
+        margin: 12px 0;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: var(--shadow-sm);
     }
 
-    #combinationsTable .combination-regular-price,
-    #combinationsTable .combination-offer-price,
-    #combinationsTable .combination-stock {
-        text-align: center;
+    .btn-add-variation {
+        background: #ffffff;
+        border: 2px dashed #cbd5e1;
+        border-radius: 16px;
+        padding: 16px;
+        width: 100%;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.25s ease;
     }
 
-    #combinationsTable .combination-regular-price:focus,
-    #combinationsTable .combination-offer-price:focus,
-    #combinationsTable .combination-stock:focus,
-    #combinationsTable .combination-description:focus,
-    #combinationsTable .combination-image:focus,
-    #combinationsTable .combination-gallery:focus {
-        border-color: #197A94;
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    .btn-add-variation:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
     }
 
-    #combinationsTable .combination-description {
-        font-size: 12px;
-        line-height: 1.4;
-    }
-
-    #combinationsTable .combination-image,
-    #combinationsTable .combination-gallery {
-        font-size: 11px;
-    }
-
-    #combinationsTable .badge {
-        font-size: 0.875rem;
-        padding: 0.5rem 0.75rem;
+    #combinationsTable table {
+        border-collapse: separate !important;
+        border-spacing: 0 6px !important;
     }
 
     #combinationsTable thead th {
-        background: #2c3e50 !important;
-        color: white;
-        font-weight: 600;
-        text-align: center;
+        background: var(--light) !important;
+        color: #475569 !important;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        border-bottom: 2px solid var(--border);
+        padding: 14px;
     }
 
     #combinationsTable tbody td {
         vertical-align: middle;
-        text-align: center;
+        padding: 12px;
+        background: #ffffff;
+        border-bottom: 1.5px solid var(--border);
     }
 
-    #combinationsTable tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-
-    /* SEO Section Styles */
+    /* SEO Section */
     .seo-preview {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 15px;
-        font-family: Arial, sans-serif;
+        background: rgba(248, 250, 252, 0.8);
+        border: 1.5px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 20px;
+        margin-top: 20px;
     }
 
     .seo-title {
         color: #1a0dab;
-        font-size: 18px;
-        font-weight: 400;
-        line-height: 1.2;
-        margin-bottom: 4px;
-        cursor: pointer;
-    }
-
-    .seo-title:hover {
-        text-decoration: underline;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 6px;
     }
 
     .seo-url {
         color: #006621;
-        font-size: 14px;
-        line-height: 1.2;
-        margin-bottom: 4px;
+        font-size: 0.875rem;
+        margin-bottom: 8px;
     }
 
     .seo-description {
-        color: #545454;
-        font-size: 13px;
-        line-height: 1.4;
+        color: #475569;
+        font-size: 0.9rem;
+        line-height: 1.5;
     }
 
-    .character-count {
-        font-size: 12px;
-        margin-top: 2px;
+    /* File Dropzones */
+    .dropzone {
+        border: 2.5px dashed var(--primary) !important;
+        border-radius: 18px !important;
+        background: rgba(99, 102, 241, 0.02) !important;
+        min-height: 130px !important;
+        padding: 20px !important;
+        transition: all 0.25s ease;
     }
 
-    .character-count.warning {
-        color: #ffc107;
+    .dropzone:hover {
+        background: rgba(99, 102, 241, 0.05) !important;
+        border-color: var(--primary-hover) !important;
     }
 
-    .character-count.danger {
-        color: #dc3545;
+    /* Primary buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+        border: none !important;
+        padding: 12px 24px;
+        border-radius: 14px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
+        transition: all 0.25s !important;
     }
 
-    .character-count.success {
-        color: #28a745;
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45) !important;
+        transform: translateY(-1px);
     }
 
-    /* Subcategory loading states */
-    .subcategory-loading {
-        opacity: 0.6;
-        pointer-events: none;
+    .btn-outline-secondary {
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 700;
+        border-width: 1.5px;
     }
 
-    .subcategory-loading::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-        width: 16px;
-        height: 16px;
-        border: 2px solid #f3f3f3;
-        border-top: 2px solid #197A94;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
+    /* Modern Pill Tabs Styling */
+    .modern-tabs {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        padding: 6px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: var(--shadow-sm);
+        display: inline-flex;
+    }
+    .modern-tabs .nav-link {
+        color: #64748b !important;
+        font-weight: 700;
+        font-size: 0.9rem;
+        padding: 10px 20px;
+        border-radius: 14px;
+        transition: all 0.25s;
+        border: none !important;
+    }
+    .modern-tabs .nav-link:hover {
+        background: rgba(99, 102, 241, 0.05);
+        color: var(--primary) !important;
+    }
+    .modern-tabs .nav-link.active {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
     }
 
-    @keyframes spin {
-        0% {
-            transform: translateY(-50%) rotate(0deg);
-        }
-
-        100% {
-            transform: translateY(-50%) rotate(360deg);
-        }
+    /* Layout Spacing Fixes */
+    .tab-content {
+        margin-top: 2rem;
     }
 
-    a.pos-menu-item {
-        display: none !important;
+    .tab-pane .row {
+        --bs-gutter-x: 28px;
+        --bs-gutter-y: 28px;
     }
 
-    /* Book Detail Section Animation */
-    #bookDetailSection {
-        transition: all 0.3s ease;
-    }
-
-    #bookDetailSection.show {
-        animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .form-section {
+        margin-bottom: 28px !important;
     }
 </style>
 @endsection
@@ -584,665 +549,582 @@
     @endif
 
     <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data" id="productForm">
-        @csrf
-        <div class="product-form-container">
-            <!-- Main Content Column -->
-            <div class="main-content">
-                <!-- Basic Information Section -->
-                <div class="form-section">
-                    <h4>Basic Information</h4>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control @error('title') is-invalid @enderror" name="title"
-                            id="productName" placeholder="Enter product name" value="{{ old('title') }}" required>
-                        <label for="productName">Product Name</label>
-                        @error('title')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control @error('slug') is-invalid @enderror" name="slug"
-                            id="productSlug" placeholder="Enter product slug" value="{{ old('slug') }}" required>
-                        <label for="productSlug">Product Slug</label>
-                        <small class="form-text text-muted">Auto-generated from product name, but you can edit it manually</small>
-                        @error('slug')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control @error('sku') is-invalid @enderror" name="sku"
-                            id="productSku" placeholder="Enter SKU (Stock Keeping Unit)" value="{{ old('sku') }}">
-                        <label for="productSku">SKU (Stock Keeping Unit)</label>
-                        <small class="form-text text-muted">Unique identifier for inventory tracking. Used for Daraz sync and other marketplace integrations.</small>
-                        @error('sku')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="productShortDescription" class="form-label">Short Description</label>
-                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="productShortDescription"
-                            name="short_description" rows="3" placeholder="Enter short description">{{ old('short_description') }}</textarea>
-                        @error('short_description')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="productDescription" class="form-label">Detailed Description</label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="productDescription" name="description"
-                            rows="8" placeholder="Enter detailed description">{{ old('description') }}</textarea>
-                        @error('description')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Product Data Section -->
-                <div class="form-section">
-                    <h4>Product Data</h4>
-
-                    <!-- Product Type Selector Cards -->
-                    <div class="product-type-selector">
-                        <div class="product-type-card" data-type="simple" onclick="selectProductType('simple')">
-                            <i class="bi bi-box"></i>
-                            <h6>Simple Product</h6>
-                            <small class="text-muted">Single product with no variations</small>
-                        </div>
-                        <div class="product-type-card" data-type="variable" onclick="selectProductType('variable')">
-                            <i class="bi bi-grid-3x3"></i>
-                            <h6>Variable Product</h6>
-                            <small class="text-muted">Product with multiple variations</small>
-                        </div>
-                        <div class="product-type-card" data-type="digital" onclick="selectProductType('digital')">
-                            <i class="bi bi-file-earmark-arrow-down"></i>
-                            <h6>Digital Product</h6>
-                            <small class="text-muted">Downloadable product</small>
-                        </div>
-                        <div class="product-type-card" data-type="affiliate" onclick="selectProductType('affiliate')">
-                            <i class="bi bi-link-45deg"></i>
-                            <h6>Affiliate Product</h6>
-                            <small class="text-muted">External product with commission</small>
-                        </div>
-                    </div>
-
-                    <input type="hidden" name="product_type" id="productTypeInput" value="simple">
-
-                    <!-- Digital Product Fields -->
-                    <div id="digitalFields" class="product-type-fields" style="display: none;">
-                        <div class="mb-3">
-                            <label for="digitalFile" class="form-label">Digital File</label>
-                            <input type="file" class="form-control" id="digital_file" name="digital_file"
-                                accept=".pdf,.zip,.rar,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
-                            <div id="digitalFilePreview" class="mt-2"></div>
-                            <input type="hidden" name="digital_file" id="digitalFileInput">
-                            @error('digital_file')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="number" class="form-control @error('download_limit') is-invalid @enderror"
-                                id="downloadLimit" name="download_limit" value="{{ old('download_limit') }}"
-                                placeholder="Enter download limit">
-                            <label for="downloadLimit">Download Limit (leave empty for unlimited)</label>
-                            @error('download_limit')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Affiliate Product Fields -->
-                    <div id="affiliateFields" class="product-type-fields" style="display: none;">
-                        <div class="form-floating mb-3">
-                            <input type="url" class="form-control @error('external_url') is-invalid @enderror"
-                                id="externalUrl" name="external_url" value="{{ old('external_url') }}"
-                                placeholder="Enter external product URL">
-                            <label for="externalUrl">External URL</label>
-                            @error('external_url')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="number" step="0.01"
-                                class="form-control @error('affiliate_commission') is-invalid @enderror"
-                                id="affiliateCommission" name="affiliate_commission"
-                                value="{{ old('affiliate_commission') }}" placeholder="Enter commission amount">
-                            <label for="affiliateCommission">Affiliate Commission (%)</label>
-                            @error('affiliate_commission')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Pricing Fields -->
-                    <div id="pricingFields">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" name="old_price" id="productOldPrice"
-                                        placeholder="Enter regular price" value="{{ old('old_price') }}" step="0.01" required>
-                                    <label for="productOldPrice">Regular Price</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" name="offer" id="productOfferPrice"
-                                        placeholder="Enter sale price" value="{{ old('offer') }}" step="0.01">
-                                    <label for="productOfferPrice">Sale Price</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" name="product_cost" id="productCost"
-                                        placeholder="Enter product cost" value="{{ old('product_cost') }}" step="0.01">
-                                    <label for="productCost">Product Cost</label>
-                                    <div class="form-text">What you pay for this product</div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" name="wholesale_price" id="wholesalePrice"
-                                        placeholder="Enter wholesale price" value="{{ old('wholesale_price') }}" step="0.01">
-                                    <label for="wholesalePrice">Wholesale Price</label>
-                                    <div class="form-text">Price for bulk/wholesale customers</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="number" class="form-control" name="quantity" id="productQuantity"
-                                    placeholder="Enter stock quantity" value="{{ old('quantity') }}">
-                                <label for="productQuantity">Stock Quantity</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="number" class="form-control" name="weight" id="productWeight"
-                                    placeholder="Enter product weight" value="{{ old('weight', '0.5') }}" step="0.001" min="0.001">
-                                <label for="productWeight">Weight (KG)</label>
-                                <div class="form-text">Weight for courier delivery (minimum 0.5 KG)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Variations Section -->
-                <div class="form-section" id="variationsSection" style="display: none;">
-                    <h4>Product Variations</h4>
-                    <div class="alert alert-info">
-                        <strong>How it works:</strong> Add variation groups (like Size, Color) and their options. The
-                        system will automatically generate all possible combinations and let you set individual prices
-                        and stock for each combination.
-                        <br><small class="text-muted mt-1">
-                            <strong>Note:</strong> Even single variations (e.g., Size-only) will create individual
-                            combinations for each option.
-                        </small>
-                    </div>
-                    <div id="variations">
-                        <!-- Variations will be added here -->
-                    </div>
-                    <button type="button" class="btn-add-variation" onclick="addVariation()">
-                        <i class="bi bi-plus-circle"></i> Add Variation Group
-                    </button>
-
-                    <!-- Combinations Preview -->
-                    <div id="combinationsPreview" style="display: none; margin-top: 30px;">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0"><i class="bi bi-grid-3x3-gap"></i> Variation Combinations</h5>
-                            <span id="combinationsCount" class="badge bg-success fs-6">0 combinations</span>
-                        </div>
-                        <p class="text-muted mb-3">
-                            <i class="bi bi-info-circle"></i>
-                            Set individual prices and stock quantities for each combination. These will be used on the
-                            frontend when customers select variations.
-                        </p>
-                        <div id="combinationsTable"></div>
-                    </div>
-                </div>
+        @csrf        <!-- Tabbed Interface for Product Creation Workspace -->
+        <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-pills modern-tabs mb-4 justify-content-center" id="productFormTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general-pane" type="button" role="tab"><i class="fas fa-info-circle me-2"></i> General Info</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pricing-tab" data-bs-toggle="tab" data-bs-target="#pricing-pane" type="button" role="tab"><i class="fas fa-coins me-2"></i> Pricing & Inventory</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="media-tab" data-bs-toggle="tab" data-bs-target="#media-pane" type="button" role="tab"><i class="fas fa-images me-2"></i> Media Gallery</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="classifications-tab" data-bs-toggle="tab" data-bs-target="#classifications-pane" type="button" role="tab"><i class="fas fa-folder-open me-2"></i> Classifications</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo-pane" type="button" role="tab"><i class="fas fa-search me-2"></i> SEO Settings</button>
+                    </li>
+                </ul>
             </div>
-
-            <!-- Sidebar Column -->
-            <div class="side-content">
-                <!-- Publish Section -->
-                <div class="form-section publish-section">
-                    <h4>Publish</h4>
-                    <div class="mb-3">
-                        <label for="productStatus" class="form-label">Status</label>
-                        <select class="form-select" name="status" id="productStatus">
-                            <option value="1" {{ old('status') == 1 ? 'selected' : '' }}>Published</option>
-                            <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>Draft</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary w-100" type="submit">Create Product</button>
-                </div>
-
-                <!-- Product Images Section -->
-                <div class="form-section">
-                    <h4>Product Images</h4>
-                    <div class="mb-3">
-                        <label for="thumb_image">Product Featured Image</label>
-                        <input type="file" class="form-control" id="thumb_image" name="thumb_image"
-                            accept="image/jpeg,image/png,image/jpg,image/gif" required>
-                        <div id="thumbnailPreview" class="mt-2" style="max-width: 200px;" required></div>
-                        @error('thumb_image')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label for="thumb_image">Product Featured Gallery Images</label>
-                        <input type="file" class="form-control" id="images" name="images[]"
-                            accept="image/jpeg,image/png,image/jpg,image/gif" multiple>
-                        <div id="galleryPreview" class="image-preview mt-2"></div>
-                        @error('images')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                </div>
-
-                <!-- Categories Section -->
-                <div class="form-sectione">
-                    <h4 style="display: none;">Categories</h4>
-                    <div class="alert alert-info mb-3" role="alert" style="display: none;">
-                        <i class="bi bi-info-circle"></i>
-                        <strong>Note:</strong> Primary category and subcategory fields below are optional and maintained for backward compatibility.
-                        You can use the multi-select category selector below to assign multiple categories, subcategories, and third-level categories.
-                        At least one category must be selected from either the primary field or the multi-select.
-                    </div>
-                    <div class="mb-3" style="display: none;">
-                        <label for="productCategory" class="form-label">Primary Category <small class="text-muted">(Optional - for backward compatibility)</small></label>
-                        <select class="form-select" name="category_id" id="productCategory">
-                            <option value="">Select Category (Optional)</option>
-                            @foreach ($categories as $category)
-                            <option value="{{ $category->id }}"
-                                {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-3" style="display: none;">
-                        <label for="productSubCategory" class="form-label">Primary Sub Category <small class="text-muted">(Optional - for backward compatibility)</small></label>
-                        <select class="form-select" name="sub_category_id" id="productSubCategory">
-                            <option value="">Select Sub Category (Optional)</option>
-                            @foreach ($sub_categories as $sub_category)
-                            <option value="{{ $sub_category->id }}"
-                                {{ old('sub_category_id') === $sub_category->id ? 'selected' : '' }}>
-                                        {{ $sub_category->name }}</option>
-                            @endforeach
-                        </select>
-                        <small class="form-text text-muted">
-                            <i class="bi bi-info-circle"></i>
-                            Subcategories will be loaded automatically when you select a primary category
-                        </small>
-                    </div>
-
-                    <!-- WordPress/WooCommerce Style Category Multi-Select -->
-                    <div class="mb-3">
-                        <div class="category-multiselect-container">
-                            <div class="category-panel-header">
-                                <h3 class="category-panel-title">Product categories</h3>
-                                <!-- <div class="category-controls">
-                                        <button type="button" class="category-control-btn" title="Toggle panel">
-                                            <span>▲</span>
-                                        </button>
-                                        <button type="button" class="category-control-btn" title="Toggle panel">
-                                            <span>▼</span>
-                                        </button>
-                                    </div> -->
-                            </div>
-                            <div class="category-tabs">
-                                <button type="button" class="category-tab active" data-tab="all">All categories</button>
-                                <button type="button" class="category-tab" data-tab="most-used">Most Used</button>
-                            </div>
-                            <div class="category-search-box">
-                                <input type="text"
-                                    id="categorySearch"
-                                    placeholder="Search categories..."
-                                    autocomplete="off">
-                            </div>
-                            <div class="category-list-wrapper" id="categoryListWrapper">
-                                @php
-                                $oldAdditionalCategories = old('additional_categories', []);
-                                $oldAdditionalSubcategories = old('additional_subcategories', []);
-                                $oldThirdCategories = old('third_categories', []);
-                                @endphp
-
-                                @foreach ($categories as $category)
-                                <!-- Primary Category (Level 0) -->
-                                <div class="category-list-item category-level-0"
-                                    data-category-name="{{ strtolower($category->name) }}"
-                                    data-level="0"
-                                    data-category-id="{{ $category->id }}">
-                                    <label>
-                                        <input type="checkbox"
-                                            name="additional_categories[]"
-                                            value="{{ $category->id }}"
-                                            id="category_{{ $category->id }}"
-                                            class="category-checkbox"
-                                            {{ in_array($category->id, $oldAdditionalCategories) ? 'checked' : '' }}>
-                                        <span class="category-name-text">{{ $category->name }}</span>
-                                    </label>
-                                </div>
-
-                                @if($category->subCategories && $category->subCategories->count() > 0)
-                                @foreach($category->subCategories as $subCategory)
-                                <!-- Sub Category (Level 1) -->
-                                <div class="category-list-item category-level-1"
-                                    data-category-name="{{ strtolower($subCategory->name . ' ' . $category->name) }}"
-                                    data-level="1"
-                                    data-parent-id="{{ $category->id }}"
-                                    data-category-id="{{ $subCategory->id }}">
-                                    <label>
-                                        <input type="checkbox"
-                                            name="additional_subcategories[]"
-                                            value="{{ $subCategory->id }}"
-                                            id="subcategory_{{ $subCategory->id }}"
-                                            class="category-checkbox additional-subcategory-checkbox"
-                                            {{ in_array($subCategory->id, $oldAdditionalSubcategories) ? 'checked' : '' }}>
-                                        <span class="category-name-text">{{ $subCategory->name }}</span>
-                                    </label>
-                                </div>
-
-                                @if($subCategory->thirdCategories && $subCategory->thirdCategories->count() > 0)
-                                @foreach($subCategory->thirdCategories as $thirdCategory)
-                                <!-- Third Level Category (Level 2) -->
-                                <div class="category-list-item category-level-2"
-                                    data-category-name="{{ strtolower($thirdCategory->name . ' ' . $subCategory->name . ' ' . $category->name) }}"
-                                    data-level="2"
-                                    data-parent-id="{{ $subCategory->id }}"
-                                    data-category-id="{{ $thirdCategory->id }}">
-                                    <label>
-                                        <input type="checkbox"
-                                            name="third_categories[]"
-                                            value="{{ $thirdCategory->id }}"
-                                            id="thirdcategory_{{ $thirdCategory->id }}"
-                                            class="category-checkbox thirdcategory-checkbox"
-                                            {{ in_array($thirdCategory->id, $oldThirdCategories) ? 'checked' : '' }}>
-                                        <span class="category-name-text">{{ $thirdCategory->name }}</span>
-                                    </label>
-                                </div>
-                                @endforeach
-                                @endif
-                                @endforeach
-                                @endif
-                                @endforeach
-                            </div>
-                            <div class="category-selected-count">
-                                <span id="selectedCount">0</span> selected
-                            </div>
-                        </div>
-                        <small class="form-text text-muted mt-2">
-                            <i class="bi bi-info-circle"></i>
-                            Select categories. The product will appear in all selected categories.
-                        </small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="productBrand" class="form-label">Brand</label>
-                        <div class="d-flex gap-2">
-                            <select class="form-select" name="brand_id" id="productBrand">
-                                <option value="">Select Brand</option>
-                                @foreach ($brands as $brand)
-                                <option value="{{ $brand->id }}"
-                                    {{ old('brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}
-                                </option>
-                                @endforeach
-                            </select>
-                            {{-- <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#createBrandModal">
-                                    <i class="bi bi-plus"></i> New
-                                </button> --}}
-                        </div>
-                        <small class="form-text text-muted">Optional: Select a brand for this product or create a new one</small>
-                    </div>
-                </div>
-
-                <!-- Tags Section -->
-                <div class="form-section">
-                    <h4>Tags</h4>
-                    <div class="mb-3">
-                        <input type="text" class="form-control" name="tags" id="productTags"
-                            placeholder="Enter tags separated by commas" value="{{ old('tags') }}">
-                        <small class="text-muted">Separate tags with commas</small>
-                    </div>
-                </div>
-
-                <!-- Others Section -->
-                <div class="form-section">
-                    <h4>Others</h4>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" name="is_featured" id="isFeatured"
-                            value="1" {{ old('is_featured') ? 'checked' : '' }} style="margin-top: 7px;">
-                        <label class="form-check-label" for="isFeatured">Set as Featured Product</label>
-                        <small class="d-block text-muted">Check this to mark the product as featured</small>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" name="is_book" id="isBook"
-                            value="1" {{ old('is_book') ? 'checked' : '' }} style="margin-top: 7px;" onchange="toggleBookDetails()">
-                        <label class="form-check-label" for="isBook">Is it Product Type of Book?</label>
-                        <small class="d-block text-muted">Check this to add book-specific details</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="video_url">Product Video URL (YouTube)</label>
-                        <input type="text" name="video_url" id="video_url" class="form-control"
-                            value="{{ old('video_url', $product->video_url ?? '') }}"
-                            placeholder="https://www.youtube.com/watch?v=xxxxxx">
-                        <small class="form-text text-muted">Leave blank to use the global video URL.</small>
-                    </div>
-                </div>
-
-
-
-            </div>
-
         </div>
 
-        <div class="row mb-5" id="bookDetailSection" style="display: none;">
-            <h4 class="mb-3"><i class="bi bi-book"></i> Book Detail</h4>
+        <div class="tab-content" id="productFormTabsContent">
+            <!-- TAB 1: GENERAL INFO -->
+            <div class="tab-pane fade show active" id="general-pane" role="tabpanel" aria-labelledby="general-tab">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Basic Information Card -->
+                        <div class="form-section mb-4">
+                            <h4>Basic Information</h4>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control @error('title') is-invalid @enderror" name="title"
+                                    id="productName" placeholder="Enter product name" value="{{ old('title') }}" required>
+                                <label for="productName">Product Name</label>
+                                @error('title')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-            <div class="col">
-                <!-- <div class="mb-3">
-                                    <label for="subject">Subject</label>
-                                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Enter subject" value="{{ old('subject') }}">
-                                </div> -->
-                <div class="mb-3">
-                    <label for="edition">Edition</label>
-                    <input type="text" class="form-control" name="edition" id="edition"
-                        placeholder="Enter edition" value="{{ old('edition') }}">
-                </div>
-                <div class="mb-3">
-                    <label for="isbn">ISBN</label>
-                    <input type="text" class="form-control" name="isbn" id="isbn"
-                        placeholder="Enter isbn" value="{{ old('isbn') }}">
-                </div>
-                <div class="mb-3">
-                    <label for="Language">Language</label>
-                    <select class="form-control" name="language">
-                        <option value="">Select Language</option>
-                        <option value="English" {{ old('language') == 'English' ? 'selected' : '' }}>English</option>
-                        <option value="Bangla" {{ old('language') == 'Bangla' ? 'selected' : '' }}>Bangla</option>
-                        <option value="Hindi" {{ old('language') == 'Hindi' ? 'selected' : '' }}>Hindi</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="sample_path">Upload Sample File</label>
-                    <input type="file" class="form-control" name="sample_path" id="sample_path"
-                        placeholder="Upload sample file">
-                </div>
-                <div class="mb-3">
-                    <label for="pages">Total Pages</label>
-                    <input type="number" class="form-control" name="pages" id="pages"
-                        placeholder="Enter total pages" value="{{ old('pages') }}">
-                </div>
-                <div class="mb-3">
-                    <label for="Cover">Cover</label>
-                    <select class="form-control" name="cover">
-                        <option value="">Select Cover</option>
-                        <option value="Hardcover" {{ old('cover') == 'Hardcover' ? 'selected' : '' }}>Hardcover
-                        </option>
-                        <option value="Paperback" {{ old('cover') == 'Paperback' ? 'selected' : '' }}>Paperback
-                        </option>
-                        <option value="Ebook" {{ old('cover') == 'Ebook' ? 'selected' : '' }}>Ebook</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="country">Country</label>
-                    <select class="form-control" name="country">
-                        <option value="">Select Country</option>
-                        <option value="Bangladesh" {{ old('country') == 'Bangladesh' ? 'selected' : '' }}>Bangladesh
-                        </option>
-                        <option value="India" {{ old('country') == 'India' ? 'selected' : '' }}>India</option>
-                        <option value="USA" {{ old('country') == 'USA' ? 'selected' : '' }}>USA</option>
-                        <option value="UK" {{ old('country') == 'UK' ? 'selected' : '' }}>UK</option>
-                        <option value="Canada" {{ old('country') == 'Canada' ? 'selected' : '' }}>Canada</option>
-                        <option value="Australia" {{ old('country') == 'Australia' ? 'selected' : '' }}>Australia
-                        </option>
-                        <option value="Other" {{ old('country') == 'Other' ? 'selected' : '' }}>Other</option>
-                    </select>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control @error('slug') is-invalid @enderror" name="slug"
+                                    id="productSlug" placeholder="Enter product slug" value="{{ old('slug') }}" required>
+                                <label for="productSlug">Product Slug</label>
+                                <small class="form-text text-muted">Auto-generated from product name, but you can edit it manually</small>
+                                @error('slug')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control @error('sku') is-invalid @enderror" name="sku"
+                                    id="productSku" placeholder="Enter SKU (Stock Keeping Unit)" value="{{ old('sku') }}">
+                                <label for="productSku">SKU (Stock Keeping Unit)</label>
+                                <small class="form-text text-muted">Unique identifier for inventory tracking. Used for Daraz sync and other marketplace integrations.</small>
+                                @error('sku')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="productShortDescription" class="form-label">Short Description</label>
+                                <textarea class="form-control @error('short_description') is-invalid @enderror" id="productShortDescription"
+                                    name="short_description" rows="3" placeholder="Enter short description">{{ old('short_description') }}</textarea>
+                                @error('short_description')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="productDescription" class="form-label">Detailed Description</label>
+                                <textarea class="form-control @error('description') is-invalid @enderror" id="productDescription" name="description"
+                                    rows="8" placeholder="Enter detailed description">{{ old('description') }}</textarea>
+                                @error('description')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <!-- Brand Section -->
+                        <div class="form-section mb-4">
+                            <h4>Brand</h4>
+                            <div class="mb-3">
+                                <label for="productBrand" class="form-label">Brand</label>
+                                <div class="d-flex gap-2">
+                                    <select class="form-select" name="brand_id" id="productBrand">
+                                        <option value="">Select Brand</option>
+                                        @foreach ($brands as $brand)
+                                        <option value="{{ $brand->id }}"
+                                            {{ old('brand_id') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <small class="form-text text-muted">Optional: Select a brand for this product</small>
+                            </div>
+                        </div>
+
+                        <!-- Tags Section -->
+                        <div class="form-section mb-4">
+                            <h4>Tags</h4>
+                            <div class="mb-3">
+                                <input type="text" class="form-control" name="tags" id="productTags"
+                                    placeholder="Enter tags separated by commas" value="{{ old('tags') }}">
+                                <small class="text-muted">Separate tags with commas</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="col">
+            <!-- TAB 2: PRICING & INVENTORY -->
+            <div class="tab-pane fade" id="pricing-pane" role="tabpanel" aria-labelledby="pricing-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Product Data Section -->
+                        <div class="form-section mb-4">
+                            <h4>Product Data</h4>
 
-                <div class="form-section">
-                    <div class="form-floating1 mb-3"></div>
-                    <label for="productWriters">Writers</label>
-                    <select class="form-select @error('writers') is-invalid @enderror" id="productWriters"
-                        name="writers[]" multiple>
-                        @foreach ($writers as $writer)
-                        <option value="{{ $writer->id }}"
-                            {{ in_array($writer->id, old('writers', [])) ? 'selected' : '' }}>
-                            {{ $writer->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                    @error('writers')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+                            <!-- Product Type Selector Cards -->
+                            <div class="product-type-selector">
+                                <div class="product-type-card" data-type="simple" onclick="selectProductType('simple')">
+                                    <i class="bi bi-box"></i>
+                                    <h6>Simple Product</h6>
+                                    <small class="text-muted">Single product with no variations</small>
+                                </div>
+                                <div class="product-type-card" data-type="variable" onclick="selectProductType('variable')">
+                                    <i class="bi bi-grid-3x3"></i>
+                                    <h6>Variable Product</h6>
+                                    <small class="text-muted">Product with multiple variations</small>
+                                </div>
+                                <div class="product-type-card" data-type="digital" onclick="selectProductType('digital')">
+                                    <i class="bi bi-file-earmark-arrow-down"></i>
+                                    <h6>Digital Product</h6>
+                                    <small class="text-muted">Downloadable product</small>
+                                </div>
+                                <div class="product-type-card" data-type="affiliate" onclick="selectProductType('affiliate')">
+                                    <i class="bi bi-link-45deg"></i>
+                                    <h6>Affiliate Product</h6>
+                                    <small class="text-muted">External product with commission</small>
+                                </div>
+                            </div>
 
+                            <input type="hidden" name="product_type" id="productTypeInput" value="simple">
 
+                            <!-- Digital Product Fields -->
+                            <div id="digitalFields" class="product-type-fields" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="digitalFile" class="form-label">Digital File</label>
+                                    <input type="file" class="form-control" id="digital_file" name="digital_file"
+                                        accept=".pdf,.zip,.rar,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                                    <div id="digitalFilePreview" class="mt-2"></div>
+                                    <input type="hidden" name="digital_file" id="digitalFileInput">
+                                    @error('digital_file')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control @error('download_limit') is-invalid @enderror"
+                                        id="downloadLimit" name="download_limit" value="{{ old('download_limit') }}"
+                                        placeholder="Enter download limit">
+                                    <label for="downloadLimit">Download Limit (leave empty for unlimited)</label>
+                                    @error('download_limit')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
 
-                <div class="form-section">
-                    <div class="form-floating1 mb-3"></div>
-                    <label for="publisher">Publisher</label>
-                    <select class="form-select @error('publisher') is-invalid @enderror" id="publisher"
-                        name="publisher">
-                        @foreach ($publishers as $publisher)
-                        <option value="{{ $publisher->id }}"
-                            {{ old('publisher') == $publisher->id ? 'selected' : '' }}>
-                            {{ $publisher->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                    @error('publisher')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                            <!-- Affiliate Product Fields -->
+                            <div id="affiliateFields" class="product-type-fields" style="display: none;">
+                                <div class="form-floating mb-3">
+                                    <input type="url" class="form-control @error('external_url') is-invalid @enderror"
+                                        id="externalUrl" name="external_url" value="{{ old('external_url') }}"
+                                        placeholder="Enter external product URL">
+                                    <label for="externalUrl">External URL</label>
+                                    @error('external_url')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="number" step="0.01"
+                                        class="form-control @error('affiliate_commission') is-invalid @enderror"
+                                        id="affiliateCommission" name="affiliate_commission"
+                                        value="{{ old('affiliate_commission') }}" placeholder="Enter commission amount">
+                                    <label for="affiliateCommission">Affiliate Commission (%)</label>
+                                    @error('affiliate_commission')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Pricing Fields -->
+                            <div id="pricingFields">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" name="old_price" id="productOldPrice"
+                                                placeholder="Enter regular price" value="{{ old('old_price') }}" step="0.01" required>
+                                            <label for="productOldPrice">Regular Price</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" name="offer" id="productOfferPrice"
+                                                placeholder="Enter sale price" value="{{ old('offer') }}" step="0.01">
+                                            <label for="productOfferPrice">Sale Price</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" name="product_cost" id="productCost"
+                                                placeholder="Enter product cost" value="{{ old('product_cost') }}" step="0.01">
+                                            <label for="productCost">Product Cost</label>
+                                            <div class="form-text">What you pay for this product</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" name="wholesale_price" id="wholesalePrice"
+                                                placeholder="Enter wholesale price" value="{{ old('wholesale_price') }}" step="0.01">
+                                            <label for="wholesalePrice">Wholesale Price</label>
+                                            <div class="form-text">Price for bulk/wholesale customers</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control" name="quantity" id="productQuantity"
+                                            placeholder="Enter stock quantity" value="{{ old('quantity') }}">
+                                        <label for="productQuantity">Stock Quantity</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control" name="weight" id="productWeight"
+                                            placeholder="Enter product weight" value="{{ old('weight', '0.5') }}" step="0.001" min="0.001">
+                                        <label for="productWeight">Weight (KG)</label>
+                                        <div class="form-text">Weight for courier delivery (minimum 0.5 KG)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Variations Section -->
+                        <div class="form-section mb-4" id="variationsSection" style="display: none;">
+                            <h4>Product Variations</h4>
+                            <div class="alert alert-info">
+                                <strong>How it works:</strong> Add variation groups (like Size, Color) and their options. The
+                                system will automatically generate all possible combinations and let you set individual prices
+                                and stock for each combination.
+                            </div>
+                            <div id="variations"></div>
+                            <button type="button" class="btn-add-variation" onclick="addVariation()">
+                                <i class="bi bi-plus-circle"></i> Add Variation Group
+                            </button>
+
+                            <!-- Combinations Preview -->
+                            <div id="combinationsPreview" style="display: none; margin-top: 30px;">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0"><i class="bi bi-grid-3x3-gap"></i> Variation Combinations</h5>
+                                    <span id="combinationsCount" class="badge bg-success fs-6">0 combinations</span>
+                                </div>
+                                <div id="combinationsTable"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-        </div>
+            <!-- TAB 3: MEDIA GALLERY -->
+            <div class="tab-pane fade" id="media-pane" role="tabpanel" aria-labelledby="media-tab">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!-- Product Images Section -->
+                        <div class="form-section mb-4">
+                            <h4>Product Images</h4>
+                            <div class="mb-4">
+                                <label for="thumb_image" class="form-label">Product Featured Image</label>
+                                <input type="file" class="form-control" id="thumb_image" name="thumb_image"
+                                    accept="image/jpeg,image/png,image/jpg,image/gif" required>
+                                <div id="thumbnailPreview" class="mt-2" style="max-width: 200px;"></div>
+                                @error('thumb_image')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="images" class="form-label">Product Gallery Images</label>
+                                <input type="file" class="form-control" id="images" name="images[]"
+                                    accept="image/jpeg,image/png,image/jpg,image/gif" multiple>
+                                <div id="galleryPreview" class="image-preview mt-2"></div>
+                                @error('images')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <!-- Video Section -->
+                        <div class="form-section mb-4">
+                            <h4>Video Integration</h4>
+                            <div class="form-group">
+                                <label for="video_url" class="form-label">Product Video URL (YouTube)</label>
+                                <input type="text" name="video_url" id="video_url" class="form-control"
+                                    value="{{ old('video_url', $product->video_url ?? '') }}"
+                                    placeholder="https://www.youtube.com/watch?v=xxxxxx">
+                                <small class="form-text text-muted">Leave blank to use the global video URL.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <!-- SEO Section -->
-        <div class="row mb-5">
-            <div class="col-md-12">
-                <div class="form-section">
-                    <h4><i class="bi bi-search"></i> SEO Settings</h4>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="seo[meta_title]" id="seoMetaTitle"
-                                    placeholder="Enter SEO title" value="" maxlength="60">
-                                <label for="seoMetaTitle">Meta Title</label>
-                                <small class="form-text text-muted">
-                                    <span id="metaTitleCount">0</span>/60 characters. Leave empty to auto-generate from
-                                    product title.
-                                </small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <textarea class="form-control" name="seo[meta_description]" id="seoMetaDescription"
-                                    placeholder="Enter SEO description" style="height: 100px;" maxlength="160"></textarea>
-                                <label for="seoMetaDescription">Meta Description</label>
-                                <small class="form-text text-muted">
-                                    <span id="metaDescriptionCount">0</span>/160 characters. Leave empty to
-                                    auto-generate from product description.
-                                </small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="seo[meta_keywords]"
-                                    id="seoMetaKeywords" placeholder="Enter SEO keywords" value="">
-                                <label for="seoMetaKeywords">Meta Keywords</label>
-                                <small class="form-text text-muted">Comma-separated keywords. Leave empty to
-                                    auto-generate from product tags and category.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="url" class="form-control" name="seo[canonical_url]"
-                                    id="seoCanonicalUrl" placeholder="Enter canonical URL" value="">
-                                <label for="seoCanonicalUrl">Canonical URL</label>
-                                <small class="form-text text-muted">Leave empty to use the default product URL.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <select class="form-select" name="seo[meta_robots]" id="seoMetaRobots">
-                                    <option value="index,follow">Index, Follow</option>
-                                    <option value="noindex,follow">No Index, Follow</option>
-                                    <option value="index,nofollow">Index, No Follow</option>
-                                    <option value="noindex,nofollow">No Index, No Follow</option>
-                                </select>
-                                <label for="seoMetaRobots">Meta Robots</label>
-                                <small class="form-text text-muted">Search engine crawling instructions.</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
+            <!-- TAB 4: CLASSIFICATIONS & BOOK DETAILS -->
+            <div class="tab-pane fade" id="classifications-pane" role="tabpanel" aria-labelledby="classifications-tab">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!-- Categories Section -->
+                        <div class="form-section mb-4">
+                            <h4>Product Categories</h4>
                             <div class="mb-3">
-                                <label for="seoOgImage" class="form-label">Open Graph Image</label>
-                                <input type="file" class="form-control" name="seo[og_image]" id="seoOgImage" accept="image/*">
-                                <small class="form-text text-muted">Custom image for social media sharing. Leave empty to use product featured image.</small>
-                                <div id="ogImagePreview" class="mt-2" style="max-width: 200px;"></div>
-                                <!-- Hidden field for consistency with edit form -->
-                                <input type="hidden" name="seo[existing_og_image]" value="">
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="mb-3">
-                                <label for="seoSchemaMarkup" class="form-label">Schema Markup (JSON-LD)</label>
-                                <textarea class="form-control" name="seo[schema_markup]" id="seoSchemaMarkup" rows="6"></textarea>
-                                <small class="form-text text-muted">Custom JSON-LD schema markup. Leave empty to
-                                    auto-generate basic product schema.</small>
-                                <div class="alert alert-info mt-2">
-                                    <strong>Example:</strong><br>
-                                    <code>{"@@context":"https://schema.org","@@type":"Product","name":"Product Name","description":"Product Description"}</code>
+                                <div class="category-multiselect-container">
+                                    <div class="category-panel-header">
+                                        <h3 class="category-panel-title">Categories Tree</h3>
+                                    </div>
+                                    <div class="category-tabs">
+                                        <button type="button" class="category-tab active" data-tab="all">All categories</button>
+                                        <button type="button" class="category-tab" data-tab="most-used">Most Used</button>
+                                    </div>
+                                    <div class="category-search-box">
+                                        <input type="text" id="categorySearch" placeholder="Search categories..." autocomplete="off">
+                                    </div>
+                                    <div class="category-list-wrapper" id="categoryListWrapper">
+                                        @php
+                                        $oldAdditionalCategories = old('additional_categories', []);
+                                        $oldAdditionalSubcategories = old('additional_subcategories', []);
+                                        $oldThirdCategories = old('third_categories', []);
+                                        @endphp
+
+                                        @foreach ($categories as $category)
+                                        <div class="category-list-item category-level-0" data-category-name="{{ strtolower($category->name) }}" data-level="0" data-category-id="{{ $category->id }}">
+                                            <label>
+                                                <input type="checkbox" name="additional_categories[]" value="{{ $category->id }}" id="category_{{ $category->id }}" class="category-checkbox" {{ in_array($category->id, $oldAdditionalCategories) ? 'checked' : '' }}>
+                                                <span class="category-name-text">{{ $category->name }}</span>
+                                            </label>
+                                        </div>
+
+                                        @if($category->subCategories && $category->subCategories->count() > 0)
+                                        @foreach($category->subCategories as $subCategory)
+                                        <div class="category-list-item category-level-1" data-category-name="{{ strtolower($subCategory->name . ' ' . $category->name) }}" data-level="1" data-parent-id="{{ $category->id }}" data-category-id="{{ $subCategory->id }}">
+                                            <label>
+                                                <input type="checkbox" name="additional_subcategories[]" value="{{ $subCategory->id }}" id="subcategory_{{ $subCategory->id }}" class="category-checkbox additional-subcategory-checkbox" {{ in_array($subCategory->id, $oldAdditionalSubcategories) ? 'checked' : '' }}>
+                                                <span class="category-name-text">{{ $subCategory->name }}</span>
+                                            </label>
+                                        </div>
+
+                                        @if($subCategory->thirdCategories && $subCategory->thirdCategories->count() > 0)
+                                        @foreach($subCategory->thirdCategories as $thirdCategory)
+                                        <div class="category-list-item category-level-2" data-category-name="{{ strtolower($thirdCategory->name . ' ' . $subCategory->name . ' ' . $category->name) }}" data-level="2" data-parent-id="{{ $subCategory->id }}" data-category-id="{{ $thirdCategory->id }}">
+                                            <label>
+                                                <input type="checkbox" name="third_categories[]" value="{{ $thirdCategory->id }}" id="thirdcategory_{{ $thirdCategory->id }}" class="category-checkbox thirdcategory-checkbox" {{ in_array($thirdCategory->id, $oldThirdCategories) ? 'checked' : '' }}>
+                                                <span class="category-name-text">{{ $thirdCategory->name }}</span>
+                                            </label>
+                                        </div>
+                                        @endforeach
+                                        @endif
+                                        @endforeach
+                                        @endif
+                                        @endforeach
+                                    </div>
+                                    <div class="category-selected-count">
+                                        <span id="selectedCount">0</span> selected
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6 class="mb-0">
-                                        <i class="bi bi-eye"></i> SEO Preview
-                                    </h6>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <!-- Special Badges & Settings -->
+                        <div class="form-section mb-4">
+                            <h4>Special Badges & Details</h4>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" name="is_featured" id="isFeatured"
+                                    value="1" {{ old('is_featured') ? 'checked' : '' }} style="margin-top: 7px;">
+                                <label class="form-check-label" for="isFeatured">Set as Featured Product</label>
+                                <small class="d-block text-muted">Check this to mark the product as featured</small>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" name="is_book" id="isBook"
+                                    value="1" {{ old('is_book') ? 'checked' : '' }} style="margin-top: 7px;" onchange="toggleBookDetails()">
+                                <label class="form-check-label" for="isBook">Is it Product Type of Book?</label>
+                                <small class="d-block text-muted">Check this to add book-specific details</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book Details Section (full width below categories and badges) -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-section mb-4" id="bookDetailSection" style="display: none;">
+                            <h4>Book Specifications</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="edition" class="form-label">Edition</label>
+                                        <input type="text" class="form-control" name="edition" id="edition"
+                                            placeholder="Enter edition" value="{{ old('edition') }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="isbn" class="form-label">ISBN</label>
+                                        <input type="text" class="form-control" name="isbn" id="isbn"
+                                            placeholder="Enter isbn" value="{{ old('isbn') }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="Language" class="form-label">Language</label>
+                                        <select class="form-select" name="language">
+                                            <option value="">Select Language</option>
+                                            <option value="English" {{ old('language') == 'English' ? 'selected' : '' }}>English</option>
+                                            <option value="Bangla" {{ old('language') == 'Bangla' ? 'selected' : '' }}>Bangla</option>
+                                            <option value="Hindi" {{ old('language') == 'Hindi' ? 'selected' : '' }}>Hindi</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="sample_path" class="form-label">Upload Sample File</label>
+                                        <input type="file" class="form-control" name="sample_path" id="sample_path"
+                                            placeholder="Upload sample file">
+                                    </div>
                                 </div>
-                                <div class="card-body">
-                                    <div class="seo-preview">
-                                        <p class="seo-title"><strong>Meta Title:</strong> Auto-generated from product name</p>
-                                        <p class="seo-description"><strong>Meta Description:</strong> Auto-generated from product description</p>
-                                        <p class="seo-description"><strong>Meta Keywords:</strong> Auto-generated from product tags and category</p>
-                                        <p class="seo-url"><strong>Canonical URL:</strong> Default product URL</p>
-                                        <p class="seo-description"><strong>Meta Robots:</strong> Default (Index, Follow)</p>
-                                        <p class="seo-description"><strong>OG Image:</strong> Product featured image</p>
-                                        <p class="seo-description"><strong>Schema Markup:</strong> Auto-generated basic product schema</p>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="pages" class="form-label">Total Pages</label>
+                                        <input type="number" class="form-control" name="pages" id="pages"
+                                            placeholder="Enter total pages" value="{{ old('pages') }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="Cover" class="form-label">Cover Type</label>
+                                        <select class="form-select" name="cover">
+                                            <option value="">Select Cover</option>
+                                            <option value="Hardcover" {{ old('cover') == 'Hardcover' ? 'selected' : '' }}>Hardcover</option>
+                                            <option value="Paperback" {{ old('cover') == 'Paperback' ? 'selected' : '' }}>Paperback</option>
+                                            <option value="Ebook" {{ old('cover') == 'Ebook' ? 'selected' : '' }}>Ebook</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="country" class="form-label">Country of Origin</label>
+                                        <select class="form-select" name="country">
+                                            <option value="">Select Country</option>
+                                            <option value="Bangladesh" {{ old('country') == 'Bangladesh' ? 'selected' : '' }}>Bangladesh</option>
+                                            <option value="India" {{ old('country') == 'India' ? 'selected' : '' }}>India</option>
+                                            <option value="USA" {{ old('country') == 'USA' ? 'selected' : '' }}>USA</option>
+                                            <option value="UK" {{ old('country') == 'UK' ? 'selected' : '' }}>UK</option>
+                                            <option value="Canada" {{ old('country') == 'Canada' ? 'selected' : '' }}>Canada</option>
+                                            <option value="Australia" {{ old('country') == 'Australia' ? 'selected' : '' }}>Australia</option>
+                                            <option value="Other" {{ old('country') == 'Other' ? 'selected' : '' }}>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <label for="productWriters" class="form-label">Writers</label>
+                                    <select class="form-select @error('writers') is-invalid @enderror" id="productWriters" name="writers[]" multiple style="height: 120px;">
+                                        @foreach ($writers as $writer)
+                                        <option value="{{ $writer->id }}" {{ in_array($writer->id, old('writers', [])) ? 'selected' : '' }}>
+                                            {{ $writer->name }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <label for="publisher" class="form-label">Publisher</label>
+                                    <select class="form-select @error('publisher') is-invalid @enderror" id="publisher" name="publisher">
+                                        <option value="">Select Publisher</option>
+                                        @foreach ($publishers as $publisher)
+                                        <option value="{{ $publisher->id }}" {{ old('publisher') == $publisher->id ? 'selected' : '' }}>
+                                            {{ $publisher->name }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: SEO SETTINGS -->
+            <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-section mb-4">
+                            <h4>SEO Settings</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" name="seo[meta_title]" id="seoMetaTitle"
+                                            placeholder="Enter SEO title" value="" maxlength="60">
+                                        <label for="seoMetaTitle">Meta Title</label>
+                                        <small class="form-text text-muted">
+                                            <span id="metaTitleCount">0</span>/60 characters. Leave empty to auto-generate from
+                                            product title.
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" name="seo[meta_description]" id="seoMetaDescription"
+                                            placeholder="Enter SEO description" style="height: 100px;" maxlength="160"></textarea>
+                                        <label for="seoMetaDescription">Meta Description</label>
+                                        <small class="form-text text-muted">
+                                            <span id="metaDescriptionCount">0</span>/160 characters. Leave empty to
+                                            auto-generate from product description.
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" name="seo[meta_keywords]"
+                                            id="seoMetaKeywords" placeholder="Enter SEO keywords" value="">
+                                        <label for="seoMetaKeywords">Meta Keywords</label>
+                                        <small class="form-text text-muted">Comma-separated keywords. Leave empty to
+                                            auto-generate from product tags and category.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="url" class="form-control" name="seo[canonical_url]"
+                                            id="seoCanonicalUrl" placeholder="Enter canonical URL" value="">
+                                        <label for="seoCanonicalUrl">Canonical URL</label>
+                                        <small class="form-text text-muted">Leave empty to use the default product URL.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" name="seo[meta_robots]" id="seoMetaRobots">
+                                            <option value="index,follow">Index, Follow</option>
+                                            <option value="noindex,follow">No Index, Follow</option>
+                                            <option value="index,nofollow">Index, No Follow</option>
+                                            <option value="noindex,nofollow">No Index, No Follow</option>
+                                        </select>
+                                        <label for="seoMetaRobots">Robots Meta</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="seoSchemaMarkup" class="form-label">Custom Schema Markup (JSON-LD)</label>
+                                        <textarea class="form-control" name="seo[schema_markup]" id="seoSchemaMarkup" rows="4" placeholder="Enter custom schema markup"></textarea>
+                                        <small class="form-text text-muted">Optional: Paste custom JSON-LD schema markup. Leave empty to
+                                            auto-generate basic product schema.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">
+                                                <i class="bi bi-eye"></i> SEO Preview
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="seo-preview">
+                                                <p class="seo-title"><strong>Meta Title:</strong> Auto-generated from product name</p>
+                                                <p class="seo-description"><strong>Meta Description:</strong> Auto-generated from product description</p>
+                                                <p class="seo-description"><strong>Meta Keywords:</strong> Auto-generated from product tags and category</p>
+                                                <p class="seo-url"><strong>Canonical URL:</strong> Default product URL</p>
+                                                <p class="seo-description"><strong>Meta Robots:</strong> Default (Index, Follow)</p>
+                                                <p class="seo-description"><strong>OG Image:</strong> Product featured image</p>
+                                                <p class="seo-description"><strong>Schema Markup:</strong> Auto-generated basic product schema</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1251,6 +1133,21 @@
                 </div>
             </div>
         </div>
+
+        <!-- Sticky/Fixed Footer Action Panel at the bottom -->
+        <div class="form-section mt-4 d-flex flex-wrap justify-content-between align-items-center" style="background: rgba(255, 255, 255, 0.85); border: 2px solid var(--primary); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);">
+            <div class="d-flex align-items-center gap-3">
+                <label for="productStatus" class="form-label mb-0" style="font-weight: 700; color: var(--dark); text-transform: none; letter-spacing: 0;">Publishing State:</label>
+                <select class="form-select" name="status" id="productStatus" style="width: 160px; height: 42px;">
+                    <option value="1" {{ old('status') == 1 ? 'selected' : '' }}>Published</option>
+                    <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>Draft</option>
+                </select>
+            </div>
+            <div>
+                <a href="{{ route('admin.product.index') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                <button class="btn btn-primary" type="submit" style="height: 42px;">Create & Publish Product</button>
+            </div>
+        </div></div>
 
     </form>
 </div>
