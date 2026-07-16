@@ -680,6 +680,49 @@
             .menu-section.expanded .section-caret {
                 transform: rotate(90deg);
             }
+
+            /* Premium Sidebar Sub-menu Redesign */
+            ul#sidebar .sub-menu ul {
+                border-left: 2px solid #e2e8f0 !important;
+                margin-left: 25px !important;
+                padding-left: 6px !important;
+                margin-top: 4px !important;
+                margin-bottom: 4px !important;
+            }
+            ul#sidebar .sub-menu ul li {
+                margin-bottom: 2px !important;
+                border-left: none !important;
+            }
+            ul#sidebar .sub-menu ul li:hover {
+                border-left: none !important;
+            }
+            ul#sidebar .sub-menu ul li a {
+                padding: 6px 12px !important;
+                border-radius: 8px !important;
+                transition: all 0.2s ease-in-out !important;
+                color: #4a5568 !important;
+                font-weight: 500 !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                background: transparent !important;
+            }
+            ul#sidebar .sub-menu ul li a:hover {
+                background: #f1f5f9 !important;
+                color: #1a56db !important;
+                transform: translateX(3px) !important;
+            }
+            ul#sidebar .sub-menu ul li.active a {
+                background: #eff6ff !important;
+                color: #1a56db !important;
+                font-weight: 600 !important;
+            }
+            ul#sidebar .sub-menu ul li a i {
+                font-size: 13px !important;
+                width: 16px !important;
+                text-align: center !important;
+                opacity: 0.8 !important;
+            }
         </style>
 
         <div class="left-menu">

@@ -251,6 +251,8 @@
             border: 1px solid var(--border);
             padding: 1rem;
             box-shadow: var(--shadow-sm);
+            overflow-x: auto !important;
+            width: 100%;
         }
         table.dataTable {
             border-collapse: separate !important;
@@ -322,6 +324,9 @@
             font-weight: 700;
             letter-spacing: 0.02em;
             display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
         }
         .status-active-modern {
             background-color: #ecfdf5;
@@ -572,11 +577,11 @@
                     </div>
                     <div class="filter-group">
                         <label>Min Price</label>
-                        <input type="number" id="price-min" placeholder="Min ৳" min="0">
+                        <input type="number" id="price-min" placeholder="Min TK" min="0">
                     </div>
                     <div class="filter-group">
                         <label>Max Price</label>
-                        <input type="number" id="price-max" placeholder="Max ৳" min="0">
+                        <input type="number" id="price-max" placeholder="Max TK" min="0">
                     </div>
                     <div class="filter-group">
                         <label>Date From</label>
@@ -622,16 +627,16 @@
                 <thead>
                     <tr>
                         <th width="30"><input type="checkbox" class="custom-control-input" id="select-all-products"></th>
-                        <th>#</th>
-                        <th>Product Details</th>
-                        <th>Image</th>
-                        <th>Category</th>
-                        <th>Type</th>
+                        <th>ID</th>
+                        <th>Product Title & Info</th>
+                        <th>Preview</th>
+                        <th>Category Group</th>
+                        <th>Stock Type</th>
                         <th>Price</th>
-                        <th>Views (T/U)</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                        <th width="150">Actions</th>
+                        <th>Product Views</th>
+                        <th>Visibility</th>
+                        <th>Date Added</th>
+                        <th width="150">Operations</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -717,13 +722,13 @@
                         if (!data) return '<span class="text-muted">N/A</span>';
                         
                         if (typeof data === 'string' && data.includes(' - ')) {
-                            return `<span class="price-modern">৳${data}</span>`;
+                            return `<span class="price-modern">TK ${data}</span>`;
                         }
                         
                         const price = parseFloat(data);
                         if (isNaN(price)) return '<span class="text-muted">N/A</span>';
                         
-                        return `<span class="price-modern">৳${price.toFixed(2)}</span>`;
+                        return `<span class="price-modern">TK ${price.toFixed(2)}</span>`;
                     }},
                     { data: 'views', orderable: false, searchable: false, render: function(data) {
                         if (!data) return '<span class="text-muted">0 / 0</span>';
@@ -776,10 +781,11 @@
                     {
                         extend: 'colvis',
                         text: '<i class="fas fa-columns"></i> Columns',
-                        className: 'dt-button-modern'
+                        className: 'dt-button-modern',
+                        columns: ':not(:first-child):not(:last-child)'
                     }
                 ],
-                responsive: true,
+                responsive: false,
                 colReorder: true,
                 select: {
                     style: 'multi',
