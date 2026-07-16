@@ -1592,13 +1592,32 @@
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $controlSystemActive ? 'display: block;' : 'display: none;' }}">
                                 @can('users.view')
-                                <li class="{{ request()->is('admin/users*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.users') }}">
+                                <li class="sub-menu {{ request()->is('admin/users*') ? 'active' : '' }}">
+                                    <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-users" style="color:#20c997;"></i>
                                             Customers & Users
                                         </span>
+                                        <span class="fas fa-caret-down right"></span>
                                     </a>
+                                    <ul class="left-menu-dp" style="{{ request()->is('admin/users*') ? 'display: block;' : '' }}">
+                                        <li class="{{ request()->is('admin/users') && !request()->has('view') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.users') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-users-cog"></i>
+                                                    All Users
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <li class="{{ request()->is('admin/users*') && request()->get('view') === 'packages' ? 'active' : '' }}">
+                                            <a href="{{ route('admin.users', ['view' => 'packages']) }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-box-open"></i>
+                                                    Admin Packages
+                                                </span>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </li>
                                 @endcan
 
