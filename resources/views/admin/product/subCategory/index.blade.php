@@ -131,7 +131,7 @@
         /* Modernized Table Design */
         .premium-table-wrapper {
             border-radius: 16px;
-            overflow: hidden;
+            overflow-x: auto;
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.015);
         }
@@ -139,65 +139,37 @@
             width: 100% !important;
             margin: 0 !important;
             border-collapse: collapse;
+            white-space: nowrap;
         }
         
-        /* Hide duplicated default DataTables sorting icons */
-        table.dataTable thead th.sorting:before,
-        table.dataTable thead th.sorting:after,
-        table.dataTable thead th.sorting_asc:before,
-        table.dataTable thead th.sorting_asc:after,
-        table.dataTable thead th.sorting_desc:before,
-        table.dataTable thead th.sorting_desc:after {
-            content: "" !important;
+        /* Hide default sorting icons globally for this table to prevent duplicates */
+        .premium-table thead th::before,
+        .premium-table thead th::after {
             display: none !important;
+            content: "" !important;
         }
 
-        /* Custom clean sort indicators only on header cells */
-        table.dataTable thead th.sorting,
-        table.dataTable thead th.sorting_asc,
-        table.dataTable thead th.sorting_desc {
-            position: relative !important;
-            padding-right: 28px !important;
+        /* SVG sorting indicators */
+        .premium-table thead th.sorting {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="12" viewBox="0 0 8 12"><path fill="%2364748b" d="M4 0l4 4H0zm0 12L0 8h8z"/></svg>') !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            padding-right: 32px !important;
             cursor: pointer;
         }
-
-        table.dataTable thead th.sorting::after {
-            content: "\f0dc" !important;
-            font-family: "Font Awesome 6 Free" !important;
-            font-weight: 900 !important;
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.35;
-            font-size: 0.75rem;
-            color: #64748b;
+        .premium-table thead th.sorting_asc {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="12" viewBox="0 0 8 12"><path fill="%234f46e5" d="M4 0l4 4H0z"/></svg>') !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            padding-right: 32px !important;
+            cursor: pointer;
         }
-
-        table.dataTable thead th.sorting_asc::after {
-            content: "\f0de" !important;
-            font-family: "Font Awesome 6 Free" !important;
-            font-weight: 900 !important;
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.9;
-            color: #4f46e5;
-            font-size: 0.75rem;
-        }
-
-        table.dataTable thead th.sorting_desc::after {
-            content: "\f0dd" !important;
-            font-family: "Font Awesome 6 Free" !important;
-            font-weight: 900 !important;
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.9;
-            color: #4f46e5;
-            font-size: 0.75rem;
+        .premium-table thead th.sorting_desc {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="12" viewBox="0 0 8 12"><path fill="%234f46e5" d="M4 12L0 8h8z"/></svg>') !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            padding-right: 32px !important;
+            cursor: pointer;
         }
 
         .premium-table thead th {
@@ -563,7 +535,11 @@
             const subcategoriesTable = $('#subcategories').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
-                    'copy', 'csv', 'excel', 'print'
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa-solid fa-file-export me-1"></i> Export'
+                    },
+                    'print'
                 ],
                 order: [[1, 'asc']], // Sort by Category ID ascending
                 pageLength: 25,
