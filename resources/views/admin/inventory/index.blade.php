@@ -64,98 +64,127 @@
             margin-bottom: 0.75rem;
         }
 
-        /* Statistics Cards */
+        /* ── Premium Stats Cards ── */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        @media(max-width:992px){ .stats-row { grid-template-columns: repeat(2,1fr); } }
+        @media(max-width:576px){ .stats-row { grid-template-columns: 1fr; } }
+
         .stats-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: #fff;
             border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 1.4rem 1.5rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+            border: 1px solid #f0f4f8;
             position: relative;
             overflow: hidden;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.3);
-        }
-        .stats-card h3 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 0.25rem;
-            letter-spacing: -0.03em;
-        }
-        .stats-card p {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .stats-card .icon-wrapper {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.35rem;
-            transition: all 0.3s ease;
+            gap: 1.1rem;
         }
-        .stats-card:hover .icon-wrapper {
-            transform: scale(1.08);
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 5px; height: 100%;
+            border-radius: 20px 0 0 20px;
         }
-        
-        .stats-card.info .icon-wrapper {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%);
-            color: #2563eb;
+        .stats-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+
+        .stats-card .s-icon {
+            width: 58px; height: 58px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; flex-shrink: 0;
+            transition: transform 0.3s ease;
         }
-        .stats-card.success .icon-wrapper {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 101, 52, 0.15) 100%);
-            color: #166534;
+        .stats-card:hover .s-icon { transform: scale(1.1) rotate(-4deg); }
+        .stats-card .s-body { flex: 1; }
+        .stats-card .s-value {
+            font-size: 2.1rem; font-weight: 800; letter-spacing: -0.04em;
+            line-height: 1; margin-bottom: 4px; display: block;
         }
-        .stats-card.warning .icon-wrapper {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.15) 100%);
-            color: #d97706;
+        .stats-card .s-label {
+            font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.07em; color: #94a3b8;
         }
-        .stats-card.danger .icon-wrapper {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%);
-            color: #dc2626;
+        .stats-card .s-trend {
+            font-size: 0.75rem; font-weight: 600; margin-top: 2px;
         }
 
-        /* Financial Card Mini Grid */
-        .financial-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            border-radius: 16px;
-            padding: 1.25rem;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.01);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Info – blue */
+        .sc-info::before { background: linear-gradient(180deg,#6366f1,#818cf8); }
+        .sc-info .s-icon { background: linear-gradient(135deg,rgba(99,102,241,.12),rgba(129,140,248,.12)); color: #6366f1; }
+        .sc-info .s-value { color: #4f46e5; }
+
+        /* Success – green */
+        .sc-success::before { background: linear-gradient(180deg,#10b981,#34d399); }
+        .sc-success .s-icon { background: linear-gradient(135deg,rgba(16,185,129,.12),rgba(52,211,153,.12)); color: #059669; }
+        .sc-success .s-value { color: #059669; }
+
+        /* Warning – amber */
+        .sc-warning::before { background: linear-gradient(180deg,#f59e0b,#fbbf24); }
+        .sc-warning .s-icon { background: linear-gradient(135deg,rgba(245,158,11,.12),rgba(251,191,36,.12)); color: #d97706; }
+        .sc-warning .s-value { color: #d97706; }
+
+        /* Danger – red */
+        .sc-danger::before { background: linear-gradient(180deg,#ef4444,#f87171); }
+        .sc-danger .s-icon { background: linear-gradient(135deg,rgba(239,68,68,.12),rgba(248,113,113,.12)); color: #dc2626; }
+        .sc-danger .s-value { color: #dc2626; }
+
+        /* ── Premium Financial Bar ── */
+        .financial-bar {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 20px;
+            padding: 1.4rem 2rem;
+            margin-bottom: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 0;
+            position: relative;
+            overflow: hidden;
         }
-        .financial-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(99, 102, 241, 0.25);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+        .financial-bar::before {
+            content: '';
+            position: absolute;
+            top: -40%; right: -10%;
+            width: 250px; height: 250px;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+            border-radius: 50%;
         }
-        .financial-card h4 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 0.15rem;
+        .financial-bar::after {
+            content: '';
+            position: absolute;
+            bottom: -30%; left: 5%;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%);
+            border-radius: 50%;
         }
-        .financial-card p {
-            font-size: 0.8rem;
-            color: #64748b;
-            font-weight: 500;
+        .f-item {
+            padding: 0 1.5rem;
+            border-right: 1px solid rgba(255,255,255,0.08);
+            position: relative; z-index: 1;
         }
+        .f-item:first-child { padding-left: 0; }
+        .f-item:last-child { border-right: none; }
+        .f-item .f-label {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .f-item .f-label i { font-size: 0.85rem; }
+        .f-item .f-value {
+            font-size: 1.35rem; font-weight: 800; letter-spacing: -0.03em;
+            font-family: 'Outfit', sans-serif;
+        }
+        .f-item .f-sub {
+            font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 3px;
+        }
+        .f-retail .f-value { color: #34d399; }
+        .f-cost .f-value { color: #60a5fa; }
+        .f-profit .f-value { color: #a78bfa; }
+        .f-wholesale .f-value { color: #fbbf24; }
+        @media(max-width:992px) { .financial-bar { grid-template-columns: repeat(2,1fr); gap: 1rem; } .f-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 0 1rem 0; } .f-item:nth-child(2n) { border-bottom: 1px solid rgba(255,255,255,0.08); } .f-item:last-child { border-bottom: none; } }
+        @media(max-width:576px) { .financial-bar { grid-template-columns: 1fr; } }
 
         /* Filter Section Styling */
         .filter-section {
@@ -330,6 +359,14 @@
             background: rgba(59, 130, 246, 0.12);
             color: #2563eb;
         }
+        .btn-action-history:hover {
+            background: rgba(14, 165, 233, 0.12);
+            color: #0284c7;
+        }
+        .btn-action-settings:hover {
+            background: rgba(100, 116, 139, 0.12);
+            color: #475569;
+        }
     </style>
 @endsection
 
@@ -345,94 +382,92 @@
 
         <div class="glass-card">
             <!-- Header Section -->
-            <div class="row align-items-center mb-4">
-                <div class="col-md-6">
-                    <h1 class="page-header-title">📦 Inventory Management</h1>
-                    <p class="page-header-subtitle">Analyze warehouse stock metrics, financial valuations, and adjust products quantity.</p>
+            <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+                <div>
+                    <div class="d-flex align-items-center gap-3 mb-1">
+                        <div style="width:46px;height:46px;background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;flex-shrink:0;box-shadow:0 8px 20px rgba(99,102,241,.3)">
+                            📦
+                        </div>
+                        <div>
+                            <h1 class="page-header-title mb-0">Inventory Management</h1>
+                            <p class="page-header-subtitle mb-0">Analyze warehouse stock metrics, financial valuations, and adjust products quantity.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-6 text-md-end d-flex justify-content-md-end gap-2">
+                <div class="d-flex gap-2 flex-wrap">
                     <a href="{{ route('admin.inventory.history') }}" class="btn-toolbar-outline">
-                        <i class="fa-solid fa-history"></i> History Logs
+                        <i class="fa-solid fa-clock-rotate-left"></i> History Logs
                     </a>
-                    <a href="{{ route('admin.inventory.low-stock') }}" class="btn-toolbar-outline text-warning">
+                    <a href="{{ route('admin.inventory.low-stock') }}" class="btn-toolbar-outline" style="color:#f59e0b;border-color:#fde68a;background:#fffbeb;">
                         <i class="fa-solid fa-triangle-exclamation"></i> Low Stock Alerts
+                        @if($stats['low_stock_products'] > 0)
+                        <span style="background:#f59e0b;color:#fff;border-radius:20px;padding:2px 8px;font-size:0.75rem;font-weight:800;margin-left:4px;">{{ $stats['low_stock_products'] }}</span>
+                        @endif
                     </a>
                 </div>
             </div>
 
-            <!-- Statistics Cards -->
-            <div class="row mb-4">
-                <div class="col-lg-3 col-md-6">
-                    <div class="stats-card info">
-                        <div>
-                            <h3 id="stat-total-products">{{ number_format($stats['total_products']) }}</h3>
-                            <p class="mb-0">Total Products</p>
-                        </div>
-                        <div class="icon-wrapper">
-                            <i class="fa-solid fa-boxes-stacked"></i>
-                        </div>
+            <!-- Premium Stats Cards -->
+            <div class="stats-row mb-2">
+                <!-- Total Products -->
+                <div class="stats-card sc-info">
+                    <div class="s-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    <div class="s-body">
+                        <span class="s-value" id="stat-total-products">{{ number_format($stats['total_products']) }}</span>
+                        <span class="s-label">Total Products</span>
+                        <div class="s-trend" style="color:#6366f1;"><i class="fa-solid fa-layer-group fa-xs me-1"></i>All catalog items</div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stats-card success">
-                        <div>
-                            <h3 id="stat-in-stock">{{ number_format($stats['in_stock_products']) }}</h3>
-                            <p class="mb-0">In Stock</p>
-                        </div>
-                        <div class="icon-wrapper">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
+                <!-- In Stock -->
+                <div class="stats-card sc-success">
+                    <div class="s-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="s-body">
+                        <span class="s-value" id="stat-in-stock">{{ number_format($stats['in_stock_products']) }}</span>
+                        <span class="s-label">In Stock</span>
+                        <div class="s-trend" style="color:#059669;"><i class="fa-solid fa-check fa-xs me-1"></i>Ready to sell</div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stats-card warning">
-                        <div>
-                            <h3 id="stat-low-stock">{{ number_format($stats['low_stock_products']) }}</h3>
-                            <p class="mb-0">Low Stock</p>
-                        </div>
-                        <div class="icon-wrapper">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
+                <!-- Low Stock -->
+                <div class="stats-card sc-warning">
+                    <div class="s-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="s-body">
+                        <span class="s-value" id="stat-low-stock">{{ number_format($stats['low_stock_products']) }}</span>
+                        <span class="s-label">Low Stock</span>
+                        <div class="s-trend" style="color:#d97706;"><i class="fa-solid fa-arrow-down fa-xs me-1"></i>Needs reorder</div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="stats-card danger">
-                        <div>
-                            <h3 id="stat-out-of-stock">{{ number_format($stats['out_of_stock_products']) }}</h3>
-                            <p class="mb-0">Out of Stock</p>
-                        </div>
-                        <div class="icon-wrapper">
-                            <i class="fa-solid fa-circle-xmark"></i>
-                        </div>
+                <!-- Out of Stock -->
+                <div class="stats-card sc-danger">
+                    <div class="s-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                    <div class="s-body">
+                        <span class="s-value" id="stat-out-of-stock">{{ number_format($stats['out_of_stock_products']) }}</span>
+                        <span class="s-label">Out of Stock</span>
+                        <div class="s-trend" style="color:#dc2626;"><i class="fa-solid fa-ban fa-xs me-1"></i>Unavailable</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Financial Overview -->
-            <div class="row mb-4">
-                <div class="col-lg-3 col-md-6 mb-2">
-                    <div class="financial-card">
-                        <h4 class="text-success mb-1" id="stat-retail-value">৳{{ number_format($stats['total_stock_value'], 2) }}</h4>
-                        <p class="mb-0">Total Retail Value</p>
-                    </div>
+            <!-- Financial Dark Bar -->
+            <div class="financial-bar mb-2">
+                <div class="f-item f-retail">
+                    <div class="f-label"><i class="fa-solid fa-tags"></i> Total Retail Value</div>
+                    <div class="f-value" id="stat-retail-value">৳{{ number_format($stats['total_stock_value'], 2) }}</div>
+                    <div class="f-sub">At current selling price</div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-2">
-                    <div class="financial-card">
-                        <h4 class="text-info mb-1" id="stat-cost-value">৳{{ number_format($stats['total_cost_value'], 2) }}</h4>
-                        <p class="mb-0">Total Cost Value</p>
-                    </div>
+                <div class="f-item f-cost">
+                    <div class="f-label"><i class="fa-solid fa-receipt"></i> Total Cost Value</div>
+                    <div class="f-value" id="stat-cost-value">৳{{ number_format($stats['total_cost_value'], 2) }}</div>
+                    <div class="f-sub">Procurement cost</div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-2">
-                    <div class="financial-card">
-                        <h4 class="text-{{ $stats['total_profit'] > 0 ? 'success' : 'danger' }} mb-1" id="stat-profit">৳{{ number_format($stats['total_profit'], 2) }}</h4>
-                        <p class="mb-0">Potential Profit</p>
-                    </div>
+                <div class="f-item f-profit">
+                    <div class="f-label"><i class="fa-solid fa-chart-line"></i> Potential Profit</div>
+                    <div class="f-value" id="stat-profit">৳{{ number_format($stats['total_profit'], 2) }}</div>
+                    <div class="f-sub">Retail minus cost</div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-2">
-                    <div class="financial-card">
-                        <h4 class="text-warning mb-1" id="stat-wholesale-value">৳{{ number_format($stats['total_wholesale_value'], 2) }}</h4>
-                        <p class="mb-0">Wholesale Value</p>
-                    </div>
+                <div class="f-item f-wholesale">
+                    <div class="f-label"><i class="fa-solid fa-truck"></i> Wholesale Value</div>
+                    <div class="f-value" id="stat-wholesale-value">৳{{ number_format($stats['total_wholesale_value'], 2) }}</div>
+                    <div class="f-sub">Bulk pricing total</div>
                 </div>
             </div>
 

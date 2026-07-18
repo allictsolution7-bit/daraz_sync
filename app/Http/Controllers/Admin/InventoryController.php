@@ -216,11 +216,14 @@ class InventoryController extends Controller
             })
             ->addColumn('product_info', function ($product) {
                 $image = $product->thumb_image ? asset('storage/' . $product->thumb_image) : asset('assets/img/no-image.png');
-                return '<div class="d-flex align-items-center">
-                    <img src="' . $image . '" alt="' . e($product->title) . '" class="inventory-thumb me-2">
+                return '<div class="d-flex align-items-center gap-3">
+                    <img src="' . $image . '" alt="' . e($product->title) . '" class="inventory-thumb">
                     <div>
-                        <div class="fw-bold">' . e($product->title) . '</div>
-                        <small class="text-muted">ID: ' . $product->id . ' | ' . ucfirst($product->product_type) . '</small>
+                        <div class="fw-semibold text-slate-800" style="font-size: 0.95rem; line-height: 1.4;">' . e($product->title) . '</div>
+                        <div class="mt-1 d-flex align-items-center gap-2">
+                            <span class="badge bg-slate-100 border border-slate-200" style="color: #475569 !important; font-size: 0.725rem; font-weight: 500; padding: 0.2rem 0.5rem; border-radius: 6px;">ID: ' . $product->id . '</span>
+                            <span class="badge bg-indigo-50 border border-indigo-100" style="color: #4f46e5 !important; font-size: 0.725rem; font-weight: 500; padding: 0.2rem 0.5rem; border-radius: 6px;">' . ucfirst($product->product_type) . '</span>
+                        </div>
                     </div>
                 </div>';
             })
@@ -232,29 +235,29 @@ class InventoryController extends Controller
                     $inStockCombinations = $product->variationCombinations->where('stock_quantity', '>', 0)->count();
                     $totalCombinations = $product->variationCombinations->count();
 
-                    $stockHtml .= '<div class="fw-bold">' . $totalStock . ' units total</div>';
-                    $stockHtml .= '<small class="text-muted">' . $inStockCombinations . '/' . $totalCombinations . ' variations in stock</small>';
+                    $stockHtml .= '<div class="fw-bold text-slate-800" style="font-size: 1rem;">' . $totalStock . ' <span class="text-muted fw-normal" style="font-size: 0.825rem;">units</span></div>';
+                    $stockHtml .= '<small class="text-slate-500" style="font-size: 0.75rem;">' . $inStockCombinations . '/' . $totalCombinations . ' var. in stock</small>';
                 } else {
                     $quantity = (int) ($product->computed_quantity ?? 0);
 
-                    $stockHtml .= '<div class="fw-bold">' . $quantity . ' units</div>';
+                    $stockHtml .= '<div class="fw-bold text-slate-800" style="font-size: 1rem;">' . $quantity . ' <span class="text-muted fw-normal" style="font-size: 0.825rem;">units</span></div>';
 
                     if (($product->computed_stock_status ?? null) === 'low_stock') {
-                        $stockHtml .= '<small class="text-warning"><i class="fas fa-exclamation-triangle"></i> Low Stock</small>';
+                        $stockHtml .= '<small class="text-amber-600 fw-medium" style="font-size: 0.75rem;"><i class="fa-solid fa-triangle-exclamation me-1"></i>Low Stock</small>';
                     }
                 }
 
                 $computedStatus = $product->computed_stock_status ?? 'in_stock';
 
-                $statusClass = match($computedStatus) {
-                    'in_stock' => 'success',
-                    'low_stock' => 'warning',
-                    'out_of_stock' => 'danger',
-                    'on_backorder' => 'warning',
-                    default => 'secondary'
+                $statusStyles = match($computedStatus) {
+                    'in_stock' => 'background: rgba(34, 197, 94, 0.12); color: #166534; border: 1px solid rgba(34, 197, 94, 0.2);',
+                    'low_stock' => 'background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.2);',
+                    'out_of_stock' => 'background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2);',
+                    'on_backorder' => 'background: rgba(99, 102, 241, 0.12); color: #4f46e5; border: 1px solid rgba(99, 102, 241, 0.2);',
+                    default => 'background: rgba(100, 116, 139, 0.12); color: #475569; border: 1px solid rgba(100, 116, 139, 0.2);'
                 };
 
-                $stockHtml .= '<br><span class="badge bg-' . $statusClass . '">' . ucfirst(str_replace('_', ' ', $computedStatus)) . '</span>';
+                $stockHtml .= '<div class="mt-2"><span class="badge" style="font-size: 0.725rem; font-weight: 600; text-transform: uppercase; padding: 0.25rem 0.6rem; border-radius: 50px; ' . $statusStyles . '">' . str_replace('_', ' ', $computedStatus) . '</span></div>';
                 $stockHtml .= '</div>';
 
                 return $stockHtml;
@@ -298,45 +301,46 @@ class InventoryController extends Controller
                 
                 $profit = $totalValue - $totalCost;
                 
-                $html = '<div class="text-end">';
-                $html .= '<div class="fw-bold text-success">৳' . number_format($totalValue, 2) . '</div>';
-                $html .= '<small class="text-muted">Retail @৳' . number_format($avgPrice, 2) . '</small><br>';
+                $html = '<div class="pricing-card-cell">';
+                $html .= '<div class="fw-bold text-slate-800" style="font-size: 1.05rem; letter-spacing: -0.01em;">৳' . number_format($totalValue, 2) . '</div>';
+                $html .= '<div style="margin-top: 0.2rem; display: flex; flex-direction: column; gap: 0.1rem; line-height: 1.3;">';
+                $html .= '<span class="text-muted" style="font-size: 0.775rem;">Retail: <span class="fw-semibold text-slate-700">৳' . number_format($avgPrice, 2) . '</span></span>';
                 
                 if ($totalCost > 0) {
-                    $html .= '<small class="text-info">Cost: ৳' . number_format($totalCost, 2) . '</small><br>';
-                    $html .= '<small class="' . ($profit > 0 ? 'text-success' : 'text-danger') . '">Profit: ৳' . number_format($profit, 2) . '</small>';
+                    $html .= '<span class="text-slate-500" style="font-size: 0.775rem;">Cost: <span class="fw-semibold text-slate-700">৳' . number_format($totalCost, 2) . '</span></span>';
+                    $html .= '<span style="font-size: 0.775rem;' . ($profit > 0 ? 'color: #166534;' : 'color: #dc2626;') . '">Profit: <span class="fw-bold">৳' . number_format($profit, 2) . '</span></span>';
                 }
                 
                 if ($totalWholesale > 0) {
-                    $html .= '<br><small class="text-warning">Wholesale @৳' . number_format($avgWholesale, 2) . '</small>';
+                    $html .= '<span class="text-amber-700" style="font-size: 0.775rem;">Wholesale: <span class="fw-semibold">৳' . number_format($avgWholesale, 2) . '</span></span>';
                 }
                 
-                $html .= '</div>';
+                $html .= '</div></div>';
                 
                 return $html;
             })
             ->addColumn('actions', function ($product) {
-                $actions = '<div class="btn-group" role="group">';
+                $actions = '<div class="d-inline-flex gap-1" role="group">';
                 
                 // Adjust Stock button
-                $actions .= '<button type="button" class="btn btn-sm btn-outline-primary adjust-stock-btn" 
+                $actions .= '<button type="button" class="btn-action-custom btn-action-edit adjust-stock-btn" 
                     data-product-id="' . $product->id . '" 
                     data-product-title="' . e($product->title) . '"
                     data-product-type="' . $product->product_type . '"
                     title="Adjust Stock">
-                    <i class="fas fa-edit"></i>
+                    <i class="fa-solid fa-pen-to-square"></i>
                 </button>';
                 
                 // View History button
                 $actions .= '<a href="' . route('admin.inventory.product-history', $product->id) . '" 
-                    class="btn btn-sm btn-outline-info" title="Stock History">
-                    <i class="fas fa-history"></i>
+                    class="btn-action-custom btn-action-history" title="Stock History">
+                    <i class="fa-solid fa-history"></i>
                 </a>';
                 
                 // Edit Product button
                 $actions .= '<a href="' . route('admin.products.edit', $product->id) . '" 
-                    class="btn btn-sm btn-outline-secondary" title="Edit Product">
-                    <i class="fas fa-cog"></i>
+                    class="btn-action-custom btn-action-settings" title="Edit Product">
+                    <i class="fa-solid fa-cog"></i>
                 </a>';
                 
                 $actions .= '</div>';
