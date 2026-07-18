@@ -1859,6 +1859,19 @@
     @yield('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Bulletproof vanilla JS sidebar toggle to prevent clashes with multiple jQuery instances
+            const vanillaToggleBtn = document.getElementById('toggleSidebar');
+            const vanillaToggleMobileBtn = document.getElementById('toggleSidebarMobile');
+            function toggleSidebarHandler(e) {
+                e.preventDefault();
+                const leftMenu = document.querySelector('.left-menu');
+                const contentWrapper = document.querySelector('.content-wrapper');
+                if (leftMenu) leftMenu.classList.toggle('hide');
+                if (contentWrapper) contentWrapper.classList.toggle('hide');
+            }
+            if (vanillaToggleBtn) vanillaToggleBtn.addEventListener('click', toggleSidebarHandler);
+            if (vanillaToggleMobileBtn) vanillaToggleMobileBtn.addEventListener('click', toggleSidebarHandler);
+
             // Toggle sections
             const sectionToggles = document.querySelectorAll('.menu-section-toggle');
             sectionToggles.forEach(toggle => {
