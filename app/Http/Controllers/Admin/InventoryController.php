@@ -371,7 +371,13 @@ class InventoryController extends Controller
      */
     public function outOfStock()
     {
-        $outOfStockProducts = Product::where('stock_status', 'out_of_stock')
+        $outOfStockProducts = Product::where(function($q) {
+                $q->where('stock_status', 'out_of_stock')
+                  ->orWhere(function($q2) {
+                      $q2->where('manage_stock', true)
+                         ->where('quantity', '<=', 0);
+                  });
+            })
             ->with(['category', 'variationCombinations'])
             ->orderBy('updated_at', 'desc')
             ->paginate(20);
