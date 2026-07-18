@@ -312,6 +312,16 @@
         transition: var(--transition);
     }
 
+    /* Restrict Product column width and enable text wrapping */
+    table#incomorders th:nth-child(2),
+    table#incomorders td:nth-child(2) {
+        max-width: 220px;
+        width: 220px !important;
+        white-space: normal !important;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
+
     /* Clean Borders based on Status instead of full rows */
     table#incomorders tbody tr td:first-child {
         border-left: 5px solid transparent;
@@ -712,21 +722,23 @@
     </div>
 
     <!-- DataTable -->
-    <table class="table table-bordered" id="incomorders" style="width:100%">
-        <thead>
-            <tr>
-                <th>
-                    <input type="checkbox" id="select-all" style="margin-right: 8px;">
-                    Customer Info
-                </th>
-                <th>Product(s)</th>
-                <th>Payment / Source</th>
-                <th>Status</th>
-                <th>Admin Note</th>
-                <th>Fraud Check</th>
-            </tr>
-        </thead>
-    </table>
+    <div class="table-responsive" style="width: 100%; overflow-x: auto;">
+        <table class="table table-bordered" id="incomorders" style="width:100%">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="select-all" style="margin-right: 8px;">
+                        Customer Info
+                    </th>
+                    <th>Product(s)</th>
+                    <th>Payment / Source</th>
+                    <th>Status</th>
+                    <th>Admin Note</th>
+                    <th>Fraud Check</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
 </div>
 
 <!-- Modal -->
@@ -989,7 +1001,7 @@
             buttons: [
                 'copy', 'pdf', 'csv', 'excel', 'print'
             ],
-            responsive: true,
+            responsive: false,
             colReorder: true,
             pageLength: 25,
                 lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
