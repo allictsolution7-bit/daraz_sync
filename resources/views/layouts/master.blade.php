@@ -641,7 +641,7 @@
         <!-- --sidebar-start-- -->
 
         @php
-        $coreShopActive = request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/inventory*') || request()->is('admin/landing-pages*');
+        $coreShopActive = request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/inventory*') || request()->is('admin/landing-pages*') || request()->is('admin/writers*') || request()->is('admin/publishers*') || request()->is('admin/reviews*') || request()->is('admin/combo_offers*');
         $ordersSalesActive = request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/my-assigned-orders*') || request()->is('admin/incomplete-orders*') || request()->is('admin/pos*');
         $shippingDeliveryActive = request()->is('admin/basic-shipping*') || request()->is('admin/shipping/rules*') || request()->is('admin/delivery*');
         $reportsAnalyticsActive = request()->routeIs('admin.orders.reports*') || request()->routeIs('admin.customers.reports*');
@@ -653,6 +653,9 @@
         @endphp
 
         <style>
+             .left-menu-dp {
+                 display: none;
+             }
             .left-menu {
                 overflow-y: auto !important;
                 height: 100vh !important;
@@ -761,7 +764,7 @@
                             <ul class="left-menu-dp menu-section-list" style="{{ $coreShopActive ? 'display: block;' : 'display: none;' }}">
                                 @can('products.view')
                                 <li
-                                    class="sub-menu {{ request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') ? 'active' : '' }}">
+                                    class="sub-menu {{ request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/writers*') || request()->is('admin/publishers*') || request()->is('admin/reviews*') || request()->is('admin/combo_offers*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-box-open" style="color:#197A94;"></i>
@@ -770,7 +773,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/writers*') || request()->is('admin/publishers*') || request()->is('admin/reviews*') || request()->is('admin/combo_offers*') ? 'display: block;' : '' }}">
                                         <li class="{{ request()->routeIs('admin.product.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.product.index') }}">
                                                 <span class="menu-content">
@@ -831,7 +834,7 @@
                                         </li>
                                         @endcan
                                         @can('writers.view')
-                                        <li>
+                                        <li class="{{ request()->is('admin/writers*') ? 'active' : '' }}">
                                             <a href="{{ route('admin.writers.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-person"></i>
@@ -841,7 +844,7 @@
                                         </li>
                                         @endcan
                                         @can('publishers.view')
-                                        <li>
+                                        <li class="{{ request()->is('admin/publishers*') ? 'active' : '' }}">
                                             <a href="{{ route('admin.publishers.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-person"></i>
@@ -851,7 +854,7 @@
                                         </li>
                                         @endcan
                                         @can('reviews.view')
-                                        <li>
+                                        <li class="{{ request()->is('admin/reviews*') ? 'active' : '' }}">
                                             <a href="{{ route('admin.reviews.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-star"></i>
@@ -1901,16 +1904,14 @@
                     const parent = this.parentElement;
                     const subMenu = this.nextElementSibling;
 
-                    // If already active, keep it open
-                    if (!parent.classList.contains('active')) {
-                        // Toggle display
-                        if (subMenu.style.display === 'block') {
-                            subMenu.style.display = 'none';
-                            parent.classList.remove('active');
-                        } else {
-                            subMenu.style.display = 'block';
-                            parent.classList.add('active');
-                        }
+                    // Toggle display unconditionally on click
+                    const isCurrentlyOpen = (subMenu.style.display === 'block' || (window.getComputedStyle(subMenu).display === 'block'));
+                    if (isCurrentlyOpen) {
+                        subMenu.style.display = 'none';
+                        parent.classList.remove('active');
+                    } else {
+                        subMenu.style.display = 'block';
+                        parent.classList.add('active');
                     }
                 });
             });
