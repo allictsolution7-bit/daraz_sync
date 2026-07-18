@@ -10,82 +10,335 @@
 <link href="https://cdn.datatables.net/colvis/1.7.0/css/colvis.dataTables.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
+    :root {
+        --primary-color: #197A94;
+        --primary-hover: #136377;
+        --secondary-color: #6c757d;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --info-color: #17a2b8;
+        --dark-color: #343a40;
+        --light-bg: #fdfdfd;
+        --card-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
+        --border-radius: 12px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+        background-color: #f4f7f6;
+    }
+
+    .container-fluid {
+        padding: 24px;
+    }
+
+    h5 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 8px;
+    }
+
+    hr {
+        border-top: 1px solid #e3e6f0;
+        margin-bottom: 24px;
+    }
+
     .modal-header {
         justify-content: space-between;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: white;
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+        padding: 16px 24px;
+    }
+
+    .modal-header .modal-title {
+        font-weight: 600;
+        font-size: 1.15rem;
     }
 
     .modal-header button.close {
-        font-size: 37px;
-        color: red;
-        display: none;
+        font-size: 24px;
+        color: white;
+        opacity: 0.8;
+        background: transparent;
+        border: none;
+        outline: none;
+        transition: var(--transition);
+        display: block !important;
+    }
+
+    .modal-header button.close:hover {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
     /* Filter Section Styles */
     .filter-section {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 7px;
-        margin-bottom: 10px;
+        background: #ffffff;
+        border: 1px solid #e3e8ec;
+        border-radius: var(--border-radius);
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+    }
+
+    .filter-section:hover {
+        box-shadow: 0 6px 24px 0 rgba(0, 0, 0, 0.08);
     }
 
     .filter-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: end;
-        margin-bottom: 2px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        align-items: center;
+    }
+
+    .filter-row-basic {
+        margin-bottom: 0;
+    }
+
+    .filter-row-advanced {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px dashed #e2e8f0;
+        display: none; /* Collapsed by default */
     }
 
     .filter-group {
-        flex: 1;
-        min-width: 200px;
+        display: flex;
+        flex-direction: column;
     }
 
     .filter-group label {
         font-weight: 600;
-        margin-bottom: 5px;
-        color: #495057;
+        font-size: 0.78rem;
+        margin-bottom: 4px;
+        color: #5a6a85;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .filter-group input,
     .filter-group select {
         width: 100%;
-        height: 38px;
+        height: 36px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        border: 1px solid #d1d9e2;
+        background-color: #fff;
+        color: #495057;
         box-sizing: border-box;
+        transition: var(--transition);
+        outline: none;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(25, 122, 148, 0.12);
     }
 
     .filter-actions {
         display: flex;
-        gap: 10px;
-        align-items: end;
+        gap: 8px;
+        justify-content: flex-end;
+        align-items: center;
+        height: 36px;
     }
 
     .btn-filter {
-        padding: 8px 16px;
+        height: 36px;
+        padding: 0 14px;
         border-radius: 6px;
-        font-weight: 500;
+        font-weight: 600;
+        font-size: 0.82rem;
         border: none;
         cursor: pointer;
-        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: var(--transition);
     }
 
     .btn-apply {
-        background: #197A94;
+        background: var(--primary-color);
         color: white;
     }
 
     .btn-apply:hover {
-        background: #197A94;
+        background: var(--primary-hover);
     }
 
     .btn-clear {
-        background: #6c757d;
-        color: white;
+        background: #f1f3f5;
+        color: #495057;
     }
 
     .btn-clear:hover {
-        background: #545b62;
+        background: #e9ecef;
+        color: #212529;
+    }
+
+    .btn-toggle-advanced {
+        background: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+    }
+    .btn-toggle-advanced:hover {
+        background: rgba(25, 122, 148, 0.05);
+    }
+    .btn-toggle-advanced.active {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    /* Action Buttons Area */
+    .mb-3 {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px !important;
+    }
+
+    .mb-3 .btn {
+        padding: 8px 14px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--transition);
+        border: 1px solid transparent;
+    }
+    
+    .mb-3 .btn i {
+        font-size: 0.85rem;
+    }
+
+    .mb-3 .btn-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--danger-color);
+        border-color: rgba(220, 53, 69, 0.2);
+    }
+    .mb-3 .btn-danger:hover {
+        background-color: var(--danger-color);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .mb-3 .btn-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: var(--success-color);
+        border-color: rgba(40, 167, 69, 0.2);
+    }
+    .mb-3 .btn-success:hover {
+        background-color: var(--success-color);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .mb-3 .btn-outline-primary {
+        background-color: transparent;
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    .mb-3 .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .mb-3 .btn-outline-warning {
+        background-color: transparent;
+        color: #e0a800;
+        border-color: #ffc107;
+    }
+    .mb-3 .btn-outline-warning:hover {
+        background-color: #ffc107;
+        color: #212529;
+        transform: translateY(-1px);
+    }
+    .mb-3 .btn-warning {
+        background-color: #ffc107;
+        color: #212529;
+        border-color: #ffc107;
+    }
+    .mb-3 .btn-warning:hover {
+        background-color: #e0a800;
+        transform: translateY(-1px);
+    }
+
+    /* Datatable Modern Card Styling */
+    table#incomorders {
+        background: #ffffff;
+        border: 1px solid #e3e8ec;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    table#incomorders thead th {
+        background-color: #f8fafc;
+        color: #5a6a85;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e3e8ec;
+        padding: 16px;
+    }
+
+    table#incomorders tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f3f5;
+        border-top: none;
+        color: #495057;
+        transition: var(--transition);
+    }
+
+    /* Clean Borders based on Status instead of full rows */
+    table#incomorders tbody tr td:first-child {
+        border-left: 5px solid transparent;
+        transition: var(--transition);
+    }
+    
+    table#incomorders tbody tr.status-pending td:first-child {
+        border-left-color: var(--warning-color);
+    }
+    table#incomorders tbody tr.status-contacted td:first-child {
+        border-left-color: var(--info-color);
+    }
+    table#incomorders tbody tr.status-follow_up td:first-child {
+        border-left-color: #fd7e14;
+    }
+    table#incomorders tbody tr.status-converted td:first-child {
+        border-left-color: var(--success-color);
+    }
+    table#incomorders tbody tr.status-cancelled td:first-child {
+        border-left-color: var(--danger-color);
+    }
+    table#incomorders tbody tr.status-spam td:first-child {
+        border-left-color: var(--secondary-color);
+    }
+
+    table#incomorders tbody tr:hover td {
+        background-color: #f8fafd;
     }
 
     /* Customer Info Styles */
@@ -94,52 +347,85 @@
     }
 
     .customer-name {
-        font-weight: 600;
-        color: #495057;
+        font-weight: 700;
+        color: var(--dark-color);
+        font-size: 0.95rem;
+        margin-bottom: 4px;
     }
 
-    .customer-phone {
-        color: #6c757d;
-        font-size: 0.9em;
+    .customer-phone a {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 0.88rem;
+        transition: var(--transition);
+    }
+
+    .customer-phone a:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+
+    /* Actions buttons in Datatable */
+    .view-incomplete-order,
+    .delete-incomplete-order {
+        width: 32px;
+        height: 32px;
+        padding: 0 !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px !important;
+        font-size: 0.85rem !important;
     }
 
     /* DataTables Button Styles */
     .dt-buttons {
-        margin-bottom: 10px;
+        margin-bottom: 20px;
+        display: inline-flex;
+        gap: 8px;
     }
 
     .dt-button {
-        background: #197A94 !important;
-        color: white !important;
-        border: none !important;
+        background: #f1f3f5 !important;
+        color: #495057 !important;
+        border: 1px solid #d1d9e2 !important;
         padding: 8px 16px !important;
-        border-radius: 4px !important;
-        margin-right: 5px !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        transition: var(--transition) !important;
+        box-shadow: none !important;
     }
 
     .dt-button:hover {
-        background: #197A94 !important;
+        background: var(--primary-color) !important;
+        color: white !important;
+        border-color: var(--primary-color) !important;
+        transform: translateY(-1px);
     }
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .filter-row {
-            flex-direction: column;
-        }
-
-        .filter-group {
-            min-width: 100%;
+            grid-template-columns: 1fr;
         }
     }
 
     /* DataTables bottom spacing */
     .bottom {
-        margin-top: 20px;
+        margin-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
     }
 
-    .dataTables_length,
-    .dataTables_info {
-        margin-top: 10px;
+    .dataTables_length select {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #d1d9e2;
+        outline: none;
     }
 
     /* Fraud Check Styles */
@@ -150,20 +436,25 @@
 
     .fraud-risk-badge {
         display: block;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         font-size: 11px;
-        padding: 2px 6px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
     }
 
     .fraud-score {
-        font-weight: 600;
-        font-size: 12px;
-        color: #333;
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--dark-color);
+        margin-top: 2px;
     }
 
     .fraud-success-rate {
         font-size: 12px;
-        color: #1f1f1f;
+        color: var(--success-color);
         margin-bottom: 2px;
         font-weight: 600;
     }
@@ -171,6 +462,7 @@
     .check-fraud-btn {
         font-size: 11px;
         padding: 4px 8px;
+        border-radius: 6px;
     }
 
     .fraud-check-loading {
@@ -187,52 +479,61 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 4px;
+        gap: 6px;
     }
 
     .check-fraud-cache-btn {
-        font-size: 10px;
-        padding: 2px 6px;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        border-color: #dee2e6;
+        color: #6c757d;
+        background-color: transparent;
+        transition: var(--transition);
+    }
+    .check-fraud-cache-btn:hover {
+        background-color: #f1f3f5;
+        color: #212529;
     }
 
-    /* Status Badge Styles */
+    /* Status Badge & Dropdown Styles */
     .status-badge {
         font-size: 11px;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-weight: 500;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
     .status-pending {
-        background-color: #ffc107;
-        color: #000;
+        background-color: rgba(255, 193, 7, 0.15) !important;
+        color: #856404 !important;
     }
 
     .status-contacted {
-        background-color: #17a2b8;
-        color: #fff;
+        background-color: rgba(23, 162, 184, 0.15) !important;
+        color: #0f5132 !important;
     }
 
     .status-follow_up {
-        background-color: #fd7e14;
-        color: #fff;
+        background-color: rgba(253, 126, 20, 0.15) !important;
+        color: #9c4c06 !important;
     }
 
     .status-converted {
-        background-color: #28a745;
-        color: #fff;
+        background-color: rgba(40, 167, 69, 0.15) !important;
+        color: #155724 !important;
     }
 
     .status-cancelled {
-        background-color: #dc3545;
-        color: #fff;
+        background-color: rgba(220, 53, 69, 0.15) !important;
+        color: #721c24 !important;
     }
 
     .status-spam {
-        background-color: #6c757d;
-        color: #fff;
+        background-color: rgba(108, 117, 125, 0.15) !important;
+        color: #383d41 !important;
     }
 
     /* Note Styles */
@@ -247,20 +548,22 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         cursor: pointer;
-        padding: 4px 8px;
-        border-radius: 4px;
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
+        padding: 8px 12px;
+        border-radius: 6px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
         font-size: 12px;
-        line-height: 1.3;
+        line-height: 1.4;
+        transition: var(--transition);
     }
 
     .admin-note-text:hover {
-        background-color: #e9ecef;
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
     }
 
     .admin-note-text.empty {
-        color: #6c757d;
+        color: #94a3b8;
         font-style: italic;
     }
 
@@ -269,7 +572,8 @@
         top: 2px;
         right: 2px;
         font-size: 10px;
-        padding: 2px 4px;
+        padding: 2px 6px;
+        border-radius: 4px;
         opacity: 0;
         transition: opacity 0.2s;
     }
@@ -280,48 +584,24 @@
 
     /* Status Dropdown Styles */
     .status-dropdown {
-        font-size: 11px;
-        padding: 4px 8px;
-        border-radius: 4px;
-        border: 1px solid #ced4da;
+        font-size: 12px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
         background-color: #fff;
         cursor: pointer;
-        transition: all 0.2s;
+        font-weight: 600;
+        transition: var(--transition);
+        outline: none;
     }
 
     .status-dropdown:hover {
-        border-color: #197A94;
+        border-color: var(--primary-color);
     }
 
     .status-dropdown:focus {
-        outline: none;
-        border-color: #197A94;
-        box-shadow: 0 0 0 0.2rem rgba(25, 122, 148, 0.25);
-    }
-
-    /* Incomplete Order Status Row Colors */
-    table#incomorders tr.status-pending td {
-        background-color: #fff3e0 !important;
-    }
-
-    table#incomorders tr.status-contacted td {
-        background-color: #e3f2fd !important;
-    }
-
-    table#incomorders tr.status-follow_up td {
-        background-color: #f3e5f5 !important;
-    }
-
-    table#incomorders tr.status-converted td {
-        background-color: #e8f5e9 !important;
-    }
-
-    table#incomorders tr.status-cancelled td {
-        background-color: #ffebee !important;
-    }
-
-    table#incomorders tr.status-spam td {
-        background-color: #eceff1 !important;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(25, 122, 148, 0.15);
     }
 </style>
 @endsection
@@ -332,20 +612,13 @@
     <hr>
     <!-- Advanced Filter Section -->
     <div class="filter-section">
-        <div class="filter-row">
+        <!-- Basic Filters (Always Visible) -->
+        <div class="filter-row filter-row-basic">
             <div class="filter-group">
                 <input type="text" id="filter-name" class="form-control" placeholder="Search by name...">
             </div>
             <div class="filter-group">
                 <input type="text" id="filter-phone" class="form-control" placeholder="Search by phone...">
-            </div>
-            <div class="filter-group">
-                <select id="filter-source" class="form-control">
-                    <option value="">All Sources</option>
-                    <option value="buynow">Buy Now</option>
-                    <option value="checkout">Checkout</option>
-                    <option value="landing">Landing</option>
-                </select>
             </div>
             <div class="filter-group">
                 <select id="filter-status" class="form-control">
@@ -358,36 +631,57 @@
                     <option value="spam">Spam</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <select id="filter-payment" class="form-control">
-                    <option value="">All Payment Methods</option>
-                    <option value="cod">Cash on Delivery</option>
-                    <option value="bkash">bKash</option>
-                    <option value="nagad">Nagad</option>
-                    <option value="rocket">Rocket</option>
-                </select>
-            </div>
-        </div>
-        <div class="filter-row">
-            <div class="filter-group">
-                <input type="number" id="filter-total-min" class="form-control" placeholder="Min amount...">
-            </div>
-            <div class="filter-group">
-                <input type="number" id="filter-total-max" class="form-control" placeholder="Max amount...">
-            </div>
-            <div class="filter-group">
-                <input type="date" id="filter-date-from" class="form-control">
-            </div>
-            <div class="filter-group">
-                <input type="date" id="filter-date-to" class="form-control">
-            </div>
             <div class="filter-actions">
                 <button id="apply-filters" class="btn-filter btn-apply">
-                    <i class="fas fa-search"></i> Apply Filters
+                    <i class="fas fa-search"></i> Apply
                 </button>
                 <button id="clear-filters" class="btn-filter btn-clear">
-                    <i class="fas fa-times"></i> Clear All
+                    <i class="fas fa-times"></i> Clear
                 </button>
+                <button id="toggle-advanced-filters" class="btn-filter btn-toggle-advanced">
+                    <i class="fas fa-sliders-h"></i> Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Advanced Filters (Collapsible) -->
+        <div id="advanced-filters-panel" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e2e8f0;">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Source</label>
+                    <select id="filter-source" class="form-control">
+                        <option value="">All Sources</option>
+                        <option value="buynow">Buy Now</option>
+                        <option value="checkout">Checkout</option>
+                        <option value="landing">Landing</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Payment Method</label>
+                    <select id="filter-payment" class="form-control">
+                        <option value="">All Payment Methods</option>
+                        <option value="cod">Cash on Delivery</option>
+                        <option value="bkash">bKash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="rocket">Rocket</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Min Amount</label>
+                    <input type="number" id="filter-total-min" class="form-control" placeholder="Min...">
+                </div>
+                <div class="filter-group">
+                    <label>Max Amount</label>
+                    <input type="number" id="filter-total-max" class="form-control" placeholder="Max...">
+                </div>
+                <div class="filter-group">
+                    <label>Date From</label>
+                    <input type="date" id="filter-date-from" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label>Date To</label>
+                    <input type="date" id="filter-date-to" class="form-control">
+                </div>
             </div>
         </div>
     </div>
@@ -728,6 +1022,11 @@
         }
 
         $('#apply-filters').on('click', applyFilters);
+
+        $('#toggle-advanced-filters').on('click', function() {
+            $(this).toggleClass('active');
+            $('#advanced-filters-panel').slideToggle(200);
+        });
 
         $('#clear-filters').on('click', function() {
             $('#filter-name, #filter-phone, #filter-source, #filter-status').val('');
