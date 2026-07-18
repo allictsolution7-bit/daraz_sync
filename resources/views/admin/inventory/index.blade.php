@@ -4,254 +4,529 @@
     <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" rel="stylesheet">
     <style>
-        .inventory-thumb {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 8px;
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+        /* Main Container Styling */
+        .categories-container {
+            font-family: 'Outfit', sans-serif;
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.02);
+            margin-top: 1rem;
         }
-        .stats-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            color: white;
-            padding: 20px;
-            margin-bottom: 20px;
+
+        /* Sleek Glassmorphic Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 20px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+            margin-bottom: 1.25rem;
         }
-        .stats-card.success {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+
+        /* Custom Breadcrumb Styles */
+        .custom-breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 0.75rem;
         }
-        .stats-card.warning {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        .custom-breadcrumb .breadcrumb-item {
+            font-size: 0.85rem;
+            font-weight: 500;
         }
-        .stats-card.danger {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        .custom-breadcrumb .breadcrumb-item a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s ease;
         }
-        .stats-card.info {
-            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+        .custom-breadcrumb .breadcrumb-item a:hover {
+            color: #4f46e5;
         }
-        .filter-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .stock-info {
-            font-size: 14px;
-        }
-        .table th {
-            background-color: #f8f9fa;
-            border-top: none;
+        .custom-breadcrumb .breadcrumb-item.active {
+            color: #1e293b;
             font-weight: 600;
         }
-        .btn-group .btn {
-            border-radius: 6px !important;
-            margin-right: 2px;
+
+        /* Typography */
+        .page-header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.15rem;
+        }
+        .page-header-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Statistics Cards */
+        .stats-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .stats-card h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.03em;
+        }
+        .stats-card p {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .stats-card .icon-wrapper {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            transition: all 0.3s ease;
+        }
+        .stats-card:hover .icon-wrapper {
+            transform: scale(1.08);
+        }
+        
+        .stats-card.info .icon-wrapper {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%);
+            color: #2563eb;
+        }
+        .stats-card.success .icon-wrapper {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 101, 52, 0.15) 100%);
+            color: #166534;
+        }
+        .stats-card.warning .icon-wrapper {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.15) 100%);
+            color: #d97706;
+        }
+        .stats-card.danger .icon-wrapper {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%);
+            color: #dc2626;
+        }
+
+        /* Financial Card Mini Grid */
+        .financial-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 16px;
+            padding: 1.25rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.01);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .financial-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(99, 102, 241, 0.25);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+        }
+        .financial-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.15rem;
+        }
+        .financial-card p {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Filter Section Styling */
+        .filter-section {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+        }
+        .form-select, .form-control {
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.9rem;
+            font-family: 'Outfit', sans-serif;
+            background-color: #ffffff;
+            color: #1e293b;
+            transition: all 0.2s ease;
+        }
+        .form-select:focus, .form-control:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        .form-label {
+            font-weight: 500;
+            color: #475569;
+            font-size: 0.85rem;
+            margin-bottom: 0.35rem;
+        }
+
+        /* Action Toolbar buttons */
+        .btn-toolbar-outline {
+            background: #ffffff;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            padding: 0.55rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-toolbar-outline:hover {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #94a3b8;
+            transform: translateY(-1px);
+        }
+
+        /* Modernized Table Design */
+        .premium-table-wrapper {
+            border-radius: 16px;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.015);
+            background: #ffffff;
+            padding: 1rem;
+        }
+        .premium-table-wrapper table {
+            width: 100% !important;
+            margin: 0 !important;
+            border-collapse: collapse;
+        }
+        .premium-table-wrapper table thead th {
+            background: #f8fafc !important; /* Light Slate Header */
+            color: #475569 !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            padding: 1.1rem 1rem !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+        }
+        .premium-table-wrapper table tbody td {
+            padding: 1rem !important;
+            vertical-align: middle !important;
+            color: #334155;
+            font-size: 0.925rem;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+
+        /* Override DataTables sorting arrow pseudo-elements & backgrounds */
+        table.dataTable thead th.sorting::after,
+        table.dataTable thead th.sorting::before,
+        table.dataTable thead th.sorting_asc::after,
+        table.dataTable thead th.sorting_asc::before,
+        table.dataTable thead th.sorting_desc::after,
+        table.dataTable thead th.sorting_desc::before,
+        .premium-table-wrapper table thead th::before,
+        .premium-table-wrapper table thead th::after {
+            content: "" !important;
+            display: none !important;
+        }
+
+        .premium-table-wrapper table thead th.sorting {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="12" viewBox="0 0 8 12"><path fill="%2364748b" d="M4 0l4 4H0zm0 12L0 8h8z"/></svg>') !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            padding-right: 30px !important;
+            cursor: pointer;
+        }
+        .premium-table-wrapper table thead th.sorting_asc {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="12" viewBox="0 0 8 12"><path fill="%234f46e5" d="M4 0l4 4H0z"/></svg>') !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            padding-right: 30px !important;
+            cursor: pointer;
+        }
+        .premium-table-wrapper table thead th.sorting_desc {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="12" viewBox="0 0 8 12"><path fill="%234f46e5" d="M4 12L0 8h8z"/></svg>') !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            padding-right: 30px !important;
+            cursor: pointer;
+        }
+
+        /* Fixed column widths */
+        .col-width-product {
+            width: 45% !important;
+            min-width: 320px;
+            white-space: normal !important;
+        }
+        .col-width-stock {
+            width: 15% !important;
+            min-width: 120px;
+            white-space: nowrap !important;
+        }
+        .col-width-value {
+            width: 25% !important;
+            min-width: 180px;
+            white-space: nowrap !important;
+        }
+        .col-width-actions {
+            width: 15% !important;
+            min-width: 100px;
+            white-space: nowrap !important;
+        }
+
+        /* Custom Thumbnail image */
+        .inventory-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Custom Action Icon Buttons */
+        .btn-action-custom {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            background: #f8fafc;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .btn-action-custom:hover {
+            transform: translateY(-2px);
+        }
+        .btn-action-edit:hover {
+            background: rgba(59, 130, 246, 0.12);
+            color: #2563eb;
         }
     </style>
 @endsection
 
 @section('content')
-    <div class="container-fluid mt-5">
+    <div class="container categories-container">
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb">
+        <nav aria-label="breadcrumb" class="custom-breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Inventory Management</li>
+                <li class="breadcrumb-item"><a href="{{ route('admin') }}"><i class="fa-solid fa-house me-1"></i> Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Inventory</li>
             </ol>
         </nav>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="mb-0">📦 Inventory Management</h4>
-            <div>
-                <a href="{{ route('admin.inventory.history') }}" class="btn btn-outline-info me-2">
-                    <i class="fas fa-history"></i> View History
-                </a>
-                <a href="{{ route('admin.inventory.low-stock') }}" class="btn btn-outline-warning">
-                    <i class="fas fa-exclamation-triangle"></i> Low Stock Alert
-                </a>
+        <div class="glass-card">
+            <!-- Header Section -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6">
+                    <h1 class="page-header-title">📦 Inventory Management</h1>
+                    <p class="page-header-subtitle">Analyze warehouse stock metrics, financial valuations, and adjust products quantity.</p>
+                </div>
+                <div class="col-md-6 text-md-end d-flex justify-content-md-end gap-2">
+                    <a href="{{ route('admin.inventory.history') }}" class="btn-toolbar-outline">
+                        <i class="fa-solid fa-history"></i> History Logs
+                    </a>
+                    <a href="{{ route('admin.inventory.low-stock') }}" class="btn-toolbar-outline text-warning">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Low Stock Alerts
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-lg-3 col-md-6">
-                <div class="stats-card info">
-                    <div class="d-flex justify-content-between align-items-center">
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card info">
                         <div>
-                            <h3 class="mb-1" id="stat-total-products">{{ number_format($stats['total_products']) }}</h3>
+                            <h3 id="stat-total-products">{{ number_format($stats['total_products']) }}</h3>
                             <p class="mb-0">Total Products</p>
                         </div>
-                        <i class="fas fa-boxes fa-2x opacity-75"></i>
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="stats-card success">
-                    <div class="d-flex justify-content-between align-items-center">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card success">
                         <div>
-                            <h3 class="mb-1" id="stat-in-stock">{{ number_format($stats['in_stock_products']) }}</h3>
+                            <h3 id="stat-in-stock">{{ number_format($stats['in_stock_products']) }}</h3>
                             <p class="mb-0">In Stock</p>
                         </div>
-                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="stats-card warning">
-                    <div class="d-flex justify-content-between align-items-center">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card warning">
                         <div>
-                            <h3 class="mb-1" id="stat-low-stock">{{ number_format($stats['low_stock_products']) }}</h3>
+                            <h3 id="stat-low-stock">{{ number_format($stats['low_stock_products']) }}</h3>
                             <p class="mb-0">Low Stock</p>
                         </div>
-                        <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="stats-card danger">
-                    <div class="d-flex justify-content-between align-items-center">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card danger">
                         <div>
-                            <h3 class="mb-1" id="stat-out-of-stock">{{ number_format($stats['out_of_stock_products']) }}</h3>
+                            <h3 id="stat-out-of-stock">{{ number_format($stats['out_of_stock_products']) }}</h3>
                             <p class="mb-0">Out of Stock</p>
                         </div>
-                        <i class="fas fa-times-circle fa-2x opacity-75"></i>
+                        <div class="icon-wrapper">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Financial Overview -->
-        <div class="row mb-4">
-            <div class="col-lg-3 col-md-6">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h4 class="text-success mb-2" id="stat-retail-value">৳{{ number_format($stats['total_stock_value'], 2) }}</h4>
-                        <p class="text-muted mb-0">Total Retail Value</p>
+            <!-- Financial Overview -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-2">
+                    <div class="financial-card">
+                        <h4 class="text-success mb-1" id="stat-retail-value">৳{{ number_format($stats['total_stock_value'], 2) }}</h4>
+                        <p class="mb-0">Total Retail Value</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-2">
+                    <div class="financial-card">
+                        <h4 class="text-info mb-1" id="stat-cost-value">৳{{ number_format($stats['total_cost_value'], 2) }}</h4>
+                        <p class="mb-0">Total Cost Value</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-2">
+                    <div class="financial-card">
+                        <h4 class="text-{{ $stats['total_profit'] > 0 ? 'success' : 'danger' }} mb-1" id="stat-profit">৳{{ number_format($stats['total_profit'], 2) }}</h4>
+                        <p class="mb-0">Potential Profit</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-2">
+                    <div class="financial-card">
+                        <h4 class="text-warning mb-1" id="stat-wholesale-value">৳{{ number_format($stats['total_wholesale_value'], 2) }}</h4>
+                        <p class="mb-0">Wholesale Value</p>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h4 class="text-info mb-2" id="stat-cost-value">৳{{ number_format($stats['total_cost_value'], 2) }}</h4>
-                        <p class="text-muted mb-0">Total Cost Value</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h4 class="text-{{ $stats['total_profit'] > 0 ? 'success' : 'danger' }} mb-2" id="stat-profit">৳{{ number_format($stats['total_profit'], 2) }}</h4>
-                        <p class="text-muted mb-0">Potential Profit</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h4 class="text-warning mb-2" id="stat-wholesale-value">৳{{ number_format($stats['total_wholesale_value'], 2) }}</h4>
-                        <p class="text-muted mb-0">Wholesale Value</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Filters -->
-        <div class="filter-section">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <button type="button" id="clear-filters-btn" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-times"></i> Clear Filters
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <select id="primary-category-filter" class="form-select">
-                        <option value="">All Categories</option>
-                        @foreach(\App\Models\ProductCategory::where('status', 'active')->orderBy('name')->get() as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
+            <!-- Filters -->
+            <div class="filter-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-semibold text-slate-800 mb-0"><i class="fa-solid fa-filter text-indigo-500 me-1"></i> Filter Records</h5>
+                    <button type="button" id="clear-filters-btn" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+                        <i class="fa-solid fa-times"></i> Clear Filters
+                    </button>
                 </div>
-                <div class="col-md-4">
-                    <select id="subcategory-filter" class="form-select" disabled>
-                        <option value="">Select a primary category first</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <select id="third-category-filter" class="form-select" disabled>
-                        <option value="">Select a subcategory first</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-3">
-                    <label for="stock-status-filter" class="form-label">Stock Status</label>
-                    <select id="stock-status-filter" class="form-select">
-                        <option value="">All Status</option>
-                        <option value="in_stock">In Stock</option>
-                        <option value="low_stock">Low Stock</option>
-                        <option value="out_of_stock">Out of Stock</option>
-                        <option value="on_backorder">On Backorder</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="product-type-filter" class="form-label">Product Type</label>
-                    <select id="product-type-filter" class="form-select">
-                        <option value="">All Types</option>
-                        <option value="simple">Simple</option>
-                        <option value="variable">Variable</option>
-                        <option value="digital">Digital</option>
-                        <option value="affiliate">Affiliate</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-check mt-4 pt-2">
-                        <input class="form-check-input" type="checkbox" id="low-stock-filter">
-                        <label class="form-check-label" for="low-stock-filter">
-                            Show Low Stock Only
-                        </label>
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Primary Category</label>
+                        <select id="primary-category-filter" class="form-select">
+                            <option value="">All Categories</option>
+                            @foreach(\App\Models\ProductCategory::where('status', 'active')->orderBy('name')->get() as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Subcategory</label>
+                        <select id="subcategory-filter" class="form-select" disabled>
+                            <option value="">Select a primary category first</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Third Level Category</label>
+                        <select id="third-category-filter" class="form-select" disabled>
+                            <option value="">Select a subcategory first</option>
+                        </select>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <label for="search-filter" class="form-label">Search</label>
-                    <input type="text" id="search-filter" class="form-control" placeholder="Search products...">
+                <div class="row mt-2">
+                    <div class="col-md-3 mb-2">
+                        <label for="stock-status-filter" class="form-label">Stock Status</label>
+                        <select id="stock-status-filter" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="in_stock">In Stock</option>
+                            <option value="low_stock">Low Stock</option>
+                            <option value="out_of_stock">Out of Stock</option>
+                            <option value="on_backorder">On Backorder</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label for="product-type-filter" class="form-label">Product Type</label>
+                        <select id="product-type-filter" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="simple">Simple</option>
+                            <option value="variable">Variable</option>
+                            <option value="digital">Digital</option>
+                            <option value="affiliate">Affiliate</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label d-block">&nbsp;</label>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="low-stock-filter">
+                            <label class="form-check-label fw-medium text-slate-700" for="low-stock-filter">
+                                Show Low Stock Only
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Inventory Table -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">📋 Product Inventory</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="inventory-table" class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Stock Info</th>
-                                <th>Value</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+            <!-- Table Block -->
+            <div class="premium-table-wrapper">
+                <table id="inventory-table" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Product Details</th>
+                            <th width="180">Stock Info</th>
+                            <th width="200">Value (৳)</th>
+                            <th width="100" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
 
     <!-- Stock Adjustment Modal -->
-    <div class="modal fade" id="adjustStockModal" tabindex="-1">
+    <div class="modal fade" id="adjustStockModal" tabindex="-1" style="font-family: 'Outfit', sans-serif;">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">📝 Adjust Stock</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
+                <div class="modal-header bg-slate-900 text-white" style="background: #0f172a; padding: 1.25rem 1.5rem;">
+                    <h5 class="modal-title fw-semibold text-white">📝 Adjust Stock</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="padding: 2rem;">
                     <div id="adjust-stock-content">
-                        <div class="text-center">
+                        <div class="text-center py-4">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
@@ -277,7 +552,7 @@
                 stock_status: $('#stock-status-filter').val(),
                 product_type: $('#product-type-filter').val(),
                 low_stock_only: $('#low-stock-filter').is(':checked') ? '1' : '',
-                search: $('#search-filter').val()
+                search: typeof table !== 'undefined' ? table.search() : ''
             };
 
             $.ajax({
@@ -285,27 +560,22 @@
                 type: 'GET',
                 data: filterData,
                 beforeSend: function() {
-                    // Add loading state
                     $('.stats-card h3, .stats-card h4').css('opacity', '0.5');
                 },
                 success: function(stats) {
-                    // Update product counts
                     $('#stat-total-products').text(stats.total_products.toLocaleString());
                     $('#stat-in-stock').text(stats.in_stock_products.toLocaleString());
                     $('#stat-low-stock').text(stats.low_stock_products.toLocaleString());
                     $('#stat-out-of-stock').text(stats.out_of_stock_products.toLocaleString());
                     
-                    // Update financial values
                     $('#stat-retail-value').text('৳' + stats.total_stock_value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
                     $('#stat-cost-value').text('৳' + stats.total_cost_value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
                     $('#stat-wholesale-value').text('৳' + stats.total_wholesale_value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
                     
-                    // Update profit with color
                     const profitElement = $('#stat-profit');
                     profitElement.text('৳' + stats.total_profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
                     profitElement.removeClass('text-success text-danger').addClass(stats.total_profit > 0 ? 'text-success' : 'text-danger');
                     
-                    // Remove loading state
                     $('.stats-card h3, .stats-card h4').css('opacity', '1');
                 },
                 error: function() {
@@ -324,16 +594,12 @@
                 ajax: {
                     url: '{{ route("admin.inventory.data") }}',
                     data: function(d) {
-                        // Category filters
                         d.primary_category_id = $('#primary-category-filter').val();
                         d.subcategory_id = $('#subcategory-filter').val();
                         d.third_category_id = $('#third-category-filter').val();
-                        
-                        // Other filters
                         d.stock_status = $('#stock-status-filter').val();
                         d.product_type = $('#product-type-filter').val();
                         d.low_stock_only = $('#low-stock-filter').is(':checked') ? '1' : '';
-                        d.search = $('#search-filter').val();
                     }
                 },
                 columns: [
@@ -341,6 +607,12 @@
                     { data: 'stock_info', name: 'computed_quantity', orderable: true },
                     { data: 'value', name: 'value', orderable: false },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
+                ],
+                columnDefs: [
+                    { targets: 0, className: 'col-width-product' },
+                    { targets: 1, className: 'col-width-stock' },
+                    { targets: 2, className: 'col-width-value' },
+                    { targets: 3, className: 'col-width-actions text-end' }
                 ],
                 order: [[1, 'asc']], // Order by stock quantity
                 pageLength: 25,
@@ -361,10 +633,9 @@
                 updateStatistics();
             });
 
-            $('#search-filter').on('keyup', function() {
-                clearTimeout(window.searchTimeout);
-                window.searchTimeout = setTimeout(function() {
-                    table.draw();
+            table.on('search.dt', function() {
+                clearTimeout(window.statsSearchTimeout);
+                window.statsSearchTimeout = setTimeout(function() {
                     updateStatistics();
                 }, 500);
             });
@@ -472,11 +743,10 @@
             $(document).on('click', '.adjust-stock-btn', function() {
                 const productId = $(this).data('product-id');
                 const productTitle = $(this).data('product-title');
-                const productType = $(this).data('product-type');
                 
                 $('#adjustStockModal .modal-title').html('📝 Adjust Stock - ' + productTitle);
                 $('#adjust-stock-content').html(`
-                    <div class="text-center">
+                    <div class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -485,15 +755,14 @@
                 
                 $('#adjustStockModal').modal('show');
                 
-                // Load adjustment form
                 $.get('{{ route("admin.inventory.adjust-form", ":id") }}'.replace(':id', productId))
                     .done(function(response) {
                         $('#adjust-stock-content').html(response);
                     })
                     .fail(function() {
                         $('#adjust-stock-content').html(`
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-triangle"></i>
+                            <div class="alert alert-danger" style="border-radius:12px;">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
                                 Failed to load adjustment form. Please try again.
                             </div>
                         `);
@@ -502,7 +771,6 @@
 
             // Clear filters button
             $('#clear-filters-btn').on('click', function() {
-                // Reset all filter inputs
                 $('#primary-category-filter').val('');
                 $('#subcategory-filter').val('').prop('disabled', true).html('<option value="">Select a primary category first</option>');
                 $('#third-category-filter').val('').prop('disabled', true).html('<option value="">Select a subcategory first</option>');
@@ -511,7 +779,6 @@
                 $('#low-stock-filter').prop('checked', false);
                 $('#search-filter').val('');
                 
-                // Refresh table and statistics
                 table.draw();
                 updateStatistics();
             });

@@ -116,10 +116,10 @@
     @endphp
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
         :root {
-            --db-font: 'Plus Jakarta Sans', sans-serif;
+            --db-font: 'Outfit', sans-serif;
             --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(226, 232, 240, 0.8);
             --neon-primary: #6366f1;

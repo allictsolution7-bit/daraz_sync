@@ -200,11 +200,17 @@ class InventoryController extends Controller
                     $q->whereRaw("$computedStatusExpression = 'low_stock'");
                 }
 
-                if ($request->filled('search')) {
-                    $search = $request->search;
-                    $q->where(function($query) use ($search) {
-                        $query->where('products.title', 'like', "%{$search}%")
-                              ->orWhere('products.id', $search);
+                $searchValue = null;
+                if ($request->filled('search') && is_string($request->search)) {
+                    $searchValue = $request->search;
+                } elseif ($request->filled('search.value')) {
+                    $searchValue = $request->input('search.value');
+                }
+
+                if ($searchValue) {
+                    $q->where(function($query) use ($searchValue) {
+                        $query->where('products.title', 'like', "%{$searchValue}%")
+                              ->orWhere('products.id', $searchValue);
                     });
                 }
             })
