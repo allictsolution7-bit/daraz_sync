@@ -207,6 +207,10 @@
             background: rgba(239, 68, 68, 0.12);
             color: #dc2626;
         }
+        .btn-action-edit:hover {
+            background: rgba(59, 130, 246, 0.12);
+            color: #2563eb;
+        }
     </style>
 @endsection
 
@@ -283,14 +287,20 @@
                                 </td>
                                 <td class="text-secondary">{{ $comboOffer->created_at->format('M d, Y') }}</td>
                                 <td class="text-end">
-                                    <form action="{{ route('admin.combo_offers.destroy', $comboOffer) }}" method="POST" class="d-inline"
-                                          onsubmit="return confirm('Are you sure you want to delete this combo offer?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-action-custom btn-action-delete" title="Delete Combo Offer">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    <div class="d-inline-flex gap-1" role="group">
+                                        <a href="{{ route('admin.combo_offers.edit', $comboOffer) }}" 
+                                           class="btn-action-custom btn-action-edit" title="Edit Combo Offer">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        <form action="{{ route('admin.combo_offers.destroy', $comboOffer) }}" method="POST" class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this combo offer?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-action-custom btn-action-delete" title="Delete Combo Offer">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
