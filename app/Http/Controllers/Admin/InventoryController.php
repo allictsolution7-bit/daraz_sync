@@ -481,6 +481,15 @@ class InventoryController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('product', function($pq) use ($search) {
+                    $pq->where('title', 'like', "%{$search}%");
+                })->orWhere('notes', 'like', "%{$search}%");
+            });
+        }
+
         $movements = $query->paginate(50);
         
         // Get filter options
