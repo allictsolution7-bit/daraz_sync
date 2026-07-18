@@ -27,28 +27,7 @@
         color: #334155;
     }
 
-    .container-fluid {
-        max-width: 1440px;
-        padding: 2.5rem 2rem;
-    }
 
-    /* Page Header */
-    .d-flex.justify-content-between.align-items-center.mb-4 {
-        margin-bottom: 2rem !important;
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(12px);
-        padding: 1.5rem 2rem;
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-    }
-
-    .d-flex.justify-content-between.align-items-center.mb-4 h4 {
-        font-size: 1.6rem;
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        color: var(--dark);
-    }
 
     /* Form Container Grid */
     .product-form-container {
@@ -513,6 +492,42 @@
     .form-section {
         margin-bottom: 28px !important;
     }
+
+    .container-fluid {
+        max-width: 1440px;
+        padding: 0.75rem 2rem;
+    }
+
+    /* Page Header */
+    .d-flex.justify-content-between.align-items-center.mb-4 {
+        margin-bottom: 1rem !important;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(12px);
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    .d-flex.justify-content-between.align-items-center.mb-4 h4 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--dark);
+        margin-bottom: 0 !important;
+    }
+    
+    .modern-breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .modern-breadcrumb .breadcrumb {
+        margin-bottom: 0 !important;
+        background: transparent !important;
+        padding: 0 !important;
+    }
 </style>
 @endsection
 
@@ -522,14 +537,16 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h4 class="mb-1">Add New Product</h4>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <nav aria-label="breadcrumb" class="modern-breadcrumb me-2">
+                <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin') }}">Home</a></li>
                     <li class="breadcrumb-item active">Add Product</li>
                 </ol>
             </nav>
+            <a href="{{ route('admin.product.index') }}" class="btn btn-sm btn-outline-secondary">← Back to Products</a>
         </div>
-        <a href="{{ route('admin.product.index') }}" class="btn btn-outline-secondary">← Back to Products</a>
     </div>
 
     @session('success')

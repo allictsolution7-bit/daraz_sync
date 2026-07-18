@@ -755,7 +755,7 @@
                         <!-- CORE SHOP SECTION -->
                         <li class="menu-section {{ $coreShopActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Core Shop</span>
+                                <span>Product Catalog</span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $coreShopActive ? 'display: block;' : 'display: none;' }}">
@@ -992,7 +992,7 @@
                         <!-- ORDERS & SALES SECTION -->
                         <li class="menu-section {{ $ordersSalesActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Orders & Sales</span>
+                                <span>Sales & Orders</span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $ordersSalesActive ? 'display: block;' : 'display: none;' }}">
@@ -1145,7 +1145,7 @@
                         <!-- REPORTS & ANALYTICS SECTION -->
                         <li class="menu-section {{ $reportsAnalyticsActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Reports & Analytics</span>
+                                <span>Reports & Insights</span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $reportsAnalyticsActive ? 'display: block;' : 'display: none;' }}">
@@ -1175,7 +1175,7 @@
                         <!-- INTEGRATIONS & SYNC SECTION -->
                         <li class="menu-section {{ $integrationsSyncActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Integrations & Sync</span>
+                                <span>Connected Apps</span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $integrationsSyncActive ? 'display: block;' : 'display: none;' }}">
@@ -1642,7 +1642,7 @@
                         <!-- CONTROL & SYSTEM SECTION -->
                         <li class="menu-section {{ $controlSystemActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Control & System</span>
+                                <span>System Settings</span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $controlSystemActive ? 'display: block;' : 'display: none;' }}">

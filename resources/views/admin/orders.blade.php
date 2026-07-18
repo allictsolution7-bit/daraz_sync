@@ -1416,6 +1416,15 @@
         }
 
         $(document).ready(function() {
+            // Check for status parameter in URL and select/filter accordingly
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlStatus = urlParams.get('status');
+            if (urlStatus) {
+                $('#status-filter').val(urlStatus);
+                $('.status-filter-item').removeClass('active');
+                $(`.status-filter-item[data-status="${urlStatus}"]`).addClass('active');
+            }
+
             let customFilters = {};
 
             // Initialize DataTable with advanced features

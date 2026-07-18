@@ -107,6 +107,12 @@
         if ($totalCustomers > 0) {
             $retentionRate = round(($returningCustomers / $totalCustomers) * 100, 1);
         }
+
+        // 5. Low Stock Alert Count
+        $lowStockCount = \App\Models\Product::where('manage_stock', true)
+            ->whereRaw('quantity <= low_stock_threshold')
+            ->where('stock_status', 'in_stock')
+            ->count();
     @endphp
 
     <style>
@@ -224,6 +230,8 @@
             flex-direction: column;
             justify-content: space-between;
             height: 100%;
+            text-decoration: none !important;
+            color: inherit !important;
         }
 
         .kpi-card:hover {
@@ -298,6 +306,9 @@
         .gradient-4 {
             --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
+        .gradient-5 {
+            --accent-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
 
         /* Custom Status Matrix Grid */
         .status-matrix-title {
@@ -333,6 +344,8 @@
             align-items: center;
             gap: 12px;
             text-align: left;
+            text-decoration: none !important;
+            color: inherit !important;
         }
 
         .matrix-card:hover {
@@ -693,9 +706,9 @@
             <!-- KPI Cards Grid -->
             <div class="kpi-container">
                 <!-- KPI 1 -->
-                <div class="kpi-card gradient-1">
+                <a href="{{ route('admin.orders.index') }}" class="kpi-card gradient-1 text-decoration-none">
                     <div class="kpi-header">
-                        <span class="kpi-title">Gross Transactions</span>
+                        <span class="kpi-title">Incoming Orders</span>
                         <div class="kpi-icon">
                             <i class="fas fa-cash-register"></i>
                         </div>
@@ -705,16 +718,16 @@
                             <span class="new-orders-count">{{ $NewtotalOrders }}</span>
                         </div>
                         <div class="kpi-subtext">
-                            <span class="fw-bold">Total Operations:</span>
+                            <span class="fw-bold">Total Orders:</span>
                             <span class="total-orders-count">{{ $totalOrders }}</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
                 <!-- KPI 2 -->
-                <div class="kpi-card gradient-2">
+                <a href="{{ route('admin.settings.index') }}" class="kpi-card gradient-2 text-decoration-none">
                     <div class="kpi-header">
-                        <span class="kpi-title">Telecommunications Credit</span>
+                        <span class="kpi-title">SMS Credits</span>
                         <div class="kpi-icon">
                             <i class="fas fa-signal"></i>
                         </div>
@@ -724,15 +737,15 @@
                             {{ $balance['balance'] ?? '0.00' }}
                         </div>
                         <div class="kpi-subtext">
-                            <span class="fw-semibold">Automated Alert Service Balance</span>
+                            <span class="fw-semibold">SMS Notification Balance</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
                 <!-- KPI 3 -->
-                <div class="kpi-card gradient-3">
+                <a href="{{ route('admin.users') }}" class="kpi-card gradient-3 text-decoration-none">
                     <div class="kpi-header">
-                        <span class="kpi-title">Enrolled Entities</span>
+                        <span class="kpi-title">Store Customers</span>
                         <div class="kpi-icon">
                             <i class="fas fa-users-gear"></i>
                         </div>
@@ -742,15 +755,15 @@
                             {{ $totalUsers }}
                         </div>
                         <div class="kpi-subtext">
-                            <span class="fw-semibold">Registered clients & accounts</span>
+                            <span class="fw-semibold">Total Client Accounts</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
                 <!-- KPI 4 -->
-                <div class="kpi-card gradient-4">
+                <a href="{{ route('admin.orders.reports') }}" class="kpi-card gradient-4 text-decoration-none">
                     <div class="kpi-header">
-                        <span class="kpi-title">Gross Volume (BDT)</span>
+                        <span class="kpi-title">Sales Revenue (BDT)</span>
                         <div class="kpi-icon">
                             <i class="fas fa-scale-balanced"></i>
                         </div>
@@ -760,15 +773,33 @@
                             {{ number_format($totalSales, 2) }}
                         </div>
                         <div class="kpi-subtext">
-                            <span class="fw-semibold">Processed transaction revenue</span>
+                            <span class="fw-semibold">Total Sales Amount</span>
                         </div>
                     </div>
-                </div>
+                </a>
+
+                <!-- KPI 5 -->
+                <a href="{{ route('admin.inventory.low-stock') }}" class="kpi-card gradient-5 text-decoration-none">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Low Stock Alerts</span>
+                        <div class="kpi-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="kpi-value">
+                            {{ $lowStockCount }}
+                        </div>
+                        <div class="kpi-subtext">
+                            <span class="fw-semibold">Products requiring restock</span>
+                        </div>
+                    </div>
+                </a>
             </div>
 
             <!-- Section: Status Sparklines -->
             <div class="status-matrix-title">
-                <i class="fas fa-grip text-indigo-500"></i> Operational Status Matrix
+                <i class="fas fa-grip text-indigo-500"></i> Order Status Tracking
             </div>
 
             <div class="status-matrix-grid">
@@ -781,15 +812,15 @@
                         $maxCount = max($counts) ?: 1;
 
                         $statusConfig = [
-                            'pending' => ['label' => 'Telemetry Queue', 'icon' => 'fas fa-clock'],
-                            'phone_not_rcv' => ['label' => 'Offline Nodes', 'icon' => 'fas fa-phone-slash'],
-                            'follow_up' => ['label' => 'Pipeline Buffering', 'icon' => 'fas fa-arrows-spin'],
-                            'processing' => ['label' => 'Core Processing', 'icon' => 'fas fa-gears'],
-                            'ready_for_delivery' => ['label' => 'Staged Extraction', 'icon' => 'fas fa-box'],
-                            'delivered' => ['label' => 'Sync Finalized', 'icon' => 'fas fa-circle-check'],
-                            'on_hold' => ['label' => 'Execution Paused', 'icon' => 'fas fa-pause'],
-                            'shipped' => ['label' => 'Orbital Transit', 'icon' => 'fas fa-truck-fast'],
-                            'cancelled' => ['label' => 'Nullified', 'icon' => 'fas fa-ban'],
+                            'pending' => ['label' => 'Awaiting Review', 'icon' => 'fas fa-clock'],
+                            'phone_not_rcv' => ['label' => 'Unreachable / No Answer', 'icon' => 'fas fa-phone-slash'],
+                            'follow_up' => ['label' => 'Follow-Up Queue', 'icon' => 'fas fa-arrows-spin'],
+                            'processing' => ['label' => 'Being Prepared', 'icon' => 'fas fa-gears'],
+                            'ready_for_delivery' => ['label' => 'Ready to Dispatch', 'icon' => 'fas fa-box'],
+                            'delivered' => ['label' => 'Completed / Delivered', 'icon' => 'fas fa-circle-check'],
+                            'on_hold' => ['label' => 'Paused / On Hold', 'icon' => 'fas fa-pause'],
+                            'shipped' => ['label' => 'Dispatched / In Transit', 'icon' => 'fas fa-truck-fast'],
+                            'cancelled' => ['label' => 'Cancelled / Voided', 'icon' => 'fas fa-ban'],
                         ];
 
                         $config = $statusConfig[$status] ?? [
@@ -801,7 +832,7 @@
                         $statusClass = 'status-' . str_replace('_', '-', $status);
                     @endphp
 
-                    <div class="matrix-card {{ $matClass }}">
+                    <a href="{{ route('admin.orders.index', ['status' => $status]) }}" class="matrix-card {{ $matClass }} text-decoration-none">
                         <div class="matrix-left">
                             <div class="matrix-icon-wrapper">
                                 <i class="{{ $config['icon'] }}"></i>
@@ -818,7 +849,7 @@
                                 {{ $config['label'] }}
                             </div>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
 
