@@ -395,13 +395,13 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="{{ route('admin.inventory.history') }}" class="btn-toolbar-outline">
+                    <a href="{{ route('admin.inventory.history') }}" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#334155 0%,#1e293b 100%);color:#e2e8f0;padding:10px 20px;border-radius:12px;font-weight:700;font-size:0.875rem;text-decoration:none;border:none;box-shadow:0 4px 14px rgba(30,41,59,0.25);transition:all 0.25s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(30,41,59,0.35)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 14px rgba(30,41,59,0.25)';">
                         <i class="fa-solid fa-clock-rotate-left"></i> History Logs
                     </a>
-                    <a href="{{ route('admin.inventory.low-stock') }}" class="btn-toolbar-outline" style="color:#f59e0b;border-color:#fde68a;background:#fffbeb;">
+                    <a href="{{ route('admin.inventory.low-stock') }}" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);color:#fff;padding:10px 20px;border-radius:12px;font-weight:700;font-size:0.875rem;text-decoration:none;border:none;box-shadow:0 4px 14px rgba(245,158,11,0.35);transition:all 0.25s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(245,158,11,0.45)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 14px rgba(245,158,11,0.35)';">
                         <i class="fa-solid fa-triangle-exclamation"></i> Low Stock Alerts
                         @if($stats['low_stock_products'] > 0)
-                        <span style="background:#f59e0b;color:#fff;border-radius:20px;padding:2px 8px;font-size:0.75rem;font-weight:800;margin-left:4px;">{{ $stats['low_stock_products'] }}</span>
+                        <span style="background:rgba(255,255,255,0.25);color:#fff;border-radius:20px;padding:2px 9px;font-size:0.75rem;font-weight:800;">{{ $stats['low_stock_products'] }}</span>
                         @endif
                     </a>
                 </div>
