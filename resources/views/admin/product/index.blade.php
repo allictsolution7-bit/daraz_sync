@@ -104,48 +104,24 @@
         }
 
         /* Beautiful Filters Panel */
-        .filter-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px dashed var(--border);
-            margin-bottom: 0.75rem;
-        }
-        .filter-header h6 {
-            margin: 0;
-            font-weight: 700;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-        .filter-toggle-icon {
-            transition: transform 0.3s;
-            color: #64748b;
-        }
         .filter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 0.75rem;
-            transition: all 0.3s ease-in-out;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
         }
-        .filter-grid.collapsed {
-            display: none;
+        @media (max-width: 992px) {
+            .filter-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 576px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
         }
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
-        }
-        .filter-group label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #64748b;
         }
         .filter-group select,
         .filter-group input {
@@ -167,11 +143,9 @@
             background-color: #ffffff;
         }
         .filter-actions {
-            grid-column: 1 / -1;
             display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            margin-top: 0.5rem;
+            gap: 0.5rem;
+            align-items: center;
         }
         .btn-modern {
             height: 42px;
@@ -530,14 +504,9 @@
 
         <!-- Filter Card -->
         <div class="modern-card">
-            <div class="filter-header" id="toggleFilterBtn">
-                <h6><i class="fas fa-sliders-h text-primary"></i> Advanced Filter Options</h6>
-                <i class="fas fa-chevron-down filter-toggle-icon" id="filterChevron" style="transform: rotate(-90deg);"></i>
-            </div>
-            <div id="filterCollapseBody" style="display: none;">
-                <div class="filter-grid mt-2">
+            <div id="filterCollapseBody">
+                <div class="filter-grid">
                     <div class="filter-group">
-                        <label>Primary Category</label>
                         <select id="primary-category-filter">
                             <option value="">All Categories</option>
                             @foreach(\App\Models\ProductCategory::where('status', 'active')->orderBy('name')->get() as $category)
@@ -546,19 +515,16 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Subcategory</label>
                         <select id="subcategory-filter" disabled>
                             <option value="">Select a primary category first</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Third Category</label>
                         <select id="third-category-filter" disabled>
                             <option value="">Select a subcategory first</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Status</label>
                         <select id="status-filter">
                             <option value="">All Statuses</option>
                             <option value="1">Active</option>
@@ -566,7 +532,6 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Product Type</label>
                         <select id="product-type-filter">
                             <option value="">All Types</option>
                             <option value="simple">Simple</option>
@@ -576,27 +541,23 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Min Price</label>
-                        <input type="number" id="price-min" placeholder="Min TK" min="0">
+                        <input type="number" id="price-min" placeholder="Min Price (TK)" min="0">
                     </div>
                     <div class="filter-group">
-                        <label>Max Price</label>
-                        <input type="number" id="price-max" placeholder="Max TK" min="0">
+                        <input type="number" id="price-max" placeholder="Max Price (TK)" min="0">
                     </div>
                     <div class="filter-group">
-                        <label>Date From</label>
-                        <input type="date" id="date-from">
+                        <input type="date" id="date-from" placeholder="Date From">
                     </div>
                     <div class="filter-group">
-                        <label>Date To</label>
-                        <input type="date" id="date-to">
+                        <input type="date" id="date-to" placeholder="Date To">
                     </div>
                     <div class="filter-actions">
-                        <button class="btn-modern btn-modern-secondary" id="clear-filters">
+                        <button class="btn-modern btn-modern-secondary w-100" id="clear-filters" style="height:36px; padding:0 10px; font-size:0.8rem;">
                             <i class="fas fa-undo-alt"></i> Reset
                         </button>
-                        <button class="btn-modern btn-modern-primary" id="apply-filters">
-                            <i class="fas fa-filter"></i> Apply Filters
+                        <button class="btn-modern btn-modern-primary w-100" id="apply-filters" style="height:36px; padding:0 10px; font-size:0.8rem;">
+                            <i class="fas fa-filter"></i> Filter
                         </button>
                     </div>
                 </div>
