@@ -6,622 +6,452 @@
     <link href="https://cdn.datatables.net/datetime/1.5.0/css/dataTables.dateTime.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet">
     <style>
-        .bulk-actions-container {
-            background: #ffffff;
-            padding: 7px;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            margin-bottom: 6px;
-            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --success-hover: #059669;
+            --success-light: #ecfdf5;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --danger-light: #fef2f2;
+            --warning: #f59e0b;
+            --warning-hover: #d97706;
+            --warning-light: #fffbeb;
+            --info: #06b6d4;
+            --info-hover: #0891b2;
+            --info-light: #ecfeff;
+            --secondary: #6b7280;
+            --secondary-hover: #4b5563;
+            --secondary-light: #f3f4f6;
+            --dark: #1f2937;
+            --border-color: #e5e7eb;
+            --card-bg: #ffffff;
+            --body-bg: #f9fafb;
         }
 
-        .bulk-actions-container button {
-            padding: 2px 10px;
+        /* Card layout */
+        .orders-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            padding: 20px;
+            margin-bottom: 24px;
         }
 
-        .bulk-assign-group .assign-input-group {
-            min-width: 250px;
-            max-width: 250px;
+        .orders-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .bulk-assign-group .assign-btn {
-            white-space: nowrap;
+        /* Filter Section Styling */
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            align-items: end;
         }
 
-        .btn-soft-primary {
-            background: #e2e8ff;
-            color: #1d4ed8;
-            border: 1px solid #cbd5ff;
-            transition: all 0.15s ease-in-out;
+        .filter-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
-        .btn-soft-primary:hover { background: #cfd9ff; color: #1e3a8a; }
 
-        .btn-soft-success {
-            background: #e7f7ed;
-            color: #15803d;
-            border: 1px solid #c4ebd3;
-            transition: all 0.15s ease-in-out;
+        .filter-control-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--secondary);
+            margin: 0;
         }
-        .btn-soft-success:hover { background: #d6f0e1; color: #166534; }
 
-        .btn-soft-info {
-            background: #e0f2ff;
-            color: #0369a1;
-            border: 1px solid #bde3ff;
-            transition: all 0.15s ease-in-out;
+        .filter-control-group select,
+        .filter-control-group input {
+            width: 100%;
+            height: 38px;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #fff;
+            color: var(--dark);
+            transition: all 0.2s ease;
+            box-sizing: border-box;
         }
-        .btn-soft-info:hover { background: #cfe9ff; color: #075985; }
 
-        .btn-soft-warning {
-            background: #fff4e0;
-            color: #b45309;
-            border: 1px solid #ffe0b3;
-            transition: all 0.15s ease-in-out;
+        .filter-control-group select:focus,
+        .filter-control-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
-        .btn-soft-warning:hover { background: #ffe9c2; color: #92400e; }
 
-        .btn-soft-danger {
-            background: #ffe5e5;
-            color: #b91c1c;
-            border: 1px solid #ffc7c7;
-            transition: all 0.15s ease-in-out;
+        .filter-actions-wrapper {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
         }
-        .btn-soft-danger:hover { background: #ffd6d6; color: #991b1b; }
 
-        .btn-soft-dark {
-            background: #eef1f6;
-            color: #1f2937;
-            border: 1px solid #d8dde6;
-            transition: all 0.15s ease-in-out;
-        }
-        .btn-soft-dark:hover { background: #e1e5ed; color: #111827; }
-
-        /* Add hover effect to rows */
-        .clickable-row:hover {
-            background-color: #f1f5f9 !important;
+        .btn-premium {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 16px;
+            height: 38px;
+            border-radius: 8px;
+            border: 1px solid transparent;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        /* Order Status Row Colors */
-        table#Products tr.order-status-pending td {
-            background-color: #fff7e6 !important;
-            color: #8a5600;
+        .btn-premium-primary {
+            background-color: var(--primary);
+            color: #fff;
         }
 
-        table#Products tr.order-status-processing td {
-            background-color: #e7f0ff !important;
-            color: #0f4fb4;
+        .btn-premium-primary:hover {
+            background-color: var(--primary-hover);
         }
 
-        table#Products tr.order-status-delivered td {
-            background-color: #e6f6ed !important;
-            color: #1a6e37;
+        .btn-premium-secondary {
+            background-color: var(--secondary-light);
+            color: var(--secondary-hover);
+            border-color: var(--border-color);
         }
 
-        table#Products tr.order-status-on_hold td {
-            background-color: #f3e8ff !important;
-            color: #6b21a8;
+        .btn-premium-secondary:hover {
+            background-color: #e5e7eb;
         }
 
-        table#Products tr.order-status-shipped td {
-            background-color: #e0f7fa !important;
-            color: #046c7a;
+        /* Bulk Actions Sections */
+        .bulk-dashboard-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
-        table#Products tr.order-status-cancelled td {
-            background-color: #ffe5e5 !important;
-            color: #b91c1c;
+        .bulk-section {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            transition: all 0.2s ease;
         }
 
-        table#Products tr.order-status-phone_not_rcv td {
-            background-color: #eceff1 !important;
-            color: #374151;
+        .bulk-section:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
-        table#Products tr.order-status-follow_up td {
-            background-color: #fff1e6 !important;
-            color: #a04b00;
+        .bulk-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 6px;
         }
 
-        table#Products tr.order-status-ready_for_delivery td {
-            background-color: #e6f7f4 !important;
-            color: #0f766e;
+        .bulk-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
-        span.editable-note {
-            position: relative;
-            top: 4px;
-            border-radius: 5px;
-            padding: 2px 5px;
+        .btn-soft {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .btn-soft-primary { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
+        .btn-soft-primary:hover { background: #c7d2fe; color: #3730a3; }
+
+        .btn-soft-success { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+        .btn-soft-success:hover { background: #a7f3d0; color: #065f46; }
+
+        .btn-soft-info { background: #ecfeff; color: #0891b2; border-color: #a5f3fc; }
+        .btn-soft-info:hover { background: #a5f3fc; color: #0369a1; }
+
+        .btn-soft-warning { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+        .btn-soft-warning:hover { background: #fde68a; color: #92400e; }
+
+        .btn-soft-danger { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+        .btn-soft-danger:hover { background: #fecaca; color: #991b1b; }
+
+        .btn-soft-dark { background: #f3f4f6; color: #1f2937; border-color: #e5e7eb; }
+        .btn-soft-dark:hover { background: #e5e7eb; color: #111827; }
+
+        /* Status Filter Tab Pills */
+        .status-pill-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 6px;
+            background: #f3f4f6;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-pill-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--secondary-hover);
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .status-pill-item:hover {
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--dark);
+        }
+
+        .status-pill-item.active {
+            background: #fff;
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .status-pill-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 12px;
+            background: #e5e7eb;
+            color: var(--secondary);
+            transition: all 0.2s ease;
+        }
+
+        .status-pill-item.active .status-pill-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Modern Table Redesign */
+        .table-responsive-wrapper {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        table.dataTable {
+            border-collapse: collapse !important;
+            margin: 0 !important;
+        }
+
+        table.dataTable thead th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 14px 16px !important;
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        table.dataTable tbody td {
+            padding: 12px 16px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            font-size: 13px;
+            color: #334155;
+            background-color: #ffffff;
+        }
+
+        /* Left status borders */
+        table#Products tbody tr td:first-child {
+            border-left: 4px solid transparent !important;
+        }
+
+        table#Products tr.order-status-pending td { background-color: #fffbeb !important; }
+        table#Products tr.order-status-pending td:first-child { border-left-color: var(--warning) !important; }
+
+        table#Products tr.order-status-processing td { background-color: #eff6ff !important; }
+        table#Products tr.order-status-processing td:first-child { border-left-color: var(--primary) !important; }
+
+        table#Products tr.order-status-delivered td { background-color: #ecfdf5 !important; }
+        table#Products tr.order-status-delivered td:first-child { border-left-color: var(--success) !important; }
+
+        table#Products tr.order-status-on_hold td { background-color: #faf5ff !important; }
+        table#Products tr.order-status-on_hold td:first-child { border-left-color: #a855f7 !important; }
+
+        table#Products tr.order-status-shipped td { background-color: #ecfeff !important; }
+        table#Products tr.order-status-shipped td:first-child { border-left-color: var(--info) !important; }
+
+        table#Products tr.order-status-cancelled td { background-color: #fef2f2 !important; }
+        table#Products tr.order-status-cancelled td:first-child { border-left-color: var(--danger) !important; }
+
+        table#Products tr.order-status-phone_not_rcv td { background-color: #f9fafb !important; }
+        table#Products tr.order-status-phone_not_rcv td:first-child { border-left-color: var(--secondary) !important; }
+
+        table#Products tr.order-status-follow_up td { background-color: #fff7ed !important; }
+        table#Products tr.order-status-follow_up td:first-child { border-left-color: #f97316 !important; }
+
+        table#Products tr.order-status-ready_for_delivery td { background-color: #f0fdfa !important; }
+        table#Products tr.order-status-ready_for_delivery td:first-child { border-left-color: #14b8a6 !important; }
+
+        /* Row Hover states */
+        table.dataTable tbody tr:hover td {
+            background-color: #f8fafc !important;
+            cursor: pointer;
         }
 
         /* Order Status Badges */
         .order-status-badge {
-            display: inline-block;
-            padding: 0px 7px;
-            border-radius: 12px;
-            color: #1f2937;
-            font-weight: bold;
-            font-size: 12px;
-            margin-bottom: 2px;
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: capitalize;
             border: 1px solid transparent;
         }
 
-        .order-status-pending {
-            background: #fff7e6;
-            color: #8a5600;
-            border-color: #ffd89a;
-        }
+        .order-status-badge.order-status-pending { background: #fef3c7; color: #d97706; border-color: #fde68a; }
+        .order-status-badge.order-status-processing { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+        .order-status-badge.order-status-delivered { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        .order-status-badge.order-status-on_hold { background: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; }
+        .order-status-badge.order-status-shipped { background: #cffafe; color: #155e75; border-color: #a5f3fc; }
+        .order-status-badge.order-status-cancelled { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .order-status-badge.order-status-phone_not_rcv { background: #e5e7eb; color: #374151; border-color: #d1d5db; }
+        .order-status-badge.order-status-follow_up { background: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+        .order-status-badge.order-status-ready_for_delivery { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
 
-        .order-status-processing {
-            background: #e7f0ff;
-            color: #0f4fb4;
-            border-color: #c7dbff;
-        }
-
-        .order-status-delivered {
-            background: #e6f6ed;
-            color: #1a6e37;
-            border-color: #c3e9d1;
-        }
-
-        .order-status-on_hold {
-            background: #f3e8ff;
-            color: #6b21a8;
-            border-color: #e5d1ff;
-        }
-
-        .order-status-shipped {
-            background: #e0f7fa;
-            color: #046c7a;
-            border-color: #b8ecf2;
-        }
-
-        .order-status-cancelled {
-            background: #ffe5e5;
-            color: #b91c1c;
-            border-color: #ffc7c7;
-        }
-
-        .order-status-phone_not_rcv {
-            background: #eceff1;
-            color: #374151;
-            border-color: #d8dde1;
-        }
-
-        .order-status-follow_up {
-            background: #fff1e6;
-            color: #a04b00;
-            border-color: #ffd9b0;
-        }
-
-        .order-status-ready_for_delivery {
-            background: #e6f7f4;
-            color: #0f766e;
-            border-color: #bcebe4;
-        }
-
-        .assigned-user-profile {
-            font-size: 12px;
-        }
-
-        .assigned-user-profile .user-img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid #e0e0e0;
-        }
-
-        .assigned-user-details .assigned-user-name {
-            font-weight: 600;
-            line-height: 1.1;
-        }
-
-        /* Steadfast Button Styles */
-        .steadfastbtn {
-            background: #4E4E4F;
-            color: #fff;
-            border-radius: 12px;
-            padding: 0px 8px;
-        }
-
-        .steadfastbtn.sent-sf {
-            background: #35A486 !important;
-            color: #fff;
-        }
-
-        button.steadfastbtn:hover {
-            background: #35A486;
-        }
-
-        input.order-checkbox {
-            width: 15px;
-            height: 15px;
-            position: relative;
-            top: 6px;
-        }
-
-        /* Combo Order Display Styles */
-        .combo-order-display {
-            line-height: 1.4;
-        }
-
-        .combo-selections-list {
-            margin-left: 10px;
-            border-left: 2px solid #e9ecef;
-            padding-left: 8px;
-        }
-
-        .combo-selections-list div {
-            margin-bottom: 2px;
-        }
-
-        /* Advanced Filter Section */
-        .filter-section {
-            background: #f8f9fa;
-            padding: 7px;
-            border-radius: 8px;
-            margin-bottom: 7px;
-            border: 1px solid #dee2e6;
-        }
-
-        /* Table header */
-        table.dataTable thead th {
-            background: #197A94 !important;
-            color: #ffffffff !important;
-            font-weight: 700;
-        }
-
-        /* DataTables buttons */
-        .dt-buttons .dt-button {
-            background: #e2e8ff !important;
-            color: #1d4ed8 !important;
-            border: 1px solid #cbd5ff !important;
-            border-radius: 8px !important;
-            padding: 6px 12px !important;
-            font-weight: 600 !important;
-            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08) !important;
-            transition: all 0.15s ease-in-out !important;
-        }
-        .dt-buttons .dt-button:hover {
-            background: #cfd9ff !important;
-            color: #1e3a8a !important;
-        }
-
-        .filter-row {
+        /* Customer Info */
+        .customer-info-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: end;
-        }
-
-        .filter-group {
-            flex: 1;
-            min-width: 100px;
-        }
-
-        .filter-group label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .filter-group select,
-        .filter-group input {
-            width: 100%;
-            padding: 5px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            height: 32px;
-            box-sizing: border-box;
-        }
-
-        .filter-actions {
-            display: flex;
-            gap: 10px;
-            align-items: end;
-        }
-
-        .btn-filter {
-            padding: 2px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .btn-clear {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-apply {
-            background: #197A94;
-            color: white;
-        }
-
-        .btn-apply:hover {
-            background: #0056b3;
-        }
-
-        .btn-clear:hover {
-            background: #545b62;
-        }
-
-        /* DataTables Button Styling */
-        .dataTables_wrapper .dt-buttons {
-            margin-bottom: 10px;
-        }
-
-        .dt-button {
-            background: #197A94 !important;
-            color: white !important;
-            border: none !important;
-            padding: 8px 16px !important;
-            border-radius: 4px !important;
-            margin-right: 5px !important;
-        }
-
-        .dt-button:hover {
-            background: #0056b3 !important;
-        }
-
-        /* Price and Amount Styling */
-        /* Amount styling based on order status */
-        .amount-pending { color: #8a5600; font-weight: 700; }
-        .amount-processing { color: #0f4fb4; font-weight: 700; }
-        .amount-delivered { color: #1a6e37; font-weight: 700; }
-        .amount-on_hold { color: #6b21a8; font-weight: 700; }
-        .amount-shipped { color: #046c7a; font-weight: 700; }
-        .amount-cancelled { color: #b91c1c; font-weight: 700; }
-        .amount-phone_not_rcv { color: #374151; font-weight: 700; }
-        .amount-follow_up { color: #a04b00; font-weight: 700; }
-        .amount-ready_for_delivery { color: #0f766e; font-weight: 700; }
-
-        /* Customer Info Styling */
-        .customer-info {
-            font-size: 14px;
-            line-height: 1.4;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .customer-name {
             font-weight: 600;
-            color: #333;
+            color: var(--dark);
+            font-size: 13.5px;
         }
 
         .customer-phone {
-            color: #666;
-            font-size: 13px;
-        }
-        
-        /* Fraud Check Styles */
-        .fraud-check-info {
-            text-align: center;
-            line-height: 1.3;
-        }
-        
-        .fraud-risk-badge {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        .fraud-risk-badge.badge-success,
-        .fraud-risk-badge.bg-success {
-            background: #e7f7ed;
-            color: #ffffffff;
-            border: 1px solid #c4ebd3;
-        }
-
-        .fraud-risk-badge.badge-warning,
-        .fraud-risk-badge.bg-warning {
-            background: #fff4e0;
-            color: #ffffffff;
-            border: 1px solid #ffe0b3;
-        }
-
-        .fraud-risk-badge.badge-danger,
-        .fraud-risk-badge.bg-danger {
-            background: #ffe5e5;
-            color: #ffffffff;
-            border: 1px solid #ffc7c7;
-        }
-        
-        .fraud-score {
-            font-weight: 600;
+            color: var(--secondary);
             font-size: 12px;
-            color: #333;
-        }
-        
-        .fraud-success-rate {
-            font-size: 12px;
-            color: #1f1f1f;
-            margin-bottom: 2px;
-            font-weight:600;
-        }
-        
-        .check-fraud-btn {
-            font-size: 11px;
-            padding: 4px 8px;
-        }
-        
-        .fraud-check-loading {
-            text-align: center;
-            color: #666;
-        }
-        
-        .fraud-check-loading i {
-            margin-right: 4px;
-        }
-        
-        .fraud-check-missing {
-            text-align: center;
             display: flex;
-            flex-direction: column;
             align-items: center;
             gap: 4px;
         }
-        
-        .check-fraud-cache-btn {
+
+        .customer-ip {
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        /* Action Icons */
+        .action-icon-btn {
+            font-size: 14px;
+            color: var(--secondary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            background: #fff;
+            border: 1px solid var(--border-color);
+        }
+
+        .action-icon-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+            border-color: #c7d2fe;
+            transform: scale(1.05);
+        }
+
+        /* Fraud Check badge style */
+        .fraud-risk-badge {
+            display: inline-block;
             font-size: 10px;
-            padding: 2px 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-bottom: 4px;
         }
-        
-        .bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-             margin-top:-5px;
+
+        .fraud-risk-badge.bg-success { background-color: var(--success-light) !important; color: var(--success) !important; border: 1px solid #a7f3d0; }
+        .fraud-risk-badge.bg-warning { background-color: var(--warning-light) !important; color: var(--warning) !important; border: 1px solid #fde68a; }
+        .fraud-risk-badge.bg-danger { background-color: var(--danger-light) !important; color: var(--danger) !important; border: 1px solid #fecaca; }
+        .fraud-risk-badge.bg-info { background-color: var(--info-light) !important; color: var(--info) !important; border: 1px solid #a5f3fc; }
+        .fraud-risk-badge.bg-secondary { background-color: var(--secondary-light) !important; color: var(--secondary) !important; border: 1px solid #e5e7eb; }
+
+        .fraud-success-rate {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--dark);
         }
-        .dataTables_length{
-           margin-top: 10px;
-           margin-bottom: 0 !important;
-        }
-        .dataTables_info{
-            margin-top: 0 !important;
-        }
-        
-        /* Note Column Width Control */
-        #Products tbody td:nth-child(8) {
-            max-width: 150px;
-            min-width: 120px;
-            width: 150px;
-        }
-        
-        #Products thead th:nth-child(8) {
-            max-width: 150px;
-            min-width: 120px;
-            width: 150px;
-        }
-        
+
+        /* Note field */
         .editable-note {
-            display: block;
-            max-width: 100%;
-            word-wrap: break-word;
-            word-break: break-word;
-            white-space: normal;
-            line-height: 1.6;
-            padding: 4px;
-            border-radius: 3px;
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
+            font-size: 12px;
+            color: var(--secondary-hover);
+            padding: 6px 10px;
+            border-radius: 8px;
+            background-color: var(--secondary-light);
+            border: 1px dashed var(--border-color);
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
-        
+
         .editable-note:hover {
-            background-color: #e9ecef;
+            background-color: #fff;
+            border-color: var(--primary);
+            color: var(--primary);
         }
-        
+
+        /* Inputs Inside Table */
         .editable-note-input {
             width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--primary);
+            padding: 2px 6px;
+            font-size: 12px;
         }
-        
-        /* Ensure checkboxes work properly */
-        .order-checkbox {
-            cursor: pointer !important;
-            pointer-events: auto !important;
-        }
-        
-        .order-checkbox:disabled {
-            cursor: not-allowed !important;
-            opacity: 0.6;
-        }
-        
-        /* Prevent DataTables from interfering with checkboxes */
-        .dataTables_wrapper .order-checkbox {
-            pointer-events: auto !important;
-        }
-        
-        /* Force checkbox functionality */
-        input[type="checkbox"].order-checkbox {
-            pointer-events: auto !important;
-            cursor: pointer !important;
-            z-index: 1000 !important;
-            position: relative !important;
-        }
-        
-        /* Ensure checkbox container doesn't interfere */
-        td:first-child {
-            position: relative !important;
-            /* z-index: 1000 !important; */
-        }
-        
-        /* Additional checkbox isolation */
-        .order-checkbox {
-            -webkit-appearance: auto !important;
-            -moz-appearance: auto !important;
-            appearance: auto !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            display: inline-block !important;
-        }
-        
-        /* Status Filter Bar Styles */
-        .status-filter-bar {
-            background-color: #f8f9fa;
-            padding: 0px 5px;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-        
-        .status-filter-item {
-            color: #197A94;
-            cursor: pointer;
-            padding: 5px 0px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            font-size: 13px;
-        }
-        
-        .status-filter-item:hover {
-            background-color: #e9ecef;
-            color: #0056b3;
-        }
-        
-        .status-filter-item.active {
-            color: #000;
-            font-weight: bold;
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            padding: 0px 5px;
-        }
-        
-        .status-filter-item.active strong {
-            color: #000;
-        }
-        
-        .status-count {
-            color: #6c757d;
-            font-weight: normal;
-        }
-        
-        .status-separator {
-            color: #6c757d;
-            margin: 0 5px;
-            font-weight: normal;
-        }
-        
-        /* Action Icons Styling */
-        .customer-info .d-flex a {
-            text-decoration: none;
-            padding: 4px 6px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-        
-        .customer-info .d-flex a:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-            transform: scale(1.1);
-        }
-        
+
         /* Custom Dropdown Styles */
         .custom-dropdown {
             position: relative;
@@ -632,37 +462,33 @@
             padding: 4px 8px;
             border: none;
             background: transparent;
-            color: #6c757d;
+            color: var(--secondary);
             cursor: pointer;
-            transition: transform 0.2s ease;
+            border-radius: 6px;
+            transition: all 0.2s ease;
         }
         
         .custom-dropdown-toggle:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-            color: #333;
-        }
-        
-        .custom-dropdown-toggle.active {
-            transform: rotate(90deg);
-            color: #333;
+            background-color: var(--secondary-light);
+            color: var(--dark);
         }
         
         .custom-dropdown-menu {
             position: absolute;
             top: 100%;
             right: 0;
-            min-width: 200px;
+            min-width: 180px;
             background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
             z-index: 1050;
             list-style: none;
-            padding: 0;
-            margin: 0;
+            padding: 4px 0;
+            margin: 4px 0 0 0;
             display: none;
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(-5px);
             transition: all 0.2s ease;
         }
         
@@ -673,328 +499,160 @@
         }
         
         .custom-dropdown-item {
-            display: block;
-            padding: 8px 16px;
-            font-size: 14px;
-            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--dark);
             text-decoration: none;
             transition: background-color 0.2s ease;
         }
         
         .custom-dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: var(--secondary-light);
+            color: var(--primary);
             text-decoration: none;
         }
-        
-        .custom-dropdown-header {
-            font-size: 12px;
-            font-weight: 600;
-            color: #6c757d;
-            padding: 8px 16px 4px;
-            margin: 0;
+
+        /* Checkbox styling */
+        input.order-checkbox, #select-all-orders {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            accent-color: var(--primary);
         }
-        
-        .custom-dropdown-divider {
-            margin: 4px 0;
+
+        /* Steadfast Button inside table */
+        .steadfastbtn {
+            background-color: #374151;
+            color: #fff;
             border: none;
-            border-top: 1px solid #dee2e6;
-        }
-        
-        /* Prevent any DataTables or other CSS from affecting checkboxes */
-        .dataTables_wrapper input[type="checkbox"].order-checkbox,
-        table input[type="checkbox"].order-checkbox {
-            -webkit-appearance: auto !important;
-            -moz-appearance: auto !important;
-            appearance: auto !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            display: inline-block !important;
-            pointer-events: auto !important;
-            cursor: pointer !important;
-        }
-        
-        
-        /* Ensure checkboxes are clickable */
-        input[type="checkbox"].order-checkbox {
-            position: relative !important;
-            z-index: 9999 !important;
-            pointer-events: auto !important;
-            cursor: pointer !important;
-            user-select: none !important;
-            -webkit-user-select: none !important;
-            -moz-user-select: none !important;
-            -ms-user-select: none !important;
-        }
-        
-        /* Make sure checkbox container doesn't block clicks */
-        td:first-child,
-        .order-checkbox-wrapper {
-            position: relative !important;
-            /* z-index: 9999 !important; */
-            pointer-events: auto !important;
-        }
-        
-        /* Mobile Product Info Styling */
-        .product-info-mobile {
-            border-top: 1px solid #e9ecef;
-            padding-top: 8px;
-            margin-top: 8px;
-        }
-        
-        .product-info-mobile .amount-high {
-            color: #28a745;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .product-info-mobile .amount-medium {
-            color: #ffc107;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .product-info-mobile .amount-low {
-            color: #dc3545;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .product-info-mobile .combo-order-display {
-            margin-top: 4px;
-            font-size: 12px;
-        }
-        
-        .product-info-mobile .combo-selections-list {
-            margin-top: 4px;
+            padding: 4px 8px;
             font-size: 11px;
-            color: #666;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        
-        .product-info-mobile .combo-selections-list div {
-            margin-bottom: 2px;
+
+        .steadfastbtn:hover {
+            background-color: #1f2937;
         }
-        
-        /* Ensure mobile layout is clean */
-        #Products tbody td:nth-child(2) {
-            width: auto !important;
-            max-width: none !important;
+
+        .steadfastbtn.sent-sf {
+            background-color: var(--success) !important;
         }
-        
-        /* Mobile table layout */
-        #Products {
-            table-layout: auto;
+
+        /* Alignment for DataTables elements */
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
-        
-        /* Mobile responsive: Show product info in customer column on small screens */
+
+        .dataTables_wrapper .dt-buttons {
+            margin: 0 !important;
+        }
+
+        .dt-button {
+            height: 38px !important;
+            padding: 8px 14px !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            border-radius: 8px !important;
+            background: #fff !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--secondary-hover) !important;
+            box-shadow: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+        }
+
+        .dt-button:hover {
+            background: var(--secondary-light) !important;
+            color: var(--dark) !important;
+        }
+
+        .dataTables_filter input {
+            height: 38px;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #fff;
+            width: 240px;
+            box-sizing: border-box;
+        }
+
+        .bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .dataTables_length select {
+            height: 34px;
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        /* Mobile adjustments */
         @media (max-width: 768px) {
-            .product-info-mobile {
-                display: block;
+            .filter-grid {
+                grid-template-columns: 1fr 1fr;
             }
-            
-            /* Hide the separate product column on mobile */
-            #Products thead th:nth-child(3),
-            #Products tbody td:nth-child(3) {
-                display: none !important;
+            .bulk-dashboard-sections {
+                grid-template-columns: 1fr;
             }
-            
-            /* Mobile product info styling */
-            .product-info-mobile {
-                border-top: 1px solid #e9ecef;
-                padding-top: 8px;
-                margin-top: 8px;
-                white-space: normal;
-                word-wrap: break-word;
-                word-break: break-word;
+            .top, .bottom {
+                flex-direction: column;
+                align-items: stretch;
             }
-            
-            .product-info-mobile .amount-high,
-            .product-info-mobile .amount-medium,
-            .product-info-mobile .amount-low {
-                font-weight: 600;
-                font-size: 14px;
-                margin-bottom: 4px;
+            .dataTables_filter input {
+                width: 100%;
             }
-            
-            .product-info-mobile .combo-order-display {
-                margin-top: 4px;
-                font-size: 12px;
-                line-height: 1.4;
-            }
-            
-            .product-info-mobile .combo-selections-list {
-                margin-top: 4px;
-                font-size: 11px;
-                color: #666;
-                margin-left: 10px;
-                border-left: 2px solid #e9ecef;
-                padding-left: 8px;
-            }
-            
-            .product-info-mobile .combo-selections-list div {
-                margin-bottom: 2px;
-            }
-            
-            /* Ensure mobile layout is clean */
-            #Products tbody td:nth-child(2) {
-                width: auto !important;
-                max-width: none !important;
-            }
-            
-            /* Mobile table layout */
-            #Products {
-                table-layout: auto;
-            }
-        }
-        
-        /* Desktop: Hide mobile product info, show separate product column */
-        @media (min-width: 769px) {
-            .product-info-mobile {
-                display: none;
-            }
-            
-            /* Show the separate product column on desktop */
-            #Products thead th:nth-child(3),
-            #Products tbody td:nth-child(3) {
-                display: table-cell;
-            }
-        }
-        
-        /* Product column styling for full text display */
-        #Products tbody td:nth-child(3) {
-            white-space: normal;
-            word-wrap: break-word;
-            word-break: break-word;
-            max-width: 200px;
-            min-width: 200px;
-            width: 200px;
-        }
-        
-        /* Courier Status Badge Hover Effects */
-        .courier-status-badge {
-            transition: all 0.3s ease;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .courier-status-badge:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            opacity: 0.9;
-        }
-        
-        .courier-status-badge:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .courier-status-badge .fa-sync-alt {
-            transition: transform 0.3s ease;
-        }
-        
-        .courier-status-badge:hover .fa-sync-alt {
-            transform: rotate(180deg);
-        }
-        
-        /* Set proper widths for all columns */
-        #Products thead th:nth-child(1) {
-            width: 50px;
-            min-width: 50px;
-            max-width: 50px;
-        }
-        
-        #Products thead th:nth-child(2) {
-            width: 180px;
-            min-width: 180px;
-            max-width: 180px;
-        }
-        
-        #Products thead th:nth-child(3) {
-            width: 200px;
-            min-width: 200px;
-            max-width: 200px;
-        }
-        
-        #Products thead th:nth-child(4) {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
-        }
-        
-        #Products thead th:nth-child(5) {
-            width: 140px;
-            min-width: 140px;
-            max-width: 140px;
-        }
-        
-        #Products thead th:nth-child(6) {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
-        }
-        
-        #Products thead th:nth-child(7) {
-            width: 150px;
-            min-width: 120px;
-            max-width: 150px;
-        }
-        
-        /* Apply the same widths to table body cells */
-        #Products tbody td:nth-child(1) {
-            width: 50px;
-            min-width: 50px;
-            max-width: 50px;
-        }
-        
-        #Products tbody td:nth-child(2) {
-            width: 180px;
-            min-width: 180px;
-            max-width: 180px;
-        }
-        
-        #Products tbody td:nth-child(4) {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
-        }
-        
-        #Products tbody td:nth-child(5) {
-            width: 140px;
-            min-width: 140px;
-            max-width: 140px;
-        }
-        
-        #Products tbody td:nth-child(6) {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
-        }
-        
-        #Products tbody td:nth-child(7) {
-            width: 150px;
-            min-width: 120px;
-            max-width: 150px;
         }
     </style>
 @endsection
 
 @section('content')
-    <div class="container-fluid mt-5">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" style="margin-bottom: -15px;">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('admin') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Orders</li>
-            </ol>
-        </nav>
-        {{-- <h5 class="mb-2">All Orders</h5> --}}
-        {{-- <hr> --}}
+    <div class="container-fluid py-4" style="background-color: var(--body-bg); min-height: 100vh;">
+        <!-- Header & Breadcrumb -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 font-weight-bold" style="color: var(--dark);">Orders Management</h4>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0" style="background: transparent; padding: 0;">
+                        <li class="breadcrumb-item"><a href="{{ route('admin') }}" class="text-decoration-none" style="color: var(--primary);"><i class="fas fa-home me-1"></i>Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" style="color: var(--secondary);">Orders</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
 
-        <!-- Advanced Filter Section -->
-        <div class="filter-section">
-            {{-- <h6 class="mb-3">Advanced Filters</h6> --}}
-            <div class="filter-row">
-                <div class="filter-group">
-                    <!-- <label for="status-filter">Order Status</label> -->
+        <!-- Advanced Filters Card -->
+        <div class="orders-card">
+            <div class="orders-card-title">
+                <i class="fas fa-filter text-primary"></i> Advanced Filters
+            </div>
+            <div class="filter-grid">
+                <div class="filter-control-group">
+                    <label for="status-filter">Order Status</label>
                     <select id="status-filter">
                         <option value="">All Status</option>
                         <option value="pending">Pending</option>
@@ -1008,195 +666,189 @@
                         <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <!-- <label for="courier-filter">Courier Status</label> -->
+                <div class="filter-control-group">
+                    <label for="courier-filter">Courier Status</label>
                     <select id="courier-filter">
                         <option value="">All Orders</option>
                         <option value="steadfast_sent">Steadfast Sent</option>
                         <option value="steadfast_not_sent">Steadfast Not Sent</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <!-- <label for="order-type-filter">Order Type</label> -->
+                <div class="filter-control-group">
+                    <label for="order-type-filter">Order Type</label>
                     <select id="order-type-filter">
                         <option value="">All Types</option>
                         <option value="combo">Combo Orders</option>
                         <option value="regular">Regular Orders</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <!-- <label for="amount-min">Min Amount</label> -->
+                <div class="filter-control-group">
+                    <label for="amount-min">Min Amount</label>
                     <input type="number" id="amount-min" placeholder="Min Amount" min="0">
                 </div>
-                <div class="filter-group">
-                    <!-- <label for="amount-max">Max Amount</label> -->
+                <div class="filter-control-group">
+                    <label for="amount-max">Max Amount</label>
                     <input type="number" id="amount-max" placeholder="Max Amount" min="0">
                 </div>
-                <div class="filter-group">
-                    <!-- <label for="date-from">Date From</label> -->
+                <div class="filter-control-group">
+                    <label for="date-from">Date From</label>
                     <input type="date" id="date-from">
                 </div>
-                <div class="filter-group">
-                    <!-- <label for="date-to">Date To</label> -->
+                <div class="filter-control-group">
+                    <label for="date-to">Date To</label>
                     <input type="date" id="date-to">
                 </div>
-                <div class="filter-actions">
-                    <button class="btn-filter btn-apply" id="apply-filters"><i class="fas fa-filter"></i> Apply Filters</button>
-                    <button class="btn-filter btn-clear" id="clear-filters"><i class="fas fa-times"></i> Clear All</button>
+            </div>
+            <div class="filter-actions-wrapper">
+                <button class="btn-premium btn-premium-primary" id="apply-filters"><i class="fas fa-search"></i> Apply Filters</button>
+                <button class="btn-premium btn-premium-secondary" id="clear-filters"><i class="fas fa-undo"></i> Reset Filters</button>
+            </div>
+        </div>
+
+        <!-- Bulk Operations Panel -->
+        <div class="orders-card">
+            <div class="orders-card-title">
+                <i class="fas fa-tools text-primary"></i> Bulk Actions Dashboard
+            </div>
+            
+            <div class="bulk-dashboard-sections">
+                <!-- Courier & Shipping Section -->
+                <div class="bulk-section">
+                    <div class="bulk-section-title">
+                        <i class="fas fa-truck text-success"></i> Logistics & Dispatch
+                    </div>
+                    <div class="bulk-btn-group">
+                        <button id="bulk-send-steadfast" class="btn-soft btn-soft-success"><i class="fas fa-paper-plane"></i> Steadfast</button>
+                        <button id="bulk-send-pathao" class="btn-soft btn-soft-primary"><i class="fas fa-shipping-fast"></i> Pathao</button>
+                        <button id="bulk-refresh-courier-status" class="btn-soft btn-soft-info" title="Refresh courier status for all orders in transit"><i class="fas fa-sync-alt"></i> Sync Courier</button>
+                    </div>
+                </div>
+
+                <!-- Documents & Export Section -->
+                <div class="bulk-section">
+                    <div class="bulk-section-title">
+                        <i class="fas fa-file-alt text-info"></i> Documents & Export
+                    </div>
+                    <div class="bulk-btn-group">
+                        <button id="bulk-print-invoices" class="btn-soft btn-soft-info"><i class="fas fa-file-invoice"></i> Invoices</button>
+                        <button id="bulk-print-package-slips" class="btn-soft btn-soft-warning"><i class="fas fa-box"></i> Package Slips</button>
+                        <button id="export-selected" class="btn-soft btn-soft-dark"><i class="fas fa-download"></i> Export CSV</button>
+                    </div>
+                </div>
+
+                <!-- Quick Updates Section -->
+                <div class="bulk-section">
+                    <div class="bulk-section-title">
+                        <i class="fas fa-sliders-h text-warning"></i> Quick Operations
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                        <!-- Update Status -->
+                        <div class="d-flex gap-2 align-items-center">
+                            <select id="bulk-status-select" class="form-select form-select-sm" style="font-size: 12px; height: 32px; border-radius: 6px;">
+                                <option value="">Select Status…</option>
+                                <option value="pending">Pending</option>
+                                <option value="phone_not_rcv">Call Not Received</option>
+                                <option value="follow_up">Follow up</option>
+                                <option value="processing">Processing</option>
+                                <option value="ready_for_delivery">Ready Delivery</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="on_hold">On Hold</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <button id="bulk-update-status" class="btn-soft btn-soft-primary" style="height: 32px; white-space: nowrap;"><i class="fas fa-check"></i> Update</button>
+                        </div>
+                        
+                        <!-- Security Block -->
+                        <div class="d-flex gap-2 align-items-center">
+                            <select id="bulk-block-type" class="form-select form-select-sm" style="font-size: 12px; height: 32px; border-radius: 6px;">
+                                <option value="phone">Block by Phone</option>
+                                <option value="ip">Block by IP</option>
+                            </select>
+                            <button id="bulk-block-selected" class="btn-soft btn-soft-danger" style="height: 32px; white-space: nowrap;"><i class="fas fa-user-slash"></i> Block</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment Section -->
+                <div class="bulk-section">
+                    <div class="bulk-section-title">
+                        <i class="fas fa-users-cog text-dark"></i> Staff & Team
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex gap-2 align-items-center">
+                            <select id="bulk-assign-user" class="form-select form-select-sm" style="font-size: 12px; height: 32px; border-radius: 6px;">
+                                <option value="">Select team member…</option>
+                                @foreach($assignableStaff as $staff)
+                                    <option value="{{ $staff->id }}">{{ $staff->name }}{{ $staff->email ? ' — '.$staff->email : '' }}</option>
+                                @endforeach
+                            </select>
+                            <button id="bulk-assign-orders" class="btn-soft btn-soft-dark" style="height: 32px; white-space: nowrap;"><i class="fas fa-user-check"></i> Assign</button>
+                        </div>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <a href="{{ route('admin.orders.index') }}" class="btn-soft btn-soft-primary"><i class="fas fa-list"></i> All</a>
+                            <a href="{{ route('admin.asigned.orders') }}" class="btn-soft btn-soft-primary"><i class="fas fa-user"></i> Mine</a>
+                            <a href="{{ route('admin.incomplete-orders.index') }}" class="btn-soft btn-soft-warning"><i class="fas fa-exclamation-circle"></i> Incomplete</a>
+                            <button id="bulk-delete-orders" class="btn-soft btn-soft-danger"><i class="fas fa-trash-alt"></i> Delete</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="bulk-actions-container d-flex flex-wrap align-items-center gap-1">
-            <div class="">
-                <button id="bulk-send-steadfast" class="btn btn-soft-success mb-1"><i class="fas fa-paper-plane"></i> Send
-                    to Steadfast</button>
-            </div>
-            <div class="">
-                <button id="bulk-send-pathao" class="btn btn-soft-primary mb-1"><i class="fas fa-shipping-fast"></i> Send
-                    to Pathao</button>
-            </div>
-            <div class="">
-                <button id="bulk-print-invoices" class="btn btn-soft-info mb-1"><i class="fas fa-file-invoice"></i> Print Invoices</button>
-            </div>
-            <div class="">
-                <button id="bulk-print-package-slips" class="btn btn-soft-warning mb-1"><i class="fas fa-box"></i> Print Package Slips</button>
-            </div>
-            <div class="">
-                <button id="bulk-delete-orders" class="btn btn-soft-danger mb-1"><i class="fas fa-trash-alt"></i> Delete</button>
-            </div>
-            <div class="">
-                <button id="export-selected" class="btn btn-soft-info mb-1"><i class="fas fa-download"></i> Export</button>
-            </div>
-            <div class="bulk-status-group d-flex align-items-center gap-2 mb-1">
-                <div class="input-group input-group-sm" style="min-width: 180px;">
-                    <span class="input-group-text"><i class="fas fa-check-double"></i></span>
-                    <select id="bulk-status-select" class="form-select">
-                        <option value="">Status…</option>
-                        <option value="pending">Pending</option>
-                        <option value="phone_not_rcv">Call Not Received</option>
-                        <option value="follow_up">Follow up</option>
-                        <option value="processing">Processing</option>
-                        <option value="ready_for_delivery">Ready Delivery</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="on_hold">On Hold</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                </div>
-                <button id="bulk-update-status" class="d-flex align-items-center gap-1 btn btn-soft-primary btn-sm">
-                    <i class="fas fa-random"></i>
-                    <span class="d-none d-md-inline">Update</span>
-                </button>
-            </div>
-            <div class="bulk-block-group d-flex align-items-center gap-2 mb-1">
-                <div class="input-group input-group-sm" style="min-width: 60px;">
-                    <span class="input-group-text text-danger"><i class="fas fa-ban"></i></span>
-                    <select id="bulk-block-type" class="form-select">
-                        <option value="phone">Block by Phone</option>
-                        <option value="ip">Block by IP</option>
-                    </select>
-                </div>
-                <button id="bulk-block-selected" class="d-flex align-items-center gap-1 btn btn-soft-danger btn-sm">
-                    <i class="fas fa-user-slash"></i>
-                    <span class="d-none d-md-inline">Block</span>
-                </button>
-            </div>
-            <div class="bulk-assign-group d-flex align-items-center gap-2 mb-1">
-                <div class="input-group input-group-sm assign-input-group">
-                    <span class="input-group-text"><i class="fas fa-user-plus"></i></span>
-                    <select id="bulk-assign-user" class="form-select">
-                        <option value="">Select team member…</option>
-                        @foreach($assignableStaff as $staff)
-                            <option value="{{ $staff->id }}">{{ $staff->name }}{{ $staff->email ? ' — '.$staff->email : '' }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <button id="bulk-assign-orders" class="d-flex align-items-center gap-1 btn btn-soft-dark btn-sm assign-btn">
-                    <i class="fas fa-user-check"></i>
-                    <span class="d-none d-md-inline">Assign</span>
-                </button>
-                <a href="{{ route('admin.orders.index') }}" class="btn btn-soft-primary btn-sm">
-                    <i class="fas fa-list"></i>
-                    <span class="d-none d-md-inline">All Orders</span>
-                </a>
-                <a href="{{ route('admin.asigned.orders') }}" class="btn btn-soft-primary btn-sm">
-                    <i class="fas fa-user"></i>
-                    <span class="d-none d-md-inline">My Orders</span>
-                </a>
-                <a href="{{ route('admin.incomplete-orders.index') }}" class="btn btn-soft-primary btn-sm">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span class="d-none d-md-inline">Incomplete Orders</span>
-                </a>
-                <button id="bulk-refresh-courier-status" class="btn btn-soft-info btn-sm" title="Refresh courier status for all orders in transit">
-                    <i class="fas fa-sync-alt"></i>
-                    <span class="d-none d-md-inline">Refresh Courier</span>
-                </button>
-            </div>
+        <!-- Status Filter Pills Bar -->
+        <div class="status-pill-bar">
+            <span class="status-pill-item active" data-status="">
+                All <span class="status-pill-badge">{{ $statusCounts['all'] ?? 0 }}</span>
+            </span>
+            <span class="status-pill-item" data-status="pending">
+                Pending <span class="status-pill-badge">{{ $statusCounts['pending'] ?? 0 }}</span>
+            </span>
+            <span class="status-pill-item" data-status="phone_not_rcv">
+                Call Not Received <span class="status-pill-badge">{{ $statusCounts['phone_not_rcv'] ?? 0 }}</span>
+            </span>
+            <span class="status-pill-item" data-status="follow_up">
+                Follow up <span class="status-pill-badge">{{ $statusCounts['follow_up'] ?? 0 }}</span>
+            </span>
+            <span class="status-pill-item" data-status="processing">
+                Processing <span class="status-pill-badge">{{ $statusCounts['processing'] ?? 0 }}</span>
+            </span>
+            <span class="status-pill-item" data-status="ready_for_delivery">
+                Ready Delivery <span class="status-pill-badge">{{ $statusCounts['ready_for_delivery'] ?? 0 }}</span>
+            </span>
+            <span class="status-pill-item" data-status="shipped">
+                Shipped <span class="status-pill-badge">{{ $statusCounts['shipped'] ?? 0 }}</span>
+            </span>
+            <span class="status-pill-item" data-status="delivered">
+                Delivered <span class="status-pill-badge">{{ $statusCounts['delivered'] ?? 0 }}</span>
+            </span>
+            <span class="status-pill-item" data-status="on_hold">
+                On Hold <span class="status-pill-badge">{{ $statusCounts['on_hold'] ?? 0 }}</span>
+            </span>
+            <span class="status-pill-item" data-status="cancelled">
+                Cancelled <span class="status-pill-badge">{{ $statusCounts['cancelled'] ?? 0 }}</span>
+            </span>
         </div>
 
-         <!-- Status Filter Bar -->
-         <div class="status-filter-bar mb-1">
-            <div class="d-flex align-items-center flex-wrap gap-1">
-                <span class="status-filter-item active" data-status="">
-                    <strong>All</strong> <span class="status-count">({{ $statusCounts['all'] ?? 0 }})</span>
-                </span>
-                <span class="status-separator">|</span>
-                <span class="status-filter-item" data-status="pending">
-                    Pending <span class="status-count">({{ $statusCounts['pending'] ?? 0 }})</span>
-                </span>
-                <span class="status-separator">|</span>
-                <span class="status-filter-item" data-status="phone_not_rcv">
-                    Call Not Received <span class="status-count">({{ $statusCounts['phone_not_rcv'] ?? 0 }})</span>
-                </span>
-                <span class="status-separator">|</span>
-                <span class="status-filter-item" data-status="follow_up">
-                    Follow up <span class="status-count">({{ $statusCounts['follow_up'] ?? 0 }})</span>
-                </span>
-                <span class="status-separator">|</span>
-                <span class="status-filter-item" data-status="processing">
-                    Processing <span class="status-count">({{ $statusCounts['processing'] ?? 0 }})</span>
-                </span>
-                <span class="status-separator">|</span>
-                <span class="status-filter-item" data-status="ready_for_delivery">
-                    Ready Delivery <span class="status-count">({{ $statusCounts['ready_for_delivery'] ?? 0 }})</span>
-                </span>
-                <span class="status-separator">|</span>
-                <span class="status-filter-item" data-status="shipped">
-                    Shipped <span class="status-count">({{ $statusCounts['shipped'] ?? 0 }})</span>
-                </span>
-                <span class="status-separator">|</span>
-                <span class="status-filter-item" data-status="delivered">
-                    Delivered <span class="status-count">({{ $statusCounts['delivered'] ?? 0 }})</span>
-                </span>
-                <span class="status-separator">|</span>
-                <span class="status-filter-item" data-status="on_hold">
-                    On Hold <span class="status-count">({{ $statusCounts['on_hold'] ?? 0 }})</span>
-                </span>
-                <span class="status-separator">|</span>
-                <span class="status-filter-item" data-status="cancelled">
-                    Cancelled <span class="status-count">({{ $statusCounts['cancelled'] ?? 0 }})</span>
-                </span>
-            </div>
-        </div>
-
-
-        <table class="table table-striped" id="Products" style="width:100%">
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="select-all-orders"></th>
-                    <th>Customer Info</th>
-                    <th>Product Price & Name</th>
-                    <th>Status</th>
+        <!-- Orders Table Wrapper -->
+        <div class="table-responsive-wrapper">
+            <table class="table" id="Products" style="width:100%">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all-orders"></th>
+                        <th>Customer Info</th>
+                        <th>Product Price & Name</th>
+                        <th>Status</th>
                         <th>Fraud Check</th>
                         <th>Order at</th>
                         <th>Note</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{-- DataTables will populate this via AJAX server-side processing --}}
-            </tbody>
-        </table>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{-- DataTables will populate this via AJAX server-side processing --}}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Status Change Modal -->
