@@ -50,70 +50,103 @@
     }
     .btn-back-inv:hover { background: rgba(255,255,255,0.18); color: #fff; transform: translateY(-1px); }
 
-    /* ── Type Legend Pills ── */
-    .legend-bar {
-        background: #fff; border-radius: 16px; border: 1.5px solid #f0f4f8;
-        padding: 1rem 1.5rem; margin-bottom: 1.5rem;
-        display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.03);
-    }
-    .legend-bar .legend-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-right: 4px; }
-    .legend-pill {
-        display: inline-flex; align-items: center; gap: 5px;
-        font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px;
-    }
-    .legend-pill .dot { width: 7px; height: 7px; border-radius: 50%; }
-    .lp-initial, .lp-restock { background: rgba(16,185,129,0.1); color: #059669; }
-    .lp-initial .dot, .lp-restock .dot { background: #10b981; }
-    .lp-sale { background: rgba(239,68,68,0.1); color: #dc2626; }
-    .lp-sale .dot { background: #ef4444; }
-    .lp-return { background: rgba(14,165,233,0.1); color: #0284c7; }
-    .lp-return .dot { background: #0ea5e9; }
-    .lp-adjustment { background: rgba(99,102,241,0.1); color: #4f46e5; }
-    .lp-adjustment .dot { background: #6366f1; }
-    .lp-damage { background: rgba(107,114,128,0.1); color: #4b5563; }
-    .lp-damage .dot { background: #6b7280; }
-    .lp-inventory_count { background: rgba(245,158,11,0.1); color: #d97706; }
-    .lp-inventory_count .dot { background: #f59e0b; }
-
-    /* ── Filter Card ── */
-    .hist-filter {
-        background: #fff; border-radius: 20px;
+    /* ── Unified Filter + Legend Panel ── */
+    .filter-panel {
+        background: #fff;
+        border-radius: 20px;
         border: 1.5px solid #f0f4f8;
-        box-shadow: 0 2px 16px rgba(0,0,0,0.03);
-        padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
     }
-    .hist-filter .filter-title {
-        font-size: 0.8rem; font-weight: 800; text-transform: uppercase;
-        letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 1rem;
+    /* Top legend strip */
+    .filter-panel-legend {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-bottom: 1.5px solid #e8edf3;
+        padding: 0.9rem 1.5rem;
+        display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+    }
+    .legend-label {
+        font-size: 0.7rem; font-weight: 900; text-transform: uppercase;
+        letter-spacing: 0.1em; color: #94a3b8;
+        margin-right: 6px; display: flex; align-items: center; gap: 5px;
+    }
+    .lchip {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 0.72rem; font-weight: 800; padding: 5px 13px;
+        border-radius: 20px; cursor: default;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1.5px solid transparent;
+    }
+    .lchip:hover { transform: translateY(-1px); }
+    .lchip .cdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .lc-green  { background: rgba(16,185,129,.1);  color: #059669; border-color: rgba(16,185,129,.2); }  .lc-green .cdot  { background: #10b981; }
+    .lc-red    { background: rgba(239,68,68,.1);   color: #dc2626; border-color: rgba(239,68,68,.2); }   .lc-red .cdot    { background: #ef4444; }
+    .lc-sky    { background: rgba(14,165,233,.1);  color: #0284c7; border-color: rgba(14,165,233,.2); }  .lc-sky .cdot    { background: #0ea5e9; }
+    .lc-indigo { background: rgba(99,102,241,.1);  color: #4f46e5; border-color: rgba(99,102,241,.2); }  .lc-indigo .cdot { background: #6366f1; }
+    .lc-gray   { background: rgba(107,114,128,.1); color: #4b5563; border-color: rgba(107,114,128,.2); } .lc-gray .cdot   { background: #6b7280; }
+    .lc-amber  { background: rgba(245,158,11,.1);  color: #d97706; border-color: rgba(245,158,11,.2); }  .lc-amber .cdot  { background: #f59e0b; }
+
+    /* Filter form area */
+    .filter-panel-body { padding: 1.25rem 1.5rem; }
+    .filter-panel-title {
+        font-size: 0.78rem; font-weight: 900; text-transform: uppercase;
+        letter-spacing: 0.09em; color: #cbd5e1; margin-bottom: 1rem;
         display: flex; align-items: center; gap: 6px;
     }
-    .hist-filter .form-label { font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 6px; }
-    .hist-filter .form-select,
-    .hist-filter .form-control {
-        border: 1.5px solid #e2e8f0; border-radius: 10px;
-        padding: 8px 12px; font-size: 0.875rem; font-family: 'Outfit', sans-serif;
-        color: #0f172a; transition: all 0.2s;
+    /* Search input */
+    .search-wrap { position: relative; margin-bottom: 1rem; }
+    .search-wrap .search-icon {
+        position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+        color: #94a3b8; font-size: 0.9rem; pointer-events: none;
     }
-    .hist-filter .form-select:focus,
-    .hist-filter .form-control:focus {
-        border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); outline: none;
+    .search-wrap input {
+        width: 100%; padding: 11px 16px 11px 44px;
+        border: 1.5px solid #e2e8f0; border-radius: 14px;
+        font-size: 0.9rem; font-family: 'Outfit', sans-serif;
+        color: #0f172a; background: #f8fafc; transition: all 0.2s;
     }
+    .search-wrap input::placeholder { color: #94a3b8; }
+    .search-wrap input:focus { outline: none; border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+    /* Filter grid inputs */
+    .filter-grid { display: grid; grid-template-columns: 2fr 1.5fr 1.2fr 1.2fr auto; gap: 12px; align-items: end; }
+    @media(max-width:992px){ .filter-grid { grid-template-columns: 1fr 1fr; } }
+    @media(max-width:576px){ .filter-grid { grid-template-columns: 1fr; } }
+    .fg-group label {
+        display: block; font-size: 0.72rem; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.07em;
+        color: #94a3b8; margin-bottom: 6px;
+    }
+    .fg-group .fg-input-wrap { position: relative; }
+    .fg-group .fg-icon {
+        position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+        color: #94a3b8; font-size: 0.8rem; pointer-events: none;
+    }
+    .fg-group select, .fg-group input[type=date] {
+        width: 100%; padding: 10px 12px 10px 34px;
+        border: 1.5px solid #e2e8f0; border-radius: 12px;
+        font-size: 0.875rem; font-family: 'Outfit', sans-serif;
+        color: #0f172a; background: #f8fafc; transition: all 0.2s;
+        appearance: none;
+    }
+    .fg-group select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2394a3b8' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+    .fg-group select:focus, .fg-group input[type=date]:focus { outline: none; border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+    .fg-actions { display: flex; gap: 8px; }
     .btn-apply {
         display: inline-flex; align-items: center; gap: 6px;
-        background: linear-gradient(135deg, #6366f1, #4f46e5);
-        color: #fff; border: none; padding: 10px 20px; border-radius: 10px;
-        font-weight: 700; font-size: 0.875rem; cursor: pointer;
-        box-shadow: 0 4px 12px rgba(99,102,241,0.3); transition: all 0.25s;
+        background: linear-gradient(135deg,#6366f1,#4f46e5); color: #fff;
+        border: none; padding: 10px 22px; border-radius: 12px;
+        font-weight: 800; font-size: 0.85rem; cursor: pointer; white-space: nowrap;
+        box-shadow: 0 4px 14px rgba(99,102,241,.3); transition: all 0.25s;
     }
-    .btn-apply:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99,102,241,0.4); }
+    .btn-apply:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,.4); }
     .btn-clear {
-        display: inline-flex; align-items: center; gap: 6px;
-        background: #f8fafc; color: #64748b;
-        border: 1.5px solid #e2e8f0; padding: 10px 18px; border-radius: 10px;
-        font-weight: 700; font-size: 0.875rem; text-decoration: none; transition: all 0.25s;
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        background: #f1f5f9; color: #64748b; border: 1.5px solid #e2e8f0;
+        padding: 10px 16px; border-radius: 12px;
+        font-weight: 700; font-size: 0.85rem; text-decoration: none; white-space: nowrap; transition: all 0.25s;
     }
-    .btn-clear:hover { background: #f1f5f9; color: #0f172a; }
+    .btn-clear:hover { background: #e2e8f0; color: #1e293b; }
 
     /* ── Timeline Table ── */
     .hist-table-wrap {
@@ -258,74 +291,81 @@
         </a>
     </div>
 
-    <!-- Legend Bar -->
-    <div class="legend-bar">
-        <span class="legend-title"><i class="fa-solid fa-circle-info me-1"></i> Types</span>
-        <span class="legend-pill lp-initial"><span class="dot"></span> Initial</span>
-        <span class="legend-pill lp-restock"><span class="dot"></span> Restock</span>
-        <span class="legend-pill lp-sale"><span class="dot"></span> Sale</span>
-        <span class="legend-pill lp-return"><span class="dot"></span> Return</span>
-        <span class="legend-pill lp-adjustment"><span class="dot"></span> Adjustment</span>
-        <span class="legend-pill lp-damage"><span class="dot"></span> Damage</span>
-        <span class="legend-pill lp-inventory_count"><span class="dot"></span> Inventory Count</span>
-    </div>
-
-    <!-- Filters -->
-    <div class="hist-filter">
-        <div class="filter-title"><i class="fa-solid fa-sliders"></i> Filter & Search Movements</div>
-        <form method="GET" action="{{ route('admin.inventory.history') }}" id="filter-form">
-            <!-- Search row -->
-            <div class="row g-3 mb-3">
-                <div class="col-12">
-                    <div style="position:relative;">
-                        <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:0.9rem;z-index:1;"></i>
-                        <input type="text" name="search" id="search" class="form-control"
-                            style="padding-left:40px;border-radius:12px;border:1.5px solid #e2e8f0;font-family:'Outfit',sans-serif;font-size:0.9rem;"
-                            placeholder="Search by product name or notes..."
-                            value="{{ request('search') }}">
+    <!-- Unified Filter + Legend Panel -->
+    <div class="filter-panel">
+        <!-- Legend strip -->
+        <div class="filter-panel-legend">
+            <span class="legend-label"><i class="fa-solid fa-tag"></i> Movement Types</span>
+            <span class="lchip lc-green"><span class="cdot"></span> Initial</span>
+            <span class="lchip lc-green"><span class="cdot"></span> Restock</span>
+            <span class="lchip lc-red"><span class="cdot"></span> Sale</span>
+            <span class="lchip lc-sky"><span class="cdot"></span> Return</span>
+            <span class="lchip lc-indigo"><span class="cdot"></span> Adjustment</span>
+            <span class="lchip lc-gray"><span class="cdot"></span> Damage</span>
+            <span class="lchip lc-amber"><span class="cdot"></span> Inventory Count</span>
+        </div>
+        <!-- Filter body -->
+        <div class="filter-panel-body">
+            <div class="filter-panel-title"><i class="fa-solid fa-sliders"></i> Filter & Search</div>
+            <form method="GET" action="{{ route('admin.inventory.history') }}" id="filter-form">
+                <!-- Search -->
+                <div class="search-wrap">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" name="search" id="search"
+                        placeholder="Search by product name or notes..."
+                        value="{{ request('search') }}">
+                </div>
+                <!-- Filter grid -->
+                <div class="filter-grid">
+                    <div class="fg-group">
+                        <label>Product</label>
+                        <div class="fg-input-wrap">
+                            <i class="fa-solid fa-box fg-icon"></i>
+                            <select name="product_id" id="product_id">
+                                <option value="">All Products</option>
+                                @foreach($products as $product)
+                                    <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
+                                        {{ $product->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <!-- Advanced filter row -->
-            <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Product</label>
-                    <select name="product_id" id="product_id" class="form-select">
-                        <option value="">All Products</option>
-                        @foreach($products as $product)
-                            <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
-                                {{ $product->title }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Movement Type</label>
-                    <select name="type" id="type" class="form-select">
-                        <option value="">All Types</option>
-                        @foreach($types as $type)
-                            <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('_', ' ', $type)) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">From Date</label>
-                    <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request('date_from') }}">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">To Date</label>
-                    <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request('date_to') }}">
-                </div>
-                <div class="col-md-3">
-                    <div class="d-flex gap-2">
+                    <div class="fg-group">
+                        <label>Movement Type</label>
+                        <div class="fg-input-wrap">
+                            <i class="fa-solid fa-shuffle fg-icon"></i>
+                            <select name="type" id="type">
+                                <option value="">All Types</option>
+                                @foreach($types as $type)
+                                    <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
+                                        {{ ucfirst(str_replace('_', ' ', $type)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="fg-group">
+                        <label>From Date</label>
+                        <div class="fg-input-wrap">
+                            <i class="fa-solid fa-calendar fg-icon"></i>
+                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}">
+                        </div>
+                    </div>
+                    <div class="fg-group">
+                        <label>To Date</label>
+                        <div class="fg-input-wrap">
+                            <i class="fa-solid fa-calendar-check fg-icon"></i>
+                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}">
+                        </div>
+                    </div>
+                    <div class="fg-actions">
                         <button type="submit" class="btn-apply"><i class="fa-solid fa-filter"></i> Apply</button>
-                        <a href="{{ route('admin.inventory.history') }}" class="btn-clear"><i class="fa-solid fa-xmark"></i> Clear</a>
+                        <a href="{{ route('admin.inventory.history') }}" class="btn-clear"><i class="fa-solid fa-xmark"></i></a>
                     </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
     @if($movements->count() > 0)
