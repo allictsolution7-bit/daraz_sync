@@ -1,406 +1,676 @@
 @extends('layouts.master')
 
 @section('styles')
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-    .settings-card {
-        background: white;
-        border-radius: 8px;
-        padding: 24px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
+    /* Complete Control Panel Overhaul */
+    #delayed-events-settings-page {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        color: #1e293b;
+        background-color: #f8fafc;
     }
 
-    .settings-card h5 {
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
-        color: #333;
+    .premium-panel-header {
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 24px;
+        margin-bottom: 32px;
     }
 
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .stat-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 8px;
-        padding: 20px;
-        color: white;
-        text-align: center;
-    }
-
-    .stat-card.pending {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    .stat-card.fired {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-
-    .stat-card.failed {
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    }
-
-    .stat-card .stat-value {
-        font-size: 32px;
-        font-weight: bold;
-    }
-
-    .stat-card .stat-label {
-        font-size: 14px;
-        opacity: 0.9;
-    }
-
-    .toggle-switch {
-        position: relative;
-        width: 60px;
-        height: 30px;
-    }
-
-    .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .toggle-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: 0.4s;
-        border-radius: 30px;
-    }
-
-    .toggle-slider:before {
-        position: absolute;
-        content: "";
-        height: 22px;
-        width: 22px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-    }
-
-    input:checked + .toggle-slider {
-        background-color: #197A94;
-    }
-
-    input:checked + .toggle-slider:before {
-        transform: translateX(30px);
-    }
-
-    .payment-method-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+    .premium-panel-header h1 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
         gap: 12px;
     }
 
-    .payment-method-item {
+    .premium-panel-header h1 i {
+        background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Tabs Layout Styling */
+    .nav-tabs-overhaul {
+        background: #e2e8f0;
+        padding: 6px;
+        border-radius: 14px;
+        gap: 4px;
+        border: none;
+        margin-bottom: 32px;
+    }
+
+    .nav-tabs-overhaul .nav-item {
+        flex: 1;
+    }
+
+    .nav-tabs-overhaul .nav-link {
+        width: 100%;
+        border-radius: 10px;
+        color: #475569;
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 14px 24px;
+        text-align: center;
+        transition: all 0.2s ease;
+        border: none !important;
+        background: transparent;
+    }
+
+    .nav-tabs-overhaul .nav-link:hover {
+        color: #0f172a;
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .nav-tabs-overhaul .nav-link.active {
+        background: #ffffff !important;
+        color: #4f46e5 !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Elegant Stats Grid */
+    .stats-overhaul {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    @media (max-width: 992px) {
+        .stats-overhaul {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-overhaul {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .stat-box {
+        position: relative;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 24px;
         display: flex;
         align-items: center;
-        padding: 12px;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
+        justify-content: space-between;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .stat-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+    }
+
+    .stat-box-total::before { background-color: #6366f1; }
+    .stat-box-pending::before { background-color: #ec4899; }
+    .stat-box-fired::before { background-color: #10b981; }
+    .stat-box-failed::before { background-color: #f59e0b; }
+
+    .stat-box .stat-meta h4 {
+        margin: 0;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
+    }
+
+    .stat-box .stat-meta .stat-val {
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .stat-box .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .stat-icon-total { background-color: #e0f2fe; color: #0284c7; }
+    .stat-icon-pending { background-color: #fce7f3; color: #be185d; }
+    .stat-icon-fired { background-color: #d1fae5; color: #059669; }
+    .stat-icon-failed { background-color: #fef3c7; color: #d97706; }
+
+    /* Custom Switch & Control Cards */
+    .control-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 28px;
+        margin-bottom: 28px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+
+    .control-card h5 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 0;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .control-card h5 i {
+        color: #6366f1;
+    }
+
+    .toggle-bar {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Firing Option Selection */
+    .firing-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .firing-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .firing-card-option {
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 24px;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
+        background: #ffffff;
+        position: relative;
+        display: flex;
+        gap: 16px;
+        margin-bottom: 0;
     }
 
-    .payment-method-item:hover {
-        border-color: #197A94;
-        background: #f8f9fa;
+    .firing-card-option:hover {
+        border-color: #6366f1;
+        background: #f8fafc;
     }
 
-    .payment-method-item input:checked + .payment-method-label {
-        color: #197A94;
-        font-weight: 500;
+    .firing-card-option.active {
+        border-color: #6366f1;
+        background: #f5f3ff;
     }
 
-    .payment-method-item input {
-        margin-right: 10px;
+    .firing-card-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #6366f1;
+        margin-top: 4px;
     }
 
-    .api-key-input {
-        font-family: monospace;
-        letter-spacing: 1px;
+    .firing-card-option strong {
+        font-size: 1.05rem;
+        color: #0f172a;
+        display: block;
+        margin-bottom: 6px;
     }
 
-    .test-connection-btn {
-        margin-top: 10px;
+    .firing-card-option .option-desc {
+        font-size: 0.825rem;
+        color: #64748b;
+        line-height: 1.5;
     }
 
+    /* Checkbox list overhaul */
+    .checkbox-panel-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .checkbox-panel-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 0;
+    }
+
+    .checkbox-panel-item:hover {
+        background: #ffffff;
+        border-color: #6366f1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .checkbox-panel-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #6366f1;
+        margin-right: 14px;
+    }
+
+    .checkbox-panel-label {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .checkbox-panel-item input:checked + .checkbox-panel-label {
+        color: #6366f1;
+    }
+
+    /* Inputs formatting */
+    .form-label {
+        font-weight: 600;
+        color: #334155;
+        font-size: 0.875rem;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        padding: 12px 18px;
+        font-size: 0.95rem;
+        color: #0f172a;
+        background-color: #f8fafc;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        background-color: #ffffff;
+    }
+
+    .form-help {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 6px;
+    }
+
+    /* Diagnostics connection box */
     .connection-status {
-        margin-top: 10px;
-        padding: 10px;
-        border-radius: 4px;
+        margin-top: 20px;
+        padding: 16px 20px;
+        border-radius: 12px;
         display: none;
+        font-weight: 600;
+        font-size: 0.9rem;
     }
 
     .connection-status.success {
-        background: #d4edda;
-        color: #155724;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
         display: block;
     }
 
     .connection-status.error {
-        background: #f8d7da;
-        color: #721c24;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
         display: block;
     }
 
-    .form-help {
-        font-size: 12px;
-        color: #6c757d;
-        margin-top: 4px;
+    /* Premium buttons & Action bars */
+    .btn-overhaul {
+        font-weight: 700;
+        padding: 14px 28px;
+        border-radius: 12px;
+        border: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+
+    .btn-overhaul:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-overhaul-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-overhaul-primary:hover {
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-overhaul-outline {
+        background: #ffffff;
+        border: 2px solid #cbd5e1;
+        color: #475569;
+    }
+
+    .btn-overhaul-outline:hover {
+        border-color: #6366f1;
+        color: #6366f1;
+        background: #fefeff;
     }
 
     .quick-links {
         display: flex;
-        gap: 10px;
-        margin-top: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
     }
 
     .quick-links a {
-        padding: 10px 20px;
-        border-radius: 6px;
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         text-decoration: none;
-        color: white;
-        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .quick-links a:hover {
+        transform: translateY(-2px);
     }
 
     .quick-links .btn-pending {
-        background: #f5576c;
+        background-color: #fff1f2;
+        color: #e11d48;
+        border: 2px solid #fecdd3;
+    }
+
+    .quick-links .btn-pending:hover {
+        background-color: #fecdd3;
+        box-shadow: 0 6px 14px rgba(225, 29, 72, 0.15);
     }
 
     .quick-links .btn-history {
-        background: #4facfe;
+        background-color: #f0f9ff;
+        color: #0284c7;
+        border: 2px solid #bae6fd;
     }
 
-    .firing-method-option {
-        display: flex;
-        align-items: flex-start;
-        padding: 16px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        flex: 1;
-    }
-
-    .firing-method-option:hover {
-        border-color: #197A94;
-        background: #f8f9fa;
-    }
-
-    .firing-method-option.active {
-        border-color: #197A94;
-        background: #eef7fa;
-    }
-
-    .firing-method-option input[type="radio"] {
-        margin-top: 3px;
+    .quick-links .btn-history:hover {
+        background-color: #bae6fd;
+        box-shadow: 0 6px 14px rgba(2, 132, 199, 0.15);
     }
 </style>
 @endsection
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-flex align-items-center justify-content-between">
-                <h5 class="mb-3">Delayed Purchase Events Settings</h5>
+<div id="delayed-events-settings-page" class="container-fluid px-4 py-4">
+    <!-- Premium Header -->
+    <div class="premium-panel-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1>
+                    <i class="fas fa-clock"></i>
+                    Delayed Event Dispatcher Engine
+                </h1>
+                <p class="text-muted mb-0">Manage outbound analytics delays, confirmation routes, and payment gateways filters.</p>
             </div>
         </div>
     </div>
 
     @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius:12px;">
+        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">{{ $stats['total'] }}</div>
-            <div class="stat-label">Total Events</div>
+    <!-- Overhauled Stats Cards -->
+    <div class="stats-overhaul">
+        <div class="stat-box stat-box-total">
+            <div class="stat-meta">
+                <h4>Total Events</h4>
+                <div class="stat-val">{{ $stats['total'] }}</div>
+            </div>
+            <div class="stat-icon stat-icon-total">
+                <i class="fas fa-database"></i>
+            </div>
         </div>
-        <div class="stat-card pending">
-            <div class="stat-value">{{ $stats['pending'] }}</div>
-            <div class="stat-label">Pending</div>
+        <div class="stat-box stat-box-pending">
+            <div class="stat-meta">
+                <h4>Pending Queue</h4>
+                <div class="stat-val">{{ $stats['pending'] }}</div>
+            </div>
+            <div class="stat-icon stat-icon-pending">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
         </div>
-        <div class="stat-card fired">
-            <div class="stat-value">{{ $stats['fired'] }}</div>
-            <div class="stat-label">Fired</div>
+        <div class="stat-box stat-box-fired">
+            <div class="stat-meta">
+                <h4>Fired Outbound</h4>
+                <div class="stat-val">{{ $stats['fired'] }}</div>
+            </div>
+            <div class="stat-icon stat-icon-fired">
+                <i class="fas fa-paper-plane"></i>
+            </div>
         </div>
-        <div class="stat-card failed">
-            <div class="stat-value">{{ $stats['failed'] }}</div>
-            <div class="stat-label">Failed</div>
+        <div class="stat-box stat-box-failed">
+            <div class="stat-meta">
+                <h4>Relay Errors</h4>
+                <div class="stat-val">{{ $stats['failed'] }}</div>
+            </div>
+            <div class="stat-icon stat-icon-failed">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
         </div>
     </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs nav-tabs-overhaul" id="settingsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="dispatcher-core-tab" data-bs-toggle="tab" data-bs-target="#dispatcher-core" type="button" role="tab">
+                <i class="fas fa-sliders-h me-2"></i> Dispatcher Settings
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="gateways-filters-tab" data-bs-toggle="tab" data-bs-target="#gateways-filters" type="button" role="tab">
+                <i class="fas fa-filter me-2"></i> Filter Rules & Sources
+            </button>
+        </li>
+    </ul>
 
     <form action="{{ route('admin.delayed-events.settings.update') }}" method="POST">
         @csrf
         @method('PUT')
 
-        <!-- Master Toggle -->
-        <div class="settings-card">
-            <h5>Feature Status</h5>
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <strong>Enable Delayed Purchase Events</strong>
-                    <p class="form-help mb-0">When enabled, purchase events for selected payment methods will be stored and fired only after admin confirmation.</p>
+        <div class="tab-content" id="settingsTabsContent">
+            <!-- Tab 1: Dispatcher Settings -->
+            <div class="tab-pane fade show active" id="dispatcher-core" role="tabpanel">
+                
+                <!-- Master Status Toggle -->
+                <div class="control-card">
+                    <h5><i class="fas fa-power-off text-danger"></i> System Status</h5>
+                    <div class="toggle-bar">
+                        <div>
+                            <strong class="text-dark d-block">Enable Delayed Purchase Events Dispatching</strong>
+                            <span class="form-help mb-0">Activating this setting routes purchase dispatches into a secure buffer queue, requiring manual authorization before transmit to analytics.</span>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="is_enabled" name="is_enabled" value="1" {{ $delayedSettings->is_enabled ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="is_enabled"></label>
+                        </div>
+                    </div>
                 </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" name="is_enabled" value="1" {{ $delayedSettings->is_enabled ? 'checked' : '' }}>
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-        </div>
 
-        <!-- Firing Method Selection -->
-        <div class="settings-card">
-            <h5>Firing Method</h5>
-            <p class="form-help">Choose how delayed purchase events are sent to your analytics providers.</p>
+                <!-- Firing Method -->
+                <div class="control-card">
+                    <h5><i class="fas fa-network-wired text-primary"></i> Relay Protocol Selection</h5>
+                    <p class="form-help mb-4">Select your data dispatcher channel to route queued conversions to analytics integrations.</p>
 
-            <div class="d-flex gap-4 mb-3">
-                <label class="firing-method-option {{ ($delayedSettings->firing_method ?? 'sgtm') === 'pixelfly' ? 'active' : '' }}">
-                    <input type="radio" name="firing_method" value="pixelfly"
-                        {{ ($delayedSettings->firing_method ?? 'sgtm') === 'pixelfly' ? 'checked' : '' }}
-                        onchange="toggleFiringMethod()">
-                    <div class="ms-2">
-                        <strong>PixelFly (Proxy)</strong>
-                        <div class="form-help mb-0">Use this if your PixelFly container is a Proxy container. Delayed events are sent through the PixelFly proxy to Meta CAPI, GA4, TikTok, etc.</div>
+                    <div class="firing-grid">
+                        <label class="firing-card-option {{ ($delayedSettings->firing_method ?? 'sgtm') === 'pixelfly' ? 'active' : '' }}">
+                            <input type="radio" name="firing_method" value="pixelfly"
+                                {{ ($delayedSettings->firing_method ?? 'sgtm') === 'pixelfly' ? 'checked' : '' }}
+                                onchange="toggleFiringMethod()">
+                            <div>
+                                <strong>Cloud Proxy Engine</strong>
+                                <span class="option-desc">Routes conversion payloads through the cloud proxy channel to Meta CAPI, TikTok, Google Analytics, and general tracking containers.</span>
+                            </div>
+                        </label>
+
+                        <label class="firing-card-option {{ ($delayedSettings->firing_method ?? 'sgtm') === 'sgtm' ? 'active' : '' }}">
+                            <input type="radio" name="firing_method" value="sgtm"
+                                {{ ($delayedSettings->firing_method ?? 'sgtm') === 'sgtm' ? 'checked' : '' }}
+                                onchange="toggleFiringMethod()">
+                            <div>
+                                <strong>Server-Side GTM Stream</strong>
+                                <span class="option-desc">Relays buffered events using GA4 Measurement Protocol straight to your custom sGTM container endpoint for tag distributions (Ads, Meta, TikTok, etc.).</span>
+                            </div>
+                        </label>
                     </div>
-                </label>
-                <label class="firing-method-option {{ ($delayedSettings->firing_method ?? 'sgtm') === 'sgtm' ? 'active' : '' }}">
-                    <input type="radio" name="firing_method" value="sgtm"
-                        {{ ($delayedSettings->firing_method ?? 'sgtm') === 'sgtm' ? 'checked' : '' }}
-                        onchange="toggleFiringMethod()">
-                    <div class="ms-2">
-                        <strong>sGTM</strong>
-                        <div class="form-help mb-0">Use this if your PixelFly container is an sGTM container. Delayed events are sent via GA4 Measurement Protocol to your server-side GTM, which distributes to all configured tags (Google Ads, Meta, etc.).</div>
+
+                    <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center gap-2 mt-3 mb-0" style="font-size: 13px; border-radius:12px;">
+                        <i class="fas fa-exclamation-circle text-warning fa-lg"></i>
+                        <div>
+                            <strong>Attention Required:</strong> Match your relay channel to your container architecture. Incorrect routing will block analytics dispatches from reaching target trackers.
+                        </div>
                     </div>
-                </label>
+                </div>
+
+                <!-- PixelFly Configuration -->
+                <div class="control-card" id="pixelflyConfig" style="{{ ($delayedSettings->firing_method ?? 'sgtm') === 'sgtm' ? 'display:none' : '' }}">
+                    <h5><i class="fas fa-sliders-h text-info"></i> Cloud Proxy Integrations</h5>
+
+                    <div class="mb-4">
+                        <label class="form-label">Access Credential Token</label>
+                        <input type="text" name="pixelfly_api_key" class="form-control"
+                            value="{{ $delayedSettings->pixelfly_api_key }}"
+                            placeholder="Enter your PixelFly API key">
+                        <div class="form-help">Retrieve your security token key from the cloud console portal.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Gateway Destination Link</label>
+                        <input type="url" name="pixelfly_endpoint" class="form-control"
+                            value="{{ $delayedSettings->pixelfly_endpoint }}"
+                            placeholder="https://track.pixelfly.io/e">
+                        <div class="form-help">Standard endpoint URL is set to https://track.pixelfly.io/e by default.</div>
+                    </div>
+
+                    <button type="button" class="btn-overhaul btn-overhaul-outline" onclick="testConnection()">
+                        <i class="fas fa-plug"></i> Verify Connection Pipeline
+                    </button>
+                    <div id="connectionStatus" class="connection-status"></div>
+                </div>
+
+                <!-- sGTM Configuration -->
+                <div class="control-card" id="sgtmConfig" style="{{ ($delayedSettings->firing_method ?? 'pixelfly') === 'pixelfly' ? 'display:none' : '' }}">
+                    <h5><i class="fas fa-server text-info"></i> sGTM Container Integrations</h5>
+
+                    <div class="mb-4">
+                        <label class="form-label">Custom sGTM Server URL</label>
+                        <input type="url" name="sgtm_endpoint" class="form-control"
+                            value="{{ $delayedSettings->sgtm_endpoint }}"
+                            placeholder="https://sgtm.yourdomain.com">
+                        <div class="form-help">The base domain URL for your server GTM workspace (omit the /mp/collect path extension).</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Google Measurement ID (G-)</label>
+                        <input type="text" name="sgtm_measurement_id" class="form-control"
+                            value="{{ $delayedSettings->sgtm_measurement_id }}"
+                            placeholder="G-XXXXXXXXXX">
+                        <div class="form-help">The Google stream tracking ID sequence (prefixed with G-).</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Measurement Protocol API Secret</label>
+                        <input type="text" name="sgtm_api_secret" class="form-control"
+                            value="{{ $delayedSettings->sgtm_api_secret }}"
+                            placeholder="Enter your GA4 API secret">
+                        <div class="form-help">Generate a protocol authentication secret key inside GA4 Stream Admin configurations.</div>
+                    </div>
+
+                    <button type="button" class="btn-overhaul btn-overhaul-outline" onclick="testConnection()">
+                        <i class="fas fa-plug"></i> Verify Connection Pipeline
+                    </button>
+                    <div id="sgtmConnectionStatus" class="connection-status"></div>
+                </div>
             </div>
-            <div class="alert alert-warning mb-0" style="font-size: 13px;">
-                <strong>Important:</strong> Select the method that matches your PixelFly container type. Mismatching may cause delayed purchase events to not reach all your analytics providers.
+
+            <!-- Tab 2: Filter Rules & Sources -->
+            <div class="tab-pane fade" id="gateways-filters" role="tabpanel">
+                
+                <!-- Payment Gateways Filter -->
+                <div class="control-card">
+                    <h5><i class="fas fa-credit-card text-warning"></i> Target Payment Gateways</h5>
+                    <p class="form-help mb-4">Choose the billing channels that will trigger event buffering. Manual payment methods (COD, Cash) usually require delay routing.</p>
+
+                    <div class="checkbox-panel-grid">
+                        @foreach($availablePaymentMethods as $value => $label)
+                        <label class="checkbox-panel-item">
+                            <input type="checkbox" name="enabled_payment_methods[]" value="{{ $value }}"
+                                {{ in_array($value, $delayedSettings->enabled_payment_methods ?? []) ? 'checked' : '' }}>
+                            <span class="checkbox-panel-label">{{ $label }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Order Sources -->
+                <div class="control-card">
+                    <h5><i class="fas fa-store text-danger"></i> Offline Purchase Channels</h5>
+                    <p class="form-help mb-4">Check the channel sources (POS registers, phone telesales, social channels) to dispatch as offline conversions to Meta trackers.</p>
+
+                    <div class="checkbox-panel-grid">
+                        @foreach($availableOrderSources as $value => $label)
+                        <label class="checkbox-panel-item">
+                            <input type="checkbox" name="enabled_order_sources[]" value="{{ $value }}"
+                                {{ in_array($value, $delayedSettings->enabled_order_sources ?? []) ? 'checked' : '' }}>
+                            <span class="checkbox-panel-label">{{ $label }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- PixelFly Configuration -->
-        <div class="settings-card" id="pixelflyConfig" style="{{ ($delayedSettings->firing_method ?? 'sgtm') === 'sgtm' ? 'display:none' : '' }}">
-            <h5>PixelFly Configuration</h5>
-
-            <div class="mb-3">
-                <label class="form-label">API Key</label>
-                <input type="text" name="pixelfly_api_key" class="form-control api-key-input"
-                    value="{{ $delayedSettings->pixelfly_api_key }}"
-                    placeholder="Enter your PixelFly API key">
-                <div class="form-help">Get your API key from the PixelFly dashboard.</div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Endpoint URL</label>
-                <input type="url" name="pixelfly_endpoint" class="form-control"
-                    value="{{ $delayedSettings->pixelfly_endpoint }}"
-                    placeholder="https://track.pixelfly.io/e">
-                <div class="form-help">Default: https://track.pixelfly.io/e</div>
-            </div>
-
-            <button type="button" class="btn btn-outline-primary test-connection-btn" onclick="testConnection()">
-                <i class="fas fa-plug"></i> Test Connection
-            </button>
-            <div id="connectionStatus" class="connection-status"></div>
-        </div>
-
-        <!-- sGTM Configuration -->
-        <div class="settings-card" id="sgtmConfig" style="{{ ($delayedSettings->firing_method ?? 'sgtm') === 'pixelfly' ? 'display:none' : '' }}">
-            <h5>sGTM Configuration</h5>
-
-            <div class="mb-3">
-                <label class="form-label">sGTM Endpoint URL</label>
-                <input type="url" name="sgtm_endpoint" class="form-control"
-                    value="{{ $delayedSettings->sgtm_endpoint }}"
-                    placeholder="https://sgtm.yourdomain.com">
-                <div class="form-help">Your server-side GTM container URL (without /mp/collect path).</div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">GA4 Measurement ID</label>
-                <input type="text" name="sgtm_measurement_id" class="form-control api-key-input"
-                    value="{{ $delayedSettings->sgtm_measurement_id }}"
-                    placeholder="G-XXXXXXXXXX">
-                <div class="form-help">Your GA4 Measurement ID (starts with G-).</div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">API Secret</label>
-                <input type="text" name="sgtm_api_secret" class="form-control api-key-input"
-                    value="{{ $delayedSettings->sgtm_api_secret }}"
-                    placeholder="Enter your GA4 API secret">
-                <div class="form-help">Create an API secret in GA4 Admin > Data Streams > Measurement Protocol API secrets.</div>
-            </div>
-
-            <button type="button" class="btn btn-outline-primary test-connection-btn" onclick="testConnection()">
-                <i class="fas fa-plug"></i> Test Connection
-            </button>
-            <div id="sgtmConnectionStatus" class="connection-status"></div>
-        </div>
-
-        <!-- Payment Methods -->
-        <div class="settings-card">
-            <h5>Enabled Payment Methods</h5>
-            <p class="form-help">Select which payment methods should use delayed purchase events. Typically, these are manual/offline payment methods where orders need confirmation.</p>
-
-            <div class="payment-method-grid">
-                @foreach($availablePaymentMethods as $value => $label)
-                <label class="payment-method-item">
-                    <input type="checkbox" name="enabled_payment_methods[]" value="{{ $value }}"
-                        {{ in_array($value, $delayedSettings->enabled_payment_methods ?? []) ? 'checked' : '' }}>
-                    <span class="payment-method-label">{{ $label }}</span>
-                </label>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Order Sources (Offline/POS Orders) -->
-        <div class="settings-card">
-            <h5>Enabled Order Sources (Offline Orders)</h5>
-            <p class="form-help">Select which offline order sources should fire purchase events to Facebook as offline conversions. These orders come from POS, phone calls, social media, etc.</p>
-
-            <div class="payment-method-grid">
-                @foreach($availableOrderSources as $value => $label)
-                <label class="payment-method-item">
-                    <input type="checkbox" name="enabled_order_sources[]" value="{{ $value }}"
-                        {{ in_array($value, $delayedSettings->enabled_order_sources ?? []) ? 'checked' : '' }}>
-                    <span class="payment-method-label">{{ $label }}</span>
-                </label>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Submit Button -->
-        <div class="d-flex justify-content-between align-items-center">
+        <!-- Master Actions bar (Always bottom static) -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-4 mt-4 mb-5">
             <div class="quick-links">
                 <a href="{{ route('admin.delayed-events.pending') }}" class="btn-pending">
-                    <i class="fas fa-clock"></i> View Pending Events ({{ $stats['pending'] }})
+                    <i class="fas fa-clock"></i> Manage Pending Queue ({{ $stats['pending'] }})
                 </a>
                 <a href="{{ route('admin.delayed-events.history') }}" class="btn-history">
-                    <i class="fas fa-history"></i> Event History
+                    <i class="fas fa-history"></i> Dispatcher Log History
                 </a>
             </div>
-            <button type="submit" class="btn btn-primary btn-lg">
-                <i class="fas fa-save"></i> Save Settings
+            <button type="submit" class="btn-overhaul btn-overhaul-primary px-5">
+                <i class="fas fa-save"></i> Save Dispatch Parameters
             </button>
         </div>
     </form>
@@ -419,10 +689,10 @@ function toggleFiringMethod() {
     sgtmConfig.style.display = selected === 'sgtm' ? '' : 'none';
 
     // Update active class on radio options
-    document.querySelectorAll('.firing-method-option').forEach(el => {
+    document.querySelectorAll('.firing-card-option').forEach(el => {
         el.classList.remove('active');
     });
-    document.querySelector('input[name="firing_method"]:checked').closest('.firing-method-option').classList.add('active');
+    document.querySelector('input[name="firing_method"]:checked').closest('.firing-card-option').classList.add('active');
 }
 
 function testConnection() {
@@ -483,20 +753,23 @@ function testSgtmConnection() {
 
 function showTestingStatus(el) {
     el.className = 'connection-status';
-    el.textContent = 'Testing connection...';
+    el.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Testing connection bridge...';
     el.style.display = 'block';
-    el.style.background = '#fff3cd';
-    el.style.color = '#856404';
+    el.style.background = '#fffbeb';
+    el.style.color = '#b45309';
+    el.style.border = '1px solid #fde68a';
 }
 
 function showResult(el, data) {
     el.className = data.success ? 'connection-status success' : 'connection-status error';
-    el.textContent = data.message;
+    el.innerHTML = data.success 
+        ? '<i class="fas fa-check-circle me-2"></i> ' + data.message 
+        : '<i class="fas fa-times-circle me-2"></i> ' + data.message;
 }
 
 function showError(el, message) {
     el.className = 'connection-status error';
-    el.textContent = 'Connection failed: ' + message;
+    el.innerHTML = '<i class="fas fa-times-circle me-2"></i> Connection failed: ' + message;
 }
 </script>
 @endsection
