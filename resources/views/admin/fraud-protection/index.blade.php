@@ -473,21 +473,7 @@
 @section('content')
 <div id="fraud-shield-page" class="container-fluid px-4 py-4">
 
-    <!-- Page Hero -->
-    <div class="page-hero">
-        <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
-            <div>
-                <h1>
-                    <span class="hero-icon"><i class="fas fa-shield-alt"></i></span>
-                    Security Shield Settings
-                </h1>
-                <p class="mt-2">Configure multi-layer protection against duplicate, fake, and fraudulent orders.</p>
-            </div>
-            <a href="{{ route('admin.fraud-protection.logs') }}" class="btn-logs">
-                <i class="fas fa-history"></i> View Protection Logs
-            </a>
-        </div>
-    </div>
+
 
     @if(session('success'))
         <div class="alert-success-premium">
@@ -539,7 +525,7 @@
                         <div class="band-icon"><i class="fas fa-copy"></i></div>
                         <div>
                             <h2>Duplicate Order Protection</h2>
-                            <span>Prevent customers from placing multiple orders in quick succession</span>
+                            <span>Smart interval and pending order controls to stop repeat submissions</span>
                         </div>
                     </div>
                     <div class="module-body">

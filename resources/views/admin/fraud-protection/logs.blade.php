@@ -1,1031 +1,822 @@
 @extends('layouts.master')
 
-@section('title', 'Fraud Protection Logs')
+@section('title', 'Protection Logs')
+
+@section('styles')
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    #logs-page {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        color: #1e293b;
+        background: #f1f5f9;
+        min-height: 100vh;
+    }
+
+    /* ── STAT CARDS ─────────────────────────────── */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    @media (max-width: 992px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 576px) { .stat-grid { grid-template-columns: 1fr; } }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px 22px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .stat-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .stat-icon {
+        width: 52px; height: 52px;
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+    }
+    .stat-icon.si-blue   { background: #eff6ff; color: #2563eb; }
+    .stat-icon.si-green  { background: #f0fdf4; color: #16a34a; }
+    .stat-icon.si-amber  { background: #fffbeb; color: #d97706; }
+    .stat-icon.si-red    { background: #fef2f2; color: #dc2626; }
+    .stat-icon.si-purple { background: #f5f3ff; color: #7c3aed; }
+    .stat-label { font-size: 0.76rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .stat-value { font-size: 1.6rem; font-weight: 800; color: #0f172a; line-height: 1; }
+    .stat-sub   { font-size: 0.75rem; color: #94a3b8; margin-top: 3px; }
+
+    /* ── FILTER PANEL ───────────────────────────── */
+    .filter-panel {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .filter-panel-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+    .filter-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 150px; }
+    .filter-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .filter-input, .filter-select {
+        padding: 9px 13px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #0f172a;
+        background: #f8fafc;
+        outline: none;
+        transition: all 0.2s ease;
+        width: 100%;
+    }
+    .filter-input:focus, .filter-select:focus {
+        border-color: #6366f1;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+    }
+    .btn-filter {
+        padding: 9px 20px;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        text-decoration: none;
+    }
+    .btn-filter.primary {
+        background: linear-gradient(135deg, #4338ca, #6366f1);
+        color: #fff;
+        box-shadow: 0 3px 12px rgba(99,102,241,0.3);
+    }
+    .btn-filter.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99,102,241,0.4); color: #fff; }
+    .btn-filter.ghost {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1.5px solid #e2e8f0;
+    }
+    .btn-filter.ghost:hover { background: #e2e8f0; color: #1e293b; }
+
+    /* ── TIME PILL FILTERS ──────────────────────── */
+    .time-pills {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    .time-pill {
+        padding: 5px 14px;
+        border-radius: 99px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        border: 1.5px solid #e2e8f0;
+        background: #f8fafc;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .time-pill:hover { border-color: #a5b4fc; color: #4338ca; background: #ede9fe; text-decoration: none; }
+    .time-pill.active { background: linear-gradient(135deg, #4338ca, #6366f1); border-color: transparent; color: #fff; box-shadow: 0 2px 10px rgba(99,102,241,0.35); }
+
+    /* ── MAIN TABLE CARD ────────────────────────── */
+    .table-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        margin-bottom: 24px;
+    }
+    .table-card-header {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .table-card-header h2 {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #fff;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .table-card-header .hdr-icon {
+        width: 36px; height: 36px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.9rem;
+        backdrop-filter: blur(4px);
+    }
+    .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .btn-hdr {
+        padding: 7px 14px;
+        border-radius: 9px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .btn-hdr.light   { background: rgba(255,255,255,0.15); color: #fff; backdrop-filter: blur(4px); }
+    .btn-hdr.light:hover { background: rgba(255,255,255,0.25); color: #fff; }
+    .btn-hdr.success { background: #10b981; color: #fff; }
+    .btn-hdr.success:hover { background: #059669; color: #fff; }
+    .btn-hdr.danger  { background: #ef4444; color: #fff; }
+    .btn-hdr.danger:hover { background: #dc2626; }
+
+    /* ── BULK ACTIONS BAR ───────────────────────── */
+    .bulk-bar {
+        padding: 12px 24px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: #fafafa;
+    }
+
+    /* ── DATA TABLE ─────────────────────────────── */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table thead tr { background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+    .data-table thead th {
+        padding: 12px 16px;
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        text-align: left;
+        white-space: nowrap;
+    }
+    .data-table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: background 0.15s ease;
+    }
+    .data-table tbody tr:hover { background: #fafbff; }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table td {
+        padding: 13px 16px;
+        font-size: 0.85rem;
+        color: #334155;
+        vertical-align: middle;
+    }
+    .data-table td code {
+        background: #f1f5f9;
+        border-radius: 5px;
+        padding: 2px 6px;
+        font-size: 0.8rem;
+        color: #4338ca;
+        font-weight: 600;
+    }
+    .time-line { font-size: 0.82rem; color: #0f172a; font-weight: 600; }
+    .time-line small { display: block; color: #94a3b8; font-size: 0.72rem; font-weight: 500; margin-top: 1px; }
+
+    /* ── BADGES ─────────────────────────────────── */
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+    .bp-duplicate { background: #eff6ff; color: #1d4ed8; }
+    .bp-fake      { background: #fffbeb; color: #b45309; }
+    .bp-fraud     { background: #fef2f2; color: #b91c1c; }
+    .bp-mod1      { background: #eff6ff; color: #2563eb; }
+    .bp-mod2      { background: #fffbeb; color: #d97706; }
+    .bp-mod3      { background: #fef2f2; color: #dc2626; }
+
+    /* ── ROW ACTION BUTTONS ─────────────────────── */
+    .row-actions { display: flex; gap: 6px; align-items: center; }
+    .icon-btn {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        border: 1.5px solid #e2e8f0;
+        background: #fff;
+        color: #64748b;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.18s ease;
+    }
+    .icon-btn.ib-delete:hover  { border-color: #fca5a5; background: #fef2f2; color: #dc2626; }
+    .icon-btn.ib-ban:hover     { border-color: #fcd34d; background: #fffbeb; color: #d97706; }
+    .icon-btn.ib-unlock:hover  { border-color: #6ee7b7; background: #f0fdf4; color: #16a34a; }
+
+    /* ── EMPTY STATE ────────────────────────────── */
+    .empty-state { padding: 60px 24px; text-align: center; }
+    .empty-icon {
+        width: 70px; height: 70px;
+        border-radius: 50%;
+        background: #f0fdf4;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 1.8rem;
+        color: #16a34a;
+    }
+    .empty-state h4 { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+    .empty-state p  { font-size: 0.875rem; color: #94a3b8; margin-bottom: 20px; }
+
+    /* ── SUB CARDS (offenders / blacklist) ──────── */
+    .sub-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .sub-card-header {
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .sub-card-header h3 { font-size: 0.92rem; font-weight: 800; color: #0f172a; margin: 0; }
+    .count-chip {
+        background: #ede9fe; color: #5b21b6;
+        border-radius: 99px; padding: 2px 9px;
+        font-size: 0.72rem; font-weight: 700;
+    }
+    .sub-card-body { padding: 16px 20px; }
+    .mini-table { width: 100%; border-collapse: collapse; }
+    .mini-table tr { border-bottom: 1px solid #f1f5f9; }
+    .mini-table tr:last-child { border-bottom: none; }
+    .mini-table td { padding: 10px 0; font-size: 0.84rem; color: #334155; vertical-align: middle; }
+
+    /* ── SECTION TITLE ──────────────────────────── */
+    .section-title {
+        font-size: 0.78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #64748b;
+        margin: 24px 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
+
+    /* ── ALERT ──────────────────────────────────── */
+    .alert-ok {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        border: 1px solid #86efac;
+        color: #15803d;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* ── CUSTOM CHECKBOX ────────────────────────── */
+    input[type="checkbox"].log-check {
+        appearance: none;
+        width: 16px; height: 16px;
+        border: 2px solid #cbd5e1;
+        border-radius: 4px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.15s ease;
+        vertical-align: middle;
+    }
+    input[type="checkbox"].log-check:checked { background: #6366f1; border-color: #6366f1; }
+    input[type="checkbox"].log-check:checked::after {
+        content: '✓';
+        position: absolute;
+        top: -2px; left: 1px;
+        font-size: 10px; color: #fff; font-weight: 900;
+    }
+
+    .btn-bulk {
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.15s ease;
+    }
+    .btn-bulk.sel   { border: 1.5px solid #e2e8f0; background: #f8fafc; color: #475569; }
+    .btn-bulk.sel:hover { border-color: #a5b4fc; color: #4338ca; background: #ede9fe; }
+    .btn-bulk.del   { border: 1.5px solid #fca5a5; background: #fef2f2; color: #dc2626; }
+    .btn-bulk.del:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-bulk.del:not(:disabled):hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+
+    /* ── PAGINATION ─────────────────────────────── */
+    .pagination { gap: 4px; }
+    .page-link { border-radius: 8px !important; border: 1.5px solid #e2e8f0 !important; color: #475569 !important; font-size: 0.82rem; font-weight: 600; padding: 6px 12px; }
+    .page-item.active .page-link { background: linear-gradient(135deg, #4338ca, #6366f1) !important; border-color: transparent !important; color: #fff !important; }
+</style>
+@endsection
 
 @section('content')
-<div class="container-fluid">
-    <!-- Page Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h2 class="mb-1 text-white">
-                                <i class="fas fa-shield-alt me-2 text-white"></i>Fraud Protection Logs
-                            </h2>
-                            <p class="mb-0 text-white-50">
-                                <i class="fas fa-lock me-1 text-white-50"></i>Secure your store against fraudulent orders log
-                            </p>
-                        </div>
-                        <div class="col-auto">
-                            <div class="text-center">
-                                <div class="h4 mb-0 text-white">{{ $stats['total_blocked'] ?? 0 }}</div>
-                                <small class="text-white-50">Blocked Today</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div id="logs-page" class="container-fluid px-4 py-4">
+
+    @if(session('success'))
+        <div class="alert-ok"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+    @endif
+
+    {{-- ── STAT CARDS ── --}}
+    @if(class_exists('\App\Models\BlockedOrderAttempt') && isset($stats))
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-icon si-red"><i class="fas fa-ban"></i></div>
+            <div>
+                <div class="stat-label">Blocked Today</div>
+                <div class="stat-value">{{ $stats['total_blocked'] ?? 0 }}</div>
+                <div class="stat-sub">Fraudulent orders stopped</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon si-blue"><i class="fas fa-copy"></i></div>
+            <div>
+                <div class="stat-label">Duplicate</div>
+                <div class="stat-value">{{ $stats['by_reason']['duplicate'] ?? 0 }}</div>
+                <div class="stat-sub">Duplicate attempts</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon si-amber"><i class="fas fa-user-secret"></i></div>
+            <div>
+                <div class="stat-label">Fake Data</div>
+                <div class="stat-value">{{ $stats['by_reason']['fake'] ?? 0 }}</div>
+                <div class="stat-sub">Fake orders caught</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon si-purple"><i class="fas fa-phone-slash"></i></div>
+            <div>
+                <div class="stat-label">Unique Phones</div>
+                <div class="stat-value">{{ $stats['unique_phones'] ?? 0 }}</div>
+                <div class="stat-sub">Distinct numbers flagged</div>
             </div>
         </div>
     </div>
+    @endif
 
-    <!-- Mini Global Filter Section -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="d-flex justify-content-end">
-                <form method="GET" action="{{ route('admin.fraud-protection.logs') }}" id="globalFilterForm" class="d-inline-block">
-                    <!-- Hidden date inputs -->
-                    <input type="hidden" id="global_date_from" name="date_from" value="{{ request('date_from') }}">
-                    <input type="hidden" id="global_date_to" name="date_to" value="{{ request('date_to') }}">
-                    
-                    <!-- Mini Segmented Control -->
-                    <div class="btn-group" role="group" style="border: 1px solid #dee2e6; border-radius: 6px; overflow: hidden;">
-                        <input type="radio" class="btn-check" name="days" id="day_1" value="1" {{ request('days') == '1' ? 'checked' : '' }}>
-                        <label class="btn btn-outline-light text-dark" for="day_1" style="border: none; padding: 6px 12px; font-size: 12px; background: {{ request('days') == '1' ? '#e3f2fd' : 'white' }};">
-                            24 hours
-                        </label>
+    {{-- ── FILTER PANEL ── --}}
+    <div class="filter-panel">
+        <div class="filter-panel-title">
+            <i class="fas fa-sliders-h" style="color:#6366f1;"></i> Filter Logs
+        </div>
 
-                        <input type="radio" class="btn-check" name="days" id="day_7" value="7" {{ request('days') == '7' ? 'checked' : '' }}>
-                        <label class="btn btn-outline-light text-dark" for="day_7" style="border: none; padding: 6px 12px; font-size: 12px; background: {{ request('days') == '7' ? '#e3f2fd' : 'white' }};">
-                            7 days
-                        </label>
+        @php $currentDays = request('days'); $baseUrl = route('admin.fraud-protection.logs'); @endphp
+        <div class="time-pills">
+            <span style="font-size:0.75rem;font-weight:700;color:#94a3b8;margin-right:2px;">Range:</span>
+            <a href="{{ $baseUrl }}?days=1"   class="time-pill {{ $currentDays=='1'   ? 'active':'' }}">24 hrs</a>
+            <a href="{{ $baseUrl }}?days=7"   class="time-pill {{ $currentDays=='7'   ? 'active':'' }}">7 days</a>
+            <a href="{{ $baseUrl }}?days=30"  class="time-pill {{ $currentDays=='30'  ? 'active':'' }}">30 days</a>
+            <a href="{{ $baseUrl }}?days=90"  class="time-pill {{ $currentDays=='90'  ? 'active':'' }}">3 months</a>
+            <a href="{{ $baseUrl }}?days=365" class="time-pill {{ $currentDays=='365' ? 'active':'' }}">1 year</a>
+            <a href="{{ $baseUrl }}"          class="time-pill {{ !$currentDays       ? 'active':'' }}">All time</a>
+        </div>
 
-                        <input type="radio" class="btn-check" name="days" id="day_30" value="30" {{ request('days') == '30' ? 'checked' : '' }}>
-                        <label class="btn btn-outline-light text-dark" for="day_30" style="border: none; padding: 6px 12px; font-size: 12px; background: {{ request('days') == '30' ? '#e3f2fd' : 'white' }};">
-                            28 days
-                        </label>
+        <form method="GET" action="{{ route('admin.fraud-protection.logs') }}" id="filterForm">
+            <input type="hidden" name="days" value="{{ request('days') }}">
+            <div class="filter-row">
+                <div class="filter-group" style="max-width:220px;">
+                    <label class="filter-label">Search</label>
+                    <input type="text" class="filter-input" name="search" value="{{ request('search') }}" placeholder="IP, phone, name…">
+                </div>
+                <div class="filter-group" style="max-width:165px;">
+                    <label class="filter-label">From Date</label>
+                    <input type="date" class="filter-input" name="date_from" value="{{ request('date_from') }}">
+                </div>
+                <div class="filter-group" style="max-width:165px;">
+                    <label class="filter-label">To Date</label>
+                    <input type="date" class="filter-input" name="date_to" value="{{ request('date_to') }}">
+                </div>
+                <div class="filter-group" style="max-width:185px;">
+                    <label class="filter-label">Block Reason</label>
+                    <select class="filter-select" name="fraud_type">
+                        <option value="">All Reasons</option>
+                        <option value="duplicate" {{ request('fraud_type')=='duplicate' ? 'selected':'' }}>Duplicate Order</option>
+                        <option value="fake"      {{ request('fraud_type')=='fake'      ? 'selected':'' }}>Fake Data</option>
+                        <option value="fraud"     {{ request('fraud_type')=='fraud'     ? 'selected':'' }}>Fraud Detected</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="max-width:185px;">
+                    <label class="filter-label">Module</label>
+                    <select class="filter-select" name="module">
+                        <option value="">All Modules</option>
+                        <option value="1" {{ request('module')=='1' ? 'selected':'' }}>Duplicate Protection</option>
+                        <option value="2" {{ request('module')=='2' ? 'selected':'' }}>Fake Order Protection</option>
+                        <option value="3" {{ request('module')=='3' ? 'selected':'' }}>Fraud & Scam Protection</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="flex:0;flex-direction:row;gap:8px;align-items:flex-end;">
+                    <button type="submit" class="btn-filter primary"><i class="fas fa-search"></i> Apply</button>
+                    <a href="{{ route('admin.fraud-protection.logs') }}" class="btn-filter ghost"><i class="fas fa-times"></i> Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
 
-                        <input type="radio" class="btn-check" name="days" id="day_90" value="90" {{ request('days') == '90' ? 'checked' : '' }}>
-                        <label class="btn btn-outline-light text-dark" for="day_90" style="border: none; padding: 6px 12px; font-size: 12px; background: {{ request('days') == '90' ? '#e3f2fd' : 'white' }};">
-                            3 months
-                        </label>
-
-                        <!-- 1 Year Button -->
-                        <button class="btn btn-outline-light text-dark" type="button" onclick="setYearRange()" style="border: none; padding: 6px 12px; font-size: 12px; background: white; border-left: 1px solid #dee2e6 !important;">
-                            1 Year
-                        </button>
-
-                        <!-- Custom Range Button -->
-                        <button class="btn btn-outline-light text-dark" type="button" data-bs-toggle="modal" data-bs-target="#customDateModal" style="border: none; padding: 6px 12px; font-size: 12px; background: white; border-left: 1px solid #dee2e6 !important;">
-                            <i class="fas fa-calendar-alt" style="margin-right: 4px;"></i>Custom
-                        </button>
-
-                        <!-- Clear All Button -->
-                        <a href="{{ route('admin.fraud-protection.logs') }}" class="btn btn-outline-light text-dark" style="border: none; padding: 6px 12px; font-size: 12px; background: white; border-left: 1px solid #dee2e6 !important; text-decoration: none;">
-                            <i class="fas fa-times" style="margin-right: 4px;"></i>Clear
-                        </a>
-                    </div>
+    {{-- ── MAIN TABLE CARD ── --}}
+    <div class="table-card">
+        <div class="table-card-header">
+            <h2>
+                <span class="hdr-icon"><i class="fas fa-history"></i></span>
+                Blocked Order Attempts
+            </h2>
+            <div class="header-actions">
+                <a href="{{ route('admin.fraud-protection.index') }}" class="btn-hdr light">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+                @if(class_exists('\App\Models\BlockedOrderAttempt'))
+                    <a href="{{ route('admin.fraud-protection.export') }}" class="btn-hdr success">
+                        <i class="fas fa-download"></i> Export CSV
+                    </a>
+                @endif
+                <form action="{{ route('admin.fraud-protection.clear-logs') }}" method="POST" style="display:inline;"
+                      onsubmit="return confirm('Clear ALL logs? This cannot be undone.')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="btn-hdr danger"><i class="fas fa-trash"></i> Clear All</button>
                 </form>
             </div>
         </div>
-    </div>
 
-    <!-- Custom Date Range Modal -->
-    <div class="modal fade" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h6 class="modal-title" id="customDateModalLabel">Custom Date Range</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="custom_from_date" class="form-label">From Date</label>
-                        <input type="date" class="form-control form-control-sm" id="custom_from_date">
-                    </div>
-                    <div class="mb-3">
-                        <label for="custom_to_date" class="form-label">To Date</label>
-                        <input type="date" class="form-control form-control-sm" id="custom_to_date">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="applyCustomDateRange()">Apply</button>
-                </div>
-            </div>
-        </div>
-    </div>
+        @if(class_exists('\App\Models\BlockedOrderAttempt') && isset($attempts) && $attempts->count() > 0)
 
-    @if(class_exists('\App\Models\BlockedOrderAttempt') && isset($stats))
-        <!-- Fraud Protection Analytics Cards -->
-        <div class="row mb-1">
-            <!-- Total Orders Saved -->
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="card border-left-success shadow h-100">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                    Orders Saved Today
-                                </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    {{ $stats['total_blocked'] ?? 0 }}
-                                </div>
-                                <div class="text-xs text-muted">
-                                    Fraudulent orders blocked
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-shopping-cart fa-2x text-success"></i>
-                            </div>
-                        </div>
-                    </div>
+            {{-- Bulk bar --}}
+            <div class="bulk-bar">
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <button class="btn-bulk sel" id="selectAllBtn" onclick="toggleSelectAll()">
+                        <i class="fas fa-check-square"></i> Select All
+                    </button>
+                    <button class="btn-bulk sel" id="deselectAllBtn" onclick="deselectAll()" style="display:none;">
+                        <i class="fas fa-square"></i> Deselect All
+                    </button>
+                    <span id="selectedCount" style="font-size:0.78rem;color:#94a3b8;font-weight:600;"></span>
                 </div>
+                <button class="btn-bulk del" id="bulkDeleteBtn" onclick="handleBulkDelete()" disabled>
+                    <i class="fas fa-trash"></i> Delete Selected
+                </button>
             </div>
 
-            <!-- Revenue Saved -->
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="card border-left-primary shadow h-100">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                    Revenue Saved
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:44px;padding-left:20px;">
+                                <input type="checkbox" class="log-check" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                            </th>
+                            <th>Time</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>IP Address</th>
+                            <th>Module</th>
+                            <th>Reason</th>
+                            <th>Errors</th>
+                            <th style="width:80px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($attempts as $attempt)
+                        <tr>
+                            <td style="padding-left:20px;">
+                                <input type="checkbox" class="log-check row-checkbox" value="{{ $attempt->id }}">
+                            </td>
+                            <td>
+                                <div class="time-line">
+                                    {{ $attempt->blocked_at->format('M d, Y') }}
+                                    <small>{{ $attempt->blocked_at->format('H:i:s') }}</small>
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ৳{{ number_format(($stats['total_blocked'] ?? 0) * 500) }}
-                                </div>
-                                <div class="text-xs text-muted">
-                                    Estimated avg order value
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-money-bill-wave fa-2x text-primary"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Time Saved -->
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="card border-left-warning shadow h-100">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                    Time Saved
-                                </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    {{ number_format((($stats['total_blocked'] ?? 0) * 15) / 60, 1) }}h
-                                </div>
-                                <div class="text-xs text-muted">
-                                    Manual review time saved
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-clock fa-2x text-warning"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ad Cost Saved -->
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="card border-left-info shadow h-100">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                    Ad Cost Saved
-                                </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                    ৳{{ number_format(($stats['total_blocked'] ?? 0) * 50) }}
-                                </div>
-                                <div class="text-xs text-muted">
-                                    Marketing cost protection
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-bullhorn fa-2x text-info"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Detailed Analytics Section -->
-        <div class="row mb-1">
-            <!-- Fraud Type Breakdown -->
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow h-100">
-                    <div class="card-header bg-danger text-white">
-                        <h6 class="mb-0">
-                            <i class="fas fa-chart-pie"></i> Fraud Type Breakdown
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-copy fa-2x text-info"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <div class="h6 mb-0">{{ $stats['by_reason']['duplicate'] ?? 0 }}</div>
-                                        <small class="text-muted">Duplicate Orders</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-user-secret fa-2x text-warning"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <div class="h6 mb-0">{{ $stats['by_reason']['fake'] ?? 0 }}</div>
-                                        <small class="text-muted">Fake Orders</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <div class="h6 mb-0">{{ $stats['by_reason']['fraud'] ?? 0 }}</div>
-                                        <small class="text-muted">Fraud Detected</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-phone-slash fa-2x text-secondary"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <div class="h6 mb-0">{{ $stats['unique_phones'] ?? 0 }}</div>
-                                        <small class="text-muted">Unique Phones</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Protection Impact -->
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow h-100">
-                    <div class="card-header bg-success text-white">
-                        <h6 class="mb-0">
-                            <i class="fas fa-shield-alt"></i> Protection Impact
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-6 mb-3">
-                                <div class="border-end">
-                                    <div class="h4 text-success mb-1">99.8%</div>
-                                    <small class="text-muted">Success Rate</small>
-                                </div>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <div class="h4 text-primary mb-1">24/7</div>
-                                <small class="text-muted">Protection</small>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <div class="border-end">
-                                    <div class="h4 text-warning mb-1">{{ $stats['unique_ips'] ?? 0 }}</div>
-                                    <small class="text-muted">IPs Blocked</small>
-                                </div>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <div class="h4 text-info mb-1">0ms</div>
-                                <small class="text-muted">Response Time</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    <!-- Logs Table -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                    <h6 class="m-0 font-weight-bold">
-                        <i class="fas fa-history"></i> Blocked Order Attempts
-                    </h6>
-                    <div>
-                        <a href="{{ route('admin.fraud-protection.index') }}" class="btn btn-sm btn-light">
-                            <i class="fas fa-cog"></i> Settings
-                        </a>
-                        @if(class_exists('\App\Models\BlockedOrderAttempt'))
-                            <a href="{{ route('admin.fraud-protection.export') }}" class="btn btn-sm btn-success">
-                                <i class="fas fa-download"></i> Export CSV
-                            </a>
-                        @endif
-                        <form action="{{ route('admin.fraud-protection.clear-logs') }}" method="POST" style="display: inline;" 
-                              onsubmit="return confirm('Are you sure you want to clear all logs? This action cannot be undone.')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-warning">
-                                <i class="fas fa-trash"></i> Clear Entire All Logs
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <!-- Filter Section -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">
-                                <i class="fas fa-filter text-info"></i> Filter Options
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <form method="GET" action="{{ route('admin.fraud-protection.logs') }}" id="filterForm">
-                                <div class="row g-3">
-                                    <!-- Search -->
-                                    <div class="col-md-3">
-                                        <label for="search" class="form-label">Search</label>
-                                        <input type="text" class="form-control" id="search" name="search" 
-                                               value="{{ request('search') }}" 
-                                               placeholder="Search by IP, email, phone...">
-                                    </div>
-
-                                    <!-- Date Range -->
-                                    <div class="col-md-3">
-                                        <label for="date_from" class="form-label">From Date</label>
-                                        <input type="date" class="form-control" id="date_from" name="date_from" 
-                                               value="{{ request('date_from') }}">
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label for="date_to" class="form-label">To Date</label>
-                                        <input type="date" class="form-control" id="date_to" name="date_to" 
-                                               value="{{ request('date_to') }}">
-                                    </div>
-
-                                    <!-- Quick Days Filter -->
-                                    <div class="col-md-3">
-                                        <label for="days" class="form-label">Quick Filter</label>
-                                        <select class="form-select" id="days" name="days" onchange="applyQuickFilter()">
-                                            <option value="">Select Period</option>
-                                            <option value="1" {{ request('days') == '1' ? 'selected' : '' }}>Last 24 Hours</option>
-                                            <option value="7" {{ request('days') == '7' ? 'selected' : '' }}>Last 7 Days</option>
-                                            <option value="30" {{ request('days') == '30' ? 'selected' : '' }}>Last 30 Days</option>
-                                            <option value="90" {{ request('days') == '90' ? 'selected' : '' }}>Last 90 Days</option>
-                                            <option value="365" {{ request('days') == '365' ? 'selected' : '' }}>Last Year</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Block Reason Filter -->
-                                    <div class="col-md-3">
-                                        <label for="fraud_type" class="form-label">Block Reason</label>
-                                        <select class="form-select" id="fraud_type" name="fraud_type">
-                                            <option value="">All Reasons</option>
-                                            <option value="duplicate" {{ request('fraud_type') == 'duplicate' ? 'selected' : '' }}>Duplicate Order</option>
-                                            <option value="fake" {{ request('fraud_type') == 'fake' ? 'selected' : '' }}>Fake Data</option>
-                                            <option value="fraud" {{ request('fraud_type') == 'fraud' ? 'selected' : '' }}>Fraud Detected</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Module Filter -->
-                                    <div class="col-md-3">
-                                        <label for="module" class="form-label">Blocked By Module</label>
-                                        <select class="form-select" id="module" name="module">
-                                            <option value="">All Modules</option>
-                                            <option value="1" {{ request('module') == '1' ? 'selected' : '' }}>Duplicate Protection</option>
-                                            <option value="2" {{ request('module') == '2' ? 'selected' : '' }}>Fake Order Protection</option>
-                                            <option value="3" {{ request('module') == '3' ? 'selected' : '' }}>Fraud & Scam Protection</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Action Buttons -->
-                                    <div class="col-md-3 d-flex align-items-end">
-                                        <div class="btn-group w-100" role="group">
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-search"></i> Apply
-                                            </button>
-                                            <a href="{{ route('admin.fraud-protection.logs') }}" class="btn btn-outline-secondary">
-                                                <i class="fas fa-times"></i> Clear
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    @if(class_exists('\App\Models\BlockedOrderAttempt') && isset($attempts) && $attempts->count() > 0)
-                        <div id="bulkActionsContainer">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" id="selectAllBtn" onclick="toggleSelectAll()">
-                                        <i class="fas fa-check-square"></i> Select All
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllBtn" onclick="deselectAll()" style="display: none;">
-                                        <i class="fas fa-square"></i> Deselect All
-                                    </button>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-sm btn-danger" id="bulkDeleteBtn" onclick="handleBulkDelete()" disabled>
-                                        <i class="fas fa-trash"></i> Delete Selected
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover table-sm">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th width="40">
-                                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
-                                            </th>
-                                            <th>Time</th>
-                                            <th>Name</th>
-                                            <th>Phone</th>
-                                            <th>IP Address</th>
-                                            <th>Module</th>
-                                            <th>Reason</th>
-                                            <th>Errors</th>
-                                            <th width="120">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($attempts as $attempt)
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox" class="row-checkbox" name="selected_ids[]" value="{{ $attempt->id }}">
-                                                </td>
-                                                <td>
-                                                    <small>{{ $attempt->blocked_at->format('M d, Y') }}<br>{{ $attempt->blocked_at->format('H:i:s') }}</small>
-                                                </td>
-                                                <td>{{ $attempt->name ?? 'N/A' }}</td>
-                                                <td>
-                                                    <code>{{ $attempt->phone ?? 'N/A' }}</code>
-                                                </td>
-                                                <td>
-                                                    <small><code>{{ $attempt->ip_address ?? 'N/A' }}</code></small>
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-{{ $attempt->blocked_by_module == 1 ? 'info' : ($attempt->blocked_by_module == 2 ? 'warning' : 'danger') }} text-white">
-                                                        Module {{ $attempt->blocked_by_module }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-dark text-white">
-                                                        {{ $attempt->formatted_reason }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    @if($attempt->validation_errors)
-                                                        <ul class="mb-0 pl-3" style="font-size: 12px;">
-                                                            @foreach($attempt->validation_errors as $error)
-                                                                <li>{{ $error }}</li>
-                                                            @endforeach
-                                                        </ul>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group btn-group-sm" role="group">
-                                                        <button type="button" class="btn btn-outline-danger btn-sm" 
-                                                                onclick="deleteSingleItem({{ $attempt->id }})"
-                                                                title="Delete this entry">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-outline-warning btn-sm" 
-                                                                onclick="addToBlacklist('{{ $attempt->phone }}')"
-                                                                title="Add to blacklist">
-                                                            <i class="fas fa-ban"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                            </td>
+                            <td>{{ $attempt->name ?? '—' }}</td>
+                            <td><code>{{ $attempt->phone ?? '—' }}</code></td>
+                            <td><code>{{ $attempt->ip_address ?? '—' }}</code></td>
+                            <td>
+                                @php $mod = $attempt->blocked_by_module; @endphp
+                                <span class="badge-pill bp-mod{{ $mod }}">
+                                    <i class="fas fa-{{ $mod==1 ? 'copy' : ($mod==2 ? 'user-secret' : 'exclamation-triangle') }}"></i>
+                                    Module {{ $mod }}
+                                </span>
+                            </td>
+                            <td>
+                                @php $r = strtolower($attempt->formatted_reason ?? ''); @endphp
+                                <span class="badge-pill {{ str_contains($r,'duplicate') ? 'bp-duplicate' : (str_contains($r,'fake') ? 'bp-fake' : 'bp-fraud') }}">
+                                    {{ $attempt->formatted_reason }}
+                                </span>
+                            </td>
+                            <td>
+                                @if($attempt->validation_errors)
+                                    <ul style="margin:0;padding-left:14px;font-size:0.75rem;color:#64748b;">
+                                        @foreach($attempt->validation_errors as $err)
+                                            <li>{{ $err }}</li>
                                         @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                    </ul>
+                                @else
+                                    <span style="color:#cbd5e1;">—</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="row-actions">
+                                    <button class="icon-btn ib-delete" onclick="deleteSingleItem({{ $attempt->id }})" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    <button class="icon-btn ib-ban" onclick="addToBlacklist('{{ $attempt->phone }}')" title="Blacklist">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-                        <!-- Pagination -->
-                        <div class="mt-3">
-                            {{ $attempts->links() }}
-                        </div>
-                    @elseif(isset($logs) && count($logs) > 0)
-                        <!-- File-based logs fallback -->
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> Showing file-based logs. For better management, ensure BlockedOrderAttempt model exists.
-                        </div>
-                        <div class="log-entries">
-                            @foreach($logs as $log)
-                                <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 12px;">{{ $log }}</pre>
+            <div style="padding:16px 24px;">{{ $attempts->links() }}</div>
+
+        @elseif(isset($logs) && count($logs) > 0)
+            <div style="padding:20px 24px;">
+                <div class="alert-ok" style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-color:#bae6fd;color:#0369a1;">
+                    <i class="fas fa-info-circle"></i> Showing file-based logs.
+                </div>
+                @foreach($logs as $log)
+                    <pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 16px;font-size:0.78rem;color:#334155;margin-bottom:8px;">{{ $log }}</pre>
+                @endforeach
+            </div>
+        @else
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-shield-alt"></i></div>
+                <h4>No Blocked Attempts</h4>
+                <p>Your store is clean — no fraudulent orders have been detected.</p>
+                <a href="{{ route('admin.fraud-protection.index') }}" class="btn-filter primary" style="margin:0 auto;">
+                    <i class="fas fa-cog"></i> Configure Protection
+                </a>
+            </div>
+        @endif
+    </div>
+
+    {{-- ── TOP OFFENDERS & BLACKLIST ── --}}
+    @if(isset($stats) && isset($stats['top_blocked_phones']) && $stats['top_blocked_phones']->count() > 0)
+        <div class="section-title">
+            <i class="fas fa-users-slash" style="color:#ef4444;"></i> Top Offenders & Blacklist
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;" class="offender-grid">
+
+            {{-- Top phones --}}
+            <div class="sub-card">
+                <div class="sub-card-header">
+                    <i class="fas fa-phone-slash" style="color:#dc2626;font-size:0.9rem;"></i>
+                    <h3>Top Blocked Phones</h3>
+                    <span class="count-chip">{{ $stats['top_blocked_phones']->count() }}</span>
+                </div>
+                <div class="sub-card-body">
+                    <table class="mini-table">
+                        @foreach($stats['top_blocked_phones'] as $phone => $count)
+                        <tr>
+                            <td><code style="background:#f1f5f9;border-radius:5px;padding:2px 6px;font-size:0.78rem;color:#4338ca;font-weight:600;">{{ $phone }}</code></td>
+                            <td style="text-align:right;"><span class="badge-pill bp-fraud">{{ $count }}×</span></td>
+                            <td style="text-align:right;padding-left:8px;">
+                                <button class="icon-btn ib-ban" onclick="addToBlacklist('{{ $phone }}')" title="Blacklist"><i class="fas fa-ban"></i></button>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </table>
+                </div>
+            </div>
+
+            {{-- Blacklisted phones --}}
+            <div class="sub-card">
+                <div class="sub-card-header">
+                    <i class="fas fa-phone" style="color:#dc2626;font-size:0.9rem;"></i>
+                    <h3>Blacklisted Phones</h3>
+                    <span class="count-chip">{{ count($blacklistedPhones ?? []) }}</span>
+                </div>
+                <div class="sub-card-body" style="max-height:260px;overflow-y:auto;">
+                    @if(!empty($blacklistedPhones))
+                        <table class="mini-table">
+                            @foreach($blacklistedPhones as $phone)
+                            <tr>
+                                <td><code style="background:#f1f5f9;border-radius:5px;padding:2px 6px;font-size:0.78rem;color:#4338ca;font-weight:600;">{{ $phone }}</code></td>
+                                <td style="text-align:right;">
+                                    <button class="icon-btn ib-unlock" onclick="unblockPhone('{{ $phone }}')" title="Remove"><i class="fas fa-unlock"></i></button>
+                                </td>
+                            </tr>
                             @endforeach
-                        </div>
+                        </table>
                     @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                            <h5>No Blocked Attempts</h5>
-                            <p class="text-muted">Your store is protected. No fraudulent orders detected in the last 24 hours.</p>
-                            <a href="{{ route('admin.fraud-protection.index') }}" class="btn btn-primary mt-3">
-                                <i class="fas fa-cog"></i> Configure Protection Settings
-                            </a>
+                        <div style="text-align:center;padding:28px 0;color:#94a3b8;font-size:0.82rem;">
+                            <i class="fas fa-check-circle" style="color:#16a34a;font-size:1.4rem;display:block;margin-bottom:8px;"></i>
+                            No blacklisted phone numbers
                         </div>
                     @endif
                 </div>
             </div>
-        </div>
-    </div>
 
-    @if(isset($stats) && isset($stats['top_blocked_phones']) && $stats['top_blocked_phones']->count() > 0)
-        <!-- Top Offenders -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card shadow">
-                    <div class="card-header bg-warning">
-                        <h6 class="m-0 font-weight-bold">
-                            <i class="fas fa-users-slash"></i> Top Blocked Phone Numbers (24h)
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-sm table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Phone Number</th>
-                                    <th>Blocked Count</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($stats['top_blocked_phones'] as $phone => $count)
-                                    <tr>
-                                        <td><code>{{ $phone }}</code></td>
-                                        <td>
-                                            <span class="badge bg-danger text-white">{{ $count }} times</span>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-danger" onclick="addToBlacklist('{{ $phone }}')">
-                                                <i class="fas fa-ban"></i> Add to Blacklist
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
+            {{-- Blacklisted IPs --}}
+            <div class="sub-card">
+                <div class="sub-card-header">
+                    <i class="fas fa-globe" style="color:#d97706;font-size:0.9rem;"></i>
+                    <h3>Blacklisted IPs</h3>
+                    <span class="count-chip">{{ count($blacklistedIps ?? []) }}</span>
+                </div>
+                <div class="sub-card-body" style="max-height:260px;overflow-y:auto;">
+                    @if(!empty($blacklistedIps))
+                        <table class="mini-table">
+                            @foreach($blacklistedIps as $ip)
+                            <tr>
+                                <td><code style="background:#f1f5f9;border-radius:5px;padding:2px 6px;font-size:0.78rem;color:#4338ca;font-weight:600;">{{ $ip }}</code></td>
+                                <td style="text-align:right;">
+                                    <button class="icon-btn ib-unlock" onclick="unblockIp('{{ $ip }}')" title="Remove"><i class="fas fa-unlock"></i></button>
+                                </td>
+                            </tr>
+                            @endforeach
                         </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Blacklist Management Section - Separate Area -->
-        <div class="row mt-3">
-            <div class="col-12">
-                <h5 class="mb-3">
-                    <i class="fas fa-ban text-danger"></i> Blacklist Management
-                </h5>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <!-- Blacklisted Phones Card -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-danger text-white">
-                        <h6 class="mb-0">
-                            <i class="fas fa-phone"></i> Blacklisted Phone Numbers
-                            <span class="badge bg-light text-dark ms-2">{{ count($blacklistedPhones ?? []) }}</span>
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        @if(!empty($blacklistedPhones))
-                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                                <table class="table table-sm table-hover">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Phone Number</th>
-                                            <th width="100">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($blacklistedPhones as $phone)
-                                            <tr>
-                                                <td>
-                                                    <code>{{ $phone }}</code>
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-danger" 
-                                                            onclick="unblockPhone('{{ $phone }}')"
-                                                            title="Remove from blacklist">
-                                                        <i class="fas fa-unlock"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <div class="text-muted text-center py-5">
-                                <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
-                                <p class="mb-0">No blacklisted phone numbers</p>
-                                <small>All phone numbers are currently allowed</small>
-                            </div>
-                        @endif
-                    </div>
+                    @else
+                        <div style="text-align:center;padding:28px 0;color:#94a3b8;font-size:0.82rem;">
+                            <i class="fas fa-check-circle" style="color:#16a34a;font-size:1.4rem;display:block;margin-bottom:8px;"></i>
+                            No blacklisted IP addresses
+                        </div>
+                    @endif
                 </div>
             </div>
 
-            <!-- Blacklisted IPs Card -->
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header bg-warning text-dark">
-                        <h6 class="mb-0">
-                            <i class="fas fa-globe"></i> Blacklisted IP Addresses
-                            <span class="badge bg-light text-dark ms-2">{{ count($blacklistedIps ?? []) }}</span>
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        @if(!empty($blacklistedIps))
-                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                                <table class="table table-sm table-hover">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>IP Address</th>
-                                            <th width="100">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($blacklistedIps as $ip)
-                                            <tr>
-                                                <td>
-                                                    <code>{{ $ip }}</code>
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-danger" 
-                                                            onclick="unblockIp('{{ $ip }}')"
-                                                            title="Remove from blacklist">
-                                                        <i class="fas fa-unlock"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <div class="text-muted text-center py-5">
-                                <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
-                                <p class="mb-0">No blacklisted IP addresses</p>
-                                <small>All IP addresses are currently allowed</small>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
         </div>
     @endif
+
 </div>
 
 <style>
-    .border-left-danger { border-left: 4px solid #dc3545; }
-    .border-left-warning { border-left: 4px solid #ffc107; }
-    .border-left-info { border-left: 4px solid #17a2b8; }
-    .border-left-success { border-left: 4px solid #28a745; }
-    .text-xs {
-        font-size: 0.75rem;
-    }
-    .text-gray-800 {
-        color: #333;
-    }
-    .text-gray-300 {
-        color: #ccc;
-    }
+    @media (max-width: 992px) { .offender-grid { grid-template-columns: 1fr !important; } }
 </style>
 
 <script>
+    // ── Blacklist helpers ─────────────────────────
     function addToBlacklist(phone) {
-        if (confirm('Add ' + phone + ' to blacklist?')) {
-            fetch('{{ route('admin.fraud-protection.add-to-blacklist') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ phone: phone })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('✅ Phone number added to blacklist successfully!');
-                    location.reload();
-                } else {
-                    alert('❌ Error adding to blacklist');
-                }
-            })
-            .catch(error => {
-                alert('❌ Error: ' + error.message);
-            });
-        }
+        if (!confirm('Add ' + phone + ' to blacklist?')) return;
+        fetch('{{ route('admin.fraud-protection.add-to-blacklist') }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ phone })
+        }).then(r => r.json()).then(d => { alert(d.success ? '✅ Added to blacklist!' : '❌ ' + d.message); if (d.success) location.reload(); });
     }
 
+    function unblockPhone(phone) {
+        if (!confirm('Remove ' + phone + ' from blacklist?')) return;
+        fetch('{{ route('admin.fraud-protection.unblock-phone') }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ phone })
+        }).then(r => r.json()).then(d => { alert(d.success ? '✅ ' + d.message : '❌ ' + d.message); if (d.success) location.reload(); });
+    }
+
+    function unblockIp(ip) {
+        if (!confirm('Remove ' + ip + ' from blacklist?')) return;
+        fetch('{{ route('admin.fraud-protection.unblock-ip') }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ ip })
+        }).then(r => r.json()).then(d => { alert(d.success ? '✅ ' + d.message : '❌ ' + d.message); if (d.success) location.reload(); });
+    }
+
+    // ── Delete helpers ────────────────────────────
+    function deleteSingleItem(id) {
+        if (!confirm('Delete this entry? Cannot be undone.')) return;
+        fetch('{{ route('admin.fraud-protection.delete-single') }}', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ id })
+        }).then(r => r.json()).then(d => { alert(d.success ? '✅ Deleted!' : '❌ ' + d.message); if (d.success) location.reload(); });
+    }
+
+    // ── Bulk selection ────────────────────────────
     function toggleSelectAll() {
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-        const selectAllBtn = document.getElementById('selectAllBtn');
-        const deselectAllBtn = document.getElementById('deselectAllBtn');
-        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
-
-        rowCheckboxes.forEach(checkbox => {
-            checkbox.checked = selectAllCheckbox.checked;
-        });
-
-        updateButtonStates();
+        const master = document.getElementById('selectAllCheckbox');
+        document.querySelectorAll('.row-checkbox').forEach(b => b.checked = master.checked);
+        updateBulkUI();
     }
 
     function deselectAll() {
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-        
-        selectAllCheckbox.checked = false;
-        rowCheckboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-
-        updateButtonStates();
+        document.getElementById('selectAllCheckbox').checked = false;
+        document.querySelectorAll('.row-checkbox').forEach(b => b.checked = false);
+        updateBulkUI();
     }
 
-    function updateButtonStates() {
-        const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
-        const selectAllBtn = document.getElementById('selectAllBtn');
-        const deselectAllBtn = document.getElementById('deselectAllBtn');
-        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
-        const totalCheckboxes = document.querySelectorAll('.row-checkbox').length;
-
-        if (selectedCheckboxes.length > 0) {
-            bulkDeleteBtn.disabled = false;
-            deselectAllBtn.style.display = 'inline-block';
-            selectAllBtn.style.display = selectedCheckboxes.length === totalCheckboxes ? 'none' : 'inline-block';
-        } else {
-            bulkDeleteBtn.disabled = true;
-            deselectAllBtn.style.display = 'none';
-            selectAllBtn.style.display = 'inline-block';
-        }
+    function updateBulkUI() {
+        const checked  = document.querySelectorAll('.row-checkbox:checked');
+        const total    = document.querySelectorAll('.row-checkbox').length;
+        const btn      = document.getElementById('bulkDeleteBtn');
+        const countEl  = document.getElementById('selectedCount');
+        const selBtn   = document.getElementById('selectAllBtn');
+        const deselBtn = document.getElementById('deselectAllBtn');
+        btn.disabled   = checked.length === 0;
+        countEl.textContent = checked.length > 0 ? checked.length + ' selected' : '';
+        selBtn.style.display   = checked.length === total ? 'none' : 'inline-flex';
+        deselBtn.style.display = checked.length > 0 ? 'inline-flex' : 'none';
     }
 
     function handleBulkDelete() {
-        const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
-        
-        if (selectedCheckboxes.length === 0) {
-            alert('Please select at least one entry to delete.');
-            return;
-        }
-
-        if (!confirm(`Are you sure you want to delete ${selectedCheckboxes.length} selected entries? This action cannot be undone.`)) {
-            return;
-        }
-
-        // Get selected IDs
-        const selectedIds = [];
-        selectedCheckboxes.forEach(checkbox => {
-            selectedIds.push(checkbox.value);
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        if (!checked.length) return;
+        if (!confirm(`Delete ${checked.length} selected entries?`)) return;
+        const ids = [...checked].map(c => c.value);
+        $.ajax({
+            url: '{{ route('admin.fraud-protection.bulk-delete') }}',
+            type: 'DELETE',
+            data: { _token: '{{ csrf_token() }}', selected_ids: ids },
+            success: d => { alert(d.success ? `✅ ${d.message}` : '❌ ' + d.message); if (d.success) location.reload(); },
+            error: () => alert('❌ Server error')
         });
-
-        // Try with jQuery AJAX first (if available), then fallback to XMLHttpRequest
-        if (typeof $ !== 'undefined') {
-            // Use jQuery AJAX
-            $.ajax({
-                url: '{{ route('admin.fraud-protection.bulk-delete') }}',
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    selected_ids: selectedIds
-                },
-                success: function(data) {
-                    if (data.success) {
-                        alert(`✅ ${data.message}!`);
-                        location.reload();
-                    } else {
-                        alert('❌ Error: ' + (data.message || 'Unknown error'));
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert('❌ Error: ' + error);
-                }
-            });
-        } else {
-            // Fallback to XMLHttpRequest
-            const xhr = new XMLHttpRequest();
-            xhr.open('DELETE', '{{ route('admin.fraud-protection.bulk-delete') }}', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
-            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-            
-        // Prepare data
-        let formData = '_token={{ csrf_token() }}';
-        selectedCheckboxes.forEach(checkbox => {
-            formData += '&selected_ids[]=' + encodeURIComponent(checkbox.value);
-        });
-            
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        try {
-                            const data = JSON.parse(xhr.responseText);
-                            if (data.success) {
-                                alert(`✅ ${data.message}!`);
-                                location.reload();
-                            } else {
-                                alert('❌ Error: ' + (data.message || 'Unknown error'));
-                            }
-                        } catch (e) {
-                            alert('❌ Error parsing response');
-                        }
-                    } else {
-                        alert('❌ Server error: ' + xhr.status);
-                    }
-                }
-            };
-            
-            xhr.send(formData);
-        }
     }
 
-
-    function deleteSingleItem(id) {
-        if (confirm('Are you sure you want to delete this entry? This action cannot be undone.')) {
-            fetch('{{ route('admin.fraud-protection.delete-single') }}', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ id: id })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('✅ Entry deleted successfully!');
-                    location.reload();
-                } else {
-                    alert('❌ Error deleting entry: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                alert('❌ Error: ' + error.message);
-            });
-        }
-    }
-
-
-    // Update button states when individual checkboxes are changed
-    document.addEventListener('DOMContentLoaded', function() {
-        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-        rowCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', updateButtonStates);
-        });
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.row-checkbox').forEach(c => c.addEventListener('change', updateBulkUI));
     });
-
-    // Quick filter function (for logs section)
-    function applyQuickFilter() {
-        const days = document.getElementById('days').value;
-        if (days) {
-            const today = new Date();
-            const fromDate = new Date(today.getTime() - (days * 24 * 60 * 60 * 1000));
-            
-            document.getElementById('date_from').value = fromDate.toISOString().split('T')[0];
-            document.getElementById('date_to').value = today.toISOString().split('T')[0];
-        }
-    }
-
-    // Global quick filter function (for dashboard filters)
-    function applyGlobalQuickFilter() {
-        const days = document.getElementById('global_days').value;
-        if (days) {
-            const today = new Date();
-            const fromDate = new Date(today.getTime() - (days * 24 * 60 * 60 * 1000));
-            
-            document.getElementById('global_date_from').value = fromDate.toISOString().split('T')[0];
-            document.getElementById('global_date_to').value = today.toISOString().split('T')[0];
-        }
-    }
-
-    // Mini filter functions
-    function showCustomDateModal() {
-        // Set default dates
-        const today = new Date();
-        const lastWeek = new Date(today.getTime() - (7 * 24 * 60 * 60 * 1000));
-        
-        document.getElementById('custom_from_date').value = lastWeek.toISOString().split('T')[0];
-        document.getElementById('custom_to_date').value = today.toISOString().split('T')[0];
-        
-        // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('customDateModal'));
-        modal.show();
-    }
-
-    function applyCustomDateRange() {
-        const fromDate = document.getElementById('custom_from_date').value;
-        const toDate = document.getElementById('custom_to_date').value;
-        
-        if (fromDate && toDate) {
-            // Clear any selected radio buttons
-            const radioButtons = document.querySelectorAll('input[name="days"]');
-            radioButtons.forEach(radio => radio.checked = false);
-            
-            // Set custom dates
-            document.getElementById('global_date_from').value = fromDate;
-            document.getElementById('global_date_to').value = toDate;
-            
-            // Submit form
-            document.getElementById('globalFilterForm').submit();
-        } else {
-            alert('Please select both start and end dates.');
-        }
-    }
-
-    function setYearRange() {
-        const today = new Date();
-        const fromDate = new Date(today.getTime() - (365 * 24 * 60 * 60 * 1000));
-        
-        // Clear any selected radio buttons
-        const radioButtons = document.querySelectorAll('input[name="days"]');
-        radioButtons.forEach(radio => radio.checked = false);
-        
-        document.getElementById('global_date_from').value = fromDate.toISOString().split('T')[0];
-        document.getElementById('global_date_to').value = today.toISOString().split('T')[0];
-        document.getElementById('globalFilterForm').submit();
-    }
-
-
-    // Auto-submit form when radio buttons change
-    document.addEventListener('DOMContentLoaded', function() {
-        const radioButtons = document.querySelectorAll('input[name="days"]');
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.checked) {
-                    const days = this.value;
-                    const today = new Date();
-                    const fromDate = new Date(today.getTime() - (days * 24 * 60 * 60 * 1000));
-                    
-                    document.getElementById('global_date_from').value = fromDate.toISOString().split('T')[0];
-                    document.getElementById('global_date_to').value = today.toISOString().split('T')[0];
-                    document.getElementById('globalFilterForm').submit();
-                }
-            });
-        });
-    });
-
-    // Unblock phone number
-    function unblockPhone(phone) {
-        if (confirm(`Are you sure you want to remove ${phone} from the blacklist?`)) {
-            fetch('{{ route('admin.fraud-protection.unblock-phone') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ phone: phone })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`✅ ${data.message}!`);
-                    location.reload();
-                } else {
-                    alert('❌ Error: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                alert('❌ Error: ' + error.message);
-            });
-        }
-    }
-
-    // Unblock IP address
-    function unblockIp(ip) {
-        if (confirm(`Are you sure you want to remove ${ip} from the blacklist?`)) {
-            fetch('{{ route('admin.fraud-protection.unblock-ip') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ ip: ip })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`✅ ${data.message}!`);
-                    location.reload();
-                } else {
-                    alert('❌ Error: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                alert('❌ Error: ' + error.message);
-            });
-        }
-    }
 </script>
 @endsection
-
