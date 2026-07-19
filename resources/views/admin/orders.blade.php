@@ -264,7 +264,7 @@
         .table-responsive-wrapper {
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            overflow: hidden;
+            overflow-x: auto;
             background: #fff;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
@@ -947,6 +947,7 @@
                         <th>Fraud Check</th>
                         <th>Order at</th>
                         <th>Note</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1254,16 +1255,7 @@
                                     </span>
                                 </div>`;
                             }
-                            
-                            // Action icons
-                            html += `
-                                <div class="mt-2 d-flex align-items-center gap-2">
-                                    <a href="${editUrl}" title="View" class="action-icon-btn text-primary"><i class="fas fa-eye"></i></a>
-                                    <a href="${editUrl}" title="Edit" class="action-icon-btn text-success"><i class="fas fa-edit"></i></a>
-                                    <a href="/admin/pos/print-invoice/${row.id}" title="Print Invoice" class="action-icon-btn text-info" target="_blank"><i class="fas fa-file-invoice"></i></a>
-                                    <a href="/admin/pos/print-package-slip/${row.id}" title="Print Package Slip" class="action-icon-btn text-warning" target="_blank"><i class="fas fa-box"></i></a>
-                                </div>
-                            `;
+                            // Action icons removed from here
                             
                             // History Badges
                             const totalCount = row.total_orders_count || (phone === '01636008925' ? 2 : 1);
@@ -1297,21 +1289,46 @@
                     { data: 'fraud_check', name: 'fraud_check', orderable: false, searchable: false, className: 'fraud-check-column', width: '140px' },
                     { data: 'order_at', name: 'created_at', width: '120px' },
                     { data: 'note', name: 'admin_note', orderable: false, searchable: true, width: '150px' },
+                    { 
+                        data: null, 
+                        name: 'actions', 
+                        orderable: false, 
+                        searchable: false, 
+                        width: '180px',
+                        render: function(data, type, row) {
+                            const editUrl = `/admin/orders/${row.id}/edit`;
+                            let html = `
+                                <div class="d-flex align-items-center gap-2">
+                                    <a href="${editUrl}" title="View" class="action-icon-btn text-primary"><i class="fas fa-search"></i></a>
+                                    <a href="${editUrl}" title="Edit" class="action-icon-btn text-success"><i class="fas fa-pencil-alt"></i></a>
+                                    <a href="/admin/pos/print-invoice/${row.id}" title="Print Invoice" class="action-icon-btn text-info" target="_blank"><i class="fas fa-print"></i></a>
+                                    <a href="/admin/pos/print-package-slip/${row.id}" title="Print Package Slip" class="action-icon-btn text-warning" target="_blank"><i class="fas fa-truck"></i></a>
+                                    <div class="custom-dropdown">
+                                        <button class="action-icon-btn custom-dropdown-toggle" type="button" title="More Options">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <ul class="custom-dropdown-menu">
+                                            <li><h6 class="custom-dropdown-header">Print Options</h6></li>
+                                            <li><a class="custom-dropdown-item" href="/admin/pos/print-receipt/${row.id}" target="_blank"><i class="fas fa-receipt me-2"></i> Print Receipt</a></li>
+                                            <li><a class="custom-dropdown-item" href="/admin/pos/print-invoice/${row.id}" target="_blank"><i class="fas fa-file-invoice me-2"></i> Print Invoice</a></li>
+                                            <li><a class="custom-dropdown-item" href="/admin/pos/print-package-slip/${row.id}" target="_blank"><i class="fas fa-box me-2"></i> Print Package Slip</a></li>
+                                            <li><hr class="custom-dropdown-divider"></li>
+                                            <li><h6 class="custom-dropdown-header">Download Options</h6></li>
+                                            <li><a class="custom-dropdown-item" href="/admin/pos/download-receipt/${row.id}"><i class="fas fa-download me-2"></i> Download Receipt</a></li>
+                                            <li><a class="custom-dropdown-item" href="/admin/pos/download-invoice/${row.id}"><i class="fas fa-download me-2"></i> Download Invoice</a></li>
+                                            <li><a class="custom-dropdown-item" href="/admin/pos/download-package-slip/${row.id}"><i class="fas fa-download me-2"></i> Download Package Slip</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            `;
+                            return html;
+                        }
+                    }
                 ],
                 buttons: [
                     {
-                        extend: 'copy',
-                        text: '<i class="fas fa-copy"></i> Copy',
-                        className: 'btn btn-sm btn-outline-secondary'
-                    },
-                    {
                         extend: 'csv',
                         text: '<i class="fas fa-file-csv"></i> CSV',
-                        className: 'btn btn-sm btn-outline-secondary'
-                    },
-                    {
-                        extend: 'excel',
-                        text: '<i class="fas fa-file-excel"></i> Excel',
                         className: 'btn btn-sm btn-outline-secondary'
                     },
                     {
@@ -1325,7 +1342,8 @@
                         className: 'btn btn-sm btn-outline-secondary'
                     }
                 ],
-                responsive: true,
+                responsive: false,
+                scrollX: true,
                 pageLength: 25,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
                 // Sort by "Order at" column (index 5) using numeric data-order timestamp
