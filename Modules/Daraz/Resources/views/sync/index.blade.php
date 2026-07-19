@@ -117,22 +117,32 @@
         }
 
         /* Tabbed Navigation Styles */
+        .daraz-tabs-wrapper {
+            background: #f1f5f9;
+            padding: 5px;
+            border-radius: 12px;
+            display: inline-flex;
+            gap: 4px;
+            border: 1px solid #e2e8f0;
+        }
         .daraz-tabs .nav-link {
-            font-weight: 600;
+            font-weight: 700;
             color: #475569;
-            border-radius: 8px;
-            padding: 8px 16px;
-            font-size: 0.88rem;
+            border-radius: 9px;
+            padding: 8px 18px;
+            font-size: 0.825rem;
             transition: all 0.2s ease;
-            border: 1px solid transparent;
+            border: none;
+            background: transparent;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .daraz-tabs .nav-link.active {
-            background-color: #3b82f6 !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+            background-color: #ffffff !important;
+            color: #4338ca !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03) !important;
         }
         .daraz-tabs .nav-link:hover:not(.active) {
-            background-color: #f1f5f9;
+            background-color: rgba(255, 255, 255, 0.5);
             color: #0f172a;
         }
         .list-group-item-premium {
@@ -233,18 +243,20 @@
         <div class="col-12">
             <div class="card premium-card mb-4">
                 <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
-                    <ul class="nav nav-pills daraz-tabs" id="darazTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="stores-tab" data-bs-toggle="tab" data-bs-target="#stores-content" type="button" role="tab" aria-controls="stores-content" aria-selected="true">
-                                <i class="fas fa-store me-2"></i>Configured Channels
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity-content" type="button" role="tab" aria-controls="activity-content" aria-selected="false">
-                                <i class="fas fa-history me-2"></i>System Operations Log
-                            </button>
-                        </li>
-                    </ul>
+                    <div class="daraz-tabs-wrapper">
+                        <ul class="nav nav-pills daraz-tabs" id="darazTab" role="tablist" style="border:none;">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="stores-tab" data-bs-toggle="tab" data-bs-target="#stores-content" type="button" role="tab" aria-controls="stores-content" aria-selected="true">
+                                    <i class="fas fa-store me-2"></i>Configured Channels
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity-content" type="button" role="tab" aria-controls="activity-content" aria-selected="false">
+                                    <i class="fas fa-history me-2"></i>System Operations Log
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
                     <div class="tab-actions">
                         <a href="{{ route('admin.daraz.stores.index') }}" class="btn btn-sm btn-outline-primary" id="manage-stores-btn" style="border-radius: 8px; font-weight: 500;">
                             Manage Outlets
