@@ -1,246 +1,367 @@
 @extends('layouts.master')
 
 @section('styles')
-
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <style>
-    .form-section {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
+    #pages-create {
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        color: #1e293b;
+        background-color: #f8fafc;
     }
 
-    .form-section h4 {
-        color: #495057;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #197A94;
+    .dashboard-header {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-radius: 16px;
+        padding: 32px;
+        color: white;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.15);
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
     }
 
-    .seo-preview {
+    .breadcrumb-custom {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: #94a3b8;
+        margin-bottom: 12px;
+        padding: 0;
+        list-style: none;
+    }
+
+    .breadcrumb-custom a {
+        color: #cbd5e1;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .breadcrumb-custom a:hover {
+        color: #6366f1;
+    }
+
+    .breadcrumb-separator {
+        color: #64748b;
+    }
+
+    .breadcrumb-active {
+        color: #94a3b8;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        margin: 0;
+    }
+
+    .form-card {
         background: #ffffff;
-        border: 1px solid #e9ecef;
-        border-radius: 0.25rem;
-        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 28px;
+        margin-bottom: 28px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
-    .seo-preview p {
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
+    .form-card-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .seo-title {
-        color: #1a73e8;
+    .form-card-title i {
+        color: #4f46e5;
+    }
+
+    .form-label {
         font-weight: 600;
+        color: #334155;
+        font-size: 0.875rem;
+        margin-bottom: 8px;
     }
 
-    .seo-description {
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        color: #0f172a;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    /* SEO Preview Mockup */
+    .seo-preview-mockup {
+        background: #ffffff;
+        border: 1px solid #dadce0;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        max-width: 600px;
+    }
+
+    .google-domain {
+        font-size: 0.85rem;
+        color: #202124;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 4px;
+    }
+
+    .google-domain-icon {
+        width: 16px;
+        height: 16px;
+        background: #f1f3f4;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.6rem;
         color: #5f6368;
     }
 
-    .seo-url {
-        color: #137333;
+    .google-title {
+        color: #1a0dab;
+        font-size: 1.25rem;
+        line-height: 1.3;
+        font-weight: 500;
+        margin-bottom: 4px;
+        text-decoration: none;
+        word-break: break-all;
     }
 
-    .form-floating>.form-control:focus~label,
-    .form-floating>.form-control:not(:placeholder-shown)~label {
-        opacity: 0.65;
-        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    .google-title:hover {
+        text-decoration: underline;
+    }
+
+    .google-snippet {
+        color: #4d5156;
+        font-size: 0.875rem;
+        line-height: 1.58;
+        word-break: break-all;
+    }
+
+    /* Back & Save actions */
+    .btn-back {
+        background: white;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .btn-back:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+        padding: 10px 24px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+        transition: all 0.2s ease;
+    }
+
+    .btn-create:hover {
+        box-shadow: 0 6px 14px rgba(79, 70, 229, 0.35);
+        transform: translateY(-1px);
+    }
+
+    /* Summernote customization */
+    .note-editor.note-frame {
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+    }
+
+    .note-toolbar {
+        background: #f8fafc !important;
+        border-bottom: 1px solid #cbd5e1 !important;
     }
 </style>
-
 @endsection
 
 @section('content')
-<div class="container-fluid mt-5">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin') }}">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Pages</li>
-        </ol>
-    </nav>
-    <h5>Add Page</h5>
-    <form action="{{ route('admin.pages.store') }}" method="POST" enctype="multipart/form-data" class="mt-1 mb-3">
+<div class="container-fluid mt-4" id="pages-create">
+    <!-- Breadcrumb & Header -->
+    <div class="dashboard-header">
+        <ul class="breadcrumb-custom">
+            <li><a href="{{ route('admin') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="breadcrumb-separator"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i></li>
+            <li><a href="{{ route('admin.pages.index') }}">Pages</a></li>
+            <li class="breadcrumb-separator"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i></li>
+            <li class="breadcrumb-active">Add Page</li>
+        </ul>
+        <h1 class="page-title">Create Page</h1>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ route('admin.pages.index') }}" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <form action="{{ route('admin.pages.store') }}" method="POST" enctype="multipart/form-data" class="mb-5">
         @csrf
-        <div class="container-fluid border my-2 py-3">
-            <a href="{{ route('admin.pages.index') }}" class="btn btn-primary mb-1">Back</a>
-            <div class="row">
-                <div class="col-12 col-md-12 mx-auto">
-                    <div class="card p-2">
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Title</label>
-                            <input type="text" name="title" id="title"
-                                class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}"
-                                required>
-                            @error('title')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+        
+        <div class="row">
+            <!-- Main Content Area -->
+            <div class="col-lg-8">
+                <!-- Page Basics -->
+                <div class="form-card">
+                    <div class="form-card-title">
+                        <i class="fa-regular fa-file-lines"></i> Page Essentials
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="title" class="form-label">Page Title</label>
+                        <input type="text" name="title" id="title"
+                            class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}"
+                            placeholder="e.g. Terms of Service" required>
+                        @error('title')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="slug" class="form-label">Custom Slug (URL structure)</label>
+                        <div class="input-group">
+                            <input type="text" name="slug" id="slug"
+                                class="form-control @error('slug') is-invalid @enderror"
+                                value="{{ old('slug') }}" placeholder="auto-generated-from-title">
+                            <button class="btn btn-outline-secondary px-3" type="button" id="generateSlug">
+                                <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Generate
+                            </button>
                         </div>
-                        <div class="mb-3">
-                            <label for="slug" class="form-label">Slug</label>
-                            <div class="input-group">
-                                <input type="text" name="slug" id="slug"
-                                    class="form-control @error('slug') is-invalid @enderror"
-                                    value="{{ old('slug') }}" placeholder="Auto-generated from title">
-                                <button class="btn btn-outline-secondary" type="button" id="generateSlug">
-                                    <i class="bi bi-arrow-clockwise"></i> Generate
-                                </button>
-                            </div>
-                            <small class="form-text text-muted">Leave empty to auto-generate from title. URL: <span id="slugPreview">{{ url('/pages/') }}/<span id="slugText">auto-generated-slug</span></span></small>
-                            @error('slug')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="mt-2 text-muted" style="font-size: 0.8rem;">
+                            Live URL Preview: <span id="slugPreview" style="color: #4f46e5; font-weight: 500;">{{ url('/pages/') }}/<span id="slugText">auto-generated-slug</span></span>
                         </div>
-                        <div class="mb-3">
-                            <label for="content" class="form-label">Content</label>
-                            <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content" rows="3"
-                                placeholder="Enter page content">{{ old('content') }}</textarea>
-                            @error('content')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Status</label>
-                            <select class="form-select" id="status" name="status" required>
-                                <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>Active
-                                </option>
-                                <option value="0" {{ old('status', 1) == 0 ? 'selected' : '' }}>
-                                    Inactive
-                                </option>
-                            </select>
-                            @error('status')
-                            <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        @error('slug')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Page Rich Layout Body</label>
+                        <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content" rows="12"
+                            placeholder="Describe your page markup content here...">{{ old('content') }}</textarea>
+                        @error('content')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- SEO Section -->
-        <div class="row mb-5">
-            <div class="col-md-12">
-                <div class="form-section">
-                    <h4><i class="bi bi-search"></i> SEO Settings</h4>
+                <!-- SEO Section -->
+                <div class="form-card">
+                    <div class="form-card-title">
+                        <i class="fa-solid fa-search"></i> SEO Optimization
+                    </div>
+                    <p class="text-muted small">Enhance search indexing performance by declaring search parameters below.</p>
+                    
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control @error('seo.meta_title') is-invalid @enderror" name="seo[meta_title]" id="seoMetaTitle"
-                                    placeholder="Enter SEO title" value="{{ old('seo.meta_title') }}" maxlength="60">
-                                <label for="seoMetaTitle">Meta Title</label>
-                                <small class="form-text text-muted">
-                                    <span id="metaTitleCount">{{ strlen(old('seo.meta_title', '')) }}</span>/60 characters. Leave empty to auto-generate from page title.
-                                </small>
-                                @error('seo.meta_title')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                        <div class="col-md-6 mb-4">
+                            <label for="seoMetaTitle" class="form-label">Meta Title</label>
+                            <input type="text" class="form-control @error('seo.meta_title') is-invalid @enderror" name="seo[meta_title]" id="seoMetaTitle"
+                                placeholder="SEO Title tag" value="{{ old('seo.meta_title') }}" maxlength="60">
+                            <div class="form-text text-end" style="font-size: 0.75rem;">
+                                <span id="metaTitleCount" class="font-weight-bold">0</span>/60 characters
                             </div>
+                            @error('seo.meta_title')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <textarea class="form-control @error('seo.meta_description') is-invalid @enderror" name="seo[meta_description]" id="seoMetaDescription"
-                                    placeholder="Enter SEO description" style="height: 100px;" maxlength="160">{{ old('seo.meta_description') }}</textarea>
-                                <label for="seoMetaDescription">Meta Description</label>
-                                <small class="form-text text-muted">
-                                    <span id="metaDescriptionCount">{{ strlen(old('seo.meta_description', '')) }}</span>/160 characters. Leave empty to auto-generate from page content.
-                                </small>
-                                @error('seo.meta_description')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+
+                        <div class="col-md-6 mb-4">
+                            <label for="seoMetaKeywords" class="form-label">Meta Keywords</label>
+                            <input type="text" class="form-control @error('seo.meta_keywords') is-invalid @enderror" name="seo[meta_keywords]"
+                                id="seoMetaKeywords" placeholder="comma, separated, tags" value="{{ old('seo.meta_keywords') }}">
+                            @error('seo.meta_keywords')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12 mb-4">
+                            <label for="seoMetaDescription" class="form-label">Meta Description</label>
+                            <textarea class="form-control @error('seo.meta_description') is-invalid @enderror" name="seo[meta_description]" id="seoMetaDescription"
+                                placeholder="Summary description displayed in search results..." style="height: 90px;" maxlength="160">{{ old('seo.meta_description') }}</textarea>
+                            <div class="form-text text-end" style="font-size: 0.75rem;">
+                                <span id="metaDescriptionCount" class="font-weight-bold">0</span>/160 characters
                             </div>
+                            @error('seo.meta_description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control @error('seo.meta_keywords') is-invalid @enderror" name="seo[meta_keywords]"
-                                    id="seoMetaKeywords" placeholder="Enter SEO keywords" value="{{ old('seo.meta_keywords') }}">
-                                <label for="seoMetaKeywords">Meta Keywords</label>
-                                <small class="form-text text-muted">Comma-separated keywords. Leave empty to auto-generate from page content.</small>
-                                @error('seo.meta_keywords')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="seoCanonicalUrl" class="form-label">Canonical URL</label>
+                            <input type="url" class="form-control @error('seo.canonical_url') is-invalid @enderror" name="seo[canonical_url]"
+                                id="seoCanonicalUrl" placeholder="https://example.com/canonical-slug" value="{{ old('seo.canonical_url') }}">
+                            @error('seo.canonical_url')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="url" class="form-control @error('seo.canonical_url') is-invalid @enderror" name="seo[canonical_url]"
-                                    id="seoCanonicalUrl" placeholder="Enter canonical URL" value="{{ old('seo.canonical_url') }}">
-                                <label for="seoCanonicalUrl">Canonical URL</label>
-                                <small class="form-text text-muted">Leave empty to use the default page URL.</small>
-                                @error('seo.canonical_url')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="seoMetaRobots" class="form-label">Search Crawlers (Robots)</label>
+                            <select class="form-select @error('seo.meta_robots') is-invalid @enderror" name="seo[meta_robots]" id="seoMetaRobots">
+                                <option value="index,follow" {{ old('seo.meta_robots', 'index,follow') == 'index,follow' ? 'selected' : '' }}>Index, Follow</option>
+                                <option value="noindex,follow" {{ old('seo.meta_robots') == 'noindex,follow' ? 'selected' : '' }}>No Index, Follow</option>
+                                <option value="index,nofollow" {{ old('seo.meta_robots') == 'index,nofollow' ? 'selected' : '' }}>Index, No Follow</option>
+                                <option value="noindex,nofollow" {{ old('seo.meta_robots') == 'noindex,nofollow' ? 'selected' : '' }}>No Index, No Follow</option>
+                            </select>
+                            @error('seo.meta_robots')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <select class="form-select @error('seo.meta_robots') is-invalid @enderror" name="seo[meta_robots]" id="seoMetaRobots">
-                                    <option value="index,follow" {{ old('seo.meta_robots', 'index,follow') == 'index,follow' ? 'selected' : '' }}>Index, Follow</option>
-                                    <option value="noindex,follow" {{ old('seo.meta_robots') == 'noindex,follow' ? 'selected' : '' }}>No Index, Follow</option>
-                                    <option value="index,nofollow" {{ old('seo.meta_robots') == 'index,nofollow' ? 'selected' : '' }}>Index, No Follow</option>
-                                    <option value="noindex,nofollow" {{ old('seo.meta_robots') == 'noindex,nofollow' ? 'selected' : '' }}>No Index, No Follow</option>
-                                </select>
-                                <label for="seoMetaRobots">Meta Robots</label>
-                                <small class="form-text text-muted">Search engine crawling instructions.</small>
-                                @error('seo.meta_robots')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+
+                        <div class="col-12 mb-4">
+                            <label for="seoSchemaMarkup" class="form-label">Structured Schema Markup (JSON-LD)</label>
+                            <textarea class="form-control @error('seo.schema_markup') is-invalid @enderror" name="seo[schema_markup]" id="seoSchemaMarkup" rows="4" placeholder='{"@context":"https://schema.org","@type":"WebPage",...}'>{{ old('seo.schema_markup') }}</textarea>
+                            @error('seo.schema_markup')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="seoOgImage" class="form-label">Open Graph Image</label>
-                                <input type="file" class="form-control @error('seo.og_image') is-invalid @enderror" name="seo[og_image]" id="seoOgImage" accept="image/*">
-                                <small class="form-text text-muted">Custom image for social media sharing. Leave empty to use default page image.</small>
-                                <div id="ogImagePreview" class="mt-2" style="max-width: 200px;"></div>
-                                @error('seo.og_image')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control @error('seo.og_image_alt') is-invalid @enderror" name="seo[og_image_alt]"
-                                    id="seoOgImageAlt" placeholder="Enter OG image alt text" value="{{ old('seo.og_image_alt') }}">
-                                <label for="seoOgImageAlt">OG Image Alt Text</label>
-                                <small class="form-text text-muted">Alt text for the Open Graph image.</small>
-                                @error('seo.og_image_alt')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="mb-3">
-                                <label for="seoSchemaMarkup" class="form-label">Schema Markup (JSON-LD)</label>
-                                <textarea class="form-control @error('seo.schema_markup') is-invalid @enderror" name="seo[schema_markup]" id="seoSchemaMarkup" rows="6" placeholder="Enter custom JSON-LD schema markup">{{ old('seo.schema_markup') }}</textarea>
-                                <small class="form-text text-muted">Custom JSON-LD schema markup. Leave empty to auto-generate basic page schema.</small>
-                                <div class="alert alert-info mt-2">
-                                    <strong>Example:</strong><br>
-                                    <code>{"@@context":"https://schema.org","@@type":"WebPage","name":"Page Title","description":"Page Description"}</code>
-                                </div>
-                                @error('seo.schema_markup')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6 class="mb-0">
-                                        <i class="bi bi-eye"></i> SEO Preview
-                                    </h6>
-                                </div>
+
+                        <!-- SEO Search Result Mockup Card -->
+                        <div class="col-12">
+                            <div class="card bg-light border-0">
                                 <div class="card-body">
-                                    <div class="seo-preview">
-                                        <p class="seo-title"><strong>Meta Title:</strong> <span id="previewMetaTitle">Auto-generated from page title</span></p>
-                                        <p class="seo-description"><strong>Meta Description:</strong> <span id="previewMetaDescription">Auto-generated from page content</span></p>
-                                        <p class="seo-description"><strong>Meta Keywords:</strong> <span id="previewMetaKeywords">Auto-generated from page content</span></p>
-                                        <p class="seo-url"><strong>Canonical URL:</strong> <span id="previewCanonicalUrl">Default page URL</span></p>
-                                        <p class="seo-description"><strong>Meta Robots:</strong> <span id="previewMetaRobots">Index, Follow</span></p>
-                                        <p class="seo-description"><strong>OG Image:</strong> <span id="previewOgImage">Default page image</span></p>
+                                    <h6 class="mb-3 font-weight-bold text-dark"><i class="fa-brands fa-google text-primary me-1"></i> Google Search Snippet Preview</h6>
+                                    <div class="seo-preview-mockup">
+                                        <div class="google-domain">
+                                            <span class="google-domain-icon"><i class="fa-solid fa-globe"></i></span>
+                                            <span>{{ url('/') }}</span>
+                                        </div>
+                                        <div class="google-title" id="previewMetaTitle">Google Search Result Preview Title</div>
+                                        <div class="google-snippet" id="previewMetaDescription">Configure search settings above. Google search results will display description text snippet preview here.</div>
                                     </div>
                                 </div>
                             </div>
@@ -248,143 +369,166 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="container-fluid border my-2 py-3">
-            <div class="row">
-                <div class="col-12 col-md-12 mx-auto">
-                    <div class="card p-2">
-                        <button type="submit" class="btn btn-primary">Create Page</button>
+            <!-- Sidebar Form Controls -->
+            <div class="col-lg-4">
+                <div class="form-card" style="position: sticky; top: 20px;">
+                    <div class="form-card-title">
+                        <i class="fa-solid fa-sliders"></i> Page Parameters
                     </div>
+                    
+                    <div class="mb-4">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>Active (Visible)</option>
+                            <option value="0" {{ old('status', 1) == 0 ? 'selected' : '' }}>Draft (Hidden)</option>
+                        </select>
+                        @error('status')
+                        <div class="text-danger mt-1 small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Social / OG image Section -->
+                    <div class="mb-4">
+                        <label for="seoOgImage" class="form-label">Social Media Sharing Image (Open Graph)</label>
+                        <input type="file" class="form-control @error('seo.og_image') is-invalid @enderror" name="seo[og_image]" id="seoOgImage" accept="image/*">
+                        <div id="ogImagePreview" class="mt-3"></div>
+                        @error('seo.og_image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="seoOgImageAlt" class="form-label">Social Image Alt Text</label>
+                        <input type="text" class="form-control @error('seo.og_image_alt') is-invalid @enderror" name="seo[og_image_alt]"
+                            id="seoOgImageAlt" placeholder="Alt description" value="{{ old('seo.og_image_alt') }}">
+                        @error('seo.og_image_alt')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <hr class="my-4">
+
+                    <button type="submit" class="btn btn-create w-100 py-3">
+                        <i class="fa-regular fa-paper-plane me-1"></i> Create Page
+                    </button>
                 </div>
             </div>
         </div>
     </form>
 </div>
 @endsection
+
 @section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 <script>
-    // Initialize Summernote for product description
-    $('#content').summernote({
-        height: 300,
-        toolbar: [
-            ['style', ['style']],
-            ['font', ['bold', 'underline', 'clear']],
-            ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph']],
-            ['table', ['table']],
-            ['insert', ['link', 'picture']],
-            ['view', ['fullscreen', 'codeview', 'help']]
-        ]
-    });
+    $(document).ready(function() {
+        // Initialize Summernote Description
+        $('#content').summernote({
+            height: 350,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
 
-    // SEO Character Counters
-    function updateCharacterCount(inputId, counterId, maxLength) {
-        const input = document.getElementById(inputId);
-        const counter = document.getElementById(counterId);
-
-        if (input && counter) {
-            input.addEventListener('input', function() {
-                const length = this.value.length;
-                counter.textContent = length;
-
-                if (length > maxLength * 0.9) {
-                    counter.style.color = '#dc3545';
-                } else if (length > maxLength * 0.8) {
-                    counter.style.color = '#ffc107';
+        // Initialize Character Counter Helper
+        function setupCharCount(inputEl, counterEl, maxLen) {
+            function update() {
+                const len = $(inputEl).val().length;
+                $(counterEl).text(len);
+                if (len > maxLen) {
+                    $(counterEl).addClass('text-danger');
                 } else {
-                    counter.style.color = '#6c757d';
+                    $(counterEl).removeClass('text-danger');
                 }
-            });
+            }
+            $(inputEl).on('input', update);
+            update();
         }
-    }
 
-    // Initialize character counters
-    updateCharacterCount('seoMetaTitle', 'metaTitleCount', 60);
-    updateCharacterCount('seoMetaDescription', 'metaDescriptionCount', 160);
+        setupCharCount('#seoMetaTitle', '#metaTitleCount', 60);
+        setupCharCount('#seoMetaDescription', '#metaDescriptionCount', 160);
 
-    // SEO Preview Updates
-    function updateSeoPreview() {
-        const title = document.getElementById('seoMetaTitle').value || 'Auto-generated from page title';
-        const description = document.getElementById('seoMetaDescription').value || 'Auto-generated from page content';
-        const keywords = document.getElementById('seoMetaKeywords').value || 'Auto-generated from page content';
-        const canonicalUrl = document.getElementById('seoCanonicalUrl').value || 'Default page URL';
-        const robots = document.getElementById('seoMetaRobots').value || 'Index, Follow';
-        const ogImage = document.getElementById('seoOgImage').files[0] ? 'Custom image selected' : 'Default page image';
+        // Update Search Result Preview
+        function updateGooglePreview() {
+            let metaTitle = $('#seoMetaTitle').val();
+            let pageTitle = $('#title').val();
+            let metaDesc = $('#seoMetaDescription').val();
 
-        document.getElementById('previewMetaTitle').textContent = title;
-        document.getElementById('previewMetaDescription').textContent = description;
-        document.getElementById('previewMetaKeywords').textContent = keywords;
-        document.getElementById('previewCanonicalUrl').textContent = canonicalUrl;
-        document.getElementById('previewMetaRobots').textContent = robots;
-        document.getElementById('previewOgImage').textContent = ogImage;
-    }
+            // Fallback rules
+            let finalTitle = metaTitle || pageTitle || "Google Search Result Preview Title";
+            let finalDesc = metaDesc || "Configure search settings above. Google search results will display description text snippet preview here.";
 
-    // Add event listeners for SEO preview
-    ['seoMetaTitle', 'seoMetaDescription', 'seoMetaKeywords', 'seoCanonicalUrl', 'seoMetaRobots', 'seoOgImage'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('input', updateSeoPreview);
-            element.addEventListener('change', updateSeoPreview);
+            $('#previewMetaTitle').text(finalTitle);
+            $('#previewMetaDescription').text(finalDesc);
         }
-    });
 
-    // OG Image Preview
-    document.getElementById('seoOgImage').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const preview = document.getElementById('ogImagePreview');
+        $('#seoMetaTitle, #title, #seoMetaDescription').on('input', updateGooglePreview);
+        updateGooglePreview();
 
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.innerHTML = '<img src="' + e.target.result + '" class="img-thumbnail" style="max-width: 200px;">';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            preview.innerHTML = '';
+        // Open Graph image preview
+        $('#seoOgImage').on('change', function(e) {
+            const file = e.target.files[0];
+            const preview = $('#ogImagePreview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.html('<img src="' + e.target.result + '" class="img-thumbnail" style="max-height: 160px; width: 100%; object-fit: cover;">');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.html('');
+            }
+        });
+
+        // Slug helper string generator
+        function generateSlugString(text) {
+            return text
+                .toLowerCase()
+                .trim()
+                .replace(/[^\w\s-]/g, '') // Remove non-word characters
+                .replace(/[\s_-]+/g, '-') // Replace spaces or underscores with hyphens
+                .replace(/^-+|-+$/g, ''); // Trim hyphens
         }
-    });
 
-    // Initialize preview on page load
-    updateSeoPreview();
-
-    // Slug generation functionality
-    function generateSlug(text) {
-        return text
-            .toLowerCase()
-            .trim()
-            .replace(/[^\w\s-]/g, '') // Remove special characters
-            .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
-            .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-    }
-
-    function updateSlugPreview() {
-        const slug = document.getElementById('slug').value || 'auto-generated-slug';
-        document.getElementById('slugText').textContent = slug;
-    }
-
-    // Auto-generate slug from title
-    document.getElementById('title').addEventListener('input', function() {
-        const slug = generateSlug(this.value);
-        document.getElementById('slug').value = slug;
-        updateSlugPreview();
-    });
-
-    // Manual slug generation
-    document.getElementById('generateSlug').addEventListener('click', function() {
-        const title = document.getElementById('title').value;
-        if (title) {
-            const slug = generateSlug(title);
-            document.getElementById('slug').value = slug;
-            updateSlugPreview();
+        function updateSlugPreviewDisplay() {
+            const slug = $('#slug').val() || 'auto-generated-slug';
+            $('#slugText').text(slug);
         }
+
+        // Automatic slug sync
+        $('#title').on('input', function() {
+            if (!$('#slug').data('user-custom')) {
+                const slug = generateSlugString($(this).val());
+                $('#slug').val(slug);
+                updateSlugPreviewDisplay();
+            }
+        });
+
+        // Detect if user modified slug manually
+        $('#slug').on('input', function() {
+            $(this).data('user-custom', true);
+            updateSlugPreviewDisplay();
+        });
+
+        // Manual generate override button
+        $('#generateSlug').on('click', function() {
+            const title = $('#title').val();
+            if (title) {
+                const slug = generateSlugString(title);
+                $('#slug').val(slug);
+                updateSlugPreviewDisplay();
+            }
+        });
+
+        updateSlugPreviewDisplay();
     });
-
-    // Update slug preview when slug changes
-    document.getElementById('slug').addEventListener('input', updateSlugPreview);
-
-    // Initialize slug preview
-    updateSlugPreview();
 </script>
 @endsection
