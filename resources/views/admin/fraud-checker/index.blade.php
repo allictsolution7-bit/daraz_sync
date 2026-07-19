@@ -62,6 +62,44 @@
         color: #ef4444;
     }
 
+    /* Tabs Layout Styling */
+    .nav-tabs-overhaul {
+        background: #e2e8f0;
+        padding: 6px;
+        border-radius: 14px;
+        gap: 4px;
+        border: none;
+        margin-bottom: 32px;
+    }
+
+    .nav-tabs-overhaul .nav-item {
+        flex: 1;
+    }
+
+    .nav-tabs-overhaul .nav-link {
+        width: 100%;
+        border-radius: 10px;
+        color: #475569;
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 14px 24px;
+        text-align: center;
+        transition: all 0.2s ease;
+        border: none !important;
+        background: transparent;
+    }
+
+    .nav-tabs-overhaul .nav-link:hover {
+        color: #0f172a;
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .nav-tabs-overhaul .nav-link.active {
+        background: #ffffff !important;
+        color: #ef4444 !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
     /* Elegant Stats Grid */
     .stats-overhaul {
         display: grid;
@@ -390,16 +428,30 @@
         </div>
     </div>
 
-    <!-- Dual Layout: Integrations & Recent -->
-    <div class="row">
-        <!-- Integrations -->
-        <div class="col-lg-6">
-            <div class="premium-card p-0" style="overflow: hidden; height: 100%;">
-                <div class="px-4 pt-4">
-                    <h5 class="premium-card-title m-0 pb-3" style="border-bottom:none;">
-                        <i class="fas fa-network-wired"></i> Verification Integrations
-                    </h5>
-                </div>
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs nav-tabs-overhaul" id="fraudTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="integrations-tab" data-bs-toggle="tab" data-bs-target="#integrations-pane" type="button" role="tab">
+                <i class="fas fa-network-wired me-2"></i> Integration Channels
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="recent-tab" data-bs-toggle="tab" data-bs-target="#recent-pane" type="button" role="tab">
+                <i class="fas fa-search me-2"></i> Verification Logs
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="flagged-tab" data-bs-toggle="tab" data-bs-target="#flagged-pane" type="button" role="tab">
+                <i class="fas fa-exclamation-triangle me-2"></i> Flagged High Risk Accounts
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content" id="fraudTabsContent">
+        <!-- Tab 1: Integrations -->
+        <div class="tab-pane fade show active" id="integrations-pane" role="tabpanel">
+            <div class="premium-card p-0" style="overflow: hidden;">
                 <div class="table-responsive">
                     <table class="table table-premium">
                         <thead>
@@ -446,12 +498,12 @@
             </div>
         </div>
 
-        <!-- Recent Results -->
-        <div class="col-lg-6">
-            <div class="premium-card p-0" style="overflow: hidden; height: 100%;">
+        <!-- Tab 2: Recent Results -->
+        <div class="tab-pane fade" id="recent-pane" role="tabpanel">
+            <div class="premium-card p-0" style="overflow: hidden;">
                 <div class="px-4 pt-4 d-flex align-items-center justify-content-between">
                     <h5 class="premium-card-title m-0 pb-3" style="border-bottom:none; flex: 1;">
-                        <i class="fas fa-search"></i> Recent Verification Logs
+                        Recent Verifications
                     </h5>
                     <a href="{{ route('admin.fraud-checker.results') }}" class="btn-action-sm btn-action-test pb-3" style="border:none; background:transparent; font-weight:700;">View All logs</a>
                 </div>
@@ -493,53 +545,50 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- High Risk Results -->
-    <div class="premium-card p-0 mt-4" style="overflow: hidden;">
-        <div class="px-4 pt-4">
-            <h5 class="premium-card-title m-0 pb-3" style="border-bottom:none;">
-                <i class="fas fa-exclamation-triangle"></i> Flagged High Risk Accounts
-            </h5>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-premium">
-                <thead>
-                    <tr>
-                        <th>Phone</th>
-                        <th>Risk Category</th>
-                        <th>Risk Score</th>
-                        <th>Delivery Success Rate</th>
-                        <th>Total Parcels</th>
-                        <th>Verified Age</th>
-                        <th class="text-end">Operations</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($highRiskResults as $result)
-                        <tr>
-                            <td style="font-weight: 600;">{{ $result->phone }}</td>
-                            <td>
-                                <span class="badge-glow badge-glow-high">High Risk</span>
-                            </td>
-                            <td style="font-weight: 700; color: #dc2626;">{{ $result->risk_score }}/100</td>
-                            <td style="font-weight: 700; color: #0f172a;">{{ $result->delivery_success_rate }}%</td>
-                            <td style="font-weight: 600; color: #475569;">{{ $result->total_parcels }}</td>
-                            <td style="font-size: 0.825rem; color: #64748b;">{{ $result->formatted_last_checked }}</td>
-                            <td class="text-end">
-                                <div class="d-inline-flex gap-2">
-                                    <a href="{{ route('admin.fraud-checker.result-details', $result->id) }}" class="btn-action-sm btn-action-edit">Details</a>
-                                    <button class="btn-action-sm btn-action-refresh refresh-result" data-id="{{ $result->id }}">Refresh</button>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-4">No flagged high-risk records in database.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+        <!-- Tab 3: High Risk Results -->
+        <div class="tab-pane fade" id="flagged-pane" role="tabpanel">
+            <div class="premium-card p-0" style="overflow: hidden;">
+                <div class="table-responsive">
+                    <table class="table table-premium">
+                        <thead>
+                            <tr>
+                                <th>Phone</th>
+                                <th>Risk Category</th>
+                                <th>Risk Score</th>
+                                <th>Delivery Success Rate</th>
+                                <th>Total Parcels</th>
+                                <th>Verified Age</th>
+                                <th class="text-end">Operations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($highRiskResults as $result)
+                                <tr>
+                                    <td style="font-weight: 600;">{{ $result->phone }}</td>
+                                    <td>
+                                        <span class="badge-glow badge-glow-high">High Risk</span>
+                                    </td>
+                                    <td style="font-weight: 700; color: #dc2626;">{{ $result->risk_score }}/100</td>
+                                    <td style="font-weight: 700; color: #0f172a;">{{ $result->delivery_success_rate }}%</td>
+                                    <td style="font-weight: 600; color: #475569;">{{ $result->total_parcels }}</td>
+                                    <td style="font-size: 0.825rem; color: #64748b;">{{ $result->formatted_last_checked }}</td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-2">
+                                            <a href="{{ route('admin.fraud-checker.result-details', $result->id) }}" class="btn-action-sm btn-action-edit">Details</a>
+                                            <button class="btn-action-sm btn-action-refresh refresh-result" data-id="{{ $result->id }}">Refresh</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">No flagged high-risk records in database.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -643,16 +692,6 @@
                 case 'low': return 'bg-info text-white';
                 case 'very_low': return 'bg-success text-white';
                 default: return 'bg-secondary text-white';
-            }
-        }
-
-        function getRiskLevelDisplay(riskLevel) {
-            switch(riskLevel) {
-                case 'high': return 'High Risk';
-                case 'medium': return 'Medium Risk';
-                case 'low': return 'Low Risk';
-                case 'very_low': return 'Very Low Risk';
-                default: return 'Unknown';
             }
         }
 
