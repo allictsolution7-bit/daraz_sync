@@ -1,84 +1,134 @@
 @extends('layouts.master')
 
 @section('styles')
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
+        /* Select2 Custom Styles */
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
+            padding: 2px 10px !important;
+            min-height: 42px !important;
+            transition: all 0.2s ease;
+            background-color: #fff !important;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            padding: 0 !important;
+            margin: 0 !important;
+            float: left;
+            width: auto;
+        }
+        .select2-container--default .select2-selection--multiple .select2-search--inline {
+            float: left;
+            margin: 0 !important;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--multiple .select2-search__field {
+            margin: 0 !important;
+            font-family: inherit !important;
+            font-size: 0.88rem !important;
+            color: #1e293b !important;
+            text-align: left !important;
+            padding: 0 !important;
+            height: 100% !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-search--inline:first-child,
+        .select2-container--default .select2-selection--multiple .select2-search--inline:first-child .select2-search__field {
+            width: 100% !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #eff6ff !important;
+            border: 1px solid #bfdbfe !important;
+            color: #2563eb !important;
+            border-radius: 0.375rem !important;
+            padding: 2px 8px !important;
+            font-size: 0.8rem !important;
+            font-weight: 500 !important;
+            margin: 4px 4px 4px 0 !important;
+            float: left;
+            display: inline-flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #3b82f6 !important;
+            margin-right: 5px !important;
+            border: none !important;
+            background: transparent !important;
+            display: inline-flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #1d4ed8 !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+        }
+        
         .sales-report {
+            font-family: 'Outfit', sans-serif;
             background: #f8fafc;
             border-radius: 18px;
             padding: 18px;
         }
 
-        .report-hero {
-            background: #1e293b;
-            border-radius: 16px;
-            padding: 20px;
-            color: #e2e8f0;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-        }
-
-        .report-hero .eyebrow {
-            text-transform: uppercase;
-            letter-spacing: 0.14em;
-            font-size: 11px;
-            color: #93c5fd;
-        }
-
-        .report-hero h4 {
-            color: #fff;
-            margin: 4px 0 6px;
-            font-weight: 800;
-        }
-
-        .hero-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .hero-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.15);
-            color: #f8fafc;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-        }
-
-        .hero-actions .btn {
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
         .filter-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+            border: 1px solid #f1f5f9;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
             background: #fff;
+            padding: 24px !important;
         }
 
         .sales-report .filter-chip {
-            border-radius: 30px;
-            padding: 6px 12px;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        .sales-report .filter-chip:hover {
+            color: #0f172a;
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+            transform: translateY(-1px);
         }
 
         .stat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
         }
 
         .stat-tile {
             position: relative;
-            border-radius: 12px;
-            padding: 12px 14px;
+            border-radius: 1rem;
+            padding: 1.25rem;
             background: #ffffff;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
             overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 120px;
+            border-left: 4px solid #8b5cf6;
+        }
+        .stat-tile:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.08);
         }
 
         .stat-tile .stat-top {
@@ -87,26 +137,27 @@
             align-items: center;
             position: relative;
             z-index: 2;
+            width: 100%;
         }
 
         .stat-tile .stat-label {
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: #6b7280;
+            color: #64748b;
             font-weight: 700;
             margin-bottom: 4px;
         }
 
         .stat-tile .stat-value {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             color: #0f172a;
             margin-bottom: 2px;
         }
 
         .stat-tile .stat-sub {
-            color: #6b7280;
+            color: #64748b;
             font-size: 12px;
         }
 
@@ -117,96 +168,196 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: #0f172a;
-            background: #eef2ff;
-            border: 1px solid #c7d2fe;
             font-size: 20px;
+            background: #f5f3ff;
+            color: #8b5cf6;
+            border: 1px solid #ddd6fe;
+        }
+
+        .report-loader {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 1050;
         }
 
         .report-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
             background: #fff;
-            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
         }
 
-        .table thead th {
-            text-transform: uppercase;
-            font-size: 12px;
-            color: #6b7280;
-            border-bottom: 1px solid #e5e7eb;
-            background: #f8fafc;
+        .card-header-premium {
+            background-color: #f8fafc;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 0.85rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .table td {
-            vertical-align: middle;
+        .card-header-premium h6 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0;
         }
 
-        .table tbody tr:hover {
-            background: #f8fafc;
+        .table-premium thead th {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            font-size: 0.72rem !important;
+            letter-spacing: 0.05em !important;
+            padding: 0.85rem 0.75rem !important;
+            border: none !important;
+        }
+        .table-premium thead th:first-child {
+            border-top-left-radius: 0.5rem !important;
+        }
+        .table-premium thead th:last-child {
+            border-top-right-radius: 0.5rem !important;
+        }
+
+        .table-premium td {
+            vertical-align: middle !important;
+            border-top: 1px solid #f1f5f9 !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            padding: 0.85rem 0.75rem !important;
+            font-size: 0.85rem !important;
+        }
+
+        .table-premium tbody tr:hover td {
+            background: #f8fafc !important;
         }
 
         .range-btn.active {
             color: #fff !important;
-            background: #2563eb !important;
-            border-color: #2563eb !important;
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
         }
 
         .text-soft {
-            color: #6b7280;
+            color: #64748b;
         }
 
         .section-heading {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin: 10px 0 8px;
+            margin: 20px 0 12px;
             font-weight: 700;
             color: #0f172a;
+            font-size: 1.1rem;
         }
 
         .section-heading .dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #2563eb, #22c55e);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+            background: linear-gradient(135deg, #4f46e5, #10b981);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+        }
+        .form-label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.8rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+        .form-control, .form-select {
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 0.65rem 1rem;
+            font-size: 0.88rem;
+            color: #1e293b;
+            background-color: #fff;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+            outline: 0;
+        }
+        #apply-filters {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            border: none;
+            color: #ffffff;
+            border-radius: 10px;
+            padding: 0.68rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.88rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            transition: all 0.2s ease;
+        }
+        #apply-filters:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+            filter: brightness(1.05);
+        }
+        #apply-filters:active {
+            transform: translateY(0);
+        }
+
+        /* Dark Theme Analytics Card Styles */
+        .card-dark-analytics {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.25) !important;
+            overflow: hidden;
+            color: #f8fafc;
+        }
+        .card-dark-analytics .card-header-premium {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            padding: 1rem 1.25rem;
+        }
+        .card-dark-analytics .card-header-premium h6 {
+            color: #f8fafc !important;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .card-dark-analytics .card-header-premium .text-muted {
+            color: #94a3b8 !important;
+            font-size: 0.75rem;
+        }
+        .card-dark-analytics .badge {
+            background: rgba(255, 255, 255, 0.08) !important;
+            color: #cbd5e1 !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            font-size: 0.72rem;
+            padding: 5px 10px;
+            border-radius: 8px;
         }
     </style>
 @endsection
 
 @section('content')
     <div class="container-fluid sales-report">
-        <div class="report-hero mb-3">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                <div>
-                    <div class="eyebrow">Customer intelligence</div>
-                    <h4 class="mb-1">Customer Reports</h4>
-                    <div class="text-white">Lifetime value, repeat behavior, sources, and payment signals.</div>
-                    <div class="hero-chips">
-                        <span class="hero-chip">
-                            <i class="fas fa-calendar-alt text-primary"></i>
-                            <span id="range-label">Loading...</span>
-                        </span>
-                        <span class="hero-chip">
-                            <i class="fas fa-user text-warning"></i> Unique / repeat
-                        </span>
-                        <span class="hero-chip">
-                            <i class="fas fa-chart-pie text-success"></i> Mix by city & source
-                        </span>
-                    </div>
-                </div>
-                <div class="hero-actions d-flex flex-wrap align-items-center gap-2">
-                    <button class="btn btn-light btn-sm" id="refresh-report">
-                        <i class="fas fa-rotate"></i> Refresh data
-                    </button>
-                </div>
-            </div>
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+            <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem; font-family: 'Outfit', sans-serif;">
+                Customer Reports 
+                <span class="badge bg-light text-secondary border ms-2" id="range-label" style="font-size: 0.75rem; font-weight: 500;">Loading...</span>
+            </h4>
+            <button class="btn btn-sm btn-outline-secondary" id="refresh-report" style="border-radius: 8px; font-weight: 500;">
+                <i class="fas fa-rotate"></i> Refresh
+            </button>
         </div>
 
-        <div class="filter-card mb-3 p-3">
-            <div class="card-body">
-                <div class="d-flex flex-wrap gap-2 mb-3">
+        <div class="filter-card mb-4">
+            <div class="card-body p-0">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-4 pb-3 border-bottom" style="border-color: #f1f5f9 !important;">
+                    <span class="text-soft small fw-bold text-uppercase me-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Presets:</span>
                     @php
                         $presets = [
                             'today' => 'Today',
@@ -224,16 +375,16 @@
                     @endforeach
                 </div>
 
-                <div class="row g-2 align-items-end">
-                    <div class="col-lg-3 col-md-6">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">Start date</label>
                         <input type="date" class="form-control" id="start_date">
                     </div>
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">End date</label>
                         <input type="date" class="form-control" id="end_date">
                     </div>
-                    <div class="col-lg-2 col-md-4">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">Order status</label>
                         <select class="form-control" id="status_filter" name="statuses[]" multiple>
                             @foreach ($statusOptions as $status)
@@ -241,7 +392,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-4">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">Payment method</label>
                         <select class="form-control" id="payment_filter" name="payment_methods[]" multiple>
                             @foreach ($paymentMethods as $method)
@@ -249,7 +400,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-4">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">Order source</label>
                         <select class="form-control" id="source_filter" name="order_sources[]" multiple>
                             @foreach ($orderSources as $source)
@@ -257,15 +408,10 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-4 d-flex align-items-end">
-                        <button class="btn btn-primary w-100" id="apply-filters">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <button class="btn btn-primary w-100" id="apply-filters" style="height: 42px;">
                             <i class="fas fa-filter"></i> Apply filters
                         </button>
-                    </div>
-                    <div class="col-12">
-                        <div class="text-soft small mt-1">
-                            Tip: hold Ctrl (or Cmd) to pick multiple values.
-                        </div>
                     </div>
                 </div>
             </div>
@@ -410,15 +556,20 @@
         <div class="section-heading"><span class="dot"></span> District heatmap</div>
         <div class="row g-3 mb-3">
             <div class="col-lg-7">
-                <div class="card report-card h-100">
-                    <div class="card-body">
-                        <h6 class="mb-2 d-flex align-items-center gap-2">
-                            <i class="fas fa-map text-primary"></i> Bangladesh districts (bubble map)
-                        </h6>
-                        <div style="min-height:260px;">
-                            <canvas id="districtMapChart" height="240"></canvas>
+                <div class="card card-dark-analytics h-100">
+                    <div class="card-header-premium">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:32px;height:32px;background:rgba(255,255,255,0.05);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-map text-primary" style="font-size:0.85rem;"></i>
+                            </div>
+                            <div>
+                                <h6>Bangladesh districts (bubble map)</h6>
+                                <div class="text-muted" style="font-size:0.75rem;">Sized by revenue, positioned by approximate district centroids.</div>
+                            </div>
                         </div>
-                        <div class="text-soft small mt-1">Sized by revenue, positioned by approximate district centroids.</div>
+                    </div>
+                    <div class="p-3" style="min-height:260px;">
+                        <canvas id="districtMapChart" height="240"></canvas>
                     </div>
                 </div>
             </div>
@@ -507,6 +658,7 @@
 
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         (function() {
             let activeRange = '{{ $defaultRange }}';
@@ -516,6 +668,12 @@
                 currency: 'BDT',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2
+            });
+
+            // Initialize Select2 dropdowns
+            $('#status_filter, #payment_filter, #source_filter').select2({
+                placeholder: "Select options",
+                width: '100%'
             });
 
             $('.range-btn').each(function() {

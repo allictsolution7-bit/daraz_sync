@@ -6,15 +6,42 @@
     <style>
         /* Select2 Custom Styles */
         .select2-container--default .select2-selection--multiple {
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 0.5rem !important;
-            padding: 4px 6px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
+            padding: 2px 10px !important;
             min-height: 42px !important;
             transition: all 0.2s ease;
+            background-color: #fff !important;
         }
         .select2-container--default.select2-container--focus .select2-selection--multiple {
             border-color: #3b82f6 !important;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            padding: 0 !important;
+            margin: 0 !important;
+            float: left;
+            width: auto;
+        }
+        .select2-container--default .select2-selection--multiple .select2-search--inline {
+            float: left;
+            margin: 0 !important;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--multiple .select2-search__field {
+            margin: 0 !important;
+            font-family: inherit !important;
+            font-size: 0.88rem !important;
+            color: #1e293b !important;
+            text-align: left !important;
+            padding: 0 !important;
+            height: 100% !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-search--inline:first-child,
+        .select2-container--default .select2-selection--multiple .select2-search--inline:first-child .select2-search__field {
+            width: 100% !important;
         }
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
             background-color: #eff6ff !important;
@@ -24,20 +51,25 @@
             padding: 2px 8px !important;
             font-size: 0.8rem !important;
             font-weight: 500 !important;
-            margin-top: 2px !important;
+            margin: 4px 4px 4px 0 !important;
+            float: left;
+            display: inline-flex;
+            align-items: center;
         }
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
             color: #3b82f6 !important;
             margin-right: 5px !important;
             border: none !important;
             background: transparent !important;
+            display: inline-flex;
+            align-items: center;
         }
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
             color: #1d4ed8 !important;
         }
         .select2-dropdown {
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 0.5rem !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
         }
         
@@ -49,80 +81,127 @@
         }
 
         .report-hero {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            border-radius: 16px;
-            padding: 24px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 20px;
+            padding: 28px;
             color: #f8fafc;
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.25), 0 10px 10px -5px rgba(15, 23, 42, 0.15);
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .report-hero::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
         }
         .report-hero::after {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            bottom: -50%;
+            left: -10%;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0) 70%);
             border-radius: 50%;
             pointer-events: none;
         }
 
         .report-hero .eyebrow {
             text-transform: uppercase;
-            letter-spacing: 0.14em;
-            font-size: 11px;
-            color: #dcfce7;
-            font-weight: 600;
+            letter-spacing: 0.18em;
+            font-size: 10px;
+            color: #818cf8;
+            font-weight: 700;
         }
 
         .report-hero h4 {
             color: #fff;
-            margin: 4px 0 6px;
+            margin: 6px 0 8px;
             font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
         }
 
         .hero-chips {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 14px;
         }
 
         .hero-chip {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.16);
-            color: #f8fafc;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-            font-size: 0.85rem;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
-
-        .hero-actions .btn {
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .hero-actions .btn:hover {
+        .hero-chip:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
             transform: translateY(-1px);
         }
 
+        .hero-actions .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+        }
+        .hero-actions .btn-light {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #f8fafc;
+            backdrop-filter: blur(8px);
+        }
+        .hero-actions .btn-light:hover {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
         .filter-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
             background: #fff;
+            padding: 24px !important;
         }
 
         .sales-report .filter-chip {
-            border-radius: 30px;
-            padding: 6px 14px;
-            font-weight: 500;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        .sales-report .filter-chip:hover {
+            color: #0f172a;
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+            transform: translateY(-1px);
         }
 
         .stat-grid {
@@ -285,8 +364,9 @@
 
         .range-btn.active {
             color: #fff !important;
-            background: #3b82f6 !important;
-            border-color: #3b82f6 !important;
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
         }
 
         .text-soft {
@@ -307,55 +387,101 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #10b981);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+            background: linear-gradient(135deg, #4f46e5, #10b981);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+        }
+        .form-label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.8rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
         }
         .form-control, .form-select {
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 0.6rem 1rem;
-            font-size: 0.9rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 0.65rem 1rem;
+            font-size: 0.88rem;
+            color: #1e293b;
+            background-color: #fff;
             transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
         }
         .form-control:focus, .form-select:focus {
             border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+            outline: 0;
+        }
+        #apply-filters {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            border: none;
+            color: #ffffff;
+            border-radius: 10px;
+            padding: 0.68rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.88rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            transition: all 0.2s ease;
+        }
+        #apply-filters:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+            filter: brightness(1.05);
+        }
+        #apply-filters:active {
+            transform: translateY(0);
+        }
+        
+        /* Dark Theme Analytics Card Styles */
+        .card-dark-analytics {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.25) !important;
+            overflow: hidden;
+            color: #f8fafc;
+        }
+        .card-dark-analytics .card-header-premium {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            padding: 1rem 1.25rem;
+        }
+        .card-dark-analytics .card-header-premium h6 {
+            color: #f8fafc !important;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .card-dark-analytics .card-header-premium .text-muted {
+            color: #94a3b8 !important;
+            font-size: 0.75rem;
+        }
+        .card-dark-analytics .badge {
+            background: rgba(255, 255, 255, 0.08) !important;
+            color: #cbd5e1 !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            font-size: 0.72rem;
+            padding: 5px 10px;
+            border-radius: 8px;
         }
     </style>
 @endsection
 
 @section('content')
     <div class="container-fluid sales-report">
-        <div class="report-hero mb-3">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                <div>
-                    <div class="eyebrow">Sales intelligence</div>
-                    <h4 class="mb-1">Advanced Sales Report</h4>
-                    <div class="text-white">Live pulse of revenue, payments, channels, and products.</div>
-                    <div class="hero-chips">
-                        <span class="hero-chip">
-                            <i class="fas fa-calendar-alt text-primary"></i>
-                            <span id="range-label">Loading...</span>
-                        </span>
-                        <span class="hero-chip">
-                            <i class="fas fa-filter text-warning"></i> Dynamic filters
-                        </span>
-                        <span class="hero-chip">
-                            <i class="fas fa-chart-line text-success"></i> Compact sparklines
-                        </span>
-                    </div>
-                </div>
-                <div class="hero-actions d-flex flex-wrap align-items-center gap-2">
-                    <button class="btn btn-light btn-sm" id="refresh-report">
-                        <i class="fas fa-rotate"></i> Refresh data
-                    </button>
-                </div>
-            </div>
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+            <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem; font-family: 'Outfit', sans-serif;">
+                Sales Report 
+                <span class="badge bg-light text-secondary border ms-2" id="range-label" style="font-size: 0.75rem; font-weight: 500;">Loading...</span>
+            </h4>
+            <button class="btn btn-sm btn-outline-secondary" id="refresh-report" style="border-radius: 8px; font-weight: 500;">
+                <i class="fas fa-rotate"></i> Refresh
+            </button>
         </div>
 
-        <div class="filter-card mb-3 p-3">
-            <div class="card-body">
-                <div class="d-flex flex-wrap gap-2 mb-3">
+        <div class="filter-card mb-4">
+            <div class="card-body p-0">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-4 pb-3 border-bottom" style="border-color: #f1f5f9 !important;">
+                    <span class="text-soft small fw-bold text-uppercase me-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Presets:</span>
                     @php
                         $presets = [
                             'today' => 'Today',
@@ -373,16 +499,16 @@
                     @endforeach
                 </div>
 
-                <div class="row g-2 align-items-end">
-                    <div class="col-lg-3 col-md-6">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">Start date</label>
                         <input type="date" class="form-control" id="start_date">
                     </div>
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">End date</label>
                         <input type="date" class="form-control" id="end_date">
                     </div>
-                    <div class="col-lg-2 col-md-4">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">Order status</label>
                         <select class="form-control" id="status_filter" name="statuses[]" multiple>
                             @foreach ($statusOptions as $status)
@@ -390,7 +516,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-4">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">Payment method</label>
                         <select class="form-control" id="payment_filter" name="payment_methods[]" multiple>
                             @foreach ($paymentMethods as $method)
@@ -398,7 +524,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-4">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
                         <label class="form-label mb-1">Order source</label>
                         <select class="form-control" id="source_filter" name="order_sources[]" multiple>
                             @foreach ($orderSources as $source)
@@ -406,15 +532,10 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-4 d-flex align-items-end">
-                        <button class="btn btn-primary w-100" id="apply-filters">
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <button class="btn btn-primary w-100" id="apply-filters" style="height: 42px;">
                             <i class="fas fa-filter"></i> Apply filters
                         </button>
-                    </div>
-                    <div class="col-12">
-                        <div class="text-soft small mt-1">
-                            Tip: hold Ctrl (or Cmd) to pick multiple values.
-                        </div>
                     </div>
                 </div>
             </div>
@@ -700,10 +821,10 @@
             <div style="width:3px;height:18px;background:linear-gradient(to bottom,#f59e0b,#d97706);border-radius:2px;"></div>
             <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Order Timing</span>
         </div>
-        <div class="card report-card mb-3">
+        <div class="card card-dark-analytics mb-4">
             <div class="card-header-premium">
                 <div class="d-flex align-items-center gap-2">
-                    <div style="width:32px;height:32px;background:#fffbeb;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.05);border-radius:8px;display:flex;align-items:center;justify-content:center;">
                         <i class="fas fa-clock text-warning" style="font-size:0.85rem;"></i>
                     </div>
                     <div>
@@ -711,7 +832,7 @@
                         <div class="text-muted" style="font-size:0.75rem;">Spot peaks across 24h — orders & revenue</div>
                     </div>
                 </div>
-                <span class="badge" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a;font-size:0.75rem;font-weight:600;padding:5px 10px;border-radius:8px;">
+                <span class="badge">
                     <i class="fas fa-info-circle me-1"></i> 24h view
                 </span>
             </div>
@@ -725,11 +846,11 @@
             <div style="width:3px;height:18px;background:linear-gradient(to bottom,#8b5cf6,#6d28d9);border-radius:2px;"></div>
             <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Combined Metrics</span>
         </div>
-        <div class="card report-card mb-4">
+        <div class="card card-dark-analytics mb-4">
             <div class="card-header-premium">
                 <div class="d-flex align-items-center gap-2">
-                    <div style="width:32px;height:32px;background:#f5f3ff;border-radius:8px;display:flex;align-items:center;justify-content:center;">
-                        <i class="fas fa-layer-group" style="color:#8b5cf6;font-size:0.85rem;"></i>
+                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.05);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-layer-group" style="color:#a78bfa;font-size:0.85rem;"></i>
                     </div>
                     <div>
                         <h6>Orders, Revenue & Refunds</h6>
@@ -737,9 +858,9 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2 align-items-center">
-                    <span class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:#16a34a;"><span style="width:10px;height:3px;background:#16a34a;display:inline-block;border-radius:2px;"></span> Revenue</span>
-                    <span class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:#2563eb;"><span style="width:10px;height:10px;background:rgba(37,99,235,0.35);display:inline-block;border-radius:2px;"></span> Orders</span>
-                    <span class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:#e11d48;"><span style="width:10px;height:3px;background:#e11d48;display:inline-block;border-radius:2px;"></span> Refunds</span>
+                    <span class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:#10b981;"><span style="width:10px;height:3px;background:#10b981;display:inline-block;border-radius:2px;"></span> Revenue</span>
+                    <span class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:#3b82f6;"><span style="width:10px;height:10px;background:rgba(59,130,246,0.35);display:inline-block;border-radius:2px;"></span> Orders</span>
+                    <span class="d-flex align-items-center gap-1" style="font-size:0.75rem;color:#f43f5e;"><span style="width:10px;height:3px;background:#f43f5e;display:inline-block;border-radius:2px;"></span> Refunds</span>
                 </div>
             </div>
             <div class="p-3" style="height: 260px;">
@@ -1352,25 +1473,30 @@
                         interaction: { mode: 'index', intersect: false },
                         scales: {
                             x: {
-                                ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 },
+                                ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12, color: '#94a3b8' },
                                 grid: { display: false }
                             },
                             y: {
                                 type: 'linear',
                                 position: 'left',
-                                ticks: { precision: 0 }
+                                ticks: { precision: 0, color: '#94a3b8' },
+                                grid: { color: 'rgba(255, 255, 255, 0.08)' }
                             },
                             yRevenue: {
                                 type: 'linear',
                                 position: 'right',
                                 ticks: {
-                                    callback: (value) => formatMoney(value)
+                                    callback: (value) => formatMoney(value),
+                                    color: '#94a3b8'
                                 },
                                 grid: { drawOnChartArea: false }
                             }
                         },
                         plugins: {
-                            legend: { display: true },
+                            legend: { 
+                                display: true,
+                                labels: { color: '#94a3b8' }
+                            },
                             tooltip: {
                                 callbacks: {
                                     label: function(ctx) {
@@ -1438,26 +1564,31 @@
                         interaction: { mode: 'index', intersect: false },
                         scales: {
                             x: {
-                                ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 },
+                                ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12, color: '#94a3b8' },
                                 grid: { display: false }
                             },
                             yOrders: {
                                 type: 'linear',
                                 position: 'left',
-                                ticks: { precision: 0, maxTicksLimit: 6 }
+                                ticks: { precision: 0, maxTicksLimit: 6, color: '#94a3b8' },
+                                grid: { color: 'rgba(255, 255, 255, 0.08)' }
                             },
                             yRevenue: {
                                 type: 'linear',
                                 position: 'right',
                                 ticks: {
                                     callback: (value) => formatMoney(value),
-                                    maxTicksLimit: 6
+                                    maxTicksLimit: 6,
+                                    color: '#94a3b8'
                                 },
                                 grid: { drawOnChartArea: false }
                             }
                         },
                         plugins: {
-                            legend: { display: true },
+                            legend: { 
+                                display: true,
+                                labels: { color: '#94a3b8' }
+                            },
                             tooltip: {
                                 callbacks: {
                                     label: function(ctx) {
