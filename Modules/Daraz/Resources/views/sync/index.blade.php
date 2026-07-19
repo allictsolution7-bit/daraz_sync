@@ -151,8 +151,8 @@
 <div class="container-fluid daraz-dashboard">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
         <div>
-            <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem;"><i class="fas fa-sync me-1 text-primary"></i> Daraz Sync Dashboard</h4>
-            <p class="text-muted small mb-0">Monitor and manage stock synchronization</p>
+            <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem;"><i class="fas fa-sync me-1 text-primary"></i> Marketplace Inventory Integration Control</h4>
+            <p class="text-muted small mb-0">Oversee and execute real-time stock balances across seller accounts</p>
         </div>
         <div class="d-flex gap-2">
             <button type="button" class="btn btn-sm btn-outline-success" id="syncAllBtn" style="border-radius: 8px; font-weight: 600; padding: 6px 14px;" {{ $stats['connected_stores'] === 0 ? 'disabled' : '' }}>
@@ -178,7 +178,7 @@
                 <div class="stat-icon"><i class="fas fa-store"></i></div>
                 <div>
                     <div class="stat-count">{{ $stats['total_stores'] }}</div>
-                    <div class="stat-label">Stores</div>
+                    <div class="stat-label">Outlets</div>
                 </div>
             </div>
         </div>
@@ -187,7 +187,7 @@
                 <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 <div>
                     <div class="stat-count">{{ $stats['connected_stores'] }}</div>
-                    <div class="stat-label">Connected</div>
+                    <div class="stat-label">Linked Outlets</div>
                 </div>
             </div>
         </div>
@@ -196,7 +196,7 @@
                 <div class="stat-icon"><i class="fas fa-link"></i></div>
                 <div>
                     <div class="stat-count">{{ $stats['total_mappings'] }}</div>
-                    <div class="stat-label">Mappings</div>
+                    <div class="stat-label">SKU Bridges</div>
                 </div>
             </div>
         </div>
@@ -205,7 +205,7 @@
                 <div class="stat-icon"><i class="fas fa-toggle-on"></i></div>
                 <div>
                     <div class="stat-count">{{ $stats['enabled_mappings'] }}</div>
-                    <div class="stat-label">Enabled</div>
+                    <div class="stat-label">Active Syncs</div>
                 </div>
             </div>
         </div>
@@ -214,7 +214,7 @@
                 <div class="stat-icon"><i class="fas fa-history"></i></div>
                 <div>
                     <div class="stat-count">{{ $stats['recent_syncs'] }}</div>
-                    <div class="stat-label">24h Syncs</div>
+                    <div class="stat-label">24h Sync Cycles</div>
                 </div>
             </div>
         </div>
@@ -223,7 +223,7 @@
                 <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
                 <div>
                     <div class="stat-count">{{ $stats['failed_syncs'] }}</div>
-                    <div class="stat-label">Failed</div>
+                    <div class="stat-label">Sync Blockages</div>
                 </div>
             </div>
         </div>
@@ -236,21 +236,21 @@
                     <ul class="nav nav-pills daraz-tabs" id="darazTab" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="stores-tab" data-bs-toggle="tab" data-bs-target="#stores-content" type="button" role="tab" aria-controls="stores-content" aria-selected="true">
-                                <i class="fas fa-store me-2"></i>Connected Stores
+                                <i class="fas fa-store me-2"></i>Configured Channels
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity-content" type="button" role="tab" aria-controls="activity-content" aria-selected="false">
-                                <i class="fas fa-history me-2"></i>Recent Activity
+                                <i class="fas fa-history me-2"></i>System Operations Log
                             </button>
                         </li>
                     </ul>
                     <div class="tab-actions">
                         <a href="{{ route('admin.daraz.stores.index') }}" class="btn btn-sm btn-outline-primary" id="manage-stores-btn" style="border-radius: 8px; font-weight: 500;">
-                            Manage Stores
+                            Manage Outlets
                         </a>
                         <a href="{{ route('admin.daraz.sync.logs') }}" class="btn btn-sm btn-outline-primary d-none" id="view-all-logs-btn" style="border-radius: 8px; font-weight: 500;">
-                            View All Logs
+                            Review Event Logs
                         </a>
                     </div>
                 </div>

@@ -106,12 +106,12 @@
 <div class="container-fluid daraz-stores-dashboard">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
         <div>
-            <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem;"><i class="fas fa-store me-1 text-primary"></i> Daraz Stores</h4>
-            <p class="text-muted small mb-0">Connect and manage your Daraz seller accounts</p>
+            <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem;"><i class="fas fa-store me-1 text-primary"></i> Seller Accounts</h4>
+            <p class="text-muted small mb-0">Configure and coordinate active seller accounts</p>
         </div>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.daraz.stores.create') }}" class="btn btn-sm btn-primary" style="border-radius: 8px; font-weight: 600; padding: 6px 14px;">
-                <i class="fas fa-plus me-1"></i> Add Store
+                <i class="fas fa-plus me-1"></i> Integrate Channel
             </a>
         </div>
     </div>
@@ -137,7 +137,7 @@
                 <div class="stat-icon"><i class="fas fa-store"></i></div>
                 <div>
                     <div class="stat-count">{{ $stores->count() }}</div>
-                    <div class="stat-label">Total Stores</div>
+                    <div class="stat-label">Configured Channels</div>
                 </div>
             </div>
         </div>
@@ -146,7 +146,7 @@
                 <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 <div>
                     <div class="stat-count">{{ $stores->filter(fn($s) => $s->isConnected())->count() }}</div>
-                    <div class="stat-label">Connected</div>
+                    <div class="stat-label">Authorized Outlets</div>
                 </div>
             </div>
         </div>
@@ -155,7 +155,7 @@
                 <div class="stat-icon"><i class="fas fa-link"></i></div>
                 <div>
                     <div class="stat-count">{{ $stores->sum('product_mappings_count') }}</div>
-                    <div class="stat-label">Total Mappings</div>
+                    <div class="stat-label">Linked SKU Pairs</div>
                 </div>
             </div>
         </div>
@@ -164,7 +164,7 @@
                 <div class="stat-icon"><i class="fas fa-sync"></i></div>
                 <div>
                     <div class="stat-count">{{ $stores->filter(fn($s) => $s->auto_sync)->count() }}</div>
-                    <div class="stat-label">Auto-Sync On</div>
+                    <div class="stat-label">Background Sync On</div>
                 </div>
             </div>
         </div>
@@ -176,10 +176,10 @@
             @if($stores->isEmpty())
                 <div class="text-center py-5">
                     <i class="fas fa-store fs-1 text-muted opacity-50 mb-3"></i>
-                    <h5 class="fw-bold text-dark">No Daraz Stores Connected</h5>
-                    <p class="text-muted small">Connect your first Daraz seller account to start syncing inventory.</p>
+                    <h5 class="fw-bold text-dark">No Seller Accounts Configured</h5>
+                    <p class="text-muted small">Integrate your initial seller account to begin mapping items.</p>
                     <a href="{{ route('admin.daraz.stores.create') }}" class="btn btn-primary btn-sm mt-2" style="border-radius: 8px;">
-                        <i class="fas fa-plus-circle me-1"></i> Add Store
+                        <i class="fas fa-plus-circle me-1"></i> Integrate Channel
                     </a>
                 </div>
             @else
@@ -187,12 +187,12 @@
                     <table class="table table-premium">
                         <thead>
                             <tr>
-                                <th>Store</th>
+                                <th>Outlet Name</th>
                                 <th>Country</th>
                                 <th>Status</th>
-                                <th>Mappings</th>
+                                <th>Bridges</th>
                                 <th>Last Synced</th>
-                                <th>Auto-Sync</th>
+                                <th>Background Sync</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>

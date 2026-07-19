@@ -88,8 +88,8 @@
 <div class="container-fluid daraz-create-dashboard">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
         <div>
-            <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem;"><i class="fas fa-plus-circle me-1 text-primary"></i> Add Daraz Store</h4>
-            <p class="text-muted small mb-0">Connect a new Daraz seller account</p>
+            <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem;"><i class="fas fa-plus-circle me-1 text-primary"></i> Register Outlet Integration</h4>
+            <p class="text-muted small mb-0">Establish connection with a new seller node</p>
         </div>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.daraz.stores.index') }}" class="btn btn-sm btn-outline-secondary" style="padding: 6px 14px !important;">
@@ -102,14 +102,14 @@
         <div class="col-lg-8">
             <div class="card premium-card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Store Configuration</h5>
+                    <h5 class="mb-0">Outlet Settings</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.daraz.stores.store') }}" method="POST">
                         @csrf
 
                         <div class="mb-4">
-                            <label for="name" class="form-label">Store Name <span class="text-danger">*</span></label>
+                            <label for="name" class="form-label">Integration Identifier <span class="text-danger">*</span></label>
                             <input type="text"
                                    class="form-control @error('name') is-invalid @enderror"
                                    id="name"
@@ -120,7 +120,7 @@
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">A friendly name to identify this store</div>
+                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">A custom name to label this connection</div>
                         </div>
 
                         <div class="mb-4">
@@ -213,7 +213,7 @@
 
                         <div class="d-flex gap-2 mt-4 pt-3 border-top" style="border-color: #e2e8f0 !important;">
                             <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" style="background: #3b82f6; border-color: #3b82f6;">
-                                <i class="fas fa-save"></i> Create Store
+                                <i class="fas fa-save"></i> Initialize Integration
                             </button>
                             <a href="{{ route('admin.daraz.stores.index') }}" class="btn btn-outline-secondary">
                                 Cancel

@@ -346,7 +346,7 @@
     <div class="container-fluid sales-report">
         <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
             <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem; font-family: 'Outfit', sans-serif;">
-                Customer Reports 
+                Client Base & Retention Overview 
                 <span class="badge bg-light text-secondary border ms-2" id="range-label" style="font-size: 0.75rem; font-weight: 500;">Loading...</span>
             </h4>
             <button class="btn btn-sm btn-outline-secondary" id="refresh-report" style="border-radius: 8px; font-weight: 500;">
@@ -357,7 +357,7 @@
         <div class="filter-card mb-4">
             <div class="card-body p-0">
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-4 pb-3 border-bottom" style="border-color: #f1f5f9 !important;">
-                    <span class="text-soft small fw-bold text-uppercase me-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Presets:</span>
+                    <span class="text-soft small fw-bold text-uppercase me-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Period Quick-Select:</span>
                     @php
                         $presets = [
                             'today' => 'Today',
@@ -417,12 +417,12 @@
             </div>
         </div>
 
-        <div class="section-heading"><span class="dot"></span> Snapshot</div>
+        <div class="section-heading"><span class="dot"></span> Overview Metrics</div>
         <div class="stat-grid mb-3">
             <div class="stat-tile">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">Unique customers</div>
+                        <div class="stat-label">Individual Clients</div>
                         <div class="stat-value" id="metric-unique">--</div>
                         <div class="stat-sub">Distinct phone numbers</div>
                     </div>
@@ -432,7 +432,7 @@
             <div class="stat-tile">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">New customers</div>
+                        <div class="stat-label">First-Time Buyers</div>
                         <div class="stat-value" id="metric-new">--</div>
                         <div class="stat-sub">First order in range</div>
                     </div>
@@ -442,7 +442,7 @@
             <div class="stat-tile">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">Repeat customers</div>
+                        <div class="stat-label">Recurring Buyers</div>
                         <div class="stat-value" id="metric-repeat">--</div>
                         <div class="stat-sub" id="metric-repeat-rate">Repeat rate</div>
                     </div>
@@ -553,7 +553,7 @@
             </div>
         </div>
 
-        <div class="section-heading"><span class="dot"></span> District heatmap</div>
+        <div class="section-heading"><span class="dot"></span> Geographic Heatmap</div>
         <div class="row g-3 mb-3">
             <div class="col-lg-7">
                 <div class="card card-dark-analytics h-100">
@@ -563,7 +563,7 @@
                                 <i class="fas fa-map text-primary" style="font-size:0.85rem;"></i>
                             </div>
                             <div>
-                                <h6>Bangladesh districts (bubble map)</h6>
+                                <h6>Regional Distribution Hubs (Density Mapping)</h6>
                                 <div class="text-muted" style="font-size:0.75rem;">Sized by revenue, positioned by approximate district centroids.</div>
                             </div>
                         </div>
@@ -577,7 +577,7 @@
                 <div class="card report-card h-100">
                     <div class="card-body">
                         <h6 class="mb-2 d-flex align-items-center gap-2">
-                            <i class="fas fa-list text-success"></i> District breakdown
+                            <i class="fas fa-list text-success"></i> Territory Distributions
                         </h6>
                         <div class="table-responsive">
                             <table class="table table-sm mb-0">
@@ -601,7 +601,7 @@
             </div>
         </div>
 
-        <div class="section-heading"><span class="dot"></span> Segments</div>
+        <div class="section-heading"><span class="dot"></span> Buyer Cohorts</div>
         <div class="card report-card mb-3">
             <div class="card-body">
                 <div class="row text-center">
@@ -625,7 +625,7 @@
             </div>
         </div>
 
-        <div class="section-heading"><span class="dot"></span> Top customers</div>
+        <div class="section-heading"><span class="dot"></span> Premier Clients Ledger</div>
         <div class="card report-card">
             <div class="card-body">
                 <div class="table-responsive">

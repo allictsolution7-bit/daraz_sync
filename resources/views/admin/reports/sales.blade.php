@@ -470,7 +470,7 @@
     <div class="container-fluid sales-report">
         <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
             <h4 class="mb-0 fw-bold text-dark" style="font-size: 1.25rem; font-family: 'Outfit', sans-serif;">
-                Sales Report 
+                Volume & Inflow Analytics 
                 <span class="badge bg-light text-secondary border ms-2" id="range-label" style="font-size: 0.75rem; font-weight: 500;">Loading...</span>
             </h4>
             <button class="btn btn-sm btn-outline-secondary" id="refresh-report" style="border-radius: 8px; font-weight: 500;">
@@ -481,7 +481,7 @@
         <div class="filter-card mb-4">
             <div class="card-body p-0">
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-4 pb-3 border-bottom" style="border-color: #f1f5f9 !important;">
-                    <span class="text-soft small fw-bold text-uppercase me-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Presets:</span>
+                    <span class="text-soft small fw-bold text-uppercase me-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Period Quick-Select:</span>
                     @php
                         $presets = [
                             'today' => 'Today',
@@ -541,14 +541,14 @@
             </div>
         </div>
 
-        <div class="section-heading"><span class="dot"></span> Snapshot</div>
+        <div class="section-heading"><span class="dot"></span> Key Metrics Ledger</div>
 
         <div class="stat-grid mb-3">
             <!-- Revenue Category -->
             <div class="stat-tile tile-revenue">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">Total revenue</div>
+                        <div class="stat-label">Gross Receipts</div>
                         <div class="stat-value text-success" id="metric-gross-sales">--</div>
                         <div class="stat-sub">Gross sales</div>
                     </div>
@@ -559,7 +559,7 @@
             <div class="stat-tile tile-revenue">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">Net revenue</div>
+                        <div class="stat-label">Retained Value</div>
                         <div class="stat-value text-success" id="metric-net">--</div>
                         <div class="stat-sub">Revenue - discount + shipping</div>
                     </div>
@@ -581,7 +581,7 @@
             <div class="stat-tile tile-revenue">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">Delivered revenue</div>
+                        <div class="stat-label">Realized Delivery Value</div>
                         <div class="stat-value text-success" id="metric-delivered">--</div>
                         <div class="stat-sub">Marked delivered</div>
                     </div>
@@ -592,7 +592,7 @@
             <div class="stat-tile tile-revenue">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">Prepaid revenue</div>
+                        <div class="stat-label">Advance Inflow</div>
                         <div class="stat-value text-success" id="metric-prepaid-rev">--</div>
                         <div class="stat-sub" id="metric-prepaid-count">Prepaid orders</div>
                     </div>
@@ -615,7 +615,7 @@
             <div class="stat-tile tile-orders">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">Average order value</div>
+                        <div class="stat-label">Mean Basket Size</div>
                         <div class="stat-value text-primary" id="metric-aov">--</div>
                         <div class="stat-sub">Per completed order</div>
                     </div>
@@ -626,7 +626,7 @@
             <div class="stat-tile tile-orders">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">Units sold</div>
+                        <div class="stat-label">Items Transacted</div>
                         <div class="stat-value text-primary" id="metric-units">--</div>
                         <div class="stat-sub">Items across orders</div>
                     </div>
@@ -637,7 +637,7 @@
             <div class="stat-tile tile-orders">
                 <div class="stat-top">
                     <div>
-                        <div class="stat-label">Delivered orders</div>
+                        <div class="stat-label">Completed Shipments</div>
                         <div class="stat-value text-primary" id="metric-ok-orders">--</div>
                         <div class="stat-sub">Marked delivered</div>
                     </div>
@@ -773,7 +773,7 @@
         {{-- === TRENDS SECTION === --}}
         <div class="d-flex align-items-center gap-2 mb-2 mt-4">
             <div style="width:3px;height:18px;background:linear-gradient(to bottom,#3b82f6,#1d4ed8);border-radius:2px;"></div>
-            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Trends</span>
+            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Historical Vectors</span>
         </div>
         <div class="row g-3 mb-3">
             <div class="col-lg-6">
@@ -784,7 +784,7 @@
                                 <i class="fas fa-chart-line text-primary" style="font-size:0.85rem;"></i>
                             </div>
                             <div>
-                                <h6>Revenue Trend</h6>
+                                <h6>Inflow Trajectory</h6>
                                 <div class="text-muted" style="font-size:0.75rem;">Daily revenue over period</div>
                             </div>
                         </div>
@@ -803,7 +803,7 @@
                                 <i class="fas fa-shopping-cart text-success" style="font-size:0.85rem;"></i>
                             </div>
                             <div>
-                                <h6>Orders Trend</h6>
+                                <h6>Order Volumes</h6>
                                 <div class="text-muted" style="font-size:0.75rem;">Daily order count over period</div>
                             </div>
                         </div>
@@ -819,7 +819,7 @@
         {{-- === ORDER TIMING === --}}
         <div class="d-flex align-items-center gap-2 mb-2 mt-3">
             <div style="width:3px;height:18px;background:linear-gradient(to bottom,#f59e0b,#d97706);border-radius:2px;"></div>
-            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Order Timing</span>
+            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Hourly Velocity</span>
         </div>
         <div class="card card-dark-analytics mb-4">
             <div class="card-header-premium">
@@ -828,7 +828,7 @@
                         <i class="fas fa-clock text-warning" style="font-size:0.85rem;"></i>
                     </div>
                     <div>
-                        <h6>Orders by Hour of Day</h6>
+                        <h6>Volume Distribution by Hour</h6>
                         <div class="text-muted" style="font-size:0.75rem;">Spot peaks across 24h — orders & revenue</div>
                     </div>
                 </div>
@@ -844,7 +844,7 @@
         {{-- === COMBINED METRICS === --}}
         <div class="d-flex align-items-center gap-2 mb-2 mt-3">
             <div style="width:3px;height:18px;background:linear-gradient(to bottom,#8b5cf6,#6d28d9);border-radius:2px;"></div>
-            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Combined Metrics</span>
+            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Unified Signals Timeline</span>
         </div>
         <div class="card card-dark-analytics mb-4">
             <div class="card-header-premium">
@@ -853,7 +853,7 @@
                         <i class="fas fa-layer-group" style="color:#a78bfa;font-size:0.85rem;"></i>
                     </div>
                     <div>
-                        <h6>Orders, Revenue & Refunds</h6>
+                        <h6>Timeline of Orders, Inflows & Returns</h6>
                         <div class="text-muted" style="font-size:0.75rem;">Multi-signal timeline view</div>
                     </div>
                 </div>
@@ -871,7 +871,7 @@
         {{-- === BREAKDOWNS === --}}
         <div class="d-flex align-items-center gap-2 mb-2 mt-3">
             <div style="width:3px;height:18px;background:linear-gradient(to bottom,#10b981,#059669);border-radius:2px;"></div>
-            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Breakdowns</span>
+            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Distribution Segments</span>
         </div>
         <div class="row g-3 mb-3">
             <div class="col-lg-4">
@@ -881,7 +881,7 @@
                             <div style="width:28px;height:28px;background:#eff6ff;border-radius:7px;display:flex;align-items:center;justify-content:center;">
                                 <i class="fas fa-wallet text-primary" style="font-size:0.78rem;"></i>
                             </div>
-                            <h6>Payment Breakdown</h6>
+                            <h6>Settlement Methods</h6>
                         </div>
                     </div>
                     <div class="p-0">
@@ -910,7 +910,7 @@
                             <div style="width:28px;height:28px;background:#f0fdf4;border-radius:7px;display:flex;align-items:center;justify-content:center;">
                                 <i class="fas fa-flag text-success" style="font-size:0.78rem;"></i>
                             </div>
-                            <h6>Status Mix</h6>
+                            <h6>Order States Mix</h6>
                         </div>
                     </div>
                     <div class="p-0">
@@ -938,7 +938,7 @@
                             <div style="width:28px;height:28px;background:#fffbeb;border-radius:7px;display:flex;align-items:center;justify-content:center;">
                                 <i class="fas fa-share-nodes text-warning" style="font-size:0.78rem;"></i>
                             </div>
-                            <h6>Source Performance</h6>
+                            <h6>Acquisition Source Performance</h6>
                         </div>
                     </div>
                     <div class="p-0">
@@ -969,7 +969,7 @@
                             <div style="width:28px;height:28px;background:#fee2e2;border-radius:7px;display:flex;align-items:center;justify-content:center;">
                                 <i class="fas fa-shield-halved text-danger" style="font-size:0.78rem;"></i>
                             </div>
-                            <h6>Payment Reliability</h6>
+                            <h6>Settlement Cleared Metrics</h6>
                         </div>
                     </div>
                     <div class="p-0">
@@ -998,7 +998,7 @@
                             <div style="width:28px;height:28px;background:#fffbeb;border-radius:7px;display:flex;align-items:center;justify-content:center;">
                                 <i class="fas fa-triangle-exclamation text-warning" style="font-size:0.78rem;"></i>
                             </div>
-                            <h6>Source Risk</h6>
+                            <h6>Acquisition Source Risk Profiles</h6>
                         </div>
                     </div>
                     <div class="p-0">
@@ -1026,7 +1026,7 @@
                             <div style="width:28px;height:28px;background:#eff6ff;border-radius:7px;display:flex;align-items:center;justify-content:center;">
                                 <i class="fas fa-truck text-primary" style="font-size:0.78rem;"></i>
                             </div>
-                            <h6>Courier Performance</h6>
+                            <h6>Logistics Deliverability</h6>
                         </div>
                     </div>
                     <div class="p-0">
@@ -1053,7 +1053,7 @@
         {{-- === TOP PRODUCTS === --}}
         <div class="d-flex align-items-center gap-2 mb-2">
             <div style="width:3px;height:18px;background:linear-gradient(to bottom,#f59e0b,#d97706);border-radius:2px;"></div>
-            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Top Products</span>
+            <span class="fw-bold text-dark" style="font-size:0.95rem;letter-spacing:0.01em;">Premier Items</span>
         </div>
         <div class="card report-card mb-4">
             <div class="card-header-premium">
@@ -1062,7 +1062,7 @@
                         <i class="fas fa-star text-warning" style="font-size:0.85rem;"></i>
                     </div>
                     <div>
-                        <h6>Top Products by Revenue</h6>
+                        <h6>Top Grossing Items</h6>
                         <div class="text-muted" style="font-size:0.75rem;">Sorted by revenue — top 8</div>
                     </div>
                 </div>
