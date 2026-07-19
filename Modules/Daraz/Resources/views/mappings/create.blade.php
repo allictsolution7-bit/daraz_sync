@@ -176,7 +176,7 @@
                                     name="variation_combination_id">
                                 <option value="">Main Product (No Variation)</option>
                             </select>
-                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">Select a specific variation if this is a variable product</div>
+                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">Identify the specific product attribute combination if variable</div>
                         </div>
 
                         <hr class="my-4" style="border-color: #e2e8f0;">
@@ -194,7 +194,7 @@
                             @error('daraz_item_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">The numeric ID of the product on the marketplace</div>
+                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">The listing reference number retrieved from the vendor platform console</div>
                         </div>
 
                         <div class="mb-4">
@@ -222,7 +222,7 @@
                             @error('seller_sku')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">Used for auto-mapping. Leave blank to use Marketplace SKU.</div>
+                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">Optional code to simplify search-based coupling matches</div>
                         </div>
 
                         <hr class="my-4" style="border-color: #e2e8f0;">
@@ -238,7 +238,7 @@
                                                style="cursor: pointer;">
                                         <label class="form-check-label fw-bold text-dark" for="sync_enabled" style="font-size: 0.85rem; cursor: pointer;">Enable Background Sync</label>
                                     </div>
-                                    <div class="text-muted small" style="font-size: 0.75rem;">When enabled, stock changes will sync automatically</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;">When active, inventory variations replicate automatically</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -250,7 +250,7 @@
                                            name="stock_buffer"
                                            value="{{ old('stock_buffer', 0) }}"
                                            min="0">
-                                    <div class="text-muted small mt-1" style="font-size: 0.75rem;">Reserve stock (effective stock = actual - buffer)</div>
+                                    <div class="text-muted small mt-1" style="font-size: 0.75rem;">Reserve limit (active stock count = physical count - reserve value)</div>
                                 </div>
                             </div>
                         </div>

@@ -144,8 +144,8 @@
                         <hr class="my-4" style="border-color: #e2e8f0;">
                         <h6 class="fw-bold mb-3 text-dark" style="font-size: 0.88rem;">API Credentials</h6>
                         <p class="text-muted small mb-3">
-                            Get your API credentials from <a href="https://open.daraz.com" target="_blank" class="text-decoration-none fw-bold text-primary">Daraz Open Platform</a>.
-                            Create an application and use the App Key and App Secret.
+                            Retrieve keys from the <a href="https://open.daraz.com" target="_blank" class="text-decoration-none fw-bold text-primary">Marketplace Open Developer Portal</a>.
+                            Create a sandbox/production application to fetch integration codes.
                         </p>
 
                         <div class="mb-4">
@@ -178,7 +178,7 @@
                             @error('app_secret')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
-                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">This will be encrypted before storing</div>
+                            <div class="text-muted small mt-1" style="font-size: 0.75rem;">Security credentials are securely hashed prior to storage</div>
                         </div>
 
                         <hr class="my-4" style="border-color: #e2e8f0;">
@@ -194,7 +194,7 @@
                                                style="cursor: pointer;">
                                         <label class="form-check-label fw-bold text-dark" for="auto_sync" style="font-size: 0.85rem; cursor: pointer;">Enable Auto-Sync</label>
                                     </div>
-                                    <div class="text-muted small" style="font-size: 0.75rem;">Automatically sync stock at regular intervals</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;">Automatically run inventory updates at scheduled intervals</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
