@@ -159,6 +159,164 @@
         .page-header-block {
             margin-bottom: 1rem !important;
         }
+
+        /* Premium Profile Dropdown redesign overrides */
+        .dropdown-menu.usr {
+            border: none !important;
+            border-radius: 16px !important;
+            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.15), 0 10px 10px -5px rgba(15, 23, 42, 0.05) !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            width: 300px !important;
+            background: #ffffff !important;
+        }
+
+        .premium-user-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+            padding: 20px !important;
+            color: white !important;
+            position: relative;
+            overflow: hidden;
+            display: flex !important;
+            align-items: center !important;
+            gap: 16px !important;
+        }
+
+        .premium-user-header::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%);
+            border-radius: 50%;
+        }
+
+        .premium-user-img {
+            width: 52px !important;
+            height: 52px !important;
+            border-radius: 50% !important;
+            border: 2px solid rgba(255, 255, 255, 0.2) !important;
+            object-fit: cover !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+            background: #1e293b;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .premium-user-info-text {
+            z-index: 1;
+            overflow: hidden;
+            flex-grow: 1;
+            text-align: left !important;
+        }
+
+        .premium-user-name {
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            color: #ffffff !important;
+            margin: 0 0 2px 0 !important;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            max-width: 190px !important;
+        }
+
+        .premium-user-email {
+            font-size: 0.775rem !important;
+            color: #94a3b8 !important;
+            margin: 0 0 6px 0 !important;
+            line-height: 1.2;
+            font-weight: 500;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            max-width: 190px !important;
+        }
+
+        .premium-user-role {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.15) !important;
+            color: #c7d2fe !important;
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 3px 8px !important;
+            border-radius: 6px !important;
+            margin: 0 !important;
+            border: 1px solid rgba(99, 102, 241, 0.25) !important;
+            line-height: 1 !important;
+        }
+
+        .premium-user-links {
+            padding: 12px !important;
+            background: #ffffff !important;
+        }
+
+        .premium-user-link {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 10px 12px !important;
+            color: #334155 !important;
+            border-radius: 12px !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+            margin-bottom: 4px;
+            text-align: left !important;
+        }
+
+        .premium-user-link:last-child {
+            margin-bottom: 0;
+        }
+
+        .premium-link-icon-container {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .icon-profile { background: rgba(79, 70, 229, 0.06) !important; color: #4f46e5 !important; }
+        .icon-settings { background: rgba(13, 148, 136, 0.06) !important; color: #0d9488 !important; }
+        .icon-logout { background: rgba(225, 29, 72, 0.06) !important; color: #e11d48 !important; }
+
+        .premium-link-title {
+            font-size: 0.875rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            line-height: 1.2;
+        }
+
+        .premium-link-desc {
+            font-size: 0.75rem !important;
+            color: #64748b !important;
+            margin-top: 2px;
+            line-height: 1.2;
+        }
+
+        .premium-user-link:hover {
+            background-color: #f8fafc !important;
+            transform: translateX(3px);
+        }
+
+        .premium-user-link:hover .premium-link-icon-container {
+            transform: scale(1.05);
+        }
+
+        .premium-user-link-logout:hover {
+            background-color: #fef2f2 !important;
+        }
     </style>
     <style>
         .dataTables_wrapper tbody tr,
@@ -576,60 +734,56 @@
                             <i class="fa-regular fa-user" style="font-size: 20px; color: #ff3366;"></i>
                         </a>
 
-                        <div class="dropdown-menu usr">
-                            <div class="dp-main-menu">
-
-                                <div class="user-info">
-                                    <div class="user-data">
-                                        <img src="{{ asset('assets/img/man.png') }}" alt="" class="user-img">
-                                        <div class="mt-3">
-                                            <h2>{{ Auth::user()->name ?? '' }}</h2>
-                                            <p><small>{{ Auth::user()->email ?? '' }}</small></p>
-                                            <p>Super admin</p>
-                                        </div>
-                                    </div>
-                                    <div class="user-link">
-                                        <a href="{{ route('admin.profile') }}"><i class="fas fa-user"></i>
-                                            Profile</a>
-                                        <a href=""><i class="fas fa-envelope"></i> Inbox</a>
-                                        <a href="{{ route('logout') }}"
-                                            onclick="event.preventDefault();
-                                        document.getElementById('logout-form').submit();"><i
-                                                class="fas fa-lock-open"></i>
-
-                                            {{ __('Logout') }}
-                                        </a>
-
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                            class="d-none">
-                                            @csrf
-                                        </form>
-                                        </a>
-
-                                    </div>
+                        <div class="dropdown-menu dropdown-menu-end usr">
+                            <div class="premium-user-header d-flex align-items-center gap-3">
+                                <img src="{{ asset('assets/img/man.png') }}" alt="" class="premium-user-img">
+                                <div class="premium-user-info-text text-start">
+                                    <h2 class="premium-user-name">{{ Auth::user()->name ?? 'Admin User' }}</h2>
+                                    <p class="premium-user-email">{{ Auth::user()->email ?? 'admin@purnobd.com' }}</p>
+                                    <span class="premium-user-role">Super Admin</span>
                                 </div>
-
+                            </div>
+                            <div class="premium-user-links">
+                                <a href="{{ route('admin.profile') }}" class="premium-user-link">
+                                    <div class="premium-link-icon-container icon-profile">
+                                        <i class="fa-regular fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="premium-link-title">Account Profile</div>
+                                        <div class="premium-link-desc">Manage your personal settings</div>
+                                    </div>
+                                </a>
+                                <a href="{{ url('admin/settings') }}" class="premium-user-link">
+                                    <div class="premium-link-icon-container icon-settings">
+                                        <i class="fa-solid fa-sliders"></i>
+                                    </div>
+                                    <div>
+                                        <div class="premium-link-title">System Settings</div>
+                                        <div class="premium-link-desc">Configure store properties</div>
+                                    </div>
+                                </a>
+                                <div class="dropdown-divider my-2"></div>
+                                <a href="{{ route('logout') }}" class="premium-user-link premium-user-link-logout"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <div class="premium-link-icon-container icon-logout">
+                                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                    </div>
+                                    <div>
+                                        <div class="premium-link-title text-danger">Logout Session</div>
+                                        <div class="premium-link-desc text-muted">End active session securely</div>
+                                    </div>
+                                </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
                             </div>
                         </div>
 
                     </li>
                     <li class="nav-item dropdown user-profile-dropdown">
-                        <a href="#" class="nav-link user" id="settingsDropdown" data-bs-toggle="dropdown">
+                        <a href="{{ url('admin/settings') }}" class="nav-link user" id="settingsDropdown">
                             <i class="fa-solid fa-gear" style="font-size: 20px; color: #007bff;"></i>
                         </a>
-                        <div class="dropdown-menu setting">
-                            <div class="dp-main-menu">
-                                <div class="user-info">
-                                    <div class="user-link mt-3">
-                                        <a href=""><i class="fas fa-gear"></i> Settings</a>
-                                        {{-- <a href=""><i class="fas fa-users"></i> Admin</a>
-                                        <a href=""><i class="fas fa-pen"></i> Color</a>
-                                        <a href=""><i class="fas fa-moon"></i> Theme</a> --}}
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
                     </li>
 
                 </ul>
