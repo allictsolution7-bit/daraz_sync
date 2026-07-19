@@ -715,18 +715,8 @@
                 dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"Bf>rt<"bottom-controls"lip>',
                 buttons: [
                     {
-                        extend: 'copy',
-                        text: '<i class="fas fa-copy"></i> Copy',
-                        className: 'dt-button-modern'
-                    },
-                    {
                         extend: 'csv',
                         text: '<i class="fas fa-file-csv"></i> CSV',
-                        className: 'dt-button-modern'
-                    },
-                    {
-                        extend: 'excel',
-                        text: '<i class="fas fa-file-excel"></i> Excel',
                         className: 'dt-button-modern'
                     },
                     {

@@ -135,19 +135,7 @@
             dom: 'Bfrtip',
             buttons: [
                 {
-                    extend: 'copy',
-                    exportOptions: {
-                        columns: [1, 2, 3, 4, 5, 6]
-                    }
-                },
-                {
                     extend: 'csv',
-                    exportOptions: {
-                        columns: [1, 2, 3, 4, 5, 6]
-                    }
-                },
-                {
-                    extend: 'excel',
                     exportOptions: {
                         columns: [1, 2, 3, 4, 5, 6]
                     }

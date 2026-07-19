@@ -999,7 +999,7 @@
             ],
             dom: 'Bfrtip',
             buttons: [
-                'copy', 'pdf', 'csv', 'excel', 'print'
+                'csv', 'pdf', 'print'
             ],
             responsive: false,
             colReorder: true,
