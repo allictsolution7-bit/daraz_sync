@@ -438,18 +438,16 @@
 @section('content')
     <div class="container-fluid mt-4" id="pages-dashboard">
         <!-- Breadcrumb & Header Card -->
-        <div class="dashboard-header">
-            <ul class="breadcrumb-custom">
+        <div class="dashboard-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="page-title">Custom Pages Manager</h1>
+                <p class="page-subtitle">Publish, manage, and design content pages for your web application store front.</p>
+            </div>
+            <ul class="breadcrumb-custom m-0">
                 <li><a href="{{ route('admin') }}"><i class="fa-solid fa-house"></i> Home</a></li>
                 <li class="breadcrumb-separator"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i></li>
                 <li class="breadcrumb-active">Pages</li>
             </ul>
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div>
-                    <h1 class="page-title">Custom Pages Manager</h1>
-                    <p class="page-subtitle">Publish, manage, and design content pages for your web application store front.</p>
-                </div>
-            </div>
         </div>
 
         <!-- Metrics Section -->
@@ -577,7 +575,7 @@
             $('#Pages').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
-                    'copy', 'pdf', 'csv', 'excel', 'print'
+                    'pdf', 'csv', 'print'
                 ],
                 ordering: true, // Enable sorting
                 order: [[0, 'asc']], // Sort by Page ID ascending by default

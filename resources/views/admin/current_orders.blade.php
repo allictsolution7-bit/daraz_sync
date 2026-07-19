@@ -1366,18 +1366,8 @@
                 fixedHeader: true,
                 buttons: [
                     {
-                        extend: 'copy',
-                        text: '<i class="fas fa-copy"></i> Copy',
-                        className: 'btn btn-sm btn-outline-secondary'
-                    },
-                    {
                         extend: 'csv',
                         text: '<i class="fas fa-file-csv"></i> CSV',
-                        className: 'btn btn-sm btn-outline-secondary'
-                    },
-                    {
-                        extend: 'excel',
-                        text: '<i class="fas fa-file-excel"></i> Excel',
                         className: 'btn btn-sm btn-outline-secondary'
                     },
                     {

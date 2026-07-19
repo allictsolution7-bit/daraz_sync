@@ -212,15 +212,17 @@
 @section('content')
 <div class="container-fluid mt-4" id="pages-edit">
     <!-- Breadcrumb & Header -->
-    <div class="dashboard-header">
-        <ul class="breadcrumb-custom">
+    <div class="dashboard-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="page-title">Edit Custom Page</h1>
+        </div>
+        <ul class="breadcrumb-custom m-0">
             <li><a href="{{ route('admin') }}"><i class="fa-solid fa-house"></i> Home</a></li>
             <li class="breadcrumb-separator"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i></li>
             <li><a href="{{ route('admin.pages.index') }}">Pages</a></li>
             <li class="breadcrumb-separator"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i></li>
             <li class="breadcrumb-active">Edit Page</li>
         </ul>
-        <h1 class="page-title">Edit Custom Page</h1>
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -348,7 +350,7 @@
 
                         <div class="col-12 mb-4">
                             <label for="seoSchemaMarkup" class="form-label">Structured Schema Markup (JSON-LD)</label>
-                            <textarea class="form-control @error('seo.schema_markup') is-invalid @enderror" name="seo[schema_markup]" id="seoSchemaMarkup" rows="4" placeholder='{"@context":"https://schema.org","@type":"WebPage",...}'>{{ $page->formatted_seo['schema_markup'] ?? $page->schema_markup ?? old('seo.schema_markup') }}</textarea>
+                            <textarea class="form-control @error('seo.schema_markup') is-invalid @enderror" name="seo[schema_markup]" id="seoSchemaMarkup" rows="4" placeholder='{"@@context":"https://schema.org","@@type":"WebPage",...}'>{{ $page->formatted_seo['schema_markup'] ?? $page->schema_markup ?? old('seo.schema_markup') }}</textarea>
                             @error('seo.schema_markup')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
