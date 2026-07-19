@@ -63,6 +63,9 @@ return [
                 PDO::ATTR_PERSISTENT => true,
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+            'dump' => [
+               'dump_binary_path' => 'c:\xampp\mysql\bin',
+            ]
         ],
 
         'pgsql' => [
