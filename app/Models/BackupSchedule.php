@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Dragonmantank\CronExpression\CronExpression;
+use Cron\CronExpression;
 
 class BackupSchedule extends Model
 {
