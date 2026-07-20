@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('styles')
+@push('styles')
     <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -22,10 +22,6 @@
             --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body {
-            color: var(--text-main);
-            background-color: #f8fafc;
-        }
 
         /* Nav Tabs Layout */
         .portal-tabs-container {
@@ -193,8 +189,7 @@
         }
 
         .premium-table tbody tr:hover {
-            background-color: rgba(241, 245, 249, 0.4) !important;
-            transform: scale(1.002);
+            background-color: rgba(241, 245, 249, 0.8) !important;
         }
 
         .premium-table tbody td {
@@ -371,10 +366,10 @@
             font-size: 16px;
         }
     </style>
-@endsection
+@endpush
 
 @section('content')
-    <div class="container mt-5">
+    <div class="container-fluid px-4 pt-3">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">

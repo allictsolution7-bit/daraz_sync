@@ -250,9 +250,7 @@
             transition: all 0.2s ease;
         }
         table.dataTable tbody tr:hover {
-            background-color: #f8fafc !important;
-            transform: scale(1.002);
-            box-shadow: var(--shadow-sm);
+            background-color: #f1f5f9 !important;
         }
         table.dataTable tbody td {
             padding: 14px 16px !important;

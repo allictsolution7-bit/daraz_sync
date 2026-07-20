@@ -615,7 +615,7 @@
         <div class="header-container">
             <header class="header navbar navbar-expand-sm expand-header">
                 <div class="header-left d-flex">
-                    <div class="logo">
+                    <div class="logo" style="display: none;">
                         <a href="{{ route('admin') }}">{{ setting('general', 'site_name', 'Thikana.shop') }}</a>
                     </div>
                     <a href="#" id="toggleSidebar" class="sidebarCollapse" data-placement="button">
@@ -812,8 +812,27 @@
              }
             .left-menu {
                 overflow-y: auto !important;
-                height: 100vh !important;
-                padding-bottom: 80px !important;
+                top: 65px !important;
+                height: calc(100vh - 65px) !important;
+                padding-bottom: 160px !important;
+            }
+            .sidebar-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 240px;
+                background: #ffffff;
+                border-top: 1px solid #e2e8f0;
+                padding: 16px;
+                z-index: 1000;
+                box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.04);
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                transition: transform 0.5s ease;
+            }
+            .left-menu.hide .sidebar-footer {
+                transform: translateX(-240px);
             }
             .menu-section-toggle {
                 padding: 10px 18px !important;
@@ -1991,6 +2010,18 @@
                     </ul>
                 </nav>
             </div>
+            <!-- Sidebar Brand & Logout Footer -->
+            <div class="sidebar-footer">
+                <div class="sidebar-brand-block text-center py-2 rounded-3 text-white" style="background: var(--main-gradient); font-weight: 600; font-size: 16px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);">
+                    <a href="{{ route('admin') }}" class="text-white text-decoration-none">{{ setting('general', 'site_name', 'Thikana.shop') }}</a>
+                </div>
+                <a href="{{ route('logout') }}" class="btn btn-outline-danger w-100 rounded-pill d-flex align-items-center justify-content-center gap-2" style="font-weight: 600; font-size: 14px;" onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();">
+                    <i class="fas fa-sign-out-alt"></i> Logout Session
+                </a>
+                <form id="logout-form-sidebar" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
+            </div>
         </div>
 
         <!-- --sidebar-end-- -->
@@ -2196,7 +2227,6 @@
 
     <!-- Push scripts section -->
     @stack('scripts')
-    </style>
 </body>
 
 </html>
