@@ -737,6 +737,191 @@
                 max-width: 180px !important;
             }
         }
+
+        /* Premium Status Change Modal Styling */
+        #statusChangeModal .modal-content {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+        }
+        
+        #statusChangeModal .modal-header {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 20px 24px;
+            background-color: #fff;
+        }
+
+        #statusChangeModal .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        #statusChangeModal .btn-close {
+            background-size: 10px;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        #statusChangeModal .btn-close:hover {
+            background-color: #f1f5f9;
+        }
+
+        #statusChangeModal .modal-body {
+            padding: 24px;
+            background-color: #fff;
+        }
+
+        #statusChangeModal .form-select {
+            height: 46px;
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+        }
+
+        #statusChangeModal .form-select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background-color: #fff;
+        }
+
+        /* Purchase Event Card */
+        #codPurchaseEventSection {
+            margin-top: 20px;
+            padding: 18px;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px;
+            background-color: #f8fafc !important;
+            transition: all 0.3s ease;
+        }
+
+        #codPurchaseEventSection h6 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #purchaseEventDescription {
+            font-size: 12.5px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        #purchaseEventStatus {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        #purchaseEventStatus .text-warning {
+            color: #d97706 !important;
+            background-color: #fffbeb;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #fef3c7;
+            width: 100%;
+        }
+
+        #purchaseEventStatus .text-success {
+            color: #059669 !important;
+            background-color: #ecfdf5;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #d1fae5;
+            width: 100%;
+        }
+
+        #purchaseEventStatus .text-danger {
+            color: #dc2626 !important;
+            background-color: #fef2f2;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #fee2e2;
+            width: 100%;
+        }
+
+        #firePurchaseEventBtn {
+            width: 100%;
+            height: 38px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            border: none;
+            background-color: #10b981;
+            color: #fff;
+        }
+
+        #firePurchaseEventBtn:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+        }
+
+        #statusChangeModal .modal-footer {
+            border-top: 1px solid #f1f5f9;
+            padding: 16px 24px;
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        #statusChangeModal .btn-secondary {
+            background-color: #94a3b8;
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            height: 38px;
+            padding: 0 18px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        #statusChangeModal .btn-secondary:hover {
+            background-color: #64748b;
+        }
+
+        #statusChangeModal .btn-primary {
+            background-color: #2563eb;
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            height: 38px;
+            padding: 0 18px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        #statusChangeModal .btn-primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
     </style>
 @endpush
 
@@ -964,33 +1149,36 @@
             <form id="statusChangeForm">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="statusChangeModalLabel">Change Order Status</h5>
+                        <h5 class="modal-title" id="statusChangeModalLabel"><i class="fas fa-sliders-h me-2 text-primary"></i>Update Order Status & Analytics</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="order_id" id="modalOrderId">
                         <input type="hidden" name="payment_method" id="modalPaymentMethod">
-                        <select name="status" id="modalStatusSelect" class="form-select">
-                            <option value="pending">Pending</option>
-                            <option value="phone_not_rcv">Call Not Received</option>
-                            <option value="follow_up">Follow up</option>
-                            <option value="processing">Processing</option>
-                            <option value="ready_for_delivery">Ready Delivery</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="on_hold">On Hold</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold tracking-wider mb-2 d-block" style="font-size: 11px; letter-spacing: 0.05em;">SELECT NEW STATUS</label>
+                            <select name="status" id="modalStatusSelect" class="form-select">
+                                <option value="pending">Pending</option>
+                                <option value="phone_not_rcv">Call Not Received</option>
+                                <option value="follow_up">Follow up</option>
+                                <option value="processing">Processing</option>
+                                <option value="ready_for_delivery">Ready Delivery</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="on_hold">On Hold</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
 
                         <!-- Purchase Event Section (COD & Offline Orders) -->
                         <div id="codPurchaseEventSection" class="mt-3 p-3 border rounded bg-light" style="display: none;">
-                            <h6 class="mb-2"><i class="fas fa-chart-line me-1"></i> Purchase Event (Analytics)</h6>
-                            <p class="text-muted small mb-2" id="purchaseEventDescription">
-                                This order has a pending purchase event. Click below to send the purchase event to Facebook/Google.
+                            <h6 class="mb-2"><i class="fas fa-sync-alt me-1 text-primary"></i> Pixel & Conversion Sync</h6>
+                            <p class="text-muted small mb-3" id="purchaseEventDescription" style="font-size: 12px; line-height: 1.4;">
+                                Verify and trigger standard customer purchase events to Facebook Pixel and Google Analytics.
                             </p>
                             <div id="purchaseEventStatus" class="mb-2"></div>
                             <button type="button" id="firePurchaseEventBtn" class="btn btn-success btn-sm">
-                                <i class="fas fa-paper-plane me-1"></i> Fire Purchase Event
+                                <i class="fas fa-paper-plane me-1"></i> Sync Purchase Event Now
                             </button>
                         </div>
                     </div>
@@ -1299,10 +1487,7 @@
                             const editUrl = `/admin/orders/${row.id}/edit`;
                             let html = `
                                 <div class="d-flex align-items-center gap-2">
-                                    <a href="${editUrl}" title="View" class="action-icon-btn text-primary"><i class="fas fa-search"></i></a>
                                     <a href="${editUrl}" title="Edit" class="action-icon-btn text-success"><i class="fas fa-pencil-alt"></i></a>
-                                    <a href="/order/${row.id}/print-invoice" title="Print Invoice" class="action-icon-btn text-info" target="_blank"><i class="fas fa-print"></i></a>
-                                    <a href="/order/${row.id}/print-package-slip" title="Print Package Slip" class="action-icon-btn text-warning" target="_blank"><i class="fas fa-truck"></i></a>
                                     <div class="custom-dropdown">
                                         <button class="action-icon-btn custom-dropdown-toggle" type="button" title="More Options">
                                             <i class="fas fa-ellipsis-h"></i>
@@ -1574,21 +1759,21 @@
                     },
                     success: function(response) {
                         if (response.was_fired) {
-                            $('#purchaseEventStatus').html('<span class="text-success"><i class="fas fa-check-circle"></i> Event already fired at ' + new Date(response.fired_at).toLocaleString() + '</span>');
+                            $('#purchaseEventStatus').html('<span class="text-success"><i class="fas fa-check-circle"></i> Synced successfully at ' + new Date(response.fired_at).toLocaleString() + '</span>');
                             $('#firePurchaseEventBtn').hide();
                         } else if (response.fire_failed) {
-                            $('#purchaseEventStatus').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> Previous attempt failed: ' + (response.fire_error || 'Unknown error') + '</span>');
-                            $('#firePurchaseEventBtn').show().prop('disabled', false).text('Retry Fire Event');
+                            $('#purchaseEventStatus').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> Sync failed: ' + (response.fire_error || 'Unknown error') + '</span>');
+                            $('#firePurchaseEventBtn').show().prop('disabled', false).text('Retry Sync');
                         } else if (response.has_pending_event) {
-                            $('#purchaseEventStatus').html('<span class="text-warning"><i class="fas fa-clock"></i> Event pending - ready to fire</span>');
-                            $('#firePurchaseEventBtn').show().prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i> Fire Purchase Event');
+                            $('#purchaseEventStatus').html('<span class="text-warning"><i class="fas fa-clock"></i> Event pending - ready to sync</span>');
+                            $('#firePurchaseEventBtn').show().prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i> Sync Purchase Event Now');
                         } else {
-                            $('#purchaseEventStatus').html('<span class="text-info"><i class="fas fa-info-circle"></i> No pending event found - will create and fire</span>');
-                            $('#firePurchaseEventBtn').show().prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i> Create & Fire Event');
+                            $('#purchaseEventStatus').html('<span class="text-info"><i class="fas fa-info-circle"></i> No record - will generate & sync</span>');
+                            $('#firePurchaseEventBtn').show().prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i> Generate & Sync Event');
                         }
                     },
                     error: function() {
-                        $('#purchaseEventStatus').html('<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> Error checking status</span>');
+                        $('#purchaseEventStatus').html('<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> Sync status check failed</span>');
                         $('#firePurchaseEventBtn').show().prop('disabled', false);
                     }
                 });
@@ -1599,7 +1784,7 @@
                 var orderId = $('#modalOrderId').val();
                 var btn = $(this);
 
-                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Firing...');
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Syncing...');
 
                 $.ajax({
                     url: '{{ route('admin.orders.firePurchaseEvent') }}',
