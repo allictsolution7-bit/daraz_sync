@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('styles')
+@push('styles')
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* Typography & Layout Animation */
@@ -186,7 +186,7 @@
             padding: 8px 12px !important;
         }
     </style>
-@endsection
+@endpush
 
 @section('content')
     <div class="container-fluid post-edit-wrapper">

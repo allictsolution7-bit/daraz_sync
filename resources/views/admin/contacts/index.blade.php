@@ -286,10 +286,50 @@
     <!-- Table Workspace Card -->
     <div class="workspace-card">
         <div class="premium-actions-bar">
-            <div class="d-flex align-items-center">
-                <h5 class="mb-0 font-weight-bold" style="color: var(--dark-slate);">
-                    {{ request()->routeIs('admin.contacts.unread') ? 'Unread Messages Log' : 'All Contacts Messages' }}
-                </h5>
+            <div class="d-flex align-items-center gap-3 flex-wrap w-100">
+                <!-- Title -->
+                <div class="me-auto">
+                    <h5 class="mb-0 font-weight-bold" style="color: var(--dark-slate);">
+                        {{ request()->routeIs('admin.contacts.unread') ? 'Unread Messages Log' : 'All Contacts Messages' }}
+                    </h5>
+                </div>
+
+                <!-- Keyword Search -->
+                <div class="d-flex align-items-center gap-2" style="flex: 1; min-width: 200px; max-width: 280px;">
+                    <div class="position-relative w-100">
+                        <i class="fas fa-search position-absolute" style="left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:13px;"></i>
+                        <input type="text" id="contactSearchInput" placeholder="Search name, email, subject…"
+                            class="form-control form-control-sm"
+                            style="padding-left:34px; border-radius:10px; border:1px solid #e2e8f0; font-size:13px;">
+                    </div>
+                </div>
+
+                <!-- Status Filter -->
+                <div>
+                    <select id="statusFilter" class="form-select form-select-sm" style="border-radius:10px; border:1px solid #e2e8f0; font-size:13px; min-width:130px;">
+                        <option value="all">All Statuses</option>
+                        <option value="unread">Unread Only</option>
+                        <option value="read">Read Only</option>
+                    </select>
+                </div>
+
+                <!-- Date Sort -->
+                <div>
+                    <button id="dateSortBtn" class="btn btn-sm d-flex align-items-center gap-2"
+                        style="border-radius:10px; border:1px solid #e2e8f0; background:#fff; font-size:13px; color:#64748b; padding:5px 14px;">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span id="dateSortLabel">Newest First</span>
+                        <i class="fas fa-sort" id="dateSortIcon"></i>
+                    </button>
+                </div>
+
+                <!-- Clear Filters -->
+                <div>
+                    <button id="clearFiltersBtn" class="btn btn-sm"
+                        style="border-radius:10px; border:1px solid #fecaca; background:#fff5f5; font-size:13px; color:#ef4444; padding:5px 14px; display:none;">
+                        <i class="fas fa-times me-1"></i> Clear
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -297,17 +337,22 @@
             <table class="table premium-table">
                 <thead>
                     <tr>
-                        <th>Sender Name</th>
+                        <th class="sortable-col" data-col="0" style="cursor:pointer;" title="Sort by Name">
+                            Sender Name <i class="fas fa-sort ms-1 sort-icon" style="opacity:0.4;"></i>
+                        </th>
                         <th>Email Address</th>
                         <th>Message Subject</th>
-                        <th>Date Received</th>
+                        <th class="sortable-col" data-col="3" style="cursor:pointer;" title="Sort by Date" id="dateColHeader">
+                            Date Received <i class="fas fa-sort-down ms-1 sort-icon" style="color:var(--primary);"></i>
+                        </th>
                         <th>Read Status</th>
                         <th style="text-align: center; width: 120px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($messages as $message)
-                    <tr>
+                    <tr data-status="{{ $message->is_read ? 'read' : 'unread' }}"
+                        data-date="{{ $message->created_at->toIso8601String() }}">
                         <td><strong>{{ $message->name }}</strong></td>
                         <td><span class="text-muted">{{ $message->email }}</span></td>
                         <td>{{ Str::limit($message->subject, 60) }}</td>
@@ -358,3 +403,161 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput   = document.getElementById('contactSearchInput');
+    const statusFilter  = document.getElementById('statusFilter');
+    const dateSortBtn   = document.getElementById('dateSortBtn');
+    const dateSortLabel = document.getElementById('dateSortLabel');
+    const dateSortIcon  = document.getElementById('dateSortIcon');
+    const clearBtn      = document.getElementById('clearFiltersBtn');
+    const tbody         = document.querySelector('.premium-table tbody');
+
+    let sortDirection = 'desc'; // newest first
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+    function getRows() {
+        return Array.from(tbody.querySelectorAll('tr[data-status]'));
+    }
+
+    function applyFilters() {
+        const q      = searchInput.value.toLowerCase().trim();
+        const status = statusFilter.value;
+        let anyVisible = false;
+
+        getRows().forEach(row => {
+            const name    = row.cells[0].textContent.toLowerCase();
+            const email   = row.cells[1].textContent.toLowerCase();
+            const subject = row.cells[2].textContent.toLowerCase();
+            const rowStatus = row.dataset.status; // 'read' | 'unread'
+
+            const matchQ      = !q || name.includes(q) || email.includes(q) || subject.includes(q);
+            const matchStatus = status === 'all' || rowStatus === status;
+
+            if (matchQ && matchStatus) {
+                row.style.display = '';
+                anyVisible = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // show/hide no-results row
+        let emptyRow = tbody.querySelector('#noResultsRow');
+        if (!anyVisible) {
+            if (!emptyRow) {
+                emptyRow = document.createElement('tr');
+                emptyRow.id = 'noResultsRow';
+                emptyRow.innerHTML = `<td colspan="6" class="text-center py-5 text-muted">
+                    <i class="fas fa-filter fa-2x mb-3" style="opacity:0.3;"></i>
+                    <h6 class="mt-2">No messages match your filters</h6>
+                    <p class="mb-0 small">Try adjusting the search or status filter.</p>
+                </td>`;
+                tbody.appendChild(emptyRow);
+            } else { emptyRow.style.display = ''; }
+        } else if (emptyRow) {
+            emptyRow.style.display = 'none';
+        }
+
+        // toggle clear button visibility
+        const hasFilter = q !== '' || status !== 'all';
+        clearBtn.style.display = hasFilter ? 'inline-flex' : 'none';
+    }
+
+    function sortByDate(dir) {
+        const rows = getRows();
+        rows.sort((a, b) => {
+            const da = new Date(a.dataset.date);
+            const db = new Date(b.dataset.date);
+            return dir === 'desc' ? db - da : da - db;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+    }
+
+    function sortByName(dir) {
+        const rows = getRows();
+        rows.sort((a, b) => {
+            const na = a.cells[0].textContent.trim().toLowerCase();
+            const nb = b.cells[0].textContent.trim().toLowerCase();
+            return dir === 'asc' ? na.localeCompare(nb) : nb.localeCompare(na);
+        });
+        rows.forEach(r => tbody.appendChild(r));
+    }
+
+    // ── events ───────────────────────────────────────────────────────────────
+    searchInput.addEventListener('input', applyFilters);
+    statusFilter.addEventListener('change', applyFilters);
+
+    dateSortBtn.addEventListener('click', function () {
+        sortDirection = sortDirection === 'desc' ? 'asc' : 'desc';
+        dateSortLabel.textContent = sortDirection === 'desc' ? 'Newest First' : 'Oldest First';
+        dateSortIcon.className    = 'fas ' + (sortDirection === 'desc' ? 'fa-sort-down' : 'fa-sort-up');
+        this.style.borderColor    = 'var(--primary)';
+        this.style.color          = 'var(--primary)';
+
+        // reset name sort visual
+        document.querySelectorAll('.sortable-col').forEach(th => {
+            if (th.dataset.col === '0') {
+                th.querySelector('.sort-icon').className = 'fas fa-sort ms-1 sort-icon';
+                th.querySelector('.sort-icon').style.opacity = '0.4';
+                th.querySelector('.sort-icon').style.color   = '';
+            }
+        });
+
+        sortByDate(sortDirection);
+    });
+
+    // Column header click sort
+    document.querySelectorAll('.sortable-col').forEach(th => {
+        th.addEventListener('click', function () {
+            const col = parseInt(this.dataset.col);
+            const icon = this.querySelector('.sort-icon');
+            const isAsc = icon.classList.contains('fa-sort-up');
+            const newDir = isAsc ? 'desc' : 'asc';
+
+            // reset all sort icons
+            document.querySelectorAll('.sortable-col .sort-icon').forEach(i => {
+                i.className = 'fas fa-sort ms-1 sort-icon';
+                i.style.opacity = '0.4';
+                i.style.color   = '';
+            });
+            icon.className = `fas fa-sort-${newDir === 'asc' ? 'up' : 'down'} ms-1 sort-icon`;
+            icon.style.opacity = '1';
+            icon.style.color   = 'var(--primary)';
+
+            // reset date sort button
+            dateSortBtn.style.borderColor = '#e2e8f0';
+            dateSortBtn.style.color       = '#64748b';
+            sortDirection = 'desc';
+            dateSortLabel.textContent = 'Newest First';
+            dateSortIcon.className    = 'fas fa-sort';
+
+            if (col === 0) sortByName(newDir);
+            if (col === 3) { sortByDate(newDir); sortDirection = newDir; }
+        });
+    });
+
+    clearBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        statusFilter.value = 'all';
+        applyFilters();
+        sortByDate('desc');
+        sortDirection = 'desc';
+        dateSortLabel.textContent = 'Newest First';
+        dateSortIcon.className    = 'fas fa-sort';
+        dateSortBtn.style.borderColor = '#e2e8f0';
+        dateSortBtn.style.color       = '#64748b';
+        document.querySelectorAll('.sortable-col .sort-icon').forEach(i => {
+            i.className = 'fas fa-sort ms-1 sort-icon';
+            i.style.opacity = '0.4';
+            i.style.color   = '';
+        });
+    });
+
+    // ── initial sort (newest first) ───────────────────────────────────────────
+    sortByDate('desc');
+});
+</script>
+@endpush
