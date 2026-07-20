@@ -1301,22 +1301,22 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <a href="${editUrl}" title="View" class="action-icon-btn text-primary"><i class="fas fa-search"></i></a>
                                     <a href="${editUrl}" title="Edit" class="action-icon-btn text-success"><i class="fas fa-pencil-alt"></i></a>
-                                    <a href="/admin/pos/print-invoice/${row.id}" title="Print Invoice" class="action-icon-btn text-info" target="_blank"><i class="fas fa-print"></i></a>
-                                    <a href="/admin/pos/print-package-slip/${row.id}" title="Print Package Slip" class="action-icon-btn text-warning" target="_blank"><i class="fas fa-truck"></i></a>
+                                    <a href="/order/${row.id}/print-invoice" title="Print Invoice" class="action-icon-btn text-info" target="_blank"><i class="fas fa-print"></i></a>
+                                    <a href="/order/${row.id}/print-package-slip" title="Print Package Slip" class="action-icon-btn text-warning" target="_blank"><i class="fas fa-truck"></i></a>
                                     <div class="custom-dropdown">
                                         <button class="action-icon-btn custom-dropdown-toggle" type="button" title="More Options">
                                             <i class="fas fa-ellipsis-h"></i>
                                         </button>
                                         <ul class="custom-dropdown-menu">
                                             <li><h6 class="custom-dropdown-header">Print Options</h6></li>
-                                            <li><a class="custom-dropdown-item" href="/admin/pos/print-receipt/${row.id}" target="_blank"><i class="fas fa-receipt me-2"></i> Print Receipt</a></li>
-                                            <li><a class="custom-dropdown-item" href="/admin/pos/print-invoice/${row.id}" target="_blank"><i class="fas fa-file-invoice me-2"></i> Print Invoice</a></li>
-                                            <li><a class="custom-dropdown-item" href="/admin/pos/print-package-slip/${row.id}" target="_blank"><i class="fas fa-box me-2"></i> Print Package Slip</a></li>
+                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/print-receipt" target="_blank"><i class="fas fa-receipt me-2"></i> Print Receipt</a></li>
+                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/print-invoice" target="_blank"><i class="fas fa-file-invoice me-2"></i> Print Invoice</a></li>
+                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/print-package-slip" target="_blank"><i class="fas fa-box me-2"></i> Print Package Slip</a></li>
                                             <li><hr class="custom-dropdown-divider"></li>
                                             <li><h6 class="custom-dropdown-header">Download Options</h6></li>
-                                            <li><a class="custom-dropdown-item" href="/admin/pos/download-receipt/${row.id}"><i class="fas fa-download me-2"></i> Download Receipt</a></li>
-                                            <li><a class="custom-dropdown-item" href="/admin/pos/download-invoice/${row.id}"><i class="fas fa-download me-2"></i> Download Invoice</a></li>
-                                            <li><a class="custom-dropdown-item" href="/admin/pos/download-package-slip/${row.id}"><i class="fas fa-download me-2"></i> Download Package Slip</a></li>
+                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/download-receipt"><i class="fas fa-download me-2"></i> Download Receipt</a></li>
+                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/download-invoice"><i class="fas fa-download me-2"></i> Download Invoice</a></li>
+                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/download-package-slip"><i class="fas fa-download me-2"></i> Download Package Slip</a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -2223,7 +2223,7 @@
                     let popupBlockedNoticeShown = false;
 
                     selected.forEach((orderId, index) => {
-                        const url = `/admin/pos/print-invoice/${orderId}`;
+                        const url = `/order/${orderId}/print-invoice`;
                         setTimeout(() => {
                             const newWindow = window.open(url, '_blank');
                             if (!newWindow && !popupBlockedNoticeShown) {
@@ -2251,7 +2251,7 @@
                     let popupBlockedNoticeShown = false;
 
                     selected.forEach((orderId, index) => {
-                        const url = `/admin/pos/print-package-slip/${orderId}`;
+                        const url = `/order/${orderId}/print-package-slip`;
                         setTimeout(() => {
                             const newWindow = window.open(url, '_blank');
                             if (!newWindow && !popupBlockedNoticeShown) {

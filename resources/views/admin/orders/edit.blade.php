@@ -247,34 +247,34 @@
                         <ul class="dropdown-menu">
                             <li><h6 class="dropdown-header">Print Options</h6></li>
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.pos.print-receipt', $order->id) }}" target="_blank">
+                                <a class="dropdown-item" href="{{ route('order.print-receipt', $order->id) }}" target="_blank">
                                     <i class="fas fa-receipt me-2"></i> Print Receipt
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.pos.print-invoice', $order->id) }}" target="_blank">
+                                <a class="dropdown-item" href="{{ route('order.print-invoice', $order->id) }}" target="_blank">
                                     <i class="fas fa-file-invoice me-2"></i> Print Invoice
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.pos.print-package-slip', $order->id) }}" target="_blank">
+                                <a class="dropdown-item" href="{{ route('order.print-package-slip', $order->id) }}" target="_blank">
                                     <i class="fas fa-box me-2"></i> Print Package Slip
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li><h6 class="dropdown-header">Download Options</h6></li>
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.pos.download-receipt', $order->id) }}">
+                                <a class="dropdown-item" href="{{ route('order.download-receipt', $order->id) }}">
                                     <i class="fas fa-download me-2"></i> Download Receipt
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.pos.download-invoice', $order->id) }}">
+                                <a class="dropdown-item" href="{{ route('order.download-invoice', $order->id) }}">
                                     <i class="fas fa-download me-2"></i> Download Invoice
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.pos.download-package-slip', $order->id) }}">
+                                <a class="dropdown-item" href="{{ route('order.download-package-slip', $order->id) }}">
                                     <i class="fas fa-download me-2"></i> Download Package Slip
                                 </a>
                             </li>
