@@ -177,61 +177,15 @@ class LicenseService
     }
 
     /**
-     * Validate and get secure URL - prevents tampering
+     * Get the configured mother panel URL from env/config.
      */
     private function validateAndGetSecureURL(): string
     {
-        $configuredUrl = config('license.mother_panel_url');
-        
-        // CRITICAL: Only allow legitimate URLs
-        $allowedDomains = [
-            'uddoktaecommerce.com',
-            'www.uddoktaecommerce.com',
-            '127.0.0.1', // For development only
-            'localhost'  // For development only
-        ];
-        
-        // Parse the configured URL
-        $parsedUrl = parse_url($configuredUrl);
-        $host = $parsedUrl['host'] ?? '';
-        
-        // Check if host is in allowed list
-        $isAllowed = false;
-        foreach ($allowedDomains as $allowedDomain) {
-            if ($host === $allowedDomain || str_ends_with($host, '.' . $allowedDomain)) {
-                $isAllowed = true;
-                break;
-            }
+        $url = config('license.mother_panel_url');
+        if ($url) {
+            return $url;
         }
-        
-        // If URL is tampered with, use hardcoded URL and log the attempt
-        if (!$isAllowed) {
-            Log::critical('LICENSE SYSTEM TAMPERING DETECTED', [
-                'configured_url' => $configuredUrl,
-                'parsed_host' => $host,
-                'allowed_domains' => $allowedDomains,
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-                'timestamp' => now()->toISOString()
-            ]);
-            
-            // Use hardcoded URL as fallback
-            return self::MOTHER_PANEL_URL;
-        }
-        
-        // Additional validation for production
-        if (config('app.env') === 'production') {
-            // In production, only allow HTTPS
-            if (!str_starts_with($configuredUrl, 'https://')) {
-                Log::critical('SECURITY VIOLATION: Non-HTTPS URL in production', [
-                    'configured_url' => $configuredUrl,
-                    'environment' => config('app.env')
-                ]);
-                return self::MOTHER_PANEL_URL;
-            }
-        }
-        
-        return $configuredUrl;
+        return self::MOTHER_PANEL_URL;
     }
 
     /**

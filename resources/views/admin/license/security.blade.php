@@ -1,189 +1,509 @@
 @extends('layouts.master')
 
+@section('styles')
+<style>
+    :root {
+        --primary: #197A94;
+        --primary-gradient: linear-gradient(135deg, #197A94 0%, #0d5c70 100%);
+        --primary-hover: #135d71;
+        --primary-light: rgba(25, 122, 148, 0.08);
+        --success: #10b981;
+        --info: #06b6d4;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --dark-slate: #1e293b;
+        --text-main: #334155;
+        --text-muted: #64748b;
+        --bg-glass: rgba(255, 255, 255, 0.95);
+        --border-glass: rgba(226, 232, 240, 0.9);
+        --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+        --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Container adjustments */
+    .container-fluid {
+        padding: 30px;
+        background-color: #f8fafc;
+        min-height: 100vh;
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary);
+        font-weight: 500;
+    }
+
+    .page-title {
+        color: var(--dark-slate);
+        font-weight: 800;
+        font-size: 24px;
+        letter-spacing: -0.5px;
+    }
+
+    /* Premium Cards */
+    .card {
+        background: var(--bg-glass);
+        border: 1px solid var(--border-glass);
+        border-radius: 20px;
+        box-shadow: var(--shadow-premium);
+        transition: var(--transition-smooth);
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background: transparent !important;
+        border-bottom: 1.5px solid #f1f5f9 !important;
+        padding: 20px 25px !important;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--dark-slate);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-body {
+        padding: 25px 30px;
+    }
+
+    /* Overview metric cards */
+    .metric-card {
+        border-left: 4px solid var(--border-glass);
+    }
+    .metric-card.border-danger { border-left: 4px solid var(--danger) !important; }
+    .metric-card.border-success { border-left: 4px solid var(--success) !important; }
+    .metric-card.border-warning { border-left: 4px solid var(--warning) !important; }
+    .metric-card.border-info { border-left: 4px solid var(--info) !important; }
+
+    .metric-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    .metric-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--dark-slate);
+        margin: 10px 0;
+    }
+
+    /* Buttons */
+    .btn-action-primary {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 12px 24px;
+        transition: var(--transition-smooth);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    .btn-action-primary:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(25, 122, 148, 0.3);
+        color: white;
+    }
+
+    .btn-action-danger {
+        background: linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%);
+        color: white;
+        border: none;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 12px 24px;
+        transition: var(--transition-smooth);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-action-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+        color: white;
+    }
+
+    .btn-action-warning {
+        background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+        color: white;
+        border: none;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 12px 24px;
+        transition: var(--transition-smooth);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-action-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
+        color: white;
+    }
+
+    .btn-action-info {
+        background: linear-gradient(135deg, var(--info) 0%, #0891b2 100%);
+        color: white;
+        border: none;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 12px 24px;
+        transition: var(--transition-smooth);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-action-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(6, 182, 212, 0.3);
+        color: white;
+    }
+
+    .btn-action-success {
+        background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
+        color: white;
+        border: none;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 12px 24px;
+        transition: var(--transition-smooth);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-action-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+        color: white;
+    }
+
+    .btn-outline-custom {
+        border: 1.5px solid #cbd5e1;
+        background: transparent;
+        color: var(--text-main);
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-size: 12px;
+        transition: var(--transition-smooth);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-outline-custom:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--primary-light);
+    }
+    .btn-outline-custom-danger {
+        border: 1.5px solid rgba(239, 68, 68, 0.4);
+        background: transparent;
+        color: var(--danger);
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-size: 12px;
+        transition: var(--transition-smooth);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-outline-custom-danger:hover {
+        border-color: var(--danger);
+        color: white;
+        background: var(--danger);
+    }
+
+    /* Table styles */
+    .table {
+        margin-bottom: 0;
+    }
+    .table th {
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 12px;
+        border-bottom: 1.5px solid #f1f5f9;
+        padding: 12px 16px;
+    }
+    .table td {
+        padding: 12px 16px;
+        font-size: 13px;
+        color: var(--text-main);
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .table-danger-custom {
+        background-color: rgba(239, 68, 68, 0.05);
+    }
+
+    /* System Health List */
+    .health-check-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .health-check-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 18px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        transition: var(--transition-smooth);
+    }
+    .health-check-row:hover {
+        background: #ffffff;
+        border-color: var(--primary);
+    }
+
+    .health-check-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .health-check-row i.status-icon {
+        font-size: 18px;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box">
-                <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.license.index') }}">License</a></li>
-                        <li class="breadcrumb-item active">Security Monitor</li>
-                    </ol>
-                </div>
-                <h5 class="page-title mb-3">License Security Monitor</h5>
+    <!-- Breadcrumb Header -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="page-title mb-0">Security Monitor</h5>
             </div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb m-0 bg-transparent p-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.license.index') }}">License</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Security Monitor</li>
+                </ol>
+            </nav>
         </div>
     </div>
 
-    <!-- Security Overview Cards -->
+    <!-- Security Metrics Grid -->
     <div class="row">
-        <div class="col-lg-3">
-            <div class="card border-danger">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-title text-danger">Tamper Attempts</h6>
-                            <h3 class="text-danger">{{ $securityData['tamper_attempts']['total_attempts'] }}</h3>
+        <!-- Tamper Attempts -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card metric-card border-danger m-0 h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="metric-title text-danger">Tamper Attempts</span>
+                            <i class="fas fa-shield-alt text-danger fs-4"></i>
                         </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-shield-alt fa-2x text-danger"></i>
-                        </div>
+                        <h3 class="metric-value text-danger">{{ $securityData['tamper_attempts']['total_attempts'] ?? 0 }}</h3>
                     </div>
-                    <button class="btn btn-sm btn-outline-danger" onclick="clearTamperAttempts()">
-                        <i class="fas fa-trash"></i> Clear
-                    </button>
+                    <div>
+                        <button class="btn-outline-custom-danger w-100 justify-content-center" onclick="clearTamperAttempts()">
+                            <i class="fas fa-trash"></i> Clear Logs
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-lg-3">
-            <div class="card {{ $securityData['heartbeat_status']['is_healthy'] ? 'border-success' : 'border-warning' }}">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-title {{ $securityData['heartbeat_status']['is_healthy'] ? 'text-success' : 'text-warning' }}">
-                                Heartbeat Status
-                            </h6>
-                            <h5 class="{{ $securityData['heartbeat_status']['is_healthy'] ? 'text-success' : 'text-warning' }}">
-                                {{ $securityData['heartbeat_status']['is_healthy'] ? 'Healthy' : 'Issues' }}
-                            </h5>
+
+        <!-- Heartbeat Status -->
+        @php $isHealthy = $securityData['heartbeat_status']['is_healthy'] ?? false; @endphp
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card metric-card {{ $isHealthy ? 'border-success' : 'border-warning' }} m-0 h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="metric-title {{ $isHealthy ? 'text-success' : 'text-warning' }}">Heartbeat Status</span>
+                            <i class="fas fa-heartbeat {{ $isHealthy ? 'text-success' : 'text-warning' }} fs-4"></i>
                         </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-heartbeat fa-2x {{ $securityData['heartbeat_status']['is_healthy'] ? 'text-success' : 'text-warning' }}"></i>
-                        </div>
+                        <h3 class="metric-value {{ $isHealthy ? 'text-success' : 'text-warning' }}">
+                            {{ $isHealthy ? 'Healthy' : 'Warning' }}
+                        </h3>
                     </div>
-                    <small class="text-muted">
-                        Last: {{ $securityData['heartbeat_status']['last_heartbeat'] }}
-                    </small>
+                    <div>
+                        <small class="text-muted d-block text-truncate">
+                            Last Sync: {{ $securityData['heartbeat_status']['last_heartbeat'] ?? 'Never' }}
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-lg-3">
-            <div class="card {{ $securityData['integrity_checks']['system_integrity'] ? 'border-success' : 'border-danger' }}">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-title {{ $securityData['integrity_checks']['system_integrity'] ? 'text-success' : 'text-danger' }}">
-                                System Integrity
-                            </h6>
-                            <h5 class="{{ $securityData['integrity_checks']['system_integrity'] ? 'text-success' : 'text-danger' }}">
-                                {{ $securityData['integrity_checks']['system_integrity'] ? 'OK' : 'Failed' }}
-                            </h5>
+
+        <!-- System Integrity -->
+        @php $integrityOk = $securityData['integrity_checks']['system_integrity'] ?? false; @endphp
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card metric-card {{ $integrityOk ? 'border-success' : 'border-danger' }} m-0 h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="metric-title {{ $integrityOk ? 'text-success' : 'text-danger' }}">System Integrity</span>
+                            <i class="fas fa-check-circle {{ $integrityOk ? 'text-success' : 'text-danger' }} fs-4"></i>
                         </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-check-circle fa-2x {{ $securityData['integrity_checks']['system_integrity'] ? 'text-success' : 'text-danger' }}"></i>
-                        </div>
+                        <h3 class="metric-value {{ $integrityOk ? 'text-success' : 'text-danger' }}">
+                            {{ $integrityOk ? 'Secure' : 'Corrupted' }}
+                        </h3>
                     </div>
-                    <button class="btn btn-sm btn-outline-primary" onclick="forceIntegrityCheck()">
-                        <i class="fas fa-sync"></i> Check
-                    </button>
+                    <div>
+                        <button class="btn-outline-custom w-100 justify-content-center" onclick="forceIntegrityCheck()">
+                            <i class="fas fa-sync"></i> Verify Now
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-lg-3">
-            <div class="card border-info">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="card-title text-info">Security Score</h6>
-                            <h3 class="text-info" id="security-score">--</h3>
+
+        <!-- Security Score -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card metric-card border-info m-0 h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="metric-title text-info">Security Score</span>
+                            <i class="fas fa-chart-line text-info fs-4"></i>
                         </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-chart-line fa-2x text-info"></i>
-                        </div>
+                        <h3 class="metric-value text-info" id="security-score">--</h3>
                     </div>
-                    <button class="btn btn-sm btn-outline-info" onclick="refreshSecurityStats()">
-                        <i class="fas fa-refresh"></i> Refresh
-                    </button>
+                    <div>
+                        <button class="btn-outline-custom w-100 justify-content-center" onclick="refreshSecurityStats()">
+                            <i class="fas fa-arrows-rotate"></i> Refresh Score
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Detailed Security Information -->
-    <div class="row mt-4">
-        <div class="col-lg-6">
-            <div class="card">
+    <div class="row">
+        <!-- Recent Tamper Attempts Log -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Recent Tamper Attempts
+                        <i class="fas fa-exclamation-triangle text-danger"></i> Recent Security Log
                     </h5>
                 </div>
                 <div class="card-body">
-                    @if(count($securityData['tamper_attempts']['recent_attempts']) > 0)
+                    @if(count($securityData['tamper_attempts']['recent_attempts'] ?? []) > 0)
                         <div class="table-responsive">
-                            <table class="table table-sm">
+                            <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Time</th>
-                                        <th>IP Address</th>
-                                        <th>Reason</th>
+                                        <th>Timestamp</th>
+                                        <th>IP Location</th>
+                                        <th>Violation Reason</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($securityData['tamper_attempts']['recent_attempts'] as $attempt)
-                                    <tr class="table-danger">
-                                        <td>{{ $attempt['timestamp'] ?? 'Unknown' }}</td>
-                                        <td>{{ $attempt['ip'] ?? 'Unknown' }}</td>
-                                        <td>{{ $attempt['reason'] ?? 'Unknown' }}</td>
+                                    <tr class="table-danger-custom">
+                                        <td class="font-weight-bold">{{ $attempt['timestamp'] ?? 'Unknown' }}</td>
+                                        <td><code class="text-dark bg-light px-2 py-1 rounded">{{ $attempt['ip'] ?? 'Unknown' }}</code></td>
+                                        <td class="text-danger font-weight-semibold">{{ $attempt['reason'] ?? 'Unknown' }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     @else
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle me-2"></i>
-                            No tamper attempts detected in recent history.
+                        <div class="alert alert-success border-0 rounded-4 py-3 mb-0 d-flex align-items-center gap-3">
+                            <i class="fas fa-check-circle fs-4"></i>
+                            <div>
+                                <h6 class="alert-heading mb-1 font-weight-bold">System Clean!</h6>
+                                <p class="mb-0 text-sm opacity-90">No tampering attempts or unauthorized access violations detected.</p>
+                            </div>
                         </div>
                     @endif
                 </div>
             </div>
         </div>
-        
-        <div class="col-lg-6">
-            <div class="card">
+
+        <!-- System health metrics -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-shield-alt me-2"></i>System Health
+                        <i class="fas fa-heartbeat text-primary"></i> System Diagnostics
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="health-checks">
-                        <div class="health-check-item">
-                            <i class="fas fa-database me-2 {{ $securityData['system_health']['database_status'] ? 'text-success' : 'text-danger' }}"></i>
-                            <span>Database Status:</span>
-                            <strong class="{{ $securityData['system_health']['database_status'] ? 'text-success' : 'text-danger' }}">
-                                {{ $securityData['system_health']['database_status'] ? 'Connected' : 'Disconnected' }}
-                            </strong>
+                    <div class="health-check-list">
+                        <!-- Database status -->
+                        @php $dbOk = $securityData['system_health']['database_status'] ?? false; @endphp
+                        <div class="health-check-row">
+                            <span class="health-check-label">
+                                <i class="fas fa-database status-icon {{ $dbOk ? 'text-success' : 'text-danger' }}"></i>
+                                Database Connection
+                            </span>
+                            <span class="badge {{ $dbOk ? 'bg-success' : 'bg-danger' }} py-2 px-3 rounded-pill">
+                                {{ $dbOk ? 'Connected' : 'Disconnected' }}
+                            </span>
                         </div>
-                        
-                        <div class="health-check-item">
-                            <i class="fas fa-file-alt me-2 {{ $securityData['system_health']['file_system_status'] ? 'text-success' : 'text-danger' }}"></i>
-                            <span>File System:</span>
-                            <strong class="{{ $securityData['system_health']['file_system_status'] ? 'text-success' : 'text-danger' }}">
-                                {{ $securityData['system_health']['file_system_status'] ? 'OK' : 'Issues' }}
-                            </strong>
+
+                        <!-- File System -->
+                        @php $fsOk = $securityData['system_health']['file_system_status'] ?? false; @endphp
+                        <div class="health-check-row">
+                            <span class="health-check-label">
+                                <i class="fas fa-folder-open status-icon {{ $fsOk ? 'text-success' : 'text-danger' }}"></i>
+                                File Integrity
+                            </span>
+                            <span class="badge {{ $fsOk ? 'bg-success' : 'bg-danger' }} py-2 px-3 rounded-pill">
+                                {{ $fsOk ? 'Secure' : 'Vulnerable' }}
+                            </span>
                         </div>
-                        
-                        <div class="health-check-item">
-                            <i class="fas fa-network-wired me-2 {{ $securityData['system_health']['network_status'] ? 'text-success' : 'text-danger' }}"></i>
-                            <span>Network:</span>
-                            <strong class="{{ $securityData['system_health']['network_status'] ? 'text-success' : 'text-danger' }}">
-                                {{ $securityData['system_health']['network_status'] ? 'Connected' : 'Disconnected' }}
-                            </strong>
+
+                        <!-- Network status -->
+                        @php $netOk = $securityData['system_health']['network_status'] ?? false; @endphp
+                        <div class="health-check-row">
+                            <span class="health-check-label">
+                                <i class="fas fa-globe status-icon {{ $netOk ? 'text-success' : 'text-danger' }}"></i>
+                                Licensing Network API
+                            </span>
+                            <span class="badge {{ $netOk ? 'bg-success' : 'bg-danger' }} py-2 px-3 rounded-pill">
+                                {{ $netOk ? 'Online' : 'Offline' }}
+                            </span>
                         </div>
-                        
-                        <div class="health-check-item">
-                            <i class="fas fa-key me-2 {{ $securityData['system_health']['license_status']['valid'] ? 'text-success' : 'text-danger' }}"></i>
-                            <span>License:</span>
-                            <strong class="{{ $securityData['system_health']['license_status']['valid'] ? 'text-success' : 'text-danger' }}">
-                                {{ $securityData['system_health']['license_status']['valid'] ? 'Valid' : 'Invalid' }}
-                            </strong>
+
+                        <!-- License Status -->
+                        @php $licOk = $securityData['system_health']['license_status']['valid'] ?? false; @endphp
+                        <div class="health-check-row">
+                            <span class="health-check-label">
+                                <i class="fas fa-key status-icon {{ $licOk ? 'text-success' : 'text-danger' }}"></i>
+                                License Status
+                            </span>
+                            <span class="badge {{ $licOk ? 'bg-success' : 'bg-danger' }} py-2 px-3 rounded-pill">
+                                {{ $licOk ? 'Authenticated' : 'Unlicensed' }}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -191,35 +511,35 @@
         </div>
     </div>
 
-    <!-- Security Actions -->
-    <div class="row mt-4">
+    <!-- Security Action Dashboard -->
+    <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-tools me-2"></i>Security Actions
+                        <i class="fas fa-screwdriver-wrench text-primary"></i> Security Control Panel
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <button class="btn btn-primary w-100" onclick="forceIntegrityCheck()">
-                                <i class="fas fa-sync me-2"></i>Force Integrity Check
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <button class="btn-action-primary w-100" onclick="forceIntegrityCheck()">
+                                <i class="fas fa-sync"></i> Force Verification
                             </button>
                         </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-warning w-100" onclick="clearTamperAttempts()">
-                                <i class="fas fa-trash me-2"></i>Clear Tamper Attempts
+                        <div class="col-lg-3 col-md-6">
+                            <button class="btn-action-warning w-100" onclick="clearTamperAttempts()">
+                                <i class="fas fa-trash-can"></i> Clear Tamper Logs
                             </button>
                         </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-info w-100" onclick="refreshSecurityStats()">
-                                <i class="fas fa-chart-bar me-2"></i>Refresh Statistics
+                        <div class="col-lg-3 col-md-6">
+                            <button class="btn-action-info w-100" onclick="refreshSecurityStats()">
+                                <i class="fas fa-chart-pie"></i> Refresh Statistics
                             </button>
                         </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-success w-100" onclick="exportSecurityLogs()">
-                                <i class="fas fa-download me-2"></i>Export Logs
+                        <div class="col-lg-3 col-md-6">
+                            <button class="btn-action-success w-100" onclick="exportSecurityLogs()">
+                                <i class="fas fa-download"></i> Export Data Logs
                             </button>
                         </div>
                     </div>
@@ -279,40 +599,10 @@ function exportSecurityLogs() {
     window.open('{{ route("admin.license.security.export") }}', '_blank');
 }
 
-// Auto-refresh security stats every 30 seconds
+// Initial fetch & auto-refresh security stats every 30 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    refreshSecurityStats();
+});
 setInterval(refreshSecurityStats, 30000);
 </script>
-@endpush
-
-@push('styles')
-<style>
-.health-check-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.health-check-item:last-child {
-    border-bottom: none;
-}
-
-.card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-}
-
-.border-danger {
-    border-left: 4px solid #dc3545 !important;
-}
-
-.border-warning {
-    border-left: 4px solid #ffc107 !important;
-}
-
-.border-success {
-    border-left: 4px solid #28a745 !important;
-}
-
-.border-info {
-    border-left: 4px solid #17a2b8 !important;
-}
-</style>
 @endpush

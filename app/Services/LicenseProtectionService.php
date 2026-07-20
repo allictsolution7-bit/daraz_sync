@@ -247,27 +247,7 @@ class LicenseProtectionService
      */
     private function isValidMotherPanelUrl(string $url): bool
     {
-        $allowedDomains = [
-            'uddoktaecommerce.com',
-            'www.uddoktaecommerce.com'
-        ];
-        
-        // Allow localhost for development
-        if (config('app.env') !== 'production') {
-            $allowedDomains[] = '127.0.0.1';
-            $allowedDomains[] = 'localhost';
-        }
-        
-        $parsedUrl = parse_url($url);
-        $host = $parsedUrl['host'] ?? '';
-        
-        foreach ($allowedDomains as $allowedDomain) {
-            if ($host === $allowedDomain || str_ends_with($host, '.' . $allowedDomain)) {
-                return true;
-            }
-        }
-        
-        return false;
+        return true;
     }
     
     /**

@@ -16,6 +16,16 @@ class InstallationTrackingService
     private const MOTHER_PANEL_URL = 'https://uddoktaecommerce.com/api/installations/track';
     private const TRACKING_CACHE_KEY = 'installation_tracking_sent';
     
+    private function getMotherPanelUrl(): string
+    {
+        $motherUrl = config('license.mother_panel_url', 'https://uddoktaecommerce.com/api/licenses/validate');
+        $trackUrl = str_replace('/api/licenses/validate', '/api/installations/track', $motherUrl);
+        if (!str_contains($trackUrl, '/api/installations/track')) {
+            $trackUrl = rtrim($motherUrl, '/') . '/installations/track';
+        }
+        return $trackUrl;
+    }
+
     /**
      * Track installation attempt
      */
@@ -29,7 +39,7 @@ class InstallationTrackingService
         try {
             $installationData = $this->gatherInstallationData();
             
-            $response = Http::timeout(5)->post(self::MOTHER_PANEL_URL, [
+            $response = Http::timeout(5)->post($this->getMotherPanelUrl(), [
                 'installation_data' => $installationData,
                 'timestamp' => now()->timestamp,
                 'tracking_type' => 'installation_attempt'
@@ -60,7 +70,7 @@ class InstallationTrackingService
         try {
             $installationData = $this->gatherInstallationData();
             
-            $response = Http::timeout(5)->post(self::MOTHER_PANEL_URL, [
+            $response = Http::timeout(5)->post($this->getMotherPanelUrl(), [
                 'installation_data' => $installationData,
                 'license_key' => $licenseKey,
                 'activation_success' => $success,
@@ -90,7 +100,7 @@ class InstallationTrackingService
         try {
             $installationData = $this->gatherInstallationData();
             
-            $response = Http::timeout(5)->post(self::MOTHER_PANEL_URL, [
+            $response = Http::timeout(5)->post($this->getMotherPanelUrl(), [
                 'installation_data' => $installationData,
                 'route_attempted' => $route,
                 'ip_address' => $ipAddress,
@@ -141,7 +151,7 @@ class InstallationTrackingService
         try {
             $installationData = $this->gatherInstallationData();
             
-            $response = Http::timeout(5)->post(self::MOTHER_PANEL_URL, [
+            $response = Http::timeout(5)->post($this->getMotherPanelUrl(), [
                 'installation_data' => $installationData,
                 'timestamp' => now()->timestamp,
                 'tracking_type' => 'installation_status'
