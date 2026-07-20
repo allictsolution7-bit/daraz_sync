@@ -276,8 +276,8 @@
                         @endif
                     </td>
                     <td class="text-center">{{ $item->quantity }}</td>
-                    <td class="text-right">৳{{ number_format($item->price, 2) }}</td>
-                    <td class="text-right">৳{{ number_format($item->sub_total, 2) }}</td>
+                    <td class="text-right">Tk. {{ number_format($item->price, 2) }}</td>
+                    <td class="text-right">Tk. {{ number_format($item->sub_total, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -302,20 +302,20 @@
             
             <div class="total-row">
                 <span>Subtotal:</span>
-                <span>৳{{ number_format($subtotal, 2) }}</span>
+                <span>Tk. {{ number_format($subtotal, 2) }}</span>
             </div>
             
             @if($discount > 0)
             <div class="total-row">
                 <span>Discount:</span>
-                <span>-৳{{ number_format($discount, 2) }}</span>
+                <span>-Tk. {{ number_format($discount, 2) }}</span>
             </div>
             @endif
             
             @if($shipping > 0)
             <div class="total-row">
                 <span>Shipping:</span>
-                <span>৳{{ number_format($shipping, 2) }}</span>
+                <span>Tk. {{ number_format($shipping, 2) }}</span>
             </div>
             @endif
             
@@ -332,13 +332,13 @@
                         Payment Charge:
                     @endif
                 </span>
-                <span>৳{{ number_format($paymentCharge, 2) }}</span>
+                <span>Tk. {{ number_format($paymentCharge, 2) }}</span>
             </div>
             @endif
             
             <div class="total-row final">
                 <span>TOTAL:</span>
-                <span>৳{{ number_format($order->total, 2) }}</span>
+                <span>Tk. {{ number_format($order->total, 2) }}</span>
             </div>
         </div>
 

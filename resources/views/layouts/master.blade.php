@@ -912,7 +912,10 @@
                         <!-- CORE SHOP SECTION -->
                         <li class="menu-section {{ $coreShopActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Product Catalog</span>
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-cubes" style="color: #4f46e5; font-size: 13px;"></i>
+                                    Product Catalog
+                                </span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $coreShopActive ? 'display: block;' : 'display: none;' }}">
@@ -1149,7 +1152,10 @@
                         <!-- ORDERS & SALES SECTION -->
                         <li class="menu-section {{ $ordersSalesActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Sales & Orders</span>
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-cart-shopping" style="color: #0ea5e9; font-size: 13px;"></i>
+                                    Sales & Orders
+                                </span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $ordersSalesActive ? 'display: block;' : 'display: none;' }}">
@@ -1221,7 +1227,10 @@
                         <!-- SHIPPING & DELIVERY SECTION -->
                         <li class="menu-section {{ $shippingDeliveryActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Shipping & Delivery</span>
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-truck-fast" style="color: #10b981; font-size: 13px;"></i>
+                                    Shipping & Delivery
+                                </span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $shippingDeliveryActive ? 'display: block;' : 'display: none;' }}">
@@ -1302,7 +1311,10 @@
                         <!-- REPORTS & ANALYTICS SECTION -->
                         <li class="menu-section {{ $reportsAnalyticsActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Reports & Insights</span>
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-chart-column" style="color: #f59e0b; font-size: 13px;"></i>
+                                    Reports & Insights
+                                </span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $reportsAnalyticsActive ? 'display: block;' : 'display: none;' }}">
@@ -1332,7 +1344,10 @@
                         <!-- INTEGRATIONS & SYNC SECTION -->
                         <li class="menu-section {{ $integrationsSyncActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Connected Apps</span>
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-plug" style="color: #ec4899; font-size: 13px;"></i>
+                                    Connected Apps
+                                </span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $integrationsSyncActive ? 'display: block;' : 'display: none;' }}">
@@ -1451,7 +1466,10 @@
                         <!-- SECURITY & TRUST SECTION -->
                         <li class="menu-section {{ $securityTrustActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Security & Trust</span>
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-shield-halved" style="color: #ef4444; font-size: 13px;"></i>
+                                    Security & Trust
+                                </span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $securityTrustActive ? 'display: block;' : 'display: none;' }}">
@@ -1573,7 +1591,10 @@
                         <!-- CONTENT & PAGES SECTION -->
                         <li class="menu-section {{ $contentPagesActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Content & Pages</span>
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-newspaper" style="color: #8b5cf6; font-size: 13px;"></i>
+                                    Content & Pages
+                                </span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $contentPagesActive ? 'display: block;' : 'display: none;' }}">
@@ -1735,7 +1756,10 @@
                         @if(module_enabled('MultiVendor') && Route::has('admin.vendors.index'))
                         <li class="menu-section {{ $vendorsActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>Vendors</span>
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-store" style="color: #06b6d4; font-size: 13px;"></i>
+                                    Vendors
+                                </span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $vendorsActive ? 'display: block;' : 'display: none;' }}">
@@ -1799,7 +1823,10 @@
                         <!-- CONTROL & SYSTEM SECTION -->
                         <li class="menu-section {{ $controlSystemActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
-                                <span>System Settings</span>
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-gears" style="color: #64748b; font-size: 13px;"></i>
+                                    System Settings
+                                </span>
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $controlSystemActive ? 'display: block;' : 'display: none;' }}">

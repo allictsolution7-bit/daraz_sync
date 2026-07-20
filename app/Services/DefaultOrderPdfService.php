@@ -199,7 +199,7 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
             $itemsHtml .= "<tr>
                 <td>{$item->product->title}</td>
                 <td style='text-align:center;'>{$item->quantity}</td>
-                <td style='text-align:right;'>৳" . number_format($item->sub_total, 2) . "</td>
+                <td style='text-align:right;'>Tk. " . number_format($item->sub_total, 2) . "</td>
             </tr>";
         }
 
@@ -240,10 +240,10 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
             </table>
 
             <div class='total'>
-                <p>Subtotal: ৳" . number_format($order->total - $order->shipping + $order->discount, 2) . "</p>
-                " . ($order->discount > 0 ? "<p>Discount: -৳" . number_format($order->discount, 2) . "</p>" : "") . "
-                " . ($order->shipping > 0 ? "<p>Shipping: ৳" . number_format($order->shipping, 2) . "</p>" : "") . "
-                <p style='font-size:12px;'>Total: ৳" . number_format($order->total, 2) . "</p>
+                <p>Subtotal: Tk. " . number_format($order->total - $order->shipping + $order->discount, 2) . "</p>
+                " . ($order->discount > 0 ? "<p>Discount: -Tk. " . number_format($order->discount, 2) . "</p>" : "") . "
+                " . ($order->shipping > 0 ? "<p>Shipping: Tk. " . number_format($order->shipping, 2) . "</p>" : "") . "
+                <p style='font-size:12px;'>Total: Tk. " . number_format($order->total, 2) . "</p>
             </div>
 
             <div class='footer'>
@@ -266,8 +266,8 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
             $itemsHtml .= "<tr>
                 <td>{$item->product->title}</td>
                 <td style='text-align:center;'>{$item->quantity}</td>
-                <td style='text-align:right;'>৳" . number_format($item->price, 2) . "</td>
-                <td style='text-align:right;'>৳" . number_format($item->sub_total, 2) . "</td>
+                <td style='text-align:right;'>Tk. " . number_format($item->price, 2) . "</td>
+                <td style='text-align:right;'>Tk. " . number_format($item->sub_total, 2) . "</td>
             </tr>";
         }
 
@@ -334,13 +334,13 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
                 <table>
                     <tr>
                         <td>Subtotal:</td>
-                        <td style='text-align:right;'>৳" . number_format($order->total - $order->shipping + $order->discount, 2) . "</td>
+                        <td style='text-align:right;'>Tk. " . number_format($order->total - $order->shipping + $order->discount, 2) . "</td>
                     </tr>
-                    " . ($order->discount > 0 ? "<tr><td>Discount:</td><td style='text-align:right;'>-৳" . number_format($order->discount, 2) . "</td></tr>" : "") . "
-                    " . ($order->shipping > 0 ? "<tr><td>Shipping:</td><td style='text-align:right;'>৳" . number_format($order->shipping, 2) . "</td></tr>" : "") . "
+                    " . ($order->discount > 0 ? "<tr><td>Discount:</td><td style='text-align:right;'>-Tk. " . number_format($order->discount, 2) . "</td></tr>" : "") . "
+                    " . ($order->shipping > 0 ? "<tr><td>Shipping:</td><td style='text-align:right;'>Tk. " . number_format($order->shipping, 2) . "</td></tr>" : "") . "
                     <tr class='grand-total'>
                         <td>Total:</td>
-                        <td style='text-align:right;'>৳" . number_format($order->total, 2) . "</td>
+                        <td style='text-align:right;'>Tk. " . number_format($order->total, 2) . "</td>
                     </tr>
                 </table>
             </div>
