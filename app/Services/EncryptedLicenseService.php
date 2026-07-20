@@ -10,7 +10,13 @@ use Exception;
 class EncryptedLicenseService
 {
     private const ENCRYPTION_KEY = 'thikana_license_key_2025';
-    private const MOTHER_PANEL_URL = 'https://uddoktaecommerce.com/api/licenses/encrypted-validate';
+
+    private function getMotherPanelUrl(): string
+    {
+        $base = rtrim(config('license.mother_panel_url') ?? '', '/');
+        $baseUrl = preg_replace('#/api/.*$#', '', $base);
+        return $baseUrl . '/api/licenses/encrypted-validate';
+    }
     
     /**
      * Encrypted license validation with obfuscated checks
@@ -48,7 +54,7 @@ class EncryptedLicenseService
             'checksum' => $this->generateChecksum($licenseKey)
         ]);
         
-        $response = Http::timeout(5)->post(self::MOTHER_PANEL_URL, [
+        $response = Http::timeout(5)->post($this->getMotherPanelUrl(), [
             'data' => $encryptedData,
             'signature' => $this->generateRequestSignature($encryptedData)
         ]);

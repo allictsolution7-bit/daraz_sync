@@ -13,17 +13,15 @@ use Illuminate\Support\Facades\Cache;
  */
 class InstallationTrackingService
 {
-    private const MOTHER_PANEL_URL = 'https://uddoktaecommerce.com/api/installations/track';
+    private const TRACKING_PATH = '/api/installations/track';
     private const TRACKING_CACHE_KEY = 'installation_tracking_sent';
     
     private function getMotherPanelUrl(): string
     {
-        $motherUrl = config('license.mother_panel_url', 'https://uddoktaecommerce.com/api/licenses/validate');
-        $trackUrl = str_replace('/api/licenses/validate', '/api/installations/track', $motherUrl);
-        if (!str_contains($trackUrl, '/api/installations/track')) {
-            $trackUrl = rtrim($motherUrl, '/') . '/installations/track';
-        }
-        return $trackUrl;
+        $base = rtrim(config('license.mother_panel_url') ?? '', '/');
+        // Strip any path suffix to get the bare base URL
+        $baseUrl = preg_replace('#/api/.*$#', '', $base);
+        return $baseUrl . self::TRACKING_PATH;
     }
 
     /**

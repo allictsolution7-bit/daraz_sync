@@ -48,11 +48,9 @@ class LicenseHeartbeatService
                 'heartbeat_id' => $this->generateHeartbeatId()
             ];
             
-            $motherUrl = config('license.mother_panel_url', 'https://uddoktaecommerce.com/api/licenses/validate');
-            $heartbeatUrl = str_replace('/api/licenses/validate', '/api/licenses/heartbeat', $motherUrl);
-            if (!str_contains($heartbeatUrl, '/api/licenses/heartbeat')) {
-                $heartbeatUrl = rtrim($motherUrl, '/') . '/heartbeat';
-            }
+            $base = rtrim(config('license.mother_panel_url') ?? '', '/');
+            $baseUrl = preg_replace('#/api/.*$#', '', $base);
+            $heartbeatUrl = $baseUrl . '/api/licenses/heartbeat';
 
             $response = Http::timeout(5)->post($heartbeatUrl, [
                 'license_key' => $license->license_key,

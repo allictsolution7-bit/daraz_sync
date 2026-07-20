@@ -11,11 +11,6 @@ use Exception;
 
 class LicenseService
 {
-    // CRITICAL: These URLs are hardcoded for security - changing them will break the system
-    private const MOTHER_PANEL_URL = 'https://uddoktaecommerce.com/api/licenses/validate';
-    //private const MOTHER_PANEL_URL = 'http://127.0.0.1:8001/api/licenses/validate';
-     private const BACKUP_MOTHER_PANEL_URL = 'https://uddoktaecommerce.com/api/licenses/validate';
-    // private const BACKUP_MOTHER_PANEL_URL = 'http://127.0.0.1:8001/api/licenses/validate';
     private const CACHE_TTL = 3 * 60 * 60;  
     
     // Security constants - DO NOT MODIFY
@@ -182,10 +177,10 @@ class LicenseService
     private function validateAndGetSecureURL(): string
     {
         $url = config('license.mother_panel_url');
-        if ($url) {
-            return $url;
+        if (empty($url)) {
+            throw new Exception('LICENSE_MOTHER_PANEL_URL is not set in your .env file.');
         }
-        return self::MOTHER_PANEL_URL;
+        return $url;
     }
 
     /**
