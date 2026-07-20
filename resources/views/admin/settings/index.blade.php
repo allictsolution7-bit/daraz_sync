@@ -3,212 +3,382 @@
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
 <style>
+    :root {
+        --primary: #197A94;
+        --primary-gradient: linear-gradient(135deg, #197A94 0%, #0d5c70 100%);
+        --primary-hover: #135d71;
+        --primary-light: rgba(25, 122, 148, 0.08);
+        --success: #10b981;
+        --info: #06b6d4;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --dark-slate: #1e293b;
+        --text-main: #334155;
+        --text-muted: #64748b;
+        --bg-glass: rgba(255, 255, 255, 0.95);
+        --border-glass: rgba(226, 232, 240, 0.9);
+        --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+        --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Page container styling */
+    .container-fluid {
+        padding: 30px;
+        background-color: #f8fafc;
+        min-height: 100vh;
+    }
+
     .settings-container {
         display: flex;
-        gap: 20px;
+        gap: 30px;
         margin: 20px 0;
+        align-items: flex-start;
     }
 
+    /* Modern Premium Sidebar */
     .settings-sidebar {
-        width: 280px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 0px;
-        height: fit-content;
+        width: 320px;
+        background: var(--bg-glass);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: var(--shadow-premium);
+        position: sticky;
+        top: 90px;
+        max-height: calc(100vh - 130px);
+        overflow-y: auto;
+        z-index: 10;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary) transparent;
     }
 
-    .settings-content {
-        flex: 1;
-        background: white;
-        border-radius: 8px;
-        padding: 30px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    .settings-sidebar::-webkit-scrollbar {
+        width: 4px;
     }
 
+    .settings-sidebar::-webkit-scrollbar-thumb {
+        background-color: var(--primary);
+        border-radius: 4px;
+    }
+
+    .settings-sidebar h6 {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 11px;
+        color: var(--text-muted) !important;
+        margin-bottom: 15px !important;
+        padding-left: 5px;
+    }
+
+    /* Navigation tabs */
     .sidebar-tab {
-        display: block;
+        display: flex;
+        align-items: center;
         width: 100%;
-        padding: 5px 15px;
-        margin: 4px 0;
+        padding: 12px 18px;
+        margin: 6px 0;
         text-align: left;
         background: transparent;
-        border: none;
-        border-radius: 6px;
-        color: #495057;
-        text-decoration: none;
-        transition: all 0.2s;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        color: var(--text-main);
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: var(--transition-smooth);
         cursor: pointer;
     }
 
+    .sidebar-tab i {
+        font-size: 16px;
+        width: 24px;
+        text-align: center;
+        transition: var(--transition-smooth);
+    }
+
     .sidebar-tab:hover {
-        background: #e9ecef;
-        color: #212529;
+        background: var(--primary-light);
+        color: var(--primary);
     }
 
     .sidebar-tab.active {
-        background: #197A94;
+        background: var(--primary-gradient);
         color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 15px rgba(25, 122, 148, 0.25);
+    }
+
+    .sidebar-tab.active i {
+        color: white;
+    }
+
+    /* Settings Content Panel */
+    .settings-content {
+        flex: 1;
+        background: var(--bg-glass);
+        border: 1px solid var(--border-glass);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: var(--shadow-premium);
+        min-height: 500px;
     }
 
     .tab-content {
         display: none;
+        animation: fadeIn 0.4s ease-out;
     }
 
     .tab-content.active {
         display: block;
     }
 
-    /* Mobile Navigation Drag and Drop Styles */
-    .sortable-list {
-        min-height: 50px;
-    }
-
-    .nav-item-config {
-        transition: all 0.3s ease;
-    }
-
-    .sortable-ghost {
-        opacity: 0.4;
-        background: #f8f9fa;
-        border: 2px dashed #dee2e6;
-    }
-
-    .sortable-chosen {
-        transform: scale(1.02);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .sortable-drag {
-        transform: rotate(2deg);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    .drag-handle {
-        transition: color 0.2s ease;
-    }
-
-    .drag-handle:hover {
-        color: #197A94 !important;
-    }
-
-    .nav-item-config:hover {
-        background-color: #f8f9fa;
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .tab-header {
-        border-bottom: 2px solid #197A94;
-        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-glass);
+        padding-bottom: 20px;
         margin-bottom: 30px;
     }
 
     .tab-title {
-        color: #197A94;
+        color: var(--dark-slate);
         font-size: 24px;
-        font-weight: 600;
+        font-weight: 700;
         margin: 0;
+        letter-spacing: -0.5px;
     }
 
+    /* Save Settings Header Card */
+    .card.shadow.mb-4 {
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        box-shadow: var(--shadow-premium) !important;
+        background: var(--bg-glass);
+        margin-bottom: 25px !important;
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: transparent !important;
+        border-bottom: 1px solid var(--border-glass) !important;
+        padding: 20px 25px !important;
+    }
+
+    .card-header h6 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--dark-slate) !important;
+    }
+
+    /* Floating Save Button */
     .save-button {
-        /* position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000; */
-        background: #197A94;
+        background: var(--primary-gradient);
         color: white;
         border: none;
-        padding: 12px 24px;
-        border-radius: 6px;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: 0 4px 15px rgba(25, 122, 148, 0.3);
+        transition: var(--transition-smooth);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
     }
 
     .save-button:hover {
-        background: #0056b3;
-        transform: translateY(-1px);
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(25, 122, 148, 0.4);
+        color: white;
+        text-decoration: none;
     }
 
-    /* Sortable list styles */
-    .list-group-item {
+    .save-button:active {
+        transform: translateY(0);
+    }
+
+    /* Form Fields & Controls */
+    .form-group {
+        margin-bottom: 25px;
+        align-items: center;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: var(--dark-slate);
+        font-size: 14px;
+    }
+
+    .form-control {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 14px;
+        color: var(--text-main);
+        background-color: #ffffff;
+        transition: var(--transition-smooth);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(25, 122, 148, 0.15);
+        color: var(--text-main);
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        line-height: 1.6;
+    }
+
+    .form-text.text-muted {
+        font-size: 12px;
+        color: var(--text-muted) !important;
+        margin-top: 6px;
+    }
+
+    /* Custom File Inputs */
+    .custom-file {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        height: auto;
+    }
+
+    .custom-file-input {
         cursor: pointer;
-        transition: all 0.2s;
+    }
+
+    .custom-file-label {
+        border: 1.5px dashed #cbd5e1;
+        border-radius: 10px;
+        padding: 12px 16px;
+        background: #f8fafc;
+        color: var(--text-muted);
+        font-weight: 500;
+        text-align: center;
+        transition: var(--transition-smooth);
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .custom-file-label::after {
+        display: none;
+    }
+
+    .custom-file-input:focus ~ .custom-file-label {
+        border-color: var(--primary);
+        background: var(--primary-light);
+    }
+
+    /* Section Headings inside Tabs */
+    h6.text-primary {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--primary) !important;
+        border-bottom: 2px solid var(--primary-light);
+        padding-bottom: 8px;
+        margin-top: 35px;
+        margin-bottom: 20px;
+    }
+
+    hr {
+        border-top: 1px solid var(--border-glass);
+        margin: 30px 0;
+    }
+
+    /* Premium Switches / Checkbox Toggle Styling */
+    .custom-switch {
+        padding-left: 2.25rem;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::before {
+        border-color: var(--primary);
+        background-color: var(--primary);
+    }
+
+    /* Sortable & Drag Handle Layouts */
+    .list-group-item {
+        border: 1px solid var(--border-glass) !important;
+        border-radius: 12px !important;
+        margin-bottom: 8px;
+        background: #ffffff;
+        padding: 14px 20px;
+        transition: var(--transition-smooth);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
     .list-group-item:hover {
-        background-color: #f8f9fa;
+        background-color: #fafafa;
+        border-color: #cbd5e1 !important;
+        transform: translateY(-1px);
     }
 
     .handle {
-        color: #6c757d;
-        font-size: 18px;
-        user-select: none;
+        color: var(--text-muted);
+        cursor: grab;
+        padding: 4px;
+        transition: var(--transition-smooth);
     }
 
     .handle:hover {
-        color: #495057;
+        color: var(--primary);
     }
 
-    .featured-checkbox {
-        margin-right: 10px;
+    /* Color picker layouts */
+    .color-input {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
     }
 
-    a.pos-menu-item {
-        display: none !important;
+    .input-group-append span {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+        cursor: pointer;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    .save-button {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-    }
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .settings-container {
+            flex-direction: column;
+            gap: 20px;
+        }
 
-    .sidebar-tab {
-        border: 1px solid #e3e3e3;
+        .settings-sidebar {
+            width: 100%;
+            position: static;
+            max-height: none;
+        }
+
+        .settings-content {
+            width: 100%;
+            padding: 25px;
+        }
     }
 
     @media (max-width: 768px) {
-        .settings-container {
-            display: block;
-            gap: 10px;
-            margin: 10px 0;
+        .container-fluid {
+            padding: 15px;
         }
 
-        .settings-content {
-            padding: 10px;
+        .card-header {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start !important;
         }
 
-        .settings-sidebar {
+        .save-button {
             width: 100%;
-        }
-
-        .settings-content {
-            width: 100%;
-        }
-
-        button.save-button {
-            position: fixed;
-            top: 72px;
-            right: 17px;
-            height: 40px;
-            padding: 0px;
-            width: 140px;
-        }
-
-        .sidebar-tab {
-            padding: 1px 9px;
-            border: 1px solid #e3e3e3;
-        }
-
-        .settings-sidebar {
-            padding: 5px;
-        }
-
-        .card.shadow.mb-4 {
-            margin-bottom: 0 !important;
-        }
-
-        h6.mb-3.text-muted {
-            margin-bottom: 8px !important;
+            justify-content: center;
         }
     }
 </style>

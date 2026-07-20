@@ -324,17 +324,14 @@ ul#sidebar {
     margin: 0;
 }
 
-ul#sidebar li {
+ul#sidebar .menu-section-list > li {
     border-left: 5px solid var(--white-color);
     transition: .3s;
-}
-
-ul#sidebar li:hover {
-    border-left: 5px solid var(--main-color);
-}
-
-ul#sidebar li {
     font-size: 15px;
+}
+
+ul#sidebar .menu-section-list > li:hover {
+    border-left: 5px solid var(--main-color);
 }
 
 ul#sidebar li a {
@@ -353,13 +350,13 @@ ul#sidebar li a:hover {
     color: var(--main-color);
 }
 
-ul#sidebar li.active {
+ul#sidebar .menu-section-list > li.active {
     background: #e8e8e8;
     color: var(--main-color);
     border-left: 5px solid var(--main-color);
 }
 
-ul#sidebar li.active a {
+ul#sidebar li.active > a {
     color: var(--main-color);
 }
 
@@ -394,5 +391,10 @@ ul#sidebar .sub-menu ul li a {
     font-weight: 400;
     padding: 4px 8px;
     padding-left: 20px;
+    transition: var(--transition-smooth);
+}
 
+ul#sidebar .sub-menu ul li a:hover {
+    background: #f1f5f9;
+    color: var(--main-color);
 }
