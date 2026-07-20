@@ -545,7 +545,7 @@
                     <li class="breadcrumb-item active">Add Product</li>
                 </ol>
             </nav>
-            <a href="{{ route('admin.product.index') }}" class="btn btn-sm btn-outline-secondary">← Back to Products</a>
+            <a href="{{ route('admin.items.index') }}" class="btn btn-sm btn-outline-secondary">← Back to Products</a>
         </div>
     </div>
 
@@ -565,7 +565,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data" id="productForm">
+    <form method="POST" action="{{ route('admin.items.store') }}" enctype="multipart/form-data" id="productForm">
         @csrf        <!-- Tabbed Interface for Product Creation Workspace -->
         <div class="row">
             <div class="col-12">
@@ -1161,7 +1161,7 @@
                 </select>
             </div>
             <div>
-                <a href="{{ route('admin.product.index') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                <a href="{{ route('admin.items.index') }}" class="btn btn-outline-secondary me-2">Cancel</a>
                 <button class="btn btn-primary" type="submit" style="height: 42px;">Create & Publish Product</button>
             </div>
         </div></div>

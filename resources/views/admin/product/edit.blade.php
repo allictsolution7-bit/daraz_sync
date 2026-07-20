@@ -166,12 +166,12 @@
             <nav aria-label="breadcrumb" class="modern-breadcrumb mt-1">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin') }}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.product.index') }}">Products</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.items.index') }}">Products</a></li>
                     <li class="breadcrumb-item active">Edit: {{ Str::limit($product->title, 40) }}</li>
                 </ol>
             </nav>
         </div>
-        <a href="{{ route('admin.product.index') }}" class="btn btn-sm btn-outline-secondary">← Back to Products</a>
+        <a href="{{ route('admin.items.index') }}" class="btn btn-sm btn-outline-secondary">← Back to Products</a>
     </div>
 
     @session('success')
@@ -188,7 +188,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.products.update', $product->id) }}" enctype="multipart/form-data" id="productForm">
+    <form method="POST" action="{{ route('admin.items.update', $product->id) }}" enctype="multipart/form-data" id="productForm">
         @csrf
         @method('PUT')
         <input type="hidden" name="old_thumb" value="{{ $product->thumb_image }}">

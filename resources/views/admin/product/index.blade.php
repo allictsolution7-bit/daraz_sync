@@ -565,7 +565,7 @@
         <!-- Action Bar -->
         <div class="action-bar">
             <div class="left-actions">
-                <a href="{{route ('admin.product.create')}}" class="btn-modern btn-modern-primary">
+                <a href="{{route ('admin.items.create')}}" class="btn-modern btn-modern-primary">
                     <i class="fas fa-plus"></i> Add Product
                 </a>
                 <button id="bulk-status-toggle" class="btn-modern btn-modern-warning">
@@ -641,7 +641,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('admin.products.data') }}',
+                    url: '{{ route('admin.items.data') }}',
                     type: 'GET',
                     data: function(d) {
                         return $.extend({}, d, customFilters);
@@ -927,7 +927,7 @@
                             const originalHtml = bulkDeleteBtn.innerHTML;
                             bulkDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
 
-                            fetch("{{ route('admin.products.bulk-delete') }}", {
+                            fetch("{{ route('admin.items.bulk-delete') }}", {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -1014,7 +1014,7 @@
                         const originalHtml = bulkStatusToggleBtn.innerHTML;
                         bulkStatusToggleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
 
-                        fetch("{{ route('admin.products.bulk-status-toggle') }}", {
+                        fetch("{{ route('admin.items.bulk-status-toggle') }}", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1078,7 +1078,7 @@
 
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = "{{ route('admin.products.export-selected') }}";
+                    form.action = "{{ route('admin.items.export-selected') }}";
                     
                     const csrfToken = document.createElement('input');
                     csrfToken.type = 'hidden';

@@ -518,7 +518,7 @@
                         <button type="button" class="btn-action-outline" onclick="revalidateLicense()">
                             <i class="fas fa-sync"></i> Revalidate License
                         </button>
-                        <a href="{{ route('admin.license.security.index') }}" class="btn-action-outline">
+                        <a href="{{ route('admin.verification.health-checks.index') }}" class="btn-action-outline">
                             <i class="fas fa-shield-alt"></i> Security Monitor
                         </a>
                     </div>
@@ -536,7 +536,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.license.activate') }}" method="POST" id="licenseForm">
+                    <form action="{{ route('admin.verification.activate') }}" method="POST" id="licenseForm">
                         @csrf
                         <div class="form-group">
                             <label for="license_key" class="form-label">License Key String</label>
@@ -599,7 +599,7 @@ function revalidateLicense() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Revalidating...';
     btn.disabled = true;
     
-    fetch('{{ route("admin.license.revalidate") }}', {
+    fetch('{{ route("admin.verification.revalidate") }}', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',

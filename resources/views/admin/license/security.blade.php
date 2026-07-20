@@ -307,7 +307,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb m-0 bg-transparent p-0">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.license.index') }}">License</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.verification.index') }}">License</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Security Monitor</li>
                 </ol>
             </nav>
@@ -554,7 +554,7 @@
 <script>
 function clearTamperAttempts() {
     if (confirm('Are you sure you want to clear all tamper attempts?')) {
-        fetch('{{ route("admin.license.security.clear-tamper") }}', {
+        fetch('{{ route("admin.verification.health-checks.clear-tamper") }}', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -573,7 +573,7 @@ function clearTamperAttempts() {
 }
 
 function forceIntegrityCheck() {
-    fetch('{{ route("admin.license.security.integrity-check") }}', {
+    fetch('{{ route("admin.verification.health-checks.integrity-check") }}', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -588,7 +588,7 @@ function forceIntegrityCheck() {
 }
 
 function refreshSecurityStats() {
-    fetch('{{ route("admin.license.security.stats") }}')
+    fetch('{{ route("admin.verification.health-checks.stats") }}')
     .then(response => response.json())
     .then(data => {
         document.getElementById('security-score').textContent = data.security_score;
@@ -596,7 +596,7 @@ function refreshSecurityStats() {
 }
 
 function exportSecurityLogs() {
-    window.open('{{ route("admin.license.security.export") }}', '_blank');
+    window.open('{{ route("admin.verification.health-checks.export") }}', '_blank');
 }
 
 // Initial fetch & auto-refresh security stats every 30 seconds

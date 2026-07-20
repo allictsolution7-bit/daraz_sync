@@ -214,7 +214,7 @@ class ProductController extends Controller
             })
             ->addColumn('actions', function($product) {
                 return '
-                    <a href="' . route('admin.products.edit', $product->id) . '" class="btn btn-sm btn-outline-primary" title="Edit">
+                    <a href="' . route('admin.items.edit', $product->id) . '" class="btn btn-sm btn-outline-primary" title="Edit">
                         <i class="fas fa-edit"></i>
                     </a>
                     <a href="' . route('product.single', ['id' => $product->id, 'slug' => $product->slug ?: \Illuminate\Support\Str::slug($product->title)]) . '" class="btn btn-sm btn-outline-info" title="View in Frontend" target="_blank">
@@ -223,7 +223,7 @@ class ProductController extends Controller
                     <button type="button" class="btn btn-sm btn-outline-secondary copy-link-btn" title="Copy Link" data-url="' . route('product.single', ['id' => $product->id, 'slug' => $product->slug ?: \Illuminate\Support\Str::slug($product->title)]) . '">
                         <i class="fas fa-copy"></i>
                     </button>
-                    <form action="' . route('admin.products.destroy', $product->id) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Are you sure?\')">
+                    <form action="' . route('admin.items.destroy', $product->id) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Are you sure?\')">
                         <input type="hidden" name="_token" value="' . csrf_token() . '" />
                         <input type="hidden" name="_method" value="DELETE" />
                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
@@ -550,7 +550,7 @@ class ProductController extends Controller
             // Generate all possible combinations using Cartesian product
             $this->generateVariationCombinations($product, $allVariationOptions, $request->input('combinations', []), $request);
         }
-        return redirect()->route('admin.product.index')->with('success', 'Product created successfully.');
+        return redirect()->route('admin.items.index')->with('success', 'Product created successfully.');
     }
 
     /**
@@ -1368,7 +1368,7 @@ class ProductController extends Controller
                 $this->updateVariationsAndCombinationsSafely($product, $request);
             }
 
-            return redirect()->route('admin.product.index')->with('success', 'Product updated successfully.');
+            return redirect()->route('admin.items.index')->with('success', 'Product updated successfully.');
         }
 
         return back()->with('error', 'Failed to update product.');

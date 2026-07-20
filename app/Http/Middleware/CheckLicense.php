@@ -127,7 +127,7 @@ class CheckLicense
     protected function shouldSkipLicenseCheck(Request $request): bool
     {
         $skipRoutes = [
-            'admin.license.*',
+            'admin.verification.*',
             'license.*',
             'admin.dashboard', // Allow access to dashboard to configure license
         ];
@@ -150,13 +150,13 @@ class CheckLicense
             return response()->json([
                 'success' => false,
                 'message' => $message,
-                'redirect' => route('admin.license.index')
+                'redirect' => route('admin.verification.index')
             ], 403);
         }
 
         // For web requests, redirect to license page with error message
         return redirect()
-            ->route('admin.license.index')
+            ->route('admin.verification.index')
             ->with('error', $message);
     }
 

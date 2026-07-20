@@ -45,8 +45,8 @@ class TrackInstallation
         // Only track on first access to admin dashboard or main pages
         $trackableRoutes = [
             'admin.dashboard',
-            'admin.license.index',
-            'admin.license.activate'
+            'admin.verification.index',
+            'admin.verification.activate'
         ];
 
         // Check if this is a trackable route

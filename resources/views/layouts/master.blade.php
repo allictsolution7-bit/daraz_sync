@@ -988,9 +988,9 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/writers*') || request()->is('admin/publishers*') || request()->is('admin/reviews*') || request()->is('admin/combo_offers*') ? 'display: block;' : '' }}">
-                                        <li class="{{ request()->routeIs('admin.product.index') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.product.index') }}">
+                                        style="{{ request()->is('admin/item*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/writers*') || request()->is('admin/publishers*') || request()->is('admin/reviews*') || request()->is('admin/combo_offers*') ? 'display: block;' : '' }}">
+                                        <li class="{{ request()->routeIs('admin.items.index') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.items.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-tags"></i>
                                                     All Products
@@ -998,8 +998,8 @@
                                             </a>
                                         </li>
                                         @can('products.create')
-                                        <li class="{{ request()->routeIs('admin.product.create') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.product.create') }}">
+                                        <li class="{{ request()->routeIs('admin.items.create') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.items.create') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-square-plus"></i>
                                                     Add Product
@@ -1208,7 +1208,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/my-assigned-orders*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/sales*') || request()->is('admin/asigned*') || request()->is('admin/my-assigned-sales*') ? 'display: block;' : '' }}">
                                         @can('orders.view')
                                         <li class="{{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.orders.index') }}">
@@ -1979,8 +1979,8 @@
                                         @endcan
  
                                         {{-- License Management --}}
-                                        <li class="{{ request()->routeIs('admin.license.*') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.license.index') }}">
+                                        <li class="{{ request()->routeIs('admin.verification.*') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.verification.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-key"></i>
                                                     License Management

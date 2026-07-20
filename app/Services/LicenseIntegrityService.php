@@ -161,7 +161,7 @@ class LicenseIntegrityService
         
         // Check if critical routes exist
         $routes = \Illuminate\Support\Facades\Route::getRoutes();
-        $requiredRoutes = ['admin.license.revalidate', 'admin.license.activate'];
+        $requiredRoutes = ['admin.verification.revalidate', 'admin.verification.activate'];
         
         foreach ($requiredRoutes as $routeName) {
             $route = $routes->getByName($routeName);

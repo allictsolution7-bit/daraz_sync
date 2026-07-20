@@ -585,7 +585,7 @@
                     <p class="mb-0 text-muted small">Unlock full dashboard capabilities, live transaction reporting, automated logistics integrations, and system-wide configurations.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.license.index') }}" class="btn btn-sm btn-danger px-4">Activate Module</a>
+                    <a href="{{ route('admin.verification.index') }}" class="btn btn-sm btn-danger px-4">Activate Module</a>
                 </div>
             </div>
         </div>

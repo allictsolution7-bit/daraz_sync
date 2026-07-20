@@ -78,7 +78,7 @@
         <h1>404</h1>
         <h2>Page Not Found</h2>
         <p>The page you are looking for does not exist or has been moved.</p>
-        <a href="/admin/orders" class="btn">Back to Orders</a>
+        <a href="/admin/sales" class="btn">Back to Orders</a>
     </div>
 </body>
 </html>

@@ -68,7 +68,7 @@ class AdminController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => $licenseStatus['message'] ?? 'License required',
-                    'redirect' => route('admin.license.index'),
+                    'redirect' => route('admin.verification.index'),
                 ], 403);
             }
 

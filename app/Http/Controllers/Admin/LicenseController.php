@@ -46,7 +46,7 @@ class LicenseController extends Controller
 
         if ($result['success']) {
             return redirect()
-                ->route('admin.license.index')
+                ->route('admin.verification.index')
                 ->with('success', $result['message']);
         } else {
             return redirect()
@@ -82,11 +82,11 @@ class LicenseController extends Controller
         // For regular form submissions, return redirect
         if ($result['success']) {
             return redirect()
-                ->route('admin.license.index')
+                ->route('admin.verification.index')
                 ->with('success', 'License revalidated successfully');
         } else {
             return redirect()
-                ->route('admin.license.index')
+                ->route('admin.verification.index')
                 ->with('error', $result['message']);
         }
     }

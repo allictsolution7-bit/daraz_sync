@@ -47,7 +47,7 @@ class CheckSupport
     protected function shouldSkipSupportCheck(Request $request): bool
     {
         $skipRoutes = [
-            'admin.license.*',
+            'admin.verification.*',
             'license.*',
             'admin.dashboard',
             'admin.settings.*',
@@ -72,13 +72,13 @@ class CheckSupport
                 'success' => false,
                 'message' => $message,
                 'error_type' => 'support_expired',
-                'redirect' => route('admin.license.index')
+                'redirect' => route('admin.verification.index')
             ], 403);
         }
 
         // For web requests, redirect to license page with error message
         return redirect()
-            ->route('admin.license.index')
+            ->route('admin.verification.index')
             ->with('error', $message);
     }
 }

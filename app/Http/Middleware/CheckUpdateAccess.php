@@ -47,7 +47,7 @@ class CheckUpdateAccess
     protected function shouldSkipUpdateCheck(Request $request): bool
     {
         $skipRoutes = [
-            'admin.license.*',
+            'admin.verification.*',
             'license.*',
             'admin.dashboard',
             'admin.settings.*',
@@ -72,13 +72,13 @@ class CheckUpdateAccess
                 'success' => false,
                 'message' => $message,
                 'error_type' => 'update_access_denied',
-                'redirect' => route('admin.license.index')
+                'redirect' => route('admin.verification.index')
             ], 403);
         }
 
         // For web requests, redirect to license page with error message
         return redirect()
-            ->route('admin.license.index')
+            ->route('admin.verification.index')
             ->with('error', $message);
     }
 }
