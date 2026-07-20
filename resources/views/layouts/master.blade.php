@@ -1718,26 +1718,7 @@
                                     </a>
                                 </li>
                                 @endcan
-                                @can('sub_categories.create')
-                                <li class="{{ request()->routeIs('admin.postsubcategory.add') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.postsubcategory.index') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-folder-plus"></i>
-                                            Add Sub Category
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
-                                @can('sub_categories.view')
-                                <li class="{{ request()->routeIs('admin.postsubcategory.index') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.postsubcategory.index') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-folder-open"></i>
-                                            All Sub Category
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
+
                                 @can('comments.view')
                                 <li class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.comments.index') }}">
