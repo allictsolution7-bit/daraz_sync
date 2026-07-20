@@ -218,7 +218,10 @@ class LicenseSecurityController extends Controller
     private function checkNetworkStatus(): bool
     {
         try {
-            $response = \Http::timeout(5)->get('https://uddoktaecommerce.com/api/licenses/health');
+            $base = rtrim(config('license.mother_panel_url') ?? '', '/');
+            $baseUrl = preg_replace('#/api/.*$#', '', $base);
+            $healthUrl = $baseUrl . '/api/licenses/health';
+            $response = \Http::timeout(5)->get($healthUrl ?: 'https://uddoktaecommerce.com/api/licenses/health');
             return $response->successful();
         } catch (\Exception $e) {
             return false;
