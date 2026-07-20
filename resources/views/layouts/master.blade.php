@@ -1718,55 +1718,55 @@
                                 @endcan
  
                                 @can('blog.view')
-                                <li class="{{ request()->routeIs('admin.post.index') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.post.index') }}">
+                                <li class="sub-menu {{ request()->is('admin/post*') || request()->is('admin/category*') || request()->is('admin/comments*') ? 'active' : '' }}">
+                                    <a href="#">
                                         <span class="menu-content">
-                                            <i class="fas fa-square-rss"></i>
-                                            All Posts
+                                            <i class="fas fa-newspaper" style="color:#f59e0b;"></i>
+                                            Blog & Posts
                                         </span>
+                                        <span class="fas fa-caret-down right"></span>
                                     </a>
+                                    <ul class="left-menu-dp" style="{{ request()->is('admin/post*') || request()->is('admin/category*') || request()->is('admin/comments*') ? 'display: block;' : '' }}">
+                                        <li class="{{ request()->routeIs('admin.post.index') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.post.index') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-square-rss"></i>
+                                                    All Posts
+                                                </span>
+                                            </a>
+                                        </li>
+                                        @can('blog.create')
+                                        <li class="{{ request()->routeIs('admin.post.add') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.post.add') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-pen-nib"></i>
+                                                    Create Post
+                                                </span>
+                                            </a>
+                                        </li>
+                                        @endcan
+                                        @can('categories.view')
+                                        <li class="{{ request()->routeIs('admin.category.index') || request()->routeIs('admin.category.add') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.category.index') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-folder-tree"></i>
+                                                    Categories
+                                                </span>
+                                            </a>
+                                        </li>
+                                        @endcan
+                                        @can('comments.view')
+                                        <li class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.comments.index') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-comment-dots"></i>
+                                                    Comments
+                                                </span>
+                                            </a>
+                                        </li>
+                                        @endcan
+                                    </ul>
                                 </li>
-                                @can('blog.create')
-                                <li class="{{ request()->routeIs('admin.post.add') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.post.add') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-pen-nib"></i>
-                                            Create Post
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
-                                @can('categories.create')
-                                <li class="{{ request()->routeIs('admin.category.add') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.category.add') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-folder-plus"></i>
-                                            Add Category
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
-                                @can('categories.view')
-                                <li class="{{ request()->routeIs('admin.category.index') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.category.index') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-folder-tree"></i>
-                                            All Category
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
-
-                                @can('comments.view')
-                                <li class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
-                                    <a href="{{ route('admin.comments.index') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-comment-dots"></i>
-                                            Comments
-                                        </span>
-                                    </a>
-                                </li>
-                                @endcan
                                 @endcan
                             </ul>
                         </li>
