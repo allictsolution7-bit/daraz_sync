@@ -831,7 +831,7 @@
                         let actions = '<button class="btn btn-primary btn-sm view-incomplete-order" data-id="' + row.id + '">' +
                             '<i class="fas fa-eye"></i></button> ';
                         if (CAN_CONVERT) {
-                            actions += '<a href="/admin/incomplete-orders/' + row.id + '/convert" target="_blank" class="btn btn-success btn-sm">' +
+                            actions += '<a href="/admin/pending-queue/' + row.id + '/convert" target="_blank" class="btn btn-success btn-sm">' +
                                 '<i class="fas fa-exchange-alt"></i></a> ';
                         }
                         if (CAN_DELETE) {
@@ -1158,7 +1158,7 @@
             if (newStatus === currentStatus) return;
 
             $.ajax({
-                url: '/admin/incomplete-orders/' + orderId + '/update-status',
+                url: '/admin/pending-queue/' + orderId + '/update-status',
                 method: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
@@ -1210,7 +1210,7 @@
                 const newNote = textarea.val().trim();
 
                 $.ajax({
-                    url: '/admin/incomplete-orders/' + orderId + '/update-note',
+                    url: '/admin/pending-queue/' + orderId + '/update-note',
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
@@ -1324,7 +1324,7 @@
             $('#incomplete-order-details').html('<div class="text-center">Loading...</div>');
             $('#incompleteOrderModal').modal('show');
 
-            $.get('/admin/incomplete-orders/' + id, function(data) {
+            $.get('/admin/pending-queue/' + id, function(data) {
                 let html = `
                         <ul class="list-group mb-3">
                             <li class="list-group-item"><strong>Name:</strong> ${data.name ?? ''}</li>
@@ -1412,7 +1412,7 @@
             var id = $(this).data('id');
             if (confirm('Are you sure you want to delete this incomplete order?')) {
                 $.ajax({
-                    url: '/admin/incomplete-orders/' + id,
+                    url: '/admin/pending-queue/' + id,
                     type: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}'

@@ -1407,7 +1407,7 @@
                             const phone = row.phone || '';
                             const address = row.address || '';
                             const ipAddress = row.ip_address || (row.delivery_data && row.delivery_data.ip) || '';
-                            const editUrl = `/admin/sales/${row.id}/edit`;
+                            const editUrl = `/admin/transactions/${row.id}/edit`;
                             
                             let html = `<div class="customer-info">`;
                             html += `<div class="customer-name">${name}</div>`;
@@ -1484,7 +1484,7 @@
                         searchable: false, 
                         width: '180px',
                         render: function(data, type, row) {
-                            const editUrl = `/admin/sales/${row.id}/edit`;
+                            const editUrl = `/admin/transactions/${row.id}/edit`;
                             let html = `
                                 <div class="d-flex align-items-center gap-2">
                                     <a href="${editUrl}" title="Edit" class="action-icon-btn text-success"><i class="fas fa-pencil-alt"></i></a>

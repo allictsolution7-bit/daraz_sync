@@ -792,7 +792,7 @@
                                         <div class="premium-link-desc">Manage your personal settings</div>
                                     </div>
                                 </a>
-                                <a href="{{ url('admin/settings') }}" class="premium-user-link">
+                                <a href="{{ url('admin/config') }}" class="premium-user-link">
                                     <div class="premium-link-icon-container icon-settings">
                                         <i class="fa-solid fa-sliders"></i>
                                     </div>
@@ -820,7 +820,7 @@
 
                     </li>
                     <li class="nav-item dropdown user-profile-dropdown">
-                        <a href="{{ url('admin/settings') }}" class="nav-link user" id="settingsDropdown">
+                        <a href="{{ url('admin/config') }}" class="nav-link user" id="settingsDropdown">
                             <i class="fa-solid fa-gear" style="font-size: 20px; color: #007bff;"></i>
                         </a>
                     </li>
@@ -834,15 +834,15 @@
         <!-- --sidebar-start-- -->
 
         @php
-        $coreShopActive = request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/inventory*') || request()->is('admin/landing-pages*') || request()->is('admin/writers*') || request()->is('admin/publishers*') || request()->is('admin/reviews*') || request()->is('admin/combo_offers*');
-        $ordersSalesActive = request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/my-assigned-orders*') || request()->is('admin/incomplete-orders*') || request()->is('admin/pos*');
-        $shippingDeliveryActive = request()->is('admin/basic-shipping*') || request()->is('admin/shipping/rules*') || request()->is('admin/delivery*');
+        $coreShopActive = request()->is('admin/product*') || request()->is('admin/catalog-groups*') || request()->is('admin/catalog-tiers*') || request()->is('admin/catalog-levels*') || request()->is('admin/publishers-mark*') || request()->is('admin/stock-control*') || request()->is('admin/promo-pages*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/bundle-deals*') || request()->is('admin/catalog*');
+        $ordersSalesActive = request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/pending-queue*') || request()->is('admin/pos*');
+        $shippingDeliveryActive = request()->is('admin/shipping-basics*') || request()->is('admin/delivery-zones/rules*') || request()->is('admin/courier-connect*');
         $reportsAnalyticsActive = request()->routeIs('admin.orders.reports*') || request()->routeIs('admin.customers.reports*');
-        $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/woocommerce-migration*') || request()->routeIs('admin.telegram-settings.*') || request()->is('admin/delayed-events*');
-        $securityTrustActive = request()->is('admin/fraud-checker*') || request()->is('admin/fraud-protection*') || request()->is('admin/backup*');
-        $contentPagesActive = request()->is('admin/sliders*') || request()->is('admin/pages*') || request()->is('admin/menus*') || request()->is('admin/post*') || request()->is('admin/category*') || request()->is('admin/postsubcategory*') || request()->is('admin/comments*');
-        $vendorsActive = request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-settings*');
-        $controlSystemActive = request()->is('admin/users*') || request()->routeIs('admin.roles_permissions.*') || request()->is('admin/modules*') || request()->is('admin/settings*') || request()->is('admin/socials*') || request()->is('admin/contacts*') || request()->routeIs('admin.subscriptions.index');
+        $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/import-woo*') || request()->routeIs('admin.telegram-settings.*') || request()->is('admin/event-queue*');
+        $securityTrustActive = request()->is('admin/trust-scanner*') || request()->is('admin/trust-shield*') || request()->is('admin/snapshots*');
+        $contentPagesActive = request()->is('admin/hero-banners*') || request()->is('admin/site-pages*') || request()->is('admin/nav-builder*') || request()->is('admin/articles*') || request()->is('admin/article-topics*') || request()->is('admin/article-subtopics*') || request()->is('admin/comments*');
+        $vendorsActive = request()->is('admin/partners*') || request()->is('admin/partner-items*') || request()->is('admin/partner-payouts*') || request()->is('admin/partner-config*');
+        $controlSystemActive = request()->is('admin/team-members*') || request()->routeIs('admin.roles_permissions.*') || request()->is('admin/extensions*') || request()->is('admin/config*') || request()->is('admin/social-links*') || request()->is('admin/inquiries*') || request()->routeIs('admin.subscriptions.index');
         @endphp
 
         <style>
@@ -853,7 +853,7 @@
                 overflow-y: auto !important;
                 top: 65px !important;
                 height: calc(100vh - 65px) !important;
-                padding-bottom: 160px !important;
+                padding-bottom: 200px !important;
             }
             .sidebar-footer {
                 position: fixed;
@@ -869,6 +869,12 @@
                 flex-direction: column;
                 gap: 10px;
                 transition: transform 0.5s ease;
+                /* Prevent footer from intercepting mouse events on list items below it */
+                pointer-events: none;
+            }
+            /* Re-enable pointer-events only for interactive children inside the footer */
+            .sidebar-footer > * {
+                pointer-events: auto;
             }
             .left-menu.hide .sidebar-footer {
                 transform: translateX(-240px);
@@ -937,7 +943,7 @@
             ul#sidebar .sub-menu ul li a:hover {
                 background: #f1f5f9 !important;
                 color: #1a56db !important;
-                transform: translateX(3px) !important;
+                /* Removed translateX transform - it shifts elements under cursor causing hover flicker */
             }
             ul#sidebar .sub-menu ul li.active a {
                 background: #eff6ff !important;
@@ -979,7 +985,7 @@
                             <ul class="left-menu-dp menu-section-list" style="{{ $coreShopActive ? 'display: block;' : 'display: none;' }}">
                                 @can('products.view')
                                 <li
-                                    class="sub-menu {{ request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/writers*') || request()->is('admin/publishers*') || request()->is('admin/reviews*') || request()->is('admin/combo_offers*') ? 'active' : '' }}">
+                                    class="sub-menu {{ request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/publishers-mark*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/combo_offers*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-boxes-stacked" style="color:#197A94;"></i>
@@ -988,7 +994,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/item*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/brands*') || request()->is('admin/writers*') || request()->is('admin/publishers*') || request()->is('admin/reviews*') || request()->is('admin/combo_offers*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/catalog*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/publishers-mark*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/combo_offers*') ? 'display: block;' : '' }}">
                                         <li class="{{ request()->routeIs('admin.items.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.items.index') }}">
                                                 <span class="menu-content">
@@ -1029,7 +1035,7 @@
                                         </li>
                                         @endcan
                                         @can('writers.view')
-                                        <li class="{{ request()->is('admin/writers*') ? 'active' : '' }}">
+                                        <li class="{{ request()->is('admin/content-authors*') ? 'active' : '' }}">
                                             <a href="{{ route('admin.writers.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-pen-fancy"></i>
@@ -1039,7 +1045,7 @@
                                         </li>
                                         @endcan
                                         @can('publishers.view')
-                                        <li class="{{ request()->is('admin/publishers*') ? 'active' : '' }}">
+                                        <li class="{{ request()->is('admin/content-publishers*') ? 'active' : '' }}">
                                             <a href="{{ route('admin.publishers.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-book-open"></i>
@@ -1049,7 +1055,7 @@
                                         </li>
                                         @endcan
                                         @can('reviews.view')
-                                        <li class="{{ request()->is('admin/reviews*') ? 'active' : '' }}">
+                                        <li class="{{ request()->is('admin/feedback*') ? 'active' : '' }}">
                                             <a href="{{ route('admin.reviews.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-star-half-stroke"></i>
@@ -1073,7 +1079,7 @@
                                 @endcan
  
                                 @can('inventory.view')
-                                <li class="sub-menu {{ request()->is('admin/inventory*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/stock-control*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-warehouse" style="color:#795548;"></i>
@@ -1082,7 +1088,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/inventory*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/stock-control*') ? 'display: block;' : '' }}">
                                         @can('inventory.view')
                                         <li class="{{ request()->routeIs('admin.inventory.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.inventory.index') }}">
@@ -1130,7 +1136,7 @@
  
                                 @can('landing_pages.view')
                                 <x-license-feature module="landing_page">
-                                    <li class="sub-menu {{ request()->is('admin/landing-pages*') ? 'active' : '' }}">
+                                    <li class="sub-menu {{ request()->is('admin/promo-pages*') ? 'active' : '' }}">
                                         <a href="#">
                                             <span class="menu-content">
                                                 <i class="fas fa-pager" style="color:#ff9800;"></i>
@@ -1148,10 +1154,10 @@
                                             <span class="fas fa-caret-down right"></span>
                                         </a>
                                         <nav class="left-menu-dp"
-                                            style="{{ request()->is('admin/landing-pages*') ? 'display: block;' : '' }}">
+                                            style="{{ request()->is('admin/promo-pages*') ? 'display: block;' : '' }}">
                                             @can('landing_pages.view')
-                                            <li class="{{ request()->routeIs('admin.landing-pages.index') ? 'active' : '' }}">
-                                                <a href="{{ route('admin.landing-pages.index') }}">
+                                            <li class="{{ request()->routeIs('admin.promo-pages.index') ? 'active' : '' }}">
+                                                <a href="{{ route('admin.promo-pages.index') }}">
                                                     <span class="menu-content">
                                                         <i class="fas fa-list-check nav-icon"></i>
                                                         All Landing Pages
@@ -1161,9 +1167,9 @@
                                             @endcan
                                             @can('landing_pages.create')
                                             <li
-                                                class="{{ request()->routeIs('admin.landing-pages.create') ? 'active' : '' }}">
+                                                class="{{ request()->routeIs('admin.promo-pages.create') ? 'active' : '' }}">
                                                 @if ($licenseService->canCreateLandingPage())
-                                                <a href="{{ route('admin.landing-pages.create') }}">
+                                                <a href="{{ route('admin.promo-pages.create') }}">
                                                     <span class="menu-content">
                                                         <i class="fas fa-file-circle-plus nav-icon"></i>
                                                         Create Landing Page
@@ -1199,7 +1205,7 @@
                             <ul class="left-menu-dp menu-section-list" style="{{ $ordersSalesActive ? 'display: block;' : 'display: none;' }}">
                                 @can('orders.view')
                                 <li
-                                    class="sub-menu {{ request()->is('admin/orders*') || request()->is('admin/asigned*') || request()->is('admin/my-assigned-orders*') ? 'active' : '' }}">
+                                    class="sub-menu {{ request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/my-assignments*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-cart-shopping" style="color:#1d600c;"></i>
@@ -1208,7 +1214,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/sales*') || request()->is('admin/asigned*') || request()->is('admin/my-assigned-sales*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/my-assigned-sales*') ? 'display: block;' : '' }}">
                                         @can('orders.view')
                                         <li class="{{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.orders.index') }}">
@@ -1275,7 +1281,7 @@
                                 {{-- Shipping Settings --}}
                                 @if (auth()->user()?->can('basic_shipping.view') || auth()->user()?->can('shipping.rules.view'))
                                 <li
-                                    class="sub-menu {{ request()->is('admin/basic-shipping*') || request()->is('admin/shipping/rules*') ? 'active' : '' }}">
+                                    class="sub-menu {{ request()->is('admin/shipping-basics*') || request()->is('admin/delivery-zones/rules*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="nav-icon fas fa-truck-fast" style="color:#20c997;"></i>
@@ -1284,9 +1290,9 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/basic-shipping*') || request()->is('admin/shipping/rules*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/shipping-basics*') || request()->is('admin/delivery-zones/rules*') ? 'display: block;' : '' }}">
                                         @can('basic_shipping.view')
-                                        <li class="{{ request()->is('admin/basic-shipping*') ? 'active' : '' }}">
+                                        <li class="{{ request()->is('admin/shipping-basics*') ? 'active' : '' }}">
                                             <a href="{{ route('admin.basic.shipping.settings.edit') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-earth-americas" style="color:#197A94;"></i>
@@ -1296,7 +1302,7 @@
                                         </li>
                                         @endcan
                                         @can('shipping.rules.view')
-                                        <li class="{{ request()->is('admin/shipping/rules*') ? 'active' : '' }}">
+                                        <li class="{{ request()->is('admin/delivery-zones/rules*') ? 'active' : '' }}">
                                             <a href="{{ route('admin.shipping.rules.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-route" style="color:#6f42c1;"></i>
@@ -1310,7 +1316,7 @@
                                 @endif
  
                                 @can('delivery.view')
-                                <li class="sub-menu {{ request()->is('admin/delivery*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/courier-connect*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="nav-icon fas fa-truck-plane" style="color:#17a2b8;"></i>
@@ -1319,7 +1325,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/delivery*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/courier-connect*') ? 'display: block;' : '' }}">
                                         @can('delivery.view')
                                         <li class="{{ request()->routeIs('admin.delivery.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.delivery.index') }}">
@@ -1438,7 +1444,7 @@
  
                                 {{-- WooCommerce Migration --}}
                                 @can('woocommerce_migration.view')
-                                <li class="{{ request()->is('admin/woocommerce-migration*') ? 'active' : '' }}">
+                                <li class="{{ request()->is('admin/import-woo*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.woocommerce-migration.index') }}">
                                         <span class="menu-content">
                                             <i class="fas fa-arrow-right-arrow-left" style="color:#ff5722;"></i>
@@ -1461,7 +1467,7 @@
  
                                 {{-- Delayed Purchase Events --}}
                                 @can('delayed_events.view')
-                                <li class="sub-menu {{ request()->is('admin/delayed-events*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/event-queue*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-clock-rotate-left" style="color:#f5576c;"></i>
@@ -1470,7 +1476,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/delayed-events*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/event-queue*') ? 'display: block;' : '' }}">
                                         <li class="{{ request()->routeIs('admin.delayed-events.settings') ? 'active' : '' }}">
                                             <a href="{{ route('admin.delayed-events.settings') }}">
                                                 <span class="menu-content">
@@ -1512,7 +1518,7 @@
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $securityTrustActive ? 'display: block;' : 'display: none;' }}">
                                 @can('fraud_checker.view')
-                                <li class="sub-menu {{ request()->is('admin/fraud-checker*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/trust-scanner*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-user-secret" style="color:#dc3545;"></i>
@@ -1521,7 +1527,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/fraud-checker*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/trust-scanner*') ? 'display: block;' : '' }}">
                                         @can('fraud_checker.view')
                                         <li class="{{ request()->routeIs('admin.fraud-checker.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.fraud-checker.index') }}">
@@ -1548,7 +1554,7 @@
  
                                 {{-- Fraud Protection --}}
                                 @can('fraud_protection.view')
-                                <li class="sub-menu {{ request()->is('admin/fraud-protection*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/trust-shield*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="nav-icon fas fa-user-shield text-success"></i>
@@ -1557,7 +1563,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/fraud-protection*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/trust-shield*') ? 'display: block;' : '' }}">
                                         <li class="{{ request()->routeIs('admin.fraud-protection.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.fraud-protection.index') }}">
                                                 <span class="menu-content">
@@ -1580,7 +1586,7 @@
  
                                 {{-- Backup System --}}
                                 @can('backup.settings.view')
-                                <li class="sub-menu {{ request()->is('admin/backup*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/snapshots*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-database" style="color:#17a2b8;"></i>
@@ -1589,7 +1595,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/backup*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/snapshots*') ? 'display: block;' : '' }}">
                                         @can('backup.settings.view')
                                         <li class="{{ request()->routeIs('admin.backup.settings') ? 'active' : '' }}">
                                             <a href="{{ route('admin.backup.settings') }}">
@@ -1637,7 +1643,7 @@
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $contentPagesActive ? 'display: block;' : 'display: none;' }}">
                                 @can('sliders.view')
-                                <li class="sub-menu {{ request()->is('admin/sliders*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/hero-banners*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-images" style="color:#e83e8c;"></i>
@@ -1646,7 +1652,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/sliders*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/hero-banners*') ? 'display: block;' : '' }}">
                                         @can('sliders.view')
                                         <li class="{{ request()->routeIs('admin.sliders.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.sliders.index') }}">
@@ -1672,7 +1678,7 @@
                                 @endcan
  
                                 @can('pages.view')
-                                <li class="sub-menu {{ request()->is('admin/pages*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/site-pages*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-file-lines" style="color:#28a745;"></i>
@@ -1681,7 +1687,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/pages*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/site-pages*') ? 'display: block;' : '' }}">
                                         @can('pages.view')
                                         <li class="{{ request()->routeIs('admin.pages.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.pages.index') }}">
@@ -1707,7 +1713,7 @@
                                 @endcan
  
                                 @can('menus.view')
-                                <li class="{{ request()->is('admin/menus*') ? 'active' : '' }}">
+                                <li class="{{ request()->is('admin/nav-builder*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.menus.index') }}">
                                         <span class="menu-content">
                                             <i class="fas fa-bars-staggered" style="color:#197A94;"></i>
@@ -1718,7 +1724,7 @@
                                 @endcan
  
                                 @can('blog.view')
-                                <li class="sub-menu {{ request()->is('admin/post*') || request()->is('admin/category*') || request()->is('admin/comments*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/articles*') || request()->is('admin/article-topics*') || request()->is('admin/comments*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-newspaper" style="color:#f59e0b;"></i>
@@ -1726,7 +1732,7 @@
                                         </span>
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
-                                    <ul class="left-menu-dp" style="{{ request()->is('admin/post*') || request()->is('admin/category*') || request()->is('admin/comments*') ? 'display: block;' : '' }}">
+                                    <ul class="left-menu-dp" style="{{ request()->is('admin/articles*') || request()->is('admin/article-topics*') || request()->is('admin/comments*') ? 'display: block;' : '' }}">
                                         <li class="{{ request()->routeIs('admin.post.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.post.index') }}">
                                                 <span class="menu-content">
@@ -1850,7 +1856,7 @@
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $controlSystemActive ? 'display: block;' : 'display: none;' }}">
                                 @can('users.view')
-                                <li class="sub-menu {{ request()->is('admin/users*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/team-members*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-user-gear" style="color:#20c997;"></i>
@@ -1858,8 +1864,8 @@
                                         </span>
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
-                                    <ul class="left-menu-dp" style="{{ request()->is('admin/users*') ? 'display: block;' : '' }}">
-                                        <li class="{{ request()->is('admin/users') && !request()->has('view') ? 'active' : '' }}">
+                                    <ul class="left-menu-dp" style="{{ request()->is('admin/team-members*') ? 'display: block;' : '' }}">
+                                        <li class="{{ request()->is('admin/team-members') && !request()->has('view') ? 'active' : '' }}">
                                             <a href="{{ route('admin.users') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-users-gear"></i>
@@ -1867,7 +1873,7 @@
                                                 </span>
                                             </a>
                                         </li>
-                                        <li class="{{ request()->is('admin/users*') && request()->get('view') === 'packages' ? 'active' : '' }}">
+                                        <li class="{{ request()->is('admin/team-members*') && request()->get('view') === 'packages' ? 'active' : '' }}">
                                             <a href="{{ route('admin.users', ['view' => 'packages']) }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-boxes-packing"></i>
@@ -1880,7 +1886,7 @@
                                 @endcan
  
                                 @can('contacts.view')
-                                <li class="sub-menu {{ request()->is('admin/contacts*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/inquiries*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-envelope-open-text" style="color:#6610f2;"></i>
@@ -1889,7 +1895,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/contacts*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/inquiries*') ? 'display: block;' : '' }}">
                                         @can('contacts.view')
                                         <li class="{{ request()->routeIs('admin.contacts.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.contacts.index') }}">
@@ -1937,7 +1943,7 @@
                                 @endcan
  
                                 {{-- Modules & Tools --}}
-                                <li class="{{ request()->is('admin/modules*') ? 'active' : '' }}">
+                                <li class="{{ request()->is('admin/extensions*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.modules.index') }}">
                                         <span class="menu-content">
                                             <i class="fas fa-puzzle-piece" style="color:#9c27b0;"></i>
@@ -1948,7 +1954,7 @@
  
                                 @can('settings.view')
                                 <li
-                                    class="sub-menu {{ request()->is('admin/settings*') || request()->is('admin/socials*') ? 'active' : '' }}">
+                                    class="sub-menu {{ request()->is('admin/config*') || request()->is('admin/socials*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-gears"></i>
@@ -1957,7 +1963,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/settings*') || request()->is('admin/socials*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/config*') || request()->is('admin/socials*') ? 'display: block;' : '' }}">
                                         @can('settings.view')
                                         @can('settings.update')
                                         <li class="{{ request()->routeIs('admin.settings.index') ? 'active' : '' }}">
