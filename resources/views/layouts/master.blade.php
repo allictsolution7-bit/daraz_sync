@@ -604,6 +604,50 @@
         .user-profile-dropdown .dropdown-menu {
             z-index: 3000 !important;
         }
+
+        /* Premium Search Bar */
+        .search-bar {
+            margin-left: 20px;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+        .search-form {
+            position: relative;
+            width: 100%;
+        }
+        .search-form input {
+            width: 100%;
+            height: 40px;
+            padding: 10px 20px 10px 45px;
+            font-size: 14px;
+            color: #334155;
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        .search-form input:focus {
+            background-color: #ffffff;
+            border-color: #197A94;
+            box-shadow: 0 0 0 3px rgba(25, 122, 148, 0.15);
+            outline: none;
+        }
+        .search-form button {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-form button i {
+            font-size: 14px;
+        }
     </style>
     @yield('styles')
 </head>
@@ -615,11 +659,13 @@
         <!-- -navbar- -->
         <div class="header-container">
             <header class="header navbar navbar-expand-sm expand-header">
-                <div class="header-left d-flex">
-                    <div class="logo" style="display: none;">
-                        <a href="{{ route('admin') }}">{{ setting('general', 'site_name', 'Thikana.shop') }}</a>
+                <div class="header-left d-flex align-items-center gap-3 ps-3">
+                    <div class="admin-logo-wrapper">
+                        <a href="{{ route('admin') }}">
+                            <img src="{{ \App\Models\SiteSetting::getLogo() }}" alt="Logo" style="max-height: 40px; width: auto; object-fit: contain;">
+                        </a>
                     </div>
-                    <a href="#" id="toggleSidebar" class="sidebarCollapse" data-placement="button">
+                    <a href="#" id="toggleSidebar" class="sidebarCollapse ms-2" data-placement="button">
                         <span class="fas fa-bars"></span>
                     </a>
                 </div>
@@ -629,18 +675,10 @@
                 <!-- ... existing code ... -->
                 <div class="search-bar">
                     <form class="search-form d-flex align-items-center" method="POST" action="#">
-                        <input type="text" name="query" placeholder="Search" title="Enter search keyword">
-                        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+                        <input type="text" name="query" placeholder="Search..." title="Enter search keyword">
+                        <button type="submit" title="Search"><i class="fas fa-search"></i></button>
                     </form>
                 </div><!-- End Search Bar -->
-
-                <!-- Add the front-end view icon here -->
-                <div class="ms-2">
-                    <a href="{{ url('/') }}" target="_blank" class="btn btn-sm btn-outline-primary"
-                        title="View Website">
-                        <i class="bi bi-eye"></i> View Site
-                    </a>
-                </div>
 
                 <ul class="navbar-item flex-row  align-items-center py-2 ml-auto ">
                     <li class="nav-item dropdown user-profile-dropdown">
@@ -971,31 +1009,11 @@
                                         @endcan
                                         @can('product_categories.view')
                                         <li
-                                            class="{{ request()->routeIs('admin.product_categories.index') ? 'active' : '' }}">
+                                            class="{{ request()->routeIs('admin.product_categories.*') || request()->routeIs('admin.sub-categories.*') || request()->routeIs('admin.third-categories.*') ? 'active' : '' }}">
                                             <a href="{{ route('admin.product_categories.index') }}">
                                                 <span class="menu-content">
                                                     <i class="fas fa-sitemap"></i>
                                                     Categories
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('sub_categories.view')
-                                        <li class="{{ request()->routeIs('admin.sub-categories.index') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.sub-categories.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-folder-open"></i>
-                                                    Sub Categories
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('sub_categories.view')
-                                        <li class="{{ request()->routeIs('admin.third-categories.*') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.third-categories.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-indent"></i>
-                                                    Third Level Categories
                                                 </span>
                                             </a>
                                         </li>
@@ -2014,7 +2032,7 @@
             <!-- Sidebar Brand & Logout Footer -->
             <div class="sidebar-footer">
                 <div class="sidebar-brand-block text-center py-2 rounded-3 text-white" style="background: var(--main-gradient); font-weight: 600; font-size: 16px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);">
-                    <a href="{{ route('admin') }}" class="text-white text-decoration-none">{{ setting('general', 'site_name', 'Thikana.shop') }}</a>
+                    <a href="{{ url('/') }}" target="_blank" class="text-white text-decoration-none d-block w-100">{{ setting('general', 'site_name', 'Thikana.shop') }}</a>
                 </div>
                 <a href="{{ route('logout') }}" class="btn btn-outline-danger w-100 rounded-pill d-flex align-items-center justify-content-center gap-2" style="font-weight: 600; font-size: 14px;" onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();">
                     <i class="fas fa-sign-out-alt"></i> Logout Session

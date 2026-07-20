@@ -106,7 +106,7 @@
             white-space: nowrap;
         }
         .premium-table thead th {
-            background: #0f172a !important; /* Premium Slate Dark Header */
+            background: #0f172a !important;
             color: #f1f5f9 !important;
             font-weight: 600;
             text-transform: uppercase;
@@ -138,34 +138,47 @@
             word-break: break-word;
         }
 
-        /* Elegant Reviewer Photo Image Frame */
-        .category-image-frame {
-            width: 44px;
-            height: 44px;
+        /* Reviewer Avatar & Click Trigger */
+        .reviewer-avatar {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            border: 2px solid #ffffff;
-            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #4f46e5;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .category-image-frame img {
+        .reviewer-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+        .reviewer-avatar:hover {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
 
-        .category-no-image {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: #f1f5f9;
-            border: 1px dashed #cbd5e1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            color: #94a3b8;
-            font-weight: 500;
+        .reviewer-short {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            max-width: 130px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            border-bottom: 1px dashed #94a3b8;
+        }
+        .reviewer-short:hover {
+            color: #4f46e5;
         }
 
         /* Status Toggle Button Pill */
@@ -237,6 +250,61 @@
             background: rgba(239, 68, 68, 0.12);
             color: #dc2626;
         }
+
+        /* Reviewer Modal Styles */
+        #reviewerModal .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+        }
+        #reviewerModal .modal-header {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 20px 24px;
+        }
+        #reviewerModal .modal-body {
+            padding: 24px;
+        }
+        .reviewer-modal-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e2e8f0;
+        }
+        .reviewer-modal-initials {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+        .reviewer-detail-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .reviewer-detail-row:last-child {
+            border-bottom: none;
+        }
+        .reviewer-detail-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            min-width: 110px;
+        }
+        .reviewer-detail-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
     </style>
 @endsection
 
@@ -290,20 +358,35 @@
                     </thead>
                     <tbody>
                         @forelse($reviews as $review)
+                            @php
+                                $nameParts = explode(' ', trim($review->reviewer_name ?? ''));
+                                $initials = strtoupper(substr($nameParts[0] ?? '?', 0, 1) . (isset($nameParts[1]) ? substr($nameParts[1], 0, 1) : ''));
+                                $shortName = strlen($review->reviewer_name) > 14
+                                    ? substr($review->reviewer_name, 0, 12) . '…'
+                                    : $review->reviewer_name;
+                            @endphp
                             <tr>
                                 <td class="font-monospace text-muted">#{{ $review->id }}</td>
                                 <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        @if($review->reviewer_image)
-                                            <div class="category-image-frame">
+                                    <div class="d-flex align-items-center gap-2"
+                                         style="cursor:pointer;"
+                                         onclick="openReviewerModal({
+                                            name: {{ json_encode($review->reviewer_name) }},
+                                            image: {{ json_encode($review->reviewer_image ? asset($review->reviewer_image) : null) }},
+                                            initials: {{ json_encode($initials) }},
+                                            product: {{ json_encode($review->product_name) }},
+                                            rating: {{ $review->rating }},
+                                            date: {{ json_encode($review->review_date->format('M d, Y')) }},
+                                            status: {{ json_encode($review->is_active ? 'Active' : 'Inactive') }}
+                                         })">
+                                        <div class="reviewer-avatar" title="View {{ $review->reviewer_name }} details">
+                                            @if($review->reviewer_image)
                                                 <img src="{{ asset($review->reviewer_image) }}" alt="{{ $review->reviewer_name }}">
-                                            </div>
-                                        @else
-                                            <div class="category-no-image">
-                                                <i class="fa-regular fa-user"></i>
-                                            </div>
-                                        @endif
-                                        <span class="fw-semibold text-slate-800">{{ $review->reviewer_name }}</span>
+                                            @else
+                                                {{ $initials }}
+                                            @endif
+                                        </div>
+                                        <span class="reviewer-short" title="{{ $review->reviewer_name }}">{{ $shortName }}</span>
                                     </div>
                                 </td>
                                 <td class="fw-medium text-slate-700 text-wrap-column">{{ $review->product_name }}</td>
@@ -331,14 +414,14 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="d-inline-flex gap-1" role="group">
-                                        <a href="{{ route('admin.reviews.edit', $review) }}" 
+                                        <a href="{{ route('admin.reviews.edit', $review) }}"
                                            class="btn-action-custom btn-action-edit" title="Edit Review">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </a>
                                         <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn-action-custom btn-action-delete" 
+                                            <button type="submit" class="btn-action-custom btn-action-delete"
                                                     title="Delete Review" onclick="return confirm('Are you sure you want to delete this review?');">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
@@ -366,4 +449,80 @@
             @endif
         </div>
     </div>
+
+    <!-- Reviewer Detail Modal -->
+    <div class="modal fade" id="reviewerModal" tabindex="-1" aria-labelledby="reviewerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="reviewerModalLabel" style="font-family:'Outfit',sans-serif;">Reviewer Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="font-family:'Outfit',sans-serif;">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div id="modal-avatar-wrapper"></div>
+                        <div>
+                            <h6 class="mb-0 fw-bold" id="modal-reviewer-name" style="font-size:1.1rem;color:#0f172a;"></h6>
+                            <small class="text-muted">Customer</small>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="reviewer-detail-row">
+                            <span class="reviewer-detail-label"><i class="fas fa-box-open me-1 text-primary"></i> Product</span>
+                            <span class="reviewer-detail-value" id="modal-reviewer-product"></span>
+                        </div>
+                        <div class="reviewer-detail-row">
+                            <span class="reviewer-detail-label"><i class="fas fa-star me-1 text-warning"></i> Rating</span>
+                            <span class="reviewer-detail-value" id="modal-reviewer-rating"></span>
+                        </div>
+                        <div class="reviewer-detail-row">
+                            <span class="reviewer-detail-label"><i class="fas fa-calendar me-1 text-info"></i> Date</span>
+                            <span class="reviewer-detail-value" id="modal-reviewer-date"></span>
+                        </div>
+                        <div class="reviewer-detail-row">
+                            <span class="reviewer-detail-label"><i class="fas fa-circle me-1 text-success"></i> Status</span>
+                            <span class="reviewer-detail-value" id="modal-reviewer-status"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+<script>
+function openReviewerModal(data) {
+    // Set avatar
+    const avatarWrapper = document.getElementById('modal-avatar-wrapper');
+    if (data.image) {
+        avatarWrapper.innerHTML = `<img src="${data.image}" class="reviewer-modal-avatar" alt="${data.name}">`;
+    } else {
+        avatarWrapper.innerHTML = `<div class="reviewer-modal-initials">${data.initials}</div>`;
+    }
+
+    document.getElementById('modal-reviewer-name').textContent = data.name;
+    document.getElementById('modal-reviewer-product').textContent = data.product;
+    document.getElementById('modal-reviewer-date').textContent = data.date;
+    document.getElementById('modal-reviewer-status').textContent = data.status;
+
+    // Build star rating
+    let starsHtml = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= Math.floor(data.rating)) {
+            starsHtml += '<i class="fa-solid fa-star text-warning"></i>';
+        } else if (i - 0.5 <= data.rating) {
+            starsHtml += '<i class="fa-solid fa-star-half-stroke text-warning"></i>';
+        } else {
+            starsHtml += '<i class="fa-regular fa-star text-warning"></i>';
+        }
+    }
+    starsHtml += ` <span class="ms-1 text-muted">(${data.rating}/5)</span>`;
+    document.getElementById('modal-reviewer-rating').innerHTML = starsHtml;
+
+    // Show modal
+    var modal = new bootstrap.Modal(document.getElementById('reviewerModal'));
+    modal.show();
+}
+</script>
+@endpush

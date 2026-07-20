@@ -414,6 +414,19 @@
         </nav>
 
         <div class="glass-card">
+            <!-- Category Navigation Tabs -->
+            <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom flex-wrap">
+                <a href="{{ route('admin.product_categories.index') }}" class="btn px-3 py-2 rounded-pill" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #fff; border: none; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2); font-weight: 600; font-size: 0.85rem;">
+                    <i class="fas fa-sitemap me-1"></i> Main Categories
+                </a>
+                <a href="{{ route('admin.sub-categories.index') }}" class="btn px-3 py-2 rounded-pill" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; font-weight: 600; font-size: 0.85rem;">
+                    <i class="fas fa-folder-open me-1"></i> Sub Categories
+                </a>
+                <a href="{{ route('admin.third-categories.index') }}" class="btn px-3 py-2 rounded-pill" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; font-weight: 600; font-size: 0.85rem;">
+                    <i class="fas fa-indent me-1"></i> Third Level Categories
+                </a>
+            </div>
+
             <!-- Header Section -->
             <div class="row align-items-center mb-4">
                 <div class="col-md-6">
