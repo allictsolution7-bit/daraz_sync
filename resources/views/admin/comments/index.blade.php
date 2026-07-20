@@ -149,47 +149,32 @@
             border-radius: 12px;
             font-weight: 700;
             font-size: 0.85rem;
-            transition: all 0.2s ease;
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
-            color: #475569;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
             cursor: pointer;
         }
 
         .btn-premium-action:hover {
-            transform: translateY(-1px);
-            background: #f8fafc;
-            color: #1e293b;
+            transform: translateY(-2px);
+            background: #ffffff !important;
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
         }
 
-        .btn-premium-approve {
-            background: rgba(16, 185, 129, 0.06);
-            color: #059669;
-            border-color: rgba(16, 185, 129, 0.2);
-        }
         .btn-premium-approve:hover {
-            background: rgba(16, 185, 129, 0.1);
-            color: #047857;
+            color: #10b981 !important;
+            border-color: #10b981 !important;
         }
 
-        .btn-premium-warning {
-            background: rgba(245, 158, 11, 0.06);
-            color: #d97706;
-            border-color: rgba(245, 158, 11, 0.2);
-        }
         .btn-premium-warning:hover {
-            background: rgba(245, 158, 11, 0.1);
-            color: #b45309;
+            color: #d97706 !important;
+            border-color: #d97706 !important;
         }
 
-        .btn-premium-danger {
-            background: rgba(239, 68, 68, 0.06);
-            color: #dc2626;
-            border-color: rgba(239, 68, 68, 0.2);
-        }
         .btn-premium-danger:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: #b91c1c;
+            color: #ef4444 !important;
+            border-color: #ef4444 !important;
         }
 
         /* Modernized Table styling */
@@ -301,6 +286,8 @@
             border: 2px solid #cbd5e1;
             cursor: pointer;
             transition: all 0.2s ease;
+            vertical-align: middle;
+            margin: 0;
         }
 
         .custom-checkbox-premium:checked {
@@ -310,9 +297,9 @@
 
         /* Table actions */
         .btn-table-action {
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -354,7 +341,7 @@
         <div class="gradient-header">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
                 <div>
-                    <h1 class="gradient-header-title">Blog Comments manager</h1>
+                    <h1 class="gradient-header-title">Blog Comments Manager</h1>
                     <p class="gradient-header-subtitle">Moderate, approve, spam-mark, and configure user responses to blog posts.</p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
@@ -423,12 +410,12 @@
                 <table class="premium-table">
                     <thead>
                         <tr>
-                            <th width="40" style="padding-left: 1.5rem;">
+                            <th width="40" style="padding-left: 1.5rem; text-align: center;">
                                 <input type="checkbox" id="select-all" class="custom-checkbox-premium">
                             </th>
                             <th>Author Identity</th>
                             <th>Response Text</th>
-                            <th>Reference Post</th>
+                            <th style="min-width: 180px;">Reference Post</th>
                             <th>Status Badge</th>
                             <th>Published Date</th>
                             <th style="width: 160px; text-align: right; padding-right: 1.5rem;">Action Tools</th>
@@ -437,7 +424,7 @@
                     <tbody>
                         @forelse($comments as $comment)
                             <tr>
-                                <td style="padding-left: 1.5rem;">
+                                <td style="padding-left: 1.5rem; text-align: center;">
                                     <input type="checkbox" class="comment-checkbox custom-checkbox-premium" value="{{ $comment->id }}">
                                 </td>
                                 <td>
@@ -488,8 +475,8 @@
                                 </td>
                                 <td>
                                     @if($comment->post)
-                                        <a href="{{ route('blog.show', $comment->post->slug) }}" target="_blank" class="category-badge" style="text-decoration: none;">
-                                            <i class="fas fa-link"></i> {{ Str::limit($comment->post->title, 40) }}
+                                        <a href="{{ route('blog.show', $comment->post->slug) }}" target="_blank" class="category-badge" style="text-decoration: none; font-size: 0.85rem; max-width: 200px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle;" title="{{ $comment->post->title }}">
+                                            <i class="fas fa-link"></i> {{ $comment->post->title }}
                                         </a>
                                     @else
                                         <span class="text-muted small">Post deleted</span>
@@ -511,7 +498,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="text-slate-600" style="font-weight:600; font-size:0.875rem;">
+                                    <span class="text-slate-600" style="font-weight:600; font-size:0.875rem; white-space: nowrap;">
                                         <i class="far fa-calendar-alt text-muted mr-1"></i>
                                         {{ $comment->created_at->format('M d, Y H:i') }}
                                     </span>
