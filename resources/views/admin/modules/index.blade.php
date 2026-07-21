@@ -508,9 +508,11 @@
                                         </button>
                                     @endif
                                 @endif
+                                @if(File::isDirectory(base_path('Modules/' . $module['name'])))
                                 <button class="btn-module btn-delete" onclick="event.stopPropagation(); deleteModule('{{ $module['name'] }}')" title="Uninstall">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                @endif
                             @else
                                 <span class="text-muted small">Upload to install</span>
                             @endif

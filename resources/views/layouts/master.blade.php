@@ -841,7 +841,7 @@
         $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/import-woo*') || request()->routeIs('admin.telegram-settings.*') || request()->is('admin/event-queue*');
         $securityTrustActive = request()->is('admin/trust-scanner*') || request()->is('admin/trust-shield*') || request()->is('admin/snapshots*');
         $contentPagesActive = request()->is('admin/hero-banners*') || request()->is('admin/site-pages*') || request()->is('admin/nav-builder*') || request()->is('admin/articles*') || request()->is('admin/article-topics*') || request()->is('admin/article-subtopics*') || request()->is('admin/comments*');
-        $vendorsActive = request()->is('admin/partners*') || request()->is('admin/partner-items*') || request()->is('admin/partner-payouts*') || request()->is('admin/partner-config*');
+        $vendorsActive = request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-settings*') || request()->is('admin/partners*') || request()->is('admin/partner-items*') || request()->is('admin/partner-payouts*') || request()->is('admin/partner-config*');
         $controlSystemActive = request()->is('admin/team-members*') || request()->routeIs('admin.roles_permissions.*') || request()->is('admin/extensions*') || request()->is('admin/config*') || request()->is('admin/social-links*') || request()->is('admin/inquiries*') || request()->routeIs('admin.subscriptions.index');
         @endphp
 
@@ -1254,8 +1254,8 @@
                                 @endcan
  
                                 {{-- POS System --}}
-                                @can('orders.create')
-                                @if(Route::has('admin.pos.index'))
+                                @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('orders.create'))
+                                @if(module_enabled('POS') && Route::has('admin.pos.index'))
                                 <x-license-feature module="pos">
                                     <li class="{{ request()->routeIs('admin.pos.*') ? 'active' : '' }}">
                                         <a href="{{ route('admin.pos.index') }}">
@@ -1267,7 +1267,7 @@
                                     </li>
                                 </x-license-feature>
                                 @endif
-                                @endcan
+                                @endif
                             </ul>
                         </li>
                         @endif
@@ -1802,7 +1802,7 @@
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $vendorsActive ? 'display: block;' : 'display: none;' }}">
-                                @can('admin.vendors.view')
+                                @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('admin.vendors.view'))
                                 <li
                                     class="{{ request()->routeIs('admin.vendors.index') || request()->routeIs('admin.vendors.show') || request()->routeIs('admin.vendors.edit') ? 'active' : '' }}">
                                     <a href="{{ route('admin.vendors.index') }}">
@@ -1812,8 +1812,8 @@
                                         </span>
                                     </a>
                                 </li>
-                                @endcan
-                                @can('admin.vendors.edit')
+                                @endif
+                                @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('admin.vendors.edit'))
                                 <li class="{{ request()->routeIs('admin.vendors.create') ? 'active' : '' }}">
                                     <a href="{{ route('admin.vendors.create') }}">
                                         <span class="menu-content">
@@ -1822,8 +1822,8 @@
                                         </span>
                                     </a>
                                 </li>
-                                @endcan
-                                @can('admin.products.view-all')
+                                @endif
+                                @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('admin.products.view-all'))
                                 <li
                                     class="{{ request()->routeIs('admin.vendor-products.index') || request()->routeIs('admin.vendor-products.show') ? 'active' : '' }}">
                                     <a href="{{ route('admin.vendor-products.index') }}">
@@ -1833,8 +1833,8 @@
                                         </span>
                                     </a>
                                 </li>
-                                @endcan
-                                @can('admin.withdrawals.view')
+                                @endif
+                                @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('admin.withdrawals.view'))
                                 <li
                                     class="{{ request()->routeIs('admin.vendor-withdrawals.index') || request()->routeIs('admin.vendor-withdrawals.show') ? 'active' : '' }}">
                                     <a href="{{ route('admin.vendor-withdrawals.index') }}">
@@ -1844,8 +1844,8 @@
                                         </span>
                                     </a>
                                 </li>
-                                @endcan
-                                @can('admin.commissions.view')
+                                @endif
+                                @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('admin.commissions.view'))
                                 <li class="{{ request()->routeIs('admin.vendor-settings.global') ? 'active' : '' }}">
                                     <a href="{{ route('admin.vendor-settings.global') }}">
                                         <span class="menu-content">
@@ -1854,7 +1854,7 @@
                                         </span>
                                     </a>
                                 </li>
-                                @endcan
+                                @endif
                             </ul>
                         </li>
                         @endif

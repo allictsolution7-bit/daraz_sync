@@ -58,7 +58,9 @@ class ModuleManager
      */
     public function has(string $name): bool
     {
-        return isset($this->modules[$name]) || File::isDirectory($this->modulesPath . '/' . $name);
+        return isset($this->modules[$name]) 
+            || File::isDirectory($this->modulesPath . '/' . $name) 
+            || isset(config('modules.available', [])[$name]);
     }
 
     /**

@@ -1,5 +1,7 @@
 {
     "POS": true,
     "MultiVendor": true,
+    "LandingPage": true,
+    "Blog": true,
     "Daraz": true
 }

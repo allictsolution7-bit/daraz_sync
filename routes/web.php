@@ -686,6 +686,20 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::post('/access-control/role/{role}/delete', [\App\Http\Controllers\Admin\RolesPermissionsController::class, 'deleteRole'])->name('roles_permissions.role.delete');
     Route::post('/access-control/user/{user}/roles', [\App\Http\Controllers\Admin\RolesPermissionsController::class, 'updateUserRoles'])->name('roles_permissions.user_roles.update');
     
+    // POS (Point of Sale) Routes
+    Route::prefix('pos')->name('pos.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\POSController::class, 'index'])->name('index');
+        Route::get('/search-products', [\App\Http\Controllers\Admin\POSController::class, 'searchProducts'])->name('search-products');
+        Route::get('/search-customers', [\App\Http\Controllers\Admin\POSController::class, 'searchCustomers'])->name('search-customers');
+        Route::post('/create-customer', [\App\Http\Controllers\Admin\POSController::class, 'createCustomer'])->name('create-customer');
+        Route::post('/create-order', [\App\Http\Controllers\Admin\POSController::class, 'createOrder'])->name('create-order');
+        Route::get('/print-receipt/{order}', [\App\Http\Controllers\Admin\POSController::class, 'printReceipt'])->name('print-receipt');
+        Route::get('/print-invoice/{order}', [\App\Http\Controllers\Admin\POSController::class, 'printInvoice'])->name('print-invoice');
+        Route::get('/download-receipt/{order}', [\App\Http\Controllers\Admin\POSController::class, 'downloadReceipt'])->name('download-receipt');
+        Route::get('/download-invoice/{order}', [\App\Http\Controllers\Admin\POSController::class, 'downloadInvoice'])->name('download-invoice');
+        Route::get('/stats', [\App\Http\Controllers\Admin\POSController::class, 'stats'])->name('stats');
+    });
+    
     // License Management Routes
     Route::prefix('licensing')->name('verification.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\LicenseController::class, 'index'])->name('index');
@@ -771,81 +785,79 @@ Route::get('/api/mobile-subcategories/{categoryId}', [CategoryController::class,
 
 
 // ==========================================
-// VENDOR PANEL ROUTES (only if MultiVendor module not enabled)
+// VENDOR PANEL ROUTES
 // ==========================================
-if (!module_enabled('MultiVendor')) {
-    Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(function () {
+Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(function () {
 
-        // Dashboard
-        Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
+    // Dashboard
+    Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
 
-        // Profile
-        Route::get('/profile', [VendorDashboardController::class, 'profile'])->name('profile');
-        Route::put('/profile', [VendorDashboardController::class, 'updateProfile'])->name('profile.update');
+    // Profile
+    Route::get('/profile', [VendorDashboardController::class, 'profile'])->name('profile');
+    Route::put('/profile', [VendorDashboardController::class, 'updateProfile'])->name('profile.update');
 
-        // Products
-        Route::get('/products/subcategories/{categoryId}', [VendorProductController::class, 'getSubcategories'])->name('products.subcategories');
-        Route::resource('products', VendorProductController::class);
+    // Products
+    Route::get('/products/subcategories/{categoryId}', [VendorProductController::class, 'getSubcategories'])->name('products.subcategories');
+    Route::resource('products', VendorProductController::class);
 
-        // Orders (view only)
-        Route::prefix('orders')->name('orders.')->group(function () {
-            Route::get('/', [VendorOrderController::class, 'index'])->name('index');
-            Route::get('/{order}', [VendorOrderController::class, 'show'])->name('show');
-            Route::get('/earnings/summary', [VendorOrderController::class, 'earnings'])->name('earnings');
-        });
-
-        // Withdrawals (requires verified vendor)
-        Route::prefix('withdrawals')->name('withdrawals.')->middleware('vendor.verified')->group(function () {
-            Route::get('/', [VendorWithdrawalController::class, 'index'])->name('index');
-            Route::get('/create', [VendorWithdrawalController::class, 'create'])->name('create');
-            Route::post('/', [VendorWithdrawalController::class, 'store'])->name('store');
-            Route::get('/{withdrawal}', [VendorWithdrawalController::class, 'show'])->name('show');
-            Route::put('/{withdrawal}/cancel', [VendorWithdrawalController::class, 'cancel'])->name('cancel');
-        });
+    // Orders (view only)
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [VendorOrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [VendorOrderController::class, 'show'])->name('show');
+        Route::get('/earnings/summary', [VendorOrderController::class, 'earnings'])->name('earnings');
     });
 
-    // ==========================================
-    // ADMIN VENDOR MANAGEMENT ROUTES
-    // ==========================================
-    Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:admin|super_admin|super admin'])->group(function () {
-
-        // Vendor Management
-        Route::resource('partners', AdminVendorController::class)->parameters(['partners' => 'vendor'])->names(['index' => 'vendors.index', 'create' => 'vendors.create', 'store' => 'vendors.store', 'show' => 'vendors.show', 'edit' => 'vendors.edit', 'update' => 'vendors.update', 'destroy' => 'vendors.destroy']);
-        Route::post('/partners/{vendor}/verify', [AdminVendorController::class, 'verify'])->name('vendors.verify');
-        Route::post('/partners/{vendor}/toggle-status', [AdminVendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
-
-        // Vendor Product Approval
-        Route::prefix('partner-items')->name('vendor-products.')->group(function () {
-            Route::get('/', [AdminVendorProductController::class, 'index'])->name('index');
-            Route::get('/{product}', [AdminVendorProductController::class, 'show'])->name('show');
-            Route::post('/{product}/approve', [AdminVendorProductController::class, 'approve'])->name('approve');
-            Route::post('/{product}/reject', [AdminVendorProductController::class, 'reject'])->name('reject');
-            Route::post('/bulk-approve', [AdminVendorProductController::class, 'bulkApprove'])->name('bulk-approve');
-            Route::put('/{product}/commission', [AdminVendorProductController::class, 'updateCommission'])->name('update-commission');
-        });
-
-        // Vendor Withdrawal Management
-        Route::prefix('partner-payouts')->name('vendor-withdrawals.')->group(function () {
-            Route::get('/', [AdminVendorWithdrawalController::class, 'index'])->name('index');
-            Route::get('/history', [AdminVendorWithdrawalController::class, 'payoutHistory'])->name('history');
-            Route::get('/{withdrawal}', [AdminVendorWithdrawalController::class, 'show'])->name('show');
-            Route::post('/{withdrawal}/approve', [AdminVendorWithdrawalController::class, 'approve'])->name('approve');
-            Route::post('/{withdrawal}/reject', [AdminVendorWithdrawalController::class, 'reject'])->name('reject');
-            Route::post('/{withdrawal}/complete', [AdminVendorWithdrawalController::class, 'complete'])->name('complete');
-            Route::post('/bulk-approve', [AdminVendorWithdrawalController::class, 'bulkApprove'])->name('bulk-approve');
-        });
-
-        // Vendor Global Settings
-        Route::prefix('partner-config')->name('vendor-settings.')->group(function () {
-            Route::get('/global', [VendorGlobalSettingsController::class, 'index'])->name('global');
-            Route::post('/global', [VendorGlobalSettingsController::class, 'update'])->name('global.update');
-            Route::post('/global/toggle-system', [VendorGlobalSettingsController::class, 'toggleSystem'])->name('toggle-system');
-            Route::put('/global/{key}', [VendorGlobalSettingsController::class, 'updateSingle'])->name('global.update-single');
-            Route::post('/global/reset', [VendorGlobalSettingsController::class, 'reset'])->name('global.reset');
-            Route::get('/global/export', [VendorGlobalSettingsController::class, 'export'])->name('global.export');
-        });
+    // Withdrawals (requires verified vendor)
+    Route::prefix('withdrawals')->name('withdrawals.')->middleware('vendor.verified')->group(function () {
+        Route::get('/', [VendorWithdrawalController::class, 'index'])->name('index');
+        Route::get('/create', [VendorWithdrawalController::class, 'create'])->name('create');
+        Route::post('/', [VendorWithdrawalController::class, 'store'])->name('store');
+        Route::get('/{withdrawal}', [VendorWithdrawalController::class, 'show'])->name('show');
+        Route::put('/{withdrawal}/cancel', [VendorWithdrawalController::class, 'cancel'])->name('cancel');
     });
-} // End MultiVendor module check
+});
+
+// ==========================================
+// ADMIN VENDOR MANAGEMENT ROUTES
+// ==========================================
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:admin|super_admin|super admin'])->group(function () {
+
+    // Vendor Management
+    Route::resource('partners', AdminVendorController::class)->parameters(['partners' => 'vendor'])->names(['index' => 'vendors.index', 'create' => 'vendors.create', 'store' => 'vendors.store', 'show' => 'vendors.show', 'edit' => 'vendors.edit', 'update' => 'vendors.update', 'destroy' => 'vendors.destroy']);
+    Route::post('/partners/{vendor}/verify', [AdminVendorController::class, 'verify'])->name('vendors.verify');
+    Route::post('/partners/{vendor}/toggle-status', [AdminVendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
+
+    // Vendor Product Approval
+    Route::prefix('partner-items')->name('vendor-products.')->group(function () {
+        Route::get('/', [AdminVendorProductController::class, 'index'])->name('index');
+        Route::get('/{product}', [AdminVendorProductController::class, 'show'])->name('show');
+        Route::post('/{product}/approve', [AdminVendorProductController::class, 'approve'])->name('approve');
+        Route::post('/{product}/reject', [AdminVendorProductController::class, 'reject'])->name('reject');
+        Route::post('/bulk-approve', [AdminVendorProductController::class, 'bulkApprove'])->name('bulk-approve');
+        Route::put('/{product}/commission', [AdminVendorProductController::class, 'updateCommission'])->name('update-commission');
+    });
+
+    // Vendor Withdrawal Management
+    Route::prefix('partner-payouts')->name('vendor-withdrawals.')->group(function () {
+        Route::get('/', [AdminVendorWithdrawalController::class, 'index'])->name('index');
+        Route::get('/history', [AdminVendorWithdrawalController::class, 'payoutHistory'])->name('history');
+        Route::get('/{withdrawal}', [AdminVendorWithdrawalController::class, 'show'])->name('show');
+        Route::post('/{withdrawal}/approve', [AdminVendorWithdrawalController::class, 'approve'])->name('approve');
+        Route::post('/{withdrawal}/reject', [AdminVendorWithdrawalController::class, 'reject'])->name('reject');
+        Route::post('/{withdrawal}/complete', [AdminVendorWithdrawalController::class, 'complete'])->name('complete');
+        Route::post('/bulk-approve', [AdminVendorWithdrawalController::class, 'bulkApprove'])->name('bulk-approve');
+    });
+
+    // Vendor Global Settings
+    Route::prefix('partner-config')->name('vendor-settings.')->group(function () {
+        Route::get('/global', [VendorGlobalSettingsController::class, 'index'])->name('global');
+        Route::post('/global', [VendorGlobalSettingsController::class, 'update'])->name('global.update');
+        Route::post('/global/toggle-system', [VendorGlobalSettingsController::class, 'toggleSystem'])->name('toggle-system');
+        Route::put('/global/{key}', [VendorGlobalSettingsController::class, 'updateSingle'])->name('global.update-single');
+        Route::post('/global/reset', [VendorGlobalSettingsController::class, 'reset'])->name('global.reset');
+        Route::get('/global/export', [VendorGlobalSettingsController::class, 'export'])->name('global.export');
+    });
+});
 
 // ==========================================
 // ADMIN ROUTES (Non-Vendor)
