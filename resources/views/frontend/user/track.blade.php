@@ -4,29 +4,34 @@
     <link rel="stylesheet" href="{{ asset('new/user.styles.css') }}">
     <style>
         .track-container {
-            margin: 40px auto;
-            padding: 0 20px;
+            margin: 20px auto;
+            padding: 0 5px;
+        }
+
+        .track-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
         }
 
         .track-card {
             background-color: #fff;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
             border-radius: 8px;
-            padding: 0;
             overflow: hidden;
         }
 
         .track-header {
             padding: 20px 25px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: #f8f9fa;
+            border-bottom: 1px solid #e2e8f0;
+            background-color: #f8fafc;
         }
 
         .track-header h4 {
             margin: 0;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--secondary-color);
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
         }
 
         .track-body {
@@ -44,55 +49,57 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--secondary-color);
+            font-weight: 600;
+            color: #1e293b;
         }
 
         .form-control {
             width: 100%;
             padding: 10px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 16px;
-            transition: var(--transition);
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
         }
 
         .form-control:focus {
-            border-color: var(--primary-color);
+            border-color: #ff6a00;
             outline: none;
-            box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
         }
 
         .track-btn {
-            background-color: var(--primary-color);
+            background-color: #ff6a00;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
+            transition: background-color 0.2s ease;
         }
 
         .track-btn:hover {
-            background-color: var(--secondary-color);
+            background-color: #e05d00;
         }
 
         .order-info {
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 20px;
             margin-top: 30px;
+            background-color: #ffffff;
         }
 
         .order-info h5 {
             font-size: 18px;
-            font-weight: 600;
-            color: var(--secondary-color);
+            font-weight: 700;
+            color: #1e293b;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .order-info-grid {
@@ -107,18 +114,18 @@
 
         .order-info-item strong {
             font-weight: 600;
-            color: var(--secondary-color);
+            color: #1e293b;
         }
 
         .status-timeline {
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid #e2e8f0;
         }
 
         .timeline-item {
             display: flex;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             position: relative;
         }
 
@@ -130,10 +137,10 @@
             content: '';
             position: absolute;
             left: 15px;
-            top: 30px;
-            bottom: -15px;
+            top: 32px;
+            bottom: -20px;
             width: 2px;
-            background-color: var(--border-color);
+            background-color: #e2e8f0;
         }
 
         .timeline-item:last-child::before {
@@ -143,20 +150,21 @@
         .timeline-icon {
             width: 32px;
             height: 32px;
-            background-color: #f8f9fa;
+            background-color: #f8fafc;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 15px;
-            border: 2px solid var(--border-color);
+            border: 2px solid #cbd5e1;
             z-index: 1;
+            color: #64748b;
         }
 
         .timeline-icon.active {
-            background-color: var(--primary-color);
+            background-color: #ff6a00;
             color: white;
-            border-color: var(--primary-color);
+            border-color: #ff6a00;
         }
 
         .timeline-content {
@@ -165,39 +173,36 @@
 
         .timeline-date {
             font-size: 12px;
-            color: #6c757d;
+            color: #64748b;
         }
 
         .timeline-status {
             font-weight: 600;
-            color: var(--secondary-color);
-            margin: 5px 0;
+            color: #1e293b;
+            margin: 4px 0;
         }
 
         .timeline-desc {
-            font-size: 14px;
-            color: #6c757d;
+            font-size: 13px;
+            color: #64748b;
         }
 
         .alert {
             padding: 15px;
-            border-radius: 4px;
+            border-radius: 6px;
             margin-bottom: 20px;
         }
 
         .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
         }
 
         @media (max-width: 768px) {
+            .track-layout {
+                grid-template-columns: 1fr;
+            }
             .order-info-grid {
                 grid-template-columns: 1fr;
             }
@@ -211,141 +216,140 @@
         $autoSubmit = request()->isMethod('get') && request('auto') == '1' && !empty($prefillPhone);
     @endphp
     <div class="base-container track-container">
-        <div class="track-card">
-            <div class="track-header">
-                <h4>Track Your Order</h4>
-            </div>
-            <div class="track-body">
-                @if (session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                @endif
+        <div class="track-layout">
+            <!-- Sidebar Menu -->
+            @include('frontend.user.partials.sidebar')
 
-                <form action="{{ route('order.track.submit') }}" method="POST" class="track-form">
-                    @csrf
-                    {{-- <div class="form-group">
-                        <label for="order_id">Order ID</label>
-                        <input type="text" id="order_id" name="order_id" class="form-control" placeholder="Enter your order ID" value="{{ old('order_id') }}" required>
-                        @error('order_id')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div> --}}
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" id="phone" name="phone" class="form-control"
-                            placeholder="Enter your phone number" value="{{ old('phone', $prefillPhone) }}" required>
-                        @error('phone')
-                            <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <button type="submit" class="track-btn">Track Order</button>
-                </form>
-
-                @if (isset($order))
-                    <div class="order-info">
-                        <h5>Order #{{ $order->id }}</h5>
-                        <div class="order-info-grid">
-                            <div>
-                                <div class="order-info-item">
-                                    <strong>Order Date:</strong> {{ $order->created_at->format('M d, Y h:i A') }}
-                                </div>
-                                <div class="order-info-item">
-                                    <strong>Status:</strong> {{ ucfirst($order->status) }}
-                                </div>
-                                <div class="order-info-item">
-                                    <strong>Payment Method:</strong> {{ ucfirst($order->payment_method ?? 'N/A') }}
-                                </div>
-                                <div class="order-info-item">
-                                    <strong>Payment Status:</strong> {{ ucfirst($order->payment_status ?? 'N/A') }}
-                                </div>
-                            </div>
-                            <div>
-                                <div class="order-info-item">
-                                    <strong>Name:</strong> {{ $order->name }}
-                                </div>
-                                <div class="order-info-item">
-                                    <strong>Phone:</strong> {{ $order->phone }}
-                                </div>
-                                <div class="order-info-item">
-                                    <strong>Address:</strong> {{ $order->address }}
-                                </div>
-                                <div class="order-info-item">
-                                    <strong>Total:</strong> ৳{{ number_format($order->total, 2) }}
-                                </div>
-                            </div>
+            <!-- Main Content Card -->
+            <div class="track-card">
+                <div class="track-header">
+                    <h4>Track Your Order Shipment</h4>
+                </div>
+                <div class="track-body">
+                    @if (session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
                         </div>
+                    @endif
 
-                        <div class="status-timeline">
-                            <h5>Order Status Timeline</h5>
+                    <form action="{{ route('order.track.submit') }}" method="POST" class="track-form">
+                        @csrf
+                        <div class="form-group">
+                            <label for="phone">Customer Phone Number</label>
+                            <input type="text" id="phone" name="phone" class="form-control"
+                                placeholder="Enter your phone number (e.g. 017XXXXXXXX)" value="{{ old('phone', $prefillPhone) }}" required>
+                            @error('phone')
+                                <div class="text-danger" style="color: #dc3545; font-size: 13px; margin-top: 5px;">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <button type="submit" class="track-btn">
+                            <i class="fa-solid fa-magnifying-glass" style="margin-right: 6px;"></i> Track Order
+                        </button>
+                    </form>
 
-                            @php
-                                $statuses = [
-                                    'pending' => [
-                                        'icon' => 'fa-clock',
-                                        'desc' => 'Your order has been received and is awaiting processing.',
-                                    ],
-                                    'processing' => [
-                                        'icon' => 'fa-spinner',
-                                        'desc' => 'Your order is being processed.',
-                                    ],
-                                    'ready_for_delivery' => [
-                                        'icon' => 'fa-box',
-                                        'desc' => 'Your order is packed and ready for delivery.',
-                                    ],
-                                    'shipped' => [
-                                        'icon' => 'fa-truck',
-                                        'desc' => 'Your order has been shipped and is on the way.',
-                                    ],
-                                    'completed' => [
-                                        'icon' => 'fa-check-circle',
-                                        'desc' => 'Your order has been delivered successfully.',
-                                    ],
-                                    'cancelled' => [
-                                        'icon' => 'fa-times-circle',
-                                        'desc' => 'Your order has been cancelled.',
-                                    ],
-                                ];
-
-                                $currentStatus = $order->status;
-                                $statusReached = false;
-                            @endphp
-
-                            @foreach ($statuses as $status => $details)
-                                @if ($status != 'cancelled' || $currentStatus == 'cancelled')
-                                    @php
-                                        if ($status == $currentStatus) {
-                                            $statusReached = true;
-                                        }
-
-                                        $isActive = $statusReached ? '' : 'active';
-
-                                        // Skip remaining statuses if cancelled
-                                        if ($currentStatus == 'cancelled' && $status != 'cancelled') {
-                                            continue;
-                                        }
-                                    @endphp
-
-                                    <div class="timeline-item">
-                                        <div class="timeline-icon {{ $status == $currentStatus ? 'active' : '' }}">
-                                            <i class="fas {{ $details['icon'] }}"></i>
-                                        </div>
-                                        <div class="timeline-content">
-                                            <div class="timeline-date">
-                                                @if ($status == $currentStatus)
-                                                    {{ $order->updated_at->format('M d, Y h:i A') }}
-                                                @endif
-                                            </div>
-                                            <div class="timeline-status">{{ ucwords(str_replace('_', ' ', $status)) }}
-                                            </div>
-                                            <div class="timeline-desc">{{ $details['desc'] }}</div>
-                                        </div>
+                    @if (isset($order))
+                        <div class="order-info">
+                            <h5>Order Summary #{{ $order->id }}</h5>
+                            <div class="order-info-grid">
+                                <div>
+                                    <div class="order-info-item">
+                                        <strong>Order Date:</strong> {{ $order->created_at->format('M d, Y h:i A') }}
                                     </div>
-                                @endif
-                            @endforeach
+                                    <div class="order-info-item">
+                                        <strong>Status:</strong> {{ ucfirst($order->status) }}
+                                    </div>
+                                    <div class="order-info-item">
+                                        <strong>Payment Method:</strong> {{ ucfirst($order->payment_method ?? 'N/A') }}
+                                    </div>
+                                    <div class="order-info-item">
+                                        <strong>Payment Status:</strong> {{ ucfirst($order->payment_status ?? 'N/A') }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="order-info-item">
+                                        <strong>Customer Name:</strong> {{ $order->name }}
+                                    </div>
+                                    <div class="order-info-item">
+                                        <strong>Phone Number:</strong> {{ $order->phone }}
+                                    </div>
+                                    <div class="order-info-item">
+                                        <strong>Delivery Address:</strong> {{ $order->address }}
+                                    </div>
+                                    <div class="order-info-item">
+                                        <strong>Total Amount:</strong> ৳{{ number_format($order->total, 2) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="status-timeline">
+                                <h5>Shipment Progress Timeline</h5>
+
+                                @php
+                                    $statuses = [
+                                        'pending' => [
+                                            'icon' => 'fa-clock',
+                                            'desc' => 'Your order has been received and is awaiting processing.',
+                                        ],
+                                        'processing' => [
+                                            'icon' => 'fa-spinner',
+                                            'desc' => 'Your order is being processed.',
+                                        ],
+                                        'ready_for_delivery' => [
+                                            'icon' => 'fa-box',
+                                            'desc' => 'Your order is packed and ready for delivery.',
+                                        ],
+                                        'shipped' => [
+                                            'icon' => 'fa-truck',
+                                            'desc' => 'Your order has been shipped and is on the way.',
+                                        ],
+                                        'completed' => [
+                                            'icon' => 'fa-check-circle',
+                                            'desc' => 'Your order has been delivered successfully.',
+                                        ],
+                                        'cancelled' => [
+                                            'icon' => 'fa-times-circle',
+                                            'desc' => 'Your order has been cancelled.',
+                                        ],
+                                    ];
+
+                                    $currentStatus = $order->status;
+                                    $statusReached = false;
+                                @endphp
+
+                                @foreach ($statuses as $status => $details)
+                                    @if ($status != 'cancelled' || $currentStatus == 'cancelled')
+                                        @php
+                                            if ($status == $currentStatus) {
+                                                $statusReached = true;
+                                            }
+
+                                            $isActive = $statusReached ? '' : 'active';
+
+                                            if ($currentStatus == 'cancelled' && $status != 'cancelled') {
+                                                continue;
+                                            }
+                                        @endphp
+
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon {{ $status == $currentStatus ? 'active' : '' }}">
+                                                <i class="fas {{ $details['icon'] }}"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <div class="timeline-date">
+                                                    @if ($status == $currentStatus)
+                                                        {{ $order->updated_at->format('M d, Y h:i A') }}
+                                                    @endif
+                                                </div>
+                                                <div class="timeline-status">{{ ucwords(str_replace('_', ' ', $status)) }}</div>
+                                                <div class="timeline-desc">{{ $details['desc'] }}</div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-                @endif
+                    @endif
+                </div>
             </div>
         </div>
     </div>

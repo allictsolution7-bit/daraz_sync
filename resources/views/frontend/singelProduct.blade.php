@@ -2811,6 +2811,42 @@
         </div>
         @endif
 
+        <!-- Wishlist Button -->
+        <div class="wishlist-btn-container" style="margin: 15px 0;">
+            <button type="button" class="btn-wishlist-toggle" onclick="toggleWishlistProduct({{ $product->id }}, '{{ addslashes($product->title) }}', '{{ $product->old_price ?? $product->price ?? 0 }}', '{{ asset('storage/' . $product->thumb_image) }}', '{{ route('product.single', ['id' => $product->id, 'slug' => $product->slug]) }}')" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 25px; border: 1.5px solid #ef4444; background: #fff0f0; color: #ef4444; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
+                <i class="fa-solid fa-heart" id="wishlist-heart-icon-{{ $product->id }}"></i>
+                <span id="wishlist-btn-text-{{ $product->id }}">Add to Wishlist</span>
+            </button>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let wishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
+                let exists = wishlist.some(item => item.id == {{ $product->id }});
+                if (exists) {
+                    let btnText = document.getElementById('wishlist-btn-text-{{ $product->id }}');
+                    if (btnText) btnText.textContent = 'Saved in Wishlist';
+                }
+            });
+
+            function toggleWishlistProduct(id, title, price, image, url) {
+                let wishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
+                let index = wishlist.findIndex(item => item.id == id);
+                let btnText = document.getElementById('wishlist-btn-text-' + id);
+
+                if (index > -1) {
+                    wishlist.splice(index, 1);
+                    if (btnText) btnText.textContent = 'Add to Wishlist';
+                    alert('Removed from your Wishlist!');
+                } else {
+                    wishlist.push({ id: id, title: title, price: price, image: image, url: url });
+                    if (btnText) btnText.textContent = 'Saved in Wishlist';
+                    alert('Added to your Wishlist!');
+                }
+                localStorage.setItem('user_wishlist', JSON.stringify(wishlist));
+            }
+        </script>
+
         {{-- Social Share --}}
         @if (setting('single_product', 'enable_social_share', '1') == '1')
         <div class="social-share">

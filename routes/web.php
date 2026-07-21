@@ -164,6 +164,7 @@ Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
 Route::post('/cart/add-quick', [App\Http\Controllers\Client\OrderController::class, 'addQuick'])->name('cart.add.quick');
 Route::get('/cart/count', [CartController::class, 'cartCount'])->name('cart.count');
 Route::get('/cart/sidebar', [CartController::class, 'sidebar'])->name('cart.sidebar');
+Route::get('/wishlist', function() { return view('frontend.user.wishlist'); })->name('wishlist.index');
 
 // Buy Now Routes
 Route::get('/buy/store', [CartController::class, 'buystore'])->name('buy.store');

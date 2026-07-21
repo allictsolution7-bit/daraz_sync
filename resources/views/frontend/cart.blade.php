@@ -1,6 +1,7 @@
 @extends('frontend.app')
 
 @section('styles')
+<link rel="stylesheet" href="{{ asset('new/user.styles.css') }}">
 <style>
     /* Cart Page Styles */
     .cart-container {
@@ -785,11 +786,17 @@
 @endsection
 
 @section('content')
-<div class="base-container cart-container">
-    <h1 class="cart-title">Shopping Cart</h1>
-    <hr class="cart-divider">
+<div class="base-container profile-container">
+    <div class="profile-layout">
+        <!-- Sidebar Menu -->
+        @include('frontend.user.partials.sidebar')
 
-    <div class="cart-layout">
+        <!-- Main Cart Content -->
+        <div class="cart-container" style="margin: 0; padding: 0; width: 100%;">
+            <h1 class="cart-title">Shopping Cart</h1>
+            <hr class="cart-divider">
+
+            <div class="cart-layout">
 
         @if (session('success'))
         <div class="cart-success">{{ session('success') }}</div>
@@ -1021,7 +1028,9 @@
                 </div>
                 -->
         </div>
+        </div>
     </div>
+</div>
 </div>
 
 <script>

@@ -1,6 +1,9 @@
 @php
-    $sidebarProfileImage = $user->profile_photo_path
-        ? \Illuminate\Support\Facades\Storage::disk('public')->url($user->profile_photo_path)
+    $currentUser = $user ?? auth()->user();
+    $sidebarName = $currentUser->name ?? 'User Account';
+    $sidebarEmail = $currentUser->email ?? 'Account details';
+    $sidebarProfileImage = ($currentUser && !empty($currentUser->profile_photo_path))
+        ? \Illuminate\Support\Facades\Storage::disk('public')->url($currentUser->profile_photo_path)
         : asset('clientside/images/profile.png');
 @endphp
 
@@ -8,8 +11,8 @@
     <div class="sidebar-header">
         <img src="{{ $sidebarProfileImage }}" alt="Profile" class="sidebar-avatar">
         <div>
-            <h3 class="sidebar-user-name">{{ $user->name }}</h3>
-            <p class="sidebar-user-email">{{ $user->email }}</p>
+            <h3 class="sidebar-user-name">{{ $sidebarName }}</h3>
+            <p class="sidebar-user-email">{{ $sidebarEmail }}</p>
         </div>
     </div>
 
@@ -39,13 +42,25 @@
         <li class="sidebar-menu-item">
             <a href="{{ route('account.show') }}" class="sidebar-menu-link {{ Route::currentRouteName() == 'account.show' ? 'active' : '' }}">
                 <i class="fa-solid fa-user sidebar-menu-icon"></i>
-                Account
+                <span>Account</span>
             </a>
         </li>
         <li class="sidebar-menu-item">
             <a href="{{ route('account.orders') }}" class="sidebar-menu-link {{ request()->is('account/orders*') ? 'active' : '' }}">
                 <i class="fa-solid fa-bag-shopping sidebar-menu-icon"></i>
                 <span>Orders</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
+            <a href="{{ Route::has('cart.index') ? route('cart.index') : url('/cart') }}" class="sidebar-menu-link {{ request()->is('cart*') ? 'active' : '' }}">
+                <i class="fa-solid fa-cart-shopping sidebar-menu-icon"></i>
+                <span>Cart</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
+            <a href="{{ route('wishlist.index') }}" class="sidebar-menu-link {{ request()->is('wishlist*') ? 'active' : '' }}">
+                <i class="fa-solid fa-heart sidebar-menu-icon"></i>
+                <span>Wishlist</span>
             </a>
         </li>
         <li class="sidebar-menu-item">
@@ -62,13 +77,15 @@
         </li>
     </ul>
 
-    <a class="logout-link" href="{{ route('logout') }}"
-        onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();" style="margin-top: 15px; display: flex; align-items: center; color: #dc3545; text-decoration: none; font-weight: 600; padding: 10px 15px;">
-        <i class="fa-solid fa-arrow-right-from-bracket sidebar-menu-icon"></i>
-        <span>{{ __('Logout') }}</span>
-    </a>
+    @auth
+        <a class="logout-link" href="{{ route('logout') }}"
+            onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();" style="margin-top: 15px; display: flex; align-items: center; color: #dc3545; text-decoration: none; font-weight: 600; padding: 10px 15px;">
+            <i class="fa-solid fa-arrow-right-from-bracket sidebar-menu-icon"></i>
+            <span>{{ __('Logout') }}</span>
+        </a>
 
-    <form id="logout-form-sidebar" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
+        <form id="logout-form-sidebar" action="{{ route('logout') }}" method="POST" class="d-none">
+            @csrf
+        </form>
+    @endauth
 </div>

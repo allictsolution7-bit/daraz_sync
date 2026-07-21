@@ -8,10 +8,10 @@
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 position-relative style-z-1">
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 fw-bold fs-7" style="backdrop-filter: blur(5px);">
+                <span class="badge text-white rounded-pill px-3 py-1 fw-bold fs-7" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(5px);">
                     <i class="fas fa-store me-1 text-warning"></i> Merchant Control Center
                 </span>
-                <span class="badge bg-success bg-opacity-80 text-white rounded-pill px-3 py-1 fw-semibold fs-7">
+                <span class="badge text-white rounded-pill px-3 py-1 fw-semibold fs-7" style="background: #10b981;">
                     <i class="fas fa-circle me-1" style="font-size: 0.5rem; vertical-align: middle;"></i> Live Active
                 </span>
             </div>
@@ -22,7 +22,7 @@
             <a href="{{ route('vendor.products.create') }}" class="btn btn-warning fw-bold rounded-pill px-4 py-2 text-dark shadow-sm d-flex align-items-center gap-2">
                 <i class="fas fa-plus-circle"></i> Add New Product
             </a>
-            <a href="{{ route('vendor.withdrawals.create') }}" class="btn btn-light bg-white bg-opacity-15 text-white border-0 fw-semibold rounded-pill px-4 py-2 d-flex align-items-center gap-2" style="backdrop-filter: blur(5px);">
+            <a href="{{ route('vendor.withdrawals.create') }}" class="btn text-white rounded-pill px-4 py-2 d-flex align-items-center gap-2 fw-semibold" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(5px);">
                 <i class="fas fa-wallet text-warning"></i> Request Payout
             </a>
         </div>
