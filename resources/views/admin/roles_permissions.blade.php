@@ -247,11 +247,11 @@
                             <div class="modal-body">
                                 <input type="text" name="name" class="form-control mb-2" value="{{ $role->name }}" required>
                                 <div class="perm-toolbar d-flex align-items-center mb-2">
-                                    {{-- <input type="text" class="form-control form-control-sm permission-search mr-2" placeholder="Search permissions..."> --}}
+                                    <input type="text" class="form-control form-control-sm permission-search mr-2" placeholder="Search permissions...">
                                     <button type="button" class="btn btn-sm btn-outline-secondary select-all-perms mr-1">Select all</button>
-                                    {{-- <button type="button" class="btn btn-sm btn-outline-secondary clear-all-perms mr-1">Clear</button> --}}
-                                    {{-- <button type="button" class="btn btn-sm btn-outline-secondary expand-all mr-1">Expand</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary collapse-all">Collapse</button> --}}
+                                    <button type="button" class="btn btn-sm btn-outline-secondary clear-all-perms mr-1">Clear</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary expand-all mr-1">Expand</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary collapse-all">Collapse</button>
                                 </div>
                                 <label class="mb-2">Permissions</label>
                                 <div class="accordion" id="accordionRole{{ $role->id }}">

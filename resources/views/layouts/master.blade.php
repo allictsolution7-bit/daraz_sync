@@ -1394,7 +1394,7 @@
                         @endif
  
                         <!-- INTEGRATIONS & SYNC SECTION -->
-                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || (module_enabled('Daraz') && Route::has('admin.daraz.index')) || auth()->user()?->canAny(['woocommerce_migration.view', 'telegram_settings.view', 'delayed_events.view']))
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || (module_enabled('Daraz') && Route::has('admin.daraz.index') && auth()->user()?->canAny(['daraz.view', 'admin.daraz.view'])) || auth()->user()?->canAny(['woocommerce_migration.view', 'telegram_settings.view', 'delayed_events.view']))
                         <li class="menu-section {{ $integrationsSyncActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1405,7 +1405,7 @@
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $integrationsSyncActive ? 'display: block;' : 'display: none;' }}">
                                 {{-- Daraz Stock Sync --}}
-                                @if(module_enabled('Daraz') && Route::has('admin.daraz.index'))
+                                @if(module_enabled('Daraz') && Route::has('admin.daraz.index') && (auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['daraz.view', 'admin.daraz.view'])))
                                 <li class="sub-menu {{ request()->is('admin/daraz*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
