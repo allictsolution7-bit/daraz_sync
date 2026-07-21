@@ -16,17 +16,9 @@
     .rp-pill { background: #fff; border: 1px solid var(--rp-border); border-radius: 12px; padding: 10px 12px; box-shadow: 0 4px 10px rgba(15,23,42,0.04); }
     .rp-pill .label { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--rp-muted); }
     .rp-pill .value { font-size: 20px; font-weight: 800; color: var(--rp-text); }
-    .perm-toolbar .btn { padding: 4px 10px; font-size: 12px; }
     .permission-search { max-width: 260px; }
-    .permissions-group { border: 1px solid #e9ecef; border-radius: 8px; }
-    .permissions-group .card-header { background: #f8f9fa; border-bottom: 1px solid #e9ecef; }
     .modal-dialog-scrollable .modal-body { max-height: 70vh; overflow-y: auto; }
     .permissions-scroll { max-height: none; overflow: visible; }
-    .form-check { margin-bottom: 6px; }
-    .badge-light { background: #eef2f7; color: #495057; }
-    .modal-header .modal-title { font-weight: 600; }
-    .permissions-group .text-uppercase { letter-spacing: .02em; }
-    .form-check-input[type=checkbox] { border-radius: .25em; margin-top: 9px; }
     .table-hover tbody tr:hover { background: #f8fafc; }
     .nav-tabs-custom {
         border-bottom: 2px solid var(--rp-border);
@@ -54,6 +46,202 @@
         border: 1px solid var(--rp-border);
         border-bottom: 2px solid #fff;
         margin-bottom: -2px;
+    }
+
+    /* Premium Modal Styling */
+    .modal-content {
+        border-radius: 16px !important;
+        border: none !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+        overflow: hidden;
+    }
+    .modal-header-custom {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #fff;
+        padding: 18px 24px;
+        border-bottom: 1px solid #334155;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100%;
+    }
+    .modal-header-custom .modal-title {
+        font-weight: 700;
+        font-size: 1.15rem;
+        letter-spacing: -0.01em;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+    }
+    .modal-header-custom .close {
+        color: #94a3b8;
+        opacity: 0.8;
+        font-size: 1.5rem;
+        transition: all 0.2s;
+        text-shadow: none;
+        margin-left: auto !important;
+        background: transparent;
+        border: none;
+        outline: none;
+        padding: 0 4px;
+        line-height: 1;
+        cursor: pointer;
+    }
+    .modal-header-custom .close:hover {
+        color: #fff;
+        opacity: 1;
+    }
+    .role-input-wrapper label {
+        font-weight: 600;
+        font-size: 0.825rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+    .role-input-custom {
+        border-radius: 10px !important;
+        border: 1.5px solid #cbd5e1 !important;
+        padding: 10px 14px !important;
+        font-weight: 600 !important;
+        color: #0f172a !important;
+        transition: all 0.2s;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .role-input-custom:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+        outline: none;
+    }
+    .perm-toolbar {
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 10px 14px;
+        gap: 8px;
+        border: 1px solid #e2e8f0;
+    }
+    .search-input-wrapper {
+        position: relative;
+        flex: 1;
+        max-width: 300px;
+    }
+    .search-input-wrapper .fa-search {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 13px;
+    }
+    .permission-search-custom {
+        padding-left: 34px !important;
+        border-radius: 8px !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #fff !important;
+        font-size: 13px !important;
+    }
+    .permission-search-custom:focus {
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    }
+    .btn-perm-tool {
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 12px;
+        transition: all 0.15s;
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        color: #475569;
+    }
+    .btn-perm-tool:hover {
+        background: #2563eb;
+        color: #fff;
+        border-color: #2563eb;
+        transform: translateY(-1px);
+    }
+    .permissions-group {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(15,23,42,0.02);
+        transition: all 0.2s;
+    }
+    .permissions-group:hover {
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 4px 12px rgba(15,23,42,0.05);
+    }
+    .permissions-group .card-header {
+        background: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 12px 16px !important;
+    }
+    .permissions-group .card-header h6 {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 0.95rem;
+    }
+    .subgroup-box {
+        background: #ffffff;
+        border-radius: 10px;
+        border-left: 3px solid #3b82f6;
+        padding: 10px 14px;
+        height: 100%;
+        border-top: 1px solid #f1f5f9;
+        border-right: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .subgroup-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #475569;
+        margin-bottom: 8px;
+        padding-bottom: 4px;
+        border-bottom: 1px dashed #cbd5e1;
+    }
+    .perm-item-check {
+        padding: 5px 8px;
+        border-radius: 6px;
+        transition: background 0.15s;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+    }
+    .perm-item-check:hover {
+        background: #eff6ff;
+    }
+    .perm-item-check label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #334155;
+        cursor: pointer;
+        margin-bottom: 0;
+        user-select: none;
+    }
+    .perm-item-check .form-check-input {
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        margin-top: 0;
+        margin-right: 8px;
+        border-color: #94a3b8;
+    }
+    .badge-perm-count {
+        background: #e0e7ff;
+        color: #4338ca;
+        font-weight: 700;
+        border-radius: 20px;
+        padding: 3px 10px;
+        font-size: 11px;
+    }
+    .modal-footer-custom {
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        padding: 14px 24px;
     }
 </style>
 @endsection
@@ -241,46 +429,60 @@
                     <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
                         <form method="POST" action="{{ route('admin.roles_permissions.role.update', $role) }}">
                             @csrf
-                            <div class="modal-header"><h5 class="modal-title">Edit Role</h5>
+                            <div class="modal-header modal-header-custom">
+                                <h5 class="modal-title"><i class="fas fa-user-pen" style="color: #60a5fa;"></i> Edit Role — <span class="text-info">{{ $role->name }}</span></h5>
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                             </div>
-                            <div class="modal-body">
-                                <input type="text" name="name" class="form-control mb-2" value="{{ $role->name }}" required>
-                                <div class="perm-toolbar d-flex align-items-center mb-2">
-                                    <input type="text" class="form-control form-control-sm permission-search mr-2" placeholder="Search permissions...">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary select-all-perms mr-1">Select all</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary clear-all-perms mr-1">Clear</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary expand-all mr-1">Expand</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary collapse-all">Collapse</button>
+                            <div class="modal-body p-4">
+                                <div class="role-input-wrapper mb-3">
+                                    <label><i class="fas fa-id-card mr-1"></i> Role Name</label>
+                                    <input type="text" name="name" class="form-control role-input-custom" value="{{ $role->name }}" required>
                                 </div>
-                                <label class="mb-2">Permissions</label>
+                                <div class="perm-toolbar d-flex flex-wrap align-items-center mb-3">
+                                    <div class="search-input-wrapper mr-auto">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" class="form-control permission-search-custom permission-search" placeholder="Search permissions...">
+                                    </div>
+                                    <button type="button" class="btn btn-perm-tool select-all-perms"><i class="fas fa-check-double mr-1"></i> Select all</button>
+                                    <button type="button" class="btn btn-perm-tool clear-all-perms"><i class="fas fa-times mr-1"></i> Clear</button>
+                                    <button type="button" class="btn btn-perm-tool expand-all"><i class="fas fa-chevron-down mr-1"></i> Expand</button>
+                                    <button type="button" class="btn btn-perm-tool collapse-all"><i class="fas fa-chevron-up mr-1"></i> Collapse</button>
+                                </div>
+                                <div class="role-input-wrapper mb-2"><label><i class="fas fa-shield-halved mr-1"></i> Module & Access Permissions</label></div>
                                 <div class="accordion" id="accordionRole{{ $role->id }}">
                                     @foreach($groupedPermissions as $group => $subgroups)
                                         @php $groupSlug = \Illuminate\Support\Str::slug($group); @endphp
-                                        <div class="card permissions-group mb-2">
-                                            <div class="card-header p-2" id="heading-{{ $role->id }}-{{ $groupSlug }}">
+                                        <div class="card permissions-group mb-3">
+                                            <div class="card-header" id="heading-{{ $role->id }}-{{ $groupSlug }}">
                                                 <a class="d-block text-decoration-none" data-toggle="collapse" href="#collapse-role-{{ $role->id }}-{{ $groupSlug }}" aria-expanded="true" aria-controls="collapse-role-{{ $role->id }}-{{ $groupSlug }}">
                                                     <h6 class="mb-0 d-flex align-items-center justify-content-between">
-                                                        <span class="text-capitalize">{{ str_replace('_',' ', $group) }}</span>
-                                                        <span class="ml-2 badge badge-light">{{ $subgroups->flatten()->count() }}</span>
-                                                        <label class="m-0 small" onclick="event.stopPropagation()">
-                                                            <input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all
-                                                        </label>
+                                                        <span class="text-capitalize d-flex align-items-center">
+                                                            <i class="fas fa-layer-group text-primary mr-2"></i>
+                                                            {{ str_replace('_',' ', $group) }}
+                                                        </span>
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
+                                                            <label class="m-0 small font-weight-bold text-muted" onclick="event.stopPropagation()">
+                                                                <input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all
+                                                            </label>
+                                                        </div>
                                                     </h6>
                                                 </a>
                                             </div>
                                             <div id="collapse-role-{{ $role->id }}-{{ $groupSlug }}" class="collapse show" data-parent="#accordionRole{{ $role->id }}">
-                                            <div class="card-body p-2 permissions-scroll">
+                                            <div class="card-body p-3 permissions-scroll bg-light">
                                                 <div class="row">
                                                     @foreach($subgroups as $sub => $perms)
-                                                        <div class="col-md-6 mb-2">
-                                                            <div class="font-weight-bold small text-muted mb-1 text-uppercase">{{ $sub === 'core' ? $group : str_replace('_',' ', $sub) }}</div>
-                                                            @foreach($perms as $permission)
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="editroleperm_{{ $role->id }}_{{ $permission->id }}" {{ $role->permissions->pluck('name')->contains($permission->name) ? 'checked' : '' }}>
-                                                                    <label class="form-check-label" for="editroleperm_{{ $role->id }}_{{ $permission->id }}">{{ $permission->name }}</label>
-                                                                </div>
-                                                            @endforeach
+                                                        <div class="col-md-6 mb-3">
+                                                            <div class="subgroup-box">
+                                                                <div class="subgroup-title">{{ $sub === 'core' ? $group : str_replace('_',' ', $sub) }}</div>
+                                                                @foreach($perms as $permission)
+                                                                    <div class="perm-item-check">
+                                                                        <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="editroleperm_{{ $role->id }}_{{ $permission->id }}" {{ $role->permissions->pluck('name')->contains($permission->name) ? 'checked' : '' }}>
+                                                                        <label for="editroleperm_{{ $role->id }}_{{ $permission->id }}">{{ $permission->name }}</label>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -290,8 +492,9 @@
                                     @endforeach
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-success">Update</button>
+                            <div class="modal-footer modal-footer-custom">
+                                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 font-weight-bold"><i class="fas fa-save mr-1"></i> Update Role</button>
                             </div>
                         </form>
                     </div></div>
@@ -430,44 +633,58 @@
         <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
             <form method="POST" action="{{ route('admin.roles_permissions.role.store') }}">
                 @csrf
-                <div class="modal-header"><h5 class="modal-title">Add Role</h5>
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title"><i class="fas fa-plus-circle" style="color: #60a5fa;"></i> Create New Role</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body">
-                    <input type="text" name="name" class="form-control mb-2" placeholder="Role Name" required>
-                    <div class="perm-toolbar d-flex align-items-center mb-2">
-                        <input type="text" class="form-control form-control-sm permission-search mr-2" placeholder="Search permissions...">
-                        <button type="button" class="btn btn-sm btn-outline-secondary select-all-perms mr-1">Select all</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary clear-all-perms mr-1">Clear</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary expand-all mr-1">Expand</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary collapse-all">Collapse</button>
+                <div class="modal-body p-4">
+                    <div class="role-input-wrapper mb-3">
+                        <label><i class="fas fa-id-card mr-1"></i> Role Name</label>
+                        <input type="text" name="name" class="form-control role-input-custom" placeholder="e.g. Content Manager, Vendor Specialist" required>
                     </div>
-                    <label class="mb-2">Permissions</label>
+                    <div class="perm-toolbar d-flex flex-wrap align-items-center mb-3">
+                        <div class="search-input-wrapper mr-auto">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control permission-search-custom permission-search" placeholder="Search permissions...">
+                        </div>
+                        <button type="button" class="btn btn-perm-tool select-all-perms"><i class="fas fa-check-double mr-1"></i> Select all</button>
+                        <button type="button" class="btn btn-perm-tool clear-all-perms"><i class="fas fa-times mr-1"></i> Clear</button>
+                        <button type="button" class="btn btn-perm-tool expand-all"><i class="fas fa-chevron-down mr-1"></i> Expand</button>
+                        <button type="button" class="btn btn-perm-tool collapse-all"><i class="fas fa-chevron-up mr-1"></i> Collapse</button>
+                    </div>
+                    <div class="role-input-wrapper mb-2"><label><i class="fas fa-shield-halved mr-1"></i> Module & Access Permissions</label></div>
                     <div class="accordion" id="accordionAddRole">
                         @foreach($groupedPermissions as $group => $subgroups)
                             @php $groupSlug = \Illuminate\Support\Str::slug($group); @endphp
-                            <div class="card permissions-group mb-2">
-                                <div class="card-header p-2" id="heading-add-{{ $groupSlug }}">
+                            <div class="card permissions-group mb-3">
+                                <div class="card-header" id="heading-add-{{ $groupSlug }}">
                                     <a class="d-block text-decoration-none" data-toggle="collapse" href="#collapse-add-{{ $groupSlug }}" aria-expanded="true" aria-controls="collapse-add-{{ $groupSlug }}">
                                         <h6 class="mb-0 d-flex align-items-center justify-content-between">
-                                            <span class="text-capitalize">{{ str_replace('_',' ', $group) }}</span>
-                                            <span class="ml-2 badge badge-light">{{ $subgroups->flatten()->count() }}</span>
-                                            <label class="m-0 small" onclick="event.stopPropagation()"><input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all</label>
+                                            <span class="text-capitalize d-flex align-items-center">
+                                                <i class="fas fa-layer-group text-primary mr-2"></i>
+                                                {{ str_replace('_',' ', $group) }}
+                                            </span>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
+                                                <label class="m-0 small font-weight-bold text-muted" onclick="event.stopPropagation()"><input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all</label>
+                                            </div>
                                         </h6>
                                     </a>
                                 </div>
                                 <div id="collapse-add-{{ $groupSlug }}" class="collapse show" data-parent="#accordionAddRole">
-                                <div class="card-body p-2 permissions-scroll">
+                                <div class="card-body p-3 permissions-scroll bg-light">
                                     <div class="row">
                                         @foreach($subgroups as $sub => $perms)
-                                            <div class="col-md-6 mb-2">
-                                                <div class="font-weight-bold small text-muted mb-1 text-uppercase">{{ $sub === 'core' ? $group : str_replace('_',' ', $sub) }}</div>
-                                                @foreach($perms as $permission)
-                                                    <div class="form-check">
-                                                        <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="addroleperm_{{ $permission->id }}">
-                                                        <label class="form-check-label" for="addroleperm_{{ $permission->id }}">{{ $permission->name }}</label>
-                                                    </div>
-                                                @endforeach
+                                            <div class="col-md-6 mb-3">
+                                                <div class="subgroup-box">
+                                                    <div class="subgroup-title">{{ $sub === 'core' ? $group : str_replace('_',' ', $sub) }}</div>
+                                                    @foreach($perms as $permission)
+                                                        <div class="perm-item-check">
+                                                            <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="addroleperm_{{ $permission->id }}">
+                                                            <label for="addroleperm_{{ $permission->id }}">{{ $permission->name }}</label>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             </div>
                                         @endforeach
                                     </div>
@@ -477,8 +694,9 @@
                         @endforeach
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Create</button>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-4 font-weight-bold"><i class="fas fa-plus mr-1"></i> Create Role</button>
                 </div>
             </form>
         </div></div>
@@ -518,15 +736,45 @@
         }
     });
 
-    // Simple permission filter in the open modal
+    // Enhanced permission filter in the open modal
     document.addEventListener('input', function(e){
         if (!e.target.classList.contains('permission-search')) return;
         const modal = e.target.closest('.modal-content');
-        const term = e.target.value.toLowerCase();
-        modal.querySelectorAll('.permissions-group .form-check').forEach(row => {
-            const label = row.querySelector('label');
-            const txt = label ? label.textContent.toLowerCase() : '';
-            row.style.display = txt.includes(term) ? '' : 'none';
+        const term = e.target.value.trim().toLowerCase();
+
+        modal.querySelectorAll('.permissions-group').forEach(groupCard => {
+            const groupHeader = groupCard.querySelector('.card-header');
+            const groupTitle = groupHeader ? groupHeader.textContent.toLowerCase() : '';
+            const isGroupMatch = term !== '' && groupTitle.includes(term);
+
+            let visibleCount = 0;
+            groupCard.querySelectorAll('.form-check').forEach(row => {
+                const label = row.querySelector('label');
+                const txt = label ? label.textContent.toLowerCase() : '';
+                const isMatch = term === '' || txt.includes(term) || isGroupMatch;
+                row.style.display = isMatch ? '' : 'none';
+                if (isMatch) visibleCount++;
+            });
+
+            // Hide/Show subgroup columns if all items inside are hidden
+            groupCard.querySelectorAll('.col-md-6').forEach(col => {
+                const visibleCheckboxes = col.querySelectorAll('.form-check[style*="display: none"]');
+                const totalCheckboxes = col.querySelectorAll('.form-check');
+                col.style.display = (term !== '' && visibleCheckboxes.length === totalCheckboxes.length) ? 'none' : '';
+            });
+
+            // Hide whole card if no permissions match
+            if (term === '') {
+                groupCard.style.display = '';
+            } else if (visibleCount > 0) {
+                groupCard.style.display = '';
+                const collapseEl = groupCard.querySelector('.collapse');
+                if (collapseEl && typeof $ !== 'undefined') {
+                    $(collapseEl).collapse('show');
+                }
+            } else {
+                groupCard.style.display = 'none';
+            }
         });
     });
 

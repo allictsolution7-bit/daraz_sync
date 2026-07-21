@@ -1792,7 +1792,7 @@
                         @endif
  
                         <!-- VENDORS SECTION -->
-                        @if(Route::has('admin.vendors.index') && (auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['admin.vendors.view', 'admin.vendors.edit', 'admin.products.view-all', 'admin.withdrawals.view', 'admin.commissions.view'])))
+                        @if(module_enabled('MultiVendor') && Route::has('admin.vendors.index') && (auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['admin.vendors.view', 'admin.vendors.edit', 'admin.products.view-all', 'admin.withdrawals.view', 'admin.commissions.view'])))
                         <li class="menu-section {{ $vendorsActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">

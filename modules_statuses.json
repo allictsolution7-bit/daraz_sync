@@ -1,5 +1,5 @@
 {
     "POS": true,
-    "MultiVendor": false,
+    "MultiVendor": true,
     "Daraz": true
 }

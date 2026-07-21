@@ -741,8 +741,8 @@
         }
 
         const url = action === 'enable'
-            ? '{{ url("admin/modules") }}/' + name + '/enable'
-            : '{{ url("admin/modules") }}/' + name + '/disable';
+            ? '{{ url("admin/extensions") }}/' + name + '/enable'
+            : '{{ url("admin/extensions") }}/' + name + '/disable';
 
         fetch(url, {
             method: 'POST',
@@ -771,7 +771,7 @@
             return;
         }
 
-        fetch('{{ url("admin/modules") }}/' + name, {
+        fetch('{{ url("admin/extensions") }}/' + name, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
