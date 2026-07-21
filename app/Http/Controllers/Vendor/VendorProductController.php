@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\SubCategory;
 use App\Models\Brand;
+use App\Models\Writer;
+use App\Models\Publisher;
 use App\Services\VendorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -64,12 +66,28 @@ class VendorProductController extends Controller
             'max' => $vendorSettings->getMaxCommissionRate(),
         ];
 
-        $categories = ProductCategory::where('status', 1)->get();
-        $brands = Brand::where('status', 1)->get();
+        $categories = ProductCategory::where('status', 'active')
+            ->with(['subCategories' => function($query) {
+                $query->where('status', 1)
+                    ->orderBy('name')
+                    ->with(['thirdCategories' => function($q) {
+                        $q->where('status', true)->ordered();
+                    }]);
+            }])
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $sub_categories = SubCategory::where('status', 1)->get(['id', 'name']);
+        $brands = Brand::where('status', 1)->get(['id', 'name']);
+        $writers = Writer::select('id', 'name')->get();
+        $publishers = Publisher::select('id', 'name')->get();
 
         return view('vendor.products.create', compact(
             'categories',
+            'sub_categories',
             'brands',
+            'writers',
+            'publishers',
             'commissionSettings'
         ));
     }

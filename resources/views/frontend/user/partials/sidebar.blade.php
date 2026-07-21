@@ -22,9 +22,17 @@
                 <li class="sidebar-menu-item">
                     <a href="{{ Route::has('vendor.dashboard') ? route('vendor.dashboard') : url('/vendor/dashboard') }}" 
                        class="sidebar-menu-link" 
-                       style="background-color: #4f46e5; color: #ffffff; font-weight: 600; margin-bottom: 12px; border-radius: 6px;">
+                       style="background-color: #4f46e5; color: #ffffff; font-weight: 600; margin-bottom: 8px; border-radius: 6px;">
                         <i class="fa-solid fa-store sidebar-menu-icon" style="color: #ffffff;"></i>
                         <span>Vendor Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ Route::has('vendor.profile') ? route('vendor.profile') : url('/vendor/profile') }}" 
+                       class="sidebar-menu-link {{ request()->is('vendor/profile*') ? 'active' : '' }}" 
+                       style="margin-bottom: 12px;">
+                        <i class="fa-solid fa-sliders sidebar-menu-icon"></i>
+                        <span>Store Profile & Settings</span>
                     </a>
                 </li>
             @elseif(auth()->user()->isAdmin() || auth()->user()->hasRole('admin') || auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('super admin'))

@@ -1,374 +1,441 @@
 @extends('vendor.layouts.app')
 
-@section('title', 'My Store Profile & Settings')
+@section('title', 'Store Profile & Settings')
+
+@push('styles')
+<style>
+    :root {
+        --v-primary: #6366f1;
+        --v-primary-hover: #4f46e5;
+        --v-success: #10b981;
+        --v-warning: #f59e0b;
+        --v-info: #06b6d4;
+        --v-danger: #ef4444;
+        --v-dark: #0f172a;
+    }
+
+    /* Glassmorphic Container */
+    .profile-header-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        padding: 1.25rem 1.75rem;
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    .metric-icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        background: rgba(99, 102, 241, 0.12);
+        color: #6366f1;
+    }
+
+    .v-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 24px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    .v-card .card-header {
+        background: rgba(248, 250, 252, 0.7);
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1.25rem 1.5rem;
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 1.5px solid #e2e8f0;
+        padding: 0.65rem 1rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+    }
+
+    /* Badges */
+    .badge-approved { background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); padding: 6px 12px; border-radius: 20px; font-weight: 700; }
+    .badge-pending { background: rgba(245, 158, 11, 0.1); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.2); padding: 6px 12px; border-radius: 20px; font-weight: 700; }
+</style>
+@endpush
 
 @section('content')
-<!-- Page Title Header -->
-<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-    <div>
-        <h2 class="fw-extrabold text-dark mb-1">Store Profile & Settings</h2>
-        <p class="text-muted mb-0">Manage your merchant details, business contact info, and payout preferences.</p>
-    </div>
-    <div class="d-flex align-items-center gap-2">
-        <a href="{{ route('vendor.dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold">
-            <i class="fas fa-arrow-left me-1"></i> Dashboard
-        </a>
-    </div>
-</div>
-
-<div class="row g-4">
-    <!-- Left Main Column - Profile & Settings Forms -->
-    <div class="col-12 col-lg-8">
-        <!-- Personal Information Card -->
-        <div class="v-card p-4 mb-4">
-            <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
-                <div class="stat-icon primary" style="width: 44px; height: 44px; font-size: 1.2rem;">
-                    <i class="fas fa-user-gear"></i>
-                </div>
-                <div>
-                    <h5 class="fw-bold text-dark mb-0">Personal Information</h5>
-                    <small class="text-muted">Account owner profile details</small>
-                </div>
+<div class="container-fluid py-4">
+    <!-- Header Card -->
+    <div class="d-flex justify-content-between align-items-center mb-4 profile-header-card">
+        <div class="d-flex align-items-center gap-3">
+            <div class="metric-icon-box">
+                <i class="fas fa-store"></i>
             </div>
-
-            <form action="{{ route('vendor.profile.update') }}" method="POST">
-                @csrf
-                @method('PUT')
-                
-                <div class="row g-3 mb-3">
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold text-dark fs-7">Full Name <span class="text-danger">*</span></label>
-                        <input type="text" 
-                               name="name" 
-                               class="form-control form-control-lg rounded-3 fs-7 @error('name') is-invalid @enderror" 
-                               value="{{ old('name', $vendor->name) }}"
-                               required>
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold text-dark fs-7">Phone Number</label>
-                        <input type="text" 
-                               name="phone" 
-                               class="form-control form-control-lg rounded-3 fs-7 @error('phone') is-invalid @enderror" 
-                               value="{{ old('phone', $vendor->phone) }}"
-                               placeholder="e.g. 017XXXXXXXX">
-                        @error('phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark fs-7">Login Email Address</label>
-                    <input type="email" 
-                           class="form-control form-control-lg rounded-3 fs-7 bg-light" 
-                           value="{{ $vendor->email }}"
-                           disabled>
-                    <small class="text-muted fs-8">Primary login email address cannot be changed directly.</small>
-                </div>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
-                        <i class="fas fa-save me-1"></i> Save Personal Details
-                    </button>
-                </div>
-            </form>
+            <div>
+                <h4 class="fw-800 mb-0 text-dark">Store Profile & Settings</h4>
+                <p class="text-muted small mb-0">Manage merchant details, business contact info, and payout preferences.</p>
+            </div>
         </div>
-
-        <!-- Business Information Card -->
-        <div class="v-card p-4 mb-4">
-            <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
-                <div class="stat-icon info" style="width: 44px; height: 44px; font-size: 1.2rem;">
-                    <i class="fas fa-building-store"></i>
-                </div>
-                <div>
-                    <h5 class="fw-bold text-dark mb-0">Business & Store Details</h5>
-                    <small class="text-muted">Public merchant store details displayed on products</small>
-                </div>
-            </div>
-
-            <form action="{{ route('vendor.profile.update') }}" method="POST">
-                @csrf
-                @method('PUT')
-                
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark fs-7">Store / Business Name <span class="text-danger">*</span></label>
-                    <input type="text" 
-                           name="business_name" 
-                           class="form-control form-control-lg rounded-3 fs-7 @error('business_name') is-invalid @enderror" 
-                           value="{{ old('business_name', $vendorSettings->business_name) }}"
-                           required>
-                    @error('business_name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold text-dark fs-7">Business Contact Email <span class="text-danger">*</span></label>
-                        <input type="email" 
-                               name="business_email" 
-                               class="form-control form-control-lg rounded-3 fs-7 @error('business_email') is-invalid @enderror" 
-                               value="{{ old('business_email', $vendorSettings->business_email) }}"
-                               required>
-                        @error('business_email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold text-dark fs-7">Business Contact Phone <span class="text-danger">*</span></label>
-                        <input type="text" 
-                               name="business_phone" 
-                               class="form-control form-control-lg rounded-3 fs-7 @error('business_phone') is-invalid @enderror" 
-                               value="{{ old('business_phone', $vendorSettings->business_phone) }}"
-                               required>
-                        @error('business_phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark fs-7">Business Address</label>
-                    <textarea name="business_address" 
-                              class="form-control rounded-3 fs-7 @error('business_address') is-invalid @enderror" 
-                              rows="3"
-                              placeholder="Full shop or warehouse address">{{ old('business_address', $vendorSettings->business_address) }}</textarea>
-                    @error('business_address')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark fs-7">Trade License / Tax ID</label>
-                    <input type="text" 
-                           name="tax_id" 
-                           class="form-control form-control-lg rounded-3 fs-7 @error('tax_id') is-invalid @enderror" 
-                           value="{{ old('tax_id', $vendorSettings->tax_id) }}"
-                           placeholder="Optional business identification number">
-                    @error('tax_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
-                        <i class="fas fa-save me-1"></i> Save Business Details
-                    </button>
-                </div>
-            </form>
+        <div>
+            <a href="{{ route('vendor.dashboard') }}" class="btn btn-outline-secondary rounded-3 px-3 fw-bold btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Dashboard
+            </a>
         </div>
+    </div>
 
-        <!-- Payout Settings Card -->
-        <div class="v-card p-4">
-            <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
-                <div class="stat-icon success" style="width: 44px; height: 44px; font-size: 1.2rem;">
-                    <i class="fas fa-wallet"></i>
+    <div class="row g-4">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+            <!-- Personal Information Card -->
+            <div class="v-card mb-4">
+                <div class="card-header">
+                    <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="fas fa-user-circle text-primary"></i> Personal Information
+                    </h5>
                 </div>
-                <div>
-                    <h5 class="fw-bold text-dark mb-0">Payout & Withdrawal Account</h5>
-                    <small class="text-muted">Where your earnings will be transferred</small>
-                </div>
-            </div>
-
-            <form action="{{ route('vendor.profile.update') }}" method="POST">
-                @csrf
-                @method('PUT')
-                
-                <div class="row g-3 mb-3">
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold text-dark fs-7">Payout Channel <span class="text-danger">*</span></label>
-                        <select name="payout_method" 
-                                class="form-select form-select-lg rounded-3 fs-7 @error('payout_method') is-invalid @enderror">
-                            <option value="">Select Method</option>
-                            <option value="bank" {{ old('payout_method', $vendorSettings->payout_method) == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
-                            <option value="bkash" {{ old('payout_method', $vendorSettings->payout_method) == 'bkash' ? 'selected' : '' }}>bKash Personal / Agent</option>
-                            <option value="nagad" {{ old('payout_method', $vendorSettings->payout_method) == 'nagad' ? 'selected' : '' }}>Nagad Personal</option>
-                            <option value="rocket" {{ old('payout_method', $vendorSettings->payout_method) == 'rocket' ? 'selected' : '' }}>Rocket Personal</option>
-                        </select>
-                        @error('payout_method')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold text-dark fs-7">Account Number <span class="text-danger">*</span></label>
-                        <input type="text" 
-                               name="payout_account_number" 
-                               class="form-control form-control-lg rounded-3 fs-7 @error('payout_account_number') is-invalid @enderror" 
-                               value="{{ old('payout_account_number', $vendorSettings->payout_account_number) }}"
-                               placeholder="Bank acct or mobile wallet number">
-                        @error('payout_account_number')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark fs-7">Account Name <span class="text-danger">*</span></label>
-                    <input type="text" 
-                           name="payout_account_name" 
-                           class="form-control form-control-lg rounded-3 fs-7 @error('payout_account_name') is-invalid @enderror" 
-                           value="{{ old('payout_account_name', $vendorSettings->payout_account_name) }}"
-                           placeholder="Full name as written on account">
-                    @error('payout_account_name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div id="bankDetails" style="display: {{ old('payout_method', $vendorSettings->payout_method) == 'bank' ? 'block' : 'none' }};">
-                    <div class="p-3 bg-light rounded-3 mb-3 border">
-                        <h6 class="fw-bold text-dark mb-3">Bank Details</h6>
-                        <div class="row g-3">
-                            <div class="col-12 col-md-4">
-                                <label class="form-label fw-semibold fs-7">Bank Name</label>
+                <div class="card-body p-4">
+                    <form action="{{ route('vendor.profile.update') }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark fs-8 uppercase">Full Name <span class="text-danger">*</span></label>
                                 <input type="text" 
-                                       name="payout_bank_name" 
-                                       class="form-control fs-7" 
-                                       value="{{ old('payout_bank_name', $vendorSettings->payout_bank_name) }}"
-                                       placeholder="e.g. Dutch Bangla Bank">
+                                       name="name" 
+                                       class="form-control @error('name') is-invalid @enderror" 
+                                       value="{{ old('name', $vendor->name) }}"
+                                       required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
-                            <div class="col-12 col-md-4">
-                                <label class="form-label fw-semibold fs-7">Branch Name</label>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark fs-8 uppercase">Phone Number</label>
                                 <input type="text" 
-                                       name="payout_branch_name" 
-                                       class="form-control fs-7" 
-                                       value="{{ old('payout_branch_name', $vendorSettings->payout_branch_name) }}"
-                                       placeholder="e.g. Gulshan Branch">
-                            </div>
-
-                            <div class="col-12 col-md-4">
-                                <label class="form-label fw-semibold fs-7">Routing Number</label>
-                                <input type="text" 
-                                       name="payout_routing_number" 
-                                       class="form-control fs-7" 
-                                       value="{{ old('payout_routing_number', $vendorSettings->payout_routing_number) }}"
-                                       placeholder="Optional routing code">
+                                       name="phone" 
+                                       class="form-control @error('phone') is-invalid @enderror" 
+                                       value="{{ old('phone', $vendor->phone) }}"
+                                       placeholder="e.g. 017XXXXXXXX">
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark fs-8 uppercase">Login Email Address</label>
+                            <input type="email" 
+                                   class="form-control bg-light" 
+                                   value="{{ $vendor->email }}"
+                                   disabled>
+                            <small class="text-muted fs-8">Primary login email address cannot be modified directly.</small>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none;">
+                                <i class="fas fa-save me-1"></i> Save Personal Details
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Business Information Card -->
+            <div class="v-card mb-4">
+                <div class="card-header">
+                    <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="fas fa-building text-primary"></i> Business & Store Details
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ route('vendor.profile.update') }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark fs-8 uppercase">Store / Business Name <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   name="business_name" 
+                                   class="form-control @error('business_name') is-invalid @enderror" 
+                                   value="{{ old('business_name', $vendorSettings->business_name) }}"
+                                   required>
+                            @error('business_name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark fs-8 uppercase">Business Contact Email <span class="text-danger">*</span></label>
+                                <input type="email" 
+                                       name="business_email" 
+                                       class="form-control @error('business_email') is-invalid @enderror" 
+                                       value="{{ old('business_email', $vendorSettings->business_email) }}"
+                                       required>
+                                @error('business_email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark fs-8 uppercase">Business Contact Phone <span class="text-danger">*</span></label>
+                                <input type="text" 
+                                       name="business_phone" 
+                                       class="form-control @error('business_phone') is-invalid @enderror" 
+                                       value="{{ old('business_phone', $vendorSettings->business_phone) }}"
+                                       required>
+                                @error('business_phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark fs-8 uppercase">Business Address</label>
+                            <textarea name="business_address" 
+                                      class="form-control @error('business_address') is-invalid @enderror" 
+                                      rows="3"
+                                      placeholder="Full shop or warehouse address">{{ old('business_address', $vendorSettings->business_address) }}</textarea>
+                            @error('business_address')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark fs-8 uppercase">Trade License / Tax ID</label>
+                            <input type="text" 
+                                   name="tax_id" 
+                                   class="form-control @error('tax_id') is-invalid @enderror" 
+                                   value="{{ old('tax_id', $vendorSettings->tax_id) }}"
+                                   placeholder="Optional business identification number">
+                            @error('tax_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none;">
+                                <i class="fas fa-save me-1"></i> Save Business Details
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Payout Settings Card -->
+            <div class="v-card mb-4">
+                <div class="card-header">
+                    <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="fas fa-wallet text-primary"></i> Payout & Withdrawal Account
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ route('vendor.profile.update') }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark fs-8 uppercase">Payout Channel <span class="text-danger">*</span></label>
+                                <select name="payout_method" 
+                                        class="form-select @error('payout_method') is-invalid @enderror">
+                                    <option value="">Select Method</option>
+                                    <option value="bank" {{ old('payout_method', $vendorSettings->payout_method) == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
+                                    <option value="bkash" {{ old('payout_method', $vendorSettings->payout_method) == 'bkash' ? 'selected' : '' }}>bKash Personal / Agent</option>
+                                    <option value="nagad" {{ old('payout_method', $vendorSettings->payout_method) == 'nagad' ? 'selected' : '' }}>Nagad Personal</option>
+                                    <option value="rocket" {{ old('payout_method', $vendorSettings->payout_method) == 'rocket' ? 'selected' : '' }}>Rocket Personal</option>
+                                </select>
+                                @error('payout_method')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark fs-8 uppercase">Account Number <span class="text-danger">*</span></label>
+                                <input type="text" 
+                                       name="payout_account_number" 
+                                       class="form-control @error('payout_account_number') is-invalid @enderror" 
+                                       value="{{ old('payout_account_number', $vendorSettings->payout_account_number) }}"
+                                       placeholder="Bank acct or mobile wallet number">
+                                @error('payout_account_number')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark fs-8 uppercase">Account Name <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   name="payout_account_name" 
+                                   class="form-control @error('payout_account_name') is-invalid @enderror" 
+                                   value="{{ old('payout_account_name', $vendorSettings->payout_account_name) }}"
+                                   placeholder="Full name as written on account">
+                            @error('payout_account_name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div id="bankDetails" style="display: {{ old('payout_method', $vendorSettings->payout_method) == 'bank' ? 'block' : 'none' }};">
+                            <div class="p-3 bg-light rounded-3 mb-3 border">
+                                <h6 class="fw-bold text-dark mb-3">Bank Details</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold fs-7">Bank Name</label>
+                                        <input type="text" 
+                                               name="payout_bank_name" 
+                                               class="form-control fs-7" 
+                                               value="{{ old('payout_bank_name', $vendorSettings->payout_bank_name) }}"
+                                               placeholder="e.g. Dutch Bangla Bank">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold fs-7">Branch Name</label>
+                                        <input type="text" 
+                                               name="payout_branch_name" 
+                                               class="form-control fs-7" 
+                                               value="{{ old('payout_branch_name', $vendorSettings->payout_branch_name) }}"
+                                               placeholder="e.g. Gulshan Branch">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold fs-7">Routing Number</label>
+                                        <input type="text" 
+                                               name="payout_routing_number" 
+                                               class="form-control fs-7" 
+                                               value="{{ old('payout_routing_number', $vendorSettings->payout_routing_number) }}"
+                                               placeholder="Routing code">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success rounded-3 px-4 fw-bold shadow-sm">
+                                <i class="fas fa-save me-1"></i> Update Payout Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Summary Column -->
+        <div class="col-lg-4">
+            <!-- Account Status Card -->
+            <div class="v-card mb-4">
+                <div class="card-header">
+                    <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="fas fa-shield-alt text-primary"></i> Verification & Status
+                    </h5>
+                </div>
+                <div class="card-body p-4 fs-8">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Verification Status:</span>
+                        @if($vendorSettings->is_verified)
+                            <span class="badge-approved fs-8">
+                                <i class="fas fa-check-circle me-1"></i> Verified
+                            </span>
+                        @else
+                            <span class="badge-pending fs-8">
+                                <i class="fas fa-clock me-1"></i> Pending Review
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Account Status:</span>
+                        @if($vendorSettings->is_active)
+                            <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2.5 py-1 rounded-pill">Active</span>
+                        @else
+                            <span class="badge bg-danger bg-opacity-10 text-danger fw-bold px-2.5 py-1 rounded-pill">Inactive</span>
+                        @endif
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Merchant Since:</span>
+                        <span class="fw-bold text-dark">{{ $vendor->created_at->format('d M Y') }}</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="alert alert-info border-0 shadow-sm rounded-3 d-flex align-items-center gap-2 mb-4">
-                    <i class="fas fa-circle-info fs-5 text-info"></i>
-                    <span class="fs-7">Ensure all account details are valid to prevent delay in processing withdrawal payouts.</span>
+            <!-- Commission Rates Summary Card -->
+            <div class="v-card mb-4">
+                <div class="card-header">
+                    <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="fas fa-sliders text-warning"></i> Store Policy & Quotas
+                    </h5>
                 </div>
+                <div class="card-body p-4 fs-8">
+                    @php
+                        $effectiveSettings = $vendorSettings->getEffectiveSettings();
+                    @endphp
 
-                <div class="text-end">
-                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">
-                        <i class="fas fa-save me-1"></i> Update Payout Account
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="text-muted">Default Commission:</span>
+                        <span class="fw-800 text-primary fs-6">{{ $effectiveSettings['default_commission'] }}%</span>
+                    </div>
 
-    <!-- Right Sidebar Column - Account Summary & Support -->
-    <div class="col-12 col-lg-4">
-        <!-- Account Status Card -->
-        <div class="v-card p-4 mb-4">
-            <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom">
-                <i class="fas fa-shield-check text-primary me-2"></i> Account Verification
-            </h6>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="text-muted">Allowed Commission Range:</span>
+                        <span class="fw-bold text-dark">{{ $effectiveSettings['min_commission'] }}% - {{ $effectiveSettings['max_commission'] }}%</span>
+                    </div>
 
-            <div class="mb-3">
-                <small class="text-muted fw-semibold d-block mb-1">Status Badge</small>
-                @if($vendorSettings->is_verified)
-                    <span class="badge badge-approved fs-7">
-                        <i class="fas fa-check-circle me-1"></i> Verified Merchant
-                    </span>
-                    @if($vendorSettings->verified_at)
-                        <small class="text-muted d-block mt-1">Verified on {{ $vendorSettings->verified_at->format('d M Y') }}</small>
-                    @endif
-                @else
-                    <span class="badge badge-pending fs-7">
-                        <i class="fas fa-clock me-1"></i> Pending Verification
-                    </span>
-                    <small class="text-muted d-block mt-1">Admin review is currently in progress.</small>
-                @endif
-            </div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="text-muted">Min Withdrawal Amount:</span>
+                        <span class="fw-bold text-success">৳{{ number_format($effectiveSettings['min_withdrawal'], 2) }}</span>
+                    </div>
 
-            <div class="mb-3">
-                <small class="text-muted fw-semibold d-block mb-1">Account State</small>
-                @if($vendorSettings->is_active)
-                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-1 rounded-pill fs-7">Active</span>
-                @else
-                    <span class="badge bg-danger bg-opacity-10 text-danger fw-bold px-3 py-1 rounded-pill fs-7">Inactive</span>
-                @endif
-            </div>
-
-            <div class="mb-3">
-                <small class="text-muted fw-semibold d-block mb-1">Merchant Registration Date</small>
-                <span class="fw-bold text-dark fs-7">{{ $vendor->created_at->format('d M Y') }}</span>
-            </div>
-        </div>
-
-        <!-- Commission Rates Summary Card -->
-        <div class="v-card p-4 mb-4">
-            <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom">
-                <i class="fas fa-percent text-warning me-2"></i> Store Policy & Quotas
-            </h6>
-
-            @php
-                $effectiveSettings = $vendorSettings->getEffectiveSettings();
-            @endphp
-
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="text-muted fs-7">Default Commission:</span>
-                <span class="fw-extrabold text-primary fs-6">{{ $effectiveSettings['default_commission'] }}%</span>
-            </div>
-
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="text-muted fs-7">Commission Range:</span>
-                <span class="fw-bold text-dark fs-7">{{ $effectiveSettings['min_commission'] }}% - {{ $effectiveSettings['max_commission'] }}%</span>
-            </div>
-
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="text-muted fs-7">Min Withdrawal Threshold:</span>
-                <span class="fw-bold text-success fs-7">৳{{ number_format($effectiveSettings['min_withdrawal'], 2) }}</span>
-            </div>
-
-            <div class="d-flex align-items-center justify-content-between">
-                <span class="text-muted fs-7">Product Limit:</span>
-                @if($effectiveSettings['product_limit'] == 0)
-                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2 py-1 rounded-pill fs-8">Unlimited</span>
-                @else
-                    <span class="fw-bold text-dark fs-7">{{ $effectiveSettings['product_count'] }} / {{ $effectiveSettings['product_limit'] }}</span>
-                @endif
-            </div>
-        </div>
-
-        <!-- Merchant Support Card -->
-        <div class="v-card p-4">
-            <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom">
-                <i class="fas fa-headset text-info me-2"></i> Need Assistance?
-            </h6>
-
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <div class="stat-icon info" style="width: 38px; height: 38px; font-size: 1rem;">
-                    <i class="fas fa-envelope"></i>
-                </div>
-                <div>
-                    <small class="text-muted d-block">Support Email</small>
-                    <a href="mailto:{{ setting('general', 'site_email', 'contact@store.com') }}" class="fw-bold text-decoration-none text-dark fs-7">
-                        {{ setting('general', 'site_email', 'contact@store.com') }}
-                    </a>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="text-muted">Product Limit:</span>
+                        @if($effectiveSettings['product_limit'] == 0)
+                            <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2 py-1 rounded-pill">Unlimited</span>
+                        @else
+                            <span class="fw-bold text-dark">{{ $effectiveSettings['product_count'] }} / {{ $effectiveSettings['product_limit'] }}</span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
-            <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon success" style="width: 38px; height: 38px; font-size: 1rem;">
-                    <i class="fas fa-phone"></i>
+            <!-- Merchant Support Card -->
+            <div class="v-card">
+                <div class="card-header">
+                    <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="fas fa-headset text-info"></i> Support Assistance
+                    </h5>
                 </div>
-                <div>
-                    <small class="text-muted d-block">Support Phone</small>
-                    <a href="tel:{{ setting('general', 'site_phone', '+8801700000000') }}" class="fw-bold text-decoration-none text-dark fs-7">
-                        {{ setting('general', 'site_phone', '+8801700000000') }}
-                    </a>
+                <div class="card-body p-4 fs-8">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="metric-icon-box" style="width: 40px; height: 40px; font-size: 1rem;">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Support Email</small>
+                            <a href="mailto:{{ setting('general', 'site_email', 'contact@store.com') }}" class="fw-bold text-decoration-none text-dark">
+                                {{ setting('general', 'site_email', 'contact@store.com') }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="metric-icon-box" style="width: 40px; height: 40px; font-size: 1rem; background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">Support Phone</small>
+                            <a href="tel:{{ setting('general', 'site_phone', '+8801700000000') }}" class="fw-bold text-decoration-none text-dark">
+                                {{ setting('general', 'site_phone', '+8801700000000') }}
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
