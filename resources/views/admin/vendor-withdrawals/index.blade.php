@@ -1,89 +1,227 @@
 @extends('layouts.master')
 
-@section('title', 'Vendor Withdrawals')
+@section('title', 'Partner Payouts & Withdrawals')
+
+@section('styles')
+<style>
+    .vp-page-wrapper {
+        background: #f1f5f9;
+        min-height: calc(100vh - 60px);
+        margin: -15px -15px 0 -15px;
+        padding: 24px;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+    .vp-hero-card {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.15);
+        margin-bottom: 24px;
+    }
+    .vp-title-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: #38bdf8;
+    }
+    .stat-card-glass {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .stat-card-glass .icon-box {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    .vp-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+    .vp-card .card-header {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 16px 20px;
+    }
+    .vp-card .card-header h5 {
+        margin: 0;
+        font-weight: 800;
+        color: #0f172a;
+        font-size: 15px;
+    }
+    .vp-page-wrapper .form-control, .vp-page-wrapper .form-select {
+        border-radius: 10px;
+        border: 1.5px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        background-color: #f8fafc;
+    }
+    .vp-page-wrapper .form-control:focus, .vp-page-wrapper .form-select:focus {
+        background-color: #ffffff;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+    .vp-table th {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 800;
+        color: #64748b;
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 12px 16px;
+    }
+    .vp-table td {
+        padding: 14px 16px;
+        vertical-align: middle;
+        font-size: 13px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .badge-soft-success {
+        background: #dcfce7;
+        color: #15803d;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    .badge-soft-warning {
+        background: #fef3c7;
+        color: #b45309;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    .badge-soft-info {
+        background: #e0f2fe;
+        color: #0369a1;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    .badge-soft-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    .btn-action-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: all 0.2s ease;
+    }
+    .btn-action-icon:hover {
+        transform: translateY(-2px);
+    }
+</style>
+@endsection
 
 @section('content')
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h4><i class="fas fa-cash-stack"></i> Vendor Withdrawal Requests</h4>
+<div class="vp-page-wrapper">
+    <!-- Header Banner -->
+    <div class="vp-hero-card d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="vp-title-icon">
+                <i class="fas fa-hand-holding-dollar"></i>
+            </div>
+            <div>
+                <h3 class="mb-0 text-white font-weight-bold">Partner Payouts & Withdrawals</h3>
+                <p class="mb-0 text-white-50 small">Manage partner payout requests, verify bank accounts & process payments</p>
+            </div>
+        </div>
+        <div>
+            <a href="{{ route('admin.vendors.index') }}" class="btn btn-secondary rounded-3 px-3">
+                <i class="fas fa-arrow-left me-1"></i> Back to Partners
+            </a>
         </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
+    <!-- Metric Stat Cards -->
+    <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card bg-warning text-dark">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">{{ $stats['pending_count'] }}</h4>
-                            <p class="mb-0">Pending Requests</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-clock fs-1"></i>
-                        </div>
-                    </div>
-                    <small class="text-muted">৳{{ number_format($stats['pending_amount'], 2) }}</small>
+            <div class="stat-card-glass d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small uppercase font-weight-bold">Pending Requests</span>
+                    <h3 class="mb-0 font-weight-bold text-dark">{{ $stats['pending_count'] }}</h3>
+                    <small class="text-warning font-weight-bold">৳{{ number_format($stats['pending_amount'], 2) }}</small>
+                </div>
+                <div class="icon-box bg-warning bg-opacity-10 text-warning">
+                    <i class="fas fa-clock"></i>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">{{ $stats['processing_count'] }}</h4>
-                            <p class="mb-0">Processing</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-cog fs-1"></i>
-                        </div>
-                    </div>
-                    <small>৳{{ number_format($stats['processing_amount'], 2) }}</small>
+            <div class="stat-card-glass d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small uppercase font-weight-bold">Processing</span>
+                    <h3 class="mb-0 font-weight-bold text-dark">{{ $stats['processing_count'] }}</h3>
+                    <small class="text-info font-weight-bold">৳{{ number_format($stats['processing_amount'], 2) }}</small>
+                </div>
+                <div class="icon-box bg-info bg-opacity-10 text-info">
+                    <i class="fas fa-sync-alt"></i>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">{{ $stats['completed_count'] }}</h4>
-                            <p class="mb-0">Completed</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-check-circle fs-1"></i>
-                        </div>
-                    </div>
-                    <small>৳{{ number_format($stats['completed_amount'], 2) }}</small>
+            <div class="stat-card-glass d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small uppercase font-weight-bold">Completed Payouts</span>
+                    <h3 class="mb-0 font-weight-bold text-dark">{{ $stats['completed_count'] }}</h3>
+                    <small class="text-success font-weight-bold">৳{{ number_format($stats['completed_amount'], 2) }}</small>
+                </div>
+                <div class="icon-box bg-success bg-opacity-10 text-success">
+                    <i class="fas fa-check-circle"></i>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">{{ $stats['rejected_count'] }}</h4>
-                            <p class="mb-0">Rejected</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-times-circle fs-1"></i>
-                        </div>
-                    </div>
-                    <small>৳{{ number_format($stats['rejected_amount'], 2) }}</small>
+            <div class="stat-card-glass d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted small uppercase font-weight-bold">Rejected</span>
+                    <h3 class="mb-0 font-weight-bold text-dark">{{ $stats['rejected_count'] }}</h3>
+                    <small class="text-danger font-weight-bold">৳{{ number_format($stats['rejected_amount'], 2) }}</small>
+                </div>
+                <div class="icon-box bg-danger bg-opacity-10 text-danger">
+                    <i class="fas fa-times-circle"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Filters -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form action="{{ route('admin.vendor-withdrawals.index') }}" method="GET" class="row g-3">
+    <!-- Filter Card -->
+    <div class="vp-card">
+        <div class="card-body p-4">
+            <form action="{{ route('admin.vendor-withdrawals.index') }}" method="GET" class="row g-3 align-items-end">
                 <div class="col-md-3">
-                    <label class="form-label">Status</label>
+                    <label class="text-xs font-weight-bold uppercase text-muted mb-1 d-block">Payout Status</label>
                     <select name="status" class="form-select">
                         <option value="">All Statuses</option>
                         <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
@@ -94,113 +232,96 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Vendor</label>
-                    <input type="text" name="vendor" class="form-control" value="{{ request('vendor') }}" placeholder="Search vendor name">
+                    <label class="text-xs font-weight-bold uppercase text-muted mb-1 d-block">Partner Search</label>
+                    <input type="text" name="vendor" class="form-control" value="{{ request('vendor') }}" placeholder="Partner name or business...">
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">From Date</label>
+                    <label class="text-xs font-weight-bold uppercase text-muted mb-1 d-block">From Date</label>
                     <input type="date" name="from" class="form-control" value="{{ request('from') }}">
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">To Date</label>
+                    <label class="text-xs font-weight-bold uppercase text-muted mb-1 d-block">To Date</label>
                     <input type="date" name="to" class="form-control" value="{{ request('to') }}">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">&nbsp;</label>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search"></i> Filter
-                        </button>
-                        <a href="{{ route('admin.vendor-withdrawals.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Clear
-                        </a>
-                    </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 font-weight-bold">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    <a href="{{ route('admin.vendor-withdrawals.index') }}" class="btn btn-secondary rounded-3 py-2">
+                        <i class="fas fa-rotate-right"></i>
+                    </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Withdrawals Table -->
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">Withdrawal Requests ({{ $withdrawals->total() }})</h5>
+    <!-- Withdrawals Table Card -->
+    <div class="vp-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-money-bill-transfer text-primary me-2"></i> Partner Payout Requests</h5>
+            <span class="badge bg-light text-dark font-weight-bold px-3 py-2 border">Total: {{ $withdrawals->total() }}</span>
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             @if($withdrawals->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table vp-table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Vendor</th>
-                                <th>Amount</th>
-                                <th>Method</th>
+                                <th class="ps-4">Request Ref</th>
+                                <th>Partner</th>
+                                <th>Requested Amount</th>
+                                <th>Payment Method</th>
                                 <th>Status</th>
                                 <th>Request Date</th>
                                 <th>Processed Date</th>
-                                <th>Actions</th>
+                                <th class="text-end pe-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($withdrawals as $withdrawal)
                                 <tr>
-                                    <td>#{{ $withdrawal->id }}</td>
+                                    <td class="ps-4 font-weight-bold text-dark">#{{ $withdrawal->id }}</td>
                                     <td>
-                                        <a href="{{ route('admin.vendors.show', $withdrawal->vendor) }}">
+                                        <a href="{{ route('admin.vendors.show', $withdrawal->vendor) }}" class="font-weight-bold text-dark text-decoration-none d-block">
                                             {{ $withdrawal->vendor->name }}
                                         </a>
-                                        <br>
                                         <small class="text-muted">{{ $withdrawal->vendor->vendorSettings->business_name ?? '' }}</small>
                                     </td>
+                                    <td class="font-weight-bold text-success fs-6">৳{{ number_format($withdrawal->amount, 2) }}</td>
                                     <td>
-                                        <strong class="text-primary">৳{{ number_format($withdrawal->amount, 2) }}</strong>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary text-capitalize">{{ $withdrawal->method }}</span>
-                                        <br>
-                                        <small class="text-muted">{{ $withdrawal->account_details['account_number'] ?? '' }}</small>
+                                        <span class="badge bg-light text-dark border font-weight-bold px-3 py-1 text-uppercase">
+                                            {{ $withdrawal->method }}
+                                        </span>
                                     </td>
                                     <td>
                                         @switch($withdrawal->status)
                                             @case('pending')
-                                                <span class="badge bg-warning text-dark">
-                                                    <i class="fas fa-clock"></i> Pending
-                                                </span>
+                                                <span class="badge-soft-warning"><i class="fas fa-clock me-1"></i> Pending</span>
                                                 @break
                                             @case('approved')
-                                                <span class="badge bg-info">
-                                                    <i class="fas fa-check-circle"></i> Approved
-                                                </span>
+                                                <span class="badge-soft-info"><i class="fas fa-thumbs-up me-1"></i> Approved</span>
                                                 @break
                                             @case('processing')
-                                                <span class="badge bg-primary">
-                                                    <i class="fas fa-cog fa-spin"></i> Processing
-                                                </span>
+                                                <span class="badge-soft-info"><i class="fas fa-cog me-1 fa-spin"></i> Processing</span>
                                                 @break
                                             @case('completed')
-                                                <span class="badge bg-success">
-                                                    <i class="fas fa-check-double"></i> Completed
-                                                </span>
+                                                <span class="badge-soft-success"><i class="fas fa-check-circle me-1"></i> Completed</span>
                                                 @break
                                             @case('rejected')
-                                                <span class="badge bg-danger">
-                                                    <i class="fas fa-times-circle"></i> Rejected
-                                                </span>
+                                                <span class="badge-soft-danger"><i class="fas fa-times-circle me-1"></i> Rejected</span>
                                                 @break
                                         @endswitch
                                     </td>
                                     <td>
-                                        {{ $withdrawal->created_at->format('d M Y') }}
-                                        <br>
+                                        <span class="small font-weight-bold text-dark d-block">{{ $withdrawal->created_at->format('d M Y') }}</span>
                                         <small class="text-muted">{{ $withdrawal->created_at->format('h:i A') }}</small>
                                     </td>
                                     <td>
                                         @if($withdrawal->processed_at)
-                                            {{ $withdrawal->processed_at->format('d M Y') }}
-                                            <br>
+                                            <span class="small font-weight-bold text-dark d-block">{{ $withdrawal->processed_at->format('d M Y') }}</span>
                                             <small class="text-muted">{{ $withdrawal->processed_at->format('h:i A') }}</small>
                                         @else
-                                            <span class="text-muted">-</span>
+                                            <span class="text-muted small">-</span>
                                         @endif
                                     </td>
                                     <td>

@@ -68,26 +68,55 @@ class VendorRolesAndPermissionsSeeder extends Seeder
             // Vendor Settings Permissions
             'vendor.profile.edit',
             
+            // Module Feature Permissions: Point of Sale (POS)
+            'admin.pos.access',
+            'admin.pos.create-order',
+            'admin.pos.manage-settings',
+
+            // Module Feature Permissions: Multi-Vendor Marketplace
+            'admin.multi-vendor.access',
+            'admin.multi-vendor.manage-vendors',
+            'admin.multi-vendor.approve-products',
+            'admin.multi-vendor.process-withdrawals',
+            'admin.multi-vendor.global-config',
+
+            // Module Feature Permissions: Landing Page Builder
+            'admin.landing-pages.access',
+            'admin.landing-pages.create',
+            'admin.landing-pages.edit',
+            'admin.landing-pages.delete',
+
+            // Module Feature Permissions: Blog & Content System
+            'admin.blogs.access',
+            'admin.blogs.create',
+            'admin.blogs.edit',
+            'admin.blogs.delete',
+
             // Admin Vendor Management Permissions
             'admin.vendors.view',
+            'admin.vendors.create',
             'admin.vendors.edit',
             'admin.vendors.delete',
             'admin.vendors.approve',
             'admin.vendors.suspend',
             
-            // Admin Product Approval Permissions (KEY FEATURE)
+            // Admin Partner Items / Product Approval Permissions
             'admin.products.view-all',
             'admin.products.approve',
             'admin.products.reject',
             'admin.products.edit-commission',
             
-            // Admin Financial Permissions
+            // Admin Partner Payouts & Financial Permissions
             'admin.withdrawals.view',
             'admin.withdrawals.approve',
             'admin.withdrawals.reject',
             'admin.withdrawals.complete',
             'admin.commissions.view',
             'admin.commissions.edit',
+            
+            // Admin Partner Global Configurations
+            'admin.vendor-settings.global',
+            'admin.vendor-settings.update',
             
             // Admin Reports Permissions
             'admin.reports.vendors',

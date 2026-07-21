@@ -1,159 +1,92 @@
 @extends('layouts.master')
 
-@section('title', 'Product Approval - ' . $product->title)
+@section('title', 'Partner Item Approval - ' . $product->title)
+
+@section('styles')
+<style>
+    .vp-page-wrapper {
+        background: #f1f5f9;
+        min-height: calc(100vh - 60px);
+        margin: -15px -15px 0 -15px;
+        padding: 24px;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+    .vp-hero-card {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.15);
+        margin-bottom: 24px;
+    }
+    .vp-title-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: #38bdf8;
+    }
+    .vp-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+    .vp-card .card-header {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 16px 20px;
+    }
+    .vp-card .card-header h5 {
+        margin: 0;
+        font-weight: 800;
+        color: #0f172a;
+        font-size: 15px;
+    }
+    .vp-page-wrapper .form-control, .vp-page-wrapper .form-select {
+        border-radius: 10px;
+        border: 1.5px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        background-color: #f8fafc;
+    }
+    .badge-soft-success {
+        background: #dcfce7;
+        color: #15803d;
+        font-weight: 700;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+    }
+    .badge-soft-warning {
+        background: #fef3c7;
+        color: #b45309;
+        font-weight: 700;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+    }
+    .badge-soft-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+        font-weight: 700;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+    }
+</style>
+@endsection
 
 @section('content')
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2><i class="fas fa-box"></i> Product Approval</h2>
-                <div>
-                    <a href="{{ route('admin.vendor-products.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to List
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Left Column - Product Details -->
-        <div class="col-md-8">
-            <!-- Status Card -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-0">{{ $product->title }}</h3>
-                            <p class="text-muted mb-0">Category: {{ $product->category->name ?? 'N/A' }}</p>
-                        </div>
-                        <div>
-                            @switch($product->approval_status)
-                                @case('approved')
-                                    <span class="badge bg-success fs-5">
-                                        <i class="fas fa-check-circle"></i> Approved
-                                    </span>
-                                    @break
-                                @case('pending')
-                                    <span class="badge bg-warning text-dark fs-5">
-                                        <i class="fas fa-clock"></i> Pending Review
-                                    </span>
-                                    @break
-                                @case('rejected')
-                                    <span class="badge bg-danger fs-5">
-                                        <i class="fas fa-x-circle"></i> Rejected
-                                    </span>
-                                    @break
-                            @endswitch
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vendor Information -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-person"></i> Vendor Information</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table table-sm">
-                                <tr>
-                                    <td width="40%"><strong>Vendor Name:</strong></td>
-                                    <td>
-                                        <a href="{{ route('admin.vendors.show', $product->vendor) }}">
-                                            {{ $product->vendor->name }}
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Business Name:</strong></td>
-                                    <td>{{ $product->vendor->vendorSettings->business_name ?? 'N/A' }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-sm">
-                                <tr>
-                                    <td width="40%"><strong>Status:</strong></td>
-                                    <td>
-                                        @if($product->vendor->vendorSettings->is_verified)
-                                            <span class="badge bg-success">Verified</span>
-                                        @else
-                                            <span class="badge bg-warning text-dark">Not Verified</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Total Products:</strong></td>
-                                    <td>{{ $product->vendor->products()->count() }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product Details -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Product Details</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-12">
-                            <strong>Description:</strong>
-                            <div class="mt-2">
-                                {!! $product->description ?? 'No description provided' !!}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table table-sm">
-                                <tr>
-                                    <td width="40%"><strong>Category:</strong></td>
-                                    <td>{{ $product->category->name ?? 'N/A' }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Brand:</strong></td>
-                                    <td>{{ $product->brand->name ?? 'N/A' }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Regular Price:</strong></td>
-                                    <td>৳{{ number_format($product->old_price, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Offer Price:</strong></td>
-                                    <td>৳{{ number_format($product->offer, 2) }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-sm">
-                                <tr>
-                                    <td width="40%"><strong>Stock Quantity:</strong></td>
-                                    <td>{{ $product->quantity ?? 0 }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Status:</strong></td>
-                                    <td>
-                                        @if($product->status == 1)
-                                            <span class="badge bg-success">Active</span>
-                                        @else
-                                            <span class="badge bg-secondary">Inactive</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Featured:</strong></td>
-                                    <td>
-                                        @if($product->is_featured)
-                                            <span class="badge bg-primary">Yes</span>
-                                        @else
                                             <span class="badge bg-secondary">No</span>
                                         @endif
                                     </td>
