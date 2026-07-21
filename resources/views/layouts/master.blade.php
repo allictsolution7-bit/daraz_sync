@@ -974,6 +974,7 @@
                         @endcan
  
                         <!-- CORE SHOP SECTION -->
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['products.view', 'inventory.view', 'landing_pages.view', 'product_categories.view', 'brands.view', 'writers.view', 'publishers.view', 'reviews.view', 'combo_offers.view']))
                         <li class="menu-section {{ $coreShopActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1192,8 +1193,10 @@
                                 @endcan
                             </ul>
                         </li>
+                        @endif
  
                         <!-- ORDERS & SALES SECTION -->
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['orders.view', 'orders.asigned', 'incomplete_orders.view', 'orders.create']))
                         <li class="menu-section {{ $ordersSalesActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1267,8 +1270,10 @@
                                 @endcan
                             </ul>
                         </li>
+                        @endif
  
                         <!-- SHIPPING & DELIVERY SECTION -->
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['basic_shipping.view', 'shipping.rules.view', 'delivery.view']))
                         <li class="menu-section {{ $shippingDeliveryActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1351,8 +1356,10 @@
                                 @endcan
                             </ul>
                         </li>
+                        @endif
  
                         <!-- REPORTS & ANALYTICS SECTION -->
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['reports.sales.view', 'reports.customers.view']))
                         <li class="menu-section {{ $reportsAnalyticsActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1384,8 +1391,10 @@
                                 @endcan
                             </ul>
                         </li>
+                        @endif
  
                         <!-- INTEGRATIONS & SYNC SECTION -->
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || (module_enabled('Daraz') && Route::has('admin.daraz.index')) || auth()->user()?->canAny(['woocommerce_migration.view', 'telegram_settings.view', 'delayed_events.view']))
                         <li class="menu-section {{ $integrationsSyncActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1506,8 +1515,10 @@
                                 @endcan
                             </ul>
                         </li>
+                        @endif
  
                         <!-- SECURITY & TRUST SECTION -->
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['fraud_checker.view', 'fraud_protection.view', 'backup.settings.view']))
                         <li class="menu-section {{ $securityTrustActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1631,8 +1642,10 @@
                                 @endcan
                             </ul>
                         </li>
+                        @endif
  
                         <!-- CONTENT & PAGES SECTION -->
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['sliders.view', 'pages.view', 'menus.view', 'blog.view']))
                         <li class="menu-section {{ $contentPagesActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1776,9 +1789,10 @@
                                 @endcan
                             </ul>
                         </li>
+                        @endif
  
                         <!-- VENDORS SECTION -->
-                        @if(module_enabled('MultiVendor') && Route::has('admin.vendors.index'))
+                        @if(Route::has('admin.vendors.index') && (auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['admin.vendors.view', 'admin.vendors.edit', 'admin.products.view-all', 'admin.withdrawals.view', 'admin.commissions.view'])))
                         <li class="menu-section {{ $vendorsActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1846,6 +1860,7 @@
                         @endif
  
                         <!-- CONTROL & SYSTEM SECTION -->
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['users.view', 'contacts.view', 'subscriptions.view', 'roles.manage', 'settings.view']))
                         <li class="menu-section {{ $controlSystemActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -2031,6 +2046,7 @@
                                 @endcan
                             </ul>
                         </li>
+                        @endif
 
                     </ul>
                 </nav>

@@ -14,6 +14,28 @@
     </div>
 
     <ul class="sidebar-menu">
+        @auth
+            @if(auth()->user()->isVendor() || auth()->user()->hasRole('vendor'))
+                <li class="sidebar-menu-item">
+                    <a href="{{ Route::has('vendor.dashboard') ? route('vendor.dashboard') : url('/vendor/dashboard') }}" 
+                       class="sidebar-menu-link" 
+                       style="background-color: #4f46e5; color: #ffffff; font-weight: 600; margin-bottom: 12px; border-radius: 6px;">
+                        <i class="fa-solid fa-store sidebar-menu-icon" style="color: #ffffff;"></i>
+                        <span>Vendor Dashboard</span>
+                    </a>
+                </li>
+            @elseif(auth()->user()->isAdmin() || auth()->user()->hasRole('admin') || auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('super admin'))
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('admin.dashboard') }}" 
+                       class="sidebar-menu-link" 
+                       style="background-color: #4f46e5; color: #ffffff; font-weight: 600; margin-bottom: 12px; border-radius: 6px;">
+                        <i class="fa-solid fa-gauge sidebar-menu-icon" style="color: #ffffff;"></i>
+                        <span>Admin Dashboard</span>
+                    </a>
+                </li>
+            @endif
+        @endauth
+
         <li class="sidebar-menu-item">
             <a href="{{ route('account.show') }}" class="sidebar-menu-link {{ Route::currentRouteName() == 'account.show' ? 'active' : '' }}">
                 <i class="fa-solid fa-user sidebar-menu-icon"></i>
@@ -21,73 +43,32 @@
             </a>
         </li>
         <li class="sidebar-menu-item">
-            <a href="{{ route('account.orders') }}" class="sidebar-menu-link {{request()->is('account/orders*') ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="20" height="20">
-                    <path fill="currentColor" d="M50.7 58.5L0 160h208V32H93.7c-18.2 0-34.8 10.3-43 26.5zM240 160H448L397.3 58.5c-8.2-16.2-24.8-26.5-43-26.5H240V160zm208 32H0V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V192z"/>
-                  </svg>
-                <span style="margin-left: 7px;">Orders</span>
-            </a>
-        </li>
-        <li class="sidebar-menu-item">
-            <a href="" class="sidebar-menu-link">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="20" height="20">
-                    <path fill="currentColor" d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/>
-                  </svg>
-                <span style="margin-left: 7px;">Cart</span>
-            </a>
-        </li>
-        <li class="sidebar-menu-item">
-            <a href="" class="sidebar-menu-link">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="20" height="20">
-                    <path fill="currentColor" d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
-                  </svg>
-                <span style="margin-left: 7px;">Wishlist</span>
+            <a href="{{ route('account.orders') }}" class="sidebar-menu-link {{ request()->is('account/orders*') ? 'active' : '' }}">
+                <i class="fa-solid fa-bag-shopping sidebar-menu-icon"></i>
+                <span>Orders</span>
             </a>
         </li>
         <li class="sidebar-menu-item">
             <a href="{{ route('order.track') }}" class="sidebar-menu-link {{ Route::currentRouteName() == 'order.track' ? 'active' : '' }}">
-                <svg width="24" height="24" viewBox="0 0 422.518 422.518" fill="currentColor">
-                    <path d="M422.512,215.424c0-0.079-0.004-0.158-0.005-0.237c-0.116-5.295-4.368-9.514-9.727-9.514h-2.554l-39.443-76.258
-                                                c-1.664-3.22-4.983-5.225-8.647-5.226l-67.34-0.014l2.569-20.364c0.733-8.138-1.783-15.822-7.086-21.638
-                                                c-5.293-5.804-12.683-9.001-20.81-9.001h-209c-5.255,0-9.719,4.066-10.22,9.308l-2.095,16.778h119.078
-                                                c7.732,0,13.836,6.268,13.634,14c-0.203,7.732-6.635,14-14.367,14H126.78c0.007,0.02,0.014,0.04,0.021,0.059H10.163
-                                                c-5.468,0-10.017,4.432-10.16,9.9c-0.143,5.468,4.173,9.9,9.641,9.9H164.06c7.168,1.104,12.523,7.303,12.326,14.808
-                                                c-0.216,8.242-7.039,14.925-15.267,14.994H54.661c-5.523,0-10.117,4.477-10.262,10c-0.145,5.523,4.215,10,9.738,10h105.204
-                                                c7.273,1.013,12.735,7.262,12.537,14.84c-0.217,8.284-7.109,15-15.393,15H35.792v0.011H25.651c-5.523,0-10.117,4.477-10.262,10
-                                                c-0.145,5.523,4.214,10,9.738,10h8.752l-3.423,35.818c-0.734,8.137,1.782,15.821,7.086,21.637c5.292,5.805,12.683,9.001,20.81,9.001
-                                                h7.55C69.5,333.8,87.3,349.345,109.073,349.345c21.773,0,40.387-15.545,45.06-36.118h94.219c7.618,0,14.83-2.913,20.486-7.682
-                                                c5.172,4.964,12.028,7.682,19.514,7.682h1.55c3.597,20.573,21.397,36.118,43.171,36.118c21.773,0,40.387-15.545,45.06-36.118h6.219
-                                                c16.201,0,30.569-13.171,32.029-29.36l6.094-67.506c0.008-0.091,0.004-0.181,0.01-0.273c0.01-0.139,0.029-0.275,0.033-0.415
-                                                C422.52,215.589,422.512,215.508,422.512,215.424z M109.597,329.345c-13.785,0-24.707-11.214-24.346-24.999
-                                                c0.361-13.786,11.87-25.001,25.655-25.001c13.785,0,24.706,11.215,24.345,25.001C134.89,318.131,123.382,329.345,109.597,329.345z
-                                                 M333.597,329.345c-13.785,0-24.706-11.214-24.346-24.999c0.361-13.786,11.87-25.001,25.655-25.001
-                                                c13.785,0,24.707,11.215,24.345,25.001C358.89,318.131,347.382,329.345,333.597,329.345z M396.457,282.588
-                                                c-0.52,5.767-5.823,10.639-11.58,10.639h-6.727c-4.454-19.453-21.744-33.882-42.721-33.882c-20.977,0-39.022,14.429-44.494,33.882
-                                                h-2.059c-2.542,0-4.81-0.953-6.389-2.685c-1.589-1.742-2.337-4.113-2.106-6.676l12.609-139.691l28.959,0.006l-4.59,50.852
-                                                c-0.735,8.137,1.78,15.821,7.083,21.637c5.292,5.806,12.685,9.004,20.813,9.004h56.338L396.457,282.588z"></path>
-                </svg>
-                <span style="margin-left: 7px;">Track Order</span>
+                <i class="fa-solid fa-truck-fast sidebar-menu-icon"></i>
+                <span>Track Order</span>
             </a>
         </li>
         <li class="sidebar-menu-item">
             <a href="{{ route('account.edit') }}" class="sidebar-menu-link {{ Route::currentRouteName() == 'account.edit' ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="20" height="20">
-                    <path fill="currentColor" d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"/>
-                  </svg>
-                <span style="margin-left: 7px;">Settings</span>
+                <i class="fa-solid fa-gear sidebar-menu-icon"></i>
+                <span>Settings</span>
             </a>
         </li>
     </ul>
 
     <a class="logout-link" href="{{ route('logout') }}"
-        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24">
-            <path fill="currentColor" d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/>
-          </svg> 
-        <span style="margin-left: 7px;">{{ __('Logout') }}</span>
+        onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();" style="margin-top: 15px; display: flex; align-items: center; color: #dc3545; text-decoration: none; font-weight: 600; padding: 10px 15px;">
+        <i class="fa-solid fa-arrow-right-from-bracket sidebar-menu-icon"></i>
+        <span>{{ __('Logout') }}</span>
     </a>
 
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+    <form id="logout-form-sidebar" action="{{ route('logout') }}" method="POST" class="d-none">
         @csrf
     </form>
 </div>

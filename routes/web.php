@@ -273,18 +273,6 @@ Route::get('/product/{product}/reviews', [App\Http\Controllers\Client\ProductRev
 Route::get('/product/{product}/can-review', [App\Http\Controllers\Client\ProductReviewController::class, 'canReview'])->name('product.review.can');
 
 // Admin Routes
-Route::get('/test-auth-role', function() {
-    $user = auth()->user();
-    if (!$user) {
-        return "Not logged in";
-    }
-    return [
-        'id' => $user->id,
-        'email' => $user->email,
-        'roles' => $user->roles->pluck('name'),
-        'permissions' => $user->getAllPermissions()->pluck('name'),
-    ];
-});
 
 Route::get("/admin", function () {
     return redirect()->route('admin.dashboard');
