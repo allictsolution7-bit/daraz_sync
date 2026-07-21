@@ -5,422 +5,265 @@
 @section('styles')
 <style>
     :root {
-        --lp-primary: #197A94;
-        --lp-secondary: #1E3A8A;
-        --lp-green: #10B981;
-        --lp-danger: #e05353;
-        --lp-surface: #f2f8f7;
-        --lp-text: #1f2937;
+        --lp-primary: #4f46e5;
+        --lp-primary-hover: #4338ca;
+        --lp-secondary: #06b6d4;
+        --lp-green: #10b981;
+        --lp-danger: #ef4444;
+        --lp-dark: #0f172a;
+        --lp-surface: #ffffff;
+        --lp-border: #e2e8f0;
+        --lp-shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+        --lp-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        --lp-shadow-lg: 0 10px 25px -5px rgba(79,70,229,0.15);
+        --lp-radius: 14px;
     }
 
-    .lp-card {
-        border: none;
-        background: transparent;
+    .lp-page-wrapper {
+        background: #f1f5f9;
+        margin: -15px -15px 0 -15px;
+        padding: 24px;
+        min-height: calc(100vh - 60px);
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
 
-    .lp-hero {
-        background: var(--lp-surface);
-        border: 1px solid #d8e7e2;
-        border-radius: 14px;
-        padding: 16px 18px;
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-        box-shadow: 0 6px 16px rgba(17, 24, 39, 0.06);
+    /* Hero Banner */
+    .lp-hero-card {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+        color: white;
+        border-radius: var(--lp-radius);
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: var(--lp-shadow-lg);
+        position: relative;
+        overflow: hidden;
     }
 
-    .lp-hero .eyebrow {
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-weight: 700;
-        color: #475467;
-        font-size: 12px;
-        margin-bottom: 4px;
-    }
-
-    .lp-hero h3 {
-        margin: 0 0 4px;
-        font-weight: 800;
-        color: var(--lp-text);
-    }
-
-    .lp-hero p {
-        margin-bottom: 8px;
-        color: #4b5563;
-    }
-
-    .lp-hero-actions {
-        text-align: right;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .lp-mini-hint {
-        font-size: 12px;
-        color: #4b5563;
-    }
-
-    .lp-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 6px;
-    }
-
-    .lp-chip {
-        background: #ffffff;
-        border: 1px solid #d8e7e2;
-        border-radius: 10px;
-        padding: 2px 10px;
-        font-weight: 700;
-        color: #0f172a;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        box-shadow: none;
-    }
-
-    .lp-chip .dot {
-        width: 10px;
-        height: 10px;
+    .lp-hero-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(6,182,212,0.25) 0%, rgba(255,255,255,0) 70%);
         border-radius: 50%;
+        pointer-events: none;
     }
 
-    .btn-gradient {
-        background: var(--lp-primary);
-        border: none;
-        color: #fff;
-        font-weight: 700;
-        padding: 10px 16px;
-        border-radius: 10px;
-        box-shadow: none;
+    .lp-title-badge {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
-    .btn-gradient:hover {
-        color: #fff;
-        background: #0f4c75;
+    .lp-title-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: #38bdf8;
     }
 
-    .lp-toolbar {
-        background: #ffffff;
-        border: 1px solid #d8e7e2;
-        border-radius: 10px;
-        padding: 10px;
-        margin: 12px 0;
+    .lp-meta-grid {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+        margin-top: 16px;
+    }
+
+    .lp-chip {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 6px 14px;
+        font-weight: 700;
+        font-size: 13px;
+        color: #ffffff;
+        display: inline-flex;
         align-items: center;
-        box-shadow: none;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .lp-chip:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+    }
+
+    .lp-chip .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .btn-create-lp {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 14px rgba(16,185,129,0.35);
+        transition: all 0.25s ease;
+        white-space: nowrap;
+    }
+
+    .btn-create-lp:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16,185,129,0.45);
+        color: white;
+    }
+
+    /* Toolbar & Filters */
+    .lp-toolbar-card {
+        background: white;
+        border: 1px solid var(--lp-border);
+        border-radius: var(--lp-radius);
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        box-shadow: var(--lp-shadow-sm);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .lp-filter-group {
         display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+        gap: 6px;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 10px;
     }
 
     .lp-filter-btn {
-        border: 1px solid #d8e7e2;
-        background: #f8fafa;
-        color: #0f4c75;
-        border-radius: 7px;
-        padding: 4px 10px;
-        font-weight: 600;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-weight: 700;
+        font-size: 13px;
         transition: all 0.2s ease;
     }
 
     .lp-filter-btn.active {
-        background: var(--lp-primary);
-        color: #fff;
-        border-color: var(--lp-primary);
-        box-shadow: none;
+        background: white;
+        color: var(--lp-primary);
+        box-shadow: var(--lp-shadow-sm);
     }
 
-    .lp-toolbar-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex: 1 1 auto;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-    }
-
-    .lp-search {
+    .lp-search-box {
         position: relative;
-        flex: 1 1 260px;
-        min-width: 220px;
+        min-width: 260px;
     }
 
-    .lp-search input {
-        width: 100%;
-        padding: 4px 36px 4px 36px;
+    .lp-search-box input {
         border-radius: 10px;
-        border: 1px solid #d8e7e2;
-        background: #ffffff;
-        font-weight: 600;
-        color: #0f172a;
+        border: 1px solid #cbd5e1;
+        padding: 8px 12px 8px 36px;
+        font-size: 13px;
     }
 
-    .lp-search .fa-search {
+    .lp-search-box i {
         position: absolute;
         left: 12px;
         top: 50%;
         transform: translateY(-50%);
-        color: #6b7280;
+        color: #94a3b8;
     }
 
-    .lp-search .clear-search {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #6b7280;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
-    }
-
-    .lp-hint {
-        color: #475467;
-        font-weight: 600;
-        margin: 0 0 10px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    #landing-pages-table {
-        background: #fff;
-        border-radius: 7px;
+    /* Modern Table Container */
+    .lp-table-card {
+        background: white;
+        border-radius: var(--lp-radius);
+        border: 1px solid var(--lp-border);
+        box-shadow: var(--lp-shadow-md);
         overflow: hidden;
-        border: 1px solid #d8e7e2;
-        box-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
     }
 
-    #landing-pages-table thead th {
-        background: #197A94;
-        color: #fff;
-        border: none;
+    .lp-table {
+        margin-bottom: 0;
+    }
+
+    .lp-table th {
+        background: #f8fafc;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
-        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #e2e8f0;
     }
 
-    #landing-pages-table tbody tr {
-        transition: all 0.15s ease;
-    }
-
-    #landing-pages-table tbody tr:hover {
-        background: #f8fbfb;
-        box-shadow: none;
-    }
-
-    #landing-pages-table tbody td {
+    .lp-table td {
+        padding: 14px 16px;
         vertical-align: middle;
-        border-color: #eef2f7;
+        font-size: 13px;
+        color: #1e293b;
+        border-bottom: 1px solid #f1f5f9;
     }
 
-    .lp-row-active {
-        background: #f6fffb;
-        border-left: 3px solid var(--lp-green);
+    .lp-table tr:last-child td {
+        border-bottom: none;
     }
 
-    .lp-row-inactive {
-        background: #f9fbfc;
-        border-left: 3px solid #cbd5e1;
+    .lp-table tr:hover td {
+        background: #f8fafc;
     }
 
     .status-pill {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 3px 12px;
-        border-radius: 999px;
-        font-weight: 600;
-        letter-spacing: 0.01em;
-        font-size: 0.9rem;
-        border: 1px solid transparent;
-    }
-
-    .status-pill .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
     }
 
     .status-pill.active {
-        background: #ecfdf3;
-        color: #0f915c;
-        border-color: #c5f1de;
-    }
-
-    .status-pill.active .dot {
-        background: #16b77e;
+        background: #dcfce7;
+        color: #166534;
     }
 
     .status-pill.inactive {
-        background: #f9fafb;
-        color: #475467;
-        border-color: #e5e7eb;
+        background: #fee2e2;
+        color: #991b1b;
     }
 
-    .status-pill.inactive .dot {
-        background: #cbd5e1;
+    .status-pill .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
     }
 
-    .position-badge {
-        padding: 6px 10px;
-        border-radius: 10px;
-        background: #f8fafa;
-        border: 1px solid #d8e7e2;
-        font-weight: 800;
-        color: #0f4c75;
-    }
-
-    .drag-handle {
-        cursor: move;
-        color: #94a3b8;
-    }
-
-    #sortable-tbody tr:hover .drag-handle i {
-        color: #197a94 !important;
-    }
-
-    .ui-sortable-helper {
-        display: table;
-        background-color: #f8f9fa;
-        opacity: 0.9;
-    }
-
-    .ui-sortable-placeholder {
-        background-color: #e9ecef;
-        visibility: visible !important;
-        height: 50px !important;
-    }
+    .status-pill.active .dot { background: #16a34a; }
+    .status-pill.inactive .dot { background: #dc2626; }
 
     .action-btn-group .btn {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px !important;
-        transition: all 0.15s ease;
-        border: 1px solid #d8e7e2;
-        background: #fff;
-        color: #0f172a;
-    }
-
-    .action-btn-group .btn i {
-        font-size: 0.9rem !important;
+        border-radius: 8px;
+        padding: 5px 9px;
+        font-size: 12px;
+        transition: all 0.2s;
     }
 
     .action-btn-group .btn:hover {
         transform: translateY(-1px);
-        box-shadow: none;
-        background: #f8fafa;
-    }
-
-    .action-btn-group .btn-info {
-        background: #eef7ff;
-        border-color: #d8e7e2;
-        color: #197a94;
-    }
-
-    .action-btn-group .btn-dark {
-        background: #edf2ff;
-        border-color: #d8e7e2;
-        color: #1e3a8a;
-    }
-
-    .action-btn-group .btn-warning {
-        background: #fff7ec;
-        border-color: #ffe7c2;
-        color: #b45309;
-    }
-
-    .action-btn-group .btn-primary {
-        background: #f6fbff;
-        border-color: #d8e7e2;
-        color: #0f4c75;
-    }
-
-    .action-btn-group .btn-success {
-        background: #ecfdf3;
-        border-color: #c5f1de;
-        color: #0f915c;
-    }
-
-    .action-btn-group .btn-secondary {
-        background: #f8fafa;
-        border-color: #e2e8f0;
-        color: #334155;
-    }
-
-    .action-btn-group .btn-danger {
-        background: #fdecec;
-        border-color: #f9d1d1;
-        color: #b91c1c;
-    }
-
-    .copy-link-btn.copied {
-        background: #dcfce7 !important;
-        border-color: #bbf7d0 !important;
-        color: #0f766e !important;
-    }
-
-    .text-limit {
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        white-space: normal;
-    }
-
-    .landing-page-title {
-        font-size: 14px;
-        margin-bottom: 5px !important;
-        max-width: 220px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    @media (min-width: 768px) {
-        .text-limit {
-            max-width: 220px;
-        }
-    }
-
-    @media (max-width: 767px) {
-
-        .lp-hero,
-        .lp-toolbar {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .lp-hero-actions {
-            width: 100%;
-            text-align: left;
-        }
-
-        .lp-toolbar-actions {
-            width: 100%;
-            justify-content: flex-start;
-        }
-
-        .text-limit {
-            max-width: none;
-        }
-
-        .landing-page-title {
-            max-width: none;
-        }
     }
 </style>
 @endsection
@@ -434,84 +277,79 @@ $activeCount = $pagesCollection->where('status', 1)->count();
 $inactiveCount = $pagesCollection->where('status', 0)->count();
 $totalLandingPages = method_exists($landingPages, 'total') ? $landingPages->total() : $pagesCollection->count();
 @endphp
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card lp-card">
-                <div class="card-body">
-                    <div class="lp-hero">
-                        <div>
-                            <div class="eyebrow">Landing Pages</div>
-                            <h3>Conversion-ready pages, organized</h3>
-                            <p class="mb-0">Monitor status, copy links, and drag to reprioritize from one clean view.</p>
-                            <div class="lp-meta">
-                                <span class="lp-chip">
-                                    <span class="dot" style="background: var(--lp-primary);"></span>
-                                    Total: {{ $totalLandingPages }}
-                                </span>
-                                <span class="lp-chip">
-                                    <span class="dot" style="background: var(--lp-green);"></span>
-                                    Active: {{ $activeCount }}
-                                </span>
-                                <span class="lp-chip">
-                                    <span class="dot" style="background: var(--lp-danger);"></span>
-                                    Inactive: {{ $inactiveCount }}
-                                </span>
-                                <span class="lp-chip">
-                                    <span class="dot" style="background: var(--lp-secondary);"></span>
-                                    Orders: {{ number_format($landingOrdersCount ?? 0) }}
-                                </span>
-                                <span class="lp-chip">
-                                    <span class="dot" style="background: var(--lp-green);"></span>
-                                    Sales: ৳{{ number_format($landingOrdersTotal ?? 0, 2) }}
-                                </span>
-                                <span class="lp-chip">
-                                    <span class="dot" style="background: #0ea5e9;"></span>
-                                    Views: {{ number_format($landingViewsTotal ?? 0) }}
-                                </span>
-                                <span class="lp-chip">
-                                    <span class="dot" style="background: #8b5cf6;"></span>
-                                    Unique: {{ number_format($landingViewsUnique ?? 0) }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="lp-hero-actions">
-                            <a href="{{ route('admin.landing-pages.create') }}" class="btn btn-gradient">
-                                <i class="fas fa-plus mr-1"></i> Create New Landing Page
-                            </a>
-                            <div class="lp-mini-hint">
-                                Drag the grip icon to reorder. Changes save instantly.
-                            </div>
-                        </div>
-                    </div>
 
-                    @if (session('success'))
-                    <div class="alert alert-success mt-3">
-                        {{ session('success') }}
-                    </div>
-                    @endif
+<div class="lp-page-wrapper">
+    <!-- Hero Banner Card -->
+    <div class="lp-hero-card d-flex justify-content-between align-items-center flex-wrap gap-4">
+        <div>
+            <div class="lp-title-badge mb-2">
+                <div class="lp-title-icon">
+                    <i class="fas fa-pager"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0 text-white font-weight-bold">Landing Page Manager</h3>
+                    <p class="mb-0 text-white-50 small">Manage high-converting promotional pages & tracking stats</p>
+                </div>
+            </div>
+            
+            <div class="lp-meta-grid">
+                <span class="lp-chip">
+                    <span class="dot" style="background: #38bdf8;"></span>
+                    Total: {{ $totalLandingPages }}
+                </span>
+                <span class="lp-chip">
+                    <span class="dot" style="background: #34d399;"></span>
+                    Active: {{ $activeCount }}
+                </span>
+                <span class="lp-chip">
+                    <span class="dot" style="background: #f87171;"></span>
+                    Inactive: {{ $inactiveCount }}
+                </span>
+                <span class="lp-chip">
+                    <span class="dot" style="background: #a78bfa;"></span>
+                    Orders: {{ number_format($landingOrdersCount ?? 0) }}
+                </span>
+                <span class="lp-chip">
+                    <span class="dot" style="background: #34d399;"></span>
+                    Sales: ৳{{ number_format($landingOrdersTotal ?? 0, 2) }}
+                </span>
+                <span class="lp-chip">
+                    <span class="dot" style="background: #38bdf8;"></span>
+                    Views: {{ number_format($landingViewsTotal ?? 0) }}
+                </span>
+            </div>
+        </div>
 
-                    <div class="lp-toolbar">
-                        <div class="lp-filter-group">
-                            <button type="button" class="lp-filter-btn active" data-status="all">All</button>
-                            <button type="button" class="lp-filter-btn" data-status="active">Active ({{ $activeCount }})</button>
-                            <button type="button" class="lp-filter-btn" data-status="inactive">Inactive ({{ $inactiveCount }})</button>
-                        </div>
-                        <div class="lp-toolbar-actions">
-                            <div class="lp-search">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="lp-search" placeholder="Search title, slug or product...">
-                                <span class="clear-search" id="lp-clear-search">Clear</span>
-                            </div>
-                        </div>
-                    </div>
+        <div>
+            <a href="{{ route('admin.landing-pages.create') }}" class="btn-create-lp">
+                <i class="fas fa-plus"></i> Create Landing Page
+            </a>
+        </div>
+    </div>
 
-                    <div class="lp-hint">
-                        <span>Showing <strong id="lp-visible-count">{{ $pagesCollection->count() }}</strong> of {{ $pagesCollection->count() }} loaded items</span>
-                        <span class="text-muted">Tip: Hover a row for emphasis and use the grip to drag.</span>
-                    </div>
+    @if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
 
-                    <div class="table-responsive">
+    <!-- Toolbar & Search -->
+    <div class="lp-toolbar-card">
+        <div class="lp-filter-group">
+            <button type="button" class="lp-filter-btn active" data-status="all">All ({{ $totalLandingPages }})</button>
+            <button type="button" class="lp-filter-btn" data-status="active">Active ({{ $activeCount }})</button>
+            <button type="button" class="lp-filter-btn" data-status="inactive">Inactive ({{ $inactiveCount }})</button>
+        </div>
+        <div class="lp-search-box">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="text" id="lp-search" class="form-control" placeholder="Search title, slug or product...">
+        </div>
+    </div>
+
+    <!-- Table Container Card -->
+    <div class="lp-table-card">
+        <div class="table-responsive">
                         <table class="table table-bordered table-striped align-middle" id="landing-pages-table">
                             <thead>
                                 <tr>
@@ -633,16 +471,11 @@ $totalLandingPages = method_exists($landingPages, 'total') ? $landingPages->tota
                                 @endif
                             </tbody>
                         </table>
-                    </div>
-
                     @if ($landingPages->hasPages())
-                    <div class="d-flex justify-content-center">
+                    <div class="p-3 border-top d-flex justify-content-center">
                         {{ $landingPages->links() }}
                     </div>
                     @endif
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 @endsection

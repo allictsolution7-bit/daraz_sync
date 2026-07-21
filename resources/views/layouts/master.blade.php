@@ -1156,37 +1156,27 @@
                                         </a>
                                         <nav class="left-menu-dp"
                                             style="{{ request()->is('admin/promo-pages*') ? 'display: block;' : '' }}">
-                                            @can('landing_pages.view')
-                                            <li class="{{ request()->routeIs('admin.promo-pages.index') ? 'active' : '' }}">
-                                                <a href="{{ route('admin.promo-pages.index') }}">
+                                            @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('landing_pages.view'))
+                                            <li class="{{ request()->routeIs('admin.landing-pages.index') ? 'active' : '' }}">
+                                                <a href="{{ route('admin.landing-pages.index') }}">
                                                     <span class="menu-content">
                                                         <i class="fas fa-list-check nav-icon"></i>
                                                         All Landing Pages
                                                     </span>
                                                 </a>
                                             </li>
-                                            @endcan
-                                            @can('landing_pages.create')
+                                            @endif
+                                            @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('landing_pages.create'))
                                             <li
-                                                class="{{ request()->routeIs('admin.promo-pages.create') ? 'active' : '' }}">
-                                                @if ($licenseService->canCreateLandingPage())
-                                                <a href="{{ route('admin.promo-pages.create') }}">
+                                                class="{{ request()->routeIs('admin.landing-pages.create') ? 'active' : '' }}">
+                                                <a href="{{ route('admin.landing-pages.create') }}">
                                                     <span class="menu-content">
                                                         <i class="fas fa-file-circle-plus nav-icon"></i>
                                                         Create Landing Page
                                                     </span>
                                                 </a>
-                                                @else
-                                                <a href="#" class="text-muted" title="Landing page limit reached">
-                                                    <span class="menu-content">
-                                                        <i class="fas fa-file-circle-plus nav-icon"></i>
-                                                        Create Landing Page
-                                                        <i class="fas fa-lock ms-1"></i>
-                                                    </span>
-                                                </a>
-                                                @endif
                                             </li>
-                                            @endcan
+                                            @endif
                                         </nav>
                                     </li>
                                 </x-license-feature>

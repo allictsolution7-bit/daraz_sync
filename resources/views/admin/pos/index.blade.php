@@ -6,292 +6,558 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
 <style>
-    .pos-container {
-        min-height: calc(100vh - 120px);
-        height: auto;
-        overflow: visible;
-        margin-top: -7px;
+    /* Premium Modern POS Custom Styles */
+    :root {
+        --pos-primary: #4f46e5;
+        --pos-primary-hover: #4338ca;
+        --pos-secondary: #06b6d4;
+        --pos-accent: #10b981;
+        --pos-dark: #0f172a;
+        --pos-light-bg: #f8fafc;
+        --pos-card-bg: #ffffff;
+        --pos-border: #e2e8f0;
+        --pos-shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+        --pos-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        --pos-shadow-lg: 0 10px 25px -5px rgba(79,70,229,0.15);
+        --pos-radius: 14px;
     }
-    
-    .pos-left-panel {
-        height: auto;
-        overflow: visible;
-        padding: 10px;
+
+    .pos-page-wrapper {
+        background: #f1f5f9;
+        margin: -15px -15px 0 -15px;
+        padding: 20px;
+        min-height: calc(100vh - 60px);
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
-    
-    .pos-right-panel {
-        height: auto;
-        overflow: visible;
-        padding: 6px;
-        background: #f8f9fa;
+
+    /* Header Styling */
+    .pos-header-card {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+        color: white;
+        border-radius: var(--pos-radius);
+        padding: 20px 24px;
+        margin-bottom: 20px;
+        box-shadow: var(--pos-shadow-lg);
+        position: relative;
+        overflow: hidden;
     }
-    
-    .product-search {
-        position: sticky;
-        top: 0;
-        background: white;
-        z-index: 10;
-        padding-bottom: 4px;
-        margin-bottom: 4px;
-        border-bottom: 1px solid #eee;
+
+    .pos-header-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(6,182,212,0.25) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
     }
-    
-    .product-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px !important;
-        padding: 0px !important;
-        max-height: 476px;
+
+    .pos-title-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: #ffffff;
     }
-    
-    .product-card {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 7px;
+
+    .pos-title-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #38bdf8;
+    }
+
+    /* Stats Section */
+    .pos-stats-grid {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .pos-stat-pill {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        padding: 8px 14px;
+        flex: 1 1 auto;
+        min-width: 110px;
         text-align: center;
-        cursor: pointer;
-        transition: all 0.3s;
-        background: white;
+        transition: all 0.2s ease;
     }
-    
-    .product-card:hover {
-        border-color: #197A94;
-        box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+
+    .pos-stat-pill:hover {
+        background: rgba(255, 255, 255, 0.25);
         transform: translateY(-2px);
     }
-    
-    .product-card.out-of-stock {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    
-    .product-image {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 4px;
-        margin-bottom: 10px;
-    }
-    
-    .product-title {
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 0px;
-        color: #333;
+
+    .pos-stat-val {
+        font-size: 17px;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         line-height: 1.2;
     }
-    
-    .product-price {
-        font-size: 16px;
-        font-weight: bold;
-        color: #28a745;
+
+    .pos-stat-lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 700;
+        margin-top: 2px;
     }
-    
-    .product-stock {
-        font-size: 12px;
-        line-height: 1.2;
-        color: #666;
-    }
-    
-    .cart-section {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        background: white;
-        margin-bottom: 20px;
-    }
-    
-    .cart-header {
-        background: #197A94;
+
+    /* Buttons & Actions */
+    .btn-pos-primary {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
-        padding: 15px;
-        border-radius: 8px 8px 0 0;
-        font-weight: 600;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+        transition: all 0.25s ease;
     }
-    
-    .cart-items {
-        max-height: 300px;
+
+    .btn-pos-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(16,185,129,0.4);
+        color: white;
+    }
+
+    .btn-pos-header {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(8px);
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 12px;
+        white-space: nowrap;
+        transition: all 0.2s;
+    }
+
+    .btn-pos-header:hover {
+        background: rgba(255, 255, 255, 0.28);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    /* Left Product Panel */
+    .product-search-box {
+        background: white;
+        border-radius: var(--pos-radius);
+        padding: 18px;
+        margin-bottom: 16px;
+        box-shadow: var(--pos-shadow-sm);
+        border: 1px solid var(--pos-border);
+    }
+
+    .pos-search-input-group {
+        position: relative;
+    }
+
+    .pos-search-input-group .input-group-text {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+        color: #64748b;
+    }
+
+    .pos-search-input-group input {
+        border-color: #cbd5e1;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        font-size: 14px;
+        padding: 11px 14px;
+        font-weight: 500;
+    }
+
+    .pos-search-input-group input:focus {
+        border-color: var(--pos-primary);
+        box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
+    }
+
+    /* Filter Panel Styling */
+    .filters-panel {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 14px;
+        margin-top: 14px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .filters-panel select, .filters-panel input {
+        font-size: 12px;
+        border-radius: 8px;
+        border-color: #cbd5e1;
+        padding: 8px 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    /* Product Grid & Skeleton Loading */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 14px !important;
+        padding: 2px !important;
+        max-height: 540px;
         overflow-y: auto;
     }
-    
-    .cart-item {
-        padding: 15px;
-        border-bottom: 1px solid #eee;
+
+    @keyframes posPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+
+    .pos-skeleton-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--pos-radius);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        animation: posPulse 1.5s infinite ease-in-out;
+    }
+
+    .pos-skeleton-img {
+        width: 100%;
+        height: 105px;
+        background: #e2e8f0;
+        border-radius: 10px;
+    }
+
+    .pos-skeleton-line {
+        height: 14px;
+        background: #e2e8f0;
+        border-radius: 4px;
+    }
+
+    .pos-skeleton-line.short {
+        width: 60%;
+    }
+
+    .product-card {
+        border: 1px solid #e2e8f0;
+        border-radius: var(--pos-radius);
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        background: white;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: var(--pos-shadow-sm);
+    }
+
+    .product-card:hover {
+        border-color: var(--pos-primary);
+        box-shadow: var(--pos-shadow-lg);
+        transform: translateY(-4px);
+    }
+
+    .product-card.out-of-stock {
+        opacity: 0.55;
+        filter: grayscale(80%);
+        cursor: not-allowed;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 105px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        background: #f1f5f9;
+    }
+
+    .product-title {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: #1e293b;
+        line-height: 1.35;
+        height: 35px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .product-price {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--pos-primary);
+        margin-bottom: 4px;
+    }
+
+    .product-stock {
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 3px 8px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    /* Right Checkout Panel */
+    .pos-right-card {
+        background: white;
+        border-radius: var(--pos-radius);
+        border: 1px solid var(--pos-border);
+        box-shadow: var(--pos-shadow-md);
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+
+    .pos-section-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: white;
+        padding: 14px 18px;
+        font-weight: 700;
+        font-size: 14px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        justify-content: space-between;
     }
-    
-    .cart-item:last-child {
-        border-bottom: none;
+
+    .pos-section-header i {
+        color: #38bdf8;
     }
-    
+
+    /* Cart Items & Empty State */
+    .cart-items {
+        min-height: 200px;
+        max-height: 320px;
+        overflow-y: auto;
+        padding: 8px;
+    }
+
+    .empty-cart-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+        background: #f8fafc;
+        border-radius: 12px;
+        margin: 12px;
+        border: 2px dashed #cbd5e1;
+    }
+
+    .empty-cart-icon {
+        width: 60px;
+        height: 60px;
+        background: #e0e7ff;
+        color: #4f46e5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .cart-item {
+        padding: 12px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #ffffff;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+
+    .cart-item:hover {
+        border-color: #cbd5e1;
+        box-shadow: var(--pos-shadow-sm);
+    }
+
     .cart-item-image {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         object-fit: cover;
-        border-radius: 4px;
-        flex-shrink: 0;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
     }
-    
-    .cart-item-details {
-        flex: 1;
-    }
-    
+
     .cart-item-name {
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 13px;
+        font-weight: 700;
+        color: #0f172a;
         margin-bottom: 2px;
     }
-    
+
     .cart-item-variation {
-        font-size: 12px;
-        color: #666;
-        margin-bottom: 5px;
+        font-size: 11px;
+        color: #64748b;
     }
-    
-    .cart-item-controls {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
+
     .quantity-control {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
     }
-    
+
     .quantity-btn {
-        background: #f8f9fa;
+        background: #f1f5f9;
         border: none;
-        padding: 5px 10px;
+        padding: 4px 10px;
         cursor: pointer;
-        font-size: 16px;
+        font-weight: 800;
+        color: #334155;
+        transition: background 0.15s;
     }
-    
+
     .quantity-btn:hover {
-        background: #e9ecef;
+        background: #e2e8f0;
+        color: var(--pos-primary);
     }
-    
+
     .quantity-input {
         border: none;
-        width: 50px;
+        width: 40px;
         text-align: center;
-        padding: 5px;
+        font-weight: 700;
+        font-size: 13px;
     }
-    
+
+    /* Cart Summary */
     .cart-summary {
-        padding: 20px;
-        border-top: 2px solid #197A94;
+        padding: 16px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
     }
-    
+
     .summary-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 10px;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: #475569;
+        font-weight: 600;
     }
-    
+
     .summary-total {
-        font-size: 18px;
-        font-weight: bold;
-        color: #197A94;
-        border-top: 1px solid #ddd;
+        font-size: 19px;
+        font-weight: 800;
+        color: var(--pos-primary);
+        border-top: 2px dashed #cbd5e1;
         padding-top: 10px;
+        margin-top: 8px;
     }
-    
-    .customer-section {
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        margin-bottom: 20px;
+
+    .customer-form, .payment-form {
+        padding: 18px;
+        background: #ffffff;
     }
-    
-    .customer-header {
-        background: #28a745;
+
+    .customer-form label, .payment-form label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .customer-form input, .payment-form input, .payment-form select, .payment-form textarea {
+        border-radius: 10px;
+        font-size: 13px;
+        border: 1.5px solid #cbd5e1;
+        padding: 10px 14px;
+        font-weight: 500;
+        background-color: #f8fafc;
+        transition: all 0.2s ease;
+    }
+
+    .customer-form input:focus, .payment-form input:focus, .payment-form select:focus, .payment-form textarea:focus {
+        background-color: #ffffff;
+        border-color: var(--pos-primary);
+        box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
+    }
+
+    .pos-section-header {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
         color: white;
-        padding: 15px;
-        border-radius: 8px 8px 0 0;
-        font-weight: 600;
+        padding: 14px 20px;
+        font-weight: 700;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
     }
-    
-    .customer-form {
-        padding: 20px;
-    }
-    
-    .payment-section {
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-    
-    .payment-header {
-        background: #ffc107;
-        color: #212529;
-        padding: 15px;
-        border-radius: 8px 8px 0 0;
-        font-weight: 600;
-    }
-    
-    .payment-form {
-        padding: 20px;
-    }
-    
+
+    /* Checkout Button */
     .btn-checkout {
-        background: #28a745;
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
         color: white;
         border: none;
-        padding: 15px 30px;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 8px;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 800;
+        border-radius: var(--pos-radius);
         width: 100%;
         cursor: pointer;
-        transition: all 0.3s;
+        box-shadow: var(--pos-shadow-lg);
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
-    
+
     .btn-checkout:hover {
-        background: #218838;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px -5px rgba(79,70,229,0.4);
     }
-    
+
     .btn-checkout:disabled {
-        background: #6c757d;
+        background: #94a3b8;
+        box-shadow: none;
         cursor: not-allowed;
         transform: none;
     }
-    
-    .variation-modal .modal-body {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    
-    .variation-option {
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 10px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    
-    .variation-option:hover {
-        border-color: #197A94;
-        background: #f8f9fa;
-    }
-    
-    .variation-option.selected {
-        border-color: #197A94;
-        background: #e3f2fd;
-    }
-    
+
     .scanner-section {
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 10px;
-        margin-top: 5px;
+        background: #f8fafc;
+        border: 1px dashed var(--pos-primary);
+        border-radius: 12px;
+        padding: 14px;
+        margin-top: 12px;
         text-align: center;
         display: none;
     }
@@ -299,128 +565,7 @@
     .scanner-section.active {
         display: block;
     }
-    
-    .scanner-btn {
-        background: #6f42c1;
-        color: white;
-        border: none;
-        padding: 7px 10px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-    }
 
-    .filters-panel.collapsed {
-        display: none;
-    }
-
-    .scanner-btn-inline {
-        display: none;
-    }
-    
-    .scanner-btn:hover {
-        background: #5a2d91;
-    }
-    
-    .stats-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 5px;
-    }
-    
-    .stat-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 3px 6px;
-    text-align: center;
-}
-    
-    .stat-value {
-        font-size: 20px;
-        font-weight: bold;
-        color: #197A94;
-    }
-    
-    .stat-label {
-    font-size: 12px;
-    color: #666;
-    margin-top: -6px;
-}
-    
-    .recent-orders {
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        max-height: 300px;
-        overflow-y: auto;
-    }
-    
-    .recent-order-item {
-        padding: 10px 15px;
-        border-bottom: 1px solid #eee;
-        font-size: 14px;
-    }
-    
-    .recent-order-item:last-child {
-        border-bottom: none;
-    }
-    
-    /* QR Scanner Styles */
-    #qr-reader {
-        width: 100%;
-        max-width: 300px;
-        margin: 0 auto;
-    }
-    
-    .empty-cart {
-        text-align: center;
-        padding: 40px 20px;
-        color: #666;
-    }
-    
-    .empty-cart i {
-        font-size: 48px;
-        margin-bottom: 15px;
-        opacity: 0.5;
-    }
-    
-    @media (max-width: 768px) {
-        .pos-container {
-            height: auto;
-        }
-        .pos-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-        }
-        .pos-header > .d-flex {
-            width: 100%;
-            justify-content: space-between;
-        }
-        .stats-cards {
-            width: 100%;
-            margin-top: 4px;
-        }
-        .scanner-section {
-            display: block;
-        }
-        .scanner-btn-header {
-            display: none;
-        }
-        .scanner-btn-inline {
-            display: inline-block;
-        }
-        
-        .product-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-        }
-        
-        .stats-cards {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
     a.pos-menu-item {
         display: none !important;
     }
@@ -428,46 +573,49 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center py-2 pos-header">
-        <div>
-            <div class="d-flex align-items-center gap-2">
-                <h4 class="mb-0 posmainheader">
-                    <i class="fas fa-cash-register text-primary"></i>
-                    Point of Sale
-                </h4>
-                <button class="scanner-btn scanner-toggle-btn scanner-btn-header" type="button" onclick="startScanner()">
-                    <i class="fas fa-qrcode"></i> Start QR/Barcode Scanner
-                </button>
+<div class="pos-page-wrapper">
+    <!-- Premium Header -->
+    <div class="pos-header-card d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="pos-title-icon">
+                <i class="fas fa-cash-register"></i>
             </div>
-            <!-- <small class="text-muted">Manage in-store and phone sales</small> -->
-        </div>
-        <!-- Stats Cards -->
-        <div class="stats-cards d-flex justify-content-between align-items-center" id="statsCards">
-            <div class="stat-card">
-                <div class="stat-value" id="todayOrders">0</div>
-                <div class="stat-label">Today's Orders</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="todayRevenue">৳0</div>
-                <div class="stat-label">Today's Revenue</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="weekOrders">0</div>
-                <div class="stat-label">This Week</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="monthRevenue">৳0</div>
-                <div class="stat-label">Monthly Revenue</div>
+            <div>
+                <h3 class="pos-title-badge mb-0">Smart POS System</h3>
+                <p class="mb-0 text-white-50 small">Fast checkout & inventory management</p>
             </div>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary btn-sm" onclick="loadStats()">
-                <i class="fas fa-sync-alt"></i> Refresh
+
+        <!-- Real-time Stats Cards -->
+        <div class="pos-stats-grid" id="statsCards">
+            <div class="pos-stat-pill">
+                <div class="pos-stat-val" id="todayOrders">0</div>
+                <div class="pos-stat-lbl">Today's Orders</div>
+            </div>
+            <div class="pos-stat-pill">
+                <div class="pos-stat-val" id="todayRevenue">৳0</div>
+                <div class="pos-stat-lbl">Today's Revenue</div>
+            </div>
+            <div class="pos-stat-pill">
+                <div class="pos-stat-val" id="weekOrders">0</div>
+                <div class="pos-stat-lbl">This Week</div>
+            </div>
+            <div class="pos-stat-pill">
+                <div class="pos-stat-val" id="monthRevenue">৳0</div>
+                <div class="pos-stat-lbl">Monthly Sales</div>
+            </div>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-pos-header" onclick="startScanner()">
+                <i class="fas fa-qrcode"></i> Scan Code
             </button>
-            <button class="btn btn-outline-secondary btn-sm" onclick="clearCart()">
-                <i class="fas fa-trash"></i> Clear Cart
+            <button class="btn btn-pos-header" onclick="loadStats()">
+                <i class="fas fa-rotate"></i> Refresh
+            </button>
+            <button class="btn btn-pos-header" style="background: rgba(239,68,68,0.25);" onclick="clearCart()">
+                <i class="fas fa-trash-can"></i> Clear Cart
             </button>
         </div>
     </div>
@@ -476,25 +624,25 @@
 
     <div class="row pos-container">
         <!-- Left Panel - Products -->
-        <div class="col-md-8 pos-left-panel">
-            <!-- Search and Scanner -->
-            <div class="product-search">
+        <div class="col-lg-7 col-md-12 pos-left-panel">
+            <!-- Search and Scanner Box -->
+            <div class="product-search-box">
                 <div class="row g-2 align-items-center mb-2">
                     <div class="col-md-8 col-12">
-                        <div class="input-group">
+                        <div class="input-group pos-search-input-group">
                             <span class="input-group-text">
-                                <i class="fas fa-search"></i>
+                                <i class="fas fa-magnifying-glass"></i>
                             </span>
                             <input type="text" class="form-control" id="productSearch" 
-                                   placeholder="Search products by name, ID, or scan barcode...">
+                                   placeholder="Search products by title, SKU, or scan barcode...">
                         </div>
                     </div>
                     <div class="col-md-4 col-12 text-end">
                         <button class="btn btn-outline-secondary btn-sm d-inline-block d-md-none me-1" id="filtersToggleBtn">
-                            <i class="fas fa-filter"></i> Show Filters
+                            <i class="fas fa-filter"></i> Filters
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary mt-1 mt-md-0" id="clearFiltersBtn">
-                            <i class="fas fa-times"></i> Clear Filters
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="clearFiltersBtn">
+                            <i class="fas fa-xmark"></i> Clear Filters
                         </button>
                     </div>
                 </div>
@@ -510,19 +658,19 @@
                         </div>
                         <div class="col-md-4">
                             <select id="subcategory-filter" class="form-select" disabled>
-                                <option value="">Select a primary category first</option>
+                                <option value="">Select primary category first</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <select id="third-category-filter" class="form-select" disabled>
-                                <option value="">Select a subcategory first</option>
+                                <option value="">Select subcategory first</option>
                             </select>
                         </div>
                     </div>
-                    <div class="row g-2 m-1">
+                    <div class="row g-2 mt-2">
                         <div class="col-md-4">
                             <select id="stock-status-filter" class="form-select">
-                                <option value="">All Status</option>
+                                <option value="">All Stock Status</option>
                                 <option value="in_stock">In Stock</option>
                                 <option value="low_stock">Low Stock</option>
                                 <option value="out_of_stock">Out of Stock</option>
@@ -531,7 +679,7 @@
                         </div>
                         <div class="col-md-4">
                             <select id="product-type-filter" class="form-select">
-                                <option value="">All Types</option>
+                                <option value="">All Product Types</option>
                                 <option value="simple">Simple</option>
                                 <option value="variable">Variable</option>
                                 <option value="digital">Digital</option>
@@ -541,8 +689,8 @@
                         <div class="col-md-4 d-flex align-items-center pt-1">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="low-stock-filter">
-                                <label class="form-check-label" for="low-stock-filter">
-                                    Show Low Stock Only
+                                <label class="form-check-label fw-semibold" for="low-stock-filter">
+                                    Low Stock Only
                                 </label>
                             </div>
                         </div>
@@ -551,42 +699,44 @@
                 
                 <!-- QR/Barcode Scanner -->
                 <div class="scanner-section">
-                    <button class="scanner-btn scanner-toggle-btn scanner-btn-inline" type="button" onclick="startScanner()">
-                        <i class="fas fa-qrcode"></i> Start QR/Barcode Scanner
+                    <button class="btn btn-sm btn-pos-primary" type="button" onclick="startScanner()">
+                        <i class="fas fa-qrcode"></i> Start Scanner
                     </button>
-                    <div id="qr-reader" style="display: none;"></div>
+                    <div id="qr-reader" class="mt-2" style="display: none;"></div>
                 </div>
             </div>
 
             <!-- Products Grid -->
             <div class="product-grid" id="productsGrid">
-                <div class="text-center py-4">
-                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">Search for products to add to cart</p>
+                <div class="text-center py-5 w-100">
+                    <i class="fas fa-box-open fa-3x text-muted opacity-50 mb-3"></i>
+                    <p class="text-muted fw-semibold">Search or select a category to display products</p>
                 </div>
             </div>
-            <div class="d-flex justify-content-between align-items-center mt-3" id="productsPagination" style="display: none;">
-                <div class="text-muted small" id="paginationInfo"></div>
+            <div class="d-flex justify-content-between align-items-center mt-3 bg-white p-3 border rounded-3" id="productsPagination" style="display: none;">
+                <div class="text-muted small fw-semibold" id="paginationInfo"></div>
                 <div class="btn-group">
-                    <button class="btn btn-outline-secondary btn-sm" id="prevPageBtn">Previous</button>
-                    <button class="btn btn-outline-secondary btn-sm" id="nextPageBtn">Next</button>
+                    <button class="btn btn-outline-indigo btn-sm" id="prevPageBtn">Previous</button>
+                    <button class="btn btn-outline-indigo btn-sm" id="nextPageBtn">Next</button>
                 </div>
             </div>
         </div>
 
         <!-- Right Panel - Cart & Checkout -->
-        <div class="col-md-4 pos-right-panel">
+        <div class="col-lg-5 col-md-12 pos-right-panel">
             <!-- Cart Section -->
-            <div class="cart-section">
-                <div class="cart-header">
-                    <i class="fas fa-shopping-cart"></i>
-                    Cart (<span id="cartItemCount">0</span> items)
+            <div class="pos-right-card">
+                <div class="pos-section-header">
+                    <span><i class="fas fa-basket-shopping me-2"></i> Current Cart</span>
+                    <span class="badge bg-indigo text-white px-2 py-1" style="background: var(--pos-primary);"><span id="cartItemCount">0</span> Items</span>
                 </div>
                 <div class="cart-items" id="cartItems">
-                    <div class="empty-cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <p>Your cart is empty</p>
-                        <small>Add products from the left panel</small>
+                    <div class="empty-cart-state">
+                        <div class="empty-cart-icon">
+                            <i class="fas fa-basket-shopping"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1">Your cart is empty</h6>
+                        <p class="text-muted small mb-0">Select products from the catalog to add to cart</p>
                     </div>
                 </div>
                 <div class="cart-summary" id="cartSummary" style="display: none;">
@@ -619,102 +769,100 @@
                 </div>
             </div>
 
-                        <!-- Payment Section -->
-                        <div class="payment-section">
-                            <div class="payment-header">
-                                <i class="fas fa-credit-card"></i>
-                                Payment & Order Details
+            <!-- Payment Section -->
+            <div class="pos-right-card mt-3">
+                <div class="pos-section-header">
+                    <span><i class="fas fa-credit-card me-2"></i> Payment & Order Details</span>
+                </div>
+                <div class="payment-form">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Order Source *</label>
+                            <select class="form-select" id="orderSource" required>
+                                @foreach($orderSources as $value => $label)
+                                    <option value="{{ $value }}" {{ $value === 'Physical Store' ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Method *</label>
+                            <select class="form-select" id="paymentMethod" required onchange="togglePaymentFields()">
+                                <option value="cod">Cash on Delivery (COD)</option>
+                                <option value="cash" selected>Cash</option>
+                                <option value="card">Card</option>
+                                <option value="bkash">bKash</option>
+                                <option value="nagad">Nagad</option>
+                                <option value="rocket">Rocket</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Payment Gateway Fields -->
+                        <!-- bKash Fields -->
+                        <div id="bkashFields" class="payment-gateway-fields" style="display: none;">
+                            <div class="col-12"><hr><h6 class="text-primary fw-bold">bKash Payment Details</h6></div>
+                            <div class="col-md-4">
+                                <label class="form-label">bKash Number *</label>
+                                <input type="tel" class="form-control" id="bkashNumber" placeholder="01XXXXXXXXX">
                             </div>
-                            <div class="payment-form">
-                                                        <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Order Source *</label>
-                                            <select class="form-select" id="orderSource" required>
-                                                @foreach($orderSources as $value => $label)
-                                                    <option value="{{ $value }}" {{ $value === 'Physical Store' ? 'selected' : '' }}>
-                                                        {{ $label }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Payment Method *</label>
-                                            <select class="form-select" id="paymentMethod" required onchange="togglePaymentFields()">
-                                                <option value="cod">Cash on Delivery (COD)</option>
-                                                <option value="cash" selected>Cash</option>
-                                                <option value="card">Card</option>
-                                                <option value="bkash">bKash</option>
-                                                <option value="nagad">Nagad</option>
-                                                <option value="rocket">Rocket</option>
-                                                <option value="bank_transfer">Bank Transfer</option>
-                                            </select>
-                                        </div>
-                                        
-                                        <!-- Payment Gateway Fields -->
-                                        <!-- bKash Fields -->
-                                        <div id="bkashFields" class="payment-gateway-fields" style="display: none;">
-                                            <div class="col-12"><hr><h6 class="text-primary">bKash Payment Details</h6></div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">bKash Number *</label>
-                                                <input type="tel" class="form-control" id="bkashNumber" placeholder="01XXXXXXXXX">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">Transaction ID (TrxID) *</label>
-                                                <input type="text" class="form-control" id="bkashTrxId" placeholder="Enter TrxID">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">bKash Charge</label>
-                                                <input type="number" class="form-control" id="bkashCharge" placeholder="0.00" min="0" step="0.01" value="0" onchange="updateTotals()">
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Nagad Fields -->
-                                        <div id="nagadFields" class="payment-gateway-fields" style="display: none;">
-                                            <div class="col-12"><hr><h6 class="text-success">Nagad Payment Details</h6></div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">Nagad Number *</label>
-                                                <input type="tel" class="form-control" id="nagadNumber" placeholder="01XXXXXXXXX">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">Transaction ID (TrxID) *</label>
-                                                <input type="text" class="form-control" id="nagadTrxId" placeholder="Enter TrxID">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">Nagad Charge</label>
-                                                <input type="number" class="form-control" id="nagadCharge" placeholder="0.00" min="0" step="0.01" value="0" onchange="updateTotals()">
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Rocket Fields -->
-                                        <div id="rocketFields" class="payment-gateway-fields" style="display: none;">
-                                            <div class="col-12"><hr><h6 class="text-warning">Rocket Payment Details</h6></div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">Rocket Number *</label>
-                                                <input type="tel" class="form-control" id="rocketNumber" placeholder="01XXXXXXXXX">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">Transaction ID (TrxID) *</label>
-                                                <input type="text" class="form-control" id="rocketTrxId" placeholder="Enter TrxID">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">Rocket Charge</label>
-                                                <input type="number" class="form-control" id="rocketCharge" placeholder="0.00" min="0" step="0.01" value="0" onchange="updateTotals()">
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-12">
-                                            <textarea class="form-control" id="orderNotes" rows="2" 
-                                                      placeholder="Order notes (optional)"></textarea>
-                                        </div>
-                                    </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Transaction ID (TrxID) *</label>
+                                <input type="text" class="form-control" id="bkashTrxId" placeholder="Enter TrxID">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">bKash Charge</label>
+                                <input type="number" class="form-control" id="bkashCharge" placeholder="0.00" min="0" step="0.01" value="0" onchange="updateTotals()">
                             </div>
                         </div>
+                        
+                        <!-- Nagad Fields -->
+                        <div id="nagadFields" class="payment-gateway-fields" style="display: none;">
+                            <div class="col-12"><hr><h6 class="text-success fw-bold">Nagad Payment Details</h6></div>
+                            <div class="col-md-4">
+                                <label class="form-label">Nagad Number *</label>
+                                <input type="tel" class="form-control" id="nagadNumber" placeholder="01XXXXXXXXX">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Transaction ID (TrxID) *</label>
+                                <input type="text" class="form-control" id="nagadTrxId" placeholder="Enter TrxID">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Nagad Charge</label>
+                                <input type="number" class="form-control" id="nagadCharge" placeholder="0.00" min="0" step="0.01" value="0" onchange="updateTotals()">
+                            </div>
+                        </div>
+                        
+                        <!-- Rocket Fields -->
+                        <div id="rocketFields" class="payment-gateway-fields" style="display: none;">
+                            <div class="col-12"><hr><h6 class="text-warning fw-bold">Rocket Payment Details</h6></div>
+                            <div class="col-md-4">
+                                <label class="form-label">Rocket Number *</label>
+                                <input type="tel" class="form-control" id="rocketNumber" placeholder="01XXXXXXXXX">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Transaction ID (TrxID) *</label>
+                                <input type="text" class="form-control" id="rocketTrxId" placeholder="Enter TrxID">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Rocket Charge</label>
+                                <input type="number" class="form-control" id="rocketCharge" placeholder="0.00" min="0" step="0.01" value="0" onchange="updateTotals()">
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <textarea class="form-control" id="orderNotes" rows="2" 
+                                      placeholder="Order notes (optional)"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Customer Section -->
-            <div class="customer-section">
-                <div class="customer-header">
-                    <i class="fas fa-user"></i>
-                    Customer Information
+            <div class="pos-right-card mt-3">
+                <div class="pos-section-header">
+                    <span><i class="fas fa-user me-2"></i> Customer Information</span>
                 </div>
                 <div class="customer-form">
                     <div class="mb-3">
@@ -837,10 +985,8 @@ $(document).ready(function() {
     loadStats();
     setupEventListeners();
     
-    // Load initial products with a small delay
-    setTimeout(function() {
-        searchProducts();
-    }, 100);
+    // Load initial products instantly
+    searchProducts();
     
     // Handle modal cancellation
     $('#orderSuccessModal').on('hidden.bs.modal', function() {
@@ -1057,6 +1203,20 @@ function searchProducts(page = 1) {
     const productType = productTypeFilter.val();
     const lowStockOnly = lowStockFilter.is(':checked') ? '1' : '';
     
+    // Render animated skeleton cards during data fetching
+    const grid = $('#productsGrid');
+    let skeletonHtml = '';
+    for (let i = 0; i < 8; i++) {
+        skeletonHtml += `
+            <div class="pos-skeleton-card">
+                <div class="pos-skeleton-img"></div>
+                <div class="pos-skeleton-line"></div>
+                <div class="pos-skeleton-line short"></div>
+            </div>
+        `;
+    }
+    grid.html(skeletonHtml);
+    
     $.get('{{ route("admin.pos.search-products") }}', {
         search: search,
         primary_category_id: primaryCategoryId,
@@ -1269,10 +1429,12 @@ function updateCartDisplay() {
     
     if (cart.length === 0) {
         cartItems.html(`
-            <div class="empty-cart">
-                <i class="fas fa-shopping-cart"></i>
-                <p>Your cart is empty</p>
-                <small>Add products from the left panel</small>
+            <div class="empty-cart-state">
+                <div class="empty-cart-icon">
+                    <i class="fas fa-basket-shopping"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-1">Your cart is empty</h6>
+                <p class="text-muted small mb-0">Select products from the catalog to add to cart</p>
             </div>
         `);
         cartSummary.hide();

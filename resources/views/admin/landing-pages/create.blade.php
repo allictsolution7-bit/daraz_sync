@@ -3,382 +3,369 @@
 @section('title', 'Create Landing Page')
 
 @section('content')
-    <div class="container-fluid landing-builder">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Create New Landing Page</h3>
-                        <div class="card-tools">
-                            <a href="{{ route('admin.landing-pages.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to List
-                            </a>
-                        </div>
+<div class="landing-builder">
+    <!-- Header Banner -->
+    <div class="lp-hero-card d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="lp-title-icon">
+                <i class="fas fa-magic"></i>
+            </div>
+            <div>
+                <h3 class="mb-0 text-white font-weight-bold">Create Landing Page</h3>
+                <p class="mb-0 text-white-50 small">Design high-converting promotional pages with custom content sections</p>
+            </div>
+        </div>
+        <div>
+            <a href="{{ route('admin.landing-pages.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Error Display Section -->
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <h6 class="alert-heading font-weight-bold mb-1">
+                <i class="fas fa-exclamation-triangle me-2"></i> 
+                Please correct the following errors:
+            </h6>
+            <ul class="mb-0 small ps-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    <form action="{{ route('admin.landing-pages.store') }}" method="POST" enctype="multipart/form-data" id="landingPageForm">
+        @csrf
+
+        <div class="row g-4">
+            <!-- Left Column: Core Setup & Style Settings -->
+            <div class="col-lg-5 col-xl-4">
+                <!-- Card 1: Page Configuration -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom d-flex align-items-center gap-2">
+                        <i class="fas fa-sliders text-primary"></i>
+                        <h5 class="mb-0 font-weight-bold text-dark">General Settings</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Error Display Section -->
-                        @if ($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <h5 class="alert-heading">
-                                    <i class="fas fa-exclamation-triangle"></i> 
-                                    Please fix the following errors:
-                                </h5>
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <div class="form-group mb-3">
+                            <label for="title">Page Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('title') is-invalid @enderror"
+                                id="title" name="title" value="{{ old('title') }}" placeholder="e.g. 5 Premium Item Combo" required>
+                            @error('title')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="slug">Page Slug <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('slug') is-invalid @enderror"
+                                id="slug" name="slug" value="{{ old('slug') }}" placeholder="e.g. premium-combo-pack" required>
+                            <small class="form-text text-muted">Unique URL path for this promo page.</small>
+                            @error('slug')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="product_id">Associated Product <span class="text-danger">*</span></label>
+                            <select class="form-control @error('product_id') is-invalid @enderror"
+                                id="product_id" name="product_id" required>
+                                <option value="">-- Choose Product --</option>
+                                @foreach ($products as $product)
+                                    <option value="{{ $product->id }}"
+                                        {{ old('product_id') == $product->id ? 'selected' : '' }}>
+                                        {{ $product->title }}
+                                        (৳{{ number_format($product->offer ?: $product->old_price, 2) }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('product_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group mb-3">
+                                    <label for="position">Display Order</label>
+                                    <input type="number" class="form-control @error('position') is-invalid @enderror"
+                                        id="position" name="position" value="{{ old('position', 0) }}" min="0">
+                                </div>
                             </div>
-                        @endif
-
-                        @if (session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-triangle"></i> 
-                                {{ session('error') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        @if (session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="fas fa-check-circle"></i> 
-                                {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        <form action="{{ route('admin.landing-pages.store') }}" method="POST"
-                            enctype="multipart/form-data" id="landingPageForm">
-                            @csrf
-
-                            <!-- Basic Information -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h4 class="mb-0">Basic Information</h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="title">Page Title *</label>
-                                                        <input type="text" class="form-control @error('title') is-invalid @enderror"
-                                                            id="title" name="title" value="{{ old('title') }}" required>
-                                                        @error('title')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="slug">Page Slug *</label>
-                                                        <input type="text" class="form-control @error('slug') is-invalid @enderror"
-                                                            id="slug" name="slug" value="{{ old('slug') }}" required>
-                                                        <small class="form-text text-muted">URL-friendly version of the title (e.g., "my-landing-page")</small>
-                                                        @error('slug')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="product_id">Associated Product *</label>
-                                                        <select class="form-control @error('product_id') is-invalid @enderror"
-                                                            id="product_id" name="product_id" required>
-                                                            <option value="">Select a product</option>
-                                                            @foreach ($products as $product)
-                                                                <option value="{{ $product->id }}"
-                                                                    {{ old('product_id') == $product->id ? 'selected' : '' }}>
-                                                                    {{ $product->title }}
-                                                                    (৳{{ number_format($product->offer ?: $product->old_price, 2) }})
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                        @error('product_id')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="position">Display Position</label>
-                                                        <input type="number"
-                                                            class="form-control @error('position') is-invalid @enderror" id="position"
-                                                            name="position" value="{{ old('position', 0) }}" min="0">
-                                                        <small class="form-text text-muted">Lower numbers appear first</small>
-                                                        @error('position')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <div class="custom-control custom-switch">
-                                                            <input type="checkbox" class="custom-control-input" id="status"
-                                                                name="status" value="1" {{ old('status', true) ? 'checked' : '' }}>
-                                                            <label class="custom-control-label" for="status">Active</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    @php
-                                                        $globalPrimaryColor = setting('general', 'primary_color', '#F02627');
-                                                        $globalSecondaryColor = setting('general', 'secondary_color', '#113056');
-                                                        $globalAccentColor = setting('general', 'accent_color', '#F02627');
-                                                    @endphp
-                                                    <h5 class="mb-3">Color Settings</h5>
-                                                    <div class="form-group">
-                                                        <label for="primary_color">Primary Color</label>
-                                                        <div class="input-group color-picker-group">
-                                                            <span class="input-group-text p-0">
-                                                                <input type="color" class="form-control color-chip @error('primary_color') is-invalid @enderror"
-                                                                    id="primary_color" name="primary_color" value="{{ old('primary_color', $globalPrimaryColor) }}">
-                                                            </span>
-                                                            <input type="text" class="form-control color-text @error('primary_color') is-invalid @enderror"
-                                                                id="primary_color_text" value="{{ old('primary_color', $globalPrimaryColor) }}" placeholder="#007bff">
-                                                        </div>
-                                                        <small class="form-text text-muted">Main brand color for headings and primary elements</small>
-                                                        @error('primary_color')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="secondary_color">Secondary Color</label>
-                                                        <div class="input-group color-picker-group">
-                                                            <span class="input-group-text p-0">
-                                                                <input type="color" class="form-control color-chip @error('secondary_color') is-invalid @enderror"
-                                                                    id="secondary_color" name="secondary_color" value="{{ old('secondary_color', $globalSecondaryColor) }}">
-                                                            </span>
-                                                            <input type="text" class="form-control color-text @error('secondary_color') is-invalid @enderror"
-                                                                id="secondary_color_text" value="{{ old('secondary_color', $globalSecondaryColor) }}" placeholder="#6c757d">
-                                                        </div>
-                                                        <small class="form-text text-muted">Secondary color for sub-headings and supporting elements</small>
-                                                        @error('secondary_color')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="accent_color">Accent Color</label>
-                                                        <div class="input-group color-picker-group">
-                                                            <span class="input-group-text p-0">
-                                                                <input type="color" class="form-control color-chip @error('accent_color') is-invalid @enderror"
-                                                                    id="accent_color" name="accent_color" value="{{ old('accent_color', $globalAccentColor) }}">
-                                                            </span>
-                                                            <input type="text" class="form-control color-text @error('accent_color') is-invalid @enderror"
-                                                                id="accent_color_text" value="{{ old('accent_color', $globalAccentColor) }}" placeholder="#28a745">
-                                                        </div>
-                                                        <small class="form-text text-muted">Highlight color for special elements and call-to-actions</small>
-                                                        @error('accent_color')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="order_button_color">Order Now Button Color</label>
-                                                        <div class="input-group color-picker-group">
-                                                            <span class="input-group-text p-0">
-                                                                <input type="color" class="form-control color-chip @error('order_button_color') is-invalid @enderror"
-                                                                    id="order_button_color" name="order_button_color" value="{{ old('order_button_color', '#dc3545') }}">
-                                                            </span>
-                                                            <input type="text" class="form-control color-text @error('order_button_color') is-invalid @enderror"
-                                                                id="order_button_color_text" value="{{ old('order_button_color', '#dc3545') }}" placeholder="#dc3545">
-                                                        </div>
-                                                        <small class="form-text text-muted">Color for the main order/CTA buttons</small>
-                                                        @error('order_button_color')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <div class="d-flex align-items-center flex-wrap gap-2">
-                                                            <span class="text-muted me-2">Global palette:</span>
-                                                            <button type="button" class="btn btn-sm global-color-swatch" data-target="primary_color" data-value="{{ $globalPrimaryColor }}" style="background: {{ $globalPrimaryColor }};"></button>
-                                                            <button type="button" class="btn btn-sm global-color-swatch" data-target="secondary_color" data-value="{{ $globalSecondaryColor }}" style="background: {{ $globalSecondaryColor }};"></button>
-                                                            <button type="button" class="btn btn-sm global-color-swatch" data-target="accent_color" data-value="{{ $globalAccentColor }}" style="background: {{ $globalAccentColor }};"></button>
-                                                        </div>
-                                                        <small class="form-text text-muted">Click to apply saved brand colors or enter any hex value.</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="col-6">
+                                <div class="form-group mb-3">
+                                    <label>Status</label>
+                                    <div class="form-check form-switch pt-2">
+                                        <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ old('status', true) ? 'checked' : '' }}>
+                                        <label class="form-check-label font-weight-bold" for="status">Active</label>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <hr>
-
-
-
-                            <!-- Button & Form Settings -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h4 class="mb-0">Button & Form Settings</h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="order_button_text">Order Button Text</label>
-                                                        <input type="text"
-                                                            class="form-control @error('order_button_text') is-invalid @enderror"
-                                                            id="order_button_text" name="order_button_text"
-                                                            value="{{ old('order_button_text', 'এখনই কিনুন') }}">
-                                                        @error('order_button_text')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="order_button_url">Order Button URL</label>
-                                                        <input type="text"
-                                                            class="form-control @error('order_button_url') is-invalid @enderror"
-                                                            id="order_button_url" name="order_button_url"
-                                                            value="{{ old('order_button_url', '#order-section') }}">
-                                                        <small class="form-text text-muted">Use #order-section to scroll to order
-                                                            form</small>
-                                                        @error('order_button_url')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="order_form_title">Order Form Title</label>
-                                                        <input type="text"
-                                                            class="form-control @error('order_form_title') is-invalid @enderror"
-                                                            id="order_form_title" name="order_form_title"
-                                                            value="{{ old('order_form_title', 'অর্ডার করুন') }}">
-                                                        @error('order_form_title')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="order_place_button_text">Order Place Button Text</label>
-                                                        <input type="text"
-                                                            class="form-control @error('order_place_button_text') is-invalid @enderror"
-                                                            id="order_place_button_text" name="order_place_button_text"
-                                                            value="{{ old('order_place_button_text', 'অর্ডার Confirm করুন') }}">
-                                                        @error('order_place_button_text')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                <!-- Card 2: Brand Styling -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom d-flex align-items-center gap-2">
+                        <i class="fas fa-palette text-primary"></i>
+                        <h5 class="mb-0 font-weight-bold text-dark">Theme & Colors</h5>
+                    </div>
+                    <div class="card-body">
+                        @php
+                            $globalPrimaryColor = setting('general', 'primary_color', '#F02627');
+                            $globalSecondaryColor = setting('general', 'secondary_color', '#113056');
+                            $globalAccentColor = setting('general', 'accent_color', '#F02627');
+                        @endphp
+                        
+                        <div class="form-group mb-3">
+                            <label for="primary_color">Primary Color</label>
+                            <div class="input-group color-picker-group">
+                                <span class="input-group-text p-0">
+                                    <input type="color" class="form-control color-chip"
+                                        id="primary_color" name="primary_color" value="{{ old('primary_color', $globalPrimaryColor) }}">
+                                </span>
+                                <input type="text" class="form-control color-text"
+                                    id="primary_color_text" value="{{ old('primary_color', $globalPrimaryColor) }}">
                             </div>
+                        </div>
 
-                            <hr>
-
-                            <!-- Sections -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <h4>Content Sections</h4>
-                                    <p class="text-muted">Add features, reviews, and other content sections to your landing
-                                        page.</p>
-
-                                    <div id="sections-container">
-                                        <!-- Sections will be added here dynamically -->
-                                    </div>
-
-                                    <button type="button" class="btn btn-outline-primary" onclick="addSection()">
-                                        <i class="fas fa-plus"></i> Add Section
-                                    </button>
-                                </div>
+                        <div class="form-group mb-3">
+                            <label for="secondary_color">Secondary Color</label>
+                            <div class="input-group color-picker-group">
+                                <span class="input-group-text p-0">
+                                    <input type="color" class="form-control color-chip"
+                                        id="secondary_color" name="secondary_color" value="{{ old('secondary_color', $globalSecondaryColor) }}">
+                                </span>
+                                <input type="text" class="form-control color-text"
+                                    id="secondary_color_text" value="{{ old('secondary_color', $globalSecondaryColor) }}">
                             </div>
+                        </div>
 
-                            <hr>
-
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Create Landing Page
-                                </button>
-                                <a href="{{ route('admin.landing-pages.index') }}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Cancel
-                                </a>
+                        <div class="form-group mb-3">
+                            <label for="accent_color">Accent Color</label>
+                            <div class="input-group color-picker-group">
+                                <span class="input-group-text p-0">
+                                    <input type="color" class="form-control color-chip"
+                                        id="accent_color" name="accent_color" value="{{ old('accent_color', $globalAccentColor) }}">
+                                </span>
+                                <input type="text" class="form-control color-text"
+                                    id="accent_color_text" value="{{ old('accent_color', $globalAccentColor) }}">
                             </div>
-                        </form>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="order_button_color">CTA Button Color</label>
+                            <div class="input-group color-picker-group">
+                                <span class="input-group-text p-0">
+                                    <input type="color" class="form-control color-chip"
+                                        id="order_button_color" name="order_button_color" value="{{ old('order_button_color', '#dc3545') }}">
+                                </span>
+                                <input type="text" class="form-control color-text"
+                                    id="order_button_color_text" value="{{ old('order_button_color', '#dc3545') }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Button & Form Text -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom d-flex align-items-center gap-2">
+                        <i class="fas fa-font text-primary"></i>
+                        <h5 class="mb-0 font-weight-bold text-dark">Call to Action Labels</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label for="order_button_text">Order Button Text</label>
+                            <input type="text" class="form-control" id="order_button_text" name="order_button_text"
+                                value="{{ old('order_button_text', 'এখনই কিনুন') }}">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="order_button_url">Order Button Action</label>
+                            <input type="text" class="form-control" id="order_button_url" name="order_button_url"
+                                value="{{ old('order_button_url', '#order-section') }}">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="order_form_title">Checkout Form Heading</label>
+                            <input type="text" class="form-control" id="order_form_title" name="order_form_title"
+                                value="{{ old('order_form_title', 'অর্ডার করুন') }}">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="order_place_button_text">Confirm Button Text</label>
+                            <input type="text" class="form-control" id="order_place_button_text" name="order_place_button_text"
+                                value="{{ old('order_place_button_text', 'অর্ডার Confirm করুন') }}">
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Right Column: Interactive Content Sections Builder -->
+            <div class="col-lg-7 col-xl-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-layer-group text-primary"></i>
+                            <h5 class="mb-0 font-weight-bold text-dark">Page Content Sections</h5>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" onclick="addSection()">
+                            <i class="fas fa-plus me-1"></i> Add Section
+                        </button>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted small mb-4">Build your sales pitch section by section. Select section types like Hero, Video, Product Benefits, or Reviews.</p>
+
+                        <div id="sections-container" class="d-flex flex-column gap-3">
+                            <!-- Dynamic section items added via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Bar -->
+                <div class="d-flex align-items-center justify-content-end gap-3 mb-5">
+                    <a href="{{ route('admin.landing-pages.index') }}" class="btn btn-secondary px-4">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-5 shadow">
+                        <i class="fas fa-check-circle me-1"></i> Save & Publish Landing Page
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
+</div>
 
     <style>
         .type-benefit {
             display: none;
         }
-        .section-move-controls .btn {
-            padding: 4px 8px;
-        }
         .landing-builder {
-            background: linear-gradient(120deg, #f4f7ff 0%, #f8fffa 100%);
-            min-height: 100vh;
-            padding-top: 20px;
+            background: #f1f5f9;
+            min-height: calc(100vh - 60px);
+            margin: -15px -15px 0 -15px;
+            padding: 24px;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
         }
         .landing-builder .card {
-            border: none;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 14px;
             background: #ffffff;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .landing-builder .lp-hero-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+            color: #ffffff;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .landing-builder .lp-title-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #38bdf8;
         }
         .landing-builder .card-header {
-            background: linear-gradient(135deg, rgba(30, 58, 138, 0.85) 0%, rgba(16, 185, 129, 0.78) 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+            color: #ffffff;
             border: none;
+            padding: 16px 20px;
         }
         .landing-builder .card-header h3,
-        .landing-builder .card-header h4 {
-            color: #fff;
+        .landing-builder .card-header h4,
+        .landing-builder .card-header h5 {
+            color: #ffffff !important;
+            font-weight: 800;
         }
         .landing-builder .btn-primary {
-            background: linear-gradient(135deg, #2d4ea3 0%, #1fb987 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border: none;
-            box-shadow: 0 6px 14px rgba(31, 185, 135, 0.3);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+            font-weight: 800;
+            border-radius: 10px;
+            padding: 12px 24px;
+            transition: all 0.25s ease;
         }
         .landing-builder .btn-primary:hover {
-            filter: brightness(1.03);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
         }
-        .landing-builder .btn-outline-primary {
-            color: #2d4ea3;
-            border-color: #2d4ea3;
+        .landing-builder .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 10px 18px;
         }
-        .landing-builder .btn-outline-primary:hover {
-            background: #2d4ea3;
-            color: #fff;
+        .landing-builder .btn-secondary:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+        .landing-builder .form-control, .landing-builder select {
+            border-radius: 10px;
+            border: 1.5px solid #cbd5e1;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            background-color: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        .landing-builder .form-control:focus, .landing-builder select:focus {
+            background-color: #ffffff;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+        .landing-builder label {
+            font-size: 12px;
+            font-weight: 800;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
         .landing-builder .section-move-controls .btn {
-            border-color: rgba(255, 255, 255, 0.8);
-        }
-        .landing-builder .section-move-controls i {
-            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 4px 8px;
         }
         .landing-builder .color-picker-group .color-chip {
-            width: 48px;
+            width: 44px;
             height: 38px;
             border: none;
             padding: 0;
             background: transparent;
+            cursor: pointer;
         }
         .landing-builder .color-picker-group .color-text {
             font-family: monospace;
-        }
-        .landing-builder .global-color-swatch {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.08);
-            padding: 0;
-        }
-        .landing-builder .card-title {
-            color: #1f2f60;
-        }
-        .landing-builder .form-text.text-muted {
-            color: #4b5563 !important;
+            font-weight: 700;
         }
     </style>
 

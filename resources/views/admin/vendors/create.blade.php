@@ -1,176 +1,117 @@
 @extends('layouts.master')
 
-@section('title', 'Add New Vendor')
+@section('title', 'Add New Partner')
+
+@section('styles')
+<style>
+    .vp-builder {
+        background: #f1f5f9;
+        min-height: calc(100vh - 60px);
+        margin: -15px -15px 0 -15px;
+        padding: 24px;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+    .vp-hero-card {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.15);
+        margin-bottom: 24px;
+    }
+    .vp-title-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #38bdf8;
+    }
+    .vp-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    .vp-card .card-header {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 16px 20px;
+    }
+    .vp-card .card-header h5 {
+        margin: 0;
+        font-weight: 800;
+        color: #0f172a;
+        font-size: 15px;
+    }
+    .vp-builder .form-control, .vp-builder .form-select, .vp-builder textarea {
+        border-radius: 10px;
+        border: 1.5px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        background-color: #f8fafc;
+    }
+    .vp-builder .form-control:focus, .vp-builder .form-select:focus, .vp-builder textarea:focus {
+        background-color: #ffffff;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+    .vp-builder label {
+        font-size: 12px;
+        font-weight: 800;
+        color: #1e293b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    .btn-save-vp {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 14px;
+        box-shadow: 0 4px 14px rgba(16,185,129,0.35);
+    }
+    .btn-save-vp:hover {
+        transform: translateY(-2px);
+        color: white;
+    }
+</style>
+@endsection
 
 @section('content')
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h4><i class="fas fa-person-plus"></i> Add New Vendor</h4>
-                <a href="{{ route('admin.vendors.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back to Vendors
-                </a>
+<div class="vp-builder">
+    <!-- Banner -->
+    <div class="vp-hero-card d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="vp-title-icon">
+                <i class="fas fa-handshake"></i>
             </div>
+            <div>
+                <h3 class="mb-0 text-white font-weight-bold">Register New Partner</h3>
+                <p class="mb-0 text-white-50 small">Create partner user account and configure business credentials</p>
+            </div>
+        </div>
+        <div>
+            <a href="{{ route('admin.vendors.index') }}" class="btn btn-secondary rounded-3 px-3">
+                <i class="fas fa-arrow-left me-1"></i> Back to Partners
+            </a>
         </div>
     </div>
 
     <form action="{{ route('admin.vendors.store') }}" method="POST">
         @csrf
         
-        <div class="row">
-            <!-- Left Column - Account Information -->
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-person-circle"></i> Account Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Full Name *</label>
-                                    <input type="text" 
-                                           name="name" 
-                                           class="form-control @error('name') is-invalid @enderror" 
-                                           value="{{ old('name') }}"
-                                           required>
-                                    @error('name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Email Address *</label>
-                                    <input type="email" 
-                                           name="email" 
-                                           class="form-control @error('email') is-invalid @enderror" 
-                                           value="{{ old('email') }}"
-                                           required>
-                                    @error('email')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Phone Number *</label>
-                                    <input type="text" 
-                                           name="phone" 
-                                           class="form-control @error('phone') is-invalid @enderror" 
-                                           value="{{ old('phone') }}"
-                                           required>
-                                    @error('phone')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Password *</label>
-                                    <input type="password" 
-                                           name="password" 
-                                           class="form-control @error('password') is-invalid @enderror"
-                                           required>
-                                    @error('password')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Minimum 8 characters</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-building"></i> Business Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Business Name *</label>
-                            <input type="text" 
-                                   name="business_name" 
-                                   class="form-control @error('business_name') is-invalid @enderror" 
-                                   value="{{ old('business_name') }}"
-                                   required>
-                            @error('business_name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Business Email *</label>
-                                    <input type="email" 
-                                           name="business_email" 
-                                           class="form-control @error('business_email') is-invalid @enderror" 
-                                           value="{{ old('business_email') }}"
-                                           required>
-                                    @error('business_email')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Business Phone *</label>
-                                    <input type="text" 
-                                           name="business_phone" 
-                                           class="form-control @error('business_phone') is-invalid @enderror" 
-                                           value="{{ old('business_phone') }}"
-                                           required>
-                                    @error('business_phone')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Business Address</label>
-                            <textarea name="business_address" 
-                                      class="form-control @error('business_address') is-invalid @enderror" 
-                                      rows="3">{{ old('business_address') }}</textarea>
-                            @error('business_address')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tax ID / Business License</label>
-                            <input type="text" 
-                                   name="tax_id" 
-                                   class="form-control @error('tax_id') is-invalid @enderror" 
-                                   value="{{ old('tax_id') }}">
-                            @error('tax_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column - Settings & Status -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-gear"></i> Account Settings</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">Account Status</label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" 
-                                       type="checkbox" 
-                                       name="is_active" 
-                                       id="isActive"
-                                       value="1"
                                        {{ old('is_active', true) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="isActive">
                                     Active

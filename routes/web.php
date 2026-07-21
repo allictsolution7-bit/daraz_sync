@@ -428,7 +428,12 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     
     // Landing Pages Management
     Route::middleware(['license:landing_page'])->group(function () {
-        Route::resource('promo-pages', \App\Http\Controllers\Admin\LandingPageController::class)->except(['store']);
+        Route::get('promo-pages', [\App\Http\Controllers\Admin\LandingPageController::class, 'index'])->name('landing-pages.index');
+        Route::get('promo-pages/create', [\App\Http\Controllers\Admin\LandingPageController::class, 'create'])->name('landing-pages.create');
+        Route::get('promo-pages/{landingPage}', [\App\Http\Controllers\Admin\LandingPageController::class, 'show'])->name('landing-pages.show');
+        Route::get('promo-pages/{landingPage}/edit', [\App\Http\Controllers\Admin\LandingPageController::class, 'edit'])->name('landing-pages.edit');
+        Route::put('promo-pages/{landingPage}', [\App\Http\Controllers\Admin\LandingPageController::class, 'update'])->name('landing-pages.update');
+        Route::delete('promo-pages/{landingPage}', [\App\Http\Controllers\Admin\LandingPageController::class, 'destroy'])->name('landing-pages.destroy');
         Route::post('promo-pages/{landingPage}/toggle-status', [\App\Http\Controllers\Admin\LandingPageController::class, 'toggleStatus'])->name('landing-pages.toggle-status');
         Route::post('promo-pages/update-positions', [\App\Http\Controllers\Admin\LandingPageController::class, 'updatePositions'])->name('landing-pages.update-positions');
         Route::post('promo-pages/{landingPage}/copy', [\App\Http\Controllers\Admin\LandingPageController::class, 'copy'])->name('landing-pages.copy');
