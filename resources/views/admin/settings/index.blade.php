@@ -404,23 +404,23 @@
                 <h6 class="mb-3 text-muted">Settings Categories</h6>
 
                 <a href="#general" class="sidebar-tab active" data-tab="general">
-                    <i class="fas fa-cog mr-2"></i> General Information
+                    <i class="fas fa-info-circle mr-2"></i> General Information
                 </a>
 
                 <a href="#preloader" class="sidebar-tab" data-tab="preloader">
-                    <i class="fas fa-spinner mr-2"></i> Preloader Settings
+                    <i class="fas fa-sync-alt mr-2"></i> Preloader Settings
                 </a>
 
                 <a href="#seo" class="sidebar-tab" data-tab="seo">
-                    <i class="fas fa-search mr-2"></i> SEO Settings
+                    <i class="fas fa-chart-line mr-2"></i> SEO Settings
                 </a>
 
                 <a href="#sitemap" class="sidebar-tab" data-tab="sitemap">
-                    <i class="fas fa-sitemap mr-2"></i> Sitemap Management
+                    <i class="fas fa-route mr-2"></i> Sitemap Management
                 </a>
 
                 <a href="#product-design" class="sidebar-tab" data-tab="product-design">
-                    <i class="fas fa-box mr-2"></i> Product Item Design
+                    <i class="fas fa-cubes mr-2"></i> Product Item Design
                 </a>
 
                 <a href="#section-headings" class="sidebar-tab" data-tab="section-headings">
@@ -428,43 +428,43 @@
                 </a>
 
                 <a href="#typography" class="sidebar-tab" data-tab="typography">
-                    <i class="fas fa-font mr-2"></i> Typography Settings
+                    <i class="fas fa-text-height mr-2"></i> Typography Settings
                 </a>
 
                 <a href="#colors" class="sidebar-tab" data-tab="colors">
-                    <i class="fas fa-palette mr-2"></i> Colors Settings
+                    <i class="fas fa-paint-brush mr-2"></i> Colors Settings
                 </a>
 
                 <a href="#contact" class="sidebar-tab" data-tab="contact">
-                    <i class="fas fa-address-book mr-2"></i> Contact Information
+                    <i class="fas fa-envelope-open-text mr-2"></i> Contact Information
                 </a>
 
                 <a href="#social" class="sidebar-tab" data-tab="social">
-                    <i class="fas fa-share-alt mr-2"></i> Social Media Links
+                    <i class="fas fa-hashtag mr-2"></i> Social Media Links
                 </a>
 
                 <a href="#header" class="sidebar-tab" data-tab="header">
-                    <i class="fas fa-header mr-2"></i> Header Customization
+                    <i class="fas fa-window-maximize mr-2"></i> Header Customization
                 </a>
 
                 <a href="#footer" class="sidebar-tab" data-tab="footer">
-                    <i class="fas fa-footer mr-2"></i> Footer Content
+                    <i class="fas fa-window-minimize mr-2"></i> Footer Content
                 </a>
 
                 <a href="#ecommerce" class="sidebar-tab" data-tab="ecommerce">
-                    <i class="fas fa-shopping-cart mr-2"></i> Ecommerce Settings
+                    <i class="fas fa-store mr-2"></i> Ecommerce Settings
                 </a>
 
                 <a href="#homepage" class="sidebar-tab" data-tab="homepage">
-                    <i class="fas fa-home mr-2"></i> Homepage Customization
+                    <i class="fas fa-laptop-code mr-2"></i> Homepage Customization
                 </a>
 
                 <a href="#single-product" class="sidebar-tab" data-tab="single-product">
-                    <i class="fas fa-file-alt mr-2"></i> Advanced Single Product
+                    <i class="fas fa-box-open mr-2"></i> Advanced Single Product
                 </a>
 
                 <a href="#registration" class="sidebar-tab" data-tab="registration">
-                    <i class="fas fa-user-plus mr-2"></i> Registration Settings
+                    <i class="fas fa-user-shield mr-2"></i> Registration Settings
                 </a>
 
                 <a href="#mobile-nav" class="sidebar-tab" data-tab="mobile-nav">
@@ -472,7 +472,7 @@
                 </a>
 
                 <a href="#layout" class="sidebar-tab" data-tab="layout">
-                    <i class="fas fa-columns mr-2"></i> Layout Settings
+                    <i class="fas fa-layer-group mr-2"></i> Layout Settings
                 </a>
 
                 <a href="#mega-menu" class="sidebar-tab" data-tab="mega-menu">

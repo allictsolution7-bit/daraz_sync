@@ -598,7 +598,7 @@
             <div class="portal-header">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
-                        <h1 class="m-0">Bazarei Store Control Hub</h1>
+                        <h1 class="m-0">{{ setting('general', 'site_name', 'Bazarei') }} Store Control Hub</h1>
                         <p class="mt-1 mb-0">Welcome back, {{ Auth::user()->name ?? 'Administrator' }}. Monitoring live sales and store metrics.</p>
                     </div>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
