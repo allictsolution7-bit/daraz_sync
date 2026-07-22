@@ -117,12 +117,15 @@ class RegisterController extends Controller
             // Generate OTP code
             $otpCode = (string) rand(1000, 9999);
             
+            $userRole = in_array($request->role, ['admin', 'super_admin', 'vendor', 'user', 'customer']) ? $request->role : 'customer';
+
             // Store registration data in session (don't create user yet)
             $registrationData = [
                 'name' => $request->name,
                 'email' => $request->email ?? $this->generateUniqueEmail(),
                 'phone' => $request->phone,
                 'password' => Hash::make($request->password),
+                'role' => $userRole,
                 'otp_code' => $otpCode,
                 'otp_expires_at' => now()->addMinutes($otpExpirationMinutes),
                 'otp_resend_count' => 0,
@@ -163,6 +166,16 @@ class RegisterController extends Controller
             }
         } else {
             // Phone OTP is disabled, create user directly
+            $userRole = in_array($request->role, ['admin', 'super_admin', 'vendor', 'user', 'customer']) ? $request->role : 'customer';
+
+            if ($userRole === 'admin' || $userRole === 'super_admin') {
+                $roleName = 'admin';
+            } else if ($userRole === 'vendor') {
+                $roleName = 'vendor';
+            } else {
+                $roleName = 'customer';
+            }
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email ?? $this->generateUniqueEmail(),
@@ -174,18 +187,28 @@ class RegisterController extends Controller
                 'otp_resend_count' => 0,
             ]);
 
+            try {
+                if (method_exists($user, 'assignRole')) {
+                    $user->assignRole($roleName);
+                }
+            } catch (\Throwable $e) {
+                \Log::warning("Could not assign Spatie role '{$roleName}': " . $e->getMessage());
+            }
+
             // Log the user in
             Auth::login($user);
+
+            $redirectTarget = ($roleName === 'admin') ? url('/admin') : $this->redirectTo;
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Registration successful! Welcome!',
-                    'redirect' => $this->redirectTo,
+                    'redirect' => $redirectTarget,
                 ]);
             }
 
-            return redirect($this->redirectTo);
+            return redirect($redirectTarget);
         }
     }
 
@@ -228,6 +251,15 @@ class RegisterController extends Controller
             ], 400);
         }
 
+        $userRole = $registrationData['role'] ?? 'customer';
+        if ($userRole === 'admin' || $userRole === 'super_admin') {
+            $roleName = 'admin';
+        } else if ($userRole === 'vendor') {
+            $roleName = 'vendor';
+        } else {
+            $roleName = 'customer';
+        }
+
         // Create user only after successful OTP verification
         $user = User::create([
             'name' => $registrationData['name'],
@@ -240,16 +272,26 @@ class RegisterController extends Controller
             'otp_resend_count' => 0,
         ]);
 
+        try {
+            if (method_exists($user, 'assignRole')) {
+                $user->assignRole($roleName);
+            }
+        } catch (\Throwable $e) {
+            \Log::warning("Could not assign Spatie role '{$roleName}': " . $e->getMessage());
+        }
+
         // Clear session
         session()->forget('pending_registration');
 
         // Log the user in
         Auth::login($user);
 
+        $redirectTarget = ($roleName === 'admin') ? url('/admin') : $this->redirectTo;
+
         return response()->json([
             'status' => 'success',
             'message' => 'Registration successful! Welcome to the Shop.',
-            'redirect' => $this->redirectTo,
+            'redirect' => $redirectTarget,
         ]);
     }
 

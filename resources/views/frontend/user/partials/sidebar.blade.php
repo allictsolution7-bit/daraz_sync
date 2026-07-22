@@ -18,29 +18,26 @@
 
     <ul class="sidebar-menu">
         @auth
+            <li class="sidebar-menu-item" style="margin-bottom: 12px;">
+                <a href="{{ url('/admin') }}" 
+                   class="sidebar-menu-link text-white shadow-sm" 
+                   style="background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; color: #ffffff !important; font-weight: 700; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                    <i class="fa-solid fa-gauge-high text-white" style="font-size: 16px; width: 20px; text-align: center;"></i>
+                    <span>Admin Dashboard</span>
+                </a>
+            </li>
+
             @php
                 $u = auth()->user();
-                $isAdminRole = ($u->role === 'admin' || (method_exists($u, 'isAdmin') && $u->isAdmin()) || (method_exists($u, 'hasRole') && ($u->hasRole('admin') || $u->hasRole('super_admin') || $u->hasRole('super admin'))) || isset($u->type) && $u->type === 'admin');
                 $isVendorRole = ($u->role === 'vendor' || (method_exists($u, 'isVendor') && $u->isVendor()) || (method_exists($u, 'hasRole') && $u->hasRole('vendor')));
             @endphp
-
-            @if($isAdminRole)
-                <li class="sidebar-menu-item" style="margin-bottom: 12px;">
-                    <a href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin') }}" 
-                       class="sidebar-menu-link text-white shadow-sm" 
-                       style="background: linear-gradient(135deg, #2563eb, #1d4ed8); font-weight: 700; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px;">
-                        <i class="fa-solid fa-gauge-high sidebar-menu-icon text-white" style="font-size: 16px; width: 20px; text-align: center;"></i>
-                        <span>Admin Dashboard</span>
-                    </a>
-                </li>
-            @endif
 
             @if($isVendorRole)
                 <li class="sidebar-menu-item" style="margin-bottom: 12px;">
                     <a href="{{ Route::has('vendor.dashboard') ? route('vendor.dashboard') : url('/vendor/dashboard') }}" 
                        class="sidebar-menu-link text-white shadow-sm" 
-                       style="background: linear-gradient(135deg, #4f46e5, #3730a3); font-weight: 700; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px;">
-                        <i class="fa-solid fa-store sidebar-menu-icon text-white" style="font-size: 16px; width: 20px; text-align: center;"></i>
+                       style="background: linear-gradient(135deg, #4f46e5, #3730a3) !important; color: #ffffff !important; font-weight: 700; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                        <i class="fa-solid fa-store text-white" style="font-size: 16px; width: 20px; text-align: center;"></i>
                         <span>Vendor Dashboard</span>
                     </a>
                 </li>

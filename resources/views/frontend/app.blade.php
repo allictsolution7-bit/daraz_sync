@@ -974,6 +974,13 @@
                             <a href="{{ route('order.track') }}" style="color:{{ $topHeaderTextColor }};">{{ $trackOrderText }}</a>
                         </span>
                     @endif
+                    @auth
+                        <span>
+                            <a href="{{ url('/admin') }}" style="color:#ffffff; background: #2563eb; padding: 3px 10px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="fas fa-gauge-high" style="font-size: 11px;"></i> Admin Dashboard
+                            </a>
+                        </span>
+                    @endauth
                     {{-- <span>
                         <!-- Truck SVG -->
                         <svg width="24" height="24" viewBox="0 0 24 24">
