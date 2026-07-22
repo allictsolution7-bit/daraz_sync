@@ -18,7 +18,7 @@ class PermissionSeeder extends Seeder
             'product_categories.view','product_categories.create','product_categories.update','product_categories.delete',
             'sub_categories.view','sub_categories.create','sub_categories.update','sub_categories.delete',
             // orders
-            'orders.view','orders.create','orders.update','orders.delete',
+            'orders.view','orders.create','orders.update','orders.delete','orders.asigned',
             'orders.update_item','orders.update_status','orders.update_note','orders.delete_multiple','orders.export_selected',
             // reports
             'reports.sales.view','reports.customers.view',
