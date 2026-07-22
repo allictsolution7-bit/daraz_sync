@@ -79,19 +79,16 @@ class POSController extends Controller
             $computedStatusExpression = "CASE WHEN $computedQuantityExpression <= 0 THEN 'out_of_stock' WHEN $lowStockConditionExpression THEN 'low_stock' ELSE 'in_stock' END";
 
             $query = Product::with([
-                    'category',
+                    'category:id,name',
                     'variationCombinations' => function ($q) {
                         $q->where('is_active', true);
-                    },
-                    'additionalCategories',
-                    'additionalSubCategories',
-                    'thirdCategories',
+                    }
                 ])
                 ->leftJoinSub($variationStockSubquery, 'variation_stock', function ($join) {
                     $join->on('products.id', '=', 'variation_stock.product_id');
                 })
                 ->where('products.status', 1)
-                ->select('products.*')
+                ->select('products.id', 'products.title', 'products.product_type', 'products.category_id', 'products.sub_category_id', 'products.thumb_image', 'products.quantity', 'products.manage_stock', 'products.stock_status', 'products.low_stock_threshold', 'products.offer', 'products.old_price', 'products.product_cost', 'products.wholesale_price')
                 ->selectRaw("$computedQuantityExpression as computed_quantity")
                 ->selectRaw("$computedStatusExpression as computed_stock_status");
 

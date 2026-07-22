@@ -203,6 +203,11 @@
         padding: 14px;
         margin-top: 14px;
         border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+
+    .filters-panel.collapsed {
+        display: none !important;
     }
 
     .filters-panel select, .filters-panel input {
@@ -218,10 +223,11 @@
     /* Product Grid & Skeleton Loading */
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-        gap: 14px !important;
+        grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+        gap: 16px !important;
         padding: 2px !important;
-        max-height: 540px;
+        min-height: 850px;
+        max-height: calc(100vh - 180px);
         overflow-y: auto;
     }
 
@@ -258,67 +264,196 @@
         width: 60%;
     }
 
-    .product-card {
-        border: 1px solid #e2e8f0;
-        border-radius: var(--pos-radius);
-        padding: 12px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        background: white;
+    /* Category Pills (Matching Reference Image) */
+    .pos-category-pills-wrap {
+        margin-bottom: 16px;
         position: relative;
+    }
+    
+    .pos-category-pills {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 4px 0 8px 0;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+
+    .pos-category-pills::-webkit-scrollbar {
+        height: 4px;
+    }
+    .pos-category-pills::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .pos-pill-btn {
+        background: #ffffff;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 8px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .pos-pill-btn:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+        transform: translateY(-1px);
+    }
+
+    .pos-pill-btn.active {
+        background: #0f172a !important;
+        color: #ffffff !important;
+        border-color: #0f172a !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+    }
+
+    /* Product Grid & Cards (Matching Reference Image) */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+    }
+
+    .pos-product-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 12px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        box-shadow: var(--pos-shadow-sm);
+        position: relative;
+        overflow: hidden;
     }
 
-    .product-card:hover {
-        border-color: var(--pos-primary);
-        box-shadow: var(--pos-shadow-lg);
-        transform: translateY(-4px);
+    .pos-product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
+        border-color: #cbd5e1;
     }
 
-    .product-card.out-of-stock {
+    .pos-product-card.out-of-stock {
         opacity: 0.55;
         filter: grayscale(80%);
         cursor: not-allowed;
     }
 
-    .product-image {
+    .pos-card-image-wrap {
         width: 100%;
-        height: 105px;
-        object-fit: cover;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        background: #f1f5f9;
+        height: 135px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
     }
 
-    .product-title {
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 6px;
-        color: #1e293b;
-        line-height: 1.35;
-        height: 35px;
-        overflow: hidden;
+    .pos-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .pos-product-card:hover .pos-card-img {
+        transform: scale(1.04);
+    }
+
+    .pos-card-body {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: space-between;
+    }
+
+    .pos-card-title {
+        font-size: 0.925rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 8px;
+        line-height: 1.3;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 2.4em;
+        font-family: 'Outfit', -apple-system, sans-serif;
     }
 
-    .product-price {
-        font-size: 16px;
+    .pos-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 4px;
+    }
+
+    .pos-card-price {
+        font-size: 1.05rem;
         font-weight: 800;
-        color: var(--pos-primary);
-        margin-bottom: 4px;
+        color: #0f172a;
+        line-height: 1;
     }
 
-    .product-stock {
+    .pos-card-stock {
         font-size: 11px;
         font-weight: 600;
-        color: #64748b;
-        background: #f1f5f9;
+        margin-top: 3px;
+    }
+
+    .pos-card-add-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #0f172a;
+        color: #ffffff;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+    }
+
+    .pos-card-add-btn:hover {
+        background: #4f46e5;
+        transform: scale(1.1);
+        box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Legacy compatibility classes */
+    .product-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 12px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 135px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        background: #f8fafc;
+    }    background: #f1f5f9;
         padding: 3px 8px;
         border-radius: 6px;
         display: inline-block;
@@ -840,31 +975,32 @@
 
 
 
-    <div class="row pos-container">
-        <!-- Left Panel - Products -->
-        <div class="col-lg-7 col-md-12 pos-left-panel">
-            <!-- Search and Scanner Box -->
+    <div class="row g-3 pos-container">
+        <!-- Left Panel - Products Catalog -->
+        <div class="col-lg-8 col-md-7 pos-left-panel">
+            <!-- Search and Filter Header Bar -->
             <div class="product-search-box">
-                <div class="row g-2 align-items-center mb-2">
-                    <div class="col-md-8 col-12">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-7 col-12">
                         <div class="input-group pos-search-input-group">
                             <span class="input-group-text">
                                 <i class="fas fa-magnifying-glass"></i>
                             </span>
                             <input type="text" class="form-control" id="productSearch" 
-                                   placeholder="Search products by title, SKU, or scan barcode...">
+                                   placeholder="Search products by title, SKU, or barcode...">
                         </div>
                     </div>
-                    <div class="col-md-4 col-12 text-end">
-                        <button class="btn btn-outline-secondary btn-sm d-inline-block d-md-none me-1" id="filtersToggleBtn">
-                            <i class="fas fa-filter"></i> Filters
+                    <div class="col-md-5 col-12 text-end d-flex align-items-center justify-content-end gap-1">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="filtersToggleBtn">
+                            <i class="fas fa-filter me-1"></i> Filters
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-danger" id="clearFiltersBtn">
-                            <i class="fas fa-xmark"></i> Clear Filters
+                            <i class="fas fa-xmark me-1"></i> Clear
                         </button>
                     </div>
                 </div>
-                <div id="filtersPanel" class="filters-panel">
+
+                <div id="filtersPanel" class="filters-panel collapsed mt-3">
                     <div class="row g-2">
                         <div class="col-md-4">
                             <select id="primary-category-filter" class="form-select">
@@ -924,9 +1060,19 @@
                 </div>
             </div>
 
+            <!-- Category Filter Pills (Matching Reference Image) -->
+            <div class="pos-category-pills-wrap">
+                <div class="pos-category-pills" id="categoryPills">
+                    <button type="button" class="pos-pill-btn active" data-cat-id="">All Products</button>
+                    @foreach($categories as $category)
+                        <button type="button" class="pos-pill-btn" data-cat-id="{{ $category->id }}">{{ $category->name }}</button>
+                    @endforeach
+                </div>
+            </div>
+
             <!-- Products Grid -->
             <div class="product-grid" id="productsGrid">
-                <div class="text-center py-5 w-100">
+                <div class="text-center py-5 w-100 bg-white rounded-4 border">
                     <i class="fas fa-box-open fa-3x text-muted opacity-50 mb-3"></i>
                     <p class="text-muted fw-semibold">Search or select a category to display products</p>
                 </div>
@@ -941,7 +1087,7 @@
         </div>
 
         <!-- Right Panel - Cart & Checkout -->
-        <div class="col-lg-5 col-md-12 pos-right-panel">
+        <div class="col-lg-4 col-md-5 pos-right-panel">
             <!-- Cart Section -->
             <div class="pos-right-card">
                 <div class="pos-section-header">
@@ -1192,8 +1338,8 @@ const lowStockFilter = $('#low-stock-filter');
 let currentPage = 1;
 let lastPage = 1;
 let totalItems = 0;
-let perPage = 20;
-let filtersCollapsed = false;
+let perPage = 24;
+let filtersCollapsed = true;
 
 // Initialize POS
 $(document).ready(function() {
@@ -1227,11 +1373,28 @@ function setupEventListeners() {
 
     // Product search
     $('#productSearch').on('input', debouncedSearch);
+    // Category pill click handler
+    $(document).on('click', '.pos-pill-btn', function() {
+        $('.pos-pill-btn').removeClass('active');
+        $(this).addClass('active');
+        const catId = $(this).attr('data-cat-id');
+        primaryCategoryFilter.val(catId).trigger('change');
+    });
+
+    // Debounced search on typing
+    let searchDebounceTimer = null;
+    $('#productSearch').on('input', function() {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(function() {
+            searchProducts(1);
+        }, 200);
+    });
+
     primaryCategoryFilter.on('change', function() {
-        const categoryId = $(this).val();
-        subcategoryFilter.val('');
-        thirdCategoryFilter.val('');
-        loadSubcategories(categoryId);
+        const catId = $(this).val();
+        $('.pos-pill-btn').removeClass('active');
+        $(`.pos-pill-btn[data-cat-id="${catId}"]`).addClass('active');
+        loadSubcategories(catId);
         searchProducts(1);
     });
     subcategoryFilter.on('change', function() {
@@ -1387,10 +1550,10 @@ function updateFiltersVisibility() {
     const toggleBtn = $('#filtersToggleBtn');
     if (filtersCollapsed) {
         panel.addClass('collapsed');
-        toggleBtn.html('<i class="fas fa-filter"></i> Show Filters');
+        toggleBtn.html('<i class="fas fa-filter me-1"></i> Filters');
     } else {
         panel.removeClass('collapsed');
-        toggleBtn.html('<i class="fas fa-filter"></i> Hide Filters');
+        toggleBtn.html('<i class="fas fa-filter-circle-xmark me-1"></i> Hide Filters');
     }
 }
 
@@ -1430,7 +1593,7 @@ function searchProducts(page = 1) {
     // Render animated skeleton cards during data fetching
     const grid = $('#productsGrid');
     let skeletonHtml = '';
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 12; i++) {
         skeletonHtml += `
             <div class="pos-skeleton-card">
                 <div class="pos-skeleton-img"></div>
@@ -1449,6 +1612,7 @@ function searchProducts(page = 1) {
         stock_status: stockStatus,
         product_type: productType,
         low_stock_only: lowStockOnly,
+        per_page: perPage,
         page: page
     })
     .done(function(response) {
@@ -1474,10 +1638,10 @@ function displayProducts(products) {
     
     if (!products || products.length === 0) {
         grid.html(`
-            <div class="text-center py-4 col-12">
-                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                <p class="text-muted">No products found</p>
-                <small class="text-muted">Try searching for products or check filters</small>
+            <div class="text-center py-5 col-12 bg-white rounded-4 border">
+                <i class="fas fa-box-open fa-3x text-muted opacity-50 mb-3"></i>
+                <h6 class="fw-bold text-dark">No products found</h6>
+                <p class="text-muted small">Try searching for products or check filters</p>
             </div>
         `);
         return;
@@ -1489,18 +1653,18 @@ function displayProducts(products) {
         const inStock = status !== 'out_of_stock';
         const stockClass = inStock ? '' : 'out-of-stock';
         
-        let stockText = 'Stock: ∞';
+        let stockText = 'In Stock';
         if (status === 'on_backorder') {
             stockText = 'On backorder';
         } else if (product.manage_stock) {
             if (product.product_type === 'variable') {
                 const inStockVariations = (product.variations || []).filter(v => v.in_stock);
-                stockText = `${inStockVariations.length} variations available`;
+                stockText = `${inStockVariations.length} variations`;
                 if (product.stock_quantity !== undefined && product.stock_quantity !== null) {
                     stockText += ` • ${product.stock_quantity} in stock`;
                 }
             } else {
-                stockText = `Stock: ${product.stock_quantity || 0}`;
+                stockText = `${product.stock_quantity || 0} in stock`;
             }
         }
         if (status === 'low_stock') {
@@ -1512,13 +1676,30 @@ function displayProducts(products) {
             : status === 'on_backorder' ? 'text-info'
             : 'text-success';
         
+        const imgHtml = product.image 
+            ? `<img src="${product.image}" alt="${product.title}" class="pos-card-img" loading="lazy">` 
+            : `<div class="d-flex align-items-center justify-content-center h-100 text-muted"><i class="fas fa-image fs-2 opacity-25"></i></div>`;
+
+        const productJson = JSON.stringify(product).replace(/'/g, "&apos;");
+        
         html += `
-            <div class="product-card ${stockClass}" onclick="selectProduct(${product.id})" data-product='${JSON.stringify(product)}'>
-                ${product.image ? `<img src="${product.image}" alt="${product.title}" class="product-image">` : '<div class="product-image bg-light d-flex align-items-center justify-content-center"><i class="fas fa-image text-muted"></i></div>'}
-                <div class="product-title">${product.title}</div>
-                <div class="product-price">৳${product.price || '0.00'}</div>
-                <div class="product-stock ${stockTextClass}">${stockText}</div>
-                ${product.product_type === 'variable' ? '<small class="text-info"><i class="fas fa-cogs"></i> Variable</small>' : ''}
+            <div class="pos-product-card ${stockClass}" onclick="selectProduct(${product.id})" data-product='${productJson}'>
+                <div class="pos-card-image-wrap">
+                    ${imgHtml}
+                    ${product.product_type === 'variable' ? '<span class="badge bg-dark position-absolute top-0 end-0 m-2 rounded-pill px-2 py-1" style="font-size:10px;">Options</span>' : ''}
+                </div>
+                <div class="pos-card-body">
+                    <h6 class="pos-card-title">${product.title}</h6>
+                    <div class="pos-card-footer">
+                        <div>
+                            <div class="pos-card-price">৳${parseFloat(product.price || 0).toFixed(2)}</div>
+                            <div class="pos-card-stock ${stockTextClass}">${stockText}</div>
+                        </div>
+                        <button type="button" class="pos-card-add-btn" title="Add to Cart" onclick="event.stopPropagation(); selectProduct(${product.id});">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         `;
     });
@@ -1527,10 +1708,18 @@ function displayProducts(products) {
 }
 
 function selectProduct(productId) {
-    const productCard = $(`.product-card[onclick="selectProduct(${productId})"]`);
-    const product = JSON.parse(productCard.attr('data-product'));
+    const productCard = $(`.pos-product-card[onclick*="selectProduct(${productId})"], .product-card[onclick*="selectProduct(${productId})"]`).first();
+    if (!productCard.length) return;
     
-    if (!product.in_stock) {
+    let product;
+    try {
+        product = JSON.parse(productCard.attr('data-product'));
+    } catch(e) {
+        console.error("Error parsing product JSON", e);
+        return;
+    }
+    
+    if (product.computed_stock_status === 'out_of_stock') {
         toastr.warning('This product is out of stock');
         return;
     }
