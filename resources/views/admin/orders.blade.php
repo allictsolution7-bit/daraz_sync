@@ -632,6 +632,25 @@
             font-size: 13px;
         }
 
+        /* Status Grid Cards in Status Change Modal */
+        .status-card-option {
+            transition: all 0.2s ease-in-out;
+            user-select: none;
+        }
+
+        .status-card-option:hover {
+            border-color: #6366f1 !important;
+            background-color: #f5f3ff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
+        }
+
+        .status-card-option.active-status-card {
+            border-color: #4f46e5 !important;
+            background-color: #eef2ff !important;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25) !important;
+        }
+
         /* Mobile adjustments */
         @media (max-width: 768px) {
             .filter-grid {
@@ -1145,46 +1164,128 @@
     <!-- Status Change Modal -->
     <div class="modal fade" id="statusChangeModal" tabindex="-1" aria-labelledby="statusChangeModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <form id="statusChangeForm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="statusChangeModalLabel"><i class="fas fa-sliders-h me-2 text-primary"></i>Update Order Status & Analytics</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
+                    <!-- Modal Header -->
+                    <div class="modal-header border-0 px-4 py-3 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;">
+                                <i class="fas fa-sliders-h fs-5"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title fw-bold mb-0 text-white" id="statusChangeModalLabel">Update Order Status & Analytics</h5>
+                                <p class="mb-0 text-white-50 small">Select a new fulfillment status and trigger automated sync events</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+
+                    <!-- Modal Body -->
+                    <div class="modal-body p-4 bg-slate-50" style="background-color: #f8fafc;">
                         <input type="hidden" name="order_id" id="modalOrderId">
                         <input type="hidden" name="payment_method" id="modalPaymentMethod">
-                        <div class="mb-3">
-                            <label class="form-label text-muted small fw-bold tracking-wider mb-2 d-block" style="font-size: 11px; letter-spacing: 0.05em;">SELECT NEW STATUS</label>
-                            <select name="status" id="modalStatusSelect" class="form-select">
-                                <option value="pending">Pending</option>
-                                <option value="phone_not_rcv">Call Not Received</option>
-                                <option value="follow_up">Follow up</option>
-                                <option value="processing">Processing</option>
-                                <option value="ready_for_delivery">Ready Delivery</option>
-                                <option value="delivered">Delivered</option>
-                                <option value="on_hold">On Hold</option>
-                                <option value="shipped">Shipped</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
+                        <input type="hidden" name="status" id="modalStatusSelect" value="pending">
+
+                        <!-- Status Grid Selection Section -->
+                        <div class="mb-4">
+                            <label class="text-uppercase text-secondary fw-bold small mb-3 d-flex align-items-center gap-2" style="font-size: 11px; letter-spacing: 0.08em;">
+                                <i class="fas fa-list-check text-primary"></i> Choose Fulfillment Status
+                            </label>
+
+                            <div class="row row-cols-lg-5 row-cols-md-3 row-cols-2 g-2" id="statusGridOptions">
+                                <div class="col">
+                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="pending">
+                                        <div class="fs-5 mb-1">⏳</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Pending</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="phone_not_rcv">
+                                        <div class="fs-5 mb-1">📞</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Call Not Received</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="follow_up">
+                                        <div class="fs-5 mb-1">🔄</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Follow up</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="processing">
+                                        <div class="fs-5 mb-1">⚙️</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Processing</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="ready_for_delivery">
+                                        <div class="fs-5 mb-1">📦</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Ready Delivery</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="shipped">
+                                        <div class="fs-5 mb-1">🚚</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Shipped</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="delivered">
+                                        <div class="fs-5 mb-1">✅</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Delivered</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="on_hold">
+                                        <div class="fs-5 mb-1">⏸️</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">On Hold</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="cancelled">
+                                        <div class="fs-5 mb-1">❌</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Cancelled</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Purchase Event Section (COD & Offline Orders) -->
-                        <div id="codPurchaseEventSection" class="mt-3 p-3 border rounded bg-light" style="display: none;">
-                            <h6 class="mb-2"><i class="fas fa-sync-alt me-1 text-primary"></i> Pixel & Conversion Sync</h6>
+                        <div id="codPurchaseEventSection" class="p-3 border rounded-3 bg-white shadow-sm mt-3" style="display: none;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold text-dark fs-6">Pixel & Analytics Conversion Sync</h6>
+                                        <span class="text-muted" style="font-size: 11px;">Meta Pixel & Google Analytics Events</span>
+                                    </div>
+                                </div>
+                                <span class="badge bg-info-subtle text-info border px-2 py-1" style="font-size: 10px;">Automated</span>
+                            </div>
+                            
                             <p class="text-muted small mb-3" id="purchaseEventDescription" style="font-size: 12px; line-height: 1.4;">
-                                Verify and trigger standard customer purchase events to Facebook Pixel and Google Analytics.
+                                Fire server-side Purchase event conversions to validate marketing attribution and ROAS metrics.
                             </p>
-                            <div id="purchaseEventStatus" class="mb-2"></div>
-                            <button type="button" id="firePurchaseEventBtn" class="btn btn-success btn-sm">
-                                <i class="fas fa-paper-plane me-1"></i> Sync Purchase Event Now
+                            
+                            <div id="purchaseEventStatus" class="mb-3"></div>
+                            
+                            <button type="button" id="firePurchaseEventBtn" class="btn btn-emerald w-100 fw-bold py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="background-color: #10b981; color: #ffffff; border: none; border-radius: 10px; font-size: 13px;">
+                                <i class="fas fa-paper-plane"></i> Sync Purchase Event Now
                             </button>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Change Status</button>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer bg-white border-top px-4 py-3 d-flex justify-content-between">
+                        <button type="button" class="btn btn-light border px-4 fw-semibold" data-bs-dismiss="modal">
+                            <i class="fas fa-xmark me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; border-radius: 10px;">
+                            <i class="fas fa-check-double me-1"></i> Update Order Status
+                        </button>
                     </div>
                 </div>
             </form>
@@ -1718,6 +1819,14 @@
             // Offline order sources that can have delayed purchase events
             var offlineOrderSources = ['Physical Store', 'Phone Call', 'WhatsApp', 'Messenger', 'Facebook', 'Instagram'];
 
+            // Status card option click selection handler
+            $(document).on('click', '.status-card-option', function() {
+                const targetStatus = $(this).data('status');
+                $('.status-card-option').removeClass('active-status-card');
+                $(this).addClass('active-status-card');
+                $('#modalStatusSelect').val(targetStatus);
+            });
+
             // When badge is clicked, show modal (delegated)
             $(document).on('click', '.change-status-btn', function(event) {
                 event.stopPropagation();
@@ -1729,6 +1838,10 @@
                 $('#modalOrderId').val(orderId);
                 $('#modalStatusSelect').val(currentStatus);
                 $('#modalPaymentMethod').val(paymentMethod);
+
+                // Highlight corresponding card in status grid
+                $('.status-card-option').removeClass('active-status-card');
+                $(`.status-card-option[data-status="${currentStatus}"]`).addClass('active-status-card');
 
                 // Check if this order can have delayed purchase events (COD or offline source)
                 var isCod = paymentMethod === 'cod';

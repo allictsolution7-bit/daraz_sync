@@ -748,7 +748,7 @@
             const isGroupMatch = term !== '' && groupTitle.includes(term);
 
             let visibleCount = 0;
-            groupCard.querySelectorAll('.form-check').forEach(row => {
+            groupCard.querySelectorAll('.perm-item-check, .form-check').forEach(row => {
                 const label = row.querySelector('label');
                 const txt = label ? label.textContent.toLowerCase() : '';
                 const isMatch = term === '' || txt.includes(term) || isGroupMatch;
@@ -758,9 +758,12 @@
 
             // Hide/Show subgroup columns if all items inside are hidden
             groupCard.querySelectorAll('.col-md-6').forEach(col => {
-                const visibleCheckboxes = col.querySelectorAll('.form-check[style*="display: none"]');
-                const totalCheckboxes = col.querySelectorAll('.form-check');
-                col.style.display = (term !== '' && visibleCheckboxes.length === totalCheckboxes.length) ? 'none' : '';
+                const totalItems = col.querySelectorAll('.perm-item-check, .form-check');
+                let colVisibleCount = 0;
+                totalItems.forEach(item => {
+                    if (item.style.display !== 'none') colVisibleCount++;
+                });
+                col.style.display = (term !== '' && colVisibleCount === 0) ? 'none' : '';
             });
 
             // Hide whole card if no permissions match

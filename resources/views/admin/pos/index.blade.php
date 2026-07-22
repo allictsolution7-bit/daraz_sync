@@ -569,6 +569,224 @@
     a.pos-menu-item {
         display: none !important;
     }
+
+    /* Variation Modal Styling */
+    #variationModal .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    #variationModal .modal-header {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+        color: #ffffff;
+        padding: 16px 20px;
+        border-bottom: none;
+    }
+
+    #variationModal .modal-header .modal-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #ffffff;
+    }
+
+    #variationModal .modal-header .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    #variationModal .modal-body {
+        padding: 20px;
+        background-color: #f8fafc;
+        max-height: 420px;
+        overflow-y: auto;
+    }
+
+    .variation-item-card {
+        background: #ffffff;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+    }
+
+    .variation-item-card:hover:not(.disabled) {
+        border-color: #818cf8;
+        background-color: #f8fafc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+    }
+
+    .variation-item-card.selected {
+        border-color: #4f46e5 !important;
+        background-color: #eef2ff !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+
+    .variation-item-card.disabled {
+        opacity: 0.55;
+        background-color: #f1f5f9;
+        cursor: not-allowed;
+        border-color: #e2e8f0;
+    }
+
+    .variation-radio-indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .variation-item-card.selected .variation-radio-indicator {
+        border-color: #4f46e5;
+        background-color: #4f46e5;
+    }
+
+    .variation-radio-indicator::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        display: none;
+    }
+
+    .variation-item-card.selected .variation-radio-indicator::after {
+        display: block;
+    }
+
+    #orderSuccessModal .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    #orderSuccessModal .modal-header.bg-primary {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%) !important;
+        color: #ffffff !important;
+        padding: 16px 20px;
+        border-bottom: none;
+    }
+
+    #orderSuccessModal .modal-header.bg-success {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+        color: #ffffff !important;
+        padding: 16px 20px;
+        border-bottom: none;
+    }
+
+    #orderSuccessModal .modal-header .modal-title {
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: #ffffff;
+    }
+
+    #orderSuccessModal .modal-header .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    #orderSuccessModal .modal-body {
+        padding: 24px;
+        background-color: #f8fafc;
+        max-height: 480px;
+        overflow-y: auto;
+    }
+
+    .pos-preview-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .pos-preview-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pos-preview-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .pos-preview-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .pos-preview-label {
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .pos-preview-value {
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .pos-preview-table {
+        margin-bottom: 0;
+    }
+
+    .pos-preview-table th {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        background: #f1f5f9;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 8px 12px;
+    }
+
+    .pos-preview-table td {
+        font-size: 13px;
+        padding: 10px 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .pos-preview-table tfoot th {
+        background: transparent;
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .pos-preview-table tfoot .table-primary th {
+        background: #eef2ff;
+        color: #312e81;
+        font-size: 15px;
+        font-weight: 800;
+        border-radius: 8px;
+    }
+
+    #orderSuccessModal .modal-footer {
+        background-color: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        padding: 14px 20px;
+    }
 </style>
 @endsection
 
@@ -906,42 +1124,48 @@
 
 <!-- Variation Selection Modal -->
 <div class="modal fade" id="variationModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Select Product Variation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title d-flex align-items-center gap-2">
+                    <i class="fas fa-tags text-warning"></i>
+                    <span>Select Product Variation</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="variationModalBody">
                 <!-- Variation options will be loaded here -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="addSelectedVariation()">Add to Cart</button>
+                <button type="button" class="btn btn-light border px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold" onclick="addSelectedVariation()">
+                    <i class="fas fa-cart-plus me-1"></i> Add to Cart
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Order Success Modal -->
+<!-- Order Success / Preview Modal -->
 <div class="modal fade" id="orderSuccessModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-check-circle"></i>
-                    Order Created Successfully!
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title d-flex align-items-center gap-2">
+                    <i class="fas fa-eye"></i>
+                    <span>Order Preview</span>
                 </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="orderSuccessBody">
                 <!-- Order details will be loaded here -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Cancel
+                <button type="button" class="btn btn-light border px-4 fw-semibold" data-bs-dismiss="modal">
+                    <i class="fas fa-xmark me-1"></i> Cancel
                 </button>
-                <button type="button" class="btn btn-success" onclick="startNewOrder()">
-                    <i class="fas fa-check-circle"></i> Place Order
+                <button type="button" class="btn btn-success px-4 fw-bold" onclick="startNewOrder()">
+                    <i class="fas fa-paper-plane me-1"></i> Place Order
                 </button>
             </div>
         </div>
@@ -1320,40 +1544,54 @@ function selectProduct(productId) {
 
 function showVariationModal(product) {
     currentProduct = product;
+    selectedVariation = null;
     const modal = $('#variationModal');
     const modalBody = $('#variationModalBody');
     
     let html = `
-        <div class="mb-3">
-            <h6>${product.title}</h6>
-            <p class="text-muted mb-3">Select a variation to add to cart:</p>
+        <div class="p-2 mb-3 bg-light rounded-3 d-flex align-items-center gap-3 border">
+            ${product.image ? `<img src="${product.image}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">` : '<div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center" style="width:50px;height:50px;"><i class="fas fa-box"></i></div>'}
+            <div>
+                <h6 class="fw-bold mb-1 text-dark">${product.title}</h6>
+                <span class="badge bg-primary-subtle text-primary fw-semibold">${product.variations ? product.variations.length : 0} Variations available</span>
+            </div>
         </div>
+        <p class="text-muted small fw-semibold mb-2">Select a variation option to add to cart:</p>
+        <div class="variation-list">
     `;
     
     if (product.variations && product.variations.length > 0) {
-        product.variations.forEach(variation => {
-            const inStock = variation.in_stock;
+        product.variations.forEach((variation, idx) => {
+            const inStock = variation.in_stock && variation.stock_quantity > 0;
             const disabled = !inStock ? 'disabled' : '';
-            const stockClass = inStock ? 'text-success' : 'text-danger';
+            const stockBadge = inStock 
+                ? `<span class="badge bg-success-subtle text-success px-2 py-1"><i class="fas fa-check-circle me-1"></i>Stock: ${variation.stock_quantity}</span>`
+                : `<span class="badge bg-danger-subtle text-danger px-2 py-1"><i class="fas fa-times-circle me-1"></i>Out of Stock</span>`;
+            
+            // Escape double quotes safely for data attributes
+            const variationData = JSON.stringify(variation).replace(/'/g, "&apos;");
             
             html += `
-                <div class="variation-option ${disabled}" data-variation='${JSON.stringify(variation)}' onclick="selectVariation(this)">
-                    <div class="d-flex justify-content-between align-items-center">
+                <div class="variation-item-card ${disabled}" data-variation-json='${variationData}' onclick="selectVariation(this)">
+                    <div class="d-flex align-items-center">
+                        <div class="variation-radio-indicator"></div>
                         <div>
-                            <strong>${variation.display_name}</strong>
-                            <div class="small text-muted">Stock: <span class="${stockClass}">${variation.stock_quantity}</span></div>
+                            <div class="fw-bold text-dark fs-6">${variation.display_name}</div>
+                            <div class="mt-1">${stockBadge}</div>
                         </div>
-                        <div class="text-end">
-                            <div class="h6 mb-0 text-success">৳${variation.price}</div>
-                            ${variation.offer_price ? `<small class="text-muted"><s>৳${variation.regular_price}</s></small>` : ''}
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-success fs-5">৳${parseFloat(variation.price || 0).toFixed(2)}</div>
+                        ${variation.offer_price && variation.regular_price ? `<small class="text-muted text-decoration-line-through">৳${parseFloat(variation.regular_price).toFixed(2)}</small>` : ''}
                     </div>
                 </div>
             `;
         });
     } else {
-        html += '<p class="text-muted">No variations available</p>';
+        html += '<p class="text-muted text-center py-4">No variations available for this product</p>';
     }
+    
+    html += `</div>`;
     
     modalBody.html(html);
     modal.modal('show');
@@ -1362,11 +1600,18 @@ function showVariationModal(product) {
 let selectedVariation = null;
 
 function selectVariation(element) {
-    if ($(element).hasClass('disabled')) return;
+    const $el = $(element);
+    if ($el.hasClass('disabled')) return;
     
-    $('.variation-option').removeClass('selected');
-    $(element).addClass('selected');
-    selectedVariation = JSON.parse($(element).attr('data-variation'));
+    $('.variation-item-card').removeClass('selected');
+    $el.addClass('selected');
+    
+    const rawJson = $el.attr('data-variation-json');
+    try {
+        selectedVariation = JSON.parse(rawJson);
+    } catch(e) {
+        console.error("Error parsing variation JSON:", e);
+    }
 }
 
 function addSelectedVariation() {
@@ -1732,17 +1977,20 @@ function showOrderPreview(orderData) {
     const body = $('#orderSuccessBody');
     
     // Update modal header for preview
-    modal.find('.modal-title').html('<i class="fas fa-eye"></i> Order Preview');
+    modal.find('.modal-title').html('<i class="fas fa-receipt text-warning me-2"></i><span>Order Confirmation & Preview</span>');
     modal.find('.modal-header').removeClass('bg-success').addClass('bg-primary');
     
     let itemsHtml = '';
     orderData.items.forEach(item => {
         itemsHtml += `
             <tr>
-                <td>${item.name}${item.display_name ? '<br><small class="text-muted">' + item.display_name + '</small>' : ''}</td>
-                <td class="text-center">${item.quantity}</td>
+                <td class="fw-semibold text-dark">
+                    ${item.name}
+                    ${item.display_name ? `<br><small class="badge bg-light text-secondary border fw-normal mt-1">${item.display_name}</small>` : ''}
+                </td>
+                <td class="text-center fw-bold">${item.quantity}</td>
                 <td class="text-end">৳${item.price.toFixed(2)}</td>
-                <td class="text-end">৳${(item.price * item.quantity).toFixed(2)}</td>
+                <td class="text-end fw-bold text-dark">৳${(item.price * item.quantity).toFixed(2)}</td>
             </tr>
         `;
     });
@@ -1750,82 +1998,112 @@ function showOrderPreview(orderData) {
     const subtotal = orderData.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
     body.html(`
-        <div class="mb-3">
-            <h6>Customer Information</h6>
-            <p class="mb-1"><strong>Name:</strong> ${orderData.customer_name}</p>
-            <p class="mb-1"><strong>Phone:</strong> ${orderData.customer_phone}</p>
-            ${orderData.customer_email ? `<p class="mb-1"><strong>Email:</strong> ${orderData.customer_email}</p>` : ''}
-            ${orderData.customer_address ? `<p class="mb-1"><strong>Address:</strong> ${orderData.customer_address}</p>` : ''}
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="pos-preview-card h-100 mb-0">
+                    <div class="pos-preview-title">
+                        <i class="fas fa-user-circle text-primary"></i> Customer Info
+                    </div>
+                    <div class="pos-preview-row">
+                        <span class="pos-preview-label">Name:</span>
+                        <span class="pos-preview-value">${orderData.customer_name}</span>
+                    </div>
+                    <div class="pos-preview-row">
+                        <span class="pos-preview-label">Phone:</span>
+                        <span class="pos-preview-value">${orderData.customer_phone}</span>
+                    </div>
+                    ${orderData.customer_email ? `
+                    <div class="pos-preview-row">
+                        <span class="pos-preview-label">Email:</span>
+                        <span class="pos-preview-value">${orderData.customer_email}</span>
+                    </div>` : ''}
+                    ${orderData.customer_address ? `
+                    <div class="pos-preview-row">
+                        <span class="pos-preview-label">Address:</span>
+                        <span class="pos-preview-value">${orderData.customer_address}</span>
+                    </div>` : ''}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="pos-preview-card h-100 mb-0">
+                    <div class="pos-preview-title">
+                        <i class="fas fa-info-circle text-info"></i> Order Details
+                    </div>
+                    <div class="pos-preview-row">
+                        <span class="pos-preview-label">Payment Method:</span>
+                        <span class="pos-preview-value text-uppercase badge bg-light text-dark border">${orderData.payment_method}</span>
+                    </div>
+                    <div class="pos-preview-row">
+                        <span class="pos-preview-label">Order Source:</span>
+                        <span class="pos-preview-value">${orderData.order_source}</span>
+                    </div>
+                    ${orderData.notes ? `
+                    <div class="pos-preview-row">
+                        <span class="pos-preview-label">Notes:</span>
+                        <span class="pos-preview-value text-muted">${orderData.notes}</span>
+                    </div>` : ''}
+
+                    ${orderData.payment_method === 'bkash' && orderData.bkash_number ? `
+                        <div class="border-top pt-2 mt-2">
+                            <div class="small fw-bold text-primary mb-1"><i class="fas fa-mobile-screen me-1"></i> bKash Details</div>
+                            <div class="pos-preview-row"><span class="pos-preview-label">Number:</span><span class="pos-preview-value">${orderData.bkash_number}</span></div>
+                            <div class="pos-preview-row"><span class="pos-preview-label">Trx ID:</span><span class="pos-preview-value">${orderData.bkash_transaction_id}</span></div>
+                        </div>
+                    ` : ''}
+
+                    ${orderData.payment_method === 'nagad' && orderData.nagad_number ? `
+                        <div class="border-top pt-2 mt-2">
+                            <div class="small fw-bold text-danger mb-1"><i class="fas fa-mobile-screen me-1"></i> Nagad Details</div>
+                            <div class="pos-preview-row"><span class="pos-preview-label">Number:</span><span class="pos-preview-value">${orderData.nagad_number}</span></div>
+                            <div class="pos-preview-row"><span class="pos-preview-label">Trx ID:</span><span class="pos-preview-value">${orderData.nagad_transaction_id}</span></div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
         </div>
         
-        <div class="mb-3">
-            <h6>Order Details</h6>
-            <p class="mb-1"><strong>Payment Method:</strong> ${orderData.payment_method}</p>
-            <p class="mb-1"><strong>Order Source:</strong> ${orderData.order_source}</p>
-            ${orderData.notes ? `<p class="mb-1"><strong>Notes:</strong> ${orderData.notes}</p>` : ''}
-            
-            ${orderData.payment_method === 'bkash' && orderData.bkash_number ? `
-                <hr>
-                <h6 class="text-primary">bKash Payment Details</h6>
-                <p class="mb-1"><strong>bKash Number:</strong> ${orderData.bkash_number}</p>
-                <p class="mb-1"><strong>Transaction ID:</strong> ${orderData.bkash_transaction_id}</p>
-                ${orderData.bkash_charge > 0 ? `<p class="mb-1"><strong>bKash Charge:</strong> ৳${orderData.bkash_charge.toFixed(2)}</p>` : ''}
-            ` : ''}
-            
-            ${orderData.payment_method === 'nagad' && orderData.nagad_number ? `
-                <hr>
-                <h6 class="text-success">Nagad Payment Details</h6>
-                <p class="mb-1"><strong>Nagad Number:</strong> ${orderData.nagad_number}</p>
-                <p class="mb-1"><strong>Transaction ID:</strong> ${orderData.nagad_transaction_id}</p>
-                ${orderData.nagad_charge > 0 ? `<p class="mb-1"><strong>Nagad Charge:</strong> ৳${orderData.nagad_charge.toFixed(2)}</p>` : ''}
-            ` : ''}
-            
-            ${orderData.payment_method === 'rocket' && orderData.rocket_number ? `
-                <hr>
-                <h6 class="text-warning">Rocket Payment Details</h6>
-                <p class="mb-1"><strong>Rocket Number:</strong> ${orderData.rocket_number}</p>
-                <p class="mb-1"><strong>Transaction ID:</strong> ${orderData.rocket_transaction_id}</p>
-                ${orderData.rocket_charge > 0 ? `<p class="mb-1"><strong>Rocket Charge:</strong> ৳${orderData.rocket_charge.toFixed(2)}</p>` : ''}
-            ` : ''}
-        </div>
-        
-        <div class="mb-3">
-            <h6>Items</h6>
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th class="text-center">Qty</th>
-                        <th class="text-end">Price</th>
-                        <th class="text-end">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${itemsHtml}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th colspan="3" class="text-end">Subtotal:</th>
-                        <th class="text-end">৳${subtotal.toFixed(2)}</th>
-                    </tr>
-                    ${orderData.discount > 0 ? `
-                    <tr>
-                        <th colspan="3" class="text-end">Discount:</th>
-                        <th class="text-end text-danger">-৳${orderData.discount.toFixed(2)}</th>
-                    </tr>
-                    ` : ''}
-                    ${orderData.shipping > 0 ? `
-                    <tr>
-                        <th colspan="3" class="text-end">Shipping:</th>
-                        <th class="text-end">৳${orderData.shipping.toFixed(2)}</th>
-                    </tr>
-                    ` : ''}
-                    <tr class="table-primary">
-                        <th colspan="3" class="text-end">Total:</th>
-                        <th class="text-end">৳${orderData.total.toFixed(2)}</th>
-                    </tr>
-                </tfoot>
-            </table>
+        <div class="pos-preview-card mb-0">
+            <div class="pos-preview-title">
+                <i class="fas fa-shopping-bag text-success"></i> Ordered Items (${orderData.items.length})
+            </div>
+            <div class="table-responsive">
+                <table class="table pos-preview-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Product Details</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-end text-muted">Subtotal:</th>
+                            <th class="text-end fw-bold">৳${subtotal.toFixed(2)}</th>
+                        </tr>
+                        ${orderData.discount > 0 ? `
+                        <tr>
+                            <th colspan="3" class="text-end text-muted">Discount:</th>
+                            <th class="text-end text-danger fw-bold">-৳${orderData.discount.toFixed(2)}</th>
+                        </tr>
+                        ` : ''}
+                        ${orderData.shipping > 0 ? `
+                        <tr>
+                            <th colspan="3" class="text-end text-muted">Shipping:</th>
+                            <th class="text-end fw-bold">৳${orderData.shipping.toFixed(2)}</th>
+                        </tr>
+                        ` : ''}
+                        <tr class="table-primary">
+                            <th colspan="3" class="text-end fs-6">Grand Total:</th>
+                            <th class="text-end fs-5 text-primary fw-bolder">৳${orderData.total.toFixed(2)}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     `);
     
@@ -1837,42 +2115,75 @@ function showOrderSuccess(order) {
     const body = $('#orderSuccessBody');
     
     // Update modal header for success
-    modal.find('.modal-title').html('<i class="fas fa-check-circle"></i> Order Created Successfully!');
+    modal.find('.modal-title').html('<i class="fas fa-circle-check text-white me-2"></i><span>Order Completed Successfully!</span>');
     modal.find('.modal-header').removeClass('bg-primary').addClass('bg-success');
     
-    // Update footer buttons for success state
+    // Update footer buttons with clean, modern layout
     modal.find('.modal-footer').html(`
-        <div class="d-flex justify-content-between w-100">
-            <div class="btn-group">
-                <button type="button" class="btn btn-primary" onclick="printReceipt(${order.id})">
-                    <i class="fas fa-receipt"></i> Print Receipt
+        <div class="d-flex flex-wrap justify-content-between align-items-center w-100 gap-2">
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary px-3 fw-bold" onclick="printReceipt(${order.id})">
+                    <i class="fas fa-receipt me-1"></i> Print Receipt
                 </button>
-                <button type="button" class="btn btn-info" onclick="printInvoice(${order.id})">
-                    <i class="fas fa-file-invoice"></i> Print Invoice
+                <button type="button" class="btn btn-info text-white px-3 fw-bold" onclick="printInvoice(${order.id})">
+                    <i class="fas fa-file-invoice me-1"></i> Print Invoice
                 </button>
             </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-outline-secondary" onclick="downloadReceipt(${order.id})">
-                    <i class="fas fa-download"></i> Download Receipt
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary px-3 fw-semibold" onclick="downloadReceipt(${order.id})">
+                    <i class="fas fa-download me-1"></i> Receipt PDF
                 </button>
-                <button type="button" class="btn btn-outline-secondary" onclick="downloadInvoice(${order.id})">
-                    <i class="fas fa-download"></i> Download Invoice
+                <button type="button" class="btn btn-outline-secondary px-3 fw-semibold" onclick="downloadInvoice(${order.id})">
+                    <i class="fas fa-file-pdf me-1"></i> Invoice PDF
                 </button>
-                <button type="button" class="btn btn-success" onclick="clearOrderForNewOne(); $('#orderSuccessModal').modal('hide');">
-                    <i class="fas fa-plus"></i> New Order
+                <button type="button" class="btn btn-success px-4 fw-bold" onclick="clearOrderForNewOne(); $('#orderSuccessModal').modal('hide');">
+                    <i class="fas fa-plus me-1"></i> New Order
                 </button>
             </div>
         </div>
     `);
     
     body.html(`
-        <div class="text-center mb-3">
-            <h5 class="text-success">Order #${order.id}</h5>
-            <p class="mb-1"><strong>Customer:</strong> ${order.customer_name}</p>
-            <p class="mb-1"><strong>Total:</strong> ৳${order.total}</p>
-            <p class="mb-1"><strong>Payment:</strong> ${order.payment_method}</p>
-            <p class="mb-1"><strong>Source:</strong> ${order.order_source}</p>
-            <small class="text-muted">Created: ${order.created_at}</small>
+        <div class="text-center py-2">
+            <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-3" style="width: 70px; height: 70px;">
+                <i class="fas fa-check fa-2x"></i>
+            </div>
+            <h4 class="fw-bolder text-dark mb-1">Order #${order.id}</h4>
+            <p class="text-muted small mb-4">Transaction has been processed & saved into inventory.</p>
+
+            <div class="row g-3 text-start">
+                <div class="col-6">
+                    <div class="p-3 bg-white rounded-3 border">
+                        <div class="small text-muted fw-semibold">CUSTOMER</div>
+                        <div class="fw-bold text-dark fs-6 mt-1">${order.customer_name}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-white rounded-3 border">
+                        <div class="small text-muted fw-semibold">TOTAL AMOUNT</div>
+                        <div class="fw-bold text-success fs-5 mt-1">৳${parseFloat(order.total || 0).toFixed(2)}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-white rounded-3 border">
+                        <div class="small text-muted fw-semibold">PAYMENT METHOD</div>
+                        <div class="fw-bold text-uppercase text-dark mt-1">
+                            <span class="badge bg-light text-dark border px-2 py-1">${order.payment_method}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-white rounded-3 border">
+                        <div class="small text-muted fw-semibold">CHANNEL SOURCE</div>
+                        <div class="fw-bold text-dark mt-1">${order.order_source}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-2 border-top text-muted small d-flex justify-content-between align-items-center px-1">
+                <span><i class="far fa-clock me-1"></i> Processed: ${order.created_at}</span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fas fa-shield-check me-1"></i> Completed</span>
+            </div>
         </div>
     `);
     
