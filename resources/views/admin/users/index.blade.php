@@ -365,6 +365,82 @@
             margin-right: 12px;
             font-size: 16px;
         }
+
+        /* Premium Feature Allocation Matrix Modal Styling */
+        .feature-group-card {
+            border-radius: 14px !important;
+            overflow: hidden;
+            border: 1px solid #e2e8f0 !important;
+            margin-bottom: 16px !important;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03) !important;
+            background: #ffffff;
+        }
+
+        .feature-group-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%) !important;
+            padding: 12px 18px !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+        }
+
+        .feature-select-card {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            transition: all 0.2s ease;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .feature-select-card:hover {
+            border-color: #3b82f6 !important;
+            background: #f8fafc !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+        }
+
+        .feature-select-card.active-selected {
+            border-color: #3b82f6 !important;
+            background: #eff6ff !important;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
+        }
+
+        .feature-select-card .form-check-input {
+            width: 18px;
+            height: 18px;
+            margin-top: 0;
+            margin-right: 10px;
+            cursor: pointer;
+            border-color: #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        .feature-select-card .form-check-input:checked {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .group-toggle-badge {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 4px 12px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .group-toggle-badge:hover {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
     </style>
 @endpush
 
@@ -455,13 +531,13 @@
 
             <!-- Create/Edit Package Modal -->
             <div class="modal fade" id="packageModal" tabindex="-1" aria-labelledby="packageModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-                        <div class="modal-header bg-dark text-white border-0 py-3">
-                            <h5 class="modal-title font-weight-bold" id="packageModalLabel">Create New Subscription Plan</h5>
+                        <div class="modal-header bg-dark text-white border-0 py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="modal-title font-weight-bold" id="packageModalLabel"><i class="fas fa-cubes text-info me-2"></i> Create New Subscription Plan</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body p-4">
+                        <div class="modal-body p-4" style="max-height: 75vh; overflow-y: auto;">
                             <form id="packageForm">
                                 <input type="hidden" id="packageId">
                                 <div class="row mb-3">
@@ -508,8 +584,29 @@
                                     </div>
                                 </div>
 
-                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-tasks text-primary me-2"></i> Features Allocation Matrix</h6>
-                                <div class="row" id="modalFeaturesContainer">
+                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 flex-wrap gap-2">
+                                    <h6 class="mb-0 font-weight-bold text-dark"><i class="fas fa-tasks text-primary me-2"></i> Features Allocation Matrix (<span id="selectedFeaturesCount">0</span> selected)</h6>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <div class="position-relative" style="min-width: 220px;">
+                                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="font-size: 12px;"></i>
+                                            <input type="text" id="packageFeatureSearch" class="form-control form-control-sm ps-5 rounded-pill" placeholder="Search features & pages...">
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="selectAllModalFeatures(true)">
+                                            <i class="fas fa-check-double me-1"></i> Select All
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="selectAllModalFeatures(false)">
+                                            <i class="fas fa-times me-1"></i> Clear All
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2" onclick="toggleModalSections(true)" title="Expand Sections">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2" onclick="toggleModalSections(false)" title="Collapse Sections">
+                                            <i class="fas fa-chevron-up"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="modalFeaturesContainer" class="accordion">
                                     <!-- Dynamic feature check list populated by JS -->
                                 </div>
                             </form>
@@ -524,23 +621,31 @@
 
             <!-- Manage Features Pool Modal -->
             <div class="modal fade" id="manageFeaturesModal" tabindex="-1" aria-labelledby="manageFeaturesModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-                        <div class="modal-header bg-secondary text-white border-0 py-3">
-                            <h5 class="modal-title font-weight-bold" id="manageFeaturesModalLabel">Manage Subscription Features</h5>
+                        <div class="modal-header bg-secondary text-white border-0 py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="modal-title font-weight-bold" id="manageFeaturesModalLabel"><i class="fas fa-list-ul me-2"></i> Manage Subscription Features</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body p-4">
                             <form id="newFeatureForm" onsubmit="addFeature(event)" class="mb-4">
-                                <label for="newFeatureName" class="form-label font-weight-bold">Create New Feature Item</label>
+                                <label for="newFeatureName" class="form-label font-weight-bold">Create Custom Feature Item</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="newFeatureName" placeholder="e.g. Premium Support, 24/7 Monitoring" required>
-                                    <button class="btn btn-success px-3" type="submit"><i class="fas fa-plus"></i> Add Item</button>
+                                    <input type="text" class="form-control" id="newFeatureName" placeholder="e.g. Dedicated Account Manager, Custom API Access" required>
+                                    <button class="btn btn-success px-4" type="submit"><i class="fas fa-plus me-1"></i> Add Item</button>
                                 </div>
                             </form>
 
-                            <h6 class="border-bottom pb-2 mb-3">Existing Features Matrix</h6>
-                            <ul class="list-group list-group-flush" id="featuresListContainer" style="max-height: 250px; overflow-y: auto;">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                                <h6 class="mb-0 font-weight-bold">Master Feature Pool (<span id="featuresPoolCount">0</span> items)</h6>
+                                <div class="d-flex gap-2">
+                                    <input type="text" id="featuresPoolSearch" class="form-control form-control-sm rounded-pill px-3" placeholder="Search pool..." style="width: 200px;" oninput="filterFeaturesPoolList()">
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="resetToDefaultSidebarFeatures()" title="Reset to all default sidebar features">
+                                        <i class="fas fa-rotate-left me-1"></i> Reset Sidebar Defaults
+                                    </button>
+                                </div>
+                            </div>
+                            <ul class="list-group list-group-flush" id="featuresListContainer" style="max-height: 350px; overflow-y: auto;">
                                 <!-- Populate via JS -->
                             </ul>
                         </div>
@@ -689,58 +794,215 @@
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 
     @if(request()->get('view') === 'packages')
+        @php
+            $rawDbPermissions = \Spatie\Permission\Models\Permission::all()->pluck('name')->toArray();
+            // Transform permission names into clean display names while maintaining mapping
+            $dbFeatureList = array_map(function($perm) {
+                return str_replace(['.', '_', '-'], [': ', ' ', ' '], ucwords($perm, '.'));
+            }, $rawDbPermissions);
+        @endphp
         <script>
-            // MOCKED PERSISTENT PACKAGES MANAGEMENT SYSTEM
-            const DEFAULT_FEATURES = [
-                "1 Store Dashboard",
-                "Unlimited Products",
-                "Advanced Sales Reports",
-                "Custom Domain Settings",
-                "24/7 Priority Support",
-                "Fraud Checker Integration",
-                "WooCommerce Migration",
-                "Custom Payment Gateways"
+            // DIRECTLY FETCHED DATABASE PERMISSIONS & SIDEBAR FEATURES
+            const DIRECT_DB_PERMISSIONS = @json($rawDbPermissions);
+            const DIRECT_DB_FORMATTED_FEATURES = @json($dbFeatureList);
+            
+            const SIDEBAR_FEATURE_GROUPS = [
+                {
+                    category: "Main Dashboard",
+                    icon: "fas fa-chart-pie text-primary",
+                    items: [
+                        "Dashboard Overview"
+                    ]
+                },
+                {
+                    category: "Product Catalog",
+                    icon: "fas fa-cubes text-info",
+                    items: [
+                        "All Products Management",
+                        "Add New Product",
+                        "Product Categories & Subcategories",
+                        "Brands Management",
+                        "Writers & Authors",
+                        "Publishers Management",
+                        "Product Reviews & Feedback",
+                        "Combo Offers & Bundles"
+                    ]
+                },
+                {
+                    category: "Inventory & Stock",
+                    icon: "fas fa-warehouse text-success",
+                    items: [
+                        "Inventory Overview",
+                        "Low Stock Alerts",
+                        "Out of Stock Items",
+                        "Stock Movement History"
+                    ]
+                },
+                {
+                    category: "Landing Pages",
+                    icon: "fas fa-pager text-warning",
+                    items: [
+                        "Landing Pages Directory",
+                        "Create & Design Landing Page"
+                    ]
+                },
+                {
+                    category: "Sales & Orders",
+                    icon: "fas fa-cart-shopping text-primary",
+                    items: [
+                        "All Orders Management",
+                        "My Assigned Orders",
+                        "Incomplete & Abandoned Orders",
+                        "Point of Sale (POS) Terminal"
+                    ]
+                },
+                {
+                    category: "Shipping & Delivery",
+                    icon: "fas fa-truck-fast text-emerald",
+                    items: [
+                        "Global Shipping Settings",
+                        "Advanced Shipping Rules & Delivery Zones",
+                        "Courier Integrations (Pathao/Steadfast)"
+                    ]
+                },
+                {
+                    category: "Reports & Insights",
+                    icon: "fas fa-chart-column text-warning",
+                    items: [
+                        "Sales & Revenue Reports",
+                        "Customer Analytics Reports"
+                    ]
+                },
+                {
+                    category: "Connected Apps & Integrations",
+                    icon: "fas fa-plug text-danger",
+                    items: [
+                        "Daraz Marketplace Sync",
+                        "WooCommerce Data Migration",
+                        "Telegram Notifications Bot",
+                        "Delayed Purchase Event Queue"
+                    ]
+                },
+                {
+                    category: "Security & Trust",
+                    icon: "fas fa-shield-halved text-danger",
+                    items: [
+                        "Fraud Checker & Risk Scanner",
+                        "Fraud Protection Shield",
+                        "System Backup & Schedules"
+                    ]
+                },
+                {
+                    category: "Content & Pages",
+                    icon: "fas fa-newspaper text-secondary",
+                    items: [
+                        "Hero Sliders Management",
+                        "Custom Web Pages",
+                        "Navigation Menu Builder",
+                        "Blog Posts Management",
+                        "Blog Categories & Topics",
+                        "Post Comments Moderation"
+                    ]
+                },
+                {
+                    category: "Multi-Vendor Management",
+                    icon: "fas fa-store text-info",
+                    items: [
+                        "Vendor Directory & Approvals",
+                        "Add New Vendor",
+                        "Vendor Product Approval",
+                        "Vendor Withdrawal Requests",
+                        "Global Vendor Commission Settings"
+                    ]
+                },
+                {
+                    category: "System Settings & Control",
+                    icon: "fas fa-gears text-secondary",
+                    items: [
+                        "Users & Team Members Management",
+                        "Contact Messages Inbox",
+                        "Newsletter Subscriptions",
+                        "Roles & Permissions Matrix",
+                        "System Extensions & Modules",
+                        "All Website Settings",
+                        "Payment Gateway Setup",
+                        "License Key Management",
+                        "System Updates & Version Control"
+                    ]
+                }
             ];
+
+            // Combine hardcoded sidebar section items with directly fetched database permissions dynamically
+            const SIDEBAR_ITEMS = SIDEBAR_FEATURE_GROUPS.flatMap(g => g.items);
+            const COMBINED_DB_FEATURES = Array.from(new Set([...SIDEBAR_ITEMS, ...DIRECT_DB_FORMATTED_FEATURES]));
+            const DEFAULT_FEATURES = COMBINED_DB_FEATURES;
 
             const DEFAULT_PACKAGES = [
                 {
                     id: "starter_plan",
                     name: "Starter Plan",
                     theme: "starter",
-                    details: "Ideal for fresh startups and hobbyists looking to build their first online storefront.",
+                    details: "Ideal for fresh startups and small stores requiring core ecommerce functionality.",
                     priceMonthly: "1200",
                     priceYearly: "12000",
                     priceLifetime: "30000",
                     status: true,
-                    features: ["1 Store Dashboard", "Unlimited Products"]
+                    features: [
+                        "Dashboard Overview",
+                        "All Products Management",
+                        "Add New Product",
+                        "Product Categories & Subcategories",
+                        "Inventory Overview",
+                        "All Orders Management",
+                        "Global Shipping Settings",
+                        "All Website Settings"
+                    ]
                 },
                 {
                     id: "pro_plan",
                     name: "Professional Plan",
                     theme: "pro",
-                    details: "Perfect for growing merchants and professional retailers needing premium tools.",
+                    details: "Perfect for growing merchants and professional retailers needing advanced tools.",
                     priceMonthly: "3500",
                     priceYearly: "35000",
                     priceLifetime: "80000",
                     status: true,
-                    features: ["1 Store Dashboard", "Unlimited Products", "Advanced Sales Reports", "Fraud Checker Integration", "24/7 Priority Support"]
+                    features: [
+                        "Dashboard Overview",
+                        "All Products Management",
+                        "Add New Product",
+                        "Product Categories & Subcategories",
+                        "Brands Management",
+                        "Product Reviews & Feedback",
+                        "Inventory Overview",
+                        "Low Stock Alerts",
+                        "Landing Pages Directory",
+                        "All Orders Management",
+                        "Point of Sale (POS) Terminal",
+                        "Global Shipping Settings",
+                        "Courier Integrations (Pathao/Steadfast)",
+                        "Sales & Revenue Reports",
+                        "Fraud Checker & Risk Scanner",
+                        "Roles & Permissions Matrix",
+                        "Payment Gateway Setup"
+                    ]
                 },
                 {
                     id: "enterprise_plan",
                     name: "Enterprise Ultimate",
                     theme: "enterprise",
-                    details: "Tailored specifically for large-scale operations requiring absolute maximum horsepower.",
+                    details: "Tailored specifically for large-scale multi-vendor operations and enterprise networks.",
                     priceMonthly: "8500",
                     priceYearly: "85000",
                     priceLifetime: "200000",
                     status: true,
-                    features: ["1 Store Dashboard", "Unlimited Products", "Advanced Sales Reports", "Custom Domain Settings", "24/7 Priority Support", "Fraud Checker Integration", "WooCommerce Migration", "Custom Payment Gateways"]
+                    features: DEFAULT_FEATURES
                 }
             ];
 
             // LocalStorage Keys
-            const FEATURES_KEY = "admin_packages_features_pool";
-            const PACKAGES_KEY = "admin_packages_list";
+            const FEATURES_KEY = "admin_packages_features_pool_v2";
+            const PACKAGES_KEY = "admin_packages_list_v2";
 
             // State variables
             let featuresPool = [];
@@ -756,6 +1018,12 @@
                     featuresPool = DEFAULT_FEATURES;
                 } else {
                     featuresPool = JSON.parse(storedFeatures);
+                    // Automatically include any newly added DB permissions into featuresPool
+                    const missingDbFeatures = DIRECT_DB_FORMATTED_FEATURES.filter(f => !featuresPool.includes(f));
+                    if (missingDbFeatures.length > 0) {
+                        featuresPool = Array.from(new Set([...featuresPool, ...DIRECT_DB_FORMATTED_FEATURES]));
+                        localStorage.setItem(FEATURES_KEY, JSON.stringify(featuresPool));
+                    }
                 }
 
                 if (!storedPackages) {
@@ -796,42 +1064,88 @@
                     cardCol.className = 'col-md-4 mb-4';
 
                     let featuresHTML = '';
-                    featuresPool.forEach(feat => {
-                        const isIncluded = pkg.features.includes(feat);
-                        featuresHTML += `
-                            <div class="feature-item ${isIncluded ? 'feature-included' : 'feature-excluded'}">
-                                <i class="${isIncluded ? 'fas fa-check-circle feature-icon-included' : 'fas fa-times-circle feature-icon-excluded'}"></i>
-                                <span>${feat}</span>
-                            </div>
-                        `;
+                    const totalFeaturesCount = featuresPool.length;
+                    const includedCount = pkg.features ? pkg.features.length : 0;
+
+                    // Group features by category for display - showing ALL features (included and excluded)
+                    SIDEBAR_FEATURE_GROUPS.forEach(group => {
+                        const poolCategoryItems = group.items.filter(item => featuresPool.includes(item));
+                        if (poolCategoryItems.length > 0) {
+                            const groupIncludedItems = poolCategoryItems.filter(item => pkg.features && pkg.features.includes(item));
+                            featuresHTML += `
+                                <div class="mb-3">
+                                    <div class="small font-weight-bold text-muted text-uppercase mb-1 border-bottom pb-1" style="font-size: 10px; letter-spacing: 0.5px;">
+                                        <i class="${group.icon} me-1"></i> ${group.category} (${groupIncludedItems.length}/${poolCategoryItems.length})
+                                    </div>
+                            `;
+                            poolCategoryItems.forEach(feat => {
+                                const isIncluded = pkg.features && pkg.features.includes(feat);
+                                featuresHTML += `
+                                    <div class="feature-item ${isIncluded ? 'feature-included' : 'feature-excluded'} py-1">
+                                        <i class="${isIncluded ? 'fas fa-check-circle feature-icon-included' : 'fas fa-times-circle feature-icon-excluded'} me-2"></i>
+                                        <span style="font-size: 12px;">${feat}</span>
+                                    </div>
+                                `;
+                            });
+                            featuresHTML += `</div>`;
+                        }
                     });
 
+                    // Add extra custom pool features not in standard groups if any
+                    const customFeatures = featuresPool.filter(f => !DEFAULT_FEATURES.includes(f));
+                    if (customFeatures.length > 0) {
+                        const customIncludedCount = customFeatures.filter(f => pkg.features && pkg.features.includes(f)).length;
+                        featuresHTML += `
+                            <div class="mb-3">
+                                <div class="small font-weight-bold text-muted text-uppercase mb-1 border-bottom pb-1" style="font-size: 10px; letter-spacing: 0.5px;">
+                                    <i class="fas fa-star text-warning me-1"></i> Custom Extensions (${customIncludedCount}/${customFeatures.length})
+                                </div>
+                        `;
+                        customFeatures.forEach(feat => {
+                            const isIncluded = pkg.features && pkg.features.includes(feat);
+                            featuresHTML += `
+                                <div class="feature-item ${isIncluded ? 'feature-included' : 'feature-excluded'} py-1">
+                                    <i class="${isIncluded ? 'fas fa-check-circle feature-icon-included' : 'fas fa-times-circle feature-icon-excluded'} me-2"></i>
+                                    <span style="font-size: 12px;">${feat}</span>
+                                </div>
+                            `;
+                        });
+                        featuresHTML += `</div>`;
+                    }
+
+                    if (includedCount === 0) {
+                        featuresHTML = `<div class="text-muted small py-3 text-center">No features allocated to this tier yet.</div>`;
+                    }
+
                     cardCol.innerHTML = `
-                        <div class="premium-card">
+                        <div class="premium-card h-100 d-flex flex-column">
                             <div class="gradient-header ${pkg.theme || 'default'}">
-                                <span class="badge ${pkg.status ? 'bg-success' : 'bg-secondary'} mb-2">${pkg.status ? 'Active' : 'Inactive'}</span>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge ${pkg.status ? 'bg-success' : 'bg-secondary'}">${pkg.status ? 'Active' : 'Inactive'}</span>
+                                    <span class="badge bg-white text-dark font-weight-bold" style="font-size: 11px;">${includedCount}/${totalFeaturesCount} Features</span>
+                                </div>
                                 <h4 class="mb-1 font-weight-bold" style="color: #fff;">${pkg.name}</h4>
-                                <p class="small mb-0 opacity-80" style="color: rgba(255,255,255,0.85); min-height: 40px;">${pkg.details}</p>
+                                <p class="small mb-0 opacity-80" style="color: rgba(255,255,255,0.85); min-height: 38px;">${pkg.details}</p>
                                 <div class="package-price-badge">Monthly: TK ${pkg.priceMonthly}</div>
                             </div>
-                            <div class="card-body p-4 pt-4 flex-grow-1">
-                                <div class="row text-center mb-3 border-bottom pb-3">
+                            <div class="card-body p-3 flex-grow-1 d-flex flex-column">
+                                <div class="row text-center mb-3 border-bottom pb-2">
                                     <div class="col-6 border-end">
-                                        <span class="text-muted d-block small">Yearly Plan</span>
+                                        <span class="text-muted d-block small">Yearly Rate</span>
                                         <strong class="text-dark">TK ${pkg.priceYearly}</strong>
                                     </div>
                                     <div class="col-6">
-                                        <span class="text-muted d-block small">Lifetime Plan</span>
+                                        <span class="text-muted d-block small">Lifetime Rate</span>
                                         <strong class="text-dark">TK ${pkg.priceLifetime}</strong>
                                     </div>
                                 </div>
-                                <div class="features-list-wrapper mb-4">
+                                <div class="features-list-wrapper mb-3 flex-grow-1" style="max-height: 280px; overflow-y: auto; padding-right: 5px;">
                                     ${featuresHTML}
                                 </div>
                             </div>
-                            <div class="card-footer bg-light border-0 p-3 d-flex justify-content-between gap-2">
+                            <div class="card-footer bg-light border-0 p-3 d-flex justify-content-between gap-2 mt-auto">
                                 <button class="btn btn-outline-info rounded-pill px-3 flex-grow-1" onclick="openEditModal('${pkg.id}')">
-                                    <i class="fas fa-edit me-1"></i> Edit
+                                    <i class="fas fa-edit me-1"></i> Edit Plan
                                 </button>
                                 <button class="btn btn-outline-danger rounded-pill px-3" onclick="deletePackage('${pkg.id}')">
                                     <i class="fas fa-trash"></i>
@@ -849,44 +1163,244 @@
             // Render list inside features pool modal
             function renderFeaturesPoolList() {
                 const container = document.getElementById('featuresListContainer');
+                if (!container) return;
                 container.innerHTML = '';
 
-                featuresPool.forEach((feat, idx) => {
+                const searchVal = (document.getElementById('featuresPoolSearch')?.value || '').toLowerCase().trim();
+                const filteredPool = featuresPool.filter(f => f.toLowerCase().includes(searchVal));
+
+                document.getElementById('featuresPoolCount').textContent = featuresPool.length;
+
+                if (filteredPool.length === 0) {
+                    container.innerHTML = `<li class="list-group-item text-muted text-center py-3">No matching features found.</li>`;
+                    return;
+                }
+
+                filteredPool.forEach((feat) => {
+                    const originalIdx = featuresPool.indexOf(feat);
                     const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center px-0 py-2';
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center px-2 py-2 border-bottom';
                     li.innerHTML = `
-                        <span>${feat}</span>
-                        <button class="btn btn-sm btn-link text-danger" onclick="deleteFeature(${idx})">
-                            <i class="fas fa-trash-alt"></i>
+                        <span class="font-weight-medium text-dark"><i class="fas fa-cube text-primary me-2" style="font-size: 12px;"></i>${feat}</span>
+                        <button class="btn btn-sm btn-outline-danger rounded-circle p-1" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;" onclick="deleteFeature(${originalIdx})" title="Delete Feature">
+                            <i class="fas fa-trash-alt" style="font-size: 11px;"></i>
                         </button>
                     `;
                     container.appendChild(li);
                 });
             }
 
-            // Render features checklist in Package Form Modal
+            function filterFeaturesPoolList() {
+                renderFeaturesPoolList();
+            }
+
+            function resetToDefaultSidebarFeatures() {
+                Swal.fire({
+                    title: 'Reset to All Sidebar Features?',
+                    text: 'This will restore the master pool to include every page and section discovered from the system sidebar.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Yes, Reset Defaults'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        featuresPool = [...DEFAULT_FEATURES];
+                        localStorage.setItem(FEATURES_KEY, JSON.stringify(featuresPool));
+                        renderWorkspace();
+                        Swal.fire('Reset!', 'Master feature pool reset to all sidebar pages.', 'success');
+                    }
+                });
+            }
+
+            // Render features checklist grouped in Package Form Modal
             function renderModalFeaturesChecklist(checkedFeatures = []) {
                 const container = document.getElementById('modalFeaturesContainer');
+                if (!container) return;
                 container.innerHTML = '';
 
                 if (featuresPool.length === 0) {
-                    container.innerHTML = `<p class="text-muted col-12">No features created in the features pool yet.</p>`;
+                    container.innerHTML = `<p class="text-muted col-12 py-3 text-center">No features created in the features pool yet.</p>`;
                     return;
                 }
 
-                featuresPool.forEach((feat, idx) => {
-                    const col = document.createElement('div');
-                    col.className = 'col-md-6 mb-2';
-                    const isChecked = checkedFeatures.includes(feat);
-                    col.innerHTML = `
-                        <div class="form-check">
-                            <input class="form-check-input feature-checkbox" type="checkbox" value="${feat}" id="featCheck_${idx}" ${isChecked ? 'checked' : ''}>
-                            <label class="form-check-label text-dark" for="featCheck_${idx}">
-                                ${feat}
-                            </label>
+                let sectionIndex = 0;
+                SIDEBAR_FEATURE_GROUPS.forEach((group) => {
+                    // Filter pool items belonging to this category
+                    const poolCategoryItems = group.items.filter(item => featuresPool.includes(item));
+                    if (poolCategoryItems.length === 0) return;
+
+                    sectionIndex++;
+                    const groupSlug = 'sec_' + sectionIndex;
+                    const allCategoryChecked = poolCategoryItems.every(item => checkedFeatures.includes(item));
+
+                    const card = document.createElement('div');
+                    card.className = 'card border mb-3 shadow-sm rounded-3 feature-group-card';
+                    card.setAttribute('data-category', group.category.toLowerCase());
+
+                    let itemsHTML = '';
+                    poolCategoryItems.forEach((feat) => {
+                        const isChecked = checkedFeatures.includes(feat);
+                        const safeId = 'feat_' + feat.replace(/[^a-zA-Z0-9]/g, '_');
+                        itemsHTML += `
+                            <div class="col-md-6 mb-2 feature-checkbox-item" data-feature-name="${feat.toLowerCase()}">
+                                <label class="feature-select-card ${isChecked ? 'active-selected' : ''}" for="${safeId}">
+                                    <input class="form-check-input feature-checkbox group-cb-${groupSlug}" type="checkbox" value="${feat}" id="${safeId}" ${isChecked ? 'checked' : ''} onchange="onFeatureCardToggle(this)">
+                                    <span class="text-dark font-weight-medium" style="font-size: 13px;">${feat}</span>
+                                </label>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="feature-group-header">
+                            <div class="d-flex align-items-center gap-2" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapse_${groupSlug}">
+                                <i class="${group.icon} fs-6 me-1"></i>
+                                <span class="feature-group-title">${group.category}</span>
+                                <span class="badge bg-primary text-white rounded-pill px-2 py-1 ms-1" style="font-size: 10px; font-weight: 700;">${poolCategoryItems.length} items</span>
+                            </div>
+                            <div class="group-toggle-badge" onclick="event.stopPropagation()">
+                                <input class="form-check-input select-all-section-cb m-0" type="checkbox" id="sec_cb_${groupSlug}" ${allCategoryChecked ? 'checked' : ''} onchange="selectAllSectionFeatures('${groupSlug}', this.checked)" style="cursor: pointer;">
+                                <label for="sec_cb_${groupSlug}" class="text-secondary">Select Group</label>
+                            </div>
+                        </div>
+                        <div id="collapse_${groupSlug}" class="collapse show">
+                            <div class="card-body p-3 bg-white">
+                                <div class="row g-2">
+                                    ${itemsHTML}
+                                </div>
+                            </div>
                         </div>
                     `;
-                    container.appendChild(col);
+                    container.appendChild(card);
+                });
+
+                // Add any custom extra features in pool not in default sidebar groups
+                const extraPoolItems = featuresPool.filter(feat => !DEFAULT_FEATURES.includes(feat));
+                if (extraPoolItems.length > 0) {
+                    sectionIndex++;
+                    const groupSlug = 'sec_custom';
+                    const allCustomChecked = extraPoolItems.every(item => checkedFeatures.includes(item));
+
+                    const card = document.createElement('div');
+                    card.className = 'card border mb-3 shadow-sm rounded-3 feature-group-card';
+                    card.setAttribute('data-category', 'custom extensions');
+
+                    let itemsHTML = '';
+                    extraPoolItems.forEach((feat) => {
+                        const isChecked = checkedFeatures.includes(feat);
+                        const safeId = 'feat_' + feat.replace(/[^a-zA-Z0-9]/g, '_');
+                        itemsHTML += `
+                            <div class="col-md-6 mb-2 feature-checkbox-item" data-feature-name="${feat.toLowerCase()}">
+                                <label class="feature-select-card ${isChecked ? 'active-selected' : ''}" for="${safeId}">
+                                    <input class="form-check-input feature-checkbox group-cb-${groupSlug}" type="checkbox" value="${feat}" id="${safeId}" ${isChecked ? 'checked' : ''} onchange="onFeatureCardToggle(this)">
+                                    <span class="text-dark font-weight-medium" style="font-size: 13px;">${feat}</span>
+                                </label>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="feature-group-header">
+                            <div class="d-flex align-items-center gap-2" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapse_${groupSlug}">
+                                <i class="fas fa-star text-warning fs-6 me-1"></i>
+                                <span class="feature-group-title">Custom Features Pool</span>
+                                <span class="badge bg-warning text-dark rounded-pill px-2 py-1 ms-1" style="font-size: 10px; font-weight: 700;">${extraPoolItems.length} items</span>
+                            </div>
+                            <div class="group-toggle-badge" onclick="event.stopPropagation()">
+                                <input class="form-check-input select-all-section-cb m-0" type="checkbox" id="sec_cb_${groupSlug}" ${allCustomChecked ? 'checked' : ''} onchange="selectAllSectionFeatures('${groupSlug}', this.checked)" style="cursor: pointer;">
+                                <label for="sec_cb_${groupSlug}" class="text-secondary">Select Group</label>
+                            </div>
+                        </div>
+                        <div id="collapse_${groupSlug}" class="collapse show">
+                            <div class="card-body p-3 bg-white">
+                                <div class="row g-2">
+                                    ${itemsHTML}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+
+                updateSelectedCountBadge();
+
+                // Attach search listener
+                const searchInput = document.getElementById('packageFeatureSearch');
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchInput.oninput = function() {
+                        const term = this.value.toLowerCase().trim();
+                        document.querySelectorAll('.feature-group-card').forEach(groupCard => {
+                            const categoryText = groupCard.getAttribute('data-category') || '';
+                            let visibleItemsCount = 0;
+                            groupCard.querySelectorAll('.feature-checkbox-item').forEach(item => {
+                                const featName = item.getAttribute('data-feature-name') || '';
+                                if (term === '' || featName.includes(term) || categoryText.includes(term)) {
+                                    item.style.display = '';
+                                    visibleItemsCount++;
+                                } else {
+                                    item.style.display = 'none';
+                                }
+                            });
+                            if (term === '') {
+                                groupCard.style.display = '';
+                            } else if (visibleItemsCount > 0) {
+                                groupCard.style.display = '';
+                                const collapseEl = groupCard.querySelector('.collapse');
+                                if (collapseEl && typeof bootstrap !== 'undefined') {
+                                    const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
+                                    bsCollapse.show();
+                                }
+                            } else {
+                                groupCard.style.display = 'none';
+                            }
+                        });
+                    };
+                }
+            }
+
+            function onFeatureCardToggle(cb) {
+                const cardLabel = cb.closest('.feature-select-card');
+                if (cardLabel) {
+                    if (cb.checked) cardLabel.classList.add('active-selected');
+                    else cardLabel.classList.remove('active-selected');
+                }
+                updateSelectedCountBadge();
+            }
+
+            function updateSelectedCountBadge() {
+                const checkedCount = document.querySelectorAll('.feature-checkbox:checked').length;
+                const badge = document.getElementById('selectedFeaturesCount');
+                if (badge) badge.textContent = checkedCount;
+            }
+
+            function selectAllSectionFeatures(groupSlug, isChecked) {
+                document.querySelectorAll(`.group-cb-${groupSlug}`).forEach(cb => {
+                    cb.checked = isChecked;
+                    onFeatureCardToggle(cb);
+                });
+                updateSelectedCountBadge();
+            }
+
+            function selectAllModalFeatures(checkState) {
+                document.querySelectorAll('.feature-checkbox').forEach(cb => {
+                    cb.checked = checkState;
+                    onFeatureCardToggle(cb);
+                });
+                document.querySelectorAll('.select-all-section-cb').forEach(cb => {
+                    cb.checked = checkState;
+                });
+                updateSelectedCountBadge();
+            }
+
+            function toggleModalSections(expand) {
+                document.querySelectorAll('#modalFeaturesContainer .collapse').forEach(collapseEl => {
+                    if (typeof bootstrap !== 'undefined') {
+                        const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
+                        if (expand) bsCollapse.show();
+                        else bsCollapse.hide();
+                    }
                 });
             }
 
@@ -936,7 +1450,9 @@
 
                         // Clean up package assignments
                         packagesList.forEach(pkg => {
-                            pkg.features = pkg.features.filter(f => f !== featToDelete);
+                            if (pkg.features) {
+                                pkg.features = pkg.features.filter(f => f !== featToDelete);
+                            }
                         });
                         localStorage.setItem(PACKAGES_KEY, JSON.stringify(packagesList));
 
@@ -964,7 +1480,7 @@
                 const pkg = packagesList.find(p => p.id === pkgId);
                 if (!pkg) return;
 
-                document.getElementById('packageModalLabel').textContent = 'Edit Package';
+                document.getElementById('packageModalLabel').textContent = 'Edit Package Plan';
                 document.getElementById('packageId').value = pkg.id;
                 document.getElementById('packageName').value = pkg.name;
                 document.getElementById('packageTheme').value = pkg.theme || 'default';
@@ -974,7 +1490,7 @@
                 document.getElementById('priceLifetime').value = pkg.priceLifetime;
                 document.getElementById('packageStatus').checked = pkg.status;
 
-                renderModalFeaturesChecklist(pkg.features);
+                renderModalFeaturesChecklist(pkg.features || []);
 
                 const modal = new bootstrap.Modal(document.getElementById('packageModal'));
                 modal.show();
