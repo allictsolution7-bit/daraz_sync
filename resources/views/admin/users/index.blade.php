@@ -1146,18 +1146,26 @@
                 const storedFeatures = localStorage.getItem(FEATURES_KEY);
                 const storedPackages = localStorage.getItem(PACKAGES_KEY);
 
-                if (!storedFeatures) {
-                    localStorage.setItem(FEATURES_KEY, JSON.stringify(DEFAULT_FEATURES));
-                    featuresPool = DEFAULT_FEATURES;
-                } else {
-                    featuresPool = JSON.parse(storedFeatures);
+                try {
+                    featuresPool = storedFeatures ? JSON.parse(storedFeatures) : [];
+                } catch(e) {
+                    featuresPool = [];
                 }
 
-                if (!storedPackages) {
-                    localStorage.setItem(PACKAGES_KEY, JSON.stringify(DEFAULT_PACKAGES));
+                if (!Array.isArray(featuresPool) || featuresPool.length === 0) {
+                    featuresPool = DEFAULT_FEATURES;
+                    localStorage.setItem(FEATURES_KEY, JSON.stringify(DEFAULT_FEATURES));
+                }
+
+                try {
+                    packagesList = storedPackages ? JSON.parse(storedPackages) : [];
+                } catch(e) {
+                    packagesList = [];
+                }
+
+                if (!Array.isArray(packagesList) || packagesList.length === 0) {
                     packagesList = DEFAULT_PACKAGES;
-                } else {
-                    packagesList = JSON.parse(storedPackages);
+                    localStorage.setItem(PACKAGES_KEY, JSON.stringify(DEFAULT_PACKAGES));
                 }
             }
 
@@ -1302,36 +1310,6 @@
                         }
                     });
 
-                    cardCol.innerHTML = `
-                        <div class="premium-card h-100 d-flex flex-column ${isCurrentSub ? 'border border-2 border-success shadow-lg' : ''}">
-                            <div class="gradient-header ${pkg.theme || 'default'}">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    ${isCurrentSub ? '<span class="badge bg-warning text-dark font-weight-bold"><i class="fas fa-star me-1"></i> Current Active Plan</span>' : `<span class="badge ${pkg.status ? 'bg-success' : 'bg-secondary'}">${pkg.status ? 'Active' : 'Inactive'}</span>`}
-                                    <span class="badge bg-white text-dark font-weight-bold" style="font-size: 11px;">${includedCount}/${totalFeaturesCount} Features</span>
-                                </div>
-                                <h4 class="mb-1 font-weight-bold" style="color: #fff;">${pkg.name}</h4>
-                                <p class="small mb-0 opacity-80" style="color: rgba(255,255,255,0.85); min-height: 38px;">${pkg.details}</p>
-                                <div class="package-price-badge">TK ${Number(displayPrice).toLocaleString()} / ${currentBillingCycle}</div>
-                            </div>
-                            <div class="card-body p-3 flex-grow-1 d-flex flex-column">
-                                <div class="row text-center mb-3 border-bottom pb-2">
-                                    <div class="col-4 border-end">
-                                        <span class="text-muted d-block small" style="font-size: 10px;">Monthly</span>
-                                        <strong class="text-dark small">TK ${pkg.priceMonthly}</strong>
-                                    </div>
-                                    <div class="col-4 border-end">
-                                        <span class="text-muted d-block small" style="font-size: 10px;">Yearly</span>
-                                        <strong class="text-dark small">TK ${pkg.priceYearly}</strong>
-                                    </div>
-                                    <div class="col-4">
-                                        <span class="text-muted d-block small" style="font-size: 10px;">Lifetime</span>
-                                        <strong class="text-dark small">TK ${pkg.priceLifetime}</strong>
-                                    </div>
-                                </div>
-                                <div class="features-list-wrapper mb-3 flex-grow-1" style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
-                                    ${featuresHTML}
-                                </div>
-                            </div>
                     let cardFooterHTML = '';
                     if (window.IS_SUPER_ADMIN) {
                         cardFooterHTML = `
@@ -1951,9 +1929,19 @@
             }
 
             // Initial render on DOM load
-            document.addEventListener('DOMContentLoaded', function() {
-                renderWorkspace();
-            });
+            function bootWorkspace() {
+                if (typeof renderWorkspace === 'function') {
+                    renderWorkspace();
+                }
+            }
+
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                setTimeout(bootWorkspace, 50);
+            }
+            document.addEventListener('DOMContentLoaded', bootWorkspace);
+            if (typeof $ !== 'undefined') {
+                $(document).ready(bootWorkspace);
+            }
         </script>
         <script>
             window.deleteMockAdmin = function(id) {
