@@ -613,7 +613,7 @@
                                 <span style="color: #c7d2fe; font-weight: 500; font-size: 0.75rem;">Expires:</span>
                                 <span class="fw-bold" style="font-size: 0.8rem;">Dec 31, 2026</span>
                             </div>
-                            <button type="button" class="btn btn-sm btn-light fw-bold text-indigo-900 px-3 ms-1" style="border-radius: 6px; color: #1e1b4b; background-color: #ffffff; transition: transform 0.2s; font-size: 0.75rem; height: 26px; padding: 0 10px; display: inline-flex; align-items: center;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">Renew Plan</button>
+                            <a href="{{ route('admin.users', ['view' => 'packages']) }}" class="btn btn-sm btn-light fw-bold text-indigo-900 px-3 ms-1" style="border-radius: 6px; color: #1e1b4b; background-color: #ffffff; transition: transform 0.2s; font-size: 0.75rem; height: 26px; padding: 0 10px; display: inline-flex; align-items: center; text-decoration: none;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">Renew Plan</a>
                         </div>
 
                         <!-- System Status & Clock -->

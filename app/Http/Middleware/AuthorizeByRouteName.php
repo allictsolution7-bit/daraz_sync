@@ -158,11 +158,14 @@ class AuthorizeByRouteName
             }
         }
 
-        // Allow access if user has explicit permission, is super admin, or has orders.assigned/orders.asigned for order resources
         $hasOrderAssignedPermission = ($resourceKey === 'orders' || str_contains($name, 'asigned')) && 
             ($user->can('orders.assigned') || $user->can('orders.asigned') || $user->can('asigned.orders'));
 
-        if ($user->can($permission) || $hasOrderAssignedPermission || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
+        // Allow packages subscription view for all admin accounts
+        $isPackagesView = $request->get('view') === 'packages';
+        $isAdminUser = method_exists($user, 'hasRole') && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('super admin') || ($user->role ?? '') === 'admin');
+
+        if ($user->can($permission) || $hasOrderAssignedPermission || ($isPackagesView && $isAdminUser) || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
             return $next($request);
         }
 

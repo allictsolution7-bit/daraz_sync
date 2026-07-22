@@ -68,8 +68,8 @@
         .stat-card-premium {
             background: var(--bg-glass);
             border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            padding: 24px;
+            border-radius: 14px;
+            padding: 14px 18px;
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-premium);
@@ -77,7 +77,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 140px;
+            min-height: 75px;
         }
 
         .stat-card-premium::before {
@@ -92,8 +92,8 @@
         }
 
         .stat-card-premium:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
         }
 
         .stat-card-premium.gradient-1 {
@@ -115,27 +115,27 @@
         }
 
         .stat-card-title {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.5px;
             opacity: 0.85;
-            margin-bottom: 6px;
+            margin-bottom: 2px;
         }
 
         .stat-card-value {
-            font-size: 32px;
+            font-size: 22px;
             font-weight: 800;
-            line-height: 1;
-            margin-bottom: 4px;
+            line-height: 1.1;
+            margin-bottom: 0;
         }
 
         .stat-card-icon {
             position: absolute;
-            right: 20px;
-            bottom: 15px;
-            font-size: 4rem;
-            opacity: 0.15;
+            right: 15px;
+            bottom: 10px;
+            font-size: 2.2rem;
+            opacity: 0.18;
             pointer-events: none;
         }
 
@@ -298,7 +298,7 @@
         .gradient-header {
             background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
             color: #fff;
-            padding: 28px;
+            padding: 16px 20px;
             position: relative;
         }
 
@@ -468,8 +468,9 @@
             </div>
         @endif
 
-        <!-- Portal Tabs Navigation -->
-        <div class="portal-tabs-container">
+        <!-- Portal Tabs Navigation (Super Admin Only) -->
+        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
+        <div class="portal-tabs-container mb-3">
             <a href="{{ route('admin.users') }}" class="portal-tab-btn {{ request()->get('view') !== 'packages' ? 'active' : '' }}">
                 <i class="fas fa-users-cog"></i> Users Accounts Directory
             </a>
@@ -477,13 +478,14 @@
                 <i class="fas fa-layer-group"></i> SaaS Billing Tiers
             </a>
         </div>
+        @endif
 
         @if(request()->get('view') === 'packages')
             <!-- ADMIN PACKAGES WORKSPACE -->
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
                 <div>
                     <h3 class="mb-1 font-weight-bold" style="color: var(--dark-slate);">SaaS Billing Matrix</h3>
-                    <p class="text-muted mb-0">Create, customize, and regulate membership subscription plans and pricing structures</p>
+                    <p class="text-muted mb-0 small">Choose or manage membership subscription plans and pricing structures</p>
                 </div>
                 @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
                 <div class="d-flex gap-2">
@@ -497,8 +499,9 @@
                 @endif
             </div>
 
-            <!-- Stats Dashboard Row -->
-            <div class="row mb-4 g-3">
+            <!-- Stats Dashboard Row (Super Admin Only) -->
+            @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
+            <div class="row mb-3 g-3">
                 <div class="col-md-4">
                     <div class="stat-card-premium gradient-1">
                         <div>
@@ -527,9 +530,10 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Billing Frequency Filter Bar -->
-            <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white border rounded-4 shadow-sm flex-wrap gap-3">
+            <div class="d-flex justify-content-between align-items-center mb-3 p-2 px-3 bg-white border rounded-4 shadow-sm flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fas fa-clock text-primary me-1"></i>
                     <span class="font-weight-bold text-dark small">Billing Cycle:</span>

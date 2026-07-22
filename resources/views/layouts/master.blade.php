@@ -1852,7 +1852,7 @@
                         @endif
  
                         <!-- CONTROL & SYSTEM SECTION -->
-                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['users.view', 'contacts.view', 'subscriptions.view', 'roles.manage', 'settings.view']))
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->hasRole('admin') || auth()->user()?->role === 'admin' || auth()->user()?->canAny(['users.view', 'contacts.view', 'subscriptions.view', 'roles.manage', 'settings.view']))
                         <li class="menu-section {{ $controlSystemActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1862,6 +1862,18 @@
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $controlSystemActive ? 'display: block;' : 'display: none;' }}">
+                                <li class="{{ request()->is('admin/team-members*') && request()->get('view') === 'packages' ? 'active' : '' }}">
+                                    <a href="{{ route('admin.users', ['view' => 'packages']) }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-boxes-packing" style="color:#10b981;"></i>
+                                            @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
+                                                SaaS Packages & Pricing Config
+                                            @else
+                                                My Subscription & Packages
+                                            @endif
+                                        </span>
+                                    </a>
+                                </li>
                                 @can('users.view')
                                 <li class="sub-menu {{ request()->is('admin/team-members*') ? 'active' : '' }}">
                                     <a href="#">
@@ -1877,14 +1889,6 @@
                                                 <span class="menu-content">
                                                     <i class="fas fa-users-gear"></i>
                                                     All Users
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li class="{{ request()->is('admin/team-members*') && request()->get('view') === 'packages' ? 'active' : '' }}">
-                                            <a href="{{ route('admin.users', ['view' => 'packages']) }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-boxes-packing"></i>
-                                                    Admin Subscription & Packages
                                                 </span>
                                             </a>
                                         </li>
