@@ -944,10 +944,9 @@
                 }
             ];
 
-            // Combine hardcoded sidebar section items with directly fetched database permissions dynamically
+            // Clean sidebar items pool
             const SIDEBAR_ITEMS = SIDEBAR_FEATURE_GROUPS.flatMap(g => g.items);
-            const COMBINED_DB_FEATURES = Array.from(new Set([...SIDEBAR_ITEMS, ...DIRECT_DB_FORMATTED_FEATURES]));
-            const DEFAULT_FEATURES = COMBINED_DB_FEATURES;
+            const DEFAULT_FEATURES = SIDEBAR_ITEMS;
 
             const DEFAULT_PACKAGES = [
                 {
@@ -1013,8 +1012,8 @@
             ];
 
             // LocalStorage Keys
-            const FEATURES_KEY = "admin_packages_features_pool_v2";
-            const PACKAGES_KEY = "admin_packages_list_v2";
+            const FEATURES_KEY = "admin_packages_features_pool_v3";
+            const PACKAGES_KEY = "admin_packages_list_v3";
 
             // State variables
             let featuresPool = [];
@@ -1030,12 +1029,6 @@
                     featuresPool = DEFAULT_FEATURES;
                 } else {
                     featuresPool = JSON.parse(storedFeatures);
-                    // Automatically include any newly added DB permissions into featuresPool
-                    const missingDbFeatures = DIRECT_DB_FORMATTED_FEATURES.filter(f => !featuresPool.includes(f));
-                    if (missingDbFeatures.length > 0) {
-                        featuresPool = Array.from(new Set([...featuresPool, ...DIRECT_DB_FORMATTED_FEATURES]));
-                        localStorage.setItem(FEATURES_KEY, JSON.stringify(featuresPool));
-                    }
                 }
 
                 if (!storedPackages) {
