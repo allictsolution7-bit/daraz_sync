@@ -365,12 +365,18 @@
         $groupedPermissions = collect($permissions)
             ->groupBy(function($perm){
                 $parts = explode('.', $perm->name);
-                return $parts[0]; // e.g., products, orders, shipping
+                if (($parts[0] === 'admin' && isset($parts[1]) && $parts[1] === 'pos') || $parts[0] === 'pos') {
+                    return 'pos';
+                }
+                return $parts[0];
             })
-            ->map(function($set){
-                return $set->groupBy(function($perm){
+            ->map(function($set, $groupKey){
+                return $set->groupBy(function($perm) use ($groupKey) {
                     $parts = explode('.', $perm->name);
-                    return $parts[1] ?? 'core'; // e.g., zones/rules/basic or core
+                    if ($groupKey === 'pos') {
+                        return $parts[2] ?? $parts[1] ?? 'access';
+                    }
+                    return $parts[1] ?? 'core';
                 })->sortKeys();
             })
             ->sortKeys();
@@ -458,7 +464,7 @@
                                                     <h6 class="mb-0 d-flex align-items-center justify-content-between">
                                                         <span class="text-capitalize d-flex align-items-center">
                                                             <i class="fas fa-layer-group text-primary mr-2"></i>
-                                                            {{ str_replace('_',' ', $group) }}
+                                                            {{ $group === 'pos' ? 'Point of Sale (POS)' : ($group === 'incomplete_orders' ? 'Incomplete Orders' : str_replace('_',' ', $group)) }}
                                                         </span>
                                                         <div class="d-flex align-items-center">
                                                             <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
@@ -662,7 +668,7 @@
                                         <h6 class="mb-0 d-flex align-items-center justify-content-between">
                                             <span class="text-capitalize d-flex align-items-center">
                                                 <i class="fas fa-layer-group text-primary mr-2"></i>
-                                                {{ str_replace('_',' ', $group) }}
+                                                {{ $group === 'pos' ? 'Point of Sale (POS)' : ($group === 'incomplete_orders' ? 'Incomplete Orders' : str_replace('_',' ', $group)) }}
                                             </span>
                                             <div class="d-flex align-items-center">
                                                 <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>

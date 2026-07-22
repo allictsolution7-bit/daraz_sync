@@ -25,6 +25,8 @@ class PermissionSeeder extends Seeder
             // incomplete orders
             'incomplete_orders.view','incomplete_orders.delete','incomplete_orders.bulk_delete','incomplete_orders.export_selected',
             'incomplete_orders.update_status','incomplete_orders.update_note','incomplete_orders.convert','incomplete_orders.get_variation_combinations','incomplete_orders.convert_page',
+            // pos
+            'pos.view','pos.access','pos.create_order','pos.manage_settings','admin.pos.access','admin.pos.create-order','admin.pos.manage-settings',
             // pages
             'pages.view','pages.create','pages.update','pages.delete',
             // landing pages

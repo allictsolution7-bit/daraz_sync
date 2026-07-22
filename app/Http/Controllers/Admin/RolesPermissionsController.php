@@ -23,17 +23,20 @@ class RolesPermissionsController extends Controller
     {
         $request->validate(['name' => 'required|unique:permissions,name']);
         Permission::create(['name' => $request->name]);
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         return back()->with('success', 'Permission created successfully.');
     }
     public function updatePermission(Request $request, Permission $permission)
     {
         $request->validate(['name' => 'required|unique:permissions,name,' . $permission->id]);
         $permission->update(['name' => $request->name]);
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         return back()->with('success', 'Permission updated successfully.');
     }
     public function deletePermission(Permission $permission)
     {
         $permission->delete();
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         return back()->with('success', 'Permission deleted successfully.');
     }
 
@@ -46,6 +49,7 @@ class RolesPermissionsController extends Controller
         ]);
         $role = Role::create(['name' => $request->name]);
         $role->syncPermissions($request->permissions ?? []);
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         return back()->with('success', 'Role created successfully.');
     }
     public function updateRole(Request $request, Role $role)
@@ -56,11 +60,13 @@ class RolesPermissionsController extends Controller
         ]);
         $role->update(['name' => $request->name]);
         $role->syncPermissions($request->permissions ?? []);
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         return back()->with('success', 'Role updated successfully.');
     }
     public function deleteRole(Role $role)
     {
         $role->delete();
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         return back()->with('success', 'Role deleted successfully.');
     }
 
@@ -68,6 +74,7 @@ class RolesPermissionsController extends Controller
     public function updateUserRoles(Request $request, User $user)
     {
         $user->syncRoles($request->roles ?? []);
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         return back()->with('success', 'User roles updated successfully.');
     }
 } 

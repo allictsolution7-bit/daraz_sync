@@ -23,6 +23,14 @@ class AuthorizeByRouteName
             return $next($request);
         }
 
+        // Direct mapping for assigned orders route
+        if ($name === 'admin.asigned.orders' || $name === 'asigned.orders') {
+            if ($user->can('orders.asigned') || $user->can('orders.assigned') || $user->can('asigned.orders') || $user->can('assigned.orders') || $user->can('orders.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
+                return $next($request);
+            }
+            abort(403);
+        }
+
         $parts = explode('.', $name);
         if (count($parts) < 2 || $parts[0] !== 'admin') {
             return $next($request);
@@ -150,7 +158,11 @@ class AuthorizeByRouteName
             }
         }
 
-        if ($user->can($permission) || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
+        // Allow access if user has explicit permission, is super admin, or has orders.assigned/orders.asigned for order resources
+        $hasOrderAssignedPermission = ($resourceKey === 'orders' || str_contains($name, 'asigned')) && 
+            ($user->can('orders.assigned') || $user->can('orders.asigned') || $user->can('asigned.orders'));
+
+        if ($user->can($permission) || $hasOrderAssignedPermission || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
             return $next($request);
         }
 
