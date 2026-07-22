@@ -690,6 +690,18 @@ class AdminController extends Controller
 
         $user->update($userData);
 
+        if (method_exists($user, 'syncRoles')) {
+            try {
+                if ($request->has('roles') && is_array($request->roles)) {
+                    $user->syncRoles($request->roles);
+                } else if ($request->filled('role')) {
+                    $user->syncRoles([$request->role]);
+                }
+            } catch (\Throwable $e) {
+                \Log::warning("Could not sync roles: " . $e->getMessage());
+            }
+        }
+
         return redirect()->route('admin.users')
             ->with('success', 'User updated successfully!');
     }
