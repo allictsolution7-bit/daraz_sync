@@ -453,7 +453,9 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('admin') }}" class="text-decoration-none text-muted">Home</a></li>
                 @if(request()->get('view') === 'packages')
-                    <li class="breadcrumb-item"><a href="{{ route('admin.users') }}" class="text-decoration-none text-muted">Users Directory</a></li>
+                    @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
+                        <li class="breadcrumb-item"><a href="{{ route('admin.users') }}" class="text-decoration-none text-muted">Users Directory</a></li>
+                    @endif
                     <li class="breadcrumb-item active text-dark font-weight-bold" aria-current="page">SaaS Pricing Tiers</li>
                 @else
                     <li class="breadcrumb-item active text-dark font-weight-bold" aria-current="page">Users Directory</li>
@@ -561,6 +563,86 @@
                 <!-- Dynamic cards populated by script -->
             </div>
 
+            <!-- Subscription Payment History & Approvals Table -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 mt-4 bg-white overflow-hidden" id="subscriptionHistoryCard">
+                <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h5 class="font-weight-bold text-dark mb-0">
+                            <i class="fas fa-history text-primary me-2"></i>
+                            @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
+                                Admin Subscription Payments & Approvals
+                            @else
+                                My Subscription Payment History
+                            @endif
+                        </h5>
+                        <p class="text-muted small mb-0">
+                            @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
+                                Review, approve or modify expiration dates (+30 days default) for admin subscription payments
+                            @else
+                                Track status, transaction details, and expiration of your subscription payments
+                            @endif
+                        </p>
+                    </div>
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill font-weight-semibold" id="historyCountBadge">0 Payments</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="subscriptionHistoryTable">
+                            <thead class="bg-light text-uppercase text-muted small font-weight-bold" style="font-size: 11px;">
+                                <tr>
+                                    <th class="ps-4">Sub ID / Date</th>
+                                    <th>Plan & Cycle</th>
+                                    <th>Amount</th>
+                                    <th>Gateway & Contact</th>
+                                    <th>TrxID</th>
+                                    <th>Status</th>
+                                    <th>Expiration Date</th>
+                                    <th class="pe-4 text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subscriptionHistoryTbody" class="small">
+                                <!-- Dynamic rows rendered by script -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for Super Admin to Edit Expiration Date -->
+            <div class="modal fade" id="editExpiryModal" tabindex="-1" aria-labelledby="editExpiryModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                        <div class="modal-header bg-primary text-white py-3">
+                            <h5 class="modal-title font-weight-bold text-white mb-0" id="editExpiryModalLabel">
+                                <i class="fas fa-calendar-alt me-2"></i> Manage Subscription Expiration
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <input type="hidden" id="editExpirySubId">
+                            <div class="mb-3">
+                                <label class="form-label font-weight-bold text-dark">Plan Name</label>
+                                <input type="text" class="form-control bg-light" id="editExpiryPlanName" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label font-weight-bold text-dark">Subscription Expiration Date</label>
+                                <input type="date" class="form-control" id="editExpiryDateInput">
+                                <div class="form-text small">Upon approval, expiration automatically increases by 30 days. You can also pick a custom date.</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" onclick="addDaysToExpiryInput(30)">+ 30 Days</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" onclick="addDaysToExpiryInput(60)">+ 60 Days</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" onclick="addDaysToExpiryInput(365)">+ 1 Year</button>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light border-0">
+                            <button type="button" class="btn btn-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary rounded-pill px-4" onclick="saveUpdatedExpiryDate()">Save Expiry Date</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Payment Modal for Admin Subscription Checkout -->
             <div class="modal fade" id="paySubscriptionModal" tabindex="-1" aria-labelledby="paySubscriptionModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -628,10 +710,19 @@
                             </div>
 
                             <!-- Gateway Instructions & Form -->
+                            @php
+                                $superAdminUser = \App\Models\User::whereHas('roles', function($q) {
+                                    $q->whereIn('name', ['super_admin', 'super admin']);
+                                })->first();
+                                $superAdminPhone = $superAdminUser?->phone ?? $superAdminUser?->mobile ?? setting('general', 'site_phone', '01779542054');
+                                $superAdminBkash = setting('ecommerce', 'bkash_number', $superAdminPhone);
+                                $superAdminNagad = setting('ecommerce', 'nagad_number', $superAdminPhone);
+                                $superAdminRocket = setting('ecommerce', 'rocket_number', $superAdminPhone);
+                            @endphp
                             <div class="card border p-3 rounded-3 bg-white mb-3">
                                 <div class="alert bg-light border p-2.5 rounded-3 mb-3 small text-dark" id="payInstructions">
-                                    <strong>bKash Merchant Payment (01700000000)</strong><br>
-                                    Send exact payment to the bKash Merchant number above and fill in your sender mobile number and Transaction ID (TrxID) below.
+                                    <strong>bKash Payment (Super Admin: {{ $superAdminBkash }})</strong><br>
+                                    Send exact payment to Super Admin bKash number <strong>{{ $superAdminBkash }}</strong> and fill in your sender mobile number and Transaction ID (TrxID) below.
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
@@ -1184,6 +1275,10 @@
                 renderWorkspace();
             };
 
+            const SUPER_ADMIN_BKASH = "{{ $superAdminBkash }}";
+            const SUPER_ADMIN_NAGAD = "{{ $superAdminNagad }}";
+            const SUPER_ADMIN_ROCKET = "{{ $superAdminRocket }}";
+
             window.selectPayGateway = function(gateway, labelEl) {
                 document.querySelectorAll('.payment-method-card').forEach(c => {
                     c.style.borderColor = '#e2e8f0';
@@ -1196,11 +1291,11 @@
 
                 const instr = document.getElementById('payInstructions');
                 if (gateway === 'bkash') {
-                    instr.innerHTML = `<strong>bKash Merchant Payment (01700000000)</strong><br>Send exact payment to the bKash Merchant number above and fill in your sender mobile number and Transaction ID (TrxID) below.`;
+                    instr.innerHTML = `<strong>bKash Payment (Super Admin: ${SUPER_ADMIN_BKASH})</strong><br>Send exact payment to Super Admin bKash number <strong>${SUPER_ADMIN_BKASH}</strong> and fill in your sender mobile number and Transaction ID (TrxID) below.`;
                 } else if (gateway === 'nagad') {
-                    instr.innerHTML = `<strong>Nagad Merchant Payment (01800000000)</strong><br>Send exact payment to the Nagad Merchant number above and fill in your sender mobile number and Transaction ID (TrxID) below.`;
+                    instr.innerHTML = `<strong>Nagad Payment (Super Admin: ${SUPER_ADMIN_NAGAD})</strong><br>Send exact payment to Super Admin Nagad number <strong>${SUPER_ADMIN_NAGAD}</strong> and fill in your sender mobile number and Transaction ID (TrxID) below.`;
                 } else if (gateway === 'rocket') {
-                    instr.innerHTML = `<strong>Rocket Biller ID (01900000000)</strong><br>Send exact payment to Rocket Biller ID 4920 and fill in your account number and Transaction ID below.`;
+                    instr.innerHTML = `<strong>Rocket Payment (Super Admin: ${SUPER_ADMIN_ROCKET})</strong><br>Send exact payment to Super Admin Rocket number <strong>${SUPER_ADMIN_ROCKET}</strong> and fill in your account number and Transaction ID below.`;
                 } else {
                     instr.innerHTML = `<strong>Credit / Debit Card (SSLCommerz)</strong><br>Click 'Confirm & Activate Subscription' to be redirected to our SSLCommerz secure payment gateway window.`;
                 }
@@ -1216,27 +1311,105 @@
                 modal.show();
             };
 
+            // Subscription History Storage Key & DB Sync
+            const SUB_PAYMENTS_KEY = "admin_subscription_payments_v2";
+            const DB_SUBSCRIPTION_HISTORY = @json($dbSubHistory);
+
+            function syncSubscriptionHistoryToDB(historyList) {
+                try {
+                    const formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('settings[saas_subscription_history_v1]', JSON.stringify(historyList));
+
+                    fetch('{{ route("settings.update") }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    }).catch(err => console.log('DB Sync Note:', err));
+                } catch(e) {
+                    console.log('DB Sync error:', e);
+                }
+            }
+
+            function getSubscriptionHistory() {
+                const stored = localStorage.getItem(SUB_PAYMENTS_KEY);
+                let localList = [];
+                try {
+                    localList = stored ? JSON.parse(stored) : [];
+                } catch(e) {
+                    localList = [];
+                }
+
+                let combinedMap = new Map();
+
+                if (Array.isArray(DB_SUBSCRIPTION_HISTORY)) {
+                    DB_SUBSCRIPTION_HISTORY.forEach(item => {
+                        if (item && item.id) combinedMap.set(item.id, item);
+                    });
+                }
+
+                if (Array.isArray(localList)) {
+                    localList.forEach(item => {
+                        if (item && item.id) {
+                            if (!combinedMap.has(item.id)) {
+                                combinedMap.set(item.id, item);
+                            }
+                        }
+                    });
+                }
+
+                let list = Array.from(combinedMap.values());
+
+                if (list.length === 0) {
+                    const d = new Date();
+                    const exp = new Date();
+                    exp.setDate(exp.getDate() + 30);
+                    list = [
+                        {
+                            id: 'SUB-1001',
+                            plan: 'Enterprise Ultimate',
+                            cycle: 'Lifetime Access',
+                            price: '200000',
+                            gateway: 'BKASH',
+                            phone: '01779542054',
+                            trxId: 'TRX8932145',
+                            date: d.toLocaleDateString(),
+                            createdAt: d.toISOString(),
+                            status: 'Approved',
+                            expiryDate: exp.toISOString().split('T')[0]
+                        }
+                    ];
+                }
+
+                localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(list));
+                return list;
+            }
+
             window.confirmSubscriptionPayment = function() {
-                const phone = document.getElementById('paySenderPhone')?.value || '01700000000';
+                const phone = document.getElementById('paySenderPhone')?.value || '01712345678';
                 const trxId = document.getElementById('payTrxId')?.value || 'TRX' + Math.floor(Math.random()*900000 + 100000);
+                const gateway = document.querySelector('input[name="pay_gateway"]:checked')?.value || 'bKash';
 
                 if (selectedCheckoutPackage) {
-                    const subData = {
+                    const history = getSubscriptionHistory();
+                    const newSub = {
+                        id: 'SUB-' + Math.floor(Math.random()*90000 + 10000),
                         plan: selectedCheckoutPackage.name,
                         cycle: selectedCheckoutPackage.cycle,
                         price: selectedCheckoutPackage.price,
+                        gateway: gateway.toUpperCase(),
                         phone: phone,
                         trxId: trxId,
-                        date: new Date().toLocaleDateString()
+                        date: new Date().toLocaleDateString(),
+                        createdAt: new Date().toISOString(),
+                        status: 'Pending',
+                        expiryDate: null
                     };
-                    localStorage.setItem('active_admin_subscription_v3', JSON.stringify(subData));
-                    
-                    const badge = document.getElementById('activeSubscriptionBadge');
-                    const nameDisp = document.getElementById('activePlanNameDisplay');
-                    if (badge && nameDisp) {
-                        nameDisp.textContent = selectedCheckoutPackage.name + ' (' + selectedCheckoutPackage.cycle + ')';
-                        badge.classList.remove('d-none');
-                    }
+                    history.unshift(newSub);
+                    localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(history));
+                    syncSubscriptionHistoryToDB(history);
                 }
 
                 const modalEl = document.getElementById('paySubscriptionModal');
@@ -1244,21 +1417,231 @@
                 if (modal) modal.hide();
 
                 if (typeof toastr !== 'undefined') {
-                    toastr.success("Subscription payment confirmed! Plan activated successfully.", "Subscription Updated");
+                    toastr.info("Subscription payment submitted! Status: Pending Super Admin Approval.", "Payment Pending");
                 } else {
-                    alert("Subscription payment confirmed! Plan activated successfully.");
+                    alert("Subscription payment submitted! Status: Pending Super Admin Approval.");
                 }
                 renderWorkspace();
             };
+
+            window.approveSubscriptionItem = function(subId, customExpiry = null) {
+                const history = getSubscriptionHistory();
+                const item = history.find(h => h.id === subId);
+                if (!item) return;
+
+                item.status = 'Approved';
+                
+                let expiryDateStr = customExpiry;
+                if (!expiryDateStr) {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 30);
+                    expiryDateStr = d.toISOString().split('T')[0];
+                }
+                item.expiryDate = expiryDateStr;
+
+                localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(history));
+                syncSubscriptionHistoryToDB(history);
+
+                const subData = {
+                    plan: item.plan,
+                    cycle: item.cycle,
+                    price: item.price,
+                    phone: item.phone,
+                    trxId: item.trxId,
+                    date: item.date,
+                    expiryDate: item.expiryDate
+                };
+                localStorage.setItem('active_admin_subscription_v3', JSON.stringify(subData));
+
+                if (typeof toastr !== 'undefined') {
+                    toastr.success(`Subscription payment ${subId} approved! Active until ${expiryDateStr} (+30 Days).`, "Payment Approved");
+                } else {
+                    alert(`Subscription payment ${subId} approved! Active until ${expiryDateStr} (+30 Days).`);
+                }
+                renderWorkspace();
+            };
+
+            window.rejectSubscriptionItem = function(subId) {
+                const history = getSubscriptionHistory();
+                const item = history.find(h => h.id === subId);
+                if (!item) return;
+
+                if (confirm(`Are you sure you want to reject subscription payment ${subId}?`)) {
+                    item.status = 'Rejected';
+                    localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(history));
+                    syncSubscriptionHistoryToDB(history);
+
+                    if (typeof toastr !== 'undefined') {
+                        toastr.warning(`Subscription payment ${subId} rejected.`, "Payment Rejected");
+                    } else {
+                        alert(`Subscription payment ${subId} rejected.`);
+                    }
+                    renderWorkspace();
+                }
+            };
+
+            window.openEditExpiryModal = function(subId) {
+                const history = getSubscriptionHistory();
+                const item = history.find(h => h.id === subId);
+                if (!item) return;
+
+                document.getElementById('editExpirySubId').value = item.id;
+                document.getElementById('editExpiryPlanName').value = (item.plan || 'Subscription Plan') + ' (' + item.cycle + ')';
+                
+                let initialDate = item.expiryDate;
+                if (!initialDate) {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 30);
+                    initialDate = d.toISOString().split('T')[0];
+                }
+                document.getElementById('editExpiryDateInput').value = initialDate;
+
+                const modal = new bootstrap.Modal(document.getElementById('editExpiryModal'));
+                modal.show();
+            };
+
+            window.addDaysToExpiryInput = function(days) {
+                const currentVal = document.getElementById('editExpiryDateInput').value;
+                const baseDate = currentVal ? new Date(currentVal) : new Date();
+                baseDate.setDate(baseDate.getDate() + days);
+                document.getElementById('editExpiryDateInput').value = baseDate.toISOString().split('T')[0];
+            };
+
+            window.saveUpdatedExpiryDate = function() {
+                const subId = document.getElementById('editExpirySubId').value;
+                const newExpiry = document.getElementById('editExpiryDateInput').value;
+                if (!subId || !newExpiry) return;
+
+                const history = getSubscriptionHistory();
+                const item = history.find(h => h.id === subId);
+                if (item) {
+                    item.expiryDate = newExpiry;
+                    if (item.status === 'Pending') {
+                        item.status = 'Approved';
+                    }
+                    const subData = {
+                        plan: item.plan,
+                        cycle: item.cycle,
+                        price: item.price,
+                        phone: item.phone,
+                        trxId: item.trxId,
+                        date: item.date,
+                        expiryDate: item.expiryDate
+                    };
+                    localStorage.setItem('active_admin_subscription_v3', JSON.stringify(subData));
+                    localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(history));
+                    syncSubscriptionHistoryToDB(history);
+
+                    const modalEl = document.getElementById('editExpiryModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(`Subscription expiration date set to ${newExpiry}.`, "Expiry Updated");
+                    } else {
+                        alert(`Subscription expiration date set to ${newExpiry}.`);
+                    }
+                    renderWorkspace();
+                }
+            };
+
+            function renderSubscriptionHistoryTable() {
+                const history = getSubscriptionHistory();
+                const tbody = document.getElementById('subscriptionHistoryTbody');
+                const countBadge = document.getElementById('historyCountBadge');
+                if (!tbody) return;
+
+                if (countBadge) countBadge.textContent = history.length + ' Payments';
+
+                tbody.innerHTML = '';
+
+                if (history.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fas fa-inbox me-2"></i> No subscription payments recorded yet.</td></tr>`;
+                    return;
+                }
+
+                history.forEach(item => {
+                    const tr = document.createElement('tr');
+
+                    let statusBadgeHTML = '';
+                    if (item.status === 'Approved') {
+                        statusBadgeHTML = `<span class="badge bg-success text-white px-2.5 py-1 rounded-pill"><i class="fas fa-check-circle me-1"></i> Approved</span>`;
+                    } else if (item.status === 'Pending') {
+                        statusBadgeHTML = `<span class="badge bg-warning text-dark px-2.5 py-1 rounded-pill"><i class="fas fa-clock me-1"></i> Pending Approval</span>`;
+                    } else {
+                        statusBadgeHTML = `<span class="badge bg-danger text-white px-2.5 py-1 rounded-pill"><i class="fas fa-times-circle me-1"></i> Rejected</span>`;
+                    }
+
+                    let actionButtonsHTML = '';
+                    if (window.IS_SUPER_ADMIN) {
+                        if (item.status === 'Pending') {
+                            actionButtonsHTML = `
+                                <div class="d-flex gap-1 justify-content-end">
+                                    <button class="btn btn-sm btn-success rounded-pill px-2 py-1 font-weight-bold" onclick="approveSubscriptionItem('${item.id}')" title="Approve Payment (+30 days default)">
+                                        <i class="fas fa-check me-1"></i> Approve
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1 font-weight-bold" onclick="rejectSubscriptionItem('${item.id}')" title="Reject Payment">
+                                        <i class="fas fa-times me-1"></i> Reject
+                                    </button>
+                                </div>
+                            `;
+                        } else {
+                            actionButtonsHTML = `
+                                <div class="d-flex gap-1 justify-content-end">
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1 font-weight-semibold" onclick="openEditExpiryModal('${item.id}')">
+                                        <i class="fas fa-calendar-alt me-1"></i> Edit Expiry
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        actionButtonsHTML = `
+                            <span class="text-muted small">${item.status === 'Pending' ? 'Awaiting Super Admin' : 'Completed'}</span>
+                        `;
+                    }
+
+                    const expiryDisplay = item.expiryDate 
+                        ? `<span class="fw-bold text-dark"><i class="fas fa-calendar-check text-success me-1"></i>${item.expiryDate}</span>` 
+                        : `<span class="text-warning small italic"><i class="fas fa-hourglass-start me-1"></i>Awaiting Approval</span>`;
+
+                    tr.innerHTML = `
+                        <td class="ps-4">
+                            <strong class="text-dark d-block">${item.id}</strong>
+                            <span class="text-muted small">${item.date}</span>
+                        </td>
+                        <td>
+                            <strong class="text-primary d-block">${item.plan}</strong>
+                            <span class="badge bg-light text-dark border font-weight-normal">${item.cycle}</span>
+                        </td>
+                        <td class="font-weight-bold text-success">
+                            TK ${Number(item.price).toLocaleString()}
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary text-white">${item.gateway}</span>
+                            <span class="d-block text-muted small">${item.phone}</span>
+                        </td>
+                        <td>
+                            <code class="text-dark bg-light px-2 py-1 rounded border">${item.trxId}</code>
+                        </td>
+                        <td>${statusBadgeHTML}</td>
+                        <td>${expiryDisplay}</td>
+                        <td class="pe-4 text-end">${actionButtonsHTML}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
 
             // Render Dashboard Stats and Grid
             function renderWorkspace() {
                 initData();
                 
-                // Update Counts
-                document.getElementById('totalPackagesCount').textContent = packagesList.length + 1;
-                document.getElementById('activePackagesCount').textContent = packagesList.filter(p => p.status).length + 1;
-                document.getElementById('totalFeaturesCount').textContent = featuresPool.length;
+                // Update Counts safely if elements exist in DOM (super admin view)
+                const totalPkgEl = document.getElementById('totalPackagesCount');
+                if (totalPkgEl) totalPkgEl.textContent = packagesList.length + 1;
+                const activePkgEl = document.getElementById('activePackagesCount');
+                if (activePkgEl) activePkgEl.textContent = packagesList.filter(p => p.status).length + 1;
+                const totalFeatEl = document.getElementById('totalFeaturesCount');
+                if (totalFeatEl) totalFeatEl.textContent = featuresPool.length;
 
                 // Render Grid
                 const grid = document.getElementById('packagesGrid');
@@ -1266,6 +1649,14 @@
 
                 // Active Subscription Status
                 const activeSub = JSON.parse(localStorage.getItem('active_admin_subscription_v3') || 'null');
+                const activePlanDisp = document.getElementById('activePlanNameDisplay');
+                if (activePlanDisp && activeSub) {
+                    let text = activeSub.plan + ' (' + activeSub.cycle + ')';
+                    if (activeSub.expiryDate) {
+                        text += ' | Expires: ' + activeSub.expiryDate;
+                    }
+                    activePlanDisp.textContent = text;
+                }
 
                 packagesList.forEach(pkg => {
                     const cardCol = document.createElement('div');
@@ -1409,6 +1800,9 @@
 
                 // Update the feature pool checklist inside Manage Features modal
                 renderFeaturesPoolList();
+
+                // Render Subscription History Table
+                renderSubscriptionHistoryTable();
             }
 
             // Render list inside features pool modal grouped by section categories matching package modal UI

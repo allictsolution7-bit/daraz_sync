@@ -1875,7 +1875,7 @@
                                     </a>
                                 </li>
                                 @can('users.view')
-                                <li class="sub-menu {{ request()->is('admin/team-members*') ? 'active' : '' }}">
+                                <li class="sub-menu {{ request()->is('admin/team-members*') && request()->get('view') !== 'packages' ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-user-gear" style="color:#20c997;"></i>
@@ -1883,7 +1883,7 @@
                                         </span>
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
-                                    <ul class="left-menu-dp" style="{{ request()->is('admin/team-members*') ? 'display: block;' : '' }}">
+                                    <ul class="left-menu-dp" style="{{ request()->is('admin/team-members*') && request()->get('view') !== 'packages' ? 'display: block;' : '' }}">
                                         <li class="{{ request()->is('admin/team-members') && !request()->has('view') ? 'active' : '' }}">
                                             <a href="{{ route('admin.users') }}">
                                                 <span class="menu-content">
