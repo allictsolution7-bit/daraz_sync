@@ -139,13 +139,21 @@
                         </div>
                         <div class="profile-actions">
                             @auth
-                                @if(auth()->user()->isVendor() || auth()->user()->hasRole('vendor'))
-                                    <a href="{{ Route::has('vendor.dashboard') ? route('vendor.dashboard') : url('/vendor/dashboard') }}" class="portal-btn">
-                                        <i class="fa-solid fa-store" style="margin-right: 8px;"></i> Vendor Dashboard
+                                @php
+                                    $u = auth()->user();
+                                    $isAdminRole = ($u->role === 'admin' || (method_exists($u, 'isAdmin') && $u->isAdmin()) || (method_exists($u, 'hasRole') && ($u->hasRole('admin') || $u->hasRole('super_admin') || $u->hasRole('super admin'))) || isset($u->type) && $u->type === 'admin');
+                                    $isVendorRole = ($u->role === 'vendor' || (method_exists($u, 'isVendor') && $u->isVendor()) || (method_exists($u, 'hasRole') && $u->hasRole('vendor')));
+                                @endphp
+
+                                @if($isAdminRole)
+                                    <a href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin') }}" class="portal-btn" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center;">
+                                        <i class="fa-solid fa-gauge-high" style="margin-right: 8px;"></i> Admin Dashboard (/admin)
                                     </a>
-                                @elseif(auth()->user()->isAdmin() || auth()->user()->hasRole('admin') || auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('super admin'))
-                                    <a href="{{ route('admin.dashboard') }}" class="portal-btn">
-                                        <i class="fa-solid fa-gauge" style="margin-right: 8px;"></i> Admin Dashboard
+                                @endif
+                                
+                                @if($isVendorRole)
+                                    <a href="{{ Route::has('vendor.dashboard') ? route('vendor.dashboard') : url('/vendor/dashboard') }}" class="portal-btn" style="background: linear-gradient(135deg, #4f46e5, #3730a3); color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center;">
+                                        <i class="fa-solid fa-store" style="margin-right: 8px;"></i> Vendor Dashboard
                                     </a>
                                 @endif
                             @endauth

@@ -170,6 +170,7 @@
                 <input type="hidden" name="role" id="register_role" value="user">
                 <input type="hidden" name="package_id" id="register_package_id" value="">
                 <input type="hidden" name="billing_cycle" id="register_billing_cycle" value="">
+                <input type="hidden" name="custom_features" id="register_custom_features" value="">
 
                 <!-- Admin Packages Selector -->
                 <div id="admin-packages-section" style="display: none;" class="mb-4">
@@ -188,6 +189,19 @@
 
                     <div id="regPackagesContainer" class="row">
                         <!-- Loaded dynamically via JS -->
+                    </div>
+
+                    <!-- Custom Package Interactive Feature Selector Container -->
+                    <div id="customFeaturesContainer" class="mt-3 p-3 bg-white border rounded-3 shadow-sm" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                            <h6 class="mb-0 font-weight-bold text-dark" style="font-size: 13px;">
+                                <i class="fas fa-sliders-h text-primary me-2"></i> Custom Package Feature Picker (<span id="customSelectedCountBadge">0 selected</span>)
+                            </h6>
+                            <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 text-primary small font-weight-bold" onclick="toggleAllCustomRegFeatures(true)">Select All</button>
+                        </div>
+                        <div id="customFeaturesChecklist" class="row g-2" style="max-height: 250px; overflow-y: auto;">
+                            <!-- Populated dynamically via JS -->
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -777,45 +791,203 @@
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
-        // SaaS Admin Packages Registration Script
-        const DEFAULT_FEATURES = [
-            "1 Store Dashboard",
-            "Unlimited Products",
-            "Advanced Sales Reports",
-            "Custom Domain Settings",
-            "24/7 Priority Support",
-            "Fraud Checker Integration",
-            "WooCommerce Migration",
-            "Custom Payment Gateways"
+        // COMPREHENSIVE SIDEBAR FEATURES & SAAS PACKAGES REGISTRATION SYSTEM
+        const SIDEBAR_FEATURE_GROUPS = [
+            {
+                category: "Main Dashboard",
+                icon: "fas fa-chart-pie text-primary",
+                items: [
+                    "Dashboard Overview"
+                ]
+            },
+            {
+                category: "Product Catalog",
+                icon: "fas fa-cubes text-info",
+                items: [
+                    "All Products Management",
+                    "Add New Product",
+                    "Product Categories & Subcategories",
+                    "Brands Management",
+                    "Writers & Authors",
+                    "Publishers Management",
+                    "Product Reviews & Feedback",
+                    "Combo Offers & Bundles"
+                ]
+            },
+            {
+                category: "Inventory & Stock",
+                icon: "fas fa-warehouse text-success",
+                items: [
+                    "Inventory Overview",
+                    "Low Stock Alerts",
+                    "Out of Stock Items",
+                    "Stock Movement History"
+                ]
+            },
+            {
+                category: "Landing Pages",
+                icon: "fas fa-pager text-warning",
+                items: [
+                    "Landing Pages Directory",
+                    "Create & Design Landing Page"
+                ]
+            },
+            {
+                category: "Sales & Orders",
+                icon: "fas fa-cart-shopping text-primary",
+                items: [
+                    "All Orders Management",
+                    "My Assigned Orders",
+                    "Incomplete & Abandoned Orders",
+                    "Point of Sale (POS) Terminal"
+                ]
+            },
+            {
+                category: "Shipping & Delivery",
+                icon: "fas fa-truck-fast text-emerald",
+                items: [
+                    "Global Shipping Settings",
+                    "Advanced Shipping Rules & Delivery Zones",
+                    "Courier Integrations (Pathao/Steadfast)"
+                ]
+            },
+            {
+                category: "Reports & Insights",
+                icon: "fas fa-chart-column text-warning",
+                items: [
+                    "Sales & Revenue Reports",
+                    "Customer Analytics Reports"
+                ]
+            },
+            {
+                category: "Connected Apps & Integrations",
+                icon: "fas fa-plug text-danger",
+                items: [
+                    "Daraz Marketplace Sync",
+                    "WooCommerce Data Migration",
+                    "Telegram Notifications Bot",
+                    "Delayed Purchase Event Queue"
+                ]
+            },
+            {
+                category: "Security & Trust",
+                icon: "fas fa-shield-halved text-danger",
+                items: [
+                    "Fraud Checker & Risk Scanner",
+                    "Fraud Protection Shield",
+                    "System Backup & Schedules"
+                ]
+            },
+            {
+                category: "Content & Pages",
+                icon: "fas fa-newspaper text-secondary",
+                items: [
+                    "Hero Sliders Management",
+                    "Custom Web Pages",
+                    "Navigation Menu Builder",
+                    "Blog Posts Management",
+                    "Blog Categories & Topics",
+                    "Post Comments Moderation"
+                ]
+            },
+            {
+                category: "Multi-Vendor Management",
+                icon: "fas fa-store text-info",
+                items: [
+                    "Vendor Directory & Approvals",
+                    "Add New Vendor",
+                    "Vendor Product Approval",
+                    "Vendor Withdrawal Requests",
+                    "Global Vendor Commission Settings"
+                ]
+            },
+            {
+                category: "System Settings & Control",
+                icon: "fas fa-gears text-secondary",
+                items: [
+                    "Users & Team Members Management",
+                    "Contact Messages Inbox",
+                    "Newsletter Subscriptions",
+                    "Roles & Permissions Matrix",
+                    "System Extensions & Modules",
+                    "All Website Settings",
+                    "Payment Gateway Setup",
+                    "License Key Management",
+                    "System Updates & Version Control"
+                ]
+            }
         ];
+
+        const DEFAULT_FEATURES = SIDEBAR_FEATURE_GROUPS.flatMap(g => g.items);
 
         const DEFAULT_PACKAGES = [
             {
                 id: "starter_plan",
                 name: "Starter Plan",
-                details: "Ideal for fresh startups and hobbyists looking to build their first online storefront.",
+                details: "Ideal for fresh startups and small stores requiring core ecommerce functionality.",
                 priceMonthly: "1200",
                 priceYearly: "12000",
                 priceLifetime: "30000",
-                features: ["1 Store Dashboard", "Unlimited Products"]
+                status: true,
+                features: [
+                    "Dashboard Overview",
+                    "All Products Management",
+                    "Add New Product",
+                    "Product Categories & Subcategories",
+                    "Inventory Overview",
+                    "All Orders Management",
+                    "Global Shipping Settings",
+                    "All Website Settings"
+                ]
             },
             {
                 id: "pro_plan",
                 name: "Professional Plan",
-                details: "Perfect for growing merchants and professional retailers needing premium tools.",
+                details: "Perfect for growing merchants and professional retailers needing advanced tools.",
                 priceMonthly: "3500",
                 priceYearly: "35000",
                 priceLifetime: "80000",
-                features: ["1 Store Dashboard", "Unlimited Products", "Advanced Sales Reports", "Fraud Checker Integration", "24/7 Priority Support"]
+                status: true,
+                features: [
+                    "Dashboard Overview",
+                    "All Products Management",
+                    "Add New Product",
+                    "Product Categories & Subcategories",
+                    "Brands Management",
+                    "Product Reviews & Feedback",
+                    "Inventory Overview",
+                    "Low Stock Alerts",
+                    "Landing Pages Directory",
+                    "All Orders Management",
+                    "Point of Sale (POS) Terminal",
+                    "Global Shipping Settings",
+                    "Courier Integrations (Pathao/Steadfast)",
+                    "Sales & Revenue Reports",
+                    "Fraud Checker & Risk Scanner",
+                    "Roles & Permissions Matrix",
+                    "Payment Gateway Setup"
+                ]
             },
             {
                 id: "enterprise_plan",
                 name: "Enterprise Ultimate",
-                details: "Tailored specifically for large-scale operations requiring absolute maximum horsepower.",
+                details: "Tailored specifically for large-scale multi-vendor operations and enterprise networks.",
                 priceMonthly: "8500",
                 priceYearly: "85000",
                 priceLifetime: "200000",
-                features: ["1 Store Dashboard", "Unlimited Products", "Advanced Sales Reports", "Custom Domain Settings", "24/7 Priority Support", "Fraud Checker Integration", "WooCommerce Migration", "Custom Payment Gateways"]
+                status: true,
+                features: DEFAULT_FEATURES
+            },
+            {
+                id: "custom_plan",
+                name: "Custom Package",
+                details: "Build a tailored subscription plan by picking exact features & modules.",
+                priceMonthly: "Custom",
+                priceYearly: "Custom",
+                priceLifetime: "Custom",
+                status: true,
+                isCustom: true,
+                features: []
             }
         ];
 
@@ -851,19 +1023,19 @@
             container.innerHTML = '';
             
             let list = DEFAULT_PACKAGES;
-            const stored = localStorage.getItem('admin_packages_list');
+            const stored = localStorage.getItem('admin_packages_list_v3');
             if (stored) {
                 list = JSON.parse(stored).filter(p => p.status !== false);
             }
 
             let featPool = DEFAULT_FEATURES;
-            const storedFeats = localStorage.getItem('admin_packages_features_pool');
+            const storedFeats = localStorage.getItem('admin_packages_features_pool_v3');
             if (storedFeats) {
                 featPool = JSON.parse(storedFeats);
             }
 
             if (list.length === 0) {
-                container.innerHTML = `<p class="col-12 text-muted text-center">No packages are currently active.</p>`;
+                container.innerHTML = `<p class="col-12 text-muted text-center py-3">No packages are currently active.</p>`;
                 return;
             }
 
@@ -882,35 +1054,69 @@
                     cycleText = ' One-time';
                 }
 
-                // Render all features list fully
-                let featuresHTML = '';
-                featPool.forEach(feat => {
-                    const isIncluded = pkg.features && pkg.features.includes(feat);
-                    featuresHTML += `
-                        <div class="d-flex align-items-center mb-1 text-start" style="font-size: 11px; ${isIncluded ? 'color: #0f172a; font-weight: 500;' : 'color: #94a3b8; text-decoration: line-through; opacity: 0.7;'}">
-                            <i class="${isIncluded ? 'fas fa-check-circle text-success me-2' : 'fas fa-times-circle text-danger me-2'}"></i>
-                            <span>${feat}</span>
+                if (pkg.isCustom) {
+                    col.innerHTML = `
+                        <div class="reg-package-card shadow-sm border rounded-3 p-3 h-100 d-flex flex-column justify-content-between" id="regCard_${pkg.id}" onclick="selectPackageCard('${pkg.id}')" style="cursor: pointer; background: #fff; border-style: dashed !important; border-color: #3b82f6 !important;">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-2">
+                                    <div>
+                                        <h6 class="font-weight-bold mb-0 text-primary"><i class="fas fa-sliders-h me-1"></i> ${pkg.name}</h6>
+                                        <p class="small text-muted mb-0" style="font-size: 11px; line-height: 1.2;">${pkg.details}</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary text-white font-weight-bold">Custom</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 text-center text-muted small bg-light rounded-3" style="font-size: 11.5px;">
+                                    <i class="fas fa-check-square text-primary me-1"></i> Pick & choose modules below
+                                </div>
+                            </div>
                         </div>
                     `;
-                });
+                } else {
+                    // Render features grouped by category for high clarity
+                    let featuresHTML = '';
+                    SIDEBAR_FEATURE_GROUPS.forEach(group => {
+                        const poolCategoryItems = group.items.filter(item => featPool.includes(item));
+                        if (poolCategoryItems.length > 0) {
+                            const groupIncludedItems = poolCategoryItems.filter(item => pkg.features && pkg.features.includes(item));
+                            featuresHTML += `
+                                <div class="mb-2">
+                                    <div class="small font-weight-bold text-muted text-uppercase mb-1 border-bottom pb-1" style="font-size: 9.5px; letter-spacing: 0.5px;">
+                                        <i class="${group.icon} me-1"></i> ${group.category} (${groupIncludedItems.length}/${poolCategoryItems.length})
+                                    </div>
+                            `;
+                            poolCategoryItems.forEach(feat => {
+                                const isIncluded = pkg.features && pkg.features.includes(feat);
+                                featuresHTML += `
+                                    <div class="d-flex align-items-center mb-1 text-start" style="font-size: 11px; ${isIncluded ? 'color: #0f172a; font-weight: 600;' : 'color: #94a3b8; text-decoration: line-through; opacity: 0.7;'}">
+                                        <i class="${isIncluded ? 'fas fa-check-circle me-2' : 'fas fa-times-circle me-2'}" style="color: ${isIncluded ? '#10b981' : '#ef4444'} !important;"></i>
+                                        <span>${feat}</span>
+                                    </div>
+                                `;
+                            });
+                            featuresHTML += `</div>`;
+                        }
+                    });
 
-                col.innerHTML = `
-                    <div class="reg-package-card" id="regCard_${pkg.id}" onclick="selectPackageCard('${pkg.id}')">
-                        <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-2">
-                            <div>
-                                <h6 class="font-weight-bold mb-0 text-dark">${pkg.name}</h6>
-                                <p class="small text-muted mb-0" style="font-size: 11px; line-height: 1.2;">${pkg.details}</p>
+                    col.innerHTML = `
+                        <div class="reg-package-card shadow-sm border rounded-3 p-3" id="regCard_${pkg.id}" onclick="selectPackageCard('${pkg.id}')" style="cursor: pointer; background: #fff;">
+                            <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-2">
+                                <div>
+                                    <h6 class="font-weight-bold mb-0 text-dark">${pkg.name}</h6>
+                                    <p class="small text-muted mb-0" style="font-size: 11px; line-height: 1.2;">${pkg.details}</p>
+                                </div>
+                                <div class="text-end">
+                                    <span class="font-weight-bold text-success" style="font-size: 14px;">TK ${price}</span>
+                                    <small class="text-muted d-block" style="font-size: 9px; margin-top: -2px;">${cycleText}</small>
+                                </div>
                             </div>
-                            <div class="text-end">
-                                <span class="font-weight-bold text-success" style="font-size: 14px;">TK ${price}</span>
-                                <small class="text-muted d-block" style="font-size: 9px; margin-top: -2px;">${cycleText}</small>
+                            <div class="features-list-wrapper" style="max-height: 160px; overflow-y: auto; padding-right: 4px;">
+                                ${featuresHTML}
                             </div>
                         </div>
-                        <div class="features-list-wrapper" style="max-height: 120px; overflow-y: auto;">
-                            ${featuresHTML}
-                        </div>
-                    </div>
-                `;
+                    `;
+                }
                 container.appendChild(col);
             });
 
@@ -923,11 +1129,66 @@
             }
         }
 
+        // Render Custom Package Interactive Feature Checklist
+        function renderCustomRegFeaturesPicker() {
+            const container = document.getElementById('customFeaturesChecklist');
+            if (!container) return;
+            container.innerHTML = '';
+
+            SIDEBAR_FEATURE_GROUPS.forEach(group => {
+                let itemsHTML = '';
+                group.items.forEach(feat => {
+                    const safeId = 'custom_reg_' + feat.replace(/[^a-zA-Z0-9]/g, '_');
+                    itemsHTML += `
+                        <div class="col-md-6 col-12">
+                            <label class="d-flex align-items-center p-2 rounded border bg-white shadow-sm mb-0 w-100" for="${safeId}" style="cursor: pointer; min-height: 38px;">
+                                <input class="custom-reg-feature-cb flex-shrink-0 me-2" type="checkbox" value="${feat}" id="${safeId}" onchange="updateCustomRegFeaturesState()" style="cursor: pointer; width: 16px; height: 16px; margin: 0;">
+                                <span class="text-dark font-weight-medium" style="font-size: 11px; line-height: 1.3;">${feat}</span>
+                            </label>
+                        </div>
+                    `;
+                });
+
+                const groupCol = document.createElement('div');
+                groupCol.className = 'col-12 mb-2';
+                groupCol.innerHTML = `
+                    <div class="small font-weight-bold text-primary text-uppercase mb-1 border-bottom pb-1" style="font-size: 10px;">
+                        <i class="${group.icon} me-1"></i> ${group.category}
+                    </div>
+                    <div class="row g-2">${itemsHTML}</div>
+                `;
+                container.appendChild(groupCol);
+            });
+            updateCustomRegFeaturesState();
+        }
+
+        window.updateCustomRegFeaturesState = function() {
+            const checkedCbs = Array.from(document.querySelectorAll('.custom-reg-feature-cb:checked')).map(cb => cb.value);
+            document.getElementById('customSelectedCountBadge').textContent = checkedCbs.length + ' selected';
+            $('#register_custom_features').val(JSON.stringify(checkedCbs));
+        };
+
+        window.toggleAllCustomRegFeatures = function(checkAll) {
+            document.querySelectorAll('.custom-reg-feature-cb').forEach(cb => {
+                cb.checked = checkAll;
+            });
+            updateCustomRegFeaturesState();
+        };
+
         window.selectPackageCard = function(pkgId) {
             $('.reg-package-card').removeClass('selected');
             $(`#regCard_${pkgId}`).addClass('selected');
             $('#register_package_id').val(pkgId);
             $('#register_billing_cycle').val(activeCycle);
+
+            if (pkgId === 'custom_plan') {
+                $('#customFeaturesContainer').slideDown();
+                if ($('#customFeaturesChecklist').children().length === 0) {
+                    renderCustomRegFeaturesPicker();
+                }
+            } else {
+                $('#customFeaturesContainer').slideUp();
+            }
         };
 
         // Intercept form submission to save details client-side
@@ -948,7 +1209,7 @@
                 const phone = $('#phone').val();
 
                 // Find package details
-                const storedPackages = localStorage.getItem('admin_packages_list');
+                const storedPackages = localStorage.getItem('admin_packages_list_v3');
                 let pkgName = "Starter Plan";
                 let pkgPrice = "1200";
                 
@@ -963,6 +1224,9 @@
                     pkgPrice = cycle === 'monthly' ? selectedPkg.priceMonthly : (cycle === 'yearly' ? selectedPkg.priceYearly : selectedPkg.priceLifetime);
                 }
 
+                const customFeatsJson = $('#register_custom_features').val() || '[]';
+                const customFeatsArray = JSON.parse(customFeatsJson);
+
                 const registeredAdmins = JSON.parse(localStorage.getItem('registered_admins') || '[]');
                 registeredAdmins.push({
                     id: 'adm_' + Date.now(),
@@ -973,6 +1237,7 @@
                     packageName: pkgName,
                     billingCycle: cycle.toUpperCase(),
                     price: pkgPrice,
+                    custom_features: customFeatsArray,
                     created_at: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                 });
                 localStorage.setItem('registered_admins', JSON.stringify(registeredAdmins));
