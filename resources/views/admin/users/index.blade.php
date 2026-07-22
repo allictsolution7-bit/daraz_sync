@@ -543,6 +543,130 @@
             </div>
             @endif
 
+            @if(!auth()->user()?->hasRole('super_admin') && !auth()->user()?->hasRole('super admin'))
+            <!-- ADMIN PORTAL: 2 TABS NAVIGATION -->
+            <ul class="nav nav-pills nav-fill bg-white p-2 rounded-4 shadow-sm border mb-4 gap-2 admin-tab-nav" id="adminSubTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-3 py-2-5 font-weight-bold" id="tab-my-sub-btn" data-bs-toggle="tab" data-bs-target="#tab-my-sub" type="button" role="tab" style="font-size: 14.5px;">
+                        <i class="fas fa-id-card text-primary me-2"></i> My Active Subscription & Payment History
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-3 py-2-5 font-weight-bold" id="tab-renew-sub-btn" data-bs-toggle="tab" data-bs-target="#tab-renew-sub" type="button" role="tab" style="font-size: 14.5px;">
+                        <i class="fas fa-sync-alt text-success me-2"></i> Renew & Change Packages
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="adminSubTabsContent">
+                <!-- TAB 1: MY ACTIVE SUBSCRIPTION & PAYMENT HISTORY -->
+                <div class="tab-pane fade show active" id="tab-my-sub" role="tabpanel">
+                    <!-- Current Subscription Overview Card -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+                        <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h5 class="font-weight-bold text-dark mb-0">
+                                    <i class="fas fa-crown text-warning me-2"></i> My Active Subscription Overview
+                                </h5>
+                                <p class="text-muted small mb-0">Current active plan tier, expiration date, and remaining access time</p>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm rounded-pill px-3 font-weight-bold" onclick="switchToRenewTab()">
+                                <i class="fas fa-sync-alt me-1"></i> Renew / Change Package
+                            </button>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md-3 border-end">
+                                    <span class="text-muted small text-uppercase font-weight-bold d-block mb-1">Active Package</span>
+                                    <h4 class="font-weight-bold text-primary mb-1" id="activeSubPlanTitle">Starter Plan</h4>
+                                    <span class="badge bg-light text-dark border font-weight-normal" id="activeSubCycleTitle">Monthly Billing</span>
+                                </div>
+                                <div class="col-md-3 border-end">
+                                    <span class="text-muted small text-uppercase font-weight-bold d-block mb-1">Account Status</span>
+                                    <div id="activeSubStatusBadge">
+                                        <span class="badge bg-success text-white px-3 py-2 rounded-pill font-weight-bold"><i class="fas fa-check-circle me-1"></i> Active</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 border-end">
+                                    <span class="text-muted small text-uppercase font-weight-bold d-block mb-1">Expiration Date</span>
+                                    <h5 class="font-weight-bold text-dark mb-1" id="activeSubExpiryDate">2026-08-21</h5>
+                                    <div id="activeSubDaysLeft">
+                                        <span class="badge bg-primary text-white px-2 py-1 rounded-pill"><i class="fas fa-hourglass-half me-1"></i> 30 Days Remaining</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center text-md-end">
+                                    <button class="btn btn-primary rounded-pill px-4 font-weight-bold shadow-sm w-100 py-2" onclick="switchToRenewTab()">
+                                        <i class="fas fa-arrow-up-right-from-square me-1"></i> Choose New Package
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Payment History Table -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden" id="subscriptionHistoryCard">
+                        <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h5 class="font-weight-bold text-dark mb-0">
+                                    <i class="fas fa-history text-primary me-2"></i> My Subscription Payment History
+                                </h5>
+                                <p class="text-muted small mb-0">Track status, transaction details, and expiration of your subscription payments</p>
+                            </div>
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill font-weight-semibold" id="historyCountBadge">0 Payments</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" id="subscriptionHistoryTable">
+                                    <thead class="bg-light text-uppercase text-muted small font-weight-bold" style="font-size: 11px;">
+                                        <tr>
+                                            <th class="ps-4">Sub ID / Date</th>
+                                            <th>Plan & Cycle</th>
+                                            <th>Amount</th>
+                                            <th>Gateway & Contact</th>
+                                            <th>TrxID</th>
+                                            <th>Status</th>
+                                            <th>Expiration Date</th>
+                                            <th class="pe-4 text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="subscriptionHistoryTbody" class="small">
+                                        <!-- Dynamic rows rendered by script -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: RENEW & CHANGE PACKAGES -->
+                <div class="tab-pane fade" id="tab-renew-sub" role="tabpanel">
+                    <!-- Billing Frequency Filter Bar -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 px-3 bg-white border rounded-4 shadow-sm flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-clock text-primary me-1"></i>
+                            <span class="font-weight-bold text-dark small">Billing Cycle:</span>
+                            <div class="btn-group bg-light p-1 rounded-pill border" role="group" id="billingCycleGroup">
+                                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 font-weight-semibold cycle-btn active" onclick="setBillingCycle('monthly', this)">
+                                    Monthly
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light rounded-pill px-3 font-weight-semibold cycle-btn" onclick="setBillingCycle('yearly', this)">
+                                    Yearly <span class="badge bg-warning text-dark rounded-pill ms-1" style="font-size: 9px;">Save 20%</span>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light rounded-pill px-3 font-weight-semibold cycle-btn" onclick="setBillingCycle('lifetime', this)">
+                                    Lifetime <span class="badge bg-success text-white rounded-pill ms-1" style="font-size: 9px;">Best Value</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Packages Grid -->
+                    <div class="row" id="packagesGrid">
+                        <!-- Dynamic cards populated by script -->
+                    </div>
+                </div>
+            </div>
+            @else
+            <!-- SUPER ADMIN VIEW (Original Full Dashboard) -->
             <!-- Billing Frequency Filter Bar -->
             <div class="d-flex justify-content-between align-items-center mb-3 p-2 px-3 bg-white border rounded-4 shadow-sm flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-2">
@@ -562,7 +686,7 @@
                 </div>
                 <div id="activeSubscriptionBadge">
                     <span class="badge bg-success text-white px-3 py-2 rounded-pill font-weight-bold shadow-sm" style="font-size: 12px;">
-                        <i class="fas fa-shield-check me-1"></i> Active Plan: <span id="activePlanNameDisplay">Enterprise Ultimate (Lifetime)</span>
+                        <i class="fas fa-shield-check me-1"></i> Super Admin Portal
                     </span>
                 </div>
             </div>
@@ -577,19 +701,10 @@
                 <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <h5 class="font-weight-bold text-dark mb-0">
-                            <i class="fas fa-history text-primary me-2"></i>
-                            @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
-                                Admin Subscription Payments & Approvals
-                            @else
-                                My Subscription Payment History
-                            @endif
+                            <i class="fas fa-history text-primary me-2"></i> Admin Subscription Payments & Approvals
                         </h5>
                         <p class="text-muted small mb-0">
-                            @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
-                                Review, approve or modify expiration dates (+30 days default) for admin subscription payments
-                            @else
-                                Track status, transaction details, and expiration of your subscription payments
-                            @endif
+                            Review, approve or modify expiration dates (+30 days default) for admin subscription payments
                         </p>
                     </div>
                     <span class="badge bg-light text-dark border px-3 py-2 rounded-pill font-weight-semibold" id="historyCountBadge">0 Payments</span>
@@ -616,6 +731,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Modal for Super Admin to Edit Expiration Date -->
             <div class="modal fade" id="editExpiryModal" tabindex="-1" aria-labelledby="editExpiryModalLabel" aria-hidden="true">
@@ -1322,14 +1438,32 @@
             function apiFetch(url, method, body) {
                 const opts = {
                     method: method || 'GET',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                    }
                 };
                 if (body) {
                     opts.headers['Content-Type'] = 'application/json';
-                    opts.headers['X-CSRF-TOKEN']  = CSRF_TOKEN;
                     opts.body = JSON.stringify(body);
                 }
-                return fetch(url, opts).then(r => r.json());
+                return fetch(url, opts).then(function(r) {
+                    if (!r.ok) {
+                        return r.text().then(function(text) {
+                            console.error('[API Error] ' + method + ' ' + url, r.status, text.substring(0, 500));
+                            throw new Error('HTTP ' + r.status + ': ' + text.substring(0, 200));
+                        });
+                    }
+                    const contentType = r.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        return r.json();
+                    }
+                    return r.text().then(function(text) {
+                        console.warn('[API] Non-JSON response from ' + url, text.substring(0, 200));
+                        return {};
+                    });
+                });
             }
 
             // Load all payments from DB and re-render table
@@ -1357,9 +1491,9 @@
 
                 apiFetch(SUB_API_STORE, 'POST', {
                     sub_id:  subId,
-                    plan:    selectedCheckoutPackage.name,
-                    cycle:   selectedCheckoutPackage.cycle,
-                    price:   selectedCheckoutPackage.price,
+                    plan:    selectedCheckoutPackage.name || 'Subscription Plan',
+                    cycle:   selectedCheckoutPackage.cycle || 'Monthly',
+                    price:   String(selectedCheckoutPackage.price || '0'),
                     gateway: gateway,
                     phone:   phone,
                     trx_id:  trxId,
@@ -1376,7 +1510,7 @@
                 })
                 .catch(err => {
                     console.error('Store payment failed:', err);
-                    alert('Failed to save payment. Please try again.');
+                    alert('Failed to save payment: ' + (err.message || 'Unknown error'));
                 });
             };
 
@@ -1552,6 +1686,78 @@
                     `;
                     tbody.appendChild(tr);
                 });
+
+                // Update Tab 1 Active Subscription Overview Card for Admin
+                updateActiveSubCard(history);
+            }
+
+            window.switchToRenewTab = function() {
+                const renewBtn = document.getElementById('tab-renew-sub-btn');
+                if (renewBtn) {
+                    const tab = new bootstrap.Tab(renewBtn);
+                    tab.show();
+                }
+            };
+
+            function updateActiveSubCard(history) {
+                const planTitleEl   = document.getElementById('activeSubPlanTitle');
+                const cycleTitleEl  = document.getElementById('activeSubCycleTitle');
+                const statusBadgeEl = document.getElementById('activeSubStatusBadge');
+                const expiryDateEl  = document.getElementById('activeSubExpiryDate');
+                const daysLeftEl    = document.getElementById('activeSubDaysLeft');
+
+                if (!planTitleEl) return;
+
+                const approved = history.find(h => h.status === 'Approved');
+                const pending  = history.find(h => h.status === 'Pending');
+                const activeItem = approved || pending || (history.length > 0 ? history[0] : null);
+
+                if (!activeItem) {
+                    planTitleEl.textContent = 'Free Trial / Starter';
+                    if (cycleTitleEl) cycleTitleEl.textContent = 'No Active Paid Subscription';
+                    if (statusBadgeEl) statusBadgeEl.innerHTML = `<span class="badge bg-secondary text-white px-3 py-2 rounded-pill font-weight-bold"><i class="fas fa-info-circle me-1"></i> Inactive</span>`;
+                    if (expiryDateEl) expiryDateEl.textContent = 'N/A';
+                    if (daysLeftEl) daysLeftEl.innerHTML = `<span class="text-muted small">No active plan recorded</span>`;
+                    return;
+                }
+
+                planTitleEl.textContent = activeItem.plan || 'Starter Plan';
+                if (cycleTitleEl) cycleTitleEl.textContent = activeItem.cycle || 'Monthly Billing';
+
+                if (activeItem.status === 'Approved') {
+                    if (statusBadgeEl) statusBadgeEl.innerHTML = `<span class="badge bg-success text-white px-3 py-2 rounded-pill font-weight-bold"><i class="fas fa-check-circle me-1"></i> Active</span>`;
+
+                    if (activeItem.expiryDate) {
+                        if (expiryDateEl) expiryDateEl.textContent = activeItem.expiryDate;
+                        
+                        const expParts = activeItem.expiryDate.split('-');
+                        const expiry = new Date(expParts[0], expParts[1] - 1, expParts[2]);
+                        const today  = new Date();
+                        today.setHours(0,0,0,0);
+                        const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+
+                        if (daysLeftEl) {
+                            if (diffDays > 0) {
+                                daysLeftEl.innerHTML = `<span class="badge bg-primary text-white px-2 py-1 rounded-pill"><i class="fas fa-hourglass-half me-1"></i> ${diffDays} Days Remaining</span>`;
+                            } else if (diffDays === 0) {
+                                daysLeftEl.innerHTML = `<span class="badge bg-warning text-dark px-2 py-1 rounded-pill"><i class="fas fa-exclamation-triangle me-1"></i> Expires Today</span>`;
+                            } else {
+                                daysLeftEl.innerHTML = `<span class="badge bg-danger text-white px-2 py-1 rounded-pill"><i class="fas fa-times-circle me-1"></i> Expired</span>`;
+                            }
+                        }
+                    } else if (activeItem.cycle && activeItem.cycle.toLowerCase().includes('lifetime')) {
+                        if (expiryDateEl) expiryDateEl.textContent = 'Never Expires';
+                        if (daysLeftEl) daysLeftEl.innerHTML = `<span class="badge bg-success text-white px-2 py-1 rounded-pill"><i class="fas fa-infinity me-1"></i> Lifetime Access</span>`;
+                    }
+                } else if (activeItem.status === 'Pending') {
+                    if (statusBadgeEl) statusBadgeEl.innerHTML = `<span class="badge bg-warning text-dark px-3 py-2 rounded-pill font-weight-bold"><i class="fas fa-clock me-1"></i> Pending Approval</span>`;
+                    if (expiryDateEl) expiryDateEl.textContent = 'Awaiting Super Admin';
+                    if (daysLeftEl) daysLeftEl.innerHTML = `<span class="text-muted small">Submitted: ${activeItem.date || 'Today'}</span>`;
+                } else {
+                    if (statusBadgeEl) statusBadgeEl.innerHTML = `<span class="badge bg-danger text-white px-3 py-2 rounded-pill font-weight-bold"><i class="fas fa-times-circle me-1"></i> Rejected</span>`;
+                    if (expiryDateEl) expiryDateEl.textContent = 'Payment Rejected';
+                    if (daysLeftEl) daysLeftEl.innerHTML = `<span class="text-muted small">Please resubmit payment</span>`;
+                }
             }
 
             // Render Dashboard Stats and Grid

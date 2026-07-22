@@ -23,6 +23,11 @@ class AuthorizeByRouteName
             return $next($request);
         }
 
+        // Allow subscription payments for all admin users
+        if (str_starts_with($name, 'admin.subscription-payments')) {
+            return $next($request);
+        }
+
         // Direct mapping for assigned orders route
         if ($name === 'admin.asigned.orders' || $name === 'asigned.orders') {
             if ($user->can('orders.asigned') || $user->can('orders.assigned') || $user->can('asigned.orders') || $user->can('assigned.orders') || $user->can('orders.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {

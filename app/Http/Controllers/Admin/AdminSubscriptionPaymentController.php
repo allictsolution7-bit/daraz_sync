@@ -36,8 +36,8 @@ class AdminSubscriptionPaymentController extends Controller
         $request->validate([
             'sub_id'  => 'required|string|unique:admin_subscription_payments,sub_id',
             'plan'    => 'required|string',
-            'cycle'   => 'required|string',
-            'price'   => 'required|string',
+            'cycle'   => 'nullable|string',
+            'price'   => 'nullable|string',
             'gateway' => 'required|string',
             'phone'   => 'nullable|string',
             'trx_id'  => 'nullable|string',
@@ -46,8 +46,8 @@ class AdminSubscriptionPaymentController extends Controller
         $payment = AdminSubscriptionPayment::create([
             'sub_id'  => $request->sub_id,
             'plan'    => $request->plan,
-            'cycle'   => $request->cycle,
-            'price'   => $request->price,
+            'cycle'   => $request->cycle ?? 'Monthly',
+            'price'   => $request->price ?? '0',
             'gateway' => strtoupper($request->gateway),
             'phone'   => $request->phone,
             'trx_id'  => $request->trx_id,
