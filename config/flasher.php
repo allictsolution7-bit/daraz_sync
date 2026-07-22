@@ -189,4 +189,10 @@ return array(
     'filter_criteria' => array(
         'limit' => 5, // Limit the number of notifications to display
     ),
+
+    'options' => array(
+        'position' => 'top-right',
+        'timeout' => 4500,
+    ),
 );
+

@@ -2254,6 +2254,159 @@
             font-family: 'Outfit', sans-serif !important;
             border-radius: 16px !important;
         }
+
+        /* Premium Global Toast / Notification Styling (PHP Flasher & Toastr) */
+        .fl-wrapper,
+        #toast-container {
+            position: fixed !important;
+            top: 24px !important;
+            right: 24px !important;
+            left: auto !important;
+            bottom: auto !important;
+            width: 400px !important;
+            max-width: calc(100vw - 32px) !important;
+            z-index: 999999 !important;
+            justify-content: flex-end !important;
+            pointer-events: none !important;
+        }
+
+        .fl-wrapper[data-position],
+        .fl-wrapper[data-position^=top-],
+        .fl-wrapper[data-position^=bottom-] {
+            top: 24px !important;
+            right: 24px !important;
+            left: auto !important;
+            bottom: auto !important;
+        }
+
+        .fl-wrapper .fl-container,
+        #toast-container > div {
+            pointer-events: auto !important;
+            width: 100% !important;
+            margin-bottom: 12px !important;
+        }
+
+        .fl-wrapper .fl-flasher,
+        #toast-container > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            background: #ffffff !important;
+            border-radius: 16px !important;
+            box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+            padding: 16px 20px !important;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            overflow: hidden !important;
+            position: relative !important;
+            border: none !important;
+            opacity: 1 !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        /* Success Theme */
+        .fl-wrapper .fl-flasher.fl-success,
+        #toast-container > .toast-success {
+            border-left: 6px solid #10b981 !important;
+            background: linear-gradient(135deg, #ffffff 80%, #f0fdf4 100%) !important;
+        }
+
+        /* Error Theme */
+        .fl-wrapper .fl-flasher.fl-error,
+        #toast-container > .toast-error {
+            border-left: 6px solid #ef4444 !important;
+            background: linear-gradient(135deg, #ffffff 80%, #fef2f2 100%) !important;
+        }
+
+        /* Warning Theme */
+        .fl-wrapper .fl-flasher.fl-warning,
+        #toast-container > .toast-warning {
+            border-left: 6px solid #f59e0b !important;
+            background: linear-gradient(135deg, #ffffff 80%, #fffbeb 100%) !important;
+        }
+
+        /* Info Theme */
+        .fl-wrapper .fl-flasher.fl-info,
+        #toast-container > .toast-info {
+            border-left: 6px solid #3b82f6 !important;
+            background: linear-gradient(135deg, #ffffff 80%, #eff6ff 100%) !important;
+        }
+
+        /* Content flex structure */
+        .fl-wrapper .fl-flasher .fl-content {
+            display: flex !important;
+            align-items: center !important;
+            gap: 16px !important;
+            padding-right: 24px !important;
+        }
+
+        /* Icon Styling */
+        .fl-wrapper .fl-flasher .fl-icon {
+            font-size: 28px !important;
+            width: 1.2em !important;
+            height: 1.2em !important;
+            min-width: 1.2em !important;
+            min-height: 1.2em !important;
+            border-radius: 50% !important;
+            display: inline-block !important;
+            position: relative !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+            margin: 0 !important;
+            flex-shrink: 0 !important;
+        }
+
+        /* Typography - Bigger & Modern */
+        .fl-wrapper .fl-flasher .fl-title,
+        #toast-container .toast-title {
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            display: block !important;
+            margin-bottom: 2px !important;
+            line-height: 1.3 !important;
+            letter-spacing: -0.01em !important;
+        }
+
+        .fl-wrapper .fl-flasher.fl-success .fl-title, #toast-container > .toast-success .toast-title { color: #059669 !important; }
+        .fl-wrapper .fl-flasher.fl-error .fl-title, #toast-container > .toast-error .toast-title { color: #dc2626 !important; }
+        .fl-wrapper .fl-flasher.fl-warning .fl-title, #toast-container > .toast-warning .toast-title { color: #d97706 !important; }
+        .fl-wrapper .fl-flasher.fl-info .fl-title, #toast-container > .toast-info .toast-title { color: #2563eb !important; }
+
+        .fl-wrapper .fl-flasher .fl-message,
+        #toast-container .toast-message {
+            font-size: 0.95rem !important;
+            color: #475569 !important;
+            font-weight: 500 !important;
+            line-height: 1.4 !important;
+            display: block !important;
+        }
+
+        /* Close button */
+        .fl-wrapper .fl-flasher .fl-close,
+        #toast-container .toast-close-button {
+            font-size: 1.5rem !important;
+            color: #94a3b8 !important;
+            opacity: 0.7 !important;
+            top: 10px !important;
+            right: 14px !important;
+            position: absolute !important;
+            background: transparent !important;
+            border: none !important;
+            cursor: pointer !important;
+            line-height: 1 !important;
+            transition: all 0.2s !important;
+        }
+
+        .fl-wrapper .fl-flasher .fl-close:hover,
+        #toast-container .toast-close-button:hover {
+            color: #0f172a !important;
+            opacity: 1 !important;
+            transform: scale(1.1);
+        }
+
+        /* Progress Bar */
+        .fl-wrapper .fl-flasher .fl-progress-bar {
+            height: 4px !important;
+            border-radius: 0 0 16px 16px !important;
+            overflow: hidden !important;
+        }
     </style>
 
     <!-- Push scripts section -->
