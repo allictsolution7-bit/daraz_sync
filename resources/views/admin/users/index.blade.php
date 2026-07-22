@@ -344,26 +344,28 @@
         }
 
         .feature-included {
-            color: var(--dark-slate);
-            font-weight: 500;
+            color: #0f172a !important;
+            font-weight: 600 !important;
         }
 
         .feature-excluded {
-            color: var(--text-muted);
-            text-decoration: line-through;
-            opacity: 0.65;
+            color: #94a3b8 !important;
+            text-decoration: line-through !important;
+            opacity: 0.75 !important;
         }
 
         .feature-icon-included {
-            color: var(--success);
-            margin-right: 12px;
-            font-size: 16px;
+            color: #10b981 !important;
+            font-size: 15px !important;
+            margin-right: 8px !important;
+            display: inline-block !important;
         }
 
         .feature-icon-excluded {
-            color: var(--danger);
-            margin-right: 12px;
-            font-size: 16px;
+            color: #ef4444 !important;
+            font-size: 15px !important;
+            margin-right: 8px !important;
+            display: inline-block !important;
         }
 
         /* Premium Feature Allocation Matrix Modal Styling */
@@ -387,9 +389,9 @@
 
         .feature-select-card {
             background: #ffffff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 10px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 16px;
             transition: all 0.2s ease;
             user-select: none;
             display: flex;
@@ -407,7 +409,7 @@
 
         .feature-select-card.active-selected {
             border-color: #3b82f6 !important;
-            background: #eff6ff !important;
+            background: #f0f6ff !important;
             box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
         }
 
@@ -584,26 +586,25 @@
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3 flex-wrap gap-2">
-                                    <h6 class="mb-0 font-weight-bold text-dark"><i class="fas fa-tasks text-primary me-2"></i> Features Allocation Matrix (<span id="selectedFeaturesCount">0</span> selected)</h6>
-                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <div class="position-relative" style="min-width: 220px;">
-                                            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="font-size: 12px;"></i>
-                                            <input type="text" id="packageFeatureSearch" class="form-control form-control-sm ps-5 rounded-pill" placeholder="Search features & pages...">
-                                        </div>
-                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="selectAllModalFeatures(true)">
-                                            <i class="fas fa-check-double me-1"></i> Select All
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="selectAllModalFeatures(false)">
-                                            <i class="fas fa-times me-1"></i> Clear All
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2" onclick="toggleModalSections(true)" title="Expand Sections">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2" onclick="toggleModalSections(false)" title="Collapse Sections">
-                                            <i class="fas fa-chevron-up"></i>
-                                        </button>
+                                <h6 class="mb-3 font-weight-bold text-dark"><i class="fas fa-tasks text-primary me-2"></i> Features Allocation Matrix (<span id="selectedFeaturesCount">0</span> selected)</h6>
+
+                                <div class="p-3 mb-4 rounded-3 border d-flex align-items-center gap-2 flex-wrap shadow-sm" style="background-color: #f1f5f9; border-color: #e2e8f0 !important;">
+                                    <div class="position-relative" style="min-width: 220px;">
+                                        <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="font-size: 12px;"></i>
+                                        <input type="text" id="packageFeatureSearch" class="form-control form-control-sm ps-5 bg-white border" placeholder="Search permissions..." style="border-radius: 8px; border-color: #cbd5e1;">
                                     </div>
+                                    <button type="button" class="btn btn-sm bg-white border text-dark font-weight-semibold px-3 py-1.5 shadow-sm" onclick="selectAllModalFeatures(true)" style="border-radius: 8px; border-color: #cbd5e1 !important; font-size: 13px;">
+                                        <i class="fas fa-check-double text-primary me-1"></i> Select all
+                                    </button>
+                                    <button type="button" class="btn btn-sm bg-white border text-dark font-weight-semibold px-3 py-1.5 shadow-sm" onclick="selectAllModalFeatures(false)" style="border-radius: 8px; border-color: #cbd5e1 !important; font-size: 13px;">
+                                        <i class="fas fa-times text-danger me-1"></i> Clear
+                                    </button>
+                                    <button type="button" class="btn btn-sm bg-white border text-dark font-weight-semibold px-3 py-1.5 shadow-sm" onclick="toggleModalSections(true)" style="border-radius: 8px; border-color: #cbd5e1 !important; font-size: 13px;">
+                                        <i class="fas fa-chevron-down text-info me-1"></i> Expand
+                                    </button>
+                                    <button type="button" class="btn btn-sm bg-white border text-dark font-weight-semibold px-3 py-1.5 shadow-sm" onclick="toggleModalSections(false)" style="border-radius: 8px; border-color: #cbd5e1 !important; font-size: 13px;">
+                                        <i class="fas fa-chevron-up text-info me-1"></i> Collapse
+                                    </button>
                                 </div>
 
                                 <div id="modalFeaturesContainer" class="accordion">
@@ -621,33 +622,44 @@
 
             <!-- Manage Features Pool Modal -->
             <div class="modal fade" id="manageFeaturesModal" tabindex="-1" aria-labelledby="manageFeaturesModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-                        <div class="modal-header bg-secondary text-white border-0 py-3 d-flex justify-content-between align-items-center">
-                            <h5 class="modal-title font-weight-bold" id="manageFeaturesModalLabel"><i class="fas fa-list-ul me-2"></i> Manage Subscription Features</h5>
+                        <div class="modal-header bg-dark text-white border-0 py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="modal-title font-weight-bold" id="manageFeaturesModalLabel"><i class="fas fa-list-check text-info me-2"></i> Manage Subscription Features Pool</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body p-4">
-                            <form id="newFeatureForm" onsubmit="addFeature(event)" class="mb-4">
-                                <label for="newFeatureName" class="form-label font-weight-bold">Create Custom Feature Item</label>
+                            <form id="newFeatureForm" onsubmit="addFeature(event)" class="mb-4 bg-light p-3 rounded-3 border">
+                                <label for="newFeatureName" class="form-label font-weight-bold text-dark mb-2">Create Custom Feature Item</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="newFeatureName" placeholder="e.g. Dedicated Account Manager, Custom API Access" required>
-                                    <button class="btn btn-success px-4" type="submit"><i class="fas fa-plus me-1"></i> Add Item</button>
+                                    <button class="btn btn-success px-4 font-weight-bold" type="submit"><i class="fas fa-plus me-1"></i> Add Feature Item</button>
                                 </div>
                             </form>
 
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-                                <h6 class="mb-0 font-weight-bold">Master Feature Pool (<span id="featuresPoolCount">0</span> items)</h6>
-                                <div class="d-flex gap-2">
-                                    <input type="text" id="featuresPoolSearch" class="form-control form-control-sm rounded-pill px-3" placeholder="Search pool..." style="width: 200px;" oninput="filterFeaturesPoolList()">
-                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="resetToDefaultSidebarFeatures()" title="Reset to all default sidebar features">
-                                        <i class="fas fa-rotate-left me-1"></i> Reset Sidebar Defaults
-                                    </button>
-                                </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0 font-weight-bold text-dark"><i class="fas fa-cubes text-primary me-2"></i> Master Feature Pool (<span id="featuresPoolCount">0</span> items)</h6>
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="resetToDefaultSidebarFeatures()" title="Reset to all default sidebar features">
+                                    <i class="fas fa-rotate-left me-1"></i> Reset Sidebar Defaults
+                                </button>
                             </div>
-                            <ul class="list-group list-group-flush" id="featuresListContainer" style="max-height: 350px; overflow-y: auto;">
-                                <!-- Populate via JS -->
-                            </ul>
+
+                            <div class="p-3 mb-4 rounded-3 border d-flex align-items-center gap-2 flex-wrap shadow-sm" style="background-color: #f1f5f9; border-color: #e2e8f0 !important;">
+                                <div class="position-relative" style="min-width: 220px;">
+                                    <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="font-size: 12px;"></i>
+                                    <input type="text" id="featuresPoolSearch" class="form-control form-control-sm ps-5 bg-white border" placeholder="Search pool..." oninput="filterFeaturesPoolList()" style="border-radius: 8px; border-color: #cbd5e1;">
+                                </div>
+                                <button type="button" class="btn btn-sm bg-white border text-dark font-weight-semibold px-3 py-1.5 shadow-sm" onclick="togglePoolSections(true)" style="border-radius: 8px; border-color: #cbd5e1 !important; font-size: 13px;">
+                                    <i class="fas fa-chevron-down text-info me-1"></i> Expand
+                                </button>
+                                <button type="button" class="btn btn-sm bg-white border text-dark font-weight-semibold px-3 py-1.5 shadow-sm" onclick="togglePoolSections(false)" style="border-radius: 8px; border-color: #cbd5e1 !important; font-size: 13px;">
+                                    <i class="fas fa-chevron-up text-info me-1"></i> Collapse
+                                </button>
+                            </div>
+
+                            <div id="featuresListContainer" class="accordion">
+                                <!-- Grouped Category Cards Populated by JS -->
+                            </div>
                         </div>
                         <div class="modal-footer border-0 bg-light p-3">
                             <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Close</button>
@@ -1080,10 +1092,13 @@
                             `;
                             poolCategoryItems.forEach(feat => {
                                 const isIncluded = pkg.features && pkg.features.includes(feat);
+                                const iconHTML = isIncluded 
+                                    ? `<i class="fas fa-check-circle me-2" style="color: #10b981 !important; font-size: 14px; flex-shrink: 0;"></i>` 
+                                    : `<i class="fas fa-times-circle me-2" style="color: #ef4444 !important; font-size: 14px; flex-shrink: 0;"></i>`;
                                 featuresHTML += `
-                                    <div class="feature-item ${isIncluded ? 'feature-included' : 'feature-excluded'} py-1">
-                                        <i class="${isIncluded ? 'fas fa-check-circle feature-icon-included' : 'fas fa-times-circle feature-icon-excluded'} me-2"></i>
-                                        <span style="font-size: 12px;">${feat}</span>
+                                    <div class="feature-item py-1 d-flex align-items-center">
+                                        ${iconHTML}
+                                        <span style="font-size: 12px; ${isIncluded ? 'color: #0f172a; font-weight: 600;' : 'color: #94a3b8; text-decoration: line-through;'}">${feat}</span>
                                     </div>
                                 `;
                             });
@@ -1103,10 +1118,13 @@
                         `;
                         customFeatures.forEach(feat => {
                             const isIncluded = pkg.features && pkg.features.includes(feat);
+                            const iconHTML = isIncluded 
+                                ? `<i class="fas fa-check-circle me-2" style="color: #10b981 !important; font-size: 14px; flex-shrink: 0;"></i>` 
+                                : `<i class="fas fa-times-circle me-2" style="color: #ef4444 !important; font-size: 14px; flex-shrink: 0;"></i>`;
                             featuresHTML += `
-                                <div class="feature-item ${isIncluded ? 'feature-included' : 'feature-excluded'} py-1">
-                                    <i class="${isIncluded ? 'fas fa-check-circle feature-icon-included' : 'fas fa-times-circle feature-icon-excluded'} me-2"></i>
-                                    <span style="font-size: 12px;">${feat}</span>
+                                <div class="feature-item py-1 d-flex align-items-center">
+                                    ${iconHTML}
+                                    <span style="font-size: 12px; ${isIncluded ? 'color: #0f172a; font-weight: 600;' : 'color: #94a3b8; text-decoration: line-through;'}">${feat}</span>
                                 </div>
                             `;
                         });
@@ -1143,12 +1161,12 @@
                                     ${featuresHTML}
                                 </div>
                             </div>
-                            <div class="card-footer bg-light border-0 p-3 d-flex justify-content-between gap-2 mt-auto">
-                                <button class="btn btn-outline-info rounded-pill px-3 flex-grow-1" onclick="openEditModal('${pkg.id}')">
-                                    <i class="fas fa-edit me-1"></i> Edit Plan
+                            <div class="card-footer bg-light border-0 p-3 d-flex justify-content-between align-items-center gap-2 mt-auto">
+                                <button class="btn btn-primary rounded-pill px-3 py-2 flex-grow-1 font-weight-bold d-flex align-items-center justify-content-center gap-2" onclick="openEditModal('${pkg.id}')">
+                                    <i class="fas fa-edit"></i> Edit Plan
                                 </button>
-                                <button class="btn btn-outline-danger rounded-pill px-3" onclick="deletePackage('${pkg.id}')">
-                                    <i class="fas fa-trash"></i>
+                                <button class="btn btn-outline-danger rounded-circle d-inline-flex align-items-center justify-content-center" onclick="deletePackage('${pkg.id}')" title="Delete Plan" style="width: 38px; height: 38px; min-width: 38px; padding: 0;">
+                                    <i class="fas fa-trash-alt" style="font-size: 14px;"></i>
                                 </button>
                             </div>
                         </div>
@@ -1160,7 +1178,7 @@
                 renderFeaturesPoolList();
             }
 
-            // Render list inside features pool modal
+            // Render list inside features pool modal grouped by section categories matching package modal UI
             function renderFeaturesPoolList() {
                 const container = document.getElementById('featuresListContainer');
                 if (!container) return;
@@ -1172,22 +1190,102 @@
                 document.getElementById('featuresPoolCount').textContent = featuresPool.length;
 
                 if (filteredPool.length === 0) {
-                    container.innerHTML = `<li class="list-group-item text-muted text-center py-3">No matching features found.</li>`;
+                    container.innerHTML = `<div class="text-muted text-center py-4">No matching features found in pool.</div>`;
                     return;
                 }
 
-                filteredPool.forEach((feat) => {
-                    const originalIdx = featuresPool.indexOf(feat);
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center px-2 py-2 border-bottom';
-                    li.innerHTML = `
-                        <span class="font-weight-medium text-dark"><i class="fas fa-cube text-primary me-2" style="font-size: 12px;"></i>${feat}</span>
-                        <button class="btn btn-sm btn-outline-danger rounded-circle p-1" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;" onclick="deleteFeature(${originalIdx})" title="Delete Feature">
-                            <i class="fas fa-trash-alt" style="font-size: 11px;"></i>
-                        </button>
+                let sectionIndex = 0;
+                SIDEBAR_FEATURE_GROUPS.forEach(group => {
+                    const groupItemsInFilteredPool = group.items.filter(item => filteredPool.includes(item));
+                    if (groupItemsInFilteredPool.length === 0) return;
+
+                    sectionIndex++;
+                    const groupSlug = 'pool_sec_' + sectionIndex;
+                    const totalCategoryItemsInPool = group.items.filter(item => featuresPool.includes(item)).length;
+
+                    const card = document.createElement('div');
+                    card.className = 'card border mb-3 shadow-sm rounded-3 feature-group-card';
+
+                    let itemsHTML = '';
+                    groupItemsInFilteredPool.forEach(feat => {
+                        const originalIdx = featuresPool.indexOf(feat);
+                        itemsHTML += `
+                            <div class="col-md-6 mb-2">
+                                <div class="feature-select-card d-flex align-items-center justify-content-between" style="border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 12px 16px; background: #ffffff;">
+                                    <span class="font-weight-medium text-dark" style="font-size: 13.5px;">
+                                        <i class="fas fa-cube me-2" style="color: #0ea5e9;"></i>${feat}
+                                    </span>
+                                    <button class="btn btn-sm btn-outline-danger rounded-circle p-0 d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px; min-width: 28px;" onclick="deleteFeature(${originalIdx})" title="Delete Feature">
+                                        <i class="fas fa-trash-alt" style="font-size: 11px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="card-header bg-light border-0 py-3 px-4 d-flex justify-content-between align-items-center" style="border-radius: 14px 14px 0 0;">
+                            <div class="d-flex align-items-center gap-2" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapse_${groupSlug}">
+                                <i class="${group.icon} fs-5 me-1" style="color: #0ea5e9;"></i>
+                                <span class="font-weight-bold text-dark fs-6 me-1">${group.category}</span>
+                                <span class="badge bg-primary text-white rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 700;">${totalCategoryItemsInPool} items</span>
+                            </div>
+                        </div>
+                        <div id="collapse_${groupSlug}" class="collapse show">
+                            <div class="card-body p-4 bg-white">
+                                <div class="row g-3">
+                                    ${itemsHTML}
+                                </div>
+                            </div>
+                        </div>
                     `;
-                    container.appendChild(li);
+                    container.appendChild(card);
                 });
+
+                // Custom features pool not in standard sidebar groups
+                const customPoolItems = filteredPool.filter(feat => !SIDEBAR_ITEMS.includes(feat));
+                if (customPoolItems.length > 0) {
+                    sectionIndex++;
+                    const groupSlug = 'pool_sec_custom';
+
+                    const card = document.createElement('div');
+                    card.className = 'card border mb-3 shadow-sm rounded-3 feature-group-card';
+
+                    let itemsHTML = '';
+                    customPoolItems.forEach(feat => {
+                        const originalIdx = featuresPool.indexOf(feat);
+                        itemsHTML += `
+                            <div class="col-md-6 mb-2">
+                                <div class="feature-select-card d-flex align-items-center justify-content-between" style="border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 12px 16px; background: #ffffff;">
+                                    <span class="font-weight-medium text-dark" style="font-size: 13.5px;">
+                                        <i class="fas fa-star text-warning me-2"></i>${feat}
+                                    </span>
+                                    <button class="btn btn-sm btn-outline-danger rounded-circle p-0 d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px; min-width: 28px;" onclick="deleteFeature(${originalIdx})" title="Delete Feature">
+                                        <i class="fas fa-trash-alt" style="font-size: 11px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="card-header bg-light border-0 py-3 px-4 d-flex justify-content-between align-items-center" style="border-radius: 14px 14px 0 0;">
+                            <div class="d-flex align-items-center gap-2" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapse_${groupSlug}">
+                                <i class="fas fa-star text-warning fs-5 me-1"></i>
+                                <span class="font-weight-bold text-dark fs-6 me-1">Custom / Additional Items</span>
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 700;">${customPoolItems.length} items</span>
+                            </div>
+                        </div>
+                        <div id="collapse_${groupSlug}" class="collapse show">
+                            <div class="card-body p-4 bg-white">
+                                <div class="row g-3">
+                                    ${itemsHTML}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
             }
 
             function filterFeaturesPoolList() {
@@ -1253,20 +1351,20 @@
                     });
 
                     card.innerHTML = `
-                        <div class="feature-group-header">
+                        <div class="card-header bg-light border-0 py-3 px-4 d-flex justify-content-between align-items-center" style="border-radius: 14px 14px 0 0;">
                             <div class="d-flex align-items-center gap-2" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapse_${groupSlug}">
-                                <i class="${group.icon} fs-6 me-1"></i>
-                                <span class="feature-group-title">${group.category}</span>
-                                <span class="badge bg-primary text-white rounded-pill px-2 py-1 ms-1" style="font-size: 10px; font-weight: 700;">${poolCategoryItems.length} items</span>
+                                <i class="${group.icon} fs-5 me-1" style="color: #0ea5e9;"></i>
+                                <span class="font-weight-bold text-dark fs-6 me-1">${group.category}</span>
+                                <span class="badge bg-primary text-white rounded-pill px-3 py-1" style="font-size: 11px; font-weight: 700;">${poolCategoryItems.length} items</span>
                             </div>
-                            <div class="group-toggle-badge" onclick="event.stopPropagation()">
-                                <input class="form-check-input select-all-section-cb m-0" type="checkbox" id="sec_cb_${groupSlug}" ${allCategoryChecked ? 'checked' : ''} onchange="selectAllSectionFeatures('${groupSlug}', this.checked)" style="cursor: pointer;">
-                                <label for="sec_cb_${groupSlug}" class="text-secondary">Select Group</label>
+                            <div class="bg-white border rounded-pill px-3 py-1 d-flex align-items-center gap-2 shadow-sm" onclick="event.stopPropagation()" style="cursor: pointer;">
+                                <input class="form-check-input select-all-section-cb m-0" type="checkbox" id="sec_cb_${groupSlug}" ${allCategoryChecked ? 'checked' : ''} onchange="selectAllSectionFeatures('${groupSlug}', this.checked)" style="cursor: pointer; width: 16px; height: 16px;">
+                                <label for="sec_cb_${groupSlug}" class="text-secondary small font-weight-bold mb-0" style="cursor: pointer; font-size: 12px; white-space: nowrap;">Select Group</label>
                             </div>
                         </div>
                         <div id="collapse_${groupSlug}" class="collapse show">
-                            <div class="card-body p-3 bg-white">
-                                <div class="row g-2">
+                            <div class="card-body p-4 bg-white">
+                                <div class="row g-3">
                                     ${itemsHTML}
                                 </div>
                             </div>
@@ -1396,6 +1494,16 @@
 
             function toggleModalSections(expand) {
                 document.querySelectorAll('#modalFeaturesContainer .collapse').forEach(collapseEl => {
+                    if (typeof bootstrap !== 'undefined') {
+                        const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
+                        if (expand) bsCollapse.show();
+                        else bsCollapse.hide();
+                    }
+                });
+            }
+
+            function togglePoolSections(expand) {
+                document.querySelectorAll('#featuresListContainer .collapse').forEach(collapseEl => {
                     if (typeof bootstrap !== 'undefined') {
                         const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
                         if (expand) bsCollapse.show();
