@@ -450,6 +450,11 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::post('/config/update', [SettingController::class, 'update'])->name('settings.update');
     Route::post('/config/sitemap/generate', [SettingController::class, 'generateSitemap'])->name('sitemap.generate');
 
+    // Admin Subscription Payments (dedicated table)
+    Route::get('/subscription-payments', [\App\Http\Controllers\Admin\AdminSubscriptionPaymentController::class, 'index'])->name('subscription-payments.index');
+    Route::post('/subscription-payments', [\App\Http\Controllers\Admin\AdminSubscriptionPaymentController::class, 'store'])->name('subscription-payments.store');
+    Route::patch('/subscription-payments/{subId}', [\App\Http\Controllers\Admin\AdminSubscriptionPaymentController::class, 'update'])->name('subscription-payments.update');
+
     // Modules & Tools Dashboard (with System Modules)
     Route::prefix('extensions')->name('modules.')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\ModuleController::class, 'index'])->name('index');

@@ -447,6 +447,15 @@
 @endpush
 
 @section('content')
+    @php
+        $superAdminUser = \App\Models\User::whereHas('roles', function($q) {
+            $q->whereIn('name', ['super_admin', 'super admin']);
+        })->first();
+        $superAdminPhone = $superAdminUser?->phone ?? $superAdminUser?->mobile ?? setting('general', 'site_phone', '01779542054');
+        $superAdminBkash = setting('ecommerce', 'bkash_number', $superAdminPhone);
+        $superAdminNagad = setting('ecommerce', 'nagad_number', $superAdminPhone);
+        $superAdminRocket = setting('ecommerce', 'rocket_number', $superAdminPhone);
+    @endphp
     <div class="container-fluid px-4 pt-3">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-4">
@@ -710,15 +719,6 @@
                             </div>
 
                             <!-- Gateway Instructions & Form -->
-                            @php
-                                $superAdminUser = \App\Models\User::whereHas('roles', function($q) {
-                                    $q->whereIn('name', ['super_admin', 'super admin']);
-                                })->first();
-                                $superAdminPhone = $superAdminUser?->phone ?? $superAdminUser?->mobile ?? setting('general', 'site_phone', '01779542054');
-                                $superAdminBkash = setting('ecommerce', 'bkash_number', $superAdminPhone);
-                                $superAdminNagad = setting('ecommerce', 'nagad_number', $superAdminPhone);
-                                $superAdminRocket = setting('ecommerce', 'rocket_number', $superAdminPhone);
-                            @endphp
                             <div class="card border p-3 rounded-3 bg-white mb-3">
                                 <div class="alert bg-light border p-2.5 rounded-3 mb-3 small text-dark" id="payInstructions">
                                     <strong>bKash Payment (Super Admin: {{ $superAdminBkash }})</strong><br>
@@ -1311,183 +1311,120 @@
                 modal.show();
             };
 
-            // Subscription History Storage Key & DB Sync
-            const SUB_PAYMENTS_KEY = "admin_subscription_payments_v2";
-            const DB_SUBSCRIPTION_HISTORY = @json($dbSubHistory);
+            // ─── Subscription Payments: Real DB API ────────────────────────────────
+            const SUB_API_INDEX  = '{{ route("admin.subscription-payments.index") }}';
+            const SUB_API_STORE  = '{{ route("admin.subscription-payments.store") }}';
+            const CSRF_TOKEN     = '{{ csrf_token() }}';
 
-            function syncSubscriptionHistoryToDB(historyList) {
-                try {
-                    const formData = new FormData();
-                    formData.append('_token', '{{ csrf_token() }}');
-                    formData.append('settings[saas_subscription_history_v1]', JSON.stringify(historyList));
+            // In-memory cache so the table renders instantly; refreshed on every page load
+            window._subPaymentsCache = [];
 
-                    fetch('{{ route("settings.update") }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: formData
-                    }).catch(err => console.log('DB Sync Note:', err));
-                } catch(e) {
-                    console.log('DB Sync error:', e);
+            function apiFetch(url, method, body) {
+                const opts = {
+                    method: method || 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                };
+                if (body) {
+                    opts.headers['Content-Type'] = 'application/json';
+                    opts.headers['X-CSRF-TOKEN']  = CSRF_TOKEN;
+                    opts.body = JSON.stringify(body);
                 }
+                return fetch(url, opts).then(r => r.json());
             }
 
-            function getSubscriptionHistory() {
-                const stored = localStorage.getItem(SUB_PAYMENTS_KEY);
-                let localList = [];
-                try {
-                    localList = stored ? JSON.parse(stored) : [];
-                } catch(e) {
-                    localList = [];
-                }
-
-                let combinedMap = new Map();
-
-                if (Array.isArray(DB_SUBSCRIPTION_HISTORY)) {
-                    DB_SUBSCRIPTION_HISTORY.forEach(item => {
-                        if (item && item.id) combinedMap.set(item.id, item);
+            // Load all payments from DB and re-render table
+            function loadSubscriptionHistory(callback) {
+                apiFetch(SUB_API_INDEX)
+                    .then(data => {
+                        window._subPaymentsCache = Array.isArray(data) ? data : [];
+                        renderSubscriptionHistoryTable();
+                        if (callback) callback(window._subPaymentsCache);
+                    })
+                    .catch(err => {
+                        console.error('Failed to load payments:', err);
+                        renderSubscriptionHistoryTable();
                     });
-                }
-
-                if (Array.isArray(localList)) {
-                    localList.forEach(item => {
-                        if (item && item.id) {
-                            if (!combinedMap.has(item.id)) {
-                                combinedMap.set(item.id, item);
-                            }
-                        }
-                    });
-                }
-
-                let list = Array.from(combinedMap.values());
-
-                if (list.length === 0) {
-                    const d = new Date();
-                    const exp = new Date();
-                    exp.setDate(exp.getDate() + 30);
-                    list = [
-                        {
-                            id: 'SUB-1001',
-                            plan: 'Enterprise Ultimate',
-                            cycle: 'Lifetime Access',
-                            price: '200000',
-                            gateway: 'BKASH',
-                            phone: '01779542054',
-                            trxId: 'TRX8932145',
-                            date: d.toLocaleDateString(),
-                            createdAt: d.toISOString(),
-                            status: 'Approved',
-                            expiryDate: exp.toISOString().split('T')[0]
-                        }
-                    ];
-                }
-
-                localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(list));
-                return list;
             }
 
             window.confirmSubscriptionPayment = function() {
-                const phone = document.getElementById('paySenderPhone')?.value || '01712345678';
-                const trxId = document.getElementById('payTrxId')?.value || 'TRX' + Math.floor(Math.random()*900000 + 100000);
+                const phone   = document.getElementById('paySenderPhone')?.value || '';
+                const trxId   = document.getElementById('payTrxId')?.value || 'TRX' + Math.floor(Math.random()*900000 + 100000);
                 const gateway = document.querySelector('input[name="pay_gateway"]:checked')?.value || 'bKash';
 
-                if (selectedCheckoutPackage) {
-                    const history = getSubscriptionHistory();
-                    const newSub = {
-                        id: 'SUB-' + Math.floor(Math.random()*90000 + 10000),
-                        plan: selectedCheckoutPackage.name,
-                        cycle: selectedCheckoutPackage.cycle,
-                        price: selectedCheckoutPackage.price,
-                        gateway: gateway.toUpperCase(),
-                        phone: phone,
-                        trxId: trxId,
-                        date: new Date().toLocaleDateString(),
-                        createdAt: new Date().toISOString(),
-                        status: 'Pending',
-                        expiryDate: null
-                    };
-                    history.unshift(newSub);
-                    localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(history));
-                    syncSubscriptionHistoryToDB(history);
-                }
+                if (!selectedCheckoutPackage) return;
 
-                const modalEl = document.getElementById('paySubscriptionModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) modal.hide();
+                const subId = 'SUB-' + Math.floor(Math.random()*90000 + 10000);
 
-                if (typeof toastr !== 'undefined') {
-                    toastr.info("Subscription payment submitted! Status: Pending Super Admin Approval.", "Payment Pending");
-                } else {
-                    alert("Subscription payment submitted! Status: Pending Super Admin Approval.");
-                }
-                renderWorkspace();
+                apiFetch(SUB_API_STORE, 'POST', {
+                    sub_id:  subId,
+                    plan:    selectedCheckoutPackage.name,
+                    cycle:   selectedCheckoutPackage.cycle,
+                    price:   selectedCheckoutPackage.price,
+                    gateway: gateway,
+                    phone:   phone,
+                    trx_id:  trxId,
+                })
+                .then(() => {
+                    const modalEl = document.getElementById('paySubscriptionModal');
+                    const modal   = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+
+                    if (typeof toastr !== 'undefined') {
+                        toastr.info('Payment submitted! Pending Super Admin approval.', 'Payment Pending');
+                    }
+                    loadSubscriptionHistory();
+                })
+                .catch(err => {
+                    console.error('Store payment failed:', err);
+                    alert('Failed to save payment. Please try again.');
+                });
             };
 
             window.approveSubscriptionItem = function(subId, customExpiry = null) {
-                const history = getSubscriptionHistory();
-                const item = history.find(h => h.id === subId);
-                if (!item) return;
-
-                item.status = 'Approved';
-                
                 let expiryDateStr = customExpiry;
                 if (!expiryDateStr) {
                     const d = new Date();
                     d.setDate(d.getDate() + 30);
                     expiryDateStr = d.toISOString().split('T')[0];
                 }
-                item.expiryDate = expiryDateStr;
 
-                localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(history));
-                syncSubscriptionHistoryToDB(history);
-
-                const subData = {
-                    plan: item.plan,
-                    cycle: item.cycle,
-                    price: item.price,
-                    phone: item.phone,
-                    trxId: item.trxId,
-                    date: item.date,
-                    expiryDate: item.expiryDate
-                };
-                localStorage.setItem('active_admin_subscription_v3', JSON.stringify(subData));
-
-                if (typeof toastr !== 'undefined') {
-                    toastr.success(`Subscription payment ${subId} approved! Active until ${expiryDateStr} (+30 Days).`, "Payment Approved");
-                } else {
-                    alert(`Subscription payment ${subId} approved! Active until ${expiryDateStr} (+30 Days).`);
-                }
-                renderWorkspace();
+                apiFetch(`{{ url('admin/subscription-payments') }}/${subId}`, 'PATCH', {
+                    status:      'Approved',
+                    expiry_date: expiryDateStr,
+                    _token:      CSRF_TOKEN,
+                })
+                .then(() => {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(`Payment ${subId} approved! Expires ${expiryDateStr}.`, 'Approved');
+                    }
+                    loadSubscriptionHistory();
+                })
+                .catch(err => console.error('Approve failed:', err));
             };
 
             window.rejectSubscriptionItem = function(subId) {
-                const history = getSubscriptionHistory();
-                const item = history.find(h => h.id === subId);
-                if (!item) return;
+                if (!confirm(`Reject payment ${subId}?`)) return;
 
-                if (confirm(`Are you sure you want to reject subscription payment ${subId}?`)) {
-                    item.status = 'Rejected';
-                    localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(history));
-                    syncSubscriptionHistoryToDB(history);
-
+                apiFetch(`{{ url('admin/subscription-payments') }}/${subId}`, 'PATCH', {
+                    status: 'Rejected',
+                    _token: CSRF_TOKEN,
+                })
+                .then(() => {
                     if (typeof toastr !== 'undefined') {
-                        toastr.warning(`Subscription payment ${subId} rejected.`, "Payment Rejected");
-                    } else {
-                        alert(`Subscription payment ${subId} rejected.`);
+                        toastr.warning(`Payment ${subId} rejected.`, 'Rejected');
                     }
-                    renderWorkspace();
-                }
+                    loadSubscriptionHistory();
+                })
+                .catch(err => console.error('Reject failed:', err));
             };
 
             window.openEditExpiryModal = function(subId) {
-                const history = getSubscriptionHistory();
-                const item = history.find(h => h.id === subId);
+                const item = window._subPaymentsCache.find(h => h.id === subId);
                 if (!item) return;
 
                 document.getElementById('editExpirySubId').value = item.id;
-                document.getElementById('editExpiryPlanName').value = (item.plan || 'Subscription Plan') + ' (' + item.cycle + ')';
-                
+                document.getElementById('editExpiryPlanName').value = (item.plan || 'Plan') + ' (' + item.cycle + ')';
+
                 let initialDate = item.expiryDate;
                 if (!initialDate) {
                     const d = new Date();
@@ -1502,51 +1439,37 @@
 
             window.addDaysToExpiryInput = function(days) {
                 const currentVal = document.getElementById('editExpiryDateInput').value;
-                const baseDate = currentVal ? new Date(currentVal) : new Date();
+                const baseDate   = currentVal ? new Date(currentVal) : new Date();
                 baseDate.setDate(baseDate.getDate() + days);
                 document.getElementById('editExpiryDateInput').value = baseDate.toISOString().split('T')[0];
             };
 
             window.saveUpdatedExpiryDate = function() {
-                const subId = document.getElementById('editExpirySubId').value;
+                const subId    = document.getElementById('editExpirySubId').value;
                 const newExpiry = document.getElementById('editExpiryDateInput').value;
                 if (!subId || !newExpiry) return;
 
-                const history = getSubscriptionHistory();
-                const item = history.find(h => h.id === subId);
-                if (item) {
-                    item.expiryDate = newExpiry;
-                    if (item.status === 'Pending') {
-                        item.status = 'Approved';
-                    }
-                    const subData = {
-                        plan: item.plan,
-                        cycle: item.cycle,
-                        price: item.price,
-                        phone: item.phone,
-                        trxId: item.trxId,
-                        date: item.date,
-                        expiryDate: item.expiryDate
-                    };
-                    localStorage.setItem('active_admin_subscription_v3', JSON.stringify(subData));
-                    localStorage.setItem(SUB_PAYMENTS_KEY, JSON.stringify(history));
-                    syncSubscriptionHistoryToDB(history);
-
+                apiFetch(`{{ url('admin/subscription-payments') }}/${subId}`, 'PATCH', {
+                    status:      'Approved',
+                    expiry_date: newExpiry,
+                    _token:      CSRF_TOKEN,
+                })
+                .then(() => {
                     const modalEl = document.getElementById('editExpiryModal');
-                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    const modal   = bootstrap.Modal.getInstance(modalEl);
                     if (modal) modal.hide();
 
                     if (typeof toastr !== 'undefined') {
-                        toastr.success(`Subscription expiration date set to ${newExpiry}.`, "Expiry Updated");
-                    } else {
-                        alert(`Subscription expiration date set to ${newExpiry}.`);
+                        toastr.success(`Expiration set to ${newExpiry}.`, 'Expiry Updated');
                     }
-                    renderWorkspace();
-                }
+                    loadSubscriptionHistory();
+                })
+                .catch(err => console.error('Save expiry failed:', err));
             };
 
             function renderSubscriptionHistoryTable() {
-                const history = getSubscriptionHistory();
+                const history    = window._subPaymentsCache;
+
                 const tbody = document.getElementById('subscriptionHistoryTbody');
                 const countBadge = document.getElementById('historyCountBadge');
                 if (!tbody) return;
@@ -2330,6 +2253,10 @@
             function bootWorkspace() {
                 if (typeof renderWorkspace === 'function') {
                     renderWorkspace();
+                }
+                // Load subscription payments from real DB table
+                if (typeof loadSubscriptionHistory === 'function') {
+                    loadSubscriptionHistory();
                 }
             }
 
