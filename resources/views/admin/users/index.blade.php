@@ -485,6 +485,7 @@
                     <h3 class="mb-1 font-weight-bold" style="color: var(--dark-slate);">SaaS Billing Matrix</h3>
                     <p class="text-muted mb-0">Create, customize, and regulate membership subscription plans and pricing structures</p>
                 </div>
+                @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
                 <div class="d-flex gap-2">
                     <button class="btn btn-outline-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#manageFeaturesModal">
                         <i class="fas fa-list-ul me-2"></i> Manage Features
@@ -493,6 +494,7 @@
                         <i class="fas fa-plus me-2"></i> New Subscription Plan
                     </button>
                 </div>
+                @endif
             </div>
 
             <!-- Stats Dashboard Row -->
@@ -526,9 +528,127 @@
                 </div>
             </div>
 
+            <!-- Billing Frequency Filter Bar -->
+            <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-white border rounded-4 shadow-sm flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-clock text-primary me-1"></i>
+                    <span class="font-weight-bold text-dark small">Billing Cycle:</span>
+                    <div class="btn-group bg-light p-1 rounded-pill border" role="group" id="billingCycleGroup">
+                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 font-weight-semibold cycle-btn active" onclick="setBillingCycle('monthly', this)">
+                            Monthly
+                        </button>
+                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3 font-weight-semibold cycle-btn" onclick="setBillingCycle('yearly', this)">
+                            Yearly <span class="badge bg-warning text-dark rounded-pill ms-1" style="font-size: 9px;">Save 20%</span>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3 font-weight-semibold cycle-btn" onclick="setBillingCycle('lifetime', this)">
+                            Lifetime <span class="badge bg-success text-white rounded-pill ms-1" style="font-size: 9px;">Best Value</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="activeSubscriptionBadge">
+                    <span class="badge bg-success text-white px-3 py-2 rounded-pill font-weight-bold shadow-sm" style="font-size: 12px;">
+                        <i class="fas fa-shield-check me-1"></i> Active Plan: <span id="activePlanNameDisplay">Enterprise Ultimate (Lifetime)</span>
+                    </span>
+                </div>
+            </div>
+
             <!-- Packages Grid -->
             <div class="row" id="packagesGrid">
                 <!-- Dynamic cards populated by script -->
+            </div>
+
+            <!-- Payment Modal for Admin Subscription Checkout -->
+            <div class="modal fade" id="paySubscriptionModal" tabindex="-1" aria-labelledby="paySubscriptionModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                        <div class="modal-header text-white border-0 py-3" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-primary text-white p-2.5 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                                    <i class="fas fa-credit-card fs-5"></i>
+                                </div>
+                                <div>
+                                    <h5 class="modal-title font-weight-bold text-white mb-0" id="paySubscriptionModalLabel">Subscribe & Checkout Payment</h5>
+                                    <p class="text-white-50 mb-0 small">Select payment gateway to activate your admin SaaS subscription</p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4 bg-light">
+                            <!-- Selected Plan Summary Card -->
+                            <div class="card border-0 shadow-sm rounded-3 mb-4 p-3 bg-white">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <span class="text-muted small text-uppercase font-weight-bold">Selected Subscription Plan</span>
+                                        <h4 class="mb-0 font-weight-bold text-primary" id="payPlanName">Starter Plan</h4>
+                                        <span class="badge bg-info text-white rounded-pill mt-1" id="payPlanCycle">Monthly Billing</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="text-muted small d-block">Total Payable Amount</span>
+                                        <h3 class="mb-0 font-weight-bold text-success" id="payPlanPrice">TK 1,200</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Gateways Selection -->
+                            <h6 class="font-weight-bold text-dark mb-3"><i class="fas fa-wallet text-warning me-2"></i> Choose Payment Method</h6>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3 col-6">
+                                    <label class="payment-method-card p-3 border rounded-3 text-center d-block bg-white shadow-sm cursor-pointer" onclick="selectPayGateway('bkash', this)">
+                                        <input type="radio" name="pay_gateway" value="bkash" class="d-none" checked>
+                                        <i class="fas fa-mobile-screen-button text-pink fs-3 d-block mb-1" style="color: #e2136e;"></i>
+                                        <span class="font-weight-bold text-dark d-block small">bKash</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <label class="payment-method-card p-3 border rounded-3 text-center d-block bg-white shadow-sm cursor-pointer" onclick="selectPayGateway('nagad', this)">
+                                        <input type="radio" name="pay_gateway" value="nagad" class="d-none">
+                                        <i class="fas fa-wallet text-danger fs-3 d-block mb-1" style="color: #f7941d;"></i>
+                                        <span class="font-weight-bold text-dark d-block small">Nagad</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <label class="payment-method-card p-3 border rounded-3 text-center d-block bg-white shadow-sm cursor-pointer" onclick="selectPayGateway('rocket', this)">
+                                        <input type="radio" name="pay_gateway" value="rocket" class="d-none">
+                                        <i class="fas fa-rocket text-primary fs-3 d-block mb-1"></i>
+                                        <span class="font-weight-bold text-dark d-block small">Rocket</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <label class="payment-method-card p-3 border rounded-3 text-center d-block bg-white shadow-sm cursor-pointer" onclick="selectPayGateway('card', this)">
+                                        <input type="radio" name="pay_gateway" value="card" class="d-none">
+                                        <i class="fas fa-credit-card text-success fs-3 d-block mb-1"></i>
+                                        <span class="font-weight-bold text-dark d-block small">Card / Bank</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Gateway Instructions & Form -->
+                            <div class="card border p-3 rounded-3 bg-white mb-3">
+                                <div class="alert bg-light border p-2.5 rounded-3 mb-3 small text-dark" id="payInstructions">
+                                    <strong>bKash Merchant Payment (01700000000)</strong><br>
+                                    Send exact payment to the bKash Merchant number above and fill in your sender mobile number and Transaction ID (TrxID) below.
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="paySenderPhone" class="form-label font-weight-semibold text-dark small">Sender Mobile / Account Number <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="paySenderPhone" placeholder="01712345678" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="payTrxId" class="form-label font-weight-semibold text-dark small">Transaction ID (TrxID) <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="payTrxId" placeholder="e.g. TRX9823H12" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 bg-white p-3">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-success rounded-pill px-5 font-weight-bold shadow py-2" onclick="confirmSubscriptionPayment()">
+                                <i class="fas fa-check-circle me-1"></i> Confirm & Activate Subscription
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Create/Edit Package Modal -->
@@ -1015,9 +1135,11 @@
             const FEATURES_KEY = "admin_packages_features_pool_v3";
             const PACKAGES_KEY = "admin_packages_list_v3";
 
-            // State variables
+            window.IS_SUPER_ADMIN = {{ (auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin')) ? 'true' : 'false' }};
             let featuresPool = [];
             let packagesList = [];
+            let currentBillingCycle = 'monthly';
+            let selectedCheckoutPackage = null;
 
             // Initialize Data
             function initData() {
@@ -1039,30 +1161,99 @@
                 }
             }
 
+            window.setBillingCycle = function(cycle, btnEl) {
+                currentBillingCycle = cycle;
+                document.querySelectorAll('#billingCycleGroup .cycle-btn').forEach(b => {
+                    b.classList.remove('btn-primary', 'text-white', 'active');
+                    b.classList.add('btn-light');
+                });
+                btnEl.classList.remove('btn-light');
+                btnEl.classList.add('btn-primary', 'text-white', 'active');
+                renderWorkspace();
+            };
+
+            window.selectPayGateway = function(gateway, labelEl) {
+                document.querySelectorAll('.payment-method-card').forEach(c => {
+                    c.style.borderColor = '#e2e8f0';
+                    c.style.backgroundColor = '#ffffff';
+                });
+                labelEl.style.borderColor = '#2563eb';
+                labelEl.style.backgroundColor = '#eff6ff';
+                const radio = labelEl.querySelector('input[type="radio"]');
+                if (radio) radio.checked = true;
+
+                const instr = document.getElementById('payInstructions');
+                if (gateway === 'bkash') {
+                    instr.innerHTML = `<strong>bKash Merchant Payment (01700000000)</strong><br>Send exact payment to the bKash Merchant number above and fill in your sender mobile number and Transaction ID (TrxID) below.`;
+                } else if (gateway === 'nagad') {
+                    instr.innerHTML = `<strong>Nagad Merchant Payment (01800000000)</strong><br>Send exact payment to the Nagad Merchant number above and fill in your sender mobile number and Transaction ID (TrxID) below.`;
+                } else if (gateway === 'rocket') {
+                    instr.innerHTML = `<strong>Rocket Biller ID (01900000000)</strong><br>Send exact payment to Rocket Biller ID 4920 and fill in your account number and Transaction ID below.`;
+                } else {
+                    instr.innerHTML = `<strong>Credit / Debit Card (SSLCommerz)</strong><br>Click 'Confirm & Activate Subscription' to be redirected to our SSLCommerz secure payment gateway window.`;
+                }
+            };
+
+            window.openCheckoutModal = function(pkgId, pkgName, price, cycleText) {
+                selectedCheckoutPackage = { id: pkgId, name: pkgName, price: price, cycle: cycleText };
+                document.getElementById('payPlanName').textContent = pkgName;
+                document.getElementById('payPlanCycle').textContent = cycleText;
+                document.getElementById('payPlanPrice').textContent = 'TK ' + Number(price).toLocaleString();
+                
+                const modal = new bootstrap.Modal(document.getElementById('paySubscriptionModal'));
+                modal.show();
+            };
+
+            window.confirmSubscriptionPayment = function() {
+                const phone = document.getElementById('paySenderPhone')?.value || '01700000000';
+                const trxId = document.getElementById('payTrxId')?.value || 'TRX' + Math.floor(Math.random()*900000 + 100000);
+
+                if (selectedCheckoutPackage) {
+                    const subData = {
+                        plan: selectedCheckoutPackage.name,
+                        cycle: selectedCheckoutPackage.cycle,
+                        price: selectedCheckoutPackage.price,
+                        phone: phone,
+                        trxId: trxId,
+                        date: new Date().toLocaleDateString()
+                    };
+                    localStorage.setItem('active_admin_subscription_v3', JSON.stringify(subData));
+                    
+                    const badge = document.getElementById('activeSubscriptionBadge');
+                    const nameDisp = document.getElementById('activePlanNameDisplay');
+                    if (badge && nameDisp) {
+                        nameDisp.textContent = selectedCheckoutPackage.name + ' (' + selectedCheckoutPackage.cycle + ')';
+                        badge.classList.remove('d-none');
+                    }
+                }
+
+                const modalEl = document.getElementById('paySubscriptionModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
+                if (typeof toastr !== 'undefined') {
+                    toastr.success("Subscription payment confirmed! Plan activated successfully.", "Subscription Updated");
+                } else {
+                    alert("Subscription payment confirmed! Plan activated successfully.");
+                }
+                renderWorkspace();
+            };
+
             // Render Dashboard Stats and Grid
             function renderWorkspace() {
                 initData();
                 
                 // Update Counts
-                document.getElementById('totalPackagesCount').textContent = packagesList.length;
-                document.getElementById('activePackagesCount').textContent = packagesList.filter(p => p.status).length;
+                document.getElementById('totalPackagesCount').textContent = packagesList.length + 1;
+                document.getElementById('activePackagesCount').textContent = packagesList.filter(p => p.status).length + 1;
                 document.getElementById('totalFeaturesCount').textContent = featuresPool.length;
 
                 // Render Grid
                 const grid = document.getElementById('packagesGrid');
                 grid.innerHTML = '';
 
-                if (packagesList.length === 0) {
-                    grid.innerHTML = `
-                        <div class="col-12 text-center py-5">
-                            <img src="https://cdn-icons-png.flaticon.com/512/7486/7486831.png" alt="Empty" width="100" style="opacity: 0.3;">
-                            <h5 class="mt-3 text-muted">No Packages Found</h5>
-                            <p class="text-muted">Get started by creating your first SaaS tier!</p>
-                            <button class="btn btn-primary rounded-pill px-4 mt-2" onclick="openCreateModal()">Create Package</button>
-                        </div>
-                    `;
-                    return;
-                }
+                // Active Subscription Status
+                const activeSub = JSON.parse(localStorage.getItem('active_admin_subscription_v3') || 'null');
 
                 packagesList.forEach(pkg => {
                     const cardCol = document.createElement('div');
@@ -1072,7 +1263,19 @@
                     const totalFeaturesCount = featuresPool.length;
                     const includedCount = pkg.features ? pkg.features.length : 0;
 
-                    // Group features by category for display - showing ALL features (included and excluded)
+                    let displayPrice = pkg.priceMonthly;
+                    let cycleText = 'Monthly Billing';
+                    if (currentBillingCycle === 'yearly') {
+                        displayPrice = pkg.priceYearly;
+                        cycleText = 'Yearly Billing (20% Off)';
+                    } else if (currentBillingCycle === 'lifetime') {
+                        displayPrice = pkg.priceLifetime;
+                        cycleText = 'Lifetime Access';
+                    }
+
+                    const isCurrentSub = activeSub && activeSub.plan === pkg.name;
+
+                    // Group features by category for display
                     SIDEBAR_FEATURE_GROUPS.forEach(group => {
                         const poolCategoryItems = group.items.filter(item => featuresPool.includes(item));
                         if (poolCategoryItems.length > 0) {
@@ -1099,61 +1302,39 @@
                         }
                     });
 
-                    // Add extra custom pool features not in standard groups if any
-                    const customFeatures = featuresPool.filter(f => !DEFAULT_FEATURES.includes(f));
-                    if (customFeatures.length > 0) {
-                        const customIncludedCount = customFeatures.filter(f => pkg.features && pkg.features.includes(f)).length;
-                        featuresHTML += `
-                            <div class="mb-3">
-                                <div class="small font-weight-bold text-muted text-uppercase mb-1 border-bottom pb-1" style="font-size: 10px; letter-spacing: 0.5px;">
-                                    <i class="fas fa-star text-warning me-1"></i> Custom Extensions (${customIncludedCount}/${customFeatures.length})
-                                </div>
-                        `;
-                        customFeatures.forEach(feat => {
-                            const isIncluded = pkg.features && pkg.features.includes(feat);
-                            const iconHTML = isIncluded 
-                                ? `<i class="fas fa-check-circle me-2" style="color: #10b981 !important; font-size: 14px; flex-shrink: 0;"></i>` 
-                                : `<i class="fas fa-times-circle me-2" style="color: #ef4444 !important; font-size: 14px; flex-shrink: 0;"></i>`;
-                            featuresHTML += `
-                                <div class="feature-item py-1 d-flex align-items-center">
-                                    ${iconHTML}
-                                    <span style="font-size: 12px; ${isIncluded ? 'color: #0f172a; font-weight: 600;' : 'color: #94a3b8; text-decoration: line-through;'}">${feat}</span>
-                                </div>
-                            `;
-                        });
-                        featuresHTML += `</div>`;
-                    }
-
-                    if (includedCount === 0) {
-                        featuresHTML = `<div class="text-muted small py-3 text-center">No features allocated to this tier yet.</div>`;
-                    }
-
                     cardCol.innerHTML = `
-                        <div class="premium-card h-100 d-flex flex-column">
+                        <div class="premium-card h-100 d-flex flex-column ${isCurrentSub ? 'border border-2 border-success shadow-lg' : ''}">
                             <div class="gradient-header ${pkg.theme || 'default'}">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="badge ${pkg.status ? 'bg-success' : 'bg-secondary'}">${pkg.status ? 'Active' : 'Inactive'}</span>
+                                    ${isCurrentSub ? '<span class="badge bg-warning text-dark font-weight-bold"><i class="fas fa-star me-1"></i> Current Active Plan</span>' : `<span class="badge ${pkg.status ? 'bg-success' : 'bg-secondary'}">${pkg.status ? 'Active' : 'Inactive'}</span>`}
                                     <span class="badge bg-white text-dark font-weight-bold" style="font-size: 11px;">${includedCount}/${totalFeaturesCount} Features</span>
                                 </div>
                                 <h4 class="mb-1 font-weight-bold" style="color: #fff;">${pkg.name}</h4>
                                 <p class="small mb-0 opacity-80" style="color: rgba(255,255,255,0.85); min-height: 38px;">${pkg.details}</p>
-                                <div class="package-price-badge">Monthly: TK ${pkg.priceMonthly}</div>
+                                <div class="package-price-badge">TK ${Number(displayPrice).toLocaleString()} / ${currentBillingCycle}</div>
                             </div>
                             <div class="card-body p-3 flex-grow-1 d-flex flex-column">
                                 <div class="row text-center mb-3 border-bottom pb-2">
-                                    <div class="col-6 border-end">
-                                        <span class="text-muted d-block small">Yearly Rate</span>
-                                        <strong class="text-dark">TK ${pkg.priceYearly}</strong>
+                                    <div class="col-4 border-end">
+                                        <span class="text-muted d-block small" style="font-size: 10px;">Monthly</span>
+                                        <strong class="text-dark small">TK ${pkg.priceMonthly}</strong>
                                     </div>
-                                    <div class="col-6">
-                                        <span class="text-muted d-block small">Lifetime Rate</span>
-                                        <strong class="text-dark">TK ${pkg.priceLifetime}</strong>
+                                    <div class="col-4 border-end">
+                                        <span class="text-muted d-block small" style="font-size: 10px;">Yearly</span>
+                                        <strong class="text-dark small">TK ${pkg.priceYearly}</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="text-muted d-block small" style="font-size: 10px;">Lifetime</span>
+                                        <strong class="text-dark small">TK ${pkg.priceLifetime}</strong>
                                     </div>
                                 </div>
-                                <div class="features-list-wrapper mb-3 flex-grow-1" style="max-height: 280px; overflow-y: auto; padding-right: 5px;">
+                                <div class="features-list-wrapper mb-3 flex-grow-1" style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
                                     ${featuresHTML}
                                 </div>
                             </div>
+                    let cardFooterHTML = '';
+                    if (window.IS_SUPER_ADMIN) {
+                        cardFooterHTML = `
                             <div class="card-footer bg-light border-0 p-3 d-flex justify-content-between align-items-center gap-2 mt-auto">
                                 <button class="btn btn-primary rounded-pill px-3 py-2 flex-grow-1 font-weight-bold d-flex align-items-center justify-content-center gap-2" onclick="openEditModal('${pkg.id}')">
                                     <i class="fas fa-edit"></i> Edit Plan
@@ -1162,10 +1343,87 @@
                                     <i class="fas fa-trash-alt" style="font-size: 14px;"></i>
                                 </button>
                             </div>
+                        `;
+                    } else {
+                        cardFooterHTML = `
+                            <div class="card-footer bg-light border-0 p-3 d-flex flex-column gap-2 mt-auto">
+                                <button class="btn btn-success rounded-pill w-100 font-weight-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" onclick="openCheckoutModal('${pkg.id}', '${pkg.name}', '${displayPrice}', '${cycleText}')">
+                                    <i class="fas fa-shopping-cart"></i> ${isCurrentSub ? 'Renew / Upgrade Plan' : 'Subscribe & Pay Now'}
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    cardCol.innerHTML = `
+                        <div class="premium-card h-100 d-flex flex-column ${isCurrentSub ? 'border border-2 border-success shadow-lg' : ''}">
+                            <div class="gradient-header ${pkg.theme || 'default'}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    ${isCurrentSub ? '<span class="badge bg-warning text-dark font-weight-bold"><i class="fas fa-star me-1"></i> Current Active Plan</span>' : `<span class="badge ${pkg.status ? 'bg-success' : 'bg-secondary'}">${pkg.status ? 'Active' : 'Inactive'}</span>`}
+                                    <span class="badge bg-white text-dark font-weight-bold" style="font-size: 11px;">${includedCount}/${totalFeaturesCount} Features</span>
+                                </div>
+                                <h4 class="mb-1 font-weight-bold" style="color: #fff;">${pkg.name}</h4>
+                                <p class="small mb-0 opacity-80" style="color: rgba(255,255,255,0.85); min-height: 38px;">${pkg.details}</p>
+                                <div class="package-price-badge">TK ${Number(displayPrice).toLocaleString()} / ${currentBillingCycle}</div>
+                            </div>
+                            <div class="card-body p-3 flex-grow-1 d-flex flex-column">
+                                <div class="row text-center mb-3 border-bottom pb-2">
+                                    <div class="col-4 border-end">
+                                        <span class="text-muted d-block small" style="font-size: 10px;">Monthly</span>
+                                        <strong class="text-dark small">TK ${pkg.priceMonthly}</strong>
+                                    </div>
+                                    <div class="col-4 border-end">
+                                        <span class="text-muted d-block small" style="font-size: 10px;">Yearly</span>
+                                        <strong class="text-dark small">TK ${pkg.priceYearly}</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="text-muted d-block small" style="font-size: 10px;">Lifetime</span>
+                                        <strong class="text-dark small">TK ${pkg.priceLifetime}</strong>
+                                    </div>
+                                </div>
+                                <div class="features-list-wrapper mb-3 flex-grow-1" style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+                                    ${featuresHTML}
+                                </div>
+                            </div>
+                            ${cardFooterHTML}
                         </div>
                     `;
                     grid.appendChild(cardCol);
                 });
+
+                // Append Custom Package Card for standard admins only
+                if (!window.IS_SUPER_ADMIN) {
+                    const customCardCol = document.createElement('div');
+                    customCardCol.className = 'col-md-4 mb-4';
+                    customCardCol.innerHTML = `
+                        <div class="premium-card h-100 d-flex flex-column border border-2 border-primary">
+                            <div class="gradient-header pro">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-warning text-dark font-weight-bold"><i class="fas fa-wand-magic-sparkles me-1"></i> Custom Plan</span>
+                                    <span class="badge bg-white text-dark font-weight-bold" style="font-size: 11px;">Flexible Features</span>
+                                </div>
+                                <h4 class="mb-1 font-weight-bold" style="color: #fff;">Custom Package Builder</h4>
+                                <p class="small mb-0 opacity-80" style="color: rgba(255,255,255,0.85); min-height: 38px;">Choose exact features you want and calculate your custom price quote.</p>
+                                <div class="package-price-badge">Custom Rate</div>
+                            </div>
+                            <div class="card-body p-3 flex-grow-1 d-flex flex-column align-items-center justify-content-center text-center">
+                                <div class="rounded-circle bg-light p-4 mb-3 border">
+                                    <i class="fas fa-sliders text-primary fs-1"></i>
+                                </div>
+                                <h6 class="font-weight-bold text-dark mb-1">Build Your Tailored Subscription</h6>
+                                <p class="text-muted small mb-3">Pick specific sidebar permissions and module items to construct a personalized plan tailored for your store.</p>
+                                <button class="btn btn-outline-primary rounded-pill px-4 font-weight-bold" data-bs-toggle="modal" data-bs-target="#manageFeaturesModal">
+                                    <i class="fas fa-list-check me-1"></i> Customize Features
+                                </button>
+                            </div>
+                            <div class="card-footer bg-light border-0 p-3 mt-auto">
+                                <button class="btn btn-primary rounded-pill w-100 font-weight-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" onclick="openCheckoutModal('custom_plan', 'Custom Tailored Plan', '4500', 'Custom Billing')">
+                                    <i class="fas fa-cash-register me-1"></i> Subscribe Custom Package
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(customCardCol);
+                }
 
                 // Update the feature pool checklist inside Manage Features modal
                 renderFeaturesPoolList();
