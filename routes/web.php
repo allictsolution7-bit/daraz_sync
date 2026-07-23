@@ -697,6 +697,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::post('/access-control/role/{role}/update', [\App\Http\Controllers\Admin\RolesPermissionsController::class, 'updateRole'])->name('roles_permissions.role.update');
     Route::post('/access-control/role/{role}/delete', [\App\Http\Controllers\Admin\RolesPermissionsController::class, 'deleteRole'])->name('roles_permissions.role.delete');
     Route::post('/access-control/user/{user}/roles', [\App\Http\Controllers\Admin\RolesPermissionsController::class, 'updateUserRoles'])->name('roles_permissions.user_roles.update');
+    Route::post('/access-control/user/{user}/permissions', [\App\Http\Controllers\Admin\RolesPermissionsController::class, 'updateUserPermissions'])->name('roles_permissions.user_permissions.update');
     
     // POS (Point of Sale) Routes
     Route::prefix('pos')->name('pos.')->group(function () {

@@ -248,19 +248,30 @@
 
 @section('content')
 <div class="container-fluid py-3 rp-container">
+
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
         <div>
             <h4 class="mb-1">Roles & Permissions</h4>
             <div class="text-muted">Keep access simple and consistent.</div>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addRoleModal"><i class="fas fa-plus"></i> Add Role</button>
-            <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#addPermissionModal"><i class="fas fa-key"></i> Add Permission</button>
+            <button class="btn btn-primary btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#addRoleModal" data-bs-target="#addRoleModal"><i class="fas fa-plus"></i> Add Role</button>
+            <button class="btn btn-outline-primary btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#addPermissionModal" data-bs-target="#addPermissionModal"><i class="fas fa-key"></i> Add Permission</button>
         </div>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
+    @if(isset($allowedRoleNames))
+        <div class="alert alert-info py-2 px-3 mb-3 d-flex align-items-center justify-content-between text-dark" style="background:#e0f2fe; border-color:#bae6fd; border-radius:10px;">
+            <span style="font-size:13px;"><i class="fas fa-shield-alt text-primary mr-2"></i> <strong>Role Management Scope:</strong> {{ $isSuperAdmin ? 'Super Admin Mode — Full Access to All Roles & Admins' : 'Admin Mode — Restricted Access (Store Manager, Vendor & Vendor Staff)' }}</span>
+            <span class="badge bg-primary text-white" style="font-size:11px; padding: 5px 10px;">{{ count($allowedRoleNames) }} Visible Roles</span>
+        </div>
     @endif
 
     @php
@@ -290,71 +301,19 @@
         </div>
     </div>
 
-    <!-- Permissions Section -->
-    {{-- <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span><strong>Permissions</strong></span>
-            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addPermissionModal">Add Permission</button>
-        </div>
-        <ul class="list-group list-group-flush">
-            @forelse($permissions as $permission)
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>{{ $permission->name }}</span>
-                    <span>
-                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editPermissionModal{{ $permission->id }}">Edit</button>
-                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deletePermissionModal{{ $permission->id }}">Delete</button>
-                    </span>
-                </li>
-                <!-- Edit Permission Modal -->
-                <div class="modal fade" id="editPermissionModal{{ $permission->id }}" tabindex="-1">
-                    <div class="modal-dialog"><div class="modal-content">
-                        <form method="POST" action="{{ route('admin.roles_permissions.permission.update', $permission) }}">
-                            @csrf
-                            <div class="modal-header"><h5 class="modal-title">Edit Permission</h5>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="text" name="name" class="form-control" value="{{ $permission->name }}" required>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-success">Update</button>
-                            </div>
-                        </form>
-                    </div></div>
-                </div>
-                <!-- Delete Permission Modal -->
-                <div class="modal fade" id="deletePermissionModal{{ $permission->id }}" tabindex="-1">
-                    <div class="modal-dialog"><div class="modal-content">
-                        <form method="POST" action="{{ route('admin.roles_permissions.permission.delete', $permission) }}">
-                            @csrf
-                            <div class="modal-header"><h5 class="modal-title">Delete Permission</h5>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body">Are you sure you want to delete this permission?</div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-danger">Delete</button>
-                            </div>
-                        </form>
-                    </div></div>
-                </div>
-            @empty
-                <li class="list-group-item text-muted">No permissions found.</li>
-            @endforelse
-        </ul>
-    </div> --}}
     <!-- Add Permission Modal -->
     <div class="modal fade" id="addPermissionModal" tabindex="-1">
         <div class="modal-dialog"><div class="modal-content">
             <form method="POST" action="{{ route('admin.roles_permissions.permission.store') }}">
                 @csrf
-                <div class="modal-header"><h5 class="modal-title">Add Permission</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <div class="modal-header modal-header-custom"><h5 class="modal-title"><i class="fas fa-key"></i> Add Permission</h5>
+                    <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body">
-                    <input type="text" name="name" class="form-control" placeholder="Permission Name" required>
+                <div class="modal-body p-4">
+                    <input type="text" name="name" class="form-control role-input-custom" placeholder="e.g. products.export, orders.refund" required>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Create</button>
+                <div class="modal-footer modal-footer-custom">
+                    <button type="submit" class="btn btn-success btn-sm font-weight-bold">Create Permission</button>
                 </div>
             </form>
         </div></div>
@@ -384,255 +343,380 @@
 
     <ul class="nav nav-tabs nav-tabs-custom mb-3" id="rolesPermissionsTabs" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="roles-tab" data-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="true"><i class="fas fa-user-shield mr-1"></i> Roles</a>
+            <a class="nav-link active" id="roles-tab" data-toggle="tab" data-bs-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="true"><i class="fas fa-user-shield mr-1"></i> Roles</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false"><i class="fas fa-users mr-1"></i> Users Overview</a>
+            <a class="nav-link" id="users-tab" data-toggle="tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false"><i class="fas fa-users mr-1"></i> Users Overview</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="assign-tab" data-toggle="tab" href="#assign" role="tab" aria-controls="assign" aria-selected="false"><i class="fas fa-user-tag mr-1"></i> Assign Roles</a>
+            <a class="nav-link" id="assign-tab" data-toggle="tab" data-bs-toggle="tab" href="#assign" role="tab" aria-controls="assign" aria-selected="false"><i class="fas fa-user-tag mr-1"></i> Assign Roles</a>
         </li>
     </ul>
 
     <div class="tab-content" id="rolesPermissionsTabsContent">
         <!-- Roles Tab -->
         <div class="tab-pane fade show active" id="roles" role="tabpanel" aria-labelledby="roles-tab">
-            <!-- Roles Section -->
             <div class="rp-card mb-3">
-        <div class="rp-card-header d-flex justify-content-between align-items-center">
-            <strong>Roles</strong>
-            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addRoleModal"><i class="fas fa-plus"></i> Add Role</button>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>Role</th>
-                        <th>Permissions</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-            @forelse($roles as $role)
-                <tr>
-                    <td class="align-middle"><strong>{{ $role->name }}</strong></td>
-                    <td class="align-middle" style="max-width: 600px;">
-                        <div class="d-flex flex-wrap" style="gap: 4px;">
-                            @forelse($role->permissions as $perm)
-                                <span class="badge bg-light text-secondary border" style="font-size: 10px; padding: 4px 6px; font-weight: normal;">{{ $perm->name }}</span>
-                            @empty
-                                <span class="text-muted small">None</span>
-                            @endforelse
-                        </div>
-                    </td>
-                    <td class="align-middle text-end role-actions">
-                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editRoleModal{{ $role->id }}">Edit</button>
-                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteRoleModal{{ $role->id }}">Delete</button>
-                    </td>
-                </tr>
-                <!-- Edit Role Modal -->
-                <div class="modal fade" id="editRoleModal{{ $role->id }}" tabindex="-1">
-                    <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
-                        <form method="POST" action="{{ route('admin.roles_permissions.role.update', $role) }}">
-                            @csrf
-                            <div class="modal-header modal-header-custom">
-                                <h5 class="modal-title"><i class="fas fa-user-pen" style="color: #60a5fa;"></i> Edit Role — <span class="text-info">{{ $role->name }}</span></h5>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body p-4">
-                                <div class="role-input-wrapper mb-3">
-                                    <label><i class="fas fa-id-card mr-1"></i> Role Name</label>
-                                    <input type="text" name="name" class="form-control role-input-custom" value="{{ $role->name }}" required>
-                                </div>
-                                <div class="perm-toolbar d-flex flex-wrap align-items-center mb-3">
-                                    <div class="search-input-wrapper mr-auto">
-                                        <i class="fas fa-search"></i>
-                                        <input type="text" class="form-control permission-search-custom permission-search" placeholder="Search permissions...">
-                                    </div>
-                                    <button type="button" class="btn btn-perm-tool select-all-perms"><i class="fas fa-check-double mr-1"></i> Select all</button>
-                                    <button type="button" class="btn btn-perm-tool clear-all-perms"><i class="fas fa-times mr-1"></i> Clear</button>
-                                    <button type="button" class="btn btn-perm-tool expand-all"><i class="fas fa-chevron-down mr-1"></i> Expand</button>
-                                    <button type="button" class="btn btn-perm-tool collapse-all"><i class="fas fa-chevron-up mr-1"></i> Collapse</button>
-                                </div>
-                                <div class="role-input-wrapper mb-2"><label><i class="fas fa-shield-halved mr-1"></i> Module & Access Permissions</label></div>
-                                <div class="accordion" id="accordionRole{{ $role->id }}">
-                                    @foreach($groupedPermissions as $group => $subgroups)
-                                        @php $groupSlug = \Illuminate\Support\Str::slug($group); @endphp
-                                        <div class="card permissions-group mb-3">
-                                            <div class="card-header" id="heading-{{ $role->id }}-{{ $groupSlug }}">
-                                                <a class="d-block text-decoration-none" data-toggle="collapse" href="#collapse-role-{{ $role->id }}-{{ $groupSlug }}" aria-expanded="true" aria-controls="collapse-role-{{ $role->id }}-{{ $groupSlug }}">
-                                                    <h6 class="mb-0 d-flex align-items-center justify-content-between">
-                                                        <span class="text-capitalize d-flex align-items-center">
-                                                            <i class="fas fa-layer-group text-primary mr-2"></i>
-                                                            {{ $group === 'pos' ? 'Point of Sale (POS)' : ($group === 'incomplete_orders' ? 'Incomplete Orders' : str_replace('_',' ', $group)) }}
-                                                        </span>
-                                                        <div class="d-flex align-items-center">
-                                                            <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
-                                                            <label class="m-0 small font-weight-bold text-muted" onclick="event.stopPropagation()">
-                                                                <input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all
-                                                            </label>
-                                                        </div>
-                                                    </h6>
-                                                </a>
-                                            </div>
-                                            <div id="collapse-role-{{ $role->id }}-{{ $groupSlug }}" class="collapse show" data-parent="#accordionRole{{ $role->id }}">
-                                            <div class="card-body p-3 permissions-scroll bg-light">
-                                                <div class="row">
-                                                    @foreach($subgroups as $sub => $perms)
-                                                        <div class="col-md-6 mb-3">
-                                                            <div class="subgroup-box">
-                                                                <div class="subgroup-title">{{ $sub === 'core' ? $group : str_replace('_',' ', $sub) }}</div>
-                                                                @foreach($perms as $permission)
-                                                                    <div class="perm-item-check">
-                                                                        <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="editroleperm_{{ $role->id }}_{{ $permission->id }}" {{ $role->permissions->pluck('name')->contains($permission->name) ? 'checked' : '' }}>
-                                                                        <label for="editroleperm_{{ $role->id }}_{{ $permission->id }}">{{ $permission->name }}</label>
-                                                                    </div>
-                                                                @endforeach
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            <div class="modal-footer modal-footer-custom">
-                                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 font-weight-bold"><i class="fas fa-save mr-1"></i> Update Role</button>
-                            </div>
-                        </form>
-                    </div></div>
+                <div class="rp-card-header d-flex justify-content-between align-items-center">
+                    <strong>Roles</strong>
+                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#addRoleModal" data-bs-target="#addRoleModal"><i class="fas fa-plus"></i> Add Role</button>
                 </div>
-                <!-- Delete Role Modal -->
-                <div class="modal fade" id="deleteRoleModal{{ $role->id }}" tabindex="-1">
-                    <div class="modal-dialog"><div class="modal-content">
-                        <form method="POST" action="{{ route('admin.roles_permissions.role.delete', $role) }}">
-                            @csrf
-                            <div class="modal-header"><h5 class="modal-title">Delete Role</h5>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body">Are you sure you want to delete this role?</div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-danger">Delete</button>
-                            </div>
-                        </form>
-                    </div></div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Permissions</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    @forelse($roles as $role)
+                        <tr>
+                            <td class="align-middle"><strong>{{ $role->name }}</strong></td>
+                            <td class="align-middle" style="max-width: 600px;">
+                                <div class="d-flex flex-wrap" style="gap: 4px;">
+                                    @forelse($role->permissions as $perm)
+                                        <span class="badge bg-light text-secondary border" style="font-size: 10px; padding: 4px 6px; font-weight: normal;">{{ $perm->name }}</span>
+                                    @empty
+                                        <span class="text-muted small">None</span>
+                                    @endforelse
+                                </div>
+                            </td>
+                            <td class="align-middle text-end role-actions">
+                                <button class="btn btn-warning btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editRoleModal{{ $role->id }}" data-bs-target="#editRoleModal{{ $role->id }}">Edit</button>
+                                <button class="btn btn-danger btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#deleteRoleModal{{ $role->id }}" data-bs-target="#deleteRoleModal{{ $role->id }}">Delete</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="text-muted text-center py-3">No roles found.</td>
+                        </tr>
+                    @endforelse
+                        </tbody>
+                    </table>
                 </div>
-            @empty
-                <li class="list-group-item text-muted">No roles found.</li>
-            @endforelse
-                </tbody>
-            </table>
             </div>
         </div>
-    </div>
 
         <!-- Users Overview Tab -->
         <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
-            <!-- Users overview: who has roles + latest created users with quick search -->
             <div class="rp-card mb-3">
-        <div class="rp-card-header d-flex align-items-center justify-content-between">
-            <strong>Users</strong>
-            <div class="d-flex align-items-center" style="gap:8px;">
-                <input id="userSearch" type="text" class="form-control form-control-sm" placeholder="Search by email or phone..." style="max-width:280px;">
-                <small class="text-muted">Type to filter</small>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6 mb-3 mb-md-0">
-                    <h6 class="mb-2">With roles</h6>
-                    <ul class="list-group" id="usersWithRoles">
-                        @forelse($usersWithRoles as $u)
-                            <li class="list-group-item d-flex justify-content-between align-items-center user-item" data-email="{{ strtolower($u->email) }}" data-phone="{{ strtolower($u->phone ?? '') }}">
-                                <div>
-                                    <strong>{{ $u->name }}</strong>
-                                    <div class="small text-muted">{{ $u->email }} @if($u->phone) • {{ $u->phone }} @endif</div>
-                                    <div class="mt-1">
-                                        @foreach($u->roles as $r)
-                                            <span class="badge badge-primary mr-1">{{ $r->name }}</span>
-                                        @endforeach
-                                    </div>
-                                </div>
-                                <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editUserRolesModal{{ $u->id }}">Edit Roles</button>
-                            </li>
-                        @empty
-                            <li class="list-group-item text-muted">No users have roles yet.</li>
-                        @endforelse
-                    </ul>
+                <div class="rp-card-header d-flex align-items-center justify-content-between">
+                    <strong>Users Overview</strong>
+                    <div class="d-flex align-items-center" style="gap:8px;">
+                        <input id="userSearch" type="text" class="form-control form-control-sm" placeholder="Search by email or phone..." style="max-width:280px;">
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <h6 class="mb-2">Latest created (5)</h6>
-                    <ul class="list-group" id="latestUsers">
-                        @forelse($latestUsers as $u)
-                            <li class="list-group-item d-flex justify-content-between align-items-center user-item" data-email="{{ strtolower($u->email) }}" data-phone="{{ strtolower($u->phone ?? '') }}">
-                                <div>
-                                    <strong>{{ $u->name }}</strong>
-                                    <div class="small text-muted">{{ $u->email }} @if($u->phone) • {{ $u->phone }} @endif</div>
-                                </div>
-                                <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editUserRolesModal{{ $u->id }}">Assign Roles</button>
-                            </li>
-                        @empty
-                            <li class="list-group-item text-muted">No users found.</li>
-                        @endforelse
-                    </ul>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h6 class="mb-2">With roles</h6>
+                            <ul class="list-group" id="usersWithRoles">
+                                @forelse($usersWithRoles as $u)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center user-item" data-email="{{ strtolower($u->email) }}" data-phone="{{ strtolower($u->phone ?? '') }}">
+                                        <div>
+                                            <strong>{{ $u->name }}</strong>
+                                            <div class="small text-muted">{{ $u->email }} @if($u->phone) • {{ $u->phone }} @endif</div>
+                                            <div class="mt-1">
+                                                @foreach($u->roles as $r)
+                                                    <span class="badge bg-primary text-white mr-1">{{ $r->name }}</span>
+                                                @endforeach
+                                                @if($u->permissions->count() > 0)
+                                                    <span class="badge bg-warning text-dark"><i class="fas fa-key mr-1"></i> {{ $u->permissions->count() }} Custom</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserRolesModal{{ $u->id }}" data-bs-target="#editUserRolesModal{{ $u->id }}"><i class="fas fa-user-tag mr-1"></i> Edit Roles</button>
+                                            <button class="btn btn-sm btn-outline-dark" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserPermissionsModal{{ $u->id }}" data-bs-target="#editUserPermissionsModal{{ $u->id }}"><i class="fas fa-key mr-1"></i> Custom Perms</button>
+                                        </div>
+                                    </li>
+                                @empty
+                                    <li class="list-group-item text-muted">No users have roles yet.</li>
+                                @endforelse
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-2">Latest created (5)</h6>
+                            <ul class="list-group" id="latestUsers">
+                                @forelse($latestUsers as $u)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center user-item" data-email="{{ strtolower($u->email) }}" data-phone="{{ strtolower($u->phone ?? '') }}">
+                                        <div>
+                                            <strong>{{ $u->name }}</strong>
+                                            <div class="small text-muted">{{ $u->email }} @if($u->phone) • {{ $u->phone }} @endif</div>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserRolesModal{{ $u->id }}" data-bs-target="#editUserRolesModal{{ $u->id }}"><i class="fas fa-user-tag mr-1"></i> Assign Roles</button>
+                                            <button class="btn btn-sm btn-outline-dark" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserPermissionsModal{{ $u->id }}" data-bs-target="#editUserPermissionsModal{{ $u->id }}"><i class="fas fa-key mr-1"></i> Custom Perms</button>
+                                        </div>
+                                    </li>
+                                @empty
+                                    <li class="list-group-item text-muted">No users found.</li>
+                                @endforelse
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-</div>
 
         <!-- Assign Roles Tab -->
         <div class="tab-pane fade" id="assign" role="tabpanel" aria-labelledby="assign-tab">
-            <!-- Assign Roles to Users Section -->
             <div class="rp-card mb-3">
-        <div class="rp-card-header"><strong>Assign Roles to Users</strong></div>
-        <ul class="list-group list-group-flush">
-            @forelse($users as $user)
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>{{ $user->name }}</strong> <span class="text-muted small">({{ $user->email }})</span><br>
-                        <span class="small">Roles:
-                            @forelse ($user->roles as $role)
-                                <span class="badge bg-primary rounded-pill">{{ $role->name }}</span>
-                            @empty
-                                <span class="badge bg-primary rounded-pill">None</span>
-                            @endforelse
-                        </span>
+                <div class="rp-card-header"><strong>Assign Roles & Permissions to Users</strong></div>
+                <ul class="list-group list-group-flush">
+                    @forelse($users as $user)
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ $user->name }}</strong> <span class="text-muted small">({{ $user->email }})</span><br>
+                                <span class="small">Roles:
+                                    @forelse ($user->roles as $role)
+                                        <span class="badge bg-primary rounded-pill">{{ $role->name }}</span>
+                                    @empty
+                                        <span class="badge bg-secondary rounded-pill">None</span>
+                                    @endforelse
+                                </span>
+                                @if($user->permissions->count() > 0)
+                                    <span class="badge bg-warning text-dark ml-2 rounded-pill"><i class="fas fa-key mr-1"></i> {{ $user->permissions->count() }} Custom Permissions</span>
+                                @endif
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserRolesModal{{ $user->id }}" data-bs-target="#editUserRolesModal{{ $user->id }}"><i class="fas fa-user-tag mr-1"></i> Edit Roles</button>
+                                <button class="btn btn-outline-dark btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserPermissionsModal{{ $user->id }}" data-bs-target="#editUserPermissionsModal{{ $user->id }}"><i class="fas fa-key mr-1"></i> Custom Permissions</button>
+                            </div>
+                        </li>
+                    @empty
+                        <li class="list-group-item text-muted">No users found.</li>
+                    @endforelse
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALL ROLE MODALS -->
+    @foreach($roles as $role)
+        <!-- Edit Role Modal -->
+        <div class="modal fade" id="editRoleModal{{ $role->id }}" tabindex="-1">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
+                <form method="POST" action="{{ route('admin.roles_permissions.role.update', $role) }}">
+                    @csrf
+                    <div class="modal-header modal-header-custom">
+                        <h5 class="modal-title"><i class="fas fa-user-pen" style="color: #60a5fa;"></i> Edit Role — <span class="text-info">{{ $role->name }}</span></h5>
+                        <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal">&times;</button>
                     </div>
-                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editUserRolesModal{{ $user->id }}">Edit Roles</button>
-                </li>
-                <!-- Edit User Roles Modal -->
-                <div class="modal fade" id="editUserRolesModal{{ $user->id }}" tabindex="-1">
-                    <div class="modal-dialog"><div class="modal-content">
-                        <form method="POST" action="{{ route('admin.roles_permissions.user_roles.update', $user) }}">
-                            @csrf
-                            <div class="modal-header"><h5 class="modal-title">Assign Roles to {{ $user->name }}</h5>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <div class="modal-body p-4">
+                        <div class="role-input-wrapper mb-3">
+                            <label><i class="fas fa-id-card mr-1"></i> Role Name</label>
+                            <input type="text" name="name" class="form-control role-input-custom" value="{{ $role->name }}" required>
+                        </div>
+                        <div class="perm-toolbar d-flex flex-wrap align-items-center mb-3">
+                            <div class="search-input-wrapper mr-auto">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control permission-search-custom permission-search" placeholder="Search permissions...">
                             </div>
-                            <div class="modal-body">
-                                @foreach($roles as $role)
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" name="roles[]" value="{{ $role->name }}" id="userrole_{{ $user->id }}_{{ $role->id }}" {{ $user->roles->pluck('name')->contains($role->name) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="userrole_{{ $user->id }}_{{ $role->id }}">{{ $role->name }}</label>
+                            <button type="button" class="btn btn-perm-tool select-all-perms"><i class="fas fa-check-double mr-1"></i> Select all</button>
+                            <button type="button" class="btn btn-perm-tool clear-all-perms"><i class="fas fa-times mr-1"></i> Clear</button>
+                            <button type="button" class="btn btn-perm-tool expand-all"><i class="fas fa-chevron-down mr-1"></i> Expand</button>
+                            <button type="button" class="btn btn-perm-tool collapse-all"><i class="fas fa-chevron-up mr-1"></i> Collapse</button>
+                        </div>
+                        <div class="role-input-wrapper mb-2"><label><i class="fas fa-shield-halved mr-1"></i> Module & Access Permissions</label></div>
+                        <div class="accordion" id="accordionRole{{ $role->id }}">
+                            @foreach($groupedPermissions as $group => $subgroups)
+                                @php $groupSlug = \Illuminate\Support\Str::slug($group); @endphp
+                                <div class="card permissions-group mb-3">
+                                    <div class="card-header" id="heading-role-{{ $role->id }}-{{ $groupSlug }}">
+                                        <a class="d-block text-decoration-none" data-toggle="collapse" data-bs-toggle="collapse" href="#collapse-role-{{ $role->id }}-{{ $groupSlug }}" aria-expanded="true">
+                                            <h6 class="mb-0 d-flex align-items-center justify-content-between">
+                                                <span class="text-capitalize d-flex align-items-center">
+                                                    <i class="fas fa-layer-group text-primary mr-2"></i>
+                                                    {{ $group === 'pos' ? 'Point of Sale (POS)' : str_replace('_',' ', $group) }}
+                                                </span>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
+                                                    <label class="m-0 small font-weight-bold text-muted" onclick="event.stopPropagation()">
+                                                        <input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all
+                                                    </label>
+                                                </div>
+                                            </h6>
+                                        </a>
                                     </div>
-                                @endforeach
+                                    <div id="collapse-role-{{ $role->id }}-{{ $groupSlug }}" class="collapse show">
+                                        <div class="card-body p-3 permissions-scroll bg-light">
+                                            <div class="row">
+                                                @foreach($subgroups as $sub => $perms)
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="subgroup-box">
+                                                            <div class="subgroup-title">{{ $sub === 'core' ? $group : str_replace('_',' ', $sub) }}</div>
+                                                            @foreach($perms as $permission)
+                                                                <div class="perm-item-check">
+                                                                    <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="editroleperm_{{ $role->id }}_{{ $permission->id }}" {{ $role->permissions->pluck('name')->contains($permission->name) ? 'checked' : '' }}>
+                                                                    <label for="editroleperm_{{ $role->id }}_{{ $permission->id }}">{{ $permission->name }}</label>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-footer-custom">
+                        <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-dismiss="modal" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 font-weight-bold"><i class="fas fa-save mr-1"></i> Update Role</button>
+                    </div>
+                </form>
+            </div></div>
+        </div>
+        <!-- Delete Role Modal -->
+        <div class="modal fade" id="deleteRoleModal{{ $role->id }}" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+                <form method="POST" action="{{ route('admin.roles_permissions.role.delete', $role) }}">
+                    @csrf
+                    <div class="modal-header modal-header-custom"><h5 class="modal-title">Delete Role</h5>
+                        <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body p-4">Are you sure you want to delete the <strong>{{ $role->name }}</strong> role?</div>
+                    <div class="modal-footer modal-footer-custom">
+                        <button type="submit" class="btn btn-danger btn-sm font-weight-bold">Delete Role</button>
+                    </div>
+                </form>
+            </div></div>
+        </div>
+    @endforeach
+
+    <!-- ALL USER MODALS -->
+    @foreach($users as $user)
+        <!-- Edit User Roles Modal -->
+        <div class="modal fade" id="editUserRolesModal{{ $user->id }}" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+                <form method="POST" action="{{ route('admin.roles_permissions.user_roles.update', $user) }}">
+                    @csrf
+                    <div class="modal-header modal-header-custom">
+                        <h5 class="modal-title"><i class="fas fa-user-tag" style="color: #60a5fa;"></i> Assign Roles to {{ $user->name }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body p-4">
+                        @foreach($roles as $role)
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="roles[]" value="{{ $role->name }}" id="userrole_{{ $user->id }}_{{ $role->id }}" {{ $user->roles->pluck('name')->contains($role->name) ? 'checked' : '' }}>
+                                <label class="form-check-label font-weight-bold" for="userrole_{{ $user->id }}_{{ $role->id }}">{{ $role->name }}</label>
                             </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-success">Update Roles</button>
+                        @endforeach
+                    </div>
+                    <div class="modal-footer modal-footer-custom">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success btn-sm font-weight-bold">Update Roles</button>
+                    </div>
+                </form>
+            </div></div>
+        </div>
+
+        <!-- Edit User Direct Custom Permissions Modal -->
+        <div class="modal fade" id="editUserPermissionsModal{{ $user->id }}" tabindex="-1">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
+                <form method="POST" action="{{ route('admin.roles_permissions.user_permissions.update', $user) }}">
+                    @csrf
+                    <div class="modal-header modal-header-custom">
+                        <h5 class="modal-title"><i class="fas fa-key" style="color: #f59e0b;"></i> Custom Direct Permissions — <span class="text-info">{{ $user->name }}</span></h5>
+                        <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="alert alert-warning py-2 px-3 small mb-3">
+                            <i class="fas fa-info-circle mr-1"></i> Permissions inherited from assigned roles are pre-checked and marked with <strong>Default (Role)</strong>. You can grant additional custom permissions below for this specific user.
+                        </div>
+                        <div class="perm-toolbar d-flex flex-wrap align-items-center mb-3">
+                            <div class="search-input-wrapper mr-auto">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control permission-search-custom permission-search" placeholder="Search permissions...">
                             </div>
-                        </form>
-                    </div></div>
-                </div>
-            @empty
-                <li class="list-group-item text-muted">No users found.</li>
-            @endforelse
-        </ul>
-    </div>
-</div>
-    </div>
+                            <button type="button" class="btn btn-perm-tool select-all-perms"><i class="fas fa-check-double mr-1"></i> Select all</button>
+                            <button type="button" class="btn btn-perm-tool clear-all-perms"><i class="fas fa-times mr-1"></i> Clear</button>
+                            <button type="button" class="btn btn-perm-tool expand-all"><i class="fas fa-chevron-down mr-1"></i> Expand</button>
+                            <button type="button" class="btn btn-perm-tool collapse-all"><i class="fas fa-chevron-up mr-1"></i> Collapse</button>
+                        </div>
+                        <div class="role-input-wrapper mb-2"><label><i class="fas fa-shield-halved mr-1"></i> Custom Direct & Role Permissions</label></div>
+
+                        @php
+                            $rolePermissions = $user->roles ? $user->roles->flatMap(function($r) {
+                                return $r->permissions ? $r->permissions->pluck('name') : collect();
+                            })->unique()->toArray() : [];
+
+                            $directPermissions = $user->permissions ? $user->permissions->pluck('name')->toArray() : [];
+                            
+                            if (empty($rolePermissions) && method_exists($user, 'getPermissionsViaRoles')) {
+                                $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+                            }
+                            if (empty($directPermissions) && method_exists($user, 'getDirectPermissionNames')) {
+                                $directPermissions = $user->getDirectPermissionNames()->toArray();
+                            }
+                        @endphp
+                        <div class="accordion" id="accordionUserPerm{{ $user->id }}">
+                            @foreach($groupedPermissions as $group => $subgroups)
+                                @php $groupSlug = \Illuminate\Support\Str::slug($group); @endphp
+                                <div class="card permissions-group mb-3">
+                                    <div class="card-header" id="heading-uperm-{{ $user->id }}-{{ $groupSlug }}">
+                                        <a class="d-block text-decoration-none" data-toggle="collapse" data-bs-toggle="collapse" href="#collapse-uperm-{{ $user->id }}-{{ $groupSlug }}" aria-expanded="true">
+                                            <h6 class="mb-0 text-capitalize d-flex align-items-center justify-content-between">
+                                                <span class="d-flex align-items-center">
+                                                    <i class="fas fa-layer-group text-primary mr-2"></i>
+                                                    {{ $group === 'pos' ? 'Point of Sale (POS)' : str_replace('_',' ', $group) }}
+                                                </span>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
+                                                    <label class="m-0 small font-weight-bold text-muted" onclick="event.stopPropagation()">
+                                                        <input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all
+                                                    </label>
+                                                </div>
+                                            </h6>
+                                        </a>
+                                    </div>
+                                    <div id="collapse-uperm-{{ $user->id }}-{{ $groupSlug }}" class="collapse show">
+                                        <div class="card-body p-3 permissions-scroll bg-light">
+                                            <div class="row">
+                                                @foreach($subgroups as $sub => $perms)
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="subgroup-box">
+                                                            <div class="subgroup-title">{{ $sub === 'core' ? $group : str_replace('_',' ', $sub) }}</div>
+                                                            @foreach($perms as $permission)
+                                                                @php
+                                                                    $isRolePerm = in_array($permission->name, $rolePermissions);
+                                                                    $isDirectPerm = in_array($permission->name, $directPermissions);
+                                                                    $isChecked = $isRolePerm || $isDirectPerm;
+                                                                @endphp
+                                                                <div class="perm-item-check" style="{{ $isRolePerm ? 'background: #f0fdf4; border-radius:4px;' : '' }}">
+                                                                    <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="uperm_{{ $user->id }}_{{ $permission->id }}" {{ $isChecked ? 'checked' : '' }}>
+                                                                    <label for="uperm_{{ $user->id }}_{{ $permission->id }}">
+                                                                        {{ $permission->name }}
+                                                                        @if($isRolePerm)
+                                                                            <span class="badge bg-success text-white ml-1" style="font-size: 9px; font-weight: normal;">Default (Role)</span>
+                                                                        @elseif($isDirectPerm)
+                                                                            <span class="badge bg-warning text-dark ml-1" style="font-size: 9px; font-weight: normal;">Custom Extra</span>
+                                                                        @endif
+                                                                    </label>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-footer-custom">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning btn-sm font-weight-bold text-dark"><i class="fas fa-save mr-1"></i> Save Custom Permissions</button>
+                    </div>
+                </form>
+            </div></div>
+        </div>
+    @endforeach
 
     <!-- Add Role Modal -->
     <div class="modal fade" id="addRoleModal" tabindex="-1">
@@ -641,7 +725,7 @@
                 @csrf
                 <div class="modal-header modal-header-custom">
                     <h5 class="modal-title"><i class="fas fa-plus-circle" style="color: #60a5fa;"></i> Create New Role</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="role-input-wrapper mb-3">
@@ -664,11 +748,11 @@
                             @php $groupSlug = \Illuminate\Support\Str::slug($group); @endphp
                             <div class="card permissions-group mb-3">
                                 <div class="card-header" id="heading-add-{{ $groupSlug }}">
-                                    <a class="d-block text-decoration-none" data-toggle="collapse" href="#collapse-add-{{ $groupSlug }}" aria-expanded="true" aria-controls="collapse-add-{{ $groupSlug }}">
+                                    <a class="d-block text-decoration-none" data-toggle="collapse" data-bs-toggle="collapse" href="#collapse-add-{{ $groupSlug }}" aria-expanded="true">
                                         <h6 class="mb-0 d-flex align-items-center justify-content-between">
                                             <span class="text-capitalize d-flex align-items-center">
                                                 <i class="fas fa-layer-group text-primary mr-2"></i>
-                                                {{ $group === 'pos' ? 'Point of Sale (POS)' : ($group === 'incomplete_orders' ? 'Incomplete Orders' : str_replace('_',' ', $group)) }}
+                                                {{ $group === 'pos' ? 'Point of Sale (POS)' : str_replace('_',' ', $group) }}
                                             </span>
                                             <div class="d-flex align-items-center">
                                                 <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
@@ -677,31 +761,31 @@
                                         </h6>
                                     </a>
                                 </div>
-                                <div id="collapse-add-{{ $groupSlug }}" class="collapse show" data-parent="#accordionAddRole">
-                                <div class="card-body p-3 permissions-scroll bg-light">
-                                    <div class="row">
-                                        @foreach($subgroups as $sub => $perms)
-                                            <div class="col-md-6 mb-3">
-                                                <div class="subgroup-box">
-                                                    <div class="subgroup-title">{{ $sub === 'core' ? $group : str_replace('_',' ', $sub) }}</div>
-                                                    @foreach($perms as $permission)
-                                                        <div class="perm-item-check">
-                                                            <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="addroleperm_{{ $permission->id }}">
-                                                            <label for="addroleperm_{{ $permission->id }}">{{ $permission->name }}</label>
-                                                        </div>
-                                                    @endforeach
+                                <div id="collapse-add-{{ $groupSlug }}" class="collapse show">
+                                    <div class="card-body p-3 permissions-scroll bg-light">
+                                        <div class="row">
+                                            @foreach($subgroups as $sub => $perms)
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="subgroup-box">
+                                                        <div class="subgroup-title">{{ $sub === 'core' ? $group : str_replace('_',' ', $sub) }}</div>
+                                                        @foreach($perms as $permission)
+                                                            <div class="perm-item-check">
+                                                                <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="addroleperm_{{ $permission->id }}">
+                                                                <label for="addroleperm_{{ $permission->id }}">{{ $permission->name }}</label>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        @endforeach
+                                            @endforeach
+                                        </div>
                                     </div>
-                                </div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 </div>
                 <div class="modal-footer modal-footer-custom">
-                    <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-dismiss="modal" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success btn-sm rounded-pill px-4 font-weight-bold"><i class="fas fa-plus mr-1"></i> Create Role</button>
                 </div>
             </form>
@@ -762,7 +846,6 @@
                 if (isMatch) visibleCount++;
             });
 
-            // Hide/Show subgroup columns if all items inside are hidden
             groupCard.querySelectorAll('.col-md-6').forEach(col => {
                 const totalItems = col.querySelectorAll('.perm-item-check, .form-check');
                 let colVisibleCount = 0;
@@ -772,7 +855,6 @@
                 col.style.display = (term !== '' && colVisibleCount === 0) ? 'none' : '';
             });
 
-            // Hide whole card if no permissions match
             if (term === '') {
                 groupCard.style.display = '';
             } else if (visibleCount > 0) {
