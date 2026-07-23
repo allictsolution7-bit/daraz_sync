@@ -638,7 +638,9 @@ class AdminController extends Controller
             'upazila' => $request->upazila,
             'city' => $request->city,
             'otp_verified' => $request->has('otp_verified') ? 1 : 0,
+            'created_by' => auth()->id(),
         ]);
+
 
         return redirect()->route('admin.users')
             ->with('success', 'User created successfully!');

@@ -103,12 +103,16 @@ class RolesPermissionsController extends Controller
                 });
             });
         } else {
-            // Standard Admin manages sub-role users (Shop Manager, Vendor, Vendor Staff, etc.)
+            // Standard Admin manages sub-role users (Shop Manager, Vendor, Vendor Staff, etc.) CREATED BY HIM
+            $authId = auth()->id();
             $restrictedRoles = ['super admin', 'super_admin', 'Super Admin', 'super-admin', 'admin', 'Admin'];
 
-            $users = User::whereHas('roles', function ($q) use ($allowedRoleNames) {
-                $q->whereIn('name', $allowedRoleNames);
-            })->orWhereDoesntHave('roles')->with(['roles.permissions', 'permissions'])->get();
+            $users = User::where(function ($query) use ($allowedRoleNames) {
+                $query->whereHas('roles', function ($q) use ($allowedRoleNames) {
+                    $q->whereIn('name', $allowedRoleNames);
+                })->orWhereDoesntHave('roles');
+            })->where('created_by', $authId)
+              ->with(['roles.permissions', 'permissions'])->get();
 
             // Filter out any user who has any restricted role (Super Admin or Admin)
             $users = $users->reject(function ($u) use ($restrictedRoles) {
@@ -118,6 +122,7 @@ class RolesPermissionsController extends Controller
                 });
             });
         }
+
 
 
 

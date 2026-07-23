@@ -86,7 +86,9 @@ class User extends Authenticatable
         'otp_expires_at',
         'otp_verified',
         'wallet_balance',
+        'created_by',
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.
