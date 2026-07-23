@@ -682,49 +682,51 @@
 
                 <ul class="navbar-item flex-row  align-items-center py-2 ml-auto ">
                     <li class="nav-item dropdown user-profile-dropdown">
-                        <a href="#" class="nav-link user" id="notificationDropdown" data-bs-toggle="dropdown">
+                        @php
+                            $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
+                                ->where('status', 'pending')
+                                ->latest()
+                                ->take(5)
+                                ->get();
+                            $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')->count();
+                        @endphp
+                        <a href="#" class="nav-link user position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
                             <i class="fa-regular fa-bell" style="font-size: 20px; color: #ffaa00;"></i>
-                            {{-- <p class="count">5</p> --}}
+                            @if($headerPendingCount > 0)
+                                <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" style="font-size: 0.65rem;">{{ $headerPendingCount }}</span>
+                            @endif
                         </a>
 
-                        <div class="dropdown-menu notification">
-                            <div class="dp-main-menu">
-                                {{-- <a href="" class="dropdown-item message-item">
-                                    <img src="{{ asset('assets/img/email.png') }}" alt="" class="user-note">
-                                <div class="note-info-desmis">
-                                    <div class="user-notify-info">
-                                        <p class="note-name">server reboted</p>
-                                        <p class="note-time">20 min ago</p>
-                                    </div>
-                                    <p class="status-link"><span class="fas fa-times"></span></p>
-                                </div>
-
-                                </a>
-                                <a href="" class="dropdown-item message-item">
-                                    <img src="{{ asset('assets/img/email.png') }}" alt="" class="user-note">
-                                    <div class="note-info-desmis">
-                                        <div class="user-notify-info">
-                                            <p class="note-name">software server reboted</p>
-                                            <p class="note-time">20 min ago</p>
+                        <div class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 p-0" style="min-width: 320px;">
+                            <div class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
+                                <h6 class="fw-bold mb-0 text-dark small"><i class="fas fa-bell text-warning me-1"></i> Payment Notifications</h6>
+                                <span class="badge bg-warning text-dark rounded-pill">{{ $headerPendingCount }} Pending</span>
+                            </div>
+                            <div class="list-group list-group-flush" style="max-height: 280px; overflow-y: auto;">
+                                @forelse($headerPendingPayments as $nTrx)
+                                    <a href="{{ route('admin.vendor-payments.index', ['status' => 'pending']) }}" class="list-group-item list-group-item-action p-3 border-bottom">
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <span class="fw-bold text-dark small">{{ $nTrx->vendor->name ?? 'Vendor' }}</span>
+                                            <span class="badge bg-success bg-opacity-10 text-success fw-bold">৳{{ number_format($nTrx->amount, 2) }}</span>
                                         </div>
-                                        <p class="status-link"><span class="fas fa-times"></span></p>
-                                    </div>
-
-                                </a>
-                                <a href="" class="dropdown-item message-item">
-                                    <img src="{{ asset('assets/img/email.png') }}" alt="" class="user-note">
-                                    <div class="note-info-desmis">
-                                        <div class="user-notify-info">
-                                            <p class="note-name">server reboted</p>
-                                            <p class="note-time">20 min ago</p>
+                                        <div class="small text-muted mb-1">
+                                            <i class="fas fa-wallet text-secondary me-1"></i> Requested recharge via <strong>{{ $nTrx->payment_method ?? 'Gateway' }}</strong>
                                         </div>
-                                        <p class="status-link"><span class="fas fa-times"></span></p>
+                                        <div class="text-muted" style="font-size: 0.7rem;">
+                                            <i class="fas fa-clock me-1"></i> {{ $nTrx->created_at->diffForHumans() }}
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div class="p-4 text-center text-muted small">
+                                        <i class="fas fa-bell-slash fs-4 d-block mb-1 opacity-50"></i>
+                                        No pending payment requests.
                                     </div>
-
-                                </a> --}}
+                                @endforelse
+                            </div>
+                            <div class="p-2 text-center bg-light border-top">
+                                <a href="{{ route('admin.vendor-payments.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.775rem;">View All Payments &rarr;</a>
                             </div>
                         </div>
-
                     </li>
                     {{-- <li class="nav-item dropdown user-profile-dropdown">
                         <a href="" class="nav-link user" id="notify" data-bs-toggle="dropdown">
@@ -1840,10 +1842,10 @@
                                          <span class="menu-content d-flex align-items-center justify-content-between">
                                              <span><i class="fas fa-wallet text-warning"></i> Vendor Payments</span>
                                              @php
-                                                 $unseenCount = \App\Models\VendorWalletTransaction::where('is_seen', false)->count();
+                                                 $pendingPaymentCount = \App\Models\VendorWalletTransaction::where('status', 'pending')->count();
                                              @endphp
-                                             @if($unseenCount > 0)
-                                                 <span class="badge bg-danger rounded-pill ms-2">{{ $unseenCount }}</span>
+                                             @if($pendingPaymentCount > 0)
+                                                 <span class="badge bg-danger rounded-pill ms-2" style="font-size: 0.65rem; padding: 2px 6px;">{{ $pendingPaymentCount }}</span>
                                              @endif
                                          </span>
                                      </a>

@@ -150,7 +150,7 @@
                                     @if($trx->status === 'pending')
                                         <form action="{{ route('admin.vendor-payments.approve', $trx->id) }}" method="POST" class="d-inline-block">
                                             @csrf
-                                            <button type="submit" class="btn btn-xs btn-success rounded-pill px-2 py-1 fw-bold" style="font-size: 0.725rem;" onclick="return confirm('Approve this request?')">
+                                            <button type="submit" class="btn btn-xs btn-success rounded-pill px-2 py-1 fw-bold" style="font-size: 0.725rem;">
                                                 <i class="fas fa-check me-1"></i> Approve
                                             </button>
                                         </form>
