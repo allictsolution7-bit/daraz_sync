@@ -28,12 +28,12 @@
             background: var(--bg-glass);
             border: 1px solid var(--border-glass);
             backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 8px;
-            margin-bottom: 30px;
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 16px;
             box-shadow: var(--shadow-premium);
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .portal-tab-btn {
@@ -41,14 +41,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 12px 24px;
-            font-size: 15px;
+            gap: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-muted);
             border: none;
             background: transparent;
-            border-radius: 12px;
+            border-radius: 10px;
             text-decoration: none;
             transition: var(--transition-smooth);
         }
@@ -68,8 +68,8 @@
         .stat-card-premium {
             background: var(--bg-glass);
             border: 1px solid var(--border-glass);
-            border-radius: 14px;
-            padding: 14px 18px;
+            border-radius: 12px;
+            padding: 10px 14px;
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-premium);
@@ -77,7 +77,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 75px;
+            min-height: 60px;
         }
 
         .stat-card-premium::before {
@@ -92,8 +92,8 @@
         }
 
         .stat-card-premium:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.08);
         }
 
         .stat-card-premium.gradient-1 {
@@ -115,16 +115,16 @@
         }
 
         .stat-card-title {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            opacity: 0.85;
+            opacity: 0.9;
             margin-bottom: 2px;
         }
 
         .stat-card-value {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             line-height: 1.1;
             margin-bottom: 0;
@@ -132,9 +132,9 @@
 
         .stat-card-icon {
             position: absolute;
-            right: 15px;
-            bottom: 10px;
-            font-size: 2.2rem;
+            right: 12px;
+            bottom: 8px;
+            font-size: 1.8rem;
             opacity: 0.18;
             pointer-events: none;
         }
@@ -143,31 +143,31 @@
         .premium-actions-bar {
             background: var(--bg-glass);
             border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 16px 24px;
+            border-radius: 12px;
+            padding: 10px 16px;
             box-shadow: var(--shadow-premium);
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
         }
 
         /* Table & Container Cards */
         .workspace-card {
             background: var(--bg-glass);
             border: 1px solid var(--border-glass);
-            border-radius: 20px;
+            border-radius: 16px;
             box-shadow: var(--shadow-premium);
-            padding: 24px;
-            margin-bottom: 40px;
+            padding: 16px;
+            margin-bottom: 24px;
         }
 
         .premium-table {
             width: 100% !important;
             border-collapse: separate !important;
-            border-spacing: 0 8px !important;
+            border-spacing: 0 4px !important;
         }
 
         .premium-table thead th {
@@ -175,17 +175,17 @@
             color: var(--text-muted);
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.5px;
-            padding: 14px 18px !important;
+            padding: 8px 12px !important;
             border: none !important;
         }
 
         .premium-table tbody tr {
             background-color: #ffffff;
             transition: var(--transition-smooth);
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.01);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
         }
 
         .premium-table tbody tr:hover {
@@ -193,11 +193,12 @@
         }
 
         .premium-table tbody td {
-            padding: 16px 18px !important;
+            padding: 8px 12px !important;
             border-top: 1px solid #f1f5f9 !important;
             border-bottom: 1px solid #f1f5f9 !important;
             vertical-align: middle;
             color: var(--text-main);
+            font-size: 13px;
         }
 
         .premium-table tbody td:first-child {
@@ -2511,48 +2512,51 @@
                 $(document).ready(bootWorkspace);
             }
         </script>
-        <script>
-            window.deleteMockAdmin = function(id) {
-                if (confirm('Are you sure you want to delete this mock registered admin?')) {
-                    let admins = JSON.parse(localStorage.getItem('registered_admins') || '[]');
-                    admins = admins.filter(a => a.id !== id);
-                    localStorage.setItem('registered_admins', JSON.stringify(admins));
-                    location.reload();
-                }
-            };
+    @endif
 
-            $(document).ready(function() {
-                // Dynamically inject mock registered admins
-                const mockAdmins = JSON.parse(localStorage.getItem('registered_admins') || '[]');
-                const tbody = document.querySelector('#users tbody');
-                if (tbody && mockAdmins.length > 0) {
-                    mockAdmins.forEach(adm => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td style="text-align: center;">
-                                <input type="checkbox" class="user-checkbox form-check-input" value="${adm.id}" onchange="updateDeleteButton()">
-                            </td>
-                            <td><strong>#${adm.id}</strong></td>
-                            <td></td>
-                            <td>${adm.name}</td>
-                            <td><span class="text-muted">${adm.email}</span></td>
-                            <td>
-                                <span class="badge-premium badge-premium-admin mb-1"><i class="fas fa-shield-alt"></i> admin</span>
-                                <span class="badge-premium badge-premium-success"><i class="fas fa-gem"></i> ${adm.packageName} (${adm.billingCycle})</span>
-                            </td>
-                            <td>${adm.created_at}</td>
-                            <td>
-                                <div class="d-flex justify-content-center gap-1">
-                                    <button class="btn-action-circle btn-action-delete" title="Delete Mock Admin" onclick="deleteMockAdmin('${adm.id}')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        `;
-                        tbody.insertBefore(tr, tbody.firstChild);
-                    });
-                }
+    <script>
+        window.deleteMockAdmin = function(id) {
+            if (confirm('Are you sure you want to delete this mock registered admin?')) {
+                let admins = JSON.parse(localStorage.getItem('registered_admins') || '[]');
+                admins = admins.filter(a => a.id !== id);
+                localStorage.setItem('registered_admins', JSON.stringify(admins));
+                location.reload();
+            }
+        };
 
+        $(document).ready(function() {
+            // Dynamically inject mock registered admins if present
+            const mockAdmins = JSON.parse(localStorage.getItem('registered_admins') || '[]');
+            const tbody = document.querySelector('#users tbody');
+            if (tbody && mockAdmins.length > 0) {
+                mockAdmins.forEach(adm => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="text-align: center;">
+                            <input type="checkbox" class="user-checkbox form-check-input" value="${adm.id}" onchange="updateDeleteButton()">
+                        </td>
+                        <td><strong>#${adm.id}</strong></td>
+                        <td></td>
+                        <td>${adm.name}</td>
+                        <td><span class="text-muted">${adm.email}</span></td>
+                        <td>
+                            <span class="badge-premium badge-premium-admin mb-1"><i class="fas fa-shield-alt"></i> admin</span>
+                            <span class="badge-premium badge-premium-success"><i class="fas fa-gem"></i> ${adm.packageName} (${adm.billingCycle})</span>
+                        </td>
+                        <td>${adm.created_at}</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-1">
+                                <button class="btn-action-circle btn-action-delete" title="Delete Mock Admin" onclick="deleteMockAdmin('${adm.id}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.insertBefore(tr, tbody.firstChild);
+                });
+            }
+
+            if ($('#users').length) {
                 $('#users').DataTable({
                     dom: 'Bfrtip',
                     buttons: [
@@ -2576,74 +2580,95 @@
                         }
                     ]
                 });
-            });
-
-            function toggleSelectAll() {
-                const selectAll = document.getElementById('selectAll');
-                const checkboxes = document.querySelectorAll('.user-checkbox');
-                
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = selectAll.checked;
-                });
-                
-                updateDeleteButton();
             }
+        });
 
-            function updateDeleteButton() {
-                const checkboxes = document.querySelectorAll('.user-checkbox:checked');
-                const deleteBtn = document.getElementById('deleteSelectedBtn');
-                
-                if (checkboxes.length > 0) {
+        window.toggleSelectAll = function() {
+            const selectAll = document.getElementById('selectAll');
+            const isChecked = selectAll ? selectAll.checked : false;
+            
+            if (window.jQuery && $.fn.DataTable && $.fn.DataTable.isDataTable('#users')) {
+                const table = $('#users').DataTable();
+                const rows = table.rows({ 'search': 'applied' }).nodes();
+                $('input.user-checkbox', rows).prop('checked', isChecked);
+            } else {
+                const checkboxes = document.querySelectorAll('.user-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                });
+            }
+            
+            window.updateDeleteButton();
+        };
+
+        window.updateDeleteButton = function() {
+            let checkedCount = 0;
+            if (window.jQuery && $.fn.DataTable && $.fn.DataTable.isDataTable('#users')) {
+                const table = $('#users').DataTable();
+                const rows = table.rows().nodes();
+                checkedCount = $(rows).find('.user-checkbox:checked').length;
+            } else {
+                checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+            }
+            
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            if (deleteBtn) {
+                if (checkedCount > 0) {
                     deleteBtn.disabled = false;
-                    deleteBtn.textContent = `Delete Selected (${checkboxes.length})`;
+                    deleteBtn.innerHTML = `<i class="fas fa-trash me-2"></i> Delete Selected (${checkedCount})`;
                 } else {
                     deleteBtn.disabled = true;
-                    deleteBtn.textContent = 'Delete Selected';
+                    deleteBtn.innerHTML = `<i class="fas fa-trash me-2"></i> Delete Selected`;
                 }
             }
+        };
 
-            function deleteSelected() {
+        window.deleteSelected = function() {
+            let userIds = [];
+            if (window.jQuery && $.fn.DataTable && $.fn.DataTable.isDataTable('#users')) {
+                const table = $('#users').DataTable();
+                const rows = table.rows().nodes();
+                userIds = $(rows).find('.user-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+            } else {
                 const checkboxes = document.querySelectorAll('.user-checkbox:checked');
-                const userIds = Array.from(checkboxes).map(cb => cb.value);
-                
-                if (userIds.length === 0) {
-                    alert('Please select users to delete.');
-                    return;
-                }
-                
-                if (confirm(`Are you sure you want to delete ${userIds.length} user(s)?`)) {
-                    // Create a form to submit multiple user IDs
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '{{ route("admin.users.bulk-delete") }}';
-                    
-                    // Add CSRF token
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
-                    form.appendChild(csrfToken);
-                    
-                    // Add method override
-                    const methodField = document.createElement('input');
-                    methodField.type = 'hidden';
-                    methodField.name = '_method';
-                    methodField.value = 'DELETE';
-                    form.appendChild(methodField);
-                    
-                    // Add user IDs
-                    userIds.forEach(id => {
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'user_ids[]';
-                        input.value = id;
-                        form.appendChild(input);
-                    });
-                    
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+                userIds = Array.from(checkboxes).map(cb => cb.value);
             }
-        </script>
-    @endif
+            
+            if (userIds.length === 0) {
+                alert('Please select users to delete.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete ${userIds.length} user(s)?`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("admin.users.bulk-delete") }}';
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                form.appendChild(csrfToken);
+                
+                const methodField = document.createElement('input');
+                methodField.type = 'hidden';
+                methodField.name = '_method';
+                methodField.value = 'DELETE';
+                form.appendChild(methodField);
+                
+                userIds.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'user_ids[]';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        };
+    </script>
 @endsection
