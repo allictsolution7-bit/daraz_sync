@@ -9,6 +9,7 @@ class AdminSubscriptionPayment extends Model
     protected $table = 'admin_subscription_payments';
 
     protected $fillable = [
+        'user_id',
         'sub_id',
         'plan',
         'cycle',
@@ -19,6 +20,11 @@ class AdminSubscriptionPayment extends Model
         'status',
         'expiry_date',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     protected $casts = [
         'expiry_date' => 'date',

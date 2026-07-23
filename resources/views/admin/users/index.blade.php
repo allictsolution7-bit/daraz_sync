@@ -1692,9 +1692,14 @@
                             ? `<span class="fw-bold text-dark"><i class="fas fa-calendar-check text-success me-1"></i>${item.expiryDate}</span>` 
                             : `<span class="text-warning small italic"><i class="fas fa-hourglass-start me-1"></i>Awaiting Approval</span>`;
 
+                        const adminBadgeHTML = window.IS_SUPER_ADMIN && item.adminName
+                            ? `<span class="d-block text-primary small font-weight-bold"><i class="fas fa-user-shield me-1"></i>${item.adminName}</span>`
+                            : '';
+
                         tr.innerHTML = `
                             <td class="ps-4">
                                 <strong class="text-dark d-block">${item.id}</strong>
+                                ${adminBadgeHTML}
                                 <span class="text-muted small">${item.date}</span>
                             </td>
                             <td>

@@ -779,7 +779,15 @@
                                 <div class="premium-user-info-text text-start">
                                     <h2 class="premium-user-name">{{ Auth::user()->name ?? 'Admin User' }}</h2>
                                     <p class="premium-user-email">{{ Auth::user()->email ?? 'admin@purnobd.com' }}</p>
-                                    <span class="premium-user-role">Super Admin</span>
+                                    <span class="premium-user-role">
+                                        @if(Auth::user()?->hasRole('super_admin') || Auth::user()?->hasRole('super admin'))
+                                            Super Admin
+                                        @elseif(Auth::user()?->hasRole('admin') || Auth::user()?->role === 'admin')
+                                            Admin
+                                        @else
+                                            {{ ucfirst(Auth::user()?->roles->first()?->name ?? Auth::user()?->role ?? 'User') }}
+                                        @endif
+                                    </span>
                                 </div>
                             </div>
                             <div class="premium-user-links">

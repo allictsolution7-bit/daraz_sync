@@ -169,10 +169,10 @@
     <table class="header-table">
         <tr>
             <td style="vertical-align: top;">
-                <h1 class="site-title">{{ $adminInfo['site_name'] }}</h1>
+                <h1 class="site-title">{{ $issuerInfo['site_name'] }}</h1>
                 <div style="font-size: 11px; color: #64748b;">
-                    <strong>Software / Platform:</strong> {{ $adminInfo['site_name'] }}<br>
-                    <strong>Website:</strong> {{ $adminInfo['website'] }}
+                    <strong>Platform / Software:</strong> {{ $issuerInfo['site_name'] }}<br>
+                    <strong>Website:</strong> {{ $issuerInfo['website'] }}
                 </div>
             </td>
             <td style="vertical-align: top; text-align: right;">
@@ -192,13 +192,26 @@
     <!-- Billing Info Section -->
     <table class="info-table">
         <tr>
-            <td class="info-card" width="100%">
-                <h4>Admin & Business Information</h4>
-                <strong>Admin Name:</strong> {{ $adminInfo['admin_name'] }}<br>
-                <strong>Company / Store Name:</strong> {{ $adminInfo['company_name'] }}<br>
-                <strong>Email:</strong> {{ $adminInfo['email'] }}<br>
-                <strong>Phone / Contact:</strong> {{ $payment->phone ?? $adminInfo['phone'] }}<br>
-                <strong>Address:</strong> {{ $adminInfo['address'] }}
+            <!-- ISSUER SECTION -->
+            <td class="info-card" width="48%">
+                <h4>Issuer (Platform / Provider)</h4>
+                <strong>{{ $issuerInfo['site_name'] }}</strong><br>
+                <strong>Provider:</strong> {{ $issuerInfo['name'] }}<br>
+                <strong>Email:</strong> {{ $issuerInfo['email'] }}<br>
+                <strong>Phone:</strong> {{ $issuerInfo['phone'] }}<br>
+                <strong>Address:</strong> {{ $issuerInfo['address'] }}
+            </td>
+
+            <td width="4%"></td>
+
+            <!-- ISSUED TO SECTION -->
+            <td class="info-card" width="48%">
+                <h4>Issued To (Subscriber Admin)</h4>
+                <strong>Admin Name:</strong> {{ $issuedToInfo['name'] }}<br>
+                <strong>Email:</strong> {{ $issuedToInfo['email'] }}<br>
+                <strong>Phone / Contact:</strong> {{ $issuedToInfo['phone'] }}<br>
+                <strong>Store / Company:</strong> {{ $issuedToInfo['company'] }}<br>
+                <strong>Address:</strong> {{ $issuedToInfo['address'] }}
             </td>
         </tr>
     </table>
@@ -249,7 +262,7 @@
     <!-- Footer Section -->
     <div class="footer">
         <p style="margin: 0 0 5px 0; font-weight: bold;">Thank you for your subscription payment!</p>
-        <p style="margin: 0;">This is an official subscription payment receipt for {{ $adminInfo['site_name'] }}.</p>
+        <p style="margin: 0;">This is an official subscription payment invoice from {{ $issuerInfo['site_name'] }}.</p>
     </div>
 </div>
 

@@ -11,19 +11,31 @@ class AdminSubscriptionPaymentController extends Controller
     // GET /admin/subscription-payments — return all payments as JSON
     public function index()
     {
-        $payments = AdminSubscriptionPayment::orderByDesc('created_at')->get()->map(function ($p) {
+        $user = auth()->user();
+        $isSuperAdmin = $user?->hasRole('super_admin') || $user?->hasRole('super admin');
+
+        $query = AdminSubscriptionPayment::with('user')->orderByDesc('created_at');
+
+        // If not super admin, only show this admin's own subscription payments
+        if (!$isSuperAdmin && $user) {
+            $query->where('user_id', $user->id);
+        }
+
+        $payments = $query->get()->map(function ($p) {
             return [
-                'id'         => $p->sub_id,
-                'plan'       => $p->plan,
-                'cycle'      => $p->cycle,
-                'price'      => $p->price,
-                'gateway'    => $p->gateway,
-                'phone'      => $p->phone,
-                'trxId'      => $p->trx_id,
-                'status'     => $p->status,
-                'expiryDate' => $p->expiry_date?->format('Y-m-d'),
-                'date'       => $p->created_at->format('n/j/Y'),
-                'createdAt'  => $p->created_at->toISOString(),
+                'id'          => $p->sub_id,
+                'plan'        => $p->plan,
+                'cycle'       => $p->cycle,
+                'price'       => $p->price,
+                'gateway'     => $p->gateway,
+                'phone'       => $p->phone,
+                'trxId'       => $p->trx_id,
+                'status'      => $p->status,
+                'expiryDate'  => $p->expiry_date?->format('Y-m-d'),
+                'date'        => $p->created_at->format('n/j/Y'),
+                'createdAt'   => $p->created_at->toISOString(),
+                'adminName'   => $p->user?->name ?? 'Admin Merchant',
+                'adminEmail'  => $p->user?->email ?? '',
             ];
         });
 
@@ -44,6 +56,7 @@ class AdminSubscriptionPaymentController extends Controller
         ]);
 
         $payment = AdminSubscriptionPayment::create([
+            'user_id' => auth()->id(),
             'sub_id'  => $request->sub_id,
             'plan'    => $request->plan,
             'cycle'   => $request->cycle ?? 'Monthly',
@@ -73,32 +86,46 @@ class AdminSubscriptionPaymentController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // Helper to gather Admin / Company details
+    // Helper to gather Issuer (Super Admin / Software Provider) and Issued To (Admin Subscriber)
     private function getInvoiceData($subId)
     {
-        $payment = AdminSubscriptionPayment::where('sub_id', $subId)->firstOrFail();
+        $payment = AdminSubscriptionPayment::with('user')->where('sub_id', $subId)->firstOrFail();
 
-        $user = auth()->user();
+        // 1. ISSUER (Super Admin / Software Provider / Platform)
+        $superAdminUser = \App\Models\User::whereHas('roles', function($q) {
+            $q->whereIn('name', ['super_admin', 'super admin']);
+        })->first();
 
-        // Site & Company Info from Settings page
-        $siteName    = setting('general', 'site_name', config('app.name', 'PurnoBD'));
-        $companyName = setting('general', 'company_name', $siteName);
-        $phone       = setting('general', 'phone_number', $user?->phone ?? $user?->mobile ?? 'N/A');
-        $email       = setting('general', 'contact_email', $user?->email ?? 'admin@purnobd.com');
-        $address     = setting('general', 'address', 'Dhaka, Bangladesh');
-        $website     = config('app.url', url('/'));
+        $issuerSiteName    = setting('general', 'site_name', config('app.name', 'PurnoBD'));
+        $issuerCompanyName = setting('general', 'company_name', $issuerSiteName);
+        $issuerPhone       = setting('ecommerce', 'bkash_number', setting('general', 'phone_number', '01779542054'));
+        $issuerEmail       = $superAdminUser?->email ?? setting('general', 'contact_email', 'admin@purnobd.com');
+        $issuerAddress     = setting('general', 'address', 'Dhaka, Bangladesh');
+        $issuerWebsite     = config('app.url', url('/'));
 
-        $adminInfo = [
-            'site_name'    => $siteName,
-            'company_name' => $companyName,
-            'phone'        => $phone,
-            'email'        => $email,
-            'address'      => $address,
-            'website'      => $website,
-            'admin_name'   => $user?->name ?? 'Admin User',
+        $issuerInfo = [
+            'site_name'    => $issuerSiteName,
+            'company_name' => $issuerCompanyName,
+            'phone'        => $issuerPhone,
+            'email'        => $issuerEmail,
+            'address'      => $issuerAddress,
+            'website'      => $issuerWebsite,
+            'name'         => $superAdminUser?->name ?? 'Super Admin / Platform Provider',
         ];
 
-        return compact('payment', 'adminInfo');
+        // 2. ISSUED TO (Admin Subscriber who paid for subscription)
+        $subscriberUser = $payment->user ?? auth()->user();
+        $adminPhone = $subscriberUser?->phone ?? $subscriberUser?->mobile ?? setting('general', 'phone_number', setting('general', 'whatsapp_number', 'N/A'));
+
+        $issuedToInfo = [
+            'name'    => $subscriberUser?->name ?? 'Subscribed Admin',
+            'email'   => $subscriberUser?->email ?? 'admin@store.com',
+            'phone'   => ($adminPhone !== 'N/A') ? $adminPhone : ($payment->phone ?? 'N/A'),
+            'company' => $issuerSiteName . ' Merchant Account',
+            'address' => setting('general', 'address', 'Dhaka, Bangladesh'),
+        ];
+
+        return compact('payment', 'issuerInfo', 'issuedToInfo');
     }
 
     // GET /admin/subscription-payments/{subId}/print-invoice

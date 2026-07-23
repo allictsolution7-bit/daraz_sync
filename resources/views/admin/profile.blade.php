@@ -320,7 +320,15 @@
                         <img src="{{ $adminProfileImage }}" alt="Profile Photo" class="avatar-img">
                     </div>
                     <h2 class="profile-name">{{ Auth::user()->name }}</h2>
-                    <span class="profile-role">Super Admin</span>
+                    <span class="profile-role">
+                        @if(Auth::user()?->hasRole('super_admin') || Auth::user()?->hasRole('super admin'))
+                            Super Admin
+                        @elseif(Auth::user()?->hasRole('admin') || Auth::user()?->role === 'admin')
+                            Admin
+                        @else
+                            {{ ucfirst(Auth::user()?->roles->first()?->name ?? Auth::user()?->role ?? 'User') }}
+                        @endif
+                    </span>
                     <p class="profile-email">{{ Auth::user()->email }}</p>
                     
                     <div class="social-links">
@@ -375,7 +383,15 @@
                                 </div>
                                 <div>
                                     <div class="info-label">Account Role</div>
-                                    <div class="info-value">Super Admin</div>
+                                    <div class="info-value">
+                                        @if(Auth::user()?->hasRole('super_admin') || Auth::user()?->hasRole('super admin'))
+                                            Super Admin
+                                        @elseif(Auth::user()?->hasRole('admin') || Auth::user()?->role === 'admin')
+                                            Admin
+                                        @else
+                                            {{ ucfirst(Auth::user()?->roles->first()?->name ?? Auth::user()?->role ?? 'User') }}
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
