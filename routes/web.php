@@ -454,6 +454,8 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::get('/subscription-payments', [\App\Http\Controllers\Admin\AdminSubscriptionPaymentController::class, 'index'])->name('subscription-payments.index');
     Route::post('/subscription-payments', [\App\Http\Controllers\Admin\AdminSubscriptionPaymentController::class, 'store'])->name('subscription-payments.store');
     Route::patch('/subscription-payments/{subId}', [\App\Http\Controllers\Admin\AdminSubscriptionPaymentController::class, 'update'])->name('subscription-payments.update');
+    Route::get('/subscription-payments/{subId}/print-invoice', [\App\Http\Controllers\Admin\AdminSubscriptionPaymentController::class, 'printInvoice'])->name('subscription-payments.print-invoice');
+    Route::get('/subscription-payments/{subId}/download-invoice', [\App\Http\Controllers\Admin\AdminSubscriptionPaymentController::class, 'downloadInvoice'])->name('subscription-payments.download-invoice');
 
     // Modules & Tools Dashboard (with System Modules)
     Route::prefix('extensions')->name('modules.')->group(function () {

@@ -72,4 +72,69 @@ class AdminSubscriptionPaymentController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    // Helper to gather Admin / Company details
+    private function getInvoiceData($subId)
+    {
+        $payment = AdminSubscriptionPayment::where('sub_id', $subId)->firstOrFail();
+
+        $user = auth()->user();
+
+        // Site & Company Info from Settings page
+        $siteName    = setting('general', 'site_name', config('app.name', 'PurnoBD'));
+        $companyName = setting('general', 'company_name', $siteName);
+        $phone       = setting('general', 'phone_number', $user?->phone ?? $user?->mobile ?? 'N/A');
+        $email       = setting('general', 'contact_email', $user?->email ?? 'admin@purnobd.com');
+        $address     = setting('general', 'address', 'Dhaka, Bangladesh');
+        $website     = config('app.url', url('/'));
+
+        $adminInfo = [
+            'site_name'    => $siteName,
+            'company_name' => $companyName,
+            'phone'        => $phone,
+            'email'        => $email,
+            'address'      => $address,
+            'website'      => $website,
+            'admin_name'   => $user?->name ?? 'Admin User',
+        ];
+
+        return compact('payment', 'adminInfo');
+    }
+
+    // GET /admin/subscription-payments/{subId}/print-invoice
+    public function printInvoice($subId)
+    {
+        $data = $this->getInvoiceData($subId);
+        return view('admin.subscripton.invoice', $data);
+    }
+
+    // GET /admin/subscription-payments/{subId}/download-invoice
+    public function downloadInvoice($subId)
+    {
+        $data = $this->getInvoiceData($subId);
+        
+        try {
+            $mpdf = new \Mpdf\Mpdf([
+                'mode' => 'utf-8',
+                'format' => 'A4',
+                'margin_left' => 12,
+                'margin_right' => 12,
+                'margin_top' => 12,
+                'margin_bottom' => 12,
+                'default_font' => 'dejavusans',
+                'autoScriptToLang' => true,
+                'autoLangToFont' => true,
+            ]);
+
+            request()->merge(['pdf' => 1]);
+            $html = view('admin.subscripton.invoice', $data)->render();
+            $mpdf->WriteHTML($html);
+
+            return response($mpdf->Output("Subscription-Invoice-{$subId}.pdf", 'S'))
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', 'attachment; filename="Subscription-Invoice-' . $subId . '.pdf"');
+        } catch (\Exception $e) {
+            return view('admin.subscripton.invoice', $data);
+        }
+    }
 }

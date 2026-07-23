@@ -479,17 +479,7 @@
             </div>
         @endif
 
-        <!-- Portal Tabs Navigation (Super Admin Only) -->
-        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin'))
-        <div class="portal-tabs-container mb-3">
-            <a href="{{ route('admin.users') }}" class="portal-tab-btn {{ request()->get('view') !== 'packages' ? 'active' : '' }}">
-                <i class="fas fa-users-cog"></i> Users Accounts Directory
-            </a>
-            <a href="{{ route('admin.users', ['view' => 'packages']) }}" class="portal-tab-btn {{ request()->get('view') === 'packages' ? 'active' : '' }}">
-                <i class="fas fa-layer-group"></i> SaaS Billing Tiers
-            </a>
-        </div>
-        @endif
+
 
         @if(request()->get('view') === 'packages')
             <!-- ADMIN PACKAGES WORKSPACE -->
@@ -629,7 +619,7 @@
                                             <th class="pe-4 text-end">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="subscriptionHistoryTbody" class="small">
+                                    <tbody id="adminSubHistoryTbody" class="subscriptionHistoryTbody small">
                                         <!-- Dynamic rows rendered by script -->
                                     </tbody>
                                 </table>
@@ -666,68 +656,89 @@
                 </div>
             </div>
             @else
-            <!-- SUPER ADMIN VIEW (Original Full Dashboard) -->
-            <!-- Billing Frequency Filter Bar -->
-            <div class="d-flex justify-content-between align-items-center mb-3 p-2 px-3 bg-white border rounded-4 shadow-sm flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="fas fa-clock text-primary me-1"></i>
-                    <span class="font-weight-bold text-dark small">Billing Cycle:</span>
-                    <div class="btn-group bg-light p-1 rounded-pill border" role="group" id="billingCycleGroup">
-                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 font-weight-semibold cycle-btn active" onclick="setBillingCycle('monthly', this)">
-                            Monthly
-                        </button>
-                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3 font-weight-semibold cycle-btn" onclick="setBillingCycle('yearly', this)">
-                            Yearly <span class="badge bg-warning text-dark rounded-pill ms-1" style="font-size: 9px;">Save 20%</span>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-light rounded-pill px-3 font-weight-semibold cycle-btn" onclick="setBillingCycle('lifetime', this)">
-                            Lifetime <span class="badge bg-success text-white rounded-pill ms-1" style="font-size: 9px;">Best Value</span>
-                        </button>
+            <!-- SUPER ADMIN VIEW: 2 TABS NAVIGATION -->
+            <ul class="nav nav-pills nav-fill bg-white p-2 rounded-4 shadow-sm border mb-4 gap-2 super-admin-tab-nav" id="superAdminSubTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-3 py-2-5 font-weight-bold" id="tab-saas-pkgs-btn" data-bs-toggle="tab" data-bs-target="#tab-saas-pkgs" type="button" role="tab" style="font-size: 14.5px;">
+                        <i class="fas fa-layer-group text-primary me-2"></i> Tab 1: SaaS Packages & Pricing Tiers
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-3 py-2-5 font-weight-bold" id="tab-saas-approvals-btn" data-bs-toggle="tab" data-bs-target="#tab-saas-approvals" type="button" role="tab" style="font-size: 14.5px;">
+                        <i class="fas fa-user-check text-success me-2"></i> Tab 2: Admin Subscription Payments & Approvals
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="superAdminSubTabsContent">
+                <!-- TAB 1: SAAS PACKAGES & PRICING -->
+                <div class="tab-pane fade show active" id="tab-saas-pkgs" role="tabpanel">
+                    <!-- Billing Frequency Filter Bar -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 px-3 bg-white border rounded-4 shadow-sm flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-clock text-primary me-1"></i>
+                            <span class="font-weight-bold text-dark small">Billing Cycle:</span>
+                            <div class="btn-group bg-light p-1 rounded-pill border" role="group" id="billingCycleGroup">
+                                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 font-weight-semibold cycle-btn active" onclick="setBillingCycle('monthly', this)">
+                                    Monthly
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light rounded-pill px-3 font-weight-semibold cycle-btn" onclick="setBillingCycle('yearly', this)">
+                                    Yearly <span class="badge bg-warning text-dark rounded-pill ms-1" style="font-size: 9px;">Save 20%</span>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light rounded-pill px-3 font-weight-semibold cycle-btn" onclick="setBillingCycle('lifetime', this)">
+                                    Lifetime <span class="badge bg-success text-white rounded-pill ms-1" style="font-size: 9px;">Best Value</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="activeSubscriptionBadge">
+                            <span class="badge bg-success text-white px-3 py-2 rounded-pill font-weight-bold shadow-sm" style="font-size: 12px;">
+                                <i class="fas fa-shield-check me-1"></i> Super Admin Portal
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Packages Grid -->
+                    <div class="row" id="packagesGrid">
+                        <!-- Dynamic cards populated by script -->
                     </div>
                 </div>
-                <div id="activeSubscriptionBadge">
-                    <span class="badge bg-success text-white px-3 py-2 rounded-pill font-weight-bold shadow-sm" style="font-size: 12px;">
-                        <i class="fas fa-shield-check me-1"></i> Super Admin Portal
-                    </span>
-                </div>
-            </div>
 
-            <!-- Packages Grid -->
-            <div class="row" id="packagesGrid">
-                <!-- Dynamic cards populated by script -->
-            </div>
-
-            <!-- Subscription Payment History & Approvals Table -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4 mt-4 bg-white overflow-hidden" id="subscriptionHistoryCard">
-                <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                        <h5 class="font-weight-bold text-dark mb-0">
-                            <i class="fas fa-history text-primary me-2"></i> Admin Subscription Payments & Approvals
-                        </h5>
-                        <p class="text-muted small mb-0">
-                            Review, approve or modify expiration dates (+30 days default) for admin subscription payments
-                        </p>
-                    </div>
-                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill font-weight-semibold" id="historyCountBadge">0 Payments</span>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0" id="subscriptionHistoryTable">
-                            <thead class="bg-light text-uppercase text-muted small font-weight-bold" style="font-size: 11px;">
-                                <tr>
-                                    <th class="ps-4">Sub ID / Date</th>
-                                    <th>Plan & Cycle</th>
-                                    <th>Amount</th>
-                                    <th>Gateway & Contact</th>
-                                    <th>TrxID</th>
-                                    <th>Status</th>
-                                    <th>Expiration Date</th>
-                                    <th class="pe-4 text-end">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="subscriptionHistoryTbody" class="small">
-                                <!-- Dynamic rows rendered by script -->
-                            </tbody>
-                        </table>
+                <!-- TAB 2: ADMIN SUBSCRIPTION PAYMENTS & APPROVALS -->
+                <div class="tab-pane fade" id="tab-saas-approvals" role="tabpanel">
+                    <!-- Subscription Payment History & Approvals Table -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden" id="subscriptionHistoryCard">
+                        <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h5 class="font-weight-bold text-dark mb-0">
+                                    <i class="fas fa-history text-primary me-2"></i> Admin Subscription Payments & Approvals
+                                </h5>
+                                <p class="text-muted small mb-0">
+                                    Review, approve or modify expiration dates (+30 days default) for admin subscription payments
+                                </p>
+                            </div>
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill font-weight-semibold" id="historyCountBadge">0 Payments</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" id="subscriptionHistoryTable">
+                                    <thead class="bg-light text-uppercase text-muted small font-weight-bold" style="font-size: 11px;">
+                                        <tr>
+                                            <th class="ps-4">Sub ID / Date</th>
+                                            <th>Plan & Cycle</th>
+                                            <th>Amount</th>
+                                            <th>Gateway & Contact</th>
+                                            <th>TrxID</th>
+                                            <th>Status</th>
+                                            <th>Expiration Date</th>
+                                            <th class="pe-4 text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="superAdminSubHistoryTbody" class="subscriptionHistoryTbody small">
+                                        <!-- Dynamic rows rendered by script -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1604,87 +1615,108 @@
             function renderSubscriptionHistoryTable() {
                 const history    = window._subPaymentsCache;
 
-                const tbody = document.getElementById('subscriptionHistoryTbody');
-                const countBadge = document.getElementById('historyCountBadge');
-                if (!tbody) return;
+                const tbodies = document.querySelectorAll('.subscriptionHistoryTbody');
+                const countBadges = document.querySelectorAll('#historyCountBadge');
+                if (!tbodies || tbodies.length === 0) return;
 
-                if (countBadge) countBadge.textContent = history.length + ' Payments';
+                countBadges.forEach(b => {
+                    b.textContent = history.length + ' Payments';
+                });
 
-                tbody.innerHTML = '';
+                tbodies.forEach(tbody => {
+                    tbody.innerHTML = '';
 
-                if (history.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fas fa-inbox me-2"></i> No subscription payments recorded yet.</td></tr>`;
-                    return;
-                }
-
-                history.forEach(item => {
-                    const tr = document.createElement('tr');
-
-                    let statusBadgeHTML = '';
-                    if (item.status === 'Approved') {
-                        statusBadgeHTML = `<span class="badge bg-success text-white px-2.5 py-1 rounded-pill"><i class="fas fa-check-circle me-1"></i> Approved</span>`;
-                    } else if (item.status === 'Pending') {
-                        statusBadgeHTML = `<span class="badge bg-warning text-dark px-2.5 py-1 rounded-pill"><i class="fas fa-clock me-1"></i> Pending Approval</span>`;
-                    } else {
-                        statusBadgeHTML = `<span class="badge bg-danger text-white px-2.5 py-1 rounded-pill"><i class="fas fa-times-circle me-1"></i> Rejected</span>`;
+                    if (history.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted"><i class="fas fa-inbox me-2"></i> No subscription payments recorded yet.</td></tr>`;
+                        return;
                     }
 
-                    let actionButtonsHTML = '';
-                    if (window.IS_SUPER_ADMIN) {
-                        if (item.status === 'Pending') {
-                            actionButtonsHTML = `
-                                <div class="d-flex gap-1 justify-content-end">
-                                    <button class="btn btn-sm btn-success rounded-pill px-2 py-1 font-weight-bold" onclick="approveSubscriptionItem('${item.id}')" title="Approve Payment (+30 days default)">
-                                        <i class="fas fa-check me-1"></i> Approve
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1 font-weight-bold" onclick="rejectSubscriptionItem('${item.id}')" title="Reject Payment">
-                                        <i class="fas fa-times me-1"></i> Reject
-                                    </button>
-                                </div>
-                            `;
+                    history.forEach(item => {
+                        const tr = document.createElement('tr');
+
+                        let statusBadgeHTML = '';
+                        if (item.status === 'Approved') {
+                            statusBadgeHTML = `<span class="badge bg-success text-white px-2.5 py-1 rounded-pill"><i class="fas fa-check-circle me-1"></i> Approved</span>`;
+                        } else if (item.status === 'Pending') {
+                            statusBadgeHTML = `<span class="badge bg-warning text-dark px-2.5 py-1 rounded-pill"><i class="fas fa-clock me-1"></i> Pending Approval</span>`;
+                        } else {
+                            statusBadgeHTML = `<span class="badge bg-danger text-white px-2.5 py-1 rounded-pill"><i class="fas fa-times-circle me-1"></i> Rejected</span>`;
+                        }
+
+                        const printUrl = `{{ url('admin/subscription-payments') }}/${item.id}/print-invoice`;
+                        const downloadUrl = `{{ url('admin/subscription-payments') }}/${item.id}/download-invoice`;
+
+                        const invoiceButtonsHTML = `
+                            <a href="${printUrl}" target="_blank" class="btn btn-sm btn-info text-white rounded-pill px-2.5 py-1 font-weight-bold shadow-sm" title="Print Invoice">
+                                <i class="fas fa-print me-1"></i> Print
+                            </a>
+                            <a href="${downloadUrl}" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1 font-weight-bold shadow-sm" title="Download PDF Invoice">
+                                <i class="fas fa-download me-1"></i> PDF
+                            </a>
+                        `;
+
+                        let actionButtonsHTML = '';
+                        if (window.IS_SUPER_ADMIN) {
+                            if (item.status === 'Pending') {
+                                actionButtonsHTML = `
+                                    <div class="d-flex gap-1 justify-content-end align-items-center">
+                                        <button class="btn btn-sm btn-success rounded-pill px-2 py-1 font-weight-bold" onclick="approveSubscriptionItem('${item.id}')" title="Approve Payment (+30 days default)">
+                                            <i class="fas fa-check me-1"></i> Approve
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1 font-weight-bold" onclick="rejectSubscriptionItem('${item.id}')" title="Reject Payment">
+                                            <i class="fas fa-times me-1"></i> Reject
+                                        </button>
+                                        ${invoiceButtonsHTML}
+                                    </div>
+                                `;
+                            } else {
+                                actionButtonsHTML = `
+                                    <div class="d-flex gap-1 justify-content-end align-items-center">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1 font-weight-semibold" onclick="openEditExpiryModal('${item.id}')">
+                                            <i class="fas fa-calendar-alt me-1"></i> Edit Expiry
+                                        </button>
+                                        ${invoiceButtonsHTML}
+                                    </div>
+                                `;
+                            }
                         } else {
                             actionButtonsHTML = `
-                                <div class="d-flex gap-1 justify-content-end">
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1 font-weight-semibold" onclick="openEditExpiryModal('${item.id}')">
-                                        <i class="fas fa-calendar-alt me-1"></i> Edit Expiry
-                                    </button>
+                                <div class="d-flex gap-2 justify-content-end align-items-center">
+                                    <span class="text-muted small">${item.status === 'Pending' ? 'Awaiting Super Admin' : 'Completed'}</span>
+                                    ${invoiceButtonsHTML}
                                 </div>
                             `;
                         }
-                    } else {
-                        actionButtonsHTML = `
-                            <span class="text-muted small">${item.status === 'Pending' ? 'Awaiting Super Admin' : 'Completed'}</span>
+
+                        const expiryDisplay = item.expiryDate 
+                            ? `<span class="fw-bold text-dark"><i class="fas fa-calendar-check text-success me-1"></i>${item.expiryDate}</span>` 
+                            : `<span class="text-warning small italic"><i class="fas fa-hourglass-start me-1"></i>Awaiting Approval</span>`;
+
+                        tr.innerHTML = `
+                            <td class="ps-4">
+                                <strong class="text-dark d-block">${item.id}</strong>
+                                <span class="text-muted small">${item.date}</span>
+                            </td>
+                            <td>
+                                <strong class="text-primary d-block">${item.plan}</strong>
+                                <span class="badge bg-light text-dark border font-weight-normal">${item.cycle}</span>
+                            </td>
+                            <td class="font-weight-bold text-success">
+                                TK ${Number(item.price).toLocaleString()}
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary text-white">${item.gateway}</span>
+                                <span class="d-block text-muted small">${item.phone}</span>
+                            </td>
+                            <td>
+                                <code class="text-dark bg-light px-2 py-1 rounded border">${item.trxId}</code>
+                            </td>
+                            <td>${statusBadgeHTML}</td>
+                            <td>${expiryDisplay}</td>
+                            <td class="pe-4 text-end">${actionButtonsHTML}</td>
                         `;
-                    }
-
-                    const expiryDisplay = item.expiryDate 
-                        ? `<span class="fw-bold text-dark"><i class="fas fa-calendar-check text-success me-1"></i>${item.expiryDate}</span>` 
-                        : `<span class="text-warning small italic"><i class="fas fa-hourglass-start me-1"></i>Awaiting Approval</span>`;
-
-                    tr.innerHTML = `
-                        <td class="ps-4">
-                            <strong class="text-dark d-block">${item.id}</strong>
-                            <span class="text-muted small">${item.date}</span>
-                        </td>
-                        <td>
-                            <strong class="text-primary d-block">${item.plan}</strong>
-                            <span class="badge bg-light text-dark border font-weight-normal">${item.cycle}</span>
-                        </td>
-                        <td class="font-weight-bold text-success">
-                            TK ${Number(item.price).toLocaleString()}
-                        </td>
-                        <td>
-                            <span class="badge bg-secondary text-white">${item.gateway}</span>
-                            <span class="d-block text-muted small">${item.phone}</span>
-                        </td>
-                        <td>
-                            <code class="text-dark bg-light px-2 py-1 rounded border">${item.trxId}</code>
-                        </td>
-                        <td>${statusBadgeHTML}</td>
-                        <td>${expiryDisplay}</td>
-                        <td class="pe-4 text-end">${actionButtonsHTML}</td>
-                    `;
-                    tbody.appendChild(tr);
+                        tbody.appendChild(tr);
+                    });
                 });
 
                 // Update Tab 1 Active Subscription Overview Card for Admin
