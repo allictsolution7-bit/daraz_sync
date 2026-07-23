@@ -38,39 +38,45 @@
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
-            padding: 18px;
+            padding: 16px 14px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            min-height: 84px;
+            box-sizing: border-box;
         }
         .stat-card-modern:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.04);
         }
         .stat-card-modern .stat-icon {
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
+            flex-shrink: 0;
         }
         .stat-card-modern .stat-count {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: #0f172a;
             line-height: 1.1;
         }
         .stat-card-modern .stat-label {
             font-size: 10px;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
             color: #64748b;
             font-weight: 700;
             margin-top: 2px;
+            white-space: nowrap;
         }
         
         /* Color themes for stats cards */
