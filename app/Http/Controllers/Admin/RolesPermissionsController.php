@@ -88,17 +88,29 @@ class RolesPermissionsController extends Controller
         // Roles visible & manageable by the logged in user
         $roles = Role::whereIn('name', $allowedRoleNames)->with('permissions')->get();
 
-        // Users visible & manageable by the logged in user
+        // Users visible & manageable by the logged in user in "Users Access & Permissions" tab
         if ($isSuperAdmin) {
-            $users = User::with(['roles.permissions', 'permissions'])->get();
+            // Super Admin manages ADMINS in this tab: show only users with 'admin' role (excluding Super Admins)
+            $users = User::whereHas('roles', function ($q) {
+                $q->whereIn('name', ['admin', 'Admin']);
+            })->with(['roles.permissions', 'permissions'])->get();
+
+            // Filter out Super Admin users
+            $users = $users->reject(function ($u) {
+                if ($u->id == 1 || !empty($u->is_super_admin)) return true;
+                return $u->roles->contains(function ($r) {
+                    return in_array(strtolower(trim($r->name)), ['super admin', 'super_admin', 'super-admin']);
+                });
+            });
         } else {
-            // Hide Super Admins and Admins from standard Admin view
+            // Standard Admin manages sub-role users (Shop Manager, Vendor, Vendor Staff, etc.)
             $restrictedRoles = ['super admin', 'super_admin', 'Super Admin', 'super-admin', 'admin', 'Admin'];
+
             $users = User::whereHas('roles', function ($q) use ($allowedRoleNames) {
                 $q->whereIn('name', $allowedRoleNames);
             })->orWhereDoesntHave('roles')->with(['roles.permissions', 'permissions'])->get();
 
-            // Filter out any user who has any restricted role
+            // Filter out any user who has any restricted role (Super Admin or Admin)
             $users = $users->reject(function ($u) use ($restrictedRoles) {
                 if ($u->id == 1 || !empty($u->is_super_admin)) return true;
                 return $u->roles->contains(function ($r) use ($restrictedRoles) {
@@ -107,8 +119,15 @@ class RolesPermissionsController extends Controller
             });
         }
 
-        return view('admin.roles_permissions', compact('permissions', 'roles', 'users', 'allowedRoleNames', 'isSuperAdmin'));
+
+
+
+
+        $allUsers = $isSuperAdmin ? User::with(['roles.permissions', 'permissions'])->get() : collect();
+
+        return view('admin.roles_permissions', compact('permissions', 'roles', 'users', 'allUsers', 'allowedRoleNames', 'isSuperAdmin'));
     }
+
 
     // Permission CRUD
     public function storePermission(Request $request)

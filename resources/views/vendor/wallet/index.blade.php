@@ -32,51 +32,52 @@
     </div>
 
     <!-- Stat Cards -->
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-3">
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="d-flex align-items-center justify-content-between">
+            <div class="card border-0 shadow-sm rounded-3 p-2.5 bg-white h-100">
+                <div class="d-flex align-items-center justify-content-between p-2">
                     <div>
-                        <span class="text-muted fw-bold small text-uppercase">Current Balance</span>
-                        <h2 class="fw-extrabold text-primary mb-0 mt-1">৳ {{ number_format($user->wallet_balance ?? 0, 2) }}</h2>
+                        <span class="text-muted fw-bold fs-8 text-uppercase">Current Balance</span>
+                        <h4 class="fw-extrabold text-primary mb-0 mt-1 fs-5">৳ {{ number_format($user->wallet_balance ?? 0, 2) }}</h4>
                     </div>
-                    <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-4">
-                        <i class="fas fa-coins fs-2"></i>
+                    <div class="bg-primary bg-opacity-10 text-primary p-2.5 rounded-3">
+                        <i class="fas fa-coins fs-4"></i>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="d-flex align-items-center justify-content-between">
+            <div class="card border-0 shadow-sm rounded-3 p-2.5 bg-white h-100">
+                <div class="d-flex align-items-center justify-content-between p-2">
                     <div>
-                        <span class="text-muted fw-bold small text-uppercase">Pending Recharge Requests</span>
-                        <h2 class="fw-extrabold text-warning mb-0 mt-1">
+                        <span class="text-muted fw-bold fs-8 text-uppercase">Pending Recharge Requests</span>
+                        <h4 class="fw-extrabold text-warning mb-0 mt-1 fs-5">
                             ৳ {{ number_format($transactions->where('status', 'pending')->where('type', 'recharge_request')->sum('amount'), 2) }}
-                        </h2>
+                        </h4>
                     </div>
-                    <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-4">
-                        <i class="fas fa-clock fs-2"></i>
+                    <div class="bg-warning bg-opacity-10 text-warning p-2.5 rounded-3">
+                        <i class="fas fa-clock fs-4"></i>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
-                <div class="d-flex align-items-center justify-content-between">
+            <div class="card border-0 shadow-sm rounded-3 p-2.5 bg-white h-100">
+                <div class="d-flex align-items-center justify-content-between p-2">
                     <div>
-                        <span class="text-muted fw-bold small text-uppercase">Total Approved Recharges</span>
-                        <h2 class="fw-extrabold text-success mb-0 mt-1">
+                        <span class="text-muted fw-bold fs-8 text-uppercase">Total Approved Recharges</span>
+                        <h4 class="fw-extrabold text-success mb-0 mt-1 fs-5">
                             ৳ {{ number_format($transactions->where('status', 'approved')->whereIn('type', ['recharge_request', 'admin_grant'])->sum('amount'), 2) }}
-                        </h2>
+                        </h4>
                     </div>
-                    <div class="bg-success bg-opacity-10 text-success p-3 rounded-4">
-                        <i class="fas fa-shield-check fs-2"></i>
+                    <div class="bg-success bg-opacity-10 text-success p-2.5 rounded-3">
+                        <i class="fas fa-shield-check fs-4"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- Transaction History Table -->
     <div class="card border-0 shadow-sm rounded-3 bg-white">

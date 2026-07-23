@@ -343,14 +343,16 @@
 
     <ul class="nav nav-tabs nav-tabs-custom mb-3" id="rolesPermissionsTabs" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="roles-tab" data-toggle="tab" data-bs-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="true"><i class="fas fa-user-shield mr-1"></i> Roles</a>
+            <a class="nav-link active" id="roles-tab" data-toggle="tab" data-bs-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="true"><i class="fas fa-user-shield mr-1"></i> Roles Management</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="users-tab" data-toggle="tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false"><i class="fas fa-users mr-1"></i> Users Overview</a>
+            <a class="nav-link" id="users-tab" data-toggle="tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false"><i class="fas fa-users mr-1"></i> {{ $isSuperAdmin ? 'Admins Access & Permissions' : 'Sub-Roles Access & Permissions' }}</a>
         </li>
+        @if($isSuperAdmin)
         <li class="nav-item">
-            <a class="nav-link" id="assign-tab" data-toggle="tab" data-bs-toggle="tab" href="#assign" role="tab" aria-controls="assign" aria-selected="false"><i class="fas fa-user-tag mr-1"></i> Assign Roles</a>
+            <a class="nav-link" id="all-users-tab" data-toggle="tab" data-bs-toggle="tab" href="#all-users" role="tab" aria-controls="all-users" aria-selected="false"><i class="fas fa-globe mr-1"></i> All Database Users</a>
         </li>
+        @endif
     </ul>
 
     <div class="tab-content" id="rolesPermissionsTabsContent">
@@ -358,7 +360,7 @@
         <div class="tab-pane fade show active" id="roles" role="tabpanel" aria-labelledby="roles-tab">
             <div class="rp-card mb-3">
                 <div class="rp-card-header d-flex justify-content-between align-items-center">
-                    <strong>Roles</strong>
+                    <strong>Roles Management</strong>
                     <button class="btn btn-primary btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#addRoleModal" data-bs-target="#addRoleModal"><i class="fas fa-plus"></i> Add Role</button>
                 </div>
                 <div class="table-responsive">
@@ -399,91 +401,42 @@
             </div>
         </div>
 
-        <!-- Users Overview Tab -->
+        <!-- Users Access & Permissions Tab -->
         <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
             <div class="rp-card mb-3">
                 <div class="rp-card-header d-flex align-items-center justify-content-between">
-                    <strong>Users Overview</strong>
-                    <div class="d-flex align-items-center" style="gap:8px;">
-                        <input id="userSearch" type="text" class="form-control form-control-sm" placeholder="Search by email or phone..." style="max-width:280px;">
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <h6 class="mb-2">With roles</h6>
-                            <ul class="list-group" id="usersWithRoles">
-                                @forelse($usersWithRoles as $u)
-                                    <li class="list-group-item d-flex justify-content-between align-items-center user-item" data-email="{{ strtolower($u->email) }}" data-phone="{{ strtolower($u->phone ?? '') }}">
-                                        <div>
-                                            <strong>{{ $u->name }}</strong>
-                                            <div class="small text-muted">{{ $u->email }} @if($u->phone) • {{ $u->phone }} @endif</div>
-                                            <div class="mt-1">
-                                                @foreach($u->roles as $r)
-                                                    <span class="badge bg-primary text-white mr-1">{{ $r->name }}</span>
-                                                @endforeach
-                                                @if($u->permissions->count() > 0)
-                                                    <span class="badge bg-warning text-dark"><i class="fas fa-key mr-1"></i> {{ $u->permissions->count() }} Custom</span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserRolesModal{{ $u->id }}" data-bs-target="#editUserRolesModal{{ $u->id }}"><i class="fas fa-user-tag mr-1"></i> Edit Roles</button>
-                                            <button class="btn btn-sm btn-outline-dark" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserPermissionsModal{{ $u->id }}" data-bs-target="#editUserPermissionsModal{{ $u->id }}"><i class="fas fa-key mr-1"></i> Custom Perms</button>
-                                        </div>
-                                    </li>
-                                @empty
-                                    <li class="list-group-item text-muted">No users have roles yet.</li>
-                                @endforelse
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="mb-2">Latest created (5)</h6>
-                            <ul class="list-group" id="latestUsers">
-                                @forelse($latestUsers as $u)
-                                    <li class="list-group-item d-flex justify-content-between align-items-center user-item" data-email="{{ strtolower($u->email) }}" data-phone="{{ strtolower($u->phone ?? '') }}">
-                                        <div>
-                                            <strong>{{ $u->name }}</strong>
-                                            <div class="small text-muted">{{ $u->email }} @if($u->phone) • {{ $u->phone }} @endif</div>
-                                        </div>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserRolesModal{{ $u->id }}" data-bs-target="#editUserRolesModal{{ $u->id }}"><i class="fas fa-user-tag mr-1"></i> Assign Roles</button>
-                                            <button class="btn btn-sm btn-outline-dark" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserPermissionsModal{{ $u->id }}" data-bs-target="#editUserPermissionsModal{{ $u->id }}"><i class="fas fa-key mr-1"></i> Custom Perms</button>
-                                        </div>
-                                    </li>
-                                @empty
-                                    <li class="list-group-item text-muted">No users found.</li>
-                                @endforelse
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    <strong>{{ $isSuperAdmin ? 'Admins List (Manageable by Super Admin)' : 'Sub-Roles Users List (Shop Manager, Vendor, Vendor Staff)' }}</strong>
 
-        <!-- Assign Roles Tab -->
-        <div class="tab-pane fade" id="assign" role="tabpanel" aria-labelledby="assign-tab">
-            <div class="rp-card mb-3">
-                <div class="rp-card-header"><strong>Assign Roles & Permissions to Users</strong></div>
-                <ul class="list-group list-group-flush">
-                    @forelse($users as $user)
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                    <div class="d-flex align-items-center" style="gap:8px;">
+                        <input id="userSearch" type="text" class="form-control form-control-sm" placeholder="Search by name, email, or phone..." style="max-width:300px;">
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush" id="allUsersList">
+                    @forelse($users as $u)
+                        <li class="list-group-item d-flex justify-content-between align-items-center user-item" data-name="{{ strtolower($u->name) }}" data-email="{{ strtolower($u->email) }}" data-phone="{{ strtolower($u->phone ?? '') }}">
                             <div>
-                                <strong>{{ $user->name }}</strong> <span class="text-muted small">({{ $user->email }})</span><br>
+                                <strong>{{ $u->name }}</strong> 
+                                <span class="text-muted small">({{ $u->email }} @if($u->phone) • {{ $u->phone }} @endif)</span><br>
                                 <span class="small">Roles:
-                                    @forelse ($user->roles as $role)
-                                        <span class="badge bg-primary rounded-pill">{{ $role->name }}</span>
+                                    @forelse ($u->roles as $role)
+                                        <span class="badge bg-primary text-white rounded-pill mr-1">{{ $role->name }}</span>
                                     @empty
-                                        <span class="badge bg-secondary rounded-pill">None</span>
+                                        <span class="badge bg-secondary rounded-pill">No Role</span>
                                     @endforelse
                                 </span>
-                                @if($user->permissions->count() > 0)
-                                    <span class="badge bg-warning text-dark ml-2 rounded-pill"><i class="fas fa-key mr-1"></i> {{ $user->permissions->count() }} Custom Permissions</span>
+                                @if($u->permissions->count() > 0)
+                                    <span class="badge bg-warning text-dark ml-2 rounded-pill"><i class="fas fa-key mr-1"></i> {{ $u->permissions->count() }} Custom Permissions</span>
                                 @endif
                             </div>
                             <div class="btn-group">
-                                <button class="btn btn-primary btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserRolesModal{{ $user->id }}" data-bs-target="#editUserRolesModal{{ $user->id }}"><i class="fas fa-user-tag mr-1"></i> Edit Roles</button>
-                                <button class="btn btn-outline-dark btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserPermissionsModal{{ $user->id }}" data-bs-target="#editUserPermissionsModal{{ $user->id }}"><i class="fas fa-key mr-1"></i> Custom Permissions</button>
+                                @if(Route::has('admin.users.edit'))
+                                    <a href="{{ route('admin.users.edit', ['id' => $u->id]) }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-user-edit mr-1"></i> Edit User</a>
+                                @elseif(Route::has('users.edit'))
+                                    <a href="{{ route('users.edit', ['id' => $u->id]) }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-user-edit mr-1"></i> Edit User</a>
+                                @endif
+                                <button class="btn btn-primary btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserRolesModal{{ $u->id }}" data-bs-target="#editUserRolesModal{{ $u->id }}"><i class="fas fa-user-tag mr-1"></i> Edit Roles</button>
+                                <button class="btn btn-outline-dark btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserPermissionsModal{{ $u->id }}" data-bs-target="#editUserPermissionsModal{{ $u->id }}"><i class="fas fa-key mr-1"></i> Custom Permissions</button>
                             </div>
                         </li>
                     @empty
@@ -492,7 +445,55 @@
                 </ul>
             </div>
         </div>
+
+        @if($isSuperAdmin)
+        <!-- All Database Users Tab (Super Admin Only) -->
+        <div class="tab-pane fade" id="all-users" role="tabpanel" aria-labelledby="all-users-tab">
+            <div class="rp-card mb-3">
+                <div class="rp-card-header d-flex align-items-center justify-content-between">
+                    <strong>All System Users in Database ({{ $allUsers->count() }})</strong>
+                    <div class="d-flex align-items-center" style="gap:8px;">
+                        <input id="allUserSearch" type="text" class="form-control form-control-sm" placeholder="Search by name, email, or phone..." style="max-width:300px;">
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush" id="globalUsersList">
+                    @forelse($allUsers as $u)
+                        <li class="list-group-item d-flex justify-content-between align-items-center user-item" data-name="{{ strtolower($u->name) }}" data-email="{{ strtolower($u->email) }}" data-phone="{{ strtolower($u->phone ?? '') }}">
+                            <div>
+                                <strong>{{ $u->name }}</strong> 
+                                <span class="text-muted small">({{ $u->email }} @if($u->phone) • {{ $u->phone }} @endif)</span><br>
+                                <span class="small">Roles:
+                                    @forelse ($u->roles as $role)
+                                        <span class="badge bg-primary text-white rounded-pill mr-1">{{ $role->name }}</span>
+                                    @empty
+                                        <span class="badge bg-secondary rounded-pill">No Role</span>
+                                    @endforelse
+                                </span>
+                                @if($u->permissions->count() > 0)
+                                    <span class="badge bg-warning text-dark ml-2 rounded-pill"><i class="fas fa-key mr-1"></i> {{ $u->permissions->count() }} Custom Permissions</span>
+                                @endif
+                            </div>
+                            <div class="btn-group">
+                                @if(Route::has('admin.users.edit'))
+                                    <a href="{{ route('admin.users.edit', ['id' => $u->id]) }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-user-edit mr-1"></i> Edit User</a>
+                                @elseif(Route::has('users.edit'))
+                                    <a href="{{ route('users.edit', ['id' => $u->id]) }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-user-edit mr-1"></i> Edit User</a>
+                                @endif
+                                <button class="btn btn-primary btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserRolesModal{{ $u->id }}" data-bs-target="#editUserRolesModal{{ $u->id }}"><i class="fas fa-user-tag mr-1"></i> Edit Roles</button>
+                                <button class="btn btn-outline-dark btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editUserPermissionsModal{{ $u->id }}" data-bs-target="#editUserPermissionsModal{{ $u->id }}"><i class="fas fa-key mr-1"></i> Custom Permissions</button>
+                            </div>
+                        </li>
+
+                    @empty
+                        <li class="list-group-item text-muted">No users found in database.</li>
+                    @endforelse
+                </ul>
+            </div>
+        </div>
+        @endif
     </div>
+
+
 
     <!-- ALL ROLE MODALS -->
     @foreach($roles as $role)
@@ -589,7 +590,9 @@
     @endforeach
 
     <!-- ALL USER MODALS -->
-    @foreach($users as $user)
+    @php $targetModalUsers = ($isSuperAdmin && isset($allUsers) && $allUsers->count() > 0) ? $allUsers : $users; @endphp
+    @foreach($targetModalUsers as $user)
+
         <!-- Edit User Roles Modal -->
         <div class="modal fade" id="editUserRolesModal{{ $user->id }}" tabindex="-1">
             <div class="modal-dialog"><div class="modal-content">
@@ -869,15 +872,19 @@
         });
     });
 
-    // User search by email or phone across both lists
+    // User search by name, email or phone across user lists
     document.addEventListener('input', function(e){
-        if (e.target.id !== 'userSearch') return;
+        if (e.target.id !== 'userSearch' && e.target.id !== 'allUserSearch') return;
+        const targetListId = e.target.id === 'allUserSearch' ? '#globalUsersList' : '#allUsersList';
         const term = e.target.value.trim().toLowerCase();
-        document.querySelectorAll('#usersWithRoles .user-item, #latestUsers .user-item').forEach(li => {
+        document.querySelectorAll(targetListId + ' .user-item').forEach(li => {
+            const name = (li.getAttribute('data-name') || '').toLowerCase();
             const email = (li.getAttribute('data-email') || '').toLowerCase();
             const phone = (li.getAttribute('data-phone') || '').toLowerCase();
-            li.style.display = (email.includes(term) || phone.includes(term)) ? '' : 'none';
+            li.style.display = (name.includes(term) || email.includes(term) || phone.includes(term)) ? '' : 'none';
         });
     });
+
+
 </script>
 @endpush

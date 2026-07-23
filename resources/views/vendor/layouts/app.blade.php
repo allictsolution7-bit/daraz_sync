@@ -19,7 +19,7 @@
     
     <style>
         :root {
-            --v-sidebar-width: 260px;
+            --v-sidebar-width: 230px;
             --v-primary: #4f46e5;
             --v-primary-dark: #3730a3;
             --v-bg: #f8fafc;
@@ -27,7 +27,7 @@
             --v-text-main: #0f172a;
             --v-text-muted: #64748b;
             --v-border: #e2e8f0;
-            --v-radius: 16px;
+            --v-radius: 12px;
         }
 
         body {
@@ -36,7 +36,16 @@
             color: var(--v-text-main);
             min-height: 100vh;
             overflow-x: hidden;
+            font-size: 0.875rem;
         }
+
+        /* Compact Typography Overrides */
+        h1, .h1 { font-size: 1.4rem !important; }
+        h2, .h2 { font-size: 1.25rem !important; }
+        h3, .h3 { font-size: 1.1rem !important; }
+        h4, .h4 { font-size: 1rem !important; }
+        h5, .h5 { font-size: 0.9rem !important; }
+        h6, .h6 { font-size: 0.825rem !important; }
 
         /* Sidebar Styling */
         .vendor-sidebar {
@@ -55,7 +64,7 @@
         }
 
         .vendor-sidebar-brand {
-            padding: 1.25rem 1.5rem;
+            padding: 0.85rem 1.15rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
@@ -63,37 +72,37 @@
         }
 
         .vendor-sidebar-nav {
-            padding: 1rem 0.85rem;
+            padding: 0.65rem 0.65rem;
             flex-grow: 1;
             overflow-y: auto;
         }
 
         .vendor-nav-header {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: rgba(255, 255, 255, 0.45);
-            padding: 0.75rem 1rem 0.35rem 1rem;
+            padding: 0.5rem 0.85rem 0.25rem 0.85rem;
         }
 
         .vendor-sidebar-link {
             color: rgba(255, 255, 255, 0.75);
             font-weight: 600;
-            font-size: 0.9rem;
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
+            font-size: 0.825rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 10px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             text-decoration: none;
             transition: all 0.2s ease;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .vendor-sidebar-link i {
-            font-size: 1.1rem;
-            width: 22px;
+            font-size: 0.95rem;
+            width: 18px;
             text-align: center;
         }
 
@@ -119,10 +128,10 @@
         }
 
         .vendor-topbar {
-            height: 72px;
+            height: 56px;
             background: #ffffff;
             border-bottom: 1px solid var(--v-border);
-            padding: 0 1.75rem;
+            padding: 0 1.25rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -137,17 +146,19 @@
             background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
             border: 1px solid #c7d2fe;
             border-radius: 50px;
-            padding: 4px 6px 4px 16px;
+            padding: 3px 4px 3px 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+            font-size: 0.8rem;
         }
 
         .wallet-balance-amount {
             font-weight: 800;
-            font-size: 1.05rem;
+            font-size: 0.9rem;
             color: #312e81;
         }
+
 
         /* Cards & Styling */
         .v-card {

@@ -18,35 +18,35 @@
     .withdrawal-header-card {
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(12px);
-        padding: 1.25rem 1.75rem;
-        border-radius: 20px;
+        padding: 0.85rem 1.25rem;
+        border-radius: 14px;
         border: 1px solid rgba(226, 232, 240, 0.8);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
     }
 
     .metric-card {
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(226, 232, 240, 0.8);
-        border-radius: 20px;
-        padding: 1.5rem;
+        border-radius: 14px;
+        padding: 1rem 1.25rem;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.03);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
     }
 
     .metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.07);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
     }
 
     .metric-icon-box {
-        width: 54px;
-        height: 54px;
-        border-radius: 16px;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.15rem;
     }
 
     .metric-icon-box.balance {
@@ -68,29 +68,29 @@
         background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(226, 232, 240, 0.8);
-        border-radius: 24px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
     }
 
     .v-card .card-header {
         background: rgba(248, 250, 252, 0.7);
         border-bottom: 1px solid #e2e8f0;
-        padding: 1.25rem 1.5rem;
-        border-top-left-radius: 24px;
-        border-top-right-radius: 24px;
+        padding: 0.75rem 1rem;
+        border-top-left-radius: 14px;
+        border-top-right-radius: 14px;
     }
 
     .form-control, .form-select {
-        border-radius: 12px;
+        border-radius: 10px;
         border: 1.5px solid #e2e8f0;
-        padding: 0.65rem 1rem;
+        padding: 0.45rem 0.85rem;
         font-weight: 500;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     .form-control:focus, .form-select:focus {
         border-color: #6366f1;
-        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     }
 
     .table-custom {
@@ -102,17 +102,17 @@
         color: #475569;
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         letter-spacing: 0.05em;
         border-bottom: 2px solid #e2e8f0;
-        padding: 1rem 1.25rem;
+        padding: 0.65rem 0.85rem;
     }
 
     .table-custom tbody td {
-        padding: 1rem 1.25rem;
+        padding: 0.65rem 0.85rem;
         vertical-align: middle;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 0.9rem;
+        font-size: 0.825rem;
     }
 
     .table-custom tbody tr:hover {
@@ -121,13 +121,13 @@
 
     /* Status Badges */
     .badge-status {
-        padding: 6px 12px;
-        border-radius: 20px;
+        padding: 4px 10px;
+        border-radius: 16px;
         font-weight: 700;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 4px;
     }
 
     .badge-status.pending { background: rgba(245, 158, 11, 0.1); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.2); }
@@ -139,35 +139,35 @@
 @endpush
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="container-fluid py-3">
     <!-- Header Card -->
-    <div class="d-flex justify-content-between align-items-center mb-4 withdrawal-header-card">
+    <div class="d-flex justify-content-between align-items-center mb-3 withdrawal-header-card">
         <div class="d-flex align-items-center gap-3">
             <div class="metric-icon-box balance">
                 <i class="fas fa-hand-holding-usd"></i>
             </div>
             <div>
-                <h4 class="fw-800 mb-0 text-dark">Payout & Withdrawal Management</h4>
-                <p class="text-muted small mb-0">Request payout funds and view your withdrawal transaction history.</p>
+                <h5 class="fw-800 mb-0 text-dark">Payout & Withdrawal Management</h5>
+                <p class="text-muted small mb-0 fs-8">Request payout funds and view your withdrawal transaction history.</p>
             </div>
         </div>
         <div>
-            <a href="{{ route('vendor.orders.earnings') }}" class="btn btn-outline-secondary rounded-3 px-3 fw-bold btn-sm">
+            <a href="{{ route('vendor.orders.earnings') }}" class="btn btn-outline-secondary rounded-3 px-3 fw-bold btn-sm fs-8">
                 <i class="fas fa-chart-line me-1"></i> Earnings Summary
             </a>
         </div>
     </div>
 
     <!-- Balance Summary Metrics -->
-    <div class="row g-4 mb-4">
+    <div class="row g-3 mb-3">
         <!-- Current Balance -->
         <div class="col-md-4">
-            <div class="metric-card h-100" style="border-left: 4px solid #6366f1;">
+            <div class="metric-card h-100" style="border-left: 3px solid #6366f1;">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="text-muted fw-bold text-uppercase fs-7 tracking-wider d-block mb-1">Available Balance</span>
-                        <h2 class="fw-800 text-dark mb-0">৳{{ number_format($vendorService->getCurrentBalance(auth()->id()), 2) }}</h2>
-                        <small class="text-muted">Ready for withdrawal</small>
+                        <span class="text-muted fw-bold text-uppercase fs-8 tracking-wider d-block mb-1">Available Balance</span>
+                        <h4 class="fw-800 text-dark mb-0 fs-5">৳{{ number_format($vendorService->getCurrentBalance(auth()->id()), 2) }}</h4>
+                        <small class="text-muted fs-8">Ready for withdrawal</small>
                     </div>
                     <div class="metric-icon-box balance">
                         <i class="fas fa-wallet"></i>
@@ -178,12 +178,12 @@
 
         <!-- Pending Earnings -->
         <div class="col-md-4">
-            <div class="metric-card h-100" style="border-left: 4px solid #f59e0b;">
+            <div class="metric-card h-100" style="border-left: 3px solid #f59e0b;">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="text-muted fw-bold text-uppercase fs-7 tracking-wider d-block mb-1">Pending Earnings</span>
-                        <h2 class="fw-800 text-warning mb-0">৳{{ number_format($vendorService->getPendingEarnings(auth()->id()), 2) }}</h2>
-                        <small class="text-muted">Uncleared / pending order funds</small>
+                        <span class="text-muted fw-bold text-uppercase fs-8 tracking-wider d-block mb-1">Pending Earnings</span>
+                        <h4 class="fw-800 text-warning mb-0 fs-5">৳{{ number_format($vendorService->getPendingEarnings(auth()->id()), 2) }}</h4>
+                        <small class="text-muted fs-8">Uncleared / pending order funds</small>
                     </div>
                     <div class="metric-icon-box pending">
                         <i class="fas fa-hourglass-half"></i>
@@ -194,12 +194,12 @@
 
         <!-- Total Earnings -->
         <div class="col-md-4">
-            <div class="metric-card h-100" style="border-left: 4px solid #10b981;">
+            <div class="metric-card h-100" style="border-left: 3px solid #10b981;">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="text-muted fw-bold text-uppercase fs-7 tracking-wider d-block mb-1">Lifetime Earnings</span>
-                        <h2 class="fw-800 text-success mb-0">৳{{ number_format($vendorService->getTotalEarnings(auth()->id()), 2) }}</h2>
-                        <small class="text-muted">Total earned to date</small>
+                        <span class="text-muted fw-bold text-uppercase fs-8 tracking-wider d-block mb-1">Lifetime Earnings</span>
+                        <h4 class="fw-800 text-success mb-0 fs-5">৳{{ number_format($vendorService->getTotalEarnings(auth()->id()), 2) }}</h4>
+                        <small class="text-muted fs-8">Total earned to date</small>
                     </div>
                     <div class="metric-icon-box total">
                         <i class="fas fa-chart-bar"></i>
@@ -208,6 +208,7 @@
             </div>
         </div>
     </div>
+
 
     <div class="row g-4">
         <!-- Left Column: Payout Request Form & Settings -->
