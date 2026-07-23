@@ -849,7 +849,7 @@
         $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/import-woo*') || request()->routeIs('admin.telegram-settings.*') || request()->is('admin/event-queue*');
         $securityTrustActive = request()->is('admin/trust-scanner*') || request()->is('admin/trust-shield*') || request()->is('admin/snapshots*');
         $contentPagesActive = request()->is('admin/hero-banners*') || request()->is('admin/site-pages*') || request()->is('admin/nav-builder*') || request()->is('admin/articles*') || request()->is('admin/article-topics*') || request()->is('admin/article-subtopics*') || request()->is('admin/comments*');
-        $vendorsActive = request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-settings*') || request()->is('admin/partners*') || request()->is('admin/partner-items*') || request()->is('admin/partner-payouts*') || request()->is('admin/partner-config*');
+        $vendorsActive = request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-payments*') || request()->is('admin/vendor-settings*') || request()->is('admin/partners*') || request()->is('admin/partner-items*') || request()->is('admin/partner-payouts*') || request()->is('admin/partner-config*');
         $controlSystemActive = request()->is('admin/team-members*') || request()->routeIs('admin.roles_permissions.*') || request()->is('admin/extensions*') || request()->is('admin/config*') || request()->is('admin/social-links*') || request()->is('admin/inquiries*') || request()->routeIs('admin.subscriptions.index');
         @endphp
 
@@ -1834,7 +1834,22 @@
                                     </a>
                                 </li>
                                 @endif
-                                @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('admin.withdrawals.view'))
+                                 @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('admin.vendors.view'))
+                                 <li class="{{ request()->routeIs('admin.vendor-payments.*') ? 'active' : '' }}">
+                                     <a href="{{ route('admin.vendor-payments.index') }}">
+                                         <span class="menu-content d-flex align-items-center justify-content-between">
+                                             <span><i class="fas fa-wallet text-warning"></i> Vendor Payments</span>
+                                             @php
+                                                 $unseenCount = \App\Models\VendorWalletTransaction::where('is_seen', false)->count();
+                                             @endphp
+                                             @if($unseenCount > 0)
+                                                 <span class="badge bg-danger rounded-pill ms-2">{{ $unseenCount }}</span>
+                                             @endif
+                                         </span>
+                                     </a>
+                                 </li>
+                                 @endif
+                                 @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->can('admin.withdrawals.view'))
                                 <li
                                     class="{{ request()->routeIs('admin.vendor-withdrawals.index') || request()->routeIs('admin.vendor-withdrawals.show') ? 'active' : '' }}">
                                     <a href="{{ route('admin.vendor-withdrawals.index') }}">

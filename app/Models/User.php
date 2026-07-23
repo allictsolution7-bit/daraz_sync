@@ -85,6 +85,7 @@ class User extends Authenticatable
         'otp_code',
         'otp_expires_at',
         'otp_verified',
+        'wallet_balance',
     ];
 
     /**

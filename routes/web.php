@@ -827,12 +827,30 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(
         Route::get('/{withdrawal}', [VendorWithdrawalController::class, 'show'])->name('show');
         Route::put('/{withdrawal}/cancel', [VendorWithdrawalController::class, 'cancel'])->name('cancel');
     });
+
+    // Wallet & Payments
+    Route::prefix('wallet')->name('wallet.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Vendor\VendorWalletController::class, 'index'])->name('index');
+        Route::post('/recharge', [\App\Http\Controllers\Vendor\VendorWalletController::class, 'recharge'])->name('recharge');
+        Route::post('/transfer', [\App\Http\Controllers\Vendor\VendorWalletController::class, 'transfer'])->name('transfer');
+    });
 });
 
 // ==========================================
 // ADMIN VENDOR MANAGEMENT ROUTES
 // ==========================================
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:admin|super_admin|super admin'])->group(function () {
+
+    // Vendor Payments & Wallet Management
+    Route::prefix('vendor-payments')->name('vendor-payments.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminVendorPaymentController::class, 'index'])->name('index');
+        Route::post('/{id}/approve', [\App\Http\Controllers\Admin\AdminVendorPaymentController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [\App\Http\Controllers\Admin\AdminVendorPaymentController::class, 'reject'])->name('reject');
+        Route::post('/grant-fund', [\App\Http\Controllers\Admin\AdminVendorPaymentController::class, 'grantFund'])->name('grant-fund');
+        Route::post('/bulk-delete', [\App\Http\Controllers\Admin\AdminVendorPaymentController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::get('/export-csv', [\App\Http\Controllers\Admin\AdminVendorPaymentController::class, 'exportCsv'])->name('export-csv');
+        Route::get('/{id}/pdf', [\App\Http\Controllers\Admin\AdminVendorPaymentController::class, 'downloadPdf'])->name('download-pdf');
+    });
 
     // Vendor Management
     Route::resource('partners', AdminVendorController::class)->parameters(['partners' => 'vendor'])->names(['index' => 'vendors.index', 'create' => 'vendors.create', 'store' => 'vendors.store', 'show' => 'vendors.show', 'edit' => 'vendors.edit', 'update' => 'vendors.update', 'destroy' => 'vendors.destroy']);

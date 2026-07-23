@@ -19,9 +19,9 @@
     
     <style>
         :root {
+            --v-sidebar-width: 260px;
             --v-primary: #4f46e5;
-            --v-primary-dark: #4338ca;
-            --v-secondary: #06b6d4;
+            --v-primary-dark: #3730a3;
             --v-bg: #f8fafc;
             --v-card-bg: #ffffff;
             --v-text-main: #0f172a;
@@ -35,273 +35,315 @@
             background-color: var(--v-bg);
             color: var(--v-text-main);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Top Bar Navigation */
-        .vendor-navbar {
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
-            box-shadow: 0 10px 30px rgba(30, 27, 75, 0.25);
-            padding: 0.75rem 1.5rem;
+        /* Sidebar Styling */
+        .vendor-sidebar {
+            width: var(--v-sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1040;
+            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
+            color: #ffffff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
         }
 
-        .vendor-brand {
-            font-weight: 800;
-            font-size: 1.25rem;
-            color: #ffffff !important;
-            letter-spacing: -0.025em;
+        .vendor-sidebar-brand {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
         }
 
-        .vendor-brand-badge {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: #fff;
-            font-size: 0.65rem;
+        .vendor-sidebar-nav {
+            padding: 1rem 0.85rem;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .vendor-nav-header {
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
-            padding: 3px 8px;
-            border-radius: 20px;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.45);
+            padding: 0.75rem 1rem 0.35rem 1rem;
         }
 
-        .vendor-nav-link {
-            color: rgba(255, 255, 255, 0.8) !important;
+        .vendor-sidebar-link {
+            color: rgba(255, 255, 255, 0.75);
             font-weight: 600;
             font-size: 0.9rem;
-            padding: 0.6rem 1rem !important;
-            border-radius: 10px;
-            transition: all 0.2s ease;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .vendor-nav-link:hover {
-            color: #ffffff !important;
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .vendor-nav-link.active {
-            color: #ffffff !important;
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
-        }
-
-        /* User Profile Menu */
-        .user-dropdown-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff !important;
-            border-radius: 12px;
-            padding: 6px 14px;
-            font-weight: 600;
-            font-size: 0.875rem;
+            gap: 12px;
+            text-decoration: none;
             transition: all 0.2s ease;
+            margin-bottom: 4px;
         }
 
-        .user-dropdown-btn:hover, .user-dropdown-btn:focus {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+        .vendor-sidebar-link i {
+            font-size: 1.1rem;
+            width: 22px;
+            text-align: center;
         }
 
-        .dropdown-menu-custom {
-            border-radius: 14px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            padding: 8px;
+        .vendor-sidebar-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
         }
 
-        .dropdown-menu-custom .dropdown-item {
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.875rem;
-            padding: 8px 12px;
-            transition: all 0.15s ease;
+        .vendor-sidebar-link.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--v-primary) 0%, var(--v-primary-dark) 100%);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
         }
 
-        /* Cards & Components */
+        /* Top Header Navigation */
+        .vendor-main-wrapper {
+            margin-left: var(--v-sidebar-width);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vendor-topbar {
+            height: 72px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--v-border);
+            padding: 0 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        /* Wallet Header Widget */
+        .wallet-pill {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border: 1px solid #c7d2fe;
+            border-radius: 50px;
+            padding: 4px 6px 4px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-balance-amount {
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: #312e81;
+        }
+
+        /* Cards & Styling */
         .v-card {
             background: var(--v-card-bg);
             border-radius: var(--v-radius);
             border: 1px solid var(--v-border);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .v-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-        }
+        /* Badges */
+        .badge-approved { background: #dcfce7; color: #15803d; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
+        .badge-pending { background: #fef3c7; color: #b45309; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
+        .badge-rejected { background: #fee2e2; color: #b91c1c; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
 
-        /* Stat Icon Badges */
-        .stat-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .stat-icon.primary { background: rgba(79, 70, 229, 0.1); color: #4f46e5; }
-        .stat-icon.info { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
-        .stat-icon.success { background: rgba(16, 185, 129, 0.1); color: #059669; }
-        .stat-icon.warning { background: rgba(245, 158, 11, 0.1); color: #d97706; }
-
-        /* Custom Badges */
-        .badge-approved { background: #dcfce7; color: #15803d; font-weight: 600; padding: 5px 10px; border-radius: 20px; }
-        .badge-pending { background: #fef3c7; color: #b45309; font-weight: 600; padding: 5px 10px; border-radius: 20px; }
-        .badge-rejected { background: #fee2e2; color: #b91c1c; font-weight: 600; padding: 5px 10px; border-radius: 20px; }
-
-        /* Welcome Hero Banner */
-        .hero-banner {
-            background: linear-gradient(135deg, #312e81 0%, #4338ca 60%, #6366f1 100%);
-            border-radius: 20px;
-            padding: 2rem 2.5rem;
-            color: #ffffff;
-            box-shadow: 0 10px 25px rgba(67, 56, 202, 0.25);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-banner::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%;
-            pointer-events: none;
+        @media (max-width: 991.98px) {
+            .vendor-sidebar {
+                margin-left: calc(-1 * var(--v-sidebar-width));
+            }
+            .vendor-sidebar.show {
+                margin-left: 0;
+            }
+            .vendor-main-wrapper {
+                margin-left: 0;
+            }
         }
     </style>
-    
+
     @stack('styles')
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg vendor-navbar sticky-top">
-        <div class="container-fluid px-lg-4">
-            <a class="vendor-brand me-4 text-decoration-none" href="{{ route('vendor.dashboard') }}">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="fas fa-store text-warning fs-4"></i>
-                    <span>{{ setting('general', 'site_name', 'Bazarei') }}</span>
-                </div>
-                <span class="vendor-brand-badge">Vendor Hub</span>
-            </a>
-            
-            <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#vendorNavbarContent">
-                <i class="fas fa-bars fs-4"></i>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="vendorNavbarContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
-                    <li class="nav-item">
-                        <a class="vendor-nav-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}" href="{{ route('vendor.dashboard') }}">
-                            <i class="fas fa-chart-line"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="vendor-nav-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}" href="{{ route('vendor.products.index') }}">
-                            <i class="fas fa-box"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="vendor-nav-link {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}" href="{{ route('vendor.orders.index') }}">
-                            <i class="fas fa-shopping-bag"></i> Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="vendor-nav-link {{ request()->routeIs('vendor.withdrawals.*') ? 'active' : '' }}" href="{{ route('vendor.withdrawals.index') }}">
-                            <i class="fas fa-wallet"></i> Withdrawals
-                        </a>
-                    </li>
-                </ul>
-                
-                <div class="d-flex align-items-center gap-3">
-                    <a href="{{ url('/') }}" target="_blank" class="btn btn-sm text-white bg-white bg-opacity-10 border-0 rounded-pill px-3 py-2 fw-semibold d-none d-md-inline-flex align-items-center gap-2" style="backdrop-filter: blur(5px);">
-                        <i class="fas fa-globe text-warning"></i> Storefront
-                    </a>
 
-                    <div class="dropdown">
-                        <button class="btn user-dropdown-btn dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 0.8rem;">
-                                {{ strtoupper(substr(auth()->user()->name ?? 'V', 0, 1)) }}
-                            </div>
-                            <span class="d-none d-sm-inline">{{ auth()->user()->name }}</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom mt-2">
-                            <li class="px-3 py-2 border-bottom mb-1">
-                                <div class="fw-bold text-dark fs-6">{{ auth()->user()->name }}</div>
-                                <small class="text-muted">{{ auth()->user()->email }}</small>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('vendor.profile') }}">
-                                    <i class="fas fa-user-gear text-primary"></i> Store Settings
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('account.show') }}">
-                                    <i class="fas fa-user-circle text-info"></i> Customer Profile
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li>
-                                <form action="{{ route('logout') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item text-danger d-flex align-items-center gap-2">
-                                        <i class="fas fa-sign-out-alt"></i> Logout Session
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
+    <!-- Sidebar Navigation -->
+    <aside class="vendor-sidebar" id="vendorSidebar">
+        <div class="vendor-sidebar-brand">
+            <a href="{{ route('vendor.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2">
+                <i class="fas fa-store text-warning fs-3"></i>
+                <span class="fw-bold text-white fs-5">{{ setting('general', 'site_name', 'Bazarei') }}</span>
+            </a>
+            <span class="badge bg-warning text-dark fw-bold px-2 py-1" style="font-size: 0.65rem;">VENDOR</span>
+        </div>
+
+        <div class="vendor-sidebar-nav">
+            <div class="vendor-nav-header">Main Menu</div>
+            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}" href="{{ route('vendor.dashboard') }}">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+
+            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}" href="{{ route('vendor.products.index') }}">
+                <i class="fas fa-box"></i> Products
+            </a>
+
+            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}" href="{{ route('vendor.orders.index') }}">
+                <i class="fas fa-shopping-cart"></i> Orders
+            </a>
+
+            <div class="vendor-nav-header">Finance & Wallet</div>
+            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.wallet.*') ? 'active' : '' }}" href="{{ route('vendor.wallet.index') }}">
+                <i class="fas fa-wallet text-warning"></i> My Wallet
+            </a>
+
+            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.withdrawals.*') ? 'active' : '' }}" href="{{ route('vendor.withdrawals.index') }}">
+                <i class="fas fa-hand-holding-dollar"></i> Withdrawals
+            </a>
+
+            <div class="vendor-nav-header">Account & Setup</div>
+            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.profile') ? 'active' : '' }}" href="{{ route('vendor.profile') }}">
+                <i class="fas fa-cog"></i> Store Settings
+            </a>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="p-3 border-top border-white border-opacity-10">
+            <div class="d-flex align-items-center gap-3 text-white-50">
+                <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px;">
+                    {{ strtoupper(substr(auth()->user()->name ?? 'V', 0, 1)) }}
+                </div>
+                <div class="overflow-hidden">
+                    <div class="text-white fw-semibold fs-6 text-truncate">{{ auth()->user()->name }}</div>
+                    <small class="text-white-50 d-block text-truncate" style="font-size: 0.75rem;">{{ auth()->user()->email }}</small>
                 </div>
             </div>
         </div>
-    </nav>
+    </aside>
 
-    <!-- Main Container -->
-    <main class="container-fluid px-lg-4 py-4">
-        @if(!auth()->user()->vendorSettings || !auth()->user()->vendorSettings->is_verified)
-            <div class="alert alert-warning border-0 shadow-sm rounded-4 d-flex align-items-center gap-3 p-3 mb-4" role="alert">
-                <div class="bg-warning bg-opacity-20 p-2 rounded-circle text-dark">
-                    <i class="fas fa-shield-halved fs-4 text-warning"></i>
+    <!-- Main Content Area -->
+    <div class="vendor-main-wrapper">
+        <!-- Topbar Header -->
+        <header class="vendor-topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-light d-lg-none" type="button" id="sidebarToggleBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h5 class="fw-bold mb-0 text-dark d-none d-sm-block">@yield('title', 'Vendor Control Hub')</h5>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <!-- Topbar Wallet Widget -->
+                <div class="wallet-pill shadow-sm">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-wallet text-primary fs-5"></i>
+                        <div>
+                            <small class="text-muted d-block lh-1" style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase;">Wallet Balance</small>
+                            <span class="wallet-balance-amount">৳ {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</span>
+                        </div>
+                    </div>
+                    <a href="{{ route('vendor.wallet.index') }}" class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold fs-7 d-flex align-items-center gap-1 shadow-sm">
+                        <i class="fas fa-plus-circle"></i> Recharge
+                    </a>
                 </div>
-                <div>
-                    <h6 class="mb-0 fw-bold text-dark">Verification Pending</h6>
-                    <small class="text-muted">Your vendor account is under review by administrator. Some functionality may be restricted until verified.</small>
+
+                <!-- Storefront Link -->
+                <a href="{{ url('/') }}" target="_blank" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="View Storefront">
+                    <i class="fas fa-globe text-secondary"></i>
+                </a>
+
+                <!-- User Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-light border rounded-pill px-3 py-1 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle text-primary fs-5"></i>
+                        <span class="fw-semibold text-dark fs-7 d-none d-md-inline">{{ auth()->user()->name }}</span>
+                        <i class="fas fa-chevron-down text-muted fs-8"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2 p-2" style="min-width: 200px;">
+                        <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="{{ route('vendor.profile') }}"><i class="fas fa-store text-primary me-2"></i> Store Settings</a></li>
+                        <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="{{ route('vendor.wallet.index') }}"><i class="fas fa-wallet text-warning me-2"></i> Wallet & Payments</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="dropdown-item rounded-3 py-2 text-danger fw-semibold"><i class="fas fa-sign-out-alt me-2"></i> Logout Session</button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        @endif
+        </header>
 
-        @if(session('success'))
-            <div class="alert alert-success border-0 shadow-sm rounded-4 d-flex align-items-center justify-content-between p-3 mb-4" role="alert">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="fas fa-circle-check fs-5 text-success"></i>
-                    <span class="fw-semibold">{{ session('success') }}</span>
+        <!-- Main Body View -->
+        <main class="flex-grow-1 p-3 p-md-4">
+            @if(!auth()->user()->vendorSettings || !auth()->user()->vendorSettings->is_verified)
+                <div class="alert alert-warning border-0 shadow-sm rounded-4 d-flex align-items-center gap-3 p-3 mb-4" role="alert">
+                    <div class="bg-warning bg-opacity-20 p-2 rounded-circle text-dark">
+                        <i class="fas fa-shield-halved fs-4 text-warning"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold text-dark">Verification Pending</h6>
+                        <small class="text-muted">Your vendor account is under review by administrator. Some functionality may be restricted until verified.</small>
+                    </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+            @endif
 
-        @if(session('error'))
-            <div class="alert alert-danger border-0 shadow-sm rounded-4 d-flex align-items-center justify-content-between p-3 mb-4" role="alert">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="fas fa-circle-exclamation fs-5 text-danger"></i>
-                    <span class="fw-semibold">{{ session('error') }}</span>
+            @if(session('success'))
+                <div class="alert alert-success border-0 shadow-sm rounded-4 d-flex align-items-center justify-content-between p-3 mb-4" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-circle-check fs-5 text-success"></i>
+                        <span class="fw-semibold">{{ session('success') }}</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+            @endif
 
-        @yield('content')
-    </main>
+            @if($errors->any())
+                <div class="alert alert-danger border-0 shadow-sm rounded-4 p-3 mb-4" role="alert">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i class="fas fa-triangle-exclamation fs-5 text-danger"></i>
+                        <span class="fw-bold text-danger">Please fix the following validation errors:</span>
+                    </div>
+                    <ul class="mb-0 ps-4 text-danger small">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger border-0 shadow-sm rounded-4 d-flex align-items-center justify-content-between p-3 mb-4" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-circle-exclamation fs-5 text-danger"></i>
+                        <span class="fw-semibold">{{ session('error') }}</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @yield('content')
+        </main>
+    </div>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sidebarToggleBtn')?.addEventListener('click', function() {
+            document.getElementById('vendorSidebar').classList.toggle('show');
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>
