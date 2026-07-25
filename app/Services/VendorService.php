@@ -6,8 +6,10 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\VendorSetting;
 use App\Models\VendorBalanceLedger;
+use App\Models\VendorWalletTransaction;
 use App\Models\order_item;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class VendorService
 {
@@ -158,15 +160,43 @@ class VendorService
             return false; // Not a vendor product
         }
 
-        $product->update([
-            'approval_status' => 'approved',
-            'approved_at' => now(),
-            'approved_by' => $adminId,
-            'commission_note' => $note,
-            'status' => 1, // Also activate the product
-        ]);
+        DB::transaction(function () use ($product, $adminId, $note) {
+            $product->update([
+                'approval_status' => 'approved',
+                'approved_at' => now(),
+                'approved_by' => $adminId,
+                'commission_note' => $note,
+                'status' => 1, // Also activate the product
+            ]);
 
-        // TODO: Send notification to vendor
+            // Deduct stock from Parent Admin product if this was copied
+            $adminProduct = Product::whereNull('vendor_id')->where('title', $product->title)->first();
+            if ($adminProduct) {
+                if ($product->product_type === 'variable' && $product->variationCombinations()->exists()) {
+                    foreach ($product->variationCombinations as $vComb) {
+                        if ($vComb->stock_quantity > 0) {
+                            $opts = $vComb->variation_options;
+                            // Find matching admin variation combination
+                            $adminComb = $adminProduct->variationCombinations->first(function($item) use ($opts) {
+                                return json_encode($item->variation_options) === json_encode($opts);
+                            });
+
+                            if ($adminComb && $adminComb->stock_quantity !== null) {
+                                $adminComb->decrement('stock_quantity', min($adminComb->stock_quantity, $vComb->stock_quantity));
+                            }
+                        }
+                    }
+                } elseif ($adminProduct->quantity !== null && $product->quantity > 0) {
+                    $adminProduct->decrement('quantity', min($adminProduct->quantity, $product->quantity));
+                }
+            }
+
+            // Update VendorWalletTransaction to approved
+            VendorWalletTransaction::where('vendor_id', $product->vendor_id)
+                ->where('type', 'stock_purchase')
+                ->where('admin_note', 'like', '%' . $product->title . '%')
+                ->update(['status' => 'approved']);
+        });
 
         return true;
     }
@@ -182,14 +212,43 @@ class VendorService
             return false;
         }
 
-        $product->update([
-            'approval_status' => 'rejected',
-            'rejection_reason' => $reason,
-            'approved_by' => $adminId,
-            'status' => 0, // Deactivate
-        ]);
+        DB::transaction(function () use ($product, $adminId, $reason) {
+            $product->update([
+                'approval_status' => 'rejected',
+                'rejection_reason' => $reason,
+                'approved_by' => $adminId,
+                'status' => 0, // Deactivate
+            ]);
 
-        // TODO: Send notification to vendor
+            // Find stock purchase transaction for this product
+            $trx = VendorWalletTransaction::where('vendor_id', $product->vendor_id)
+                ->where('type', 'stock_purchase')
+                ->where('admin_note', 'like', '%' . $product->title . '%')
+                ->latest()
+                ->first();
+
+            if ($trx && $trx->amount > 0) {
+                // Refund vendor wallet
+                $vendor = User::find($product->vendor_id);
+                if ($vendor) {
+                    $vendor->increment('wallet_balance', $trx->amount);
+
+                    VendorWalletTransaction::create([
+                        'vendor_id' => $vendor->id,
+                        'admin_id' => $adminId,
+                        'type' => 'stock_purchase_refund',
+                        'amount' => $trx->amount,
+                        'payment_method' => 'Wallet',
+                        'transaction_id' => 'REF-' . strtoupper(Str::random(8)),
+                        'status' => 'approved',
+                        'admin_note' => 'Refund for rejected stock purchase: "' . $product->title . '" (' . $reason . ')',
+                        'is_seen' => true,
+                    ]);
+                }
+
+                $trx->update(['status' => 'rejected']);
+            }
+        });
 
         return true;
     }

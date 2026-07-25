@@ -116,7 +116,9 @@ class VendorProductController extends Controller
         $totalCost = 0;
         $combStockMap = []; // combination_id => quantity
 
-        if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
+        $product->load('variationCombinations');
+
+        if ($product->product_type === 'variable' && $product->variationCombinations->isNotEmpty()) {
             $requestedCombinations = $request->input('combinations', []);
             foreach ($product->variationCombinations as $comb) {
                 $qty = isset($requestedCombinations[$comb->id]['quantity']) ? (int)$requestedCombinations[$comb->id]['quantity'] : 0;
@@ -192,15 +194,28 @@ class VendorProductController extends Controller
                 $newProduct->approved_at = now();
                 $newProduct->status = 1; // Active
                 $statusTarget = 'approved';
+                $trxStatus = 'approved';
                 $flashType = 'success';
                 $flashMessage = 'Product "' . $newProduct->title . '" copied with ' . $totalQuantity . ' stock units! ৳' . number_format($totalCost, 2) . ' deducted from your wallet.';
+
+                // Deduct stock from Parent Admin Product immediately if auto-approved
+                if ($product->product_type === 'variable' && !empty($combStockMap)) {
+                    foreach ($product->variationCombinations as $adminComb) {
+                        if (isset($combStockMap[$adminComb->id]) && $combStockMap[$adminComb->id]['quantity'] > 0) {
+                            $adminComb->decrement('stock_quantity', $combStockMap[$adminComb->id]['quantity']);
+                        }
+                    }
+                } elseif ($product->quantity !== null && $totalQuantity > 0) {
+                    $product->decrement('quantity', $totalQuantity);
+                }
             } else {
                 $newProduct->approval_status = 'pending';
                 $newProduct->approved_at = null;
                 $newProduct->status = 0; // Inactive until admin approves
                 $statusTarget = 'pending';
+                $trxStatus = 'pending';
                 $flashType = 'warning';
-                $flashMessage = 'Product "' . $newProduct->title . '" copied with ' . $totalQuantity . ' stock units! ৳' . number_format($totalCost, 2) . ' deducted from your wallet balance. Submitted for admin approval.';
+                $flashMessage = 'Product "' . $newProduct->title . '" copy requested with ' . $totalQuantity . ' stock units! ৳' . number_format($totalCost, 2) . ' held from wallet. Admin stock will transfer upon approval.';
             }
 
             $newProduct->save();
@@ -246,8 +261,8 @@ class VendorProductController extends Controller
                 'amount' => $totalCost,
                 'payment_method' => 'Wallet',
                 'transaction_id' => 'TRX-PRD-' . strtoupper(Str::random(8)),
-                'status' => 'approved',
-                'admin_note' => 'Stock Purchase: Copied product "' . $product->title . '" (' . $totalQuantity . ' units)',
+                'status' => $trxStatus,
+                'admin_note' => 'Stock Purchase: Requested product "' . $product->title . '" (' . $totalQuantity . ' units)',
                 'is_seen' => true,
             ]);
 

@@ -236,6 +236,24 @@
         </div>
     </div>
 
+    @if(isset($stockPurchaseTrx) && $stockPurchaseTrx)
+        <div class="alert border-0 shadow-sm rounded-4 mb-4 p-3" style="background: #fffbeb; border-left: 4px solid #f59e0b !important;">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                    <h6 class="font-weight-bold text-dark mb-1"><i class="fas fa-boxes text-warning me-2"></i> Parent Stock Purchase & Copy Request</h6>
+                    <p class="mb-0 text-muted small">
+                        Vendor <strong>{{ $product->vendor->name ?? 'Partner' }}</strong> requested to copy this product with <strong>{{ $product->quantity ?? 0 }} stock units</strong> for <strong>৳{{ number_format($stockPurchaseTrx->amount, 2) }}</strong>. Funds are held in escrow and admin stock will transfer upon approval.
+                    </p>
+                </div>
+                <div>
+                    <span class="badge bg-warning text-dark font-weight-bold px-3 py-2 rounded-pill" style="font-size: 13px;">
+                        <i class="fas fa-wallet me-1"></i> Funds Held: ৳{{ number_format($stockPurchaseTrx->amount, 2) }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4" role="alert">
             <i class="fas fa-check-circle me-2"></i> <strong>Success:</strong> {{ session('success') }}
@@ -481,7 +499,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-pp-approve w-100 d-flex align-items-center justify-content-center gap-2" onclick="return confirm('Approve this partner product listing?')">
+                            <button type="submit" class="btn btn-pp-approve w-100 d-flex align-items-center justify-content-center gap-2">
                                 <i class="fas fa-check-circle fs-5"></i> Approve & Publish Item
                             </button>
                         </form>
@@ -494,7 +512,7 @@
                                     <label class="form-label font-weight-bold text-dark small text-uppercase">Rejection Reason</label>
                                     <textarea name="rejection_reason" class="form-control small" rows="2" placeholder="State reason for rejecting item..." required></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-pp-reject w-100 d-flex align-items-center justify-content-center gap-2" onclick="return confirm('Reject this product listing?')">
+                                <button type="submit" class="btn btn-pp-reject w-100 d-flex align-items-center justify-content-center gap-2">
                                     <i class="fas fa-times-circle fs-5"></i> Reject Listing Request
                                 </button>
                             </form>

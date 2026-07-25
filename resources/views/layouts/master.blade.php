@@ -685,46 +685,76 @@
                         @php
                             $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
                                 ->where('status', 'pending')
+                                ->where('type', 'recharge_request')
                                 ->latest()
                                 ->take(5)
                                 ->get();
-                            $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')->count();
+                            $headerPendingCount = $headerPendingPayments->count();
+
+                            $headerPendingProducts = \App\Models\Product::with('vendor')
+                                ->whereNotNull('vendor_id')
+                                ->where('approval_status', 'pending')
+                                ->latest()
+                                ->take(5)
+                                ->get();
+                            $headerPendingProdCount = \App\Models\Product::whereNotNull('vendor_id')->where('approval_status', 'pending')->count();
+                            $headerTotalCount = $headerPendingCount + $headerPendingProdCount;
                         @endphp
                         <a href="#" class="nav-link user position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
                             <i class="fa-regular fa-bell" style="font-size: 20px; color: #ffaa00;"></i>
-                            @if($headerPendingCount > 0)
-                                <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" style="font-size: 0.65rem;">{{ $headerPendingCount }}</span>
+                            @if($headerTotalCount > 0)
+                                <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" style="font-size: 0.65rem;">{{ $headerTotalCount }}</span>
                             @endif
                         </a>
 
-                        <div class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 p-0" style="min-width: 320px;">
+                        <div class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 p-0" style="min-width: 340px;">
                             <div class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
-                                <h6 class="fw-bold mb-0 text-dark small"><i class="fas fa-bell text-warning me-1"></i> Payment Notifications</h6>
-                                <span class="badge bg-warning text-dark rounded-pill">{{ $headerPendingCount }} Pending</span>
+                                <h6 class="fw-bold mb-0 text-dark small"><i class="fas fa-bell text-warning me-1"></i> Admin Notifications</h6>
+                                <span class="badge bg-warning text-dark rounded-pill">{{ $headerTotalCount }} Pending</span>
                             </div>
-                            <div class="list-group list-group-flush" style="max-height: 280px; overflow-y: auto;">
-                                @forelse($headerPendingPayments as $nTrx)
+                            <div class="list-group list-group-flush" style="max-height: 320px; overflow-y: auto;">
+                                <!-- Product Approvals -->
+                                @foreach($headerPendingProducts as $nProd)
+                                    <a href="{{ route('admin.vendor-products.show', $nProd->id) }}" class="list-group-item list-group-item-action p-3 border-bottom" style="background: #fffdf5;">
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <span class="fw-bold text-dark small"><i class="fas fa-box text-primary me-1"></i> {{ $nProd->vendor->name ?? 'Vendor' }}</span>
+                                            <span class="badge bg-warning text-dark font-weight-bold" style="font-size: 0.7rem;">Product Approval</span>
+                                        </div>
+                                        <div class="small text-dark fw-semibold mb-1">
+                                            Requested approval for: <strong>{{ Str::limit($nProd->title, 28) }}</strong>
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.7rem;">
+                                            <i class="fas fa-clock me-1"></i> {{ $nProd->created_at ? $nProd->created_at->diffForHumans() : 'Just now' }}
+                                        </div>
+                                    </a>
+                                @endforeach
+
+                                <!-- Payment Recharges -->
+                                @foreach($headerPendingPayments as $nTrx)
                                     <a href="{{ route('admin.vendor-payments.index', ['status' => 'pending']) }}" class="list-group-item list-group-item-action p-3 border-bottom">
                                         <div class="d-flex align-items-center justify-content-between mb-1">
-                                            <span class="fw-bold text-dark small">{{ $nTrx->vendor->name ?? 'Vendor' }}</span>
+                                            <span class="fw-bold text-dark small"><i class="fas fa-wallet text-warning me-1"></i> {{ $nTrx->vendor->name ?? 'Vendor' }}</span>
                                             <span class="badge bg-success bg-opacity-10 text-success fw-bold">৳{{ number_format($nTrx->amount, 2) }}</span>
                                         </div>
                                         <div class="small text-muted mb-1">
-                                            <i class="fas fa-wallet text-secondary me-1"></i> Requested recharge via <strong>{{ $nTrx->payment_method ?? 'Gateway' }}</strong>
+                                            Requested recharge via <strong>{{ $nTrx->payment_method ?? 'Gateway' }}</strong>
                                         </div>
                                         <div class="text-muted" style="font-size: 0.7rem;">
                                             <i class="fas fa-clock me-1"></i> {{ $nTrx->created_at->diffForHumans() }}
                                         </div>
                                     </a>
-                                @empty
+                                @endforeach
+
+                                @if($headerTotalCount === 0)
                                     <div class="p-4 text-center text-muted small">
                                         <i class="fas fa-bell-slash fs-4 d-block mb-1 opacity-50"></i>
-                                        No pending payment requests.
+                                        No pending approval or payment requests.
                                     </div>
-                                @endforelse
+                                @endif
                             </div>
-                            <div class="p-2 text-center bg-light border-top">
-                                <a href="{{ route('admin.vendor-payments.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.775rem;">View All Payments &rarr;</a>
+                            <div class="p-2 text-center bg-light border-top d-flex justify-content-around">
+                                <a href="{{ route('admin.vendor-products.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">Product Approvals ({{ $headerPendingProdCount }}) &rarr;</a>
+                                <a href="{{ route('admin.vendor-payments.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">Payments ({{ $headerPendingCount }}) &rarr;</a>
                             </div>
                         </div>
                     </li>
@@ -1829,9 +1859,14 @@
                                 <li
                                     class="{{ request()->routeIs('admin.vendor-products.index') || request()->routeIs('admin.vendor-products.show') ? 'active' : '' }}">
                                     <a href="{{ route('admin.vendor-products.index') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-square-check"></i>
-                                            Product Approval
+                                        <span class="menu-content d-flex align-items-center justify-content-between">
+                                            <span><i class="fas fa-square-check"></i> Product Approval</span>
+                                            @php
+                                                $pendingProdCount = \App\Models\Product::whereNotNull('vendor_id')->where('approval_status', 'pending')->count();
+                                            @endphp
+                                            @if($pendingProdCount > 0)
+                                                <span class="badge bg-warning text-dark rounded-pill ms-2 fw-bold" style="font-size: 0.65rem; padding: 2px 6px;">{{ $pendingProdCount }}</span>
+                                            @endif
                                         </span>
                                     </a>
                                 </li>
@@ -1842,7 +1877,7 @@
                                          <span class="menu-content d-flex align-items-center justify-content-between">
                                              <span><i class="fas fa-wallet text-warning"></i> Vendor Payments</span>
                                              @php
-                                                 $pendingPaymentCount = \App\Models\VendorWalletTransaction::where('status', 'pending')->count();
+                                                 $pendingPaymentCount = \App\Models\VendorWalletTransaction::where('status', 'pending')->where('type', 'recharge_request')->count();
                                              @endphp
                                              @if($pendingPaymentCount > 0)
                                                  <span class="badge bg-danger rounded-pill ms-2" style="font-size: 0.65rem; padding: 2px 6px;">{{ $pendingPaymentCount }}</span>

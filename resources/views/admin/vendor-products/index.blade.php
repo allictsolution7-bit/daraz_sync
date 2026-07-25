@@ -289,14 +289,20 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if($product->vendor_proposed_commission)
-                                        <span class="badge bg-warning bg-opacity-20 text-dark font-weight-bold d-block mb-1">
-                                            Proposed: {{ $product->vendor_proposed_commission }}%
+                                    @if($product->vendor_commission_rate !== null)
+                                        <span class="badge px-2 py-1 rounded-pill d-inline-block" style="color: #065f46; background: #d1fae5; font-weight: 700; font-size: 11px;">
+                                            <i class="fas fa-percent me-1"></i> {{ number_format($product->vendor_commission_rate, 2) }}%
                                         </span>
-                                    @endif
-                                    @if($product->vendor_commission_rate)
-                                        <span class="badge bg-info bg-opacity-20 text-info font-weight-bold d-block">
-                                            Approved: {{ $product->vendor_commission_rate }}%
+                                    @elseif($product->vendor_proposed_commission)
+                                        <span class="badge px-2 py-1 rounded-pill d-inline-block" style="color: #92400e; background: #fef3c7; font-weight: 700; font-size: 11px;">
+                                            <i class="fas fa-hand-holding-dollar me-1"></i> Prop: {{ number_format($product->vendor_proposed_commission, 2) }}%
+                                        </span>
+                                    @else
+                                        @php
+                                            $defComm = $product->vendor?->vendorSettings ? $product->vendor->vendorSettings->getDefaultCommissionRate() : 15.0;
+                                        @endphp
+                                        <span class="badge px-2 py-1 rounded-pill d-inline-block" style="color: #1e40af; background: #dbeafe; font-weight: 700; font-size: 11px;">
+                                            <i class="fas fa-store me-1"></i> {{ number_format($defComm, 2) }}% (Default)
                                         </span>
                                     @endif
                                 </td>

@@ -866,7 +866,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:adm
         Route::post('/{product}/approve', [AdminVendorProductController::class, 'approve'])->name('approve');
         Route::post('/{product}/reject', [AdminVendorProductController::class, 'reject'])->name('reject');
         Route::post('/bulk-approve', [AdminVendorProductController::class, 'bulkApprove'])->name('bulk-approve');
-        Route::put('/{product}/commission', [AdminVendorProductController::class, 'updateCommission'])->name('update-commission');
+        Route::match(['get', 'post', 'put'], '/{product}/commission', [AdminVendorProductController::class, 'updateCommission'])->name('update-commission');
     });
 
     // Vendor Withdrawal Management

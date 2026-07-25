@@ -16,14 +16,39 @@ class AdminVendorPaymentController extends Controller
         VendorWalletTransaction::where('is_seen', false)->update(['is_seen' => true]);
 
         $statusFilter = $request->get('status', 'all');
+        $search = $request->get('search');
+        $typeFilter = $request->get('type');
+        $vendorFilter = $request->get('vendor_id');
 
-        $query = VendorWalletTransaction::with(['vendor', 'admin'])->latest();
+        $query = VendorWalletTransaction::with(['vendor', 'admin'])
+            ->whereIn('type', ['recharge_request', 'admin_grant', 'transfer_sent', 'transfer_received'])
+            ->latest();
 
-        if ($statusFilter !== 'all') {
+        if ($statusFilter !== 'all' && !empty($statusFilter)) {
             $query->where('status', $statusFilter);
         }
 
-        $transactions = $query->paginate(20);
+        if (!empty($typeFilter)) {
+            $query->where('type', $typeFilter);
+        }
+
+        if (!empty($vendorFilter)) {
+            $query->where('vendor_id', $vendorFilter);
+        }
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('transaction_id', 'like', "%{$search}%")
+                  ->orWhere('payment_method', 'like', "%{$search}%")
+                  ->orWhere('admin_note', 'like', "%{$search}%")
+                  ->orWhereHas('vendor', function ($vQ) use ($search) {
+                      $vQ->where('name', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $transactions = $query->paginate(20)->withQueryString();
         $vendors = User::role('vendor')->orWhereHas('roles', function($q){
             $q->where('name', 'vendor');
         })->get();
@@ -32,7 +57,9 @@ class AdminVendorPaymentController extends Controller
             $vendors = User::all();
         }
 
-        $pendingCount = VendorWalletTransaction::where('status', 'pending')->count();
+        $pendingCount = VendorWalletTransaction::where('status', 'pending')
+            ->where('type', 'recharge_request')
+            ->count();
         $totalRecharged = VendorWalletTransaction::where('status', 'approved')
             ->whereIn('type', ['recharge_request', 'admin_grant'])
             ->sum('amount');

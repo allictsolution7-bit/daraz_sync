@@ -68,10 +68,17 @@ class AdminVendorProductController extends Controller
             'default' => $vendorSettings && method_exists($vendorSettings, 'getDefaultCommissionRate') ? $vendorSettings->getDefaultCommissionRate() : 15.0,
         ];
 
+        $stockPurchaseTrx = \App\Models\VendorWalletTransaction::where('vendor_id', $product->vendor_id)
+            ->where('type', 'stock_purchase')
+            ->where('admin_note', 'like', '%' . $product->title . '%')
+            ->latest()
+            ->first();
+
         return view('admin.vendor-products.show', compact(
             'product',
             'commission',
-            'commissionLimits'
+            'commissionLimits',
+            'stockPurchaseTrx'
         ));
     }
 
@@ -155,6 +162,10 @@ class AdminVendorProductController extends Controller
      */
     public function updateCommission(Request $request, Product $product)
     {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.vendor-products.show', $product);
+        }
+
         if (!$product->vendor_id) {
             return redirect()->back()->with('error', 'This is not a vendor product.');
         }

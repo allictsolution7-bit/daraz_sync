@@ -61,6 +61,48 @@
                 </div>
             </div>
         </div>
+    <!-- Search & Filter Card -->
+    <div class="card border-0 shadow-sm rounded-3 bg-white mb-3">
+        <div class="card-body p-3">
+            <form action="{{ route('admin.vendor-payments.index') }}" method="GET" class="row g-2 align-items-center">
+                @if(request('status'))
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                @endif
+                <div class="col-md-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control form-control-sm border-start-0 ps-0" placeholder="Search Vendor, Email, TRX ID, Method..." value="{{ request('search') }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="vendor_id" class="form-select form-select-sm">
+                        <option value="">All Vendors</option>
+                        @foreach($vendors as $v)
+                            <option value="{{ $v->id }}" {{ request('vendor_id') == $v->id ? 'selected' : '' }}>
+                                {{ $v->name }} ({{ $v->email }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="type" class="form-select form-select-sm">
+                        <option value="">All Transaction Types</option>
+                        <option value="recharge_request" {{ request('type') === 'recharge_request' ? 'selected' : '' }}>Recharge Request</option>
+                        <option value="admin_grant" {{ request('type') === 'admin_grant' ? 'selected' : '' }}>Direct Admin Grant</option>
+                        <option value="transfer_sent" {{ request('type') === 'transfer_sent' ? 'selected' : '' }}>Transfer Sent</option>
+                        <option value="transfer_received" {{ request('type') === 'transfer_received' ? 'selected' : '' }}>Transfer Received</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold rounded-2">
+                        <i class="fas fa-search me-1"></i> Search
+                    </button>
+                    @if(request('search') || request('vendor_id') || request('type'))
+                        <a href="{{ route('admin.vendor-payments.index') }}" class="btn btn-light btn-sm fw-bold border" title="Reset Filters"><i class="fas fa-rotate-left"></i></a>
+                    @endif
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Filter & Table -->
