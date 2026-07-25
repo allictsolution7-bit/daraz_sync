@@ -53,7 +53,8 @@ Route::prefix('mappings')->name('mappings.')->group(function () {
     Route::post('/bulk-toggle', [DarazProductMappingController::class, 'bulkToggle'])->name('bulk-toggle');
     Route::delete('/bulk-delete', [DarazProductMappingController::class, 'bulkDelete'])->name('bulk-delete');
 
-    // AJAX
+    // Single Operations / AJAX
+    Route::post('/{mapping}/toggle-sync', [DarazProductMappingController::class, 'toggleSync'])->name('toggle-sync');
     Route::get('/fetch-daraz-products', [DarazProductMappingController::class, 'fetchDarazProducts'])->name('fetch-daraz-products');
     Route::get('/search-products', [DarazProductMappingController::class, 'searchProducts'])->name('search-products');
 });

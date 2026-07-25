@@ -194,6 +194,28 @@ class DarazProductMappingController extends Controller
     }
 
     /**
+     * Bulk toggle mappings (enable / disable).
+     */
+    public function bulkToggle(Request $request)
+    {
+        $validated = $request->validate([
+            'mapping_ids' => 'required|array',
+            'mapping_ids.*' => 'exists:daraz_product_mappings,id',
+            'action' => 'required|string|in:enable,disable',
+        ]);
+
+        $syncEnabled = $validated['action'] === 'enable';
+
+        DarazProductMapping::forCurrentUser()
+            ->whereIn('id', $validated['mapping_ids'])
+            ->update(['sync_enabled' => $syncEnabled]);
+
+        flash()->success(count($validated['mapping_ids']) . ' mapping(s) ' . ($syncEnabled ? 'enabled' : 'disabled') . ' successfully.');
+
+        return back();
+    }
+
+    /**
      * Bulk delete mappings.
      */
     public function bulkDelete(Request $request)
@@ -203,12 +225,13 @@ class DarazProductMappingController extends Controller
             'mapping_ids.*' => 'exists:daraz_product_mappings,id',
         ]);
 
-        DarazProductMapping::whereIn('id', $validated['mapping_ids'])->delete();
+        DarazProductMapping::forCurrentUser()
+            ->whereIn('id', $validated['mapping_ids'])
+            ->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => count($validated['mapping_ids']) . ' mappings deleted.',
-        ]);
+        flash()->success(count($validated['mapping_ids']) . ' mapping(s) deleted successfully.');
+
+        return back();
     }
 
     /**

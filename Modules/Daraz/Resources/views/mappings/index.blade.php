@@ -395,13 +395,15 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($mapping->sync_enabled)
-                                            <span class="badge-pill bp-active">Enabled</span>
-                                        @else
-                                            <span class="badge-pill bp-country">Disabled</span>
-                                        @endif
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input toggle-sync-switch"
+                                                   type="checkbox"
+                                                   data-mapping-id="{{ $mapping->id }}"
+                                                   {{ $mapping->sync_enabled ? 'checked' : '' }}
+                                                   style="cursor: pointer; width: 36px; height: 18px;">
+                                        </div>
                                         @if($mapping->last_sync_status)
-                                            <div style="margin-top:4px;">
+                                            <div style="margin-top:2px;">
                                                 <span class="badge-pill {{ $mapping->last_sync_status === 'success' ? 'bp-active' : ($mapping->last_sync_status === 'failed' ? 'bp-inactive' : 'bp-warning') }}" style="font-size:0.65rem; padding: 2px 8px;">
                                                     {{ ucfirst($mapping->last_sync_status) }}
                                                 </span>
@@ -486,6 +488,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Select All
     document.getElementById('selectAll')?.addEventListener('change', function() {
         document.querySelectorAll('.mapping-ids').forEach(cb => cb.checked = this.checked);
+    });
+
+    // Toggle switch per row
+    document.querySelectorAll('.toggle-sync-switch').forEach(switchEl => {
+        switchEl.addEventListener('change', function() {
+            const mappingId = this.dataset.mappingId;
+            const isChecked = this.checked;
+
+            fetch(`{{ url('admin/daraz/mappings') }}/${mappingId}/toggle-sync`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    this.checked = !isChecked;
+                    alert(data.message || 'Failed to toggle status');
+                }
+            })
+            .catch(err => {
+                this.checked = !isChecked;
+                alert('Error toggling status: ' + err.message);
+            });
+        });
     });
 
     // Auto-Map Modal
