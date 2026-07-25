@@ -27,6 +27,7 @@ class VendorSetting extends Model
         'can_manage_orders',
         'can_create_coupons',
         'can_see_customer_info',
+        'can_access_admin_products',
         'is_active',
         'is_verified',
         'verified_at',
@@ -58,6 +59,7 @@ class VendorSetting extends Model
         'can_manage_orders' => 'boolean',
         'can_create_coupons' => 'boolean',
         'can_see_customer_info' => 'boolean',
+        'can_access_admin_products' => 'boolean',
         'is_active' => 'boolean',
         'is_verified' => 'boolean',
         'verified_at' => 'datetime',
@@ -352,6 +354,49 @@ class VendorSetting extends Model
             'product_count' => $this->vendor->products()->count(),
             'has_reached_limit' => $this->hasReachedProductLimit(),
         ];
+    }
+
+    /**
+     * Check if vendor can access parent admin products
+     */
+    public function canAccessAdminProducts(): bool
+    {
+        if ($this->can_access_admin_products) {
+            return true;
+        }
+
+        $user = $this->vendor ?? auth()->user();
+        if (!$user) {
+            return false;
+        }
+
+        // Check Spatie permission
+        try {
+            if (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo('vendor.access_admin_products')) {
+                return true;
+            }
+            if (method_exists($user, 'can') && $user->can('vendor.access_admin_products')) {
+                return true;
+            }
+        } catch (\Throwable $e) {}
+
+        // Check role permissions collection directly
+        if (method_exists($user, 'roles') && $user->roles) {
+            foreach ($user->roles as $role) {
+                if ($role->permissions && $role->permissions->contains('name', 'vendor.access_admin_products')) {
+                    return true;
+                }
+            }
+        }
+
+        // Check direct permissions collection
+        if (method_exists($user, 'permissions') && $user->permissions) {
+            if ($user->permissions->contains('name', 'vendor.access_admin_products')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

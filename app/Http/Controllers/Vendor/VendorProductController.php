@@ -23,24 +23,119 @@ class VendorProductController extends Controller
         $this->vendorService = $vendorService;
     }
 
+    protected function checkVendorAdminProductAccess($vendor): bool
+    {
+        if (!$vendor) return false;
+
+        $vendorSettings = $vendor->vendorSettings;
+        if ($vendorSettings && method_exists($vendorSettings, 'canAccessAdminProducts')) {
+            if ($vendorSettings->canAccessAdminProducts()) {
+                return true;
+            }
+        }
+
+        try {
+            if (method_exists($vendor, 'hasPermissionTo') && $vendor->hasPermissionTo('vendor.access_admin_products')) {
+                return true;
+            }
+            if (method_exists($vendor, 'can') && $vendor->can('vendor.access_admin_products')) {
+                return true;
+            }
+        } catch (\Throwable $e) {}
+
+        if (method_exists($vendor, 'roles') && $vendor->roles) {
+            foreach ($vendor->roles as $role) {
+                if ($role->permissions && $role->permissions->contains('name', 'vendor.access_admin_products')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
-     * Display vendor's products
+     * Display vendor's products or parent admin products
      */
     public function index(Request $request)
     {
         $vendor = auth()->user();
-        
-        $query = Product::forVendor($vendor->id)
-            ->with(['category', 'subCategory', 'brand']);
+        $canAccessAdminProducts = $this->checkVendorAdminProductAccess($vendor);
 
-        // Filter by approval status
-        if ($request->has('status')) {
-            $query->where('approval_status', $request->status);
+        $source = $request->get('source', 'my_products');
+
+        if ($source === 'admin_products' && $canAccessAdminProducts) {
+            $adminId = $vendor->created_by;
+            $query = Product::where(function ($q) use ($adminId) {
+                if ($adminId) {
+                    $q->where('vendor_id', $adminId)->orWhereNull('vendor_id');
+                } else {
+                    $q->whereNull('vendor_id');
+                }
+            })->with(['category', 'subCategory', 'brand']);
+        } else {
+            $source = 'my_products';
+            $query = Product::forVendor($vendor->id)
+                ->with(['category', 'subCategory', 'brand']);
+
+            if ($request->has('status')) {
+                $query->where('approval_status', $request->status);
+            }
         }
 
-        $products = $query->latest()->paginate(20);
+        $products = $query->latest()->paginate(20)->withQueryString();
 
-        return view('vendor.products.index', compact('products'));
+        return view('vendor.products.index', compact('products', 'canAccessAdminProducts', 'source'));
+    }
+
+    /**
+     * Copy / duplicate a parent admin product to vendor's catalog
+     */
+    public function copy(Request $request, Product $product)
+    {
+        $vendor = auth()->user();
+        $canAccessAdminProducts = $this->checkVendorAdminProductAccess($vendor);
+
+        if (!$canAccessAdminProducts) {
+            return redirect()->route('vendor.products.index')
+                ->with('error', 'You do not have permission to copy parent admin products.');
+        }
+
+        $adminId = $vendor->created_by;
+        if ($product->vendor_id && $product->vendor_id != $adminId) {
+            return redirect()->route('vendor.products.index')
+                ->with('error', 'Unauthorized product copy request.');
+        }
+
+        $newProduct = $product->replicate([
+            'views_total',
+            'views_unique',
+        ]);
+
+        $newProduct->title = $product->title;
+        $newProduct->slug = Str::slug($product->title) . '-v' . $vendor->id . '-' . Str::random(4);
+        if ($product->sku) {
+            $newProduct->sku = $product->sku . '-V' . $vendor->id . '-' . rand(100, 999);
+        }
+        $newProduct->vendor_id = $vendor->id;
+        $newProduct->approval_status = 'approved';
+        $newProduct->status = 1;
+        $newProduct->save();
+
+        // Copy variation combinations if present
+        if ($product->relationLoaded('variationCombinations') || $product->variationCombinations()->exists()) {
+            foreach ($product->variationCombinations as $combination) {
+                $newCombination = $combination->replicate();
+                $newCombination->product_id = $newProduct->id;
+                if ($combination->sku) {
+                    $newCombination->sku = $combination->sku . '-V' . $vendor->id . '-' . rand(100, 999);
+                }
+                $newCombination->save();
+            }
+        }
+
+        return redirect()->route('vendor.products.index', ['status' => 'approved'])
+            ->with('success', 'Product "' . $newProduct->title . '" copied to your products list successfully!');
     }
 
     /**

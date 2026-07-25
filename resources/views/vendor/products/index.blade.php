@@ -5,7 +5,7 @@
 @section('content')
 <div class="row mb-4">
     <div class="col-md-6">
-        <h2><i class="fas fa-box"></i> My Products</h2>
+        <h2><i class="fas fa-box"></i> {{ ($source ?? 'my_products') === 'admin_products' ? 'Parent Admin Catalog' : 'My Products' }}</h2>
     </div>
     <div class="col-md-6 text-end">
         <a href="{{ route('vendor.products.create') }}" class="btn btn-primary">
@@ -14,37 +14,60 @@
     </div>
 </div>
 
-<!-- Filter Tabs -->
+<!-- Source Tabs (My Products vs Parent Admin Catalog) -->
+@if($canAccessAdminProducts ?? false)
+<div class="mb-3">
+    <ul class="nav nav-tabs border-bottom-0">
+        <li class="nav-item">
+            <a class="nav-link fw-bold px-4 py-2 {{ ($source ?? 'my_products') === 'my_products' ? 'active bg-white text-primary border border-bottom-0' : 'text-secondary' }}" 
+               href="{{ route('vendor.products.index', ['source' => 'my_products']) }}">
+                <i class="fas fa-boxes me-1"></i> My Products
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link fw-bold px-4 py-2 {{ ($source ?? 'my_products') === 'admin_products' ? 'active bg-white text-success border border-bottom-0' : 'text-secondary' }}" 
+               href="{{ route('vendor.products.index', ['source' => 'admin_products']) }}">
+                <i class="fas fa-store me-1"></i> Parent Admin Catalog
+                <span class="badge bg-success ms-1">Shared</span>
+            </a>
+        </li>
+    </ul>
+</div>
+@endif
+
+<!-- Filter Tabs for My Products -->
+@if(($source ?? 'my_products') === 'my_products')
 <div class="card mb-4">
     <div class="card-body">
         <ul class="nav nav-pills">
             <li class="nav-item">
                 <a class="nav-link {{ !request('status') ? 'active' : '' }}" 
-                   href="{{ route('vendor.products.index') }}">
+                   href="{{ route('vendor.products.index', ['source' => 'my_products']) }}">
                     All Products
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request('status') === 'approved' ? 'active' : '' }}" 
-                   href="{{ route('vendor.products.index', ['status' => 'approved']) }}">
+                   href="{{ route('vendor.products.index', ['source' => 'my_products', 'status' => 'approved']) }}">
                     Approved
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request('status') === 'pending' ? 'active' : '' }}" 
-                   href="{{ route('vendor.products.index', ['status' => 'pending']) }}">
+                   href="{{ route('vendor.products.index', ['source' => 'my_products', 'status' => 'pending']) }}">
                     Pending
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request('status') === 'rejected' ? 'active' : '' }}" 
-                   href="{{ route('vendor.products.index', ['status' => 'rejected']) }}">
+                   href="{{ route('vendor.products.index', ['source' => 'my_products', 'status' => 'rejected']) }}">
                     Rejected
                 </a>
             </li>
         </ul>
     </div>
 </div>
+@endif
 
 <!-- Products Table -->
 <div class="card">
@@ -53,22 +76,30 @@
             <div class="text-center py-5">
                 <i class="fas fa-box fs-1 text-muted"></i>
                 <h4 class="mt-3">No Products Found</h4>
-                <p class="text-muted">Start by creating your first product!</p>
-                <a href="{{ route('vendor.products.create') }}" class="btn btn-primary mt-2">
-                    <i class="fas fa-plus-circle"></i> Create Product
-                </a>
+                @if(($source ?? 'my_products') === 'admin_products')
+                    <p class="text-muted">No products available in the Parent Admin catalog right now.</p>
+                @else
+                    <p class="text-muted">Start by creating your first product or copy from Parent Admin Catalog!</p>
+                    <a href="{{ route('vendor.products.create') }}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus-circle"></i> Create Product
+                    </a>
+                @endif
             </div>
         @else
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover align-middle">
                     <thead>
                         <tr>
                             <th style="width: 60px;">Image</th>
                             <th>Product Name</th>
                             <th>Price</th>
-                            <th>Commission</th>
+                            @if(($source ?? 'my_products') === 'my_products')
+                                <th>Commission</th>
+                            @endif
                             <th>Stock</th>
-                            <th>Status</th>
+                            @if(($source ?? 'my_products') === 'my_products')
+                                <th>Status</th>
+                            @endif
                             <th>Created</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -99,6 +130,7 @@
                                 @endif
                                 <strong>৳{{ number_format($product->offer, 2) }}</strong>
                             </td>
+                            @if(($source ?? 'my_products') === 'my_products')
                             <td>
                                 @if($product->vendor_commission_rate)
                                     <span class="badge bg-info">{{ $product->vendor_commission_rate }}%</span>
@@ -109,17 +141,19 @@
                                     <br><small class="text-warning">Proposed: {{ $product->vendor_proposed_commission }}%</small>
                                 @endif
                             </td>
+                            @endif
                             <td>
                                 @if($product->manage_stock)
                                     @if($product->quantity > 0)
-                                        <span class="text-success">{{ $product->quantity }}</span>
+                                        <span class="text-success fw-bold">{{ $product->quantity }}</span>
                                     @else
-                                        <span class="text-danger">Out of Stock</span>
+                                        <span class="text-danger fw-bold">Out of Stock</span>
                                     @endif
                                 @else
-                                    <span class="text-muted">Not Managed</span>
+                                    <span class="text-muted">In Stock</span>
                                 @endif
                             </td>
+                            @if(($source ?? 'my_products') === 'my_products')
                             <td>
                                 @if($product->approval_status === 'approved')
                                     <span class="badge bg-success">
@@ -138,29 +172,39 @@
                                     <br><small class="text-muted">Inactive</small>
                                 @endif
                             </td>
+                            @endif
                             <td>
-                                <small>{{ $product->created_at->format('d M Y') }}</small>
+                                <small>{{ $product->created_at ? $product->created_at->format('d M Y') : 'N/A' }}</small>
                             </td>
                             <td class="text-end">
-                                <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('vendor.products.edit', $product) }}" 
-                                       class="btn btn-outline-primary"
-                                       title="Edit">
-                                        <i class="fas fa-pencil"></i>
-                                    </a>
-                                    <form action="{{ route('vendor.products.destroy', $product) }}" 
-                                          method="POST" 
-                                          class="d-inline"
-                                          onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                @if(($source ?? 'my_products') === 'admin_products')
+                                    <form action="{{ route('vendor.products.copy', $product) }}" method="POST" class="d-inline">
                                         @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                class="btn btn-outline-danger"
-                                                title="Delete">
-                                            <i class="fas fa-trash"></i>
+                                        <button type="submit" class="btn btn-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1">
+                                            <i class="fas fa-copy"></i> Copy to My Products
                                         </button>
                                     </form>
-                                </div>
+                                @else
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ route('vendor.products.edit', $product) }}" 
+                                           class="btn btn-outline-primary"
+                                           title="Edit">
+                                            <i class="fas fa-pencil"></i>
+                                        </a>
+                                        <form action="{{ route('vendor.products.destroy', $product) }}" 
+                                              method="POST" 
+                                              class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    class="btn btn-outline-danger"
+                                                    title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
@@ -177,14 +221,15 @@
 </div>
 
 <!-- Info Alert -->
-@if($products->isNotEmpty())
+@if(($source ?? 'my_products') === 'admin_products')
+<div class="alert alert-success mt-4">
+    <i class="fas fa-info-circle me-1"></i>
+    <strong>Parent Admin Catalog:</strong> Click <strong>"Copy to My Products"</strong> on any item to duplicate it into your store. Once copied, it becomes your product and you can edit details or sync it to Daraz.
+</div>
+@elseif($products->isNotEmpty())
 <div class="alert alert-info mt-4">
-    <i class="fas fa-info-circle"></i>
-    <strong>Note:</strong> Products with "Pending" status are awaiting admin approval. Once approved, they will be visible on your store.
-    @if($products->where('approval_status', 'rejected')->isNotEmpty())
-        Rejected products can be edited and resubmitted for approval.
-    @endif
+    <i class="fas fa-info-circle me-1"></i>
+    <strong>Note:</strong> Products with "Pending" status are awaiting admin approval. Once approved, they will be visible on your store and syncable with Daraz.
 </div>
 @endif
 @endsection
-

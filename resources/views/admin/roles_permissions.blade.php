@@ -629,6 +629,21 @@
                         <div class="alert alert-warning py-2 px-3 small mb-3">
                             <i class="fas fa-info-circle mr-1"></i> Permissions inherited from assigned roles are pre-checked and marked with <strong>Default (Role)</strong>. You can grant additional custom permissions below for this specific user.
                         </div>
+
+                        @if($user->hasRole('vendor') || $user->vendorSettings)
+                        <div class="card border-primary mb-3" style="background: #f0f7ff; border: 1px solid #bfdbfe !important;">
+                            <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="mb-1 text-primary font-weight-bold"><i class="fas fa-boxes mr-1"></i> Parent Admin Product Access Toggle</h6>
+                                    <small class="text-muted">Allow this vendor to view and copy products created by their parent Admin directly into their store catalog.</small>
+                                </div>
+                                <div class="form-check form-switch ms-3">
+                                    <input type="checkbox" class="form-check-input" id="toggleAdminProducts{{ $user->id }}" name="can_access_admin_products" value="1" style="width: 2.5em; height: 1.25em; cursor: pointer;" {{ ($user->vendorSettings?->can_access_admin_products || (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo('vendor.access_admin_products'))) ? 'checked' : '' }}>
+                                    <label class="form-check-label font-weight-bold ms-2" for="toggleAdminProducts{{ $user->id }}">Enable Access</label>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                         <div class="perm-toolbar d-flex flex-wrap align-items-center mb-3">
                             <div class="search-input-wrapper mr-auto">
                                 <i class="fas fa-search"></i>

@@ -260,7 +260,16 @@ class RolesPermissionsController extends Controller
             }
         }
 
-        $user->syncPermissions($request->permissions ?? []);
+        $permissions = $request->permissions ?? [];
+        $user->syncPermissions($permissions);
+
+        if ($user->vendorSettings) {
+            $hasAccess = in_array('vendor.access_admin_products', $permissions) || $request->has('can_access_admin_products');
+            $user->vendorSettings->update([
+                'can_access_admin_products' => $hasAccess,
+            ]);
+        }
+
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         return back()->with('success', 'Direct custom permissions for user updated successfully.');
     }
