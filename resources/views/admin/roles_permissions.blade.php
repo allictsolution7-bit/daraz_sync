@@ -526,21 +526,19 @@
                             @foreach($groupedPermissions as $group => $subgroups)
                                 @php $groupSlug = \Illuminate\Support\Str::slug($group); @endphp
                                 <div class="card permissions-group mb-3">
-                                    <div class="card-header" id="heading-role-{{ $role->id }}-{{ $groupSlug }}">
-                                        <a class="d-block text-decoration-none" data-toggle="collapse" data-bs-toggle="collapse" href="#collapse-role-{{ $role->id }}-{{ $groupSlug }}" aria-expanded="true">
-                                            <h6 class="mb-0 d-flex align-items-center justify-content-between">
-                                                <span class="text-capitalize d-flex align-items-center">
-                                                    <i class="fas fa-layer-group text-primary mr-2"></i>
-                                                    {{ $group === 'pos' ? 'Point of Sale (POS)' : str_replace('_',' ', $group) }}
-                                                </span>
-                                                <div class="d-flex align-items-center">
-                                                    <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
-                                                    <label class="m-0 small font-weight-bold text-muted" onclick="event.stopPropagation()">
-                                                        <input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all
-                                                    </label>
-                                                </div>
+                                    <div class="card-header d-flex align-items-center justify-content-between py-2 px-3" id="heading-role-{{ $role->id }}-{{ $groupSlug }}">
+                                        <a class="text-decoration-none d-flex align-items-center flex-grow-1" data-toggle="collapse" data-bs-toggle="collapse" href="#collapse-role-{{ $role->id }}-{{ $groupSlug }}" aria-expanded="true">
+                                            <h6 class="mb-0 text-capitalize d-flex align-items-center">
+                                                <i class="fas fa-layer-group text-primary mr-2 me-2"></i>
+                                                {{ $group === 'pos' ? 'Point of Sale (POS)' : str_replace('_',' ', $group) }}
                                             </h6>
                                         </a>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge-perm-count mr-3 me-3">{{ $subgroups->flatten()->count() }} permissions</span>
+                                            <label class="m-0 small font-weight-bold text-muted cursor-pointer d-flex align-items-center" style="user-select: none;">
+                                                <input type="checkbox" class="select-all-group mr-1 me-1" data-group="{{ $groupSlug }}"> Select All
+                                            </label>
+                                        </div>
                                     </div>
                                     <div id="collapse-role-{{ $role->id }}-{{ $groupSlug }}" class="collapse show">
                                         <div class="card-body p-3 permissions-scroll bg-light">
@@ -661,21 +659,19 @@
                             @foreach($groupedPermissions as $group => $subgroups)
                                 @php $groupSlug = \Illuminate\Support\Str::slug($group); @endphp
                                 <div class="card permissions-group mb-3">
-                                    <div class="card-header" id="heading-uperm-{{ $user->id }}-{{ $groupSlug }}">
-                                        <a class="d-block text-decoration-none" data-toggle="collapse" data-bs-toggle="collapse" href="#collapse-uperm-{{ $user->id }}-{{ $groupSlug }}" aria-expanded="true">
-                                            <h6 class="mb-0 text-capitalize d-flex align-items-center justify-content-between">
-                                                <span class="d-flex align-items-center">
-                                                    <i class="fas fa-layer-group text-primary mr-2"></i>
-                                                    {{ $group === 'pos' ? 'Point of Sale (POS)' : str_replace('_',' ', $group) }}
-                                                </span>
-                                                <div class="d-flex align-items-center">
-                                                    <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
-                                                    <label class="m-0 small font-weight-bold text-muted" onclick="event.stopPropagation()">
-                                                        <input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all
-                                                    </label>
-                                                </div>
+                                    <div class="card-header d-flex align-items-center justify-content-between py-2 px-3" id="heading-uperm-{{ $user->id }}-{{ $groupSlug }}">
+                                        <a class="text-decoration-none d-flex align-items-center flex-grow-1" data-toggle="collapse" data-bs-toggle="collapse" href="#collapse-uperm-{{ $user->id }}-{{ $groupSlug }}" aria-expanded="true">
+                                            <h6 class="mb-0 text-capitalize d-flex align-items-center">
+                                                <i class="fas fa-layer-group text-primary mr-2 me-2"></i>
+                                                {{ $group === 'pos' ? 'Point of Sale (POS)' : str_replace('_',' ', $group) }}
                                             </h6>
                                         </a>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge-perm-count mr-3 me-3">{{ $subgroups->flatten()->count() }} permissions</span>
+                                            <label class="m-0 small font-weight-bold text-muted cursor-pointer d-flex align-items-center" style="user-select: none;">
+                                                <input type="checkbox" class="select-all-group mr-1 me-1" data-group="{{ $groupSlug }}"> Select All
+                                            </label>
+                                        </div>
                                     </div>
                                     <div id="collapse-uperm-{{ $user->id }}-{{ $groupSlug }}" class="collapse show">
                                         <div class="card-body p-3 permissions-scroll bg-light">
@@ -750,19 +746,19 @@
                         @foreach($groupedPermissions as $group => $subgroups)
                             @php $groupSlug = \Illuminate\Support\Str::slug($group); @endphp
                             <div class="card permissions-group mb-3">
-                                <div class="card-header" id="heading-add-{{ $groupSlug }}">
-                                    <a class="d-block text-decoration-none" data-toggle="collapse" data-bs-toggle="collapse" href="#collapse-add-{{ $groupSlug }}" aria-expanded="true">
-                                        <h6 class="mb-0 d-flex align-items-center justify-content-between">
-                                            <span class="text-capitalize d-flex align-items-center">
-                                                <i class="fas fa-layer-group text-primary mr-2"></i>
-                                                {{ $group === 'pos' ? 'Point of Sale (POS)' : str_replace('_',' ', $group) }}
-                                            </span>
-                                            <div class="d-flex align-items-center">
-                                                <span class="badge-perm-count mr-3">{{ $subgroups->flatten()->count() }} permissions</span>
-                                                <label class="m-0 small font-weight-bold text-muted" onclick="event.stopPropagation()"><input type="checkbox" class="select-all-group" data-group="{{ $groupSlug }}"> Select all</label>
-                                            </div>
+                                <div class="card-header d-flex align-items-center justify-content-between py-2 px-3" id="heading-add-{{ $groupSlug }}">
+                                    <a class="text-decoration-none d-flex align-items-center flex-grow-1" data-toggle="collapse" data-bs-toggle="collapse" href="#collapse-add-{{ $groupSlug }}" aria-expanded="true">
+                                        <h6 class="mb-0 text-capitalize d-flex align-items-center">
+                                            <i class="fas fa-layer-group text-primary mr-2 me-2"></i>
+                                            {{ $group === 'pos' ? 'Point of Sale (POS)' : str_replace('_',' ', $group) }}
                                         </h6>
                                     </a>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge-perm-count mr-3 me-3">{{ $subgroups->flatten()->count() }} permissions</span>
+                                        <label class="m-0 small font-weight-bold text-muted cursor-pointer d-flex align-items-center" style="user-select: none;">
+                                            <input type="checkbox" class="select-all-group mr-1 me-1" data-group="{{ $groupSlug }}"> Select All
+                                        </label>
+                                    </div>
                                 </div>
                                 <div id="collapse-add-{{ $groupSlug }}" class="collapse show">
                                     <div class="card-body p-3 permissions-scroll bg-light">
@@ -799,13 +795,25 @@
 
 @push('scripts')
 <script>
-    // Select all permissions within a group in the current modal content
+    // Select all permissions within a specific group card
     document.addEventListener('change', function(e){
         if (e.target && e.target.classList.contains('select-all-group')) {
-            const container = e.target.closest('.modal-content') || document;
-            const group = e.target.getAttribute('data-group');
-            const checked = e.target.checked;
-            container.querySelectorAll("input.permission-checkbox[data-group='"+group+"']").forEach(cb => cb.checked = checked);
+            const card = e.target.closest('.card.permissions-group');
+            if (card) {
+                const checked = e.target.checked;
+                card.querySelectorAll("input.permission-checkbox").forEach(cb => cb.checked = checked);
+            }
+        }
+        if (e.target && e.target.classList.contains('permission-checkbox')) {
+            const card = e.target.closest('.card.permissions-group');
+            if (card) {
+                const groupCheckbox = card.querySelector('.select-all-group');
+                if (groupCheckbox) {
+                    const allCBs = card.querySelectorAll('.permission-checkbox');
+                    const checkedCBs = card.querySelectorAll('.permission-checkbox:checked');
+                    groupCheckbox.checked = (allCBs.length > 0 && allCBs.length === checkedCBs.length);
+                }
+            }
         }
     });
 
@@ -816,6 +824,7 @@
 
         if (e.target.classList.contains('select-all-perms')) {
             modal.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = true);
+            modal.querySelectorAll('.select-all-group').forEach(cb => cb.checked = true);
         }
         if (e.target.classList.contains('clear-all-perms')) {
             modal.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = false);
