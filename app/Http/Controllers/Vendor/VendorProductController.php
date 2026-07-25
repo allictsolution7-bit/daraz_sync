@@ -11,6 +11,7 @@ use App\Models\Writer;
 use App\Models\Publisher;
 use App\Services\VendorService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -28,20 +29,12 @@ class VendorProductController extends Controller
         if (!$vendor) return false;
 
         $vendorSettings = $vendor->vendorSettings;
-        if ($vendorSettings && method_exists($vendorSettings, 'canAccessAdminProducts')) {
-            if ($vendorSettings->canAccessAdminProducts()) {
-                return true;
-            }
+        if ($vendorSettings && $vendorSettings->canAccessAdminProducts()) {
+            return true;
         }
-
-        try {
-            if (method_exists($vendor, 'hasPermissionTo') && $vendor->hasPermissionTo('vendor.access_admin_products')) {
-                return true;
-            }
-            if (method_exists($vendor, 'can') && $vendor->can('vendor.access_admin_products')) {
-                return true;
-            }
-        } catch (\Throwable $e) {}
+        if (method_exists($vendor, 'can') && $vendor->can('vendor.access_admin_products')) {
+            return true;
+        }
 
         if (method_exists($vendor, 'roles') && $vendor->roles) {
             foreach ($vendor->roles as $role) {
@@ -90,7 +83,7 @@ class VendorProductController extends Controller
     }
 
     /**
-     * Copy / duplicate a parent admin product to vendor's catalog
+     * Copy / duplicate a parent admin product to vendor's catalog with stock allocation and wallet fund deduction
      */
     public function copy(Request $request, Product $product)
     {
@@ -115,9 +108,64 @@ class VendorProductController extends Controller
 
         if ($alreadyCopied) {
             return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
-                ->with('error', 'You have already copied "' . $product->title . '" to your catalog. Please select or try a different product.');
+                ->with('error', 'You have already copied "' . $product->title . '" to your catalog. Please select a different product.');
         }
 
+        // Calculate requested stock quantity & cost
+        $totalQuantity = 0;
+        $totalCost = 0;
+        $combStockMap = []; // combination_id => quantity
+
+        if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
+            $requestedCombinations = $request->input('combinations', []);
+            foreach ($product->variationCombinations as $comb) {
+                $qty = isset($requestedCombinations[$comb->id]['quantity']) ? (int)$requestedCombinations[$comb->id]['quantity'] : 0;
+                if ($qty > 0) {
+                    if ($comb->stock_quantity !== null && $qty > $comb->stock_quantity) {
+                        return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                            ->with('error', 'Requested quantity (' . $qty . ') exceeds available admin stock (' . $comb->stock_quantity . ') for combination options.');
+                    }
+
+                    $unitCost = (float)($comb->product_cost > 0 ? $comb->product_cost : ($comb->offer_price > 0 ? $comb->offer_price : $comb->regular_price ?? 0));
+                    $combStockMap[$comb->id] = [
+                        'quantity' => $qty,
+                        'unit_cost' => $unitCost,
+                        'total_cost' => $qty * $unitCost
+                    ];
+                    $totalQuantity += $qty;
+                    $totalCost += ($qty * $unitCost);
+                }
+            }
+
+            if ($totalQuantity <= 0) {
+                return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                    ->with('error', 'Please enter a valid stock quantity for at least one variation option.');
+            }
+        } else {
+            $qty = (int)$request->input('quantity', 0);
+            if ($qty <= 0) {
+                return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                    ->with('error', 'Please specify how many stock units you wish to purchase.');
+            }
+
+            if ($product->quantity !== null && $product->manage_stock && $qty > $product->quantity) {
+                return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                    ->with('error', 'Requested quantity (' . $qty . ') exceeds available admin stock (' . $product->quantity . ').');
+            }
+
+            $unitCost = (float)($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : $product->old_price ?? 0));
+            $totalQuantity = $qty;
+            $totalCost = $qty * $unitCost;
+        }
+
+        // Wallet Balance Check
+        $walletBalance = (float)($vendor->wallet_balance ?? 0);
+        if ($walletBalance < $totalCost) {
+            return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                ->with('error', 'Insufficient wallet balance. Total stock cost is ৳' . number_format($totalCost, 2) . ', but your wallet balance is ৳' . number_format($walletBalance, 2) . '. Please recharge your wallet first.');
+        }
+
+        DB::beginTransaction();
         try {
             $vendorSettings = $vendor->vendorSettings;
 
@@ -132,6 +180,7 @@ class VendorProductController extends Controller
                 $newProduct->sku = $product->sku . '-V' . $vendor->id . '-' . rand(100, 999);
             }
             $newProduct->vendor_id = $vendor->id;
+            $newProduct->quantity = $totalQuantity;
 
             // Respect vendor auto-approve settings or default to pending admin approval
             $autoApprove = $vendorSettings && method_exists($vendorSettings, 'shouldAutoApproveProducts') 
@@ -144,14 +193,14 @@ class VendorProductController extends Controller
                 $newProduct->status = 1; // Active
                 $statusTarget = 'approved';
                 $flashType = 'success';
-                $flashMessage = 'Product "' . $newProduct->title . '" copied to your catalog and automatically approved!';
+                $flashMessage = 'Product "' . $newProduct->title . '" copied with ' . $totalQuantity . ' stock units! ৳' . number_format($totalCost, 2) . ' deducted from your wallet.';
             } else {
                 $newProduct->approval_status = 'pending';
                 $newProduct->approved_at = null;
                 $newProduct->status = 0; // Inactive until admin approves
                 $statusTarget = 'pending';
                 $flashType = 'warning';
-                $flashMessage = 'Product "' . $newProduct->title . '" copied to your catalog! It has been submitted to your Admin for approval and is currently pending review.';
+                $flashMessage = 'Product "' . $newProduct->title . '" copied with ' . $totalQuantity . ' stock units! ৳' . number_format($totalCost, 2) . ' deducted from your wallet balance. Submitted for admin approval.';
             }
 
             $newProduct->save();
@@ -175,6 +224,10 @@ class VendorProductController extends Controller
                         $newCombination->combination_key = $newProduct->id . '_' . (is_array($optsArr) ? implode('_', $optsArr) : $optsArr);
                     }
 
+                    // Set requested combination stock
+                    $allocatedCombStock = isset($combStockMap[$combination->id]) ? $combStockMap[$combination->id]['quantity'] : 0;
+                    $newCombination->stock_quantity = $allocatedCombStock;
+
                     if ($combination->sku) {
                         $newCombination->sku = $combination->sku . '-V' . $vendor->id . '-' . rand(100, 999);
                     }
@@ -182,13 +235,32 @@ class VendorProductController extends Controller
                 }
             }
 
+            // Deduct fund from vendor's wallet balance
+            $vendor->decrement('wallet_balance', $totalCost);
+
+            // Record transaction in VendorWalletTransaction
+            \App\Models\VendorWalletTransaction::create([
+                'vendor_id' => $vendor->id,
+                'admin_id' => $adminId,
+                'type' => 'stock_purchase',
+                'amount' => $totalCost,
+                'payment_method' => 'Wallet',
+                'transaction_id' => 'TRX-PRD-' . strtoupper(Str::random(8)),
+                'status' => 'approved',
+                'admin_note' => 'Stock Purchase: Copied product "' . $product->title . '" (' . $totalQuantity . ' units)',
+                'is_seen' => true,
+            ]);
+
+            DB::commit();
+
             return redirect()->route('vendor.products.index', ['source' => 'my_products', 'status' => $statusTarget])
                 ->with($flashType, $flashMessage);
 
         } catch (\Throwable $e) {
+            DB::rollBack();
             \Log::error('Product Copy Exception: ' . $e->getMessage());
             return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
-                ->with('error', 'Could not copy "' . $product->title . '". You have already copied this product or a duplicate SKU exists. Please try a different product.');
+                ->with('error', 'Could not copy "' . $product->title . '". Error: ' . $e->getMessage());
         }
     }
 
@@ -518,7 +590,7 @@ class VendorProductController extends Controller
      */
     public function getSubcategories($categoryId)
     {
-        $subcategories = SubCategory::where('category_id', $categoryId)
+        $subcategories = SubCategory::where('product_category_id', $categoryId)
             ->where('status', 1)
             ->select('id', 'name')
             ->get();
@@ -542,15 +614,15 @@ class VendorProductController extends Controller
 
         // Get commission settings
         $commissionSettings = [
-            'default' => $vendorSettings->getDefaultCommissionRate(),
-            'min' => $vendorSettings->getMinCommissionRate(),
-            'max' => $vendorSettings->getMaxCommissionRate(),
+            'default' => $vendorSettings && method_exists($vendorSettings, 'getDefaultCommissionRate') ? $vendorSettings->getDefaultCommissionRate() : 15.0,
+            'min' => $vendorSettings && method_exists($vendorSettings, 'getMinCommissionRate') ? $vendorSettings->getMinCommissionRate() : 5.0,
+            'max' => $vendorSettings && method_exists($vendorSettings, 'getMaxCommissionRate') ? $vendorSettings->getMaxCommissionRate() : 30.0,
         ];
 
         $categories = ProductCategory::where('status', 1)->get();
         // Get subcategories from primary category, or all if no primary category
         $subCategories = $product->category_id 
-            ? SubCategory::where('category_id', $product->category_id)->get()
+            ? SubCategory::where('product_category_id', $product->category_id)->get()
             : SubCategory::where('status', true)->get();
         $brands = Brand::where('status', 1)->get();
 

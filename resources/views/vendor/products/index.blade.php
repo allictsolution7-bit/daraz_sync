@@ -258,12 +258,109 @@
                                             <i class="fas fa-check-circle text-success"></i> Already Copied
                                         </button>
                                     @else
-                                        <form action="{{ route('vendor.products.copy', $product) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1">
-                                                <i class="fas fa-copy"></i> Copy to My Products
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}" onclick="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
+                                            <i class="fas fa-copy"></i> Copy to My Products
+                                        </button>
+
+                                        <!-- Modal for Stock Allocation & Purchase -->
+                                        <div class="modal fade text-start" id="copyStockModal_{{ $product->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered {{ $product->product_type === 'variable' ? 'modal-lg' : '' }}">
+                                                <div class="modal-content rounded-4 border-0 shadow">
+                                                    <form action="{{ route('vendor.products.copy', $product) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-header bg-primary text-white">
+                                                            <h5 class="modal-title font-weight-bold"><i class="fas fa-boxes me-2"></i> Stock Purchase & Copy: {{ $product->title }}</h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body p-4">
+                                                            <!-- Wallet Balance Header -->
+                                                            <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center mb-4">
+                                                                <div>
+                                                                    <small class="text-muted font-weight-bold d-block">YOUR WALLET BALANCE</small>
+                                                                    <span class="fs-5 font-weight-bold text-primary">৳{{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</span>
+                                                                </div>
+                                                                <a href="{{ route('vendor.wallet.index') }}" class="btn btn-sm btn-outline-primary font-weight-bold" target="_blank">
+                                                                    <i class="fas fa-plus-circle me-1"></i> Recharge Wallet
+                                                                </a>
+                                                            </div>
+
+                                                            @if($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty())
+                                                                <h6 class="font-weight-bold text-dark mb-2">Select Stock Quantity Per Variation:</h6>
+                                                                <div class="table-responsive mb-3 border rounded">
+                                                                    <table class="table table-sm align-middle mb-0">
+                                                                        <thead class="table-light">
+                                                                            <tr>
+                                                                                <th>Option / Variation</th>
+                                                                                <th>Unit Cost</th>
+                                                                                <th>Admin Stock</th>
+                                                                                <th width="130">Your Quantity</th>
+                                                                                <th class="text-end">Subtotal</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($product->variationCombinations as $comb)
+                                                                                @php
+                                                                                    $unitCost = (float)($comb->product_cost > 0 ? $comb->product_cost : ($comb->offer_price > 0 ? $comb->offer_price : $comb->regular_price ?? 0));
+                                                                                    $optNames = method_exists($comb, 'getOptionNamesArray') ? $comb->getOptionNamesArray() : [];
+                                                                                    $optLabel = !empty($optNames) ? implode(' / ', $optNames) : (is_array($comb->variation_options) ? implode(' / ', $comb->variation_options) : $comb->variation_options);
+                                                                                @endphp
+                                                                                <tr>
+                                                                                    <td><span class="badge" style="color: #4f46e5; background: #eef2ff; font-weight: 700;">{{ $optLabel }}</span></td>
+                                                                                    <td class="font-weight-bold">৳{{ number_format($unitCost, 2) }}</td>
+                                                                                    <td class="text-muted small">{{ $comb->stock_quantity ?? 'Unlimited' }}</td>
+                                                                                    <td>
+                                                                                        <input type="number" name="combinations[{{ $comb->id }}][quantity]" 
+                                                                                               class="form-control form-control-sm var-qty-input-{{ $product->id }}" 
+                                                                                               data-cost="{{ $unitCost }}"
+                                                                                               min="0" max="{{ $comb->stock_quantity ?? 99999 }}" value="1"
+                                                                                               oninput="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
+                                                                                    </td>
+                                                                                    <td class="text-end font-weight-bold text-dark var-subtotal-{{ $product->id }}">৳{{ number_format($unitCost, 2) }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            @else
+                                                                @php
+                                                                    $unitCost = (float)($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : $product->old_price ?? 0));
+                                                                @endphp
+                                                                <div class="mb-3">
+                                                                    <label class="form-label font-weight-bold">Stock Quantity to Purchase (Unit Cost: ৳{{ number_format($unitCost, 2) }})</label>
+                                                                    <input type="number" name="quantity" id="simple_qty_{{ $product->id }}" 
+                                                                           class="form-control form-control-lg font-weight-bold" 
+                                                                           data-cost="{{ $unitCost }}" 
+                                                                           min="1" max="{{ $product->quantity ?? 99999 }}" value="1" required
+                                                                           oninput="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
+                                                                </div>
+                                                            @endif
+
+                                                            <!-- Live Total Cost Summary Box -->
+                                                            <div class="p-3 rounded-3 border mt-3" style="background: #eef2ff; border-color: #c7d2fe !important;">
+                                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                    <span class="font-weight-bold text-dark">Total Stock Units Purchased:</span>
+                                                                    <span class="font-weight-bold text-dark fs-6" id="total_qty_display_{{ $product->id }}">1 units</span>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                    <span class="font-weight-bold text-dark">Total Wallet Deduction:</span>
+                                                                    <span class="fs-4 font-weight-extrabold text-danger" id="total_cost_display_{{ $product->id }}">৳0.00</span>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between align-items-center">
+                                                                    <span class="small text-muted font-weight-bold">Est. Remaining Wallet Balance:</span>
+                                                                    <span class="small font-weight-bold text-success" id="remaining_bal_display_{{ $product->id }}">৳0.00</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer bg-light">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-success font-weight-bold px-4" id="submit_copy_btn_{{ $product->id }}">
+                                                                <i class="fas fa-check-circle me-1"></i> Confirm & Deduct Wallet Fund
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endif
                                 @else
                                     <div class="btn-group btn-group-sm">
@@ -314,3 +411,91 @@
 </div>
 @endif
 @endsection
+
+@push('scripts')
+<script>
+function calculateProductStockCopy(productId, currentBalance) {
+    let modal = document.getElementById('copyStockModal_' + productId);
+    if (!modal) return;
+
+    let totalQty = 0;
+    let totalCost = 0;
+
+    let varInputs = modal.querySelectorAll('.var-qty-input-' + productId);
+    if (varInputs && varInputs.length > 0) {
+        varInputs.forEach(function(input) {
+            let qty = parseInt(input.value) || 0;
+            let cost = parseFloat(input.getAttribute('data-cost')) || 0;
+            let sub = qty * cost;
+            totalQty += qty;
+            totalCost += sub;
+
+            let rowSub = input.closest('tr').querySelector('.var-subtotal-' + productId);
+            if (rowSub) {
+                rowSub.innerText = '৳' + sub.toFixed(2);
+            }
+        });
+    } else {
+        let simpleInput = modal.querySelector('#simple_qty_' + productId);
+        if (simpleInput) {
+            let qty = parseInt(simpleInput.value) || 0;
+            let cost = parseFloat(simpleInput.getAttribute('data-cost')) || 0;
+            totalQty = qty;
+            totalCost = qty * cost;
+        }
+    }
+
+    let remaining = currentBalance - totalCost;
+
+    let qtyElem = modal.querySelector('#total_qty_display_' + productId);
+    let costElem = modal.querySelector('#total_cost_display_' + productId);
+    let remElem = modal.querySelector('#remaining_bal_display_' + productId);
+    let submitBtn = modal.querySelector('#submit_copy_btn_' + productId);
+
+    if (qtyElem) qtyElem.innerText = totalQty + ' units';
+    if (costElem) costElem.innerText = '৳' + totalCost.toFixed(2);
+    
+    if (remElem) {
+        if (remaining < 0) {
+            remElem.className = 'small font-weight-bold text-danger';
+            remElem.innerText = '৳' + remaining.toFixed(2) + ' (Insufficient Balance)';
+        } else {
+            remElem.className = 'small font-weight-bold text-success';
+            remElem.innerText = '৳' + remaining.toFixed(2);
+        }
+    }
+
+    if (submitBtn) {
+        if (totalCost > currentBalance || totalQty <= 0) {
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('btn-success');
+            submitBtn.classList.add('btn-secondary');
+        } else {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-secondary');
+            submitBtn.classList.add('btn-success');
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    let modals = document.querySelectorAll('[id^="copyStockModal_"]');
+    modals.forEach(function(modal) {
+        // Trigger both Bootstrap 4 and Bootstrap 5 event listeners
+        modal.addEventListener('shown.bs.modal', function() {
+            let parts = modal.id.split('_');
+            let pId = parts[1];
+            calculateProductStockCopy(pId, {{ auth()->user()->wallet_balance ?? 0 }});
+        });
+    });
+
+    if (window.jQuery) {
+        jQuery(document).on('shown.bs.modal', '[id^="copyStockModal_"]', function() {
+            let parts = this.id.split('_');
+            let pId = parts[1];
+            calculateProductStockCopy(pId, {{ auth()->user()->wallet_balance ?? 0 }});
+        });
+    }
+});
+</script>
+@endpush

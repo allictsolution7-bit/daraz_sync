@@ -18,9 +18,29 @@ class ProductController extends Controller
     {
 
         
-        $product = Product::where('status', 1)->where('id', $id)
-            ->forPublicDisplay() // Only show approved vendor products or admin products
-            ->with([
+        $query = Product::where('id', $id);
+        $user = auth()->user();
+
+        // Check if requester is Admin or owner Vendor previewing the item
+        $isAuthorizedPreview = false;
+        if ($user) {
+            // Check admin status or role
+            if (isset($user->is_admin) && $user->is_admin) {
+                $isAuthorizedPreview = true;
+            } elseif (isset($user->role) && in_array($user->role, ['admin', 'super_admin', 'super-admin'])) {
+                $isAuthorizedPreview = true;
+            } elseif (method_exists($user, 'hasRole') && ($user->hasRole('admin') || $user->hasRole('Super Admin') || $user->hasRole('super_admin'))) {
+                $isAuthorizedPreview = true;
+            } elseif (Product::where('id', $id)->where('vendor_id', $user->id)->exists()) {
+                $isAuthorizedPreview = true;
+            }
+        }
+
+        if (!$isAuthorizedPreview) {
+            $query->where('status', 1)->forPublicDisplay();
+        }
+
+        $product = $query->with([
                 'variationCombinations',
                 'additionalCategories',
                 'additionalSubCategories.category',
