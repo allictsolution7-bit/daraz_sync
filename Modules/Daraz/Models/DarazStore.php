@@ -123,8 +123,9 @@ class DarazStore extends Model
     }
 
     /**
-     * Scope to filter stores for the current authenticated user/vendor.
-     * Admin/Super Admin sees all stores; Vendor sees only their own connected stores.
+     * Scope to filter stores for the current authenticated user.
+     * - Super Admin: Sees ALL stores across the entire system.
+     * - Vendor / Admin / Manager / Staff: Sees ONLY stores connected by their user ID (or vendor account).
      */
     public function scopeForCurrentUser($query)
     {
@@ -133,11 +134,13 @@ class DarazStore extends Model
             return $query;
         }
 
-        if ($user->isVendor()) {
-            return $query->where('vendor_id', $user->id);
+        // Super Admin sees all stores
+        if ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->id == 1) {
+            return $query;
         }
 
-        return $query;
+        // Everyone else (Admin, Vendor, Manager, Staff, etc.) sees stores they connected/own
+        return $query->where('vendor_id', $user->id);
     }
 
     /**

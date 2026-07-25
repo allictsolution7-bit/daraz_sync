@@ -60,10 +60,9 @@ class DarazStoreController extends Controller
         ]);
 
         $user = auth()->user();
-        $vendorId = $user->isVendor() ? $user->id : null;
 
         $store = DarazStore::create([
-            'vendor_id' => $vendorId,
+            'vendor_id' => $user?->id,
             'name' => $validated['name'],
             'country_code' => $validated['country_code'],
             'app_key' => $validated['app_key'],
@@ -79,14 +78,30 @@ class DarazStoreController extends Controller
     }
 
     /**
+     * Helper to check if current user can access/manage given store.
+     */
+    protected function authorizeStoreAccess(DarazStore $store): void
+    {
+        $user = auth()->user();
+        if (!$user) {
+            abort(403, 'Unauthenticated.');
+        }
+
+        if ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->id == 1) {
+            return;
+        }
+
+        if ($store->vendor_id !== $user->id) {
+            abort(403, 'Unauthorized store access.');
+        }
+    }
+
+    /**
      * Show the form for editing a store.
      */
     public function edit(DarazStore $store)
     {
-        $user = auth()->user();
-        if ($user && $user->isVendor() && $store->vendor_id !== $user->id) {
-            abort(403, 'Unauthorized store access.');
-        }
+        $this->authorizeStoreAccess($store);
 
         $countries = DarazStore::getCountries();
         $recentLogs = $store->syncLogs()->latest('created_at')->limit(10)->get();
@@ -99,10 +114,7 @@ class DarazStoreController extends Controller
      */
     public function update(Request $request, DarazStore $store)
     {
-        $user = auth()->user();
-        if ($user && $user->isVendor() && $store->vendor_id !== $user->id) {
-            abort(403, 'Unauthorized store access.');
-        }
+        $this->authorizeStoreAccess($store);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -144,10 +156,7 @@ class DarazStoreController extends Controller
      */
     public function destroy(DarazStore $store)
     {
-        $user = auth()->user();
-        if ($user && $user->isVendor() && $store->vendor_id !== $user->id) {
-            abort(403, 'Unauthorized store access.');
-        }
+        $this->authorizeStoreAccess($store);
 
         $store->delete();
 
@@ -161,10 +170,7 @@ class DarazStoreController extends Controller
      */
     public function startAuthorization(DarazStore $store)
     {
-        $user = auth()->user();
-        if ($user && $user->isVendor() && $store->vendor_id !== $user->id) {
-            abort(403, 'Unauthorized store access.');
-        }
+        $this->authorizeStoreAccess($store);
         if (!$store->hasValidCredentials()) {
             flash()->error('Please configure app key and secret first.');
             return redirect()->route('admin.daraz.stores.edit', $store);

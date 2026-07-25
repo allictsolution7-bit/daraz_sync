@@ -321,8 +321,8 @@
                     <thead>
                         <tr>
                             <th>Outlet Name</th>
-                            @if(auth()->user()->isAdmin())
-                                <th>Vendor / Owner</th>
+                            @if(auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('super admin') || auth()->user()->id == 1)
+                                <th>Account Owner</th>
                             @endif
                             <th>Country</th>
                             <th>Status</th>
@@ -339,13 +339,13 @@
                                     <span class="text-title">{{ $store->name }}</span>
                                     <span class="text-subtitle">App Key: {{ Str::limit($store->app_key, 20) }}</span>
                                 </td>
-                                @if(auth()->user()->isAdmin())
+                                @if(auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('super admin') || auth()->user()->id == 1)
                                     <td>
                                         @if($store->vendor)
                                             <span class="text-title" style="font-size:0.85rem; font-weight:700;">{{ $store->vendor->name }}</span>
                                             <span class="text-subtitle">{{ $store->vendor->email }}</span>
                                         @else
-                                            <span class="badge-pill bp-country" style="background:#e2e8f0; color:#475569;">Admin / System</span>
+                                            <span class="badge-pill bp-country" style="background:#e2e8f0; color:#475569;">System / Global</span>
                                         @endif
                                     </td>
                                 @endif

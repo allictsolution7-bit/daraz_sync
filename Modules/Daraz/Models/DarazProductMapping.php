@@ -174,8 +174,9 @@ class DarazProductMapping extends Model
     }
 
     /**
-     * Scope to get mappings accessible by the current authenticated user/vendor.
-     * Admin/Super Admin sees all mappings; Vendor sees only mappings linked to their stores.
+     * Scope to get mappings accessible by the current authenticated user.
+     * - Super Admin: Sees ALL product mappings across the system.
+     * - Vendor / Admin / Manager / Staff: Sees ONLY mappings linked to stores connected by their user ID.
      */
     public function scopeForCurrentUser($query)
     {
@@ -184,13 +185,15 @@ class DarazProductMapping extends Model
             return $query;
         }
 
-        if ($user->isVendor()) {
-            return $query->whereHas('store', function ($q) use ($user) {
-                $q->where('vendor_id', $user->id);
-            });
+        // Super Admin sees all mappings
+        if ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->id == 1) {
+            return $query;
         }
 
-        return $query;
+        // Everyone else sees mappings for stores connected by their user ID
+        return $query->whereHas('store', function ($q) use ($user) {
+            $q->where('vendor_id', $user->id);
+        });
     }
 
     /**

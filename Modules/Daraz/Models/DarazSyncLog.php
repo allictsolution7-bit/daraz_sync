@@ -68,8 +68,9 @@ class DarazSyncLog extends Model
     }
 
     /**
-     * Scope to get sync logs accessible by the current authenticated user/vendor.
-     * Admin/Super Admin sees all logs; Vendor sees only logs linked to their stores.
+     * Scope to get sync logs accessible by the current authenticated user.
+     * - Super Admin: Sees ALL sync logs across the system.
+     * - Vendor / Admin / Manager / Staff: Sees ONLY logs linked to stores connected by their user ID.
      */
     public function scopeForCurrentUser($query)
     {
@@ -78,13 +79,15 @@ class DarazSyncLog extends Model
             return $query;
         }
 
-        if ($user->isVendor()) {
-            return $query->whereHas('store', function ($q) use ($user) {
-                $q->where('vendor_id', $user->id);
-            });
+        // Super Admin sees all logs
+        if ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->id == 1) {
+            return $query;
         }
 
-        return $query;
+        // Everyone else sees logs for stores connected by their user ID
+        return $query->whereHas('store', function ($q) use ($user) {
+            $q->where('vendor_id', $user->id);
+        });
     }
 
     /**
