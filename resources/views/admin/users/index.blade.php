@@ -170,15 +170,26 @@
             border-spacing: 0 4px !important;
         }
 
-        .premium-table thead th {
+        .premium-table thead th,
+        table.dataTable.premium-table thead th {
             background-color: #f1f5f9 !important;
-            color: var(--text-muted);
-            font-weight: 600;
+            color: #1e293b !important;
+            font-weight: 700 !important;
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.5px;
-            padding: 8px 12px !important;
+            padding: 10px 12px !important;
             border: none !important;
+        }
+
+        table.dataTable.premium-table thead .sorting:before,
+        table.dataTable.premium-table thead .sorting:after,
+        table.dataTable.premium-table thead .sorting_asc:before,
+        table.dataTable.premium-table thead .sorting_asc:after,
+        table.dataTable.premium-table thead .sorting_desc:before,
+        table.dataTable.premium-table thead .sorting_desc:after {
+            color: #475569 !important;
+            opacity: 0.7 !important;
         }
 
         .premium-table tbody tr {
@@ -1014,9 +1025,28 @@
         @else
             <!-- ORIGINAL USERS WORKSPACE (Redesigned Workspace) -->
             @php
+                $currentUser = auth()->user();
+                $isSuperAdmin = $currentUser ? ($currentUser->id == 1 || !empty($currentUser->is_super_admin) || $currentUser->hasAnyRole(['super_admin', 'super admin', 'Super Admin', 'super-admin'])) : false;
+
+                if (!$isSuperAdmin && $currentUser) {
+                    $restrictedRoles = ['super admin', 'super_admin', 'super-admin', 'admin', 'Admin'];
+                    $users = $users->filter(function($u) use ($currentUser, $restrictedRoles) {
+                        // Never show Super Admin or Admin accounts to regular admins
+                        $hasRestrictedRole = $u->id == 1 || !empty($u->is_super_admin) || $u->roles->contains(function($r) use ($restrictedRoles) {
+                            return in_array(strtolower(trim($r->name)), array_map('strtolower', $restrictedRoles));
+                        });
+                        if ($hasRestrictedRole) {
+                            return false;
+                        }
+
+                        // Only show users created by current logged in admin
+                        return isset($u->created_by) && $u->created_by == $currentUser->id;
+                    });
+                }
+
                 $totalUsersCount = count($users);
                 $adminUsersCount = $users->filter(function($u) {
-                    return $u->getRoleNames()->contains('admin') || $u->getRoleNames()->contains('super-admin');
+                    return $u->getRoleNames()->contains('admin') || $u->getRoleNames()->contains('super-admin') || $u->getRoleNames()->contains('super_admin');
                 })->count();
                 $standardUsersCount = $totalUsersCount - $adminUsersCount;
             @endphp

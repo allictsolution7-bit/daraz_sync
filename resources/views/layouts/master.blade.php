@@ -1877,7 +1877,7 @@
                         @endif
  
                         <!-- CONTROL & SYSTEM SECTION -->
-                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->hasRole('admin') || auth()->user()?->role === 'admin' || auth()->user()?->canAny(['users.view', 'contacts.view', 'subscriptions.view', 'roles.manage', 'settings.view']))
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->canAny(['users.view', 'contacts.view', 'subscriptions.view', 'roles.manage', 'roles_permissions.view', 'settings.view']))
                         <li class="menu-section {{ $controlSystemActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1956,7 +1956,7 @@
                                 </li>
                                 @endcan
  
-                                @can('roles.manage')
+                                @canany(['roles_permissions.view', 'roles.manage', 'permissions.manage'])
                                 <li class="{{ request()->routeIs('admin.roles_permissions.*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.roles_permissions.index') }}">
                                         <span class="menu-content">
@@ -1965,7 +1965,7 @@
                                         </span>
                                     </a>
                                 </li>
-                                @endcan
+                                @endcanany
  
                                 {{-- Modules & Tools --}}
                                 <li class="{{ request()->is('admin/extensions*') ? 'active' : '' }}">

@@ -173,6 +173,17 @@
         .badge-pending { background: #fef3c7; color: #b45309; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
         .badge-rejected { background: #fee2e2; color: #b91c1c; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
 
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+            border-radius: var(--v-radius);
+            padding: 1.5rem 1.75rem;
+            color: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(49, 46, 129, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
         @media (max-width: 991.98px) {
             .vendor-sidebar {
                 margin-left: calc(-1 * var(--v-sidebar-width));

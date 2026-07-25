@@ -831,20 +831,23 @@
 
     // Enhanced permission filter in the open modal
     document.addEventListener('input', function(e){
-        if (!e.target.classList.contains('permission-search')) return;
+        if (!e.target.classList.contains('permission-search') && !e.target.classList.contains('permission-search-custom')) return;
         const modal = e.target.closest('.modal-content');
+        if (!modal) return;
+
         const term = e.target.value.trim().toLowerCase();
 
         modal.querySelectorAll('.permissions-group').forEach(groupCard => {
-            const groupHeader = groupCard.querySelector('.card-header');
-            const groupTitle = groupHeader ? groupHeader.textContent.toLowerCase() : '';
-            const isGroupMatch = term !== '' && groupTitle.includes(term);
+            const groupCategoryTitle = groupCard.querySelector('.card-header .text-capitalize');
+            const categoryText = groupCategoryTitle ? groupCategoryTitle.textContent.toLowerCase() : '';
+            const isCategoryMatch = term !== '' && categoryText.includes(term);
 
             let visibleCount = 0;
             groupCard.querySelectorAll('.perm-item-check, .form-check').forEach(row => {
                 const label = row.querySelector('label');
-                const txt = label ? label.textContent.toLowerCase() : '';
-                const isMatch = term === '' || txt.includes(term) || isGroupMatch;
+                const input = row.querySelector('input');
+                const txt = (label ? label.textContent : '') + ' ' + (input ? input.value : '');
+                const isMatch = term === '' || txt.toLowerCase().includes(term) || isCategoryMatch;
                 row.style.display = isMatch ? '' : 'none';
                 if (isMatch) visibleCount++;
             });

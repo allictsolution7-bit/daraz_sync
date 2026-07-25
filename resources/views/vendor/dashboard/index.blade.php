@@ -16,7 +16,7 @@
                 </span>
             </div>
             <h2 class="fw-extrabold text-white mb-1">Welcome back, {{ auth()->user()->name }}!</h2>
-            <p class="text-white-50 mb-0">Here is what's happening with your store products, orders, and revenue today.</p>
+            <p class="text-white opacity-75 mb-0">Here is what's happening with your store products, orders, and revenue today.</p>
         </div>
         <div class="d-flex align-items-center gap-2 flex-wrap">
             <a href="{{ route('vendor.products.create') }}" class="btn btn-warning fw-bold rounded-pill px-4 py-2 text-dark shadow-sm d-flex align-items-center gap-2">
