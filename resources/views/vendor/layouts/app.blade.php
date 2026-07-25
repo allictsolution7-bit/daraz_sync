@@ -238,6 +238,54 @@
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.profile') ? 'active' : '' }}" href="{{ route('vendor.profile') }}">
                 <i class="fas fa-cog"></i> Store Settings
             </a>
+
+            @php
+                $user = auth()->user();
+                $hasDarazPermission = false;
+                if ($user) {
+                    if ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')) {
+                        $hasDarazPermission = true;
+                    } elseif (method_exists($user, 'canAny') && $user->canAny(['daraz.view', 'admin.daraz.view', 'daraz_sync.view', 'daraz.index', 'daraz'])) {
+                        $hasDarazPermission = true;
+                    } elseif (method_exists($user, 'hasAnyPermission') && $user->hasAnyPermission(['daraz.view', 'admin.daraz.view', 'daraz_sync.view', 'daraz.index', 'daraz'])) {
+                        $hasDarazPermission = true;
+                    } elseif ($user->permissions && $user->permissions->pluck('name')->filter(fn($p) => str_contains(strtolower($p), 'daraz'))->count() > 0) {
+                        $hasDarazPermission = true;
+                    } elseif ($user->roles && $user->roles->flatMap->permissions->pluck('name')->filter(fn($p) => str_contains(strtolower($p), 'daraz'))->count() > 0) {
+                        $hasDarazPermission = true;
+                    }
+                }
+            @endphp
+
+            @if(module_enabled('Daraz') && Route::has('admin.daraz.index') && $hasDarazPermission)
+                <div class="vendor-nav-header mt-3">Connected Apps</div>
+                <div class="vendor-sidebar-group">
+                    <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->is('admin/daraz*') ? 'active' : '' }}" 
+                       data-bs-toggle="collapse" 
+                       href="#darazSyncVendorMenu" 
+                       role="button" 
+                       aria-expanded="{{ request()->is('admin/daraz*') ? 'true' : 'false' }}">
+                        <span class="d-flex align-items-center gap-2">
+                            <i class="fas fa-rotate text-warning"></i> Daraz Sync
+                        </span>
+                        <i class="fas fa-chevron-down fs-8"></i>
+                    </a>
+                    <div class="collapse {{ request()->is('admin/daraz*') ? 'show' : '' }} ps-3 mt-1" id="darazSyncVendorMenu">
+                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('admin.daraz.index') ? 'active text-white' : '' }}" href="{{ route('admin.daraz.index') }}">
+                            <i class="fas fa-chart-simple fs-7"></i> Dashboard
+                        </a>
+                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('admin.daraz.stores.*') ? 'active text-white' : '' }}" href="{{ route('admin.daraz.stores.index') }}">
+                            <i class="fas fa-store fs-7"></i> Stores
+                        </a>
+                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('admin.daraz.mappings.*') ? 'active text-white' : '' }}" href="{{ route('admin.daraz.mappings.index') }}">
+                            <i class="fas fa-arrows-spin fs-7"></i> Product Mappings
+                        </a>
+                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('admin.daraz.sync.logs') ? 'active text-white' : '' }}" href="{{ route('admin.daraz.sync.logs') }}">
+                            <i class="fas fa-terminal fs-7"></i> Sync Logs
+                        </a>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Sidebar Footer -->

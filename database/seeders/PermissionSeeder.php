@@ -80,6 +80,7 @@ class PermissionSeeder extends Seeder
             'delayed_events.view',
             'woocommerce_migration.view',
             'basic_shipping.view',
+            'daraz.view', 'admin.daraz.view', 'daraz_sync.view', 'daraz.index',
         ];
 
         foreach ($permissions as $p) {
