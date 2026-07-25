@@ -201,6 +201,9 @@
                                 <div class="mb-3">
                                     <label for="sync_interval" class="form-label">Sync Interval</label>
                                     <select class="form-select" id="sync_interval" name="sync_interval">
+                                        <option value="2" {{ old('sync_interval', 30) == 2 ? 'selected' : '' }}>Every 2 minutes</option>
+                                        <option value="5" {{ old('sync_interval', 30) == 5 ? 'selected' : '' }}>Every 5 minutes</option>
+                                        <option value="10" {{ old('sync_interval', 30) == 10 ? 'selected' : '' }}>Every 10 minutes</option>
                                         <option value="15" {{ old('sync_interval', 30) == 15 ? 'selected' : '' }}>Every 15 minutes</option>
                                         <option value="30" {{ old('sync_interval', 30) == 30 ? 'selected' : '' }}>Every 30 minutes</option>
                                         <option value="60" {{ old('sync_interval', 30) == 60 ? 'selected' : '' }}>Every hour</option>

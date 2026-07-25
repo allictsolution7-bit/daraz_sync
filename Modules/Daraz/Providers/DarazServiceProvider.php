@@ -145,9 +145,9 @@ class DarazServiceProvider extends ServiceProvider
      */
     public static function schedule(\Illuminate\Console\Scheduling\Schedule $schedule): void
     {
-        // Sync due stores every 15 minutes
+        // Check and sync due stores every minute
         $schedule->command('daraz:sync --queue')
-            ->everyFifteenMinutes()
+            ->everyMinute()
             ->withoutOverlapping()
             ->runInBackground();
 

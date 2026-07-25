@@ -56,7 +56,7 @@ class DarazStoreController extends Controller
             'app_key' => 'required|string|max:255',
             'app_secret' => 'required|string|max:500',
             'auto_sync' => 'boolean',
-            'sync_interval' => 'integer|min:5|max:1440',
+            'sync_interval' => 'integer|min:1|max:1440',
         ]);
 
         $user = auth()->user();
@@ -122,7 +122,7 @@ class DarazStoreController extends Controller
             'app_key' => 'required|string|max:255',
             'app_secret' => 'nullable|string|max:500',
             'auto_sync' => 'boolean',
-            'sync_interval' => 'integer|min:5|max:1440',
+            'sync_interval' => 'integer|min:1|max:1440',
             'is_active' => 'boolean',
         ]);
 

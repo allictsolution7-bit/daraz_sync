@@ -270,6 +270,9 @@
                         <div style="margin-bottom:24px;">
                             <label class="field-label">Sync Interval</label>
                             <select class="field-select" id="sync_interval" name="sync_interval">
+                                <option value="2" {{ old('sync_interval', $store->sync_interval) == 2 ? 'selected' : '' }}>Every 2 minutes</option>
+                                <option value="5" {{ old('sync_interval', $store->sync_interval) == 5 ? 'selected' : '' }}>Every 5 minutes</option>
+                                <option value="10" {{ old('sync_interval', $store->sync_interval) == 10 ? 'selected' : '' }}>Every 10 minutes</option>
                                 <option value="15" {{ old('sync_interval', $store->sync_interval) == 15 ? 'selected' : '' }}>Every 15 minutes</option>
                                 <option value="30" {{ old('sync_interval', $store->sync_interval) == 30 ? 'selected' : '' }}>Every 30 minutes</option>
                                 <option value="60" {{ old('sync_interval', $store->sync_interval) == 60 ? 'selected' : '' }}>Every hour</option>
