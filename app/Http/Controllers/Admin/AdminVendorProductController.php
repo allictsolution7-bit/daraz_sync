@@ -22,14 +22,11 @@ class AdminVendorProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::whereNotNull('vendor_id')
-            ->with(['vendor', 'category', 'subCategory']);
+            ->with(['vendor.vendorSettings', 'category', 'subCategory', 'variationCombinations']);
 
         // Filter by approval status
-        if ($request->has('status')) {
+        if ($request->has('status') && !empty($request->status) && $request->status !== 'all') {
             $query->where('approval_status', $request->status);
-        } else {
-            // Default: show pending products
-            $query->where('approval_status', 'pending');
         }
 
         // Filter by vendor
@@ -45,7 +42,7 @@ class AdminVendorProductController extends Controller
             });
         }
 
-        $products = $query->latest()->paginate(20);
+        $products = $query->latest()->paginate(20)->withQueryString();
 
         return view('admin.vendor-products.index', compact('products'));
     }
@@ -59,16 +56,16 @@ class AdminVendorProductController extends Controller
             abort(404, 'This is not a vendor product.');
         }
 
-        $product->load(['vendor.vendorSettings', 'category', 'subCategory', 'brand']);
+        $product->load(['vendor.vendorSettings', 'category', 'subCategory', 'brand', 'variationCombinations']);
 
         // Calculate commission
         $commission = $this->vendorService->calculateProductCommission($product);
         
-        $vendorSettings = $product->vendor->vendorSettings;
+        $vendorSettings = $product->vendor?->vendorSettings;
         $commissionLimits = [
-            'min' => $vendorSettings->getMinCommissionRate(),
-            'max' => $vendorSettings->getMaxCommissionRate(),
-            'default' => $vendorSettings->getDefaultCommissionRate(),
+            'min' => $vendorSettings && method_exists($vendorSettings, 'getMinCommissionRate') ? $vendorSettings->getMinCommissionRate() : 5.0,
+            'max' => $vendorSettings && method_exists($vendorSettings, 'getMaxCommissionRate') ? $vendorSettings->getMaxCommissionRate() : 30.0,
+            'default' => $vendorSettings && method_exists($vendorSettings, 'getDefaultCommissionRate') ? $vendorSettings->getDefaultCommissionRate() : 15.0,
         ];
 
         return view('admin.vendor-products.show', compact(

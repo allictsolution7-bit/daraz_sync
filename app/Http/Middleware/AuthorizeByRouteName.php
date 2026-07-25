@@ -61,6 +61,7 @@ class AuthorizeByRouteName
         // Resource aliases to keep permission names consistent
         $resourceAliases = [
             'product' => 'products',
+            'items' => 'products',
             'post' => 'posts',
             'landing-pages' => 'landing_pages',
             'postsubcategory' => 'post_subcategories',
@@ -170,7 +171,10 @@ class AuthorizeByRouteName
         $isPackagesView = $request->get('view') === 'packages';
         $isAdminUser = method_exists($user, 'hasRole') && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('super admin') || ($user->role ?? '') === 'admin');
 
-        if ($user->can($permission) || $hasOrderAssignedPermission || ($isPackagesView && $isAdminUser) || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
+        $vendorPerm = str_starts_with($permission, 'vendor.') ? $permission : 'vendor.' . $permission;
+        $standardPerm = str_replace('vendor.', '', $permission);
+
+        if ($user->can($permission) || $user->can($vendorPerm) || $user->can($standardPerm) || $hasOrderAssignedPermission || ($isPackagesView && $isAdminUser) || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
             return $next($request);
         }
 

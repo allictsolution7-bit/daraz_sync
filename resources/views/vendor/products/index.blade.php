@@ -14,6 +14,27 @@
     </div>
 </div>
 
+@if(session('warning'))
+    <div class="alert alert-warning alert-dismissible fade show mb-4 shadow-sm border-warning" role="alert">
+        <i class="fas fa-clock me-2"></i> <strong>Pending Admin Approval:</strong> {{ session('warning') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm border-success" role="alert">
+        <i class="fas fa-check-circle me-2"></i> <strong>Success:</strong> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm border-danger" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i> <strong>Error:</strong> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 <!-- Source Tabs (My Products vs Parent Admin Catalog) -->
 @if($canAccessAdminProducts ?? false)
 <div class="mb-3">
@@ -122,13 +143,67 @@
                             </td>
                             <td>
                                 <strong>{{ $product->title }}</strong><br>
-                                <small class="text-muted">{{ $product->category->name ?? 'N/A' }}</small>
+                                @php
+                                    $catParts = [];
+                                    if ($product->category) {
+                                        $catParts[] = $product->category->name;
+                                    }
+                                    if ($product->subCategory) {
+                                        $catParts[] = $product->subCategory->name;
+                                    }
+                                @endphp
+                                <small class="text-muted">{{ count($catParts) > 0 ? implode(' > ', $catParts) : 'N/A' }}</small>
                             </td>
                             <td>
-                                @if($product->old_price && $product->old_price > $product->offer)
-                                    <span class="text-decoration-line-through text-muted">৳{{ number_format($product->old_price, 2) }}</span><br>
+                                @php
+                                    $displayPrice = '৳0.00';
+                                    $displayOldPrice = null;
+
+                                    if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
+                                        $prices = [];
+                                        $regularPrices = [];
+                                        foreach ($product->variationCombinations as $comb) {
+                                            $p = $comb->offer_price ?? $comb->regular_price ?? 0;
+                                            $reg = $comb->regular_price ?? 0;
+                                            if ($p > 0) $prices[] = (float)$p;
+                                            if ($reg > 0) $regularPrices[] = (float)$reg;
+                                        }
+                                        if (!empty($prices)) {
+                                            $minP = min($prices);
+                                            $maxP = max($prices);
+                                            if ($minP === $maxP) {
+                                                $displayPrice = '৳' . number_format($minP, 2);
+                                            } else {
+                                                $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                            }
+                                        } elseif (!empty($regularPrices)) {
+                                            $minP = min($regularPrices);
+                                            $maxP = max($regularPrices);
+                                            if ($minP === $maxP) {
+                                                $displayPrice = '৳' . number_format($minP, 2);
+                                            } else {
+                                                $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                            }
+                                        }
+                                    } else {
+                                        $offerPrice = (float)($product->offer ?? 0);
+                                        $oldPrice = (float)($product->old_price ?? 0);
+
+                                        if ($offerPrice > 0) {
+                                            $displayPrice = '৳' . number_format($offerPrice, 2);
+                                            if ($oldPrice > $offerPrice) {
+                                                $displayOldPrice = '৳' . number_format($oldPrice, 2);
+                                            }
+                                        } elseif ($oldPrice > 0) {
+                                            $displayPrice = '৳' . number_format($oldPrice, 2);
+                                        }
+                                    }
+                                @endphp
+
+                                @if($displayOldPrice)
+                                    <span class="text-decoration-line-through text-muted" style="font-size: 0.8rem;">{{ $displayOldPrice }}</span><br>
                                 @endif
-                                <strong>৳{{ number_format($product->offer, 2) }}</strong>
+                                <strong class="text-dark">{{ $displayPrice }}</strong>
                             </td>
                             @if(($source ?? 'my_products') === 'my_products')
                             <td>
@@ -178,12 +253,18 @@
                             </td>
                             <td class="text-end">
                                 @if(($source ?? 'my_products') === 'admin_products')
-                                    <form action="{{ route('vendor.products.copy', $product) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1">
-                                            <i class="fas fa-copy"></i> Copy to My Products
+                                    @if(in_array($product->title, $copiedProductTitles ?? []))
+                                        <button disabled class="btn btn-outline-secondary btn-sm font-weight-bold d-inline-flex align-items-center gap-1" title="You have already copied this product to your store">
+                                            <i class="fas fa-check-circle text-success"></i> Already Copied
                                         </button>
-                                    </form>
+                                    @else
+                                        <form action="{{ route('vendor.products.copy', $product) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1">
+                                                <i class="fas fa-copy"></i> Copy to My Products
+                                            </button>
+                                        </form>
+                                    @endif
                                 @else
                                     <div class="btn-group btn-group-sm">
                                         <a href="{{ route('vendor.products.edit', $product) }}" 

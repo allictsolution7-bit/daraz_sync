@@ -72,20 +72,21 @@ class VendorProductController extends Controller
                 } else {
                     $q->whereNull('vendor_id');
                 }
-            })->with(['category', 'subCategory', 'brand']);
+            })->with(['category', 'subCategory', 'brand', 'variationCombinations']);
         } else {
             $source = 'my_products';
             $query = Product::forVendor($vendor->id)
-                ->with(['category', 'subCategory', 'brand']);
+                ->with(['category', 'subCategory', 'brand', 'variationCombinations']);
 
             if ($request->has('status')) {
                 $query->where('approval_status', $request->status);
             }
         }
 
+        $copiedProductTitles = Product::where('vendor_id', $vendor->id)->pluck('title')->toArray();
         $products = $query->latest()->paginate(20)->withQueryString();
 
-        return view('vendor.products.index', compact('products', 'canAccessAdminProducts', 'source'));
+        return view('vendor.products.index', compact('products', 'canAccessAdminProducts', 'source', 'copiedProductTitles'));
     }
 
     /**
@@ -107,35 +108,88 @@ class VendorProductController extends Controller
                 ->with('error', 'Unauthorized product copy request.');
         }
 
-        $newProduct = $product->replicate([
-            'views_total',
-            'views_unique',
-        ]);
+        // Check if vendor has already copied this product
+        $alreadyCopied = Product::where('vendor_id', $vendor->id)
+            ->where('title', $product->title)
+            ->exists();
 
-        $newProduct->title = $product->title;
-        $newProduct->slug = Str::slug($product->title) . '-v' . $vendor->id . '-' . Str::random(4);
-        if ($product->sku) {
-            $newProduct->sku = $product->sku . '-V' . $vendor->id . '-' . rand(100, 999);
+        if ($alreadyCopied) {
+            return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                ->with('error', 'You have already copied "' . $product->title . '" to your catalog. Please select or try a different product.');
         }
-        $newProduct->vendor_id = $vendor->id;
-        $newProduct->approval_status = 'approved';
-        $newProduct->status = 1;
-        $newProduct->save();
 
-        // Copy variation combinations if present
-        if ($product->relationLoaded('variationCombinations') || $product->variationCombinations()->exists()) {
-            foreach ($product->variationCombinations as $combination) {
-                $newCombination = $combination->replicate();
-                $newCombination->product_id = $newProduct->id;
-                if ($combination->sku) {
-                    $newCombination->sku = $combination->sku . '-V' . $vendor->id . '-' . rand(100, 999);
-                }
-                $newCombination->save();
+        try {
+            $vendorSettings = $vendor->vendorSettings;
+
+            $newProduct = $product->replicate([
+                'views_total',
+                'views_unique',
+            ]);
+
+            $newProduct->title = $product->title;
+            $newProduct->slug = Str::slug($product->title) . '-v' . $vendor->id . '-' . Str::random(4);
+            if ($product->sku) {
+                $newProduct->sku = $product->sku . '-V' . $vendor->id . '-' . rand(100, 999);
             }
-        }
+            $newProduct->vendor_id = $vendor->id;
 
-        return redirect()->route('vendor.products.index', ['status' => 'approved'])
-            ->with('success', 'Product "' . $newProduct->title . '" copied to your products list successfully!');
+            // Respect vendor auto-approve settings or default to pending admin approval
+            $autoApprove = $vendorSettings && method_exists($vendorSettings, 'shouldAutoApproveProducts') 
+                ? $vendorSettings->shouldAutoApproveProducts() 
+                : false;
+
+            if ($autoApprove) {
+                $newProduct->approval_status = 'approved';
+                $newProduct->approved_at = now();
+                $newProduct->status = 1; // Active
+                $statusTarget = 'approved';
+                $flashType = 'success';
+                $flashMessage = 'Product "' . $newProduct->title . '" copied to your catalog and automatically approved!';
+            } else {
+                $newProduct->approval_status = 'pending';
+                $newProduct->approved_at = null;
+                $newProduct->status = 0; // Inactive until admin approves
+                $statusTarget = 'pending';
+                $flashType = 'warning';
+                $flashMessage = 'Product "' . $newProduct->title . '" copied to your catalog! It has been submitted to your Admin for approval and is currently pending review.';
+            }
+
+            $newProduct->save();
+
+            // Copy variation combinations if present
+            if ($product->relationLoaded('variationCombinations') || $product->variationCombinations()->exists()) {
+                foreach ($product->variationCombinations as $combination) {
+                    $newCombination = $combination->replicate();
+                    $newCombination->product_id = $newProduct->id;
+
+                    $opts = $combination->variation_options;
+                    if (is_string($opts)) {
+                        $optsArr = json_decode($opts, true) ?? explode('_', $opts);
+                    } else {
+                        $optsArr = (array)$opts;
+                    }
+
+                    if (method_exists(\App\Models\VariationCombination::class, 'generateCombinationKey')) {
+                        $newCombination->combination_key = \App\Models\VariationCombination::generateCombinationKey($newProduct->id, $optsArr);
+                    } else {
+                        $newCombination->combination_key = $newProduct->id . '_' . (is_array($optsArr) ? implode('_', $optsArr) : $optsArr);
+                    }
+
+                    if ($combination->sku) {
+                        $newCombination->sku = $combination->sku . '-V' . $vendor->id . '-' . rand(100, 999);
+                    }
+                    $newCombination->save();
+                }
+            }
+
+            return redirect()->route('vendor.products.index', ['source' => 'my_products', 'status' => $statusTarget])
+                ->with($flashType, $flashMessage);
+
+        } catch (\Throwable $e) {
+            \Log::error('Product Copy Exception: ' . $e->getMessage());
+            return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                ->with('error', 'Could not copy "' . $product->title . '". You have already copied this product or a duplicate SKU exists. Please try a different product.');
+        }
     }
 
     /**

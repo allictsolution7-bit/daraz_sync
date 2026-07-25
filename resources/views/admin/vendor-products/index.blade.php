@@ -239,9 +239,53 @@
                                     <small class="text-muted">{{ $product->vendor->vendorSettings->business_name ?? '' }}</small>
                                 </td>
                                 <td>
-                                    <span class="font-weight-bold text-dark d-block">৳{{ number_format($product->offer, 2) }}</span>
-                                    @if($product->old_price && $product->old_price > $product->offer)
-                                        <small class="text-muted text-decoration-line-through">৳{{ number_format($product->old_price, 2) }}</small>
+                                    @php
+                                        $displayPrice = '৳0.00';
+                                        $displayOldPrice = null;
+
+                                        if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
+                                            $prices = [];
+                                            $regularPrices = [];
+                                            foreach ($product->variationCombinations as $comb) {
+                                                $p = $comb->offer_price ?? $comb->regular_price ?? 0;
+                                                $reg = $comb->regular_price ?? 0;
+                                                if ($p > 0) $prices[] = (float)$p;
+                                                if ($reg > 0) $regularPrices[] = (float)$reg;
+                                            }
+                                            if (!empty($prices)) {
+                                                $minP = min($prices);
+                                                $maxP = max($prices);
+                                                if ($minP === $maxP) {
+                                                    $displayPrice = '৳' . number_format($minP, 2);
+                                                } else {
+                                                    $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                                }
+                                            } elseif (!empty($regularPrices)) {
+                                                $minP = min($regularPrices);
+                                                $maxP = max($regularPrices);
+                                                if ($minP === $maxP) {
+                                                    $displayPrice = '৳' . number_format($minP, 2);
+                                                } else {
+                                                    $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                                }
+                                            }
+                                        } else {
+                                            $offerPrice = (float)($product->offer ?? 0);
+                                            $oldPrice = (float)($product->old_price ?? 0);
+
+                                            if ($offerPrice > 0) {
+                                                $displayPrice = '৳' . number_format($offerPrice, 2);
+                                                if ($oldPrice > $offerPrice) {
+                                                    $displayOldPrice = '৳' . number_format($oldPrice, 2);
+                                                }
+                                            } elseif ($oldPrice > 0) {
+                                                $displayPrice = '৳' . number_format($oldPrice, 2);
+                                            }
+                                        }
+                                    @endphp
+                                    <span class="font-weight-bold text-dark d-block">{{ $displayPrice }}</span>
+                                    @if($displayOldPrice)
+                                        <small class="text-muted text-decoration-line-through">{{ $displayOldPrice }}</small>
                                     @endif
                                 </td>
                                 <td>

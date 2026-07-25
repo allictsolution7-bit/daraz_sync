@@ -245,13 +245,13 @@
                                 <input type="number" 
                                        name="commission_rate" 
                                        class="form-control" 
-                                       value="{{ $product->vendor_proposed_commission ?? $product->vendor->vendorSettings->getDefaultCommissionRate() }}"
-                                       min="{{ $product->vendor->vendorSettings->getMinCommissionRate() }}"
-                                       max="{{ $product->vendor->vendorSettings->getMaxCommissionRate() }}"
+                                       value="{{ $product->vendor_proposed_commission ?? $commissionLimits['default'] }}"
+                                       min="{{ $commissionLimits['min'] }}"
+                                       max="{{ $commissionLimits['max'] }}"
                                        step="0.01"
                                        required>
                                 <small class="text-muted">
-                                    Range: {{ $product->vendor->vendorSettings->getMinCommissionRate() }}% - {{ $product->vendor->vendorSettings->getMaxCommissionRate() }}%
+                                    Range: {{ $commissionLimits['min'] }}% - {{ $commissionLimits['max'] }}%
                                 </small>
                             </div>
 
