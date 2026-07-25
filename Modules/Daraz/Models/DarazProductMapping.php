@@ -174,6 +174,26 @@ class DarazProductMapping extends Model
     }
 
     /**
+     * Scope to get mappings accessible by the current authenticated user/vendor.
+     * Admin/Super Admin sees all mappings; Vendor sees only mappings linked to their stores.
+     */
+    public function scopeForCurrentUser($query)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return $query;
+        }
+
+        if ($user->isVendor()) {
+            return $query->whereHas('store', function ($q) use ($user) {
+                $q->where('vendor_id', $user->id);
+            });
+        }
+
+        return $query;
+    }
+
+    /**
      * Find mappings by Daraz SKU.
      */
     public static function findByDarazSku(string $sku, ?int $storeId = null)

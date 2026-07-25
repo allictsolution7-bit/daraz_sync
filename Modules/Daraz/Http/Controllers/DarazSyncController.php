@@ -25,13 +25,15 @@ class DarazSyncController extends Controller
      */
     public function index()
     {
-        $stores = DarazStore::active()
+        $stores = DarazStore::forCurrentUser()
+            ->active()
             ->withCount(['productMappings', 'productMappings as enabled_mappings_count' => function ($q) {
                 $q->where('sync_enabled', true);
             }])
             ->get();
 
-        $recentLogs = DarazSyncLog::with(['store', 'productMapping'])
+        $recentLogs = DarazSyncLog::forCurrentUser()
+            ->with(['store', 'productMapping'])
             ->orderBy('created_at', 'desc')
             ->limit(20)
             ->get();
@@ -40,10 +42,10 @@ class DarazSyncController extends Controller
         $stats = [
             'total_stores' => $stores->count(),
             'connected_stores' => $stores->filter(fn($s) => $s->isConnected())->count(),
-            'total_mappings' => DarazProductMapping::count(),
-            'enabled_mappings' => DarazProductMapping::where('sync_enabled', true)->count(),
-            'recent_syncs' => DarazSyncLog::where('created_at', '>=', now()->subHours(24))->count(),
-            'failed_syncs' => DarazSyncLog::where('created_at', '>=', now()->subHours(24))
+            'total_mappings' => DarazProductMapping::forCurrentUser()->count(),
+            'enabled_mappings' => DarazProductMapping::forCurrentUser()->where('sync_enabled', true)->count(),
+            'recent_syncs' => DarazSyncLog::forCurrentUser()->where('created_at', '>=', now()->subHours(24))->count(),
+            'failed_syncs' => DarazSyncLog::forCurrentUser()->where('created_at', '>=', now()->subHours(24))
                 ->where('status', 'failed')->count(),
         ];
 
@@ -101,7 +103,7 @@ class DarazSyncController extends Controller
      */
     public function syncAll()
     {
-        $stores = DarazStore::active()->get();
+        $stores = DarazStore::forCurrentUser()->active()->get();
 
         $totalStats = [
             'stores' => 0,
@@ -141,7 +143,7 @@ class DarazSyncController extends Controller
      */
     public function pullAll()
     {
-        $stores = DarazStore::active()->get();
+        $stores = DarazStore::forCurrentUser()->active()->get();
 
         $totalStats = [
             'stores' => 0,
@@ -185,9 +187,10 @@ class DarazSyncController extends Controller
         $type = $request->get('type');
         $status = $request->get('status');
 
-        $stores = DarazStore::all();
+        $stores = DarazStore::forCurrentUser()->get();
 
-        $logs = DarazSyncLog::with(['store', 'productMapping.product'])
+        $logs = DarazSyncLog::forCurrentUser()
+            ->with(['store', 'productMapping.product'])
             ->when($storeId, fn($q) => $q->where('daraz_store_id', $storeId))
             ->when($type, fn($q) => $q->where('type', $type))
             ->when($status, fn($q) => $q->where('status', $status))

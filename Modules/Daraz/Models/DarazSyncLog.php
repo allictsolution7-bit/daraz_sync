@@ -68,6 +68,26 @@ class DarazSyncLog extends Model
     }
 
     /**
+     * Scope to get sync logs accessible by the current authenticated user/vendor.
+     * Admin/Super Admin sees all logs; Vendor sees only logs linked to their stores.
+     */
+    public function scopeForCurrentUser($query)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return $query;
+        }
+
+        if ($user->isVendor()) {
+            return $query->whereHas('store', function ($q) use ($user) {
+                $q->where('vendor_id', $user->id);
+            });
+        }
+
+        return $query;
+    }
+
+    /**
      * Create a stock push log.
      */
     public static function logStockPush(

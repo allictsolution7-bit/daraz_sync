@@ -33,10 +33,11 @@ class DarazProductMappingController extends Controller
      */
     public function index(Request $request)
     {
-        $stores = DarazStore::active()->get();
+        $stores = DarazStore::forCurrentUser()->active()->get();
         $selectedStoreId = $request->get('store_id');
 
-        $mappings = DarazProductMapping::with(['store', 'product', 'variationCombination'])
+        $mappings = DarazProductMapping::forCurrentUser()
+            ->with(['store', 'product', 'variationCombination'])
             ->when($selectedStoreId, fn($q) => $q->where('daraz_store_id', $selectedStoreId))
             ->orderBy('created_at', 'desc')
             ->paginate(20);
@@ -49,7 +50,7 @@ class DarazProductMappingController extends Controller
      */
     public function create(Request $request)
     {
-        $stores = DarazStore::active()->get();
+        $stores = DarazStore::forCurrentUser()->active()->get();
         $selectedStoreId = $request->get('store_id');
 
         return view('daraz::mappings.create', compact('stores', 'selectedStoreId'));
@@ -238,7 +239,10 @@ class DarazProductMappingController extends Controller
                 ->toArray();
         }
 
+        $user = auth()->user();
+
         $products = Product::where('status', 1)
+            ->when($user && $user->isVendor(), fn($q) => $q->where('vendor_id', $user->id))
             ->where(function ($q) use ($query) {
                 $q->where('title', 'like', "%{$query}%")
                   ->orWhere('sku', 'like', "%{$query}%");

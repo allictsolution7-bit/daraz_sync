@@ -3,6 +3,7 @@
 namespace Modules\Daraz\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Crypt;
 
@@ -11,6 +12,7 @@ class DarazStore extends Model
     protected $table = 'daraz_stores';
 
     protected $fillable = [
+        'vendor_id',
         'name',
         'country_code',
         'app_key',
@@ -97,11 +99,45 @@ class DarazStore extends Model
     }
 
     /**
+     * Get the vendor user that owns this store connection.
+     */
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'vendor_id');
+    }
+
+    /**
      * Get product mappings for this store.
      */
     public function productMappings(): HasMany
     {
         return $this->hasMany(DarazProductMapping::class, 'daraz_store_id');
+    }
+
+    /**
+     * Scope to filter stores for a specific vendor.
+     */
+    public function scopeForVendor($query, int $vendorId)
+    {
+        return $query->where('vendor_id', $vendorId);
+    }
+
+    /**
+     * Scope to filter stores for the current authenticated user/vendor.
+     * Admin/Super Admin sees all stores; Vendor sees only their own connected stores.
+     */
+    public function scopeForCurrentUser($query)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return $query;
+        }
+
+        if ($user->isVendor()) {
+            return $query->where('vendor_id', $user->id);
+        }
+
+        return $query;
     }
 
     /**
