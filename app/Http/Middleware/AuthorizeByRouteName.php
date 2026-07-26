@@ -185,7 +185,21 @@ class AuthorizeByRouteName
         $vendorPerm = str_starts_with($permission, 'vendor.') ? $permission : 'vendor.' . $permission;
         $standardPerm = str_replace('vendor.', '', $permission);
 
-        if ($user->can($permission) || $user->can($vendorPerm) || $user->can($standardPerm) || $hasOrderAssignedPermission || ($isPackagesView && $isAdminUser) || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
+        // Explicit route action mappings for vendor routes (e.g. vendor.products.edit, vendor.products.create, vendor.products.delete)
+        $routePermission = str_replace(['.update', '.destroy'], ['.edit', '.delete'], $name);
+        $routePermissionSnake = str_replace(['.update', '.destroy'], ['.edit', '.delete'], $permission);
+
+        if (
+            $user->can($permission) || 
+            $user->can($vendorPerm) || 
+            $user->can($standardPerm) || 
+            $user->can($name) ||
+            $user->can($routePermission) ||
+            $user->can($routePermissionSnake) ||
+            $hasOrderAssignedPermission || 
+            ($isPackagesView && $isAdminUser) || 
+            (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))
+        ) {
             return $next($request);
         }
 

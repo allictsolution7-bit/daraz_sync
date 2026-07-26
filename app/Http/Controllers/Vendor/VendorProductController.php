@@ -591,6 +591,12 @@ class VendorProductController extends Controller
             // Delete the allocation record
             $allocation->delete();
 
+            // Also delete copied product from vendor's catalog if this product belongs to vendor
+            $product = \App\Models\Product::find($productId);
+            if ($product && $product->vendor_id == $vendor->id) {
+                $product->delete();
+            }
+
             DB::commit();
 
             return redirect()->route('vendor.products.index', ['source' => 'my_products'])
@@ -954,8 +960,9 @@ class VendorProductController extends Controller
     {
         $vendor = auth()->user();
 
-        // Ensure this is vendor's product
-        if ($product->vendor_id !== $vendor->id) {
+        // Ensure vendor owns product or has stock allocation for this product
+        $hasAllocation = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)->where('product_id', $product->id)->exists();
+        if ($product->vendor_id != $vendor->id && !$hasAllocation) {
             abort(403, 'Unauthorized');
         }
 
@@ -991,8 +998,9 @@ class VendorProductController extends Controller
     {
         $vendor = auth()->user();
 
-        // Ensure this is vendor's product
-        if ($product->vendor_id !== $vendor->id) {
+        // Ensure vendor owns product or has stock allocation for this product
+        $hasAllocation = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)->where('product_id', $product->id)->exists();
+        if ($product->vendor_id != $vendor->id && !$hasAllocation) {
             abort(403, 'Unauthorized');
         }
 
@@ -1019,6 +1027,12 @@ class VendorProductController extends Controller
             'thumb_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'vendor_proposed_commission' => 'nullable|numeric|min:0|max:100',
+            'seo.meta_title' => 'nullable|string|max:60',
+            'seo.meta_description' => 'nullable|string|max:160',
+            'seo.meta_keywords' => 'nullable|string|max:255',
+            'seo.canonical_url' => 'nullable|url|max:500',
+            'seo.meta_robots' => 'nullable|string|max:50',
+            'seo.og_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         // Validate proposed commission if changed
@@ -1072,6 +1086,28 @@ class VendorProductController extends Controller
             $validated['images'] = json_encode($existingImages);
         }
 
+        // Handle SEO data
+        $seoInput = $request->input('seo', []);
+        $seoData = is_array($product->seo) ? $product->seo : (json_decode($product->seo, true) ?? []);
+
+        $seoData['meta_title']       = $seoInput['meta_title'] ?? null;
+        $seoData['meta_description'] = $seoInput['meta_description'] ?? null;
+        $seoData['meta_keywords']    = $seoInput['meta_keywords'] ?? null;
+        $seoData['canonical_url']    = $seoInput['canonical_url'] ?? null;
+        $seoData['meta_robots']      = $seoInput['meta_robots'] ?? 'index,follow';
+
+        // Handle OG image upload
+        if ($request->hasFile('seo.og_image')) {
+            $ogFile = $request->file('seo.og_image');
+            $ogPath = 'product/og/' . time() . '-' . $ogFile->getClientOriginalName();
+            $ogFile->storeAs('public', $ogPath);
+            $seoData['og_image'] = $ogPath;
+        } elseif (!empty($seoInput['existing_og_image'])) {
+            $seoData['og_image'] = $seoInput['existing_og_image'];
+        }
+
+        $validated['seo'] = $seoData;
+
         // If product was approved and edited, set back to pending
         if ($product->isApproved()) {
             $validated['approval_status'] = 'pending';
@@ -1091,8 +1127,9 @@ class VendorProductController extends Controller
     {
         $vendor = auth()->user();
 
-        // Ensure this is vendor's product
-        if ($product->vendor_id !== $vendor->id) {
+        // Ensure vendor owns product or has stock allocation for this product
+        $hasAllocation = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)->where('product_id', $product->id)->exists();
+        if ($product->vendor_id != $vendor->id && !$hasAllocation) {
             abort(403, 'Unauthorized');
         }
 

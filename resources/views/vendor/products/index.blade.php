@@ -331,32 +331,33 @@
                 @endif
             </div>
         @else
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th style="width: 40px;">
-                                @if(($source ?? 'my_products') === 'admin_products')
-                                    <input type="checkbox" class="form-check-input select-all-products" title="Select All">
-                                @else
-                                    #
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
+                        <thead style="background: rgba(248, 250, 252, 0.95); border-bottom: 2px solid #e2e8f0;">
+                            <tr>
+                                <th style="width: 45px;" class="ps-4 py-3">
+                                    @if(($source ?? 'my_products') === 'admin_products')
+                                        <input type="checkbox" class="form-check-input select-all-products" title="Select All">
+                                    @else
+                                        #
+                                    @endif
+                                </th>
+                                <th style="width: 70px;" class="py-3">Image</th>
+                                <th class="py-3">Product Info</th>
+                                <th class="py-3">Price</th>
+                                @if(($source ?? 'my_products') === 'my_products')
+                                    <th class="py-3">Commission</th>
                                 @endif
-                            </th>
-                            <th style="width: 60px;">Image</th>
-                            <th>Product Name</th>
-                            <th>Price</th>
-                            @if(($source ?? 'my_products') === 'my_products')
-                                <th>Commission</th>
-                            @endif
-                            <th>Stock</th>
-                            @if(($source ?? 'my_products') === 'my_products')
-                                <th>Status</th>
-                            @endif
-                            <th>Created</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                                <th class="py-3">Stock</th>
+                                @if(($source ?? 'my_products') === 'my_products')
+                                    <th class="py-3">Status</th>
+                                @endif
+                                <th class="py-3">Created</th>
+                                <th class="text-end pe-4 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                         @foreach($products as $product)
                         <tr>
                             <td>
@@ -370,16 +371,15 @@
                                     <small class="text-muted">{{ $loop->iteration }}</small>
                                 @endif
                             </td>
-                            <td>
+                            <td class="ps-2">
                                 @if($product->thumb_image)
                                     <img src="{{ asset('storage/' . $product->thumb_image) }}" 
                                          alt="{{ $product->title }}"
-                                         class="rounded"
-                                         style="width: 50px; height: 50px; object-fit: cover;">
+                                         style="width: 56px; height: 56px; object-fit: cover; border-radius: 14px; border: 2px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                                 @else
-                                    <div class="bg-light rounded d-flex align-items-center justify-content-center"
-                                         style="width: 50px; height: 50px;">
-                                        <i class="fas fa-image text-muted"></i>
+                                    <div class="d-flex align-items-center justify-content-center"
+                                         style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border: 2px dashed #cbd5e1;">
+                                        <i class="fas fa-image" style="color: #94a3b8; font-size: 18px;"></i>
                                     </div>
                                 @endif
                             </td>
@@ -646,7 +646,7 @@
                                         </div>
                                     @endif
                                 @else
-                                    <div class="btn-group btn-group-sm">
+                                    <div class="d-flex align-items-center gap-2 justify-content-end pe-2">
                                         @php
                                             $hasAllocation = isset($productAllocations[$product->id]);
                                         @endphp
@@ -656,31 +656,38 @@
                                                   class="d-inline"
                                                   onsubmit="return confirm('Are you sure you want to return/cancel this product stock request? The total cost will be refunded to your wallet balance immediately.');">
                                                 @csrf
-                                                <button type="submit" 
-                                                        class="btn btn-warning text-dark font-weight-bold" 
-                                                        title="Return product stock & get full wallet refund">
-                                                    <i class="fas fa-undo me-1"></i> Return & Refund
-                                                </button>
-                                            </form>
-                                        @else
-                                            <a href="{{ route('vendor.products.edit', $product) }}" 
-                                               class="btn btn-outline-primary"
-                                               title="Edit">
-                                                <i class="fas fa-pencil"></i>
-                                            </a>
-                                            <form action="{{ route('vendor.products.destroy', $product) }}" 
-                                                  method="POST" 
-                                                  class="d-inline"
-                                                  onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                        class="btn btn-outline-danger"
-                                                        title="Delete">
-                                                    <i class="fas fa-trash"></i>
+                                                <button type="submit"
+                                                        title="Return stock & get wallet refund"
+                                                        style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:0.8rem; font-weight:700; color:#92400e; background:linear-gradient(135deg,#fef3c7,#fde68a); border:1.5px solid #f59e0b; border-radius:10px; cursor:pointer; transition:all .2s;"
+                                                        onmouseover="this.style.background='linear-gradient(135deg,#fde68a,#fbbf24)'"
+                                                        onmouseout="this.style.background='linear-gradient(135deg,#fef3c7,#fde68a)'">
+                                                    <i class="fas fa-rotate-left"></i> Return
                                                 </button>
                                             </form>
                                         @endif
+
+                                        <a href="{{ route('vendor.products.edit', $product) }}"
+                                           title="Edit product"
+                                           style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:0.8rem; font-weight:700; color:#1d4ed8; background:linear-gradient(135deg,#eff6ff,#dbeafe); border:1.5px solid #93c5fd; border-radius:10px; text-decoration:none; transition:all .2s;"
+                                           onmouseover="this.style.background='linear-gradient(135deg,#dbeafe,#bfdbfe)'"
+                                           onmouseout="this.style.background='linear-gradient(135deg,#eff6ff,#dbeafe)'">
+                                            <i class="fas fa-pen-to-square"></i> Edit
+                                        </a>
+
+                                        <form action="{{ route('vendor.products.destroy', $product) }}" 
+                                              method="POST" 
+                                              class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    title="Delete product"
+                                                    style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; color:#dc2626; background:linear-gradient(135deg,#fff1f2,#fee2e2); border:1.5px solid #fca5a5; border-radius:10px; cursor:pointer; font-size:0.85rem; transition:all .2s;"
+                                                    onmouseover="this.style.background='linear-gradient(135deg,#fee2e2,#fecaca)'; this.style.borderColor='#f87171';"
+                                                    onmouseout="this.style.background='linear-gradient(135deg,#fff1f2,#fee2e2)'; this.style.borderColor='#fca5a5';">
+                                                <i class="fas fa-trash-can"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 @endif
                             </td>
@@ -689,11 +696,12 @@
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            <!-- Pagination -->
-            <div class="mt-3">
-                {{ $products->links() }}
-            </div>
+        <!-- Pagination -->
+        <div class="mt-3">
+            {{ $products->links() }}
+        </div>
         @endif
     </div>
 </div>
