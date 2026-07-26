@@ -18,27 +18,28 @@
 
     <ul class="sidebar-menu">
         @auth
-            <li class="sidebar-menu-item" style="margin-bottom: 12px;">
-                <a href="{{ url('/admin') }}" 
-                   class="sidebar-menu-link text-white shadow-sm" 
-                   style="background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; color: #ffffff !important; font-weight: 700; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                    <i class="fa-solid fa-gauge-high text-white" style="font-size: 16px; width: 20px; text-align: center;"></i>
-                    <span>Admin Dashboard</span>
-                </a>
-            </li>
-
             @php
                 $u = auth()->user();
-                $isVendorRole = ($u->role === 'vendor' || (method_exists($u, 'isVendor') && $u->isVendor()) || (method_exists($u, 'hasRole') && $u->hasRole('vendor')));
+                $isVendorUser = ($u->role === 'vendor' || (method_exists($u, 'isVendor') && $u->isVendor()) || (method_exists($u, 'hasRole') && $u->hasRole('vendor')) || (isset($u->user_type) && $u->user_type === 'vendor') || (isset($u->type) && $u->type === 'vendor'));
+                $isAdminUser = !$isVendorUser && ($u->isAdmin() || $u->hasRole('admin') || $u->hasRole('super_admin') || $u->hasRole('super admin') || $u->hasRole('manager') || $u->can('access admin') || $u->id == 1 || (isset($u->role) && in_array($u->role, ['admin', 'super_admin', 'manager'])));
             @endphp
 
-            @if($isVendorRole)
+            @if($isVendorUser)
                 <li class="sidebar-menu-item" style="margin-bottom: 12px;">
                     <a href="{{ Route::has('vendor.dashboard') ? route('vendor.dashboard') : url('/vendor/dashboard') }}" 
                        class="sidebar-menu-link text-white shadow-sm" 
                        style="background: linear-gradient(135deg, #4f46e5, #3730a3) !important; color: #ffffff !important; font-weight: 700; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none;">
                         <i class="fa-solid fa-store text-white" style="font-size: 16px; width: 20px; text-align: center;"></i>
                         <span>Vendor Dashboard</span>
+                    </a>
+                </li>
+            @elseif($isAdminUser)
+                <li class="sidebar-menu-item" style="margin-bottom: 12px;">
+                    <a href="{{ url('/admin') }}" 
+                       class="sidebar-menu-link text-white shadow-sm" 
+                       style="background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; color: #ffffff !important; font-weight: 700; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                        <i class="fa-solid fa-gauge-high text-white" style="font-size: 16px; width: 20px; text-align: center;"></i>
+                        <span>Admin Dashboard</span>
                     </a>
                 </li>
             @endif

@@ -975,11 +975,25 @@
                         </span>
                     @endif
                     @auth
-                        <span>
-                            <a href="{{ url('/admin') }}" style="color:#ffffff; background: #2563eb; padding: 3px 10px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
-                                <i class="fas fa-gauge-high" style="font-size: 11px;"></i> Admin Dashboard
-                            </a>
-                        </span>
+                        @php
+                            $u = auth()->user();
+                            $isVendorUser = ($u->role === 'vendor' || (method_exists($u, 'isVendor') && $u->isVendor()) || (method_exists($u, 'hasRole') && $u->hasRole('vendor')) || (isset($u->user_type) && $u->user_type === 'vendor') || (isset($u->type) && $u->type === 'vendor'));
+                            $isAdminUser = !$isVendorUser && ($u->isAdmin() || $u->hasRole('admin') || $u->hasRole('super_admin') || $u->hasRole('super admin') || $u->hasRole('manager') || $u->can('access admin') || $u->id == 1 || (isset($u->role) && in_array($u->role, ['admin', 'super_admin', 'manager'])));
+                        @endphp
+
+                        @if($isVendorUser)
+                            <span>
+                                <a href="{{ Route::has('vendor.dashboard') ? route('vendor.dashboard') : url('/vendor/dashboard') }}" style="color:#ffffff; background: #4f46e5; padding: 3px 10px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+                                    <i class="fas fa-store" style="font-size: 11px;"></i> Vendor Dashboard
+                                </a>
+                            </span>
+                        @elseif($isAdminUser)
+                            <span>
+                                <a href="{{ url('/admin') }}" style="color:#ffffff; background: #2563eb; padding: 3px 10px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+                                    <i class="fas fa-gauge-high" style="font-size: 11px;"></i> Admin Dashboard
+                                </a>
+                            </span>
+                        @endif
                     @endauth
                     {{-- <span>
                         <!-- Truck SVG -->
