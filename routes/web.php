@@ -811,6 +811,8 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(
 
     // Products
     Route::get('/products/subcategories/{categoryId}', [VendorProductController::class, 'getSubcategories'])->name('products.subcategories');
+    Route::get('/products/thirdcategories/{subCategoryId}', [VendorProductController::class, 'getThirdcategories'])->name('products.thirdcategories');
+    Route::post('/products/bulk-copy', [VendorProductController::class, 'bulkCopy'])->name('products.bulk-copy');
     Route::post('/products/{product}/copy', [VendorProductController::class, 'copy'])->name('products.copy');
     Route::resource('products', VendorProductController::class);
 

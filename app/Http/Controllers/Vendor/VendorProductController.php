@@ -84,12 +84,53 @@ class VendorProductController extends Controller
 
         // Category Filter
         if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $categoryId = $request->category_id;
+            $query->where(function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId)
+                  ->orWhereHas('additionalCategories', function($catQ) use ($categoryId) {
+                      $catQ->where('product_categories.id', $categoryId);
+                  });
+            });
         }
 
         // SubCategory Filter
         if ($request->filled('sub_category_id')) {
-            $query->where('sub_category_id', $request->sub_category_id);
+            $subCategoryId = $request->sub_category_id;
+            $query->where(function($q) use ($subCategoryId) {
+                $q->where('sub_category_id', $subCategoryId)
+                  ->orWhereHas('additionalSubCategories', function($catQ) use ($subCategoryId) {
+                      $catQ->where('sub_categories.id', $subCategoryId);
+                  });
+            });
+        }
+
+        // Third Category / Child Subcategory Filter
+        if ($request->filled('third_category_id')) {
+            $thirdCategoryId = $request->third_category_id;
+            $query->whereHas('thirdCategories', function($q) use ($thirdCategoryId) {
+                $q->where('third_categories.id', $thirdCategoryId);
+            });
+        }
+
+        // Product Type Filter
+        if ($request->filled('product_type')) {
+            $query->where('product_type', $request->product_type);
+        }
+
+        // Price Range Filters
+        if ($request->filled('price_min')) {
+            $query->where('old_price', '>=', $request->price_min);
+        }
+        if ($request->filled('price_max')) {
+            $query->where('old_price', '<=', $request->price_max);
+        }
+
+        // Date Range Filters
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
         }
 
         // Keyword Search Filter
@@ -105,6 +146,11 @@ class VendorProductController extends Controller
         $subCategories = collect();
         if ($request->filled('category_id')) {
             $subCategories = SubCategory::where('product_category_id', $request->category_id)->orderBy('name')->get();
+        }
+
+        $thirdCategories = collect();
+        if ($request->filled('sub_category_id')) {
+            $thirdCategories = \App\Models\ThirdCategory::where('sub_category_id', $request->sub_category_id)->orderBy('name')->get();
         }
 
         $viewMode = $request->get('view_mode', 'table'); // 'table' or 'grouped'
@@ -133,6 +179,7 @@ class VendorProductController extends Controller
             'allocatedProductIds',
             'categories',
             'subCategories',
+            'thirdCategories',
             'viewMode',
             'groupedProducts'
         ));
@@ -282,6 +329,152 @@ class VendorProductController extends Controller
             \Log::error('Product Copy Exception: ' . $e->getMessage());
             return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
                 ->with('error', 'Could not copy "' . $product->title . '". Error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk Copy multiple parent admin products at once with default 1 unit stock (or available stock) per product
+     */
+    public function bulkCopy(Request $request)
+    {
+        $vendor = auth()->user();
+        $canAccessAdminProducts = $this->checkVendorAdminProductAccess($vendor);
+
+        if (!$canAccessAdminProducts) {
+            return redirect()->route('vendor.products.index')
+                ->with('error', 'You do not have permission to copy parent admin products.');
+        }
+
+        $productIds = $request->input('product_ids', []);
+        if (empty($productIds) || !is_array($productIds)) {
+            return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                ->with('error', 'No products selected for bulk copy.');
+        }
+
+        $adminId = $vendor->created_by;
+        $allocatedProductIds = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)
+            ->pluck('product_id')
+            ->toArray();
+
+        $products = Product::whereIn('id', $productIds)
+            ->where(function($q) use ($adminId) {
+                if ($adminId) {
+                    $q->where('vendor_id', $adminId)->orWhereNull('vendor_id');
+                } else {
+                    $q->whereNull('vendor_id');
+                }
+            })
+            ->whereNotIn('id', $allocatedProductIds)
+            ->with('variationCombinations')
+            ->get();
+
+        if ($products->isEmpty()) {
+            return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                ->with('error', 'Selected products have already been copied or are unavailable.');
+        }
+
+        // Calculate total cost for default 1 unit of stock for each product
+        $totalCost = 0;
+        $totalItemsCount = 0;
+        $productCopyData = [];
+
+        foreach ($products as $product) {
+            $prodCost = 0;
+            $prodQty = 0;
+            $combStockMap = [];
+
+            if ($product->product_type === 'variable' && $product->variationCombinations->isNotEmpty()) {
+                foreach ($product->variationCombinations as $comb) {
+                    $qty = 1; // Default 1 unit per variation
+                    $unitCost = (float)($comb->product_cost > 0 ? $comb->product_cost : ($comb->offer_price > 0 ? $comb->offer_price : $comb->regular_price ?? 0));
+                    $combStockMap[$comb->id] = [
+                        'quantity' => $qty,
+                        'unit_cost' => $unitCost,
+                        'total_cost' => $qty * $unitCost
+                    ];
+                    $prodQty += $qty;
+                    $prodCost += ($qty * $unitCost);
+                }
+            } else {
+                $qty = 1; // Default 1 unit
+                $unitCost = (float)($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : $product->old_price ?? 0));
+                $prodQty = $qty;
+                $prodCost = $qty * $unitCost;
+            }
+
+            $totalCost += $prodCost;
+            $totalItemsCount++;
+            $productCopyData[] = [
+                'product' => $product,
+                'total_qty' => $prodQty,
+                'total_cost' => $prodCost,
+                'comb_map' => $combStockMap,
+            ];
+        }
+
+        // Wallet Balance Check
+        $walletBalance = (float)($vendor->wallet_balance ?? 0);
+        if ($walletBalance < $totalCost) {
+            return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                ->with('error', 'Insufficient wallet balance for bulk copy. Total required cost for ' . $totalItemsCount . ' products is ৳' . number_format($totalCost, 2) . ', but your wallet balance is ৳' . number_format($walletBalance, 2) . '. Please recharge your wallet first.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $vendorSettings = $vendor->vendorSettings;
+            $autoApprove = $vendorSettings && method_exists($vendorSettings, 'shouldAutoApproveProducts') 
+                ? $vendorSettings->shouldAutoApproveProducts() 
+                : false;
+
+            $statusTarget = $autoApprove ? 'approved' : 'pending';
+            $trxStatus = $autoApprove ? 'approved' : 'pending';
+
+            foreach ($productCopyData as $item) {
+                $product = $item['product'];
+                $prodQty = $item['total_qty'];
+                $prodCost = $item['total_cost'];
+                $combMap = $item['comb_map'];
+
+                \App\Models\VendorProductAllocation::create([
+                    'vendor_id' => $vendor->id,
+                    'product_id' => $product->id,
+                    'requested_quantity' => $prodQty,
+                    'allocated_quantity' => $autoApprove ? $prodQty : 0,
+                    'variation_allocations' => !empty($combMap) ? $combMap : null,
+                    'total_cost' => $prodCost,
+                    'status' => $trxStatus,
+                ]);
+
+                \App\Models\VendorWalletTransaction::create([
+                    'vendor_id' => $vendor->id,
+                    'product_id' => $product->id,
+                    'admin_id' => $adminId,
+                    'type' => 'stock_purchase',
+                    'amount' => $prodCost,
+                    'payment_method' => 'Wallet',
+                    'transaction_id' => 'TRX-PRD-' . strtoupper(Str::random(8)),
+                    'status' => $trxStatus,
+                    'admin_note' => 'Bulk Stock Purchase: Requested product "' . $product->title . '" (' . $prodQty . ' units)',
+                    'is_seen' => true,
+                ]);
+            }
+
+            // Deduct total cost from vendor's wallet balance
+            $vendor->decrement('wallet_balance', $totalCost);
+
+            DB::commit();
+
+            $msgType = $autoApprove ? 'success' : 'warning';
+            $msgContent = 'Successfully copied ' . $totalItemsCount . ' products to your catalog! ৳' . number_format($totalCost, 2) . ' deducted/held from your wallet balance.';
+
+            return redirect()->route('vendor.products.index', ['source' => 'my_products'])
+                ->with($msgType, $msgContent);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            \Log::error('Bulk Product Copy Exception: ' . $e->getMessage());
+            return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                ->with('error', 'Bulk copy failed: ' . $e->getMessage());
         }
     }
 
@@ -615,6 +808,17 @@ class VendorProductController extends Controller
             ->get(['id', 'name', 'slug']);
         
         return response()->json($subcategories);
+    }
+
+    /**
+     * Get third categories for a subcategory (AJAX)
+     */
+    public function getThirdcategories($subCategoryId)
+    {
+        $thirdCategories = \App\Models\ThirdCategory::where('sub_category_id', $subCategoryId)
+            ->get(['id', 'name', 'slug']);
+        
+        return response()->json($thirdCategories);
     }
 
     /**

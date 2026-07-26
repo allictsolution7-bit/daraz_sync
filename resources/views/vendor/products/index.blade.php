@@ -3,57 +3,53 @@
 @section('title', 'My Products')
 
 @section('content')
-<div class="row mb-4">
-    <div class="col-md-6">
-        <h2><i class="fas fa-box"></i> {{ ($source ?? 'my_products') === 'admin_products' ? 'Parent Admin Catalog' : 'My Products' }}</h2>
+<div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-3">
+        <h4 class="mb-0 fw-bold text-dark fs-5"><i class="fas fa-box me-1 text-primary"></i> {{ ($source ?? 'my_products') === 'admin_products' ? 'Parent Admin Catalog' : 'My Products' }}</h4>
+        
+        @if($canAccessAdminProducts ?? false)
+        <ul class="nav nav-pills border-0 bg-light p-1 rounded-3">
+            <li class="nav-item">
+                <a class="nav-link py-1 px-3 fw-bold small {{ ($source ?? 'my_products') === 'my_products' ? 'active bg-white text-primary shadow-sm' : 'text-secondary' }}" 
+                   href="{{ route('vendor.products.index', ['source' => 'my_products']) }}">
+                    <i class="fas fa-boxes me-1"></i> My Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link py-1 px-3 fw-bold small {{ ($source ?? 'my_products') === 'admin_products' ? 'active bg-white text-success shadow-sm' : 'text-secondary' }}" 
+                   href="{{ route('vendor.products.index', ['source' => 'admin_products']) }}">
+                    <i class="fas fa-store me-1"></i> Parent Admin Catalog
+                    <span class="badge bg-success ms-1" style="font-size: 0.65rem;">Shared</span>
+                </a>
+            </li>
+        </ul>
+        @endif
     </div>
-    <div class="col-md-6 text-end">
-        <a href="{{ route('vendor.products.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus-circle"></i> Add New Product
-        </a>
-    </div>
+
+    <a href="{{ route('vendor.products.create') }}" class="btn btn-sm btn-primary py-1 px-3 font-weight-bold">
+        <i class="fas fa-plus-circle me-1"></i> Add New Product
+    </a>
 </div>
 
 @if(session('warning'))
-    <div class="alert alert-warning alert-dismissible fade show mb-4 shadow-sm border-warning" role="alert">
+    <div class="alert alert-warning alert-dismissible fade show mb-2 py-2 small shadow-sm border-warning" role="alert">
         <i class="fas fa-clock me-2"></i> <strong>Pending Admin Approval:</strong> {{ session('warning') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
 @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm border-success" role="alert">
+    <div class="alert alert-success alert-dismissible fade show mb-2 py-2 small shadow-sm border-success" role="alert">
         <i class="fas fa-check-circle me-2"></i> <strong>Success:</strong> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
 @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm border-danger" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show mb-2 py-2 small shadow-sm border-danger" role="alert">
         <i class="fas fa-exclamation-triangle me-2"></i> <strong>Error:</strong> {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-@endif
-
-<!-- Source Tabs (My Products vs Parent Admin Catalog) -->
-@if($canAccessAdminProducts ?? false)
-<div class="mb-3">
-    <ul class="nav nav-tabs border-bottom-0">
-        <li class="nav-item">
-            <a class="nav-link fw-bold px-4 py-2 {{ ($source ?? 'my_products') === 'my_products' ? 'active bg-white text-primary border border-bottom-0' : 'text-secondary' }}" 
-               href="{{ route('vendor.products.index', ['source' => 'my_products']) }}">
-                <i class="fas fa-boxes me-1"></i> My Products
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link fw-bold px-4 py-2 {{ ($source ?? 'my_products') === 'admin_products' ? 'active bg-white text-success border border-bottom-0' : 'text-secondary' }}" 
-               href="{{ route('vendor.products.index', ['source' => 'admin_products']) }}">
-                <i class="fas fa-store me-1"></i> Parent Admin Catalog
-                <span class="badge bg-success ms-1">Shared</span>
-            </a>
-        </li>
-    </ul>
-</div>
 @endif
 
 <!-- Top Filter Panel -->
@@ -61,8 +57,10 @@
     <div class="card-body">
         <form method="GET" action="{{ route('vendor.products.index') }}" id="vendorProductFilterForm">
             <input type="hidden" name="source" value="{{ $source ?? 'my_products' }}">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-3">
+            <input type="hidden" name="view_mode" id="vendor_view_mode_input" value="{{ request('view_mode', 'table') }}">
+            
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3 col-6">
                     <label for="vendor_category_id" class="form-label small fw-bold mb-1">Category</label>
                     <select name="category_id" id="vendor_category_id" class="form-select form-select-sm">
                         <option value="">All Categories</option>
@@ -73,7 +71,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 col-6">
                     <label for="vendor_sub_category_id" class="form-label small fw-bold mb-1">Subcategory</label>
                     <select name="sub_category_id" id="vendor_sub_category_id" class="form-select form-select-sm" {{ $subCategories->isEmpty() ? 'disabled' : '' }}>
                         <option value="">{{ request('category_id') ? 'All Subcategories' : 'Select Category First' }}</option>
@@ -84,13 +82,18 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label for="vendor_search" class="form-label small fw-bold mb-1">Search Product</label>
-                    <input type="text" name="search" id="vendor_search" class="form-select-sm form-control" placeholder="Search by name..." value="{{ request('search') }}">
+                <div class="col-md-3 col-6">
+                    <label for="vendor_third_category_id" class="form-label small fw-bold mb-1">Child Subcategory</label>
+                    <select name="third_category_id" id="vendor_third_category_id" class="form-select form-select-sm" {{ $thirdCategories->isEmpty() ? 'disabled' : '' }}>
+                        <option value="">{{ request('sub_category_id') ? 'All Child Subcategories' : 'Select Subcategory First' }}</option>
+                        @foreach($thirdCategories as $thirdCat)
+                            <option value="{{ $thirdCat->id }}" {{ request('third_category_id') == $thirdCat->id ? 'selected' : '' }}>
+                                {{ $thirdCat->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-
-                @if(($source ?? 'my_products') === 'my_products')
-                <div class="col-md-2">
+                <div class="col-md-3 col-6">
                     <label for="vendor_status" class="form-label small fw-bold mb-1">Status</label>
                     <select name="status" id="vendor_status" class="form-select form-select-sm">
                         <option value="">All Statuses</option>
@@ -99,30 +102,58 @@
                         <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
                     </select>
                 </div>
-                @endif
 
-                <div class="col-md-1 text-end mt-4">
-                    <input type="hidden" name="view_mode" id="vendor_view_mode_input" value="{{ request('view_mode', 'table') }}">
-                    <div class="btn-group btn-group-sm w-100" role="group">
-                        <a href="{{ route('vendor.products.index', array_merge(request()->except(['view_mode']), ['view_mode' => 'table', 'source' => $source ?? 'my_products'])) }}" 
-                           class="btn {{ request('view_mode', 'table') === 'table' ? 'btn-primary' : 'btn-outline-secondary' }}" title="Table View">
-                            <i class="fas fa-list"></i>
+                <div class="col-md-3 col-6">
+                    <label for="vendor_product_type" class="form-label small fw-bold mb-1">Product Type</label>
+                    <select name="product_type" id="vendor_product_type" class="form-select form-select-sm">
+                        <option value="">All Types</option>
+                        <option value="simple" {{ request('product_type') === 'simple' ? 'selected' : '' }}>Simple</option>
+                        <option value="variable" {{ request('product_type') === 'variable' ? 'selected' : '' }}>Variable</option>
+                        <option value="digital" {{ request('product_type') === 'digital' ? 'selected' : '' }}>Digital</option>
+                        <option value="affiliate" {{ request('product_type') === 'affiliate' ? 'selected' : '' }}>Affiliate</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-6">
+                    <label for="vendor_price_min" class="form-label small fw-bold mb-1">Min Price (TK)</label>
+                    <input type="number" name="price_min" id="vendor_price_min" class="form-control form-control-sm" placeholder="Min Price" value="{{ request('price_min') }}" min="0">
+                </div>
+                <div class="col-md-2 col-6">
+                    <label for="vendor_price_max" class="form-label small fw-bold mb-1">Max Price (TK)</label>
+                    <input type="number" name="price_max" id="vendor_price_max" class="form-control form-control-sm" placeholder="Max Price" value="{{ request('price_max') }}" min="0">
+                </div>
+                <div class="col-md-2 col-6">
+                    <label for="vendor_date_from" class="form-label small fw-bold mb-1">Date From</label>
+                    <input type="date" name="date_from" id="vendor_date_from" class="form-control form-control-sm" value="{{ request('date_from') }}">
+                </div>
+                <div class="col-md-3 col-6">
+                    <label for="vendor_date_to" class="form-label small fw-bold mb-1">Date To</label>
+                    <input type="date" name="date_to" id="vendor_date_to" class="form-control form-control-sm" value="{{ request('date_to') }}">
+                </div>
+
+                <div class="col-md-9 col-12">
+                    <label for="vendor_search" class="form-label small fw-bold mb-1">Search Product</label>
+                    <input type="text" name="search" id="vendor_search" class="form-control form-control-sm" placeholder="Search by product name or ID..." value="{{ request('search') }}">
+                </div>
+                <div class="col-md-3 col-12 text-end">
+                    <div class="d-flex justify-content-end gap-2">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a href="{{ route('vendor.products.index', array_merge(request()->except(['view_mode']), ['view_mode' => 'table', 'source' => $source ?? 'my_products'])) }}" 
+                               class="btn {{ request('view_mode', 'table') === 'table' ? 'btn-primary' : 'btn-outline-secondary' }}" title="Table View">
+                                <i class="fas fa-list"></i>
+                            </a>
+                            <a href="{{ route('vendor.products.index', array_merge(request()->except(['view_mode']), ['view_mode' => 'grouped', 'source' => $source ?? 'my_products'])) }}" 
+                               class="btn {{ request('view_mode') === 'grouped' ? 'btn-primary' : 'btn-outline-secondary' }}" title="Grouped Category View">
+                                <i class="fas fa-layer-group"></i>
+                            </a>
+                        </div>
+                        <a href="{{ route('vendor.products.index', ['source' => $source ?? 'my_products']) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-undo me-1"></i> Reset
                         </a>
-                        <a href="{{ route('vendor.products.index', array_merge(request()->except(['view_mode']), ['view_mode' => 'grouped', 'source' => $source ?? 'my_products'])) }}" 
-                           class="btn {{ request('view_mode') === 'grouped' ? 'btn-primary' : 'btn-outline-secondary' }}" title="Grouped Category View">
-                            <i class="fas fa-layer-group"></i>
-                        </a>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-filter me-1"></i> Filter
+                        </button>
                     </div>
                 </div>
-            </div>
-            
-            <div class="d-flex justify-content-end gap-2 mt-3">
-                <a href="{{ route('vendor.products.index', ['source' => $source ?? 'my_products']) }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-undo me-1"></i> Reset Filters
-                </a>
-                <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="fas fa-filter me-1"></i> Apply Filters
-                </button>
             </div>
         </form>
     </div>
@@ -152,6 +183,9 @@
                                 <table class="table table-sm table-hover align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
+                                            <th style="width: 40px;">
+                                                <input type="checkbox" class="form-check-input select-all-products" title="Select All">
+                                            </th>
                                             <th style="width: 50px;">Image</th>
                                             <th>Product Name</th>
                                             <th>Price</th>
@@ -162,6 +196,13 @@
                                     <tbody>
                                         @foreach($prods as $product)
                                             <tr>
+                                                <td>
+                                                    @if(($source ?? 'my_products') === 'admin_products' && !in_array($product->id, $allocatedProductIds ?? []) && !in_array($product->title, $copiedProductTitles ?? []))
+                                                        <input type="checkbox" class="form-check-input product-select-checkbox" value="{{ $product->id }}">
+                                                    @else
+                                                        <input type="checkbox" class="form-check-input" disabled>
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     @if($product->thumb_image)
                                                         <img src="{{ asset('storage/' . $product->thumb_image) }}" alt="{{ $product->title }}" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
@@ -176,7 +217,7 @@
                                                 <td>{{ $product->quantity ?? 0 }}</td>
                                                 <td>
                                                     @if(($source ?? 'my_products') === 'admin_products')
-                                                        @if(in_array($product->title, $copiedProductTitles))
+                                                        @if(in_array($product->id, $allocatedProductIds ?? []) || in_array($product->title, $copiedProductTitles ?? []))
                                                             <button class="btn btn-sm btn-outline-secondary" disabled>Already Copied</button>
                                                         @else
                                                             <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}">
@@ -201,8 +242,27 @@
 @endif
 
 <!-- Products Table -->
-<div class="card">
+<div class="card shadow-sm border-0">
     <div class="card-body">
+        @if(($source ?? 'my_products') === 'admin_products')
+            <!-- Bulk Action Bar -->
+            <form id="bulkCopyForm" action="{{ route('vendor.products.bulk-copy') }}" method="POST">
+                @csrf
+                <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 mb-3 border">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="form-check m-0">
+                            <input type="checkbox" class="form-check-input" id="select_all_header_checkbox" style="cursor: pointer;">
+                            <label class="form-check-label fw-bold small" for="select_all_header_checkbox" style="cursor: pointer;">Select All Available Products</label>
+                        </div>
+                        <span class="badge bg-secondary font-weight-bold" id="selected_count_badge">0 Selected</span>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-success font-weight-bold d-inline-flex align-items-center gap-1" id="bulk_copy_btn" disabled>
+                        <i class="fas fa-copy"></i> Copy Selected Products
+                    </button>
+                </div>
+            </form>
+        @endif
+
         @if($products->isEmpty())
             <div class="text-center py-5">
                 <i class="fas fa-box fs-1 text-muted"></i>
@@ -221,6 +281,13 @@
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
+                            <th style="width: 40px;">
+                                @if(($source ?? 'my_products') === 'admin_products')
+                                    <input type="checkbox" class="form-check-input select-all-products" title="Select All">
+                                @else
+                                    #
+                                @endif
+                            </th>
                             <th style="width: 60px;">Image</th>
                             <th>Product Name</th>
                             <th>Price</th>
@@ -238,6 +305,17 @@
                     <tbody>
                         @foreach($products as $product)
                         <tr>
+                            <td>
+                                @if(($source ?? 'my_products') === 'admin_products')
+                                    @if(in_array($product->id, $allocatedProductIds ?? []) || in_array($product->title, $copiedProductTitles ?? []))
+                                        <input type="checkbox" class="form-check-input" disabled>
+                                    @else
+                                        <input type="checkbox" class="form-check-input product-select-checkbox" value="{{ $product->id }}" name="product_ids[]" form="bulkCopyForm">
+                                    @endif
+                                @else
+                                    <small class="text-muted">{{ $loop->iteration }}</small>
+                                @endif
+                            </td>
                             <td>
                                 @if($product->thumb_image)
                                     <img src="{{ asset('storage/' . $product->thumb_image) }}" 
@@ -606,15 +684,21 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateProductStockCopy(pId, {{ auth()->user()->wallet_balance ?? 0 }});
         });
     }
-    // Dynamic Subcategory Fetching for Vendor Filter
+    // Dynamic Subcategory & Child Subcategory Fetching for Vendor Filter
     const catSelect = document.getElementById('vendor_category_id');
     const subCatSelect = document.getElementById('vendor_sub_category_id');
+    const thirdCatSelect = document.getElementById('vendor_third_category_id');
 
     if (catSelect && subCatSelect) {
         catSelect.addEventListener('change', function() {
             const categoryId = this.value;
             subCatSelect.innerHTML = '<option value="">Loading...</option>';
             subCatSelect.disabled = true;
+
+            if (thirdCatSelect) {
+                thirdCatSelect.innerHTML = '<option value="">Select Subcategory First</option>';
+                thirdCatSelect.disabled = true;
+            }
 
             if (!categoryId) {
                 subCatSelect.innerHTML = '<option value="">Select Category First</option>';
@@ -654,6 +738,97 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
     }
+
+    if (subCatSelect && thirdCatSelect) {
+        subCatSelect.addEventListener('change', function() {
+            const subCategoryId = this.value;
+            thirdCatSelect.innerHTML = '<option value="">Loading...</option>';
+            thirdCatSelect.disabled = true;
+
+            if (!subCategoryId) {
+                thirdCatSelect.innerHTML = '<option value="">Select Subcategory First</option>';
+                return;
+            }
+
+            const rawUrl = '{{ route("vendor.products.thirdcategories", ":id") }}';
+            const url = rawUrl.replace('%3Aid', subCategoryId).replace(':id', subCategoryId);
+
+            fetch(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP error ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    thirdCatSelect.innerHTML = '<option value="">All Child Subcategories</option>';
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.id;
+                            option.textContent = item.name;
+                            thirdCatSelect.appendChild(option);
+                        });
+                        thirdCatSelect.disabled = false;
+                    } else {
+                        thirdCatSelect.innerHTML = '<option value="">No Child Subcategories Found</option>';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching child subcategories:', err);
+                    thirdCatSelect.innerHTML = '<option value="">Failed to load child subcategories</option>';
+                });
+        });
+    }
+
+    // Checkbox & Bulk Selection Logic
+    const selectAllHeaderBtn = document.getElementById('select_all_header_checkbox');
+    const selectAllTableBtns = document.querySelectorAll('.select-all-products');
+    const productCheckboxes = document.querySelectorAll('.product-select-checkbox');
+    const selectedBadge = document.getElementById('selected_count_badge');
+    const bulkCopyBtn = document.getElementById('bulk_copy_btn');
+
+    function updateBulkCopyUI() {
+        const checked = document.querySelectorAll('.product-select-checkbox:checked');
+        const count = checked.length;
+        if (selectedBadge) selectedBadge.textContent = count + ' Selected';
+        if (bulkCopyBtn) bulkCopyBtn.disabled = (count === 0);
+        
+        const enabledCheckboxes = document.querySelectorAll('.product-select-checkbox');
+        if (selectAllHeaderBtn && enabledCheckboxes.length > 0) {
+            selectAllHeaderBtn.checked = (checked.length === enabledCheckboxes.length);
+        }
+        selectAllTableBtns.forEach(btn => {
+            if (enabledCheckboxes.length > 0) {
+                btn.checked = (checked.length === enabledCheckboxes.length);
+            }
+        });
+    }
+
+    if (selectAllHeaderBtn) {
+        selectAllHeaderBtn.addEventListener('change', function() {
+            productCheckboxes.forEach(cb => {
+                if (!cb.disabled) cb.checked = this.checked;
+            });
+            updateBulkCopyUI();
+        });
+    }
+
+    selectAllTableBtns.forEach(tableBtn => {
+        tableBtn.addEventListener('change', function() {
+            productCheckboxes.forEach(cb => {
+                if (!cb.disabled) cb.checked = this.checked;
+            });
+            updateBulkCopyUI();
+        });
+    });
+
+    productCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateBulkCopyUI);
+    });
 });
 </script>
 @endpush
