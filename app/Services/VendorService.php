@@ -254,6 +254,74 @@ class VendorService
     }
 
     /**
+     * Approve a vendor product allocation request (without creating duplicate product)
+     */
+    public function approveAllocation(int $allocationId, int $adminId): bool
+    {
+        $allocation = \App\Models\VendorProductAllocation::findOrFail($allocationId);
+
+        DB::transaction(function () use ($allocation, $adminId) {
+            $allocation->update([
+                'status' => 'approved',
+                'allocated_quantity' => $allocation->requested_quantity,
+            ]);
+
+            // Update VendorWalletTransaction to approved
+            VendorWalletTransaction::where('vendor_id', $allocation->vendor_id)
+                ->where('type', 'stock_purchase')
+                ->where('product_id', $allocation->product_id)
+                ->where('status', 'pending')
+                ->update(['status' => 'approved']);
+        });
+
+        return true;
+    }
+
+    /**
+     * Reject a vendor product allocation request and refund wallet
+     */
+    public function rejectAllocation(int $allocationId, int $adminId, ?string $reason = null): bool
+    {
+        $allocation = \App\Models\VendorProductAllocation::findOrFail($allocationId);
+
+        DB::transaction(function () use ($allocation, $adminId, $reason) {
+            $allocation->update([
+                'status' => 'rejected',
+            ]);
+
+            $trx = VendorWalletTransaction::where('vendor_id', $allocation->vendor_id)
+                ->where('type', 'stock_purchase')
+                ->where('product_id', $allocation->product_id)
+                ->where('status', 'pending')
+                ->latest()
+                ->first();
+
+            if ($trx && $trx->amount > 0) {
+                $vendor = User::find($allocation->vendor_id);
+                if ($vendor) {
+                    $vendor->increment('wallet_balance', $trx->amount);
+
+                    VendorWalletTransaction::create([
+                        'vendor_id' => $vendor->id,
+                        'product_id' => $allocation->product_id,
+                        'admin_id' => $adminId,
+                        'type' => 'stock_purchase_refund',
+                        'amount' => $trx->amount,
+                        'payment_method' => 'Wallet',
+                        'transaction_id' => 'REF-' . strtoupper(Str::random(8)),
+                        'status' => 'approved',
+                        'admin_note' => 'Refund for rejected stock allocation request on "' . ($allocation->product->title ?? 'Product') . '": ' . ($reason ?? 'Rejected by admin'),
+                        'is_seen' => true,
+                    ]);
+                }
+                $trx->update(['status' => 'rejected']);
+            }
+        });
+
+        return true;
+    }
+
+    /**
      * Calculate commission for a product
      * Returns the commission rate to be used
      */

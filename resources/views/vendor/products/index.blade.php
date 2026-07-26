@@ -253,7 +253,7 @@
                             </td>
                             <td class="text-end">
                                 @if(($source ?? 'my_products') === 'admin_products')
-                                    @if(in_array($product->title, $copiedProductTitles ?? []))
+                                    @if(in_array($product->id, $allocatedProductIds ?? []) || in_array($product->title, $copiedProductTitles ?? []))
                                         <button disabled class="btn btn-outline-secondary btn-sm font-weight-bold d-inline-flex align-items-center gap-1" title="You have already copied this product to your store">
                                             <i class="fas fa-check-circle text-success"></i> Already Copied
                                         </button>

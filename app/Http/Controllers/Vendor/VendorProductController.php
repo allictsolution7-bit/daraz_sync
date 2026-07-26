@@ -57,6 +57,10 @@ class VendorProductController extends Controller
 
         $source = $request->get('source', 'my_products');
 
+        $allocatedProductIds = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)
+            ->pluck('product_id')
+            ->toArray();
+
         if ($source === 'admin_products' && $canAccessAdminProducts) {
             $adminId = $vendor->created_by;
             $query = Product::where(function ($q) use ($adminId) {
@@ -68,18 +72,20 @@ class VendorProductController extends Controller
             })->with(['category', 'subCategory', 'brand', 'variationCombinations']);
         } else {
             $source = 'my_products';
-            $query = Product::forVendor($vendor->id)
-                ->with(['category', 'subCategory', 'brand', 'variationCombinations']);
+            $query = Product::where(function ($q) use ($vendor, $allocatedProductIds) {
+                $q->where('vendor_id', $vendor->id)
+                  ->orWhereIn('id', $allocatedProductIds);
+            })->with(['category', 'subCategory', 'brand', 'variationCombinations']);
 
-            if ($request->has('status')) {
+            if ($request->has('status') && !empty($request->status)) {
                 $query->where('approval_status', $request->status);
             }
         }
 
-        $copiedProductTitles = Product::where('vendor_id', $vendor->id)->pluck('title')->toArray();
+        $copiedProductTitles = Product::whereIn('id', $allocatedProductIds)->pluck('title')->toArray();
         $products = $query->latest()->paginate(20)->withQueryString();
 
-        return view('vendor.products.index', compact('products', 'canAccessAdminProducts', 'source', 'copiedProductTitles'));
+        return view('vendor.products.index', compact('products', 'canAccessAdminProducts', 'source', 'copiedProductTitles', 'allocatedProductIds'));
     }
 
     /**
@@ -171,84 +177,33 @@ class VendorProductController extends Controller
         try {
             $vendorSettings = $vendor->vendorSettings;
 
-            $newProduct = $product->replicate([
-                'views_total',
-                'views_unique',
-            ]);
-
-            $newProduct->title = $product->title;
-            $newProduct->slug = Str::slug($product->title) . '-v' . $vendor->id . '-' . Str::random(4);
-            if ($product->sku) {
-                $newProduct->sku = $product->sku . '-V' . $vendor->id . '-' . rand(100, 999);
-            }
-            $newProduct->vendor_id = $vendor->id;
-            $newProduct->quantity = $totalQuantity;
-
             // Respect vendor auto-approve settings or default to pending admin approval
             $autoApprove = $vendorSettings && method_exists($vendorSettings, 'shouldAutoApproveProducts') 
                 ? $vendorSettings->shouldAutoApproveProducts() 
                 : false;
 
             if ($autoApprove) {
-                $newProduct->approval_status = 'approved';
-                $newProduct->approved_at = now();
-                $newProduct->status = 1; // Active
                 $statusTarget = 'approved';
                 $trxStatus = 'approved';
                 $flashType = 'success';
-                $flashMessage = 'Product "' . $newProduct->title . '" copied with ' . $totalQuantity . ' stock units! ৳' . number_format($totalCost, 2) . ' deducted from your wallet.';
-
-                // Deduct stock from Parent Admin Product immediately if auto-approved
-                if ($product->product_type === 'variable' && !empty($combStockMap)) {
-                    foreach ($product->variationCombinations as $adminComb) {
-                        if (isset($combStockMap[$adminComb->id]) && $combStockMap[$adminComb->id]['quantity'] > 0) {
-                            $adminComb->decrement('stock_quantity', $combStockMap[$adminComb->id]['quantity']);
-                        }
-                    }
-                } elseif ($product->quantity !== null && $totalQuantity > 0) {
-                    $product->decrement('quantity', $totalQuantity);
-                }
+                $flashMessage = 'Product "' . $product->title . '" stock allocated (' . $totalQuantity . ' units)! ৳' . number_format($totalCost, 2) . ' deducted from your wallet.';
             } else {
-                $newProduct->approval_status = 'pending';
-                $newProduct->approved_at = null;
-                $newProduct->status = 0; // Inactive until admin approves
                 $statusTarget = 'pending';
                 $trxStatus = 'pending';
                 $flashType = 'warning';
-                $flashMessage = 'Product "' . $newProduct->title . '" copy requested with ' . $totalQuantity . ' stock units! ৳' . number_format($totalCost, 2) . ' held from wallet. Admin stock will transfer upon approval.';
+                $flashMessage = 'Product "' . $product->title . '" stock copy requested (' . $totalQuantity . ' units)! ৳' . number_format($totalCost, 2) . ' held from wallet. Admin stock will transfer upon approval.';
             }
 
-            $newProduct->save();
-
-            // Copy variation combinations if present
-            if ($product->relationLoaded('variationCombinations') || $product->variationCombinations()->exists()) {
-                foreach ($product->variationCombinations as $combination) {
-                    $newCombination = $combination->replicate();
-                    $newCombination->product_id = $newProduct->id;
-
-                    $opts = $combination->variation_options;
-                    if (is_string($opts)) {
-                        $optsArr = json_decode($opts, true) ?? explode('_', $opts);
-                    } else {
-                        $optsArr = (array)$opts;
-                    }
-
-                    if (method_exists(\App\Models\VariationCombination::class, 'generateCombinationKey')) {
-                        $newCombination->combination_key = \App\Models\VariationCombination::generateCombinationKey($newProduct->id, $optsArr);
-                    } else {
-                        $newCombination->combination_key = $newProduct->id . '_' . (is_array($optsArr) ? implode('_', $optsArr) : $optsArr);
-                    }
-
-                    // Set requested combination stock
-                    $allocatedCombStock = isset($combStockMap[$combination->id]) ? $combStockMap[$combination->id]['quantity'] : 0;
-                    $newCombination->stock_quantity = $allocatedCombStock;
-
-                    if ($combination->sku) {
-                        $newCombination->sku = $combination->sku . '-V' . $vendor->id . '-' . rand(100, 999);
-                    }
-                    $newCombination->save();
-                }
-            }
+            // Record allocation without replicating Product row
+            $allocation = \App\Models\VendorProductAllocation::create([
+                'vendor_id' => $vendor->id,
+                'product_id' => $product->id,
+                'requested_quantity' => $totalQuantity,
+                'allocated_quantity' => $autoApprove ? $totalQuantity : 0,
+                'variation_allocations' => !empty($combStockMap) ? $combStockMap : null,
+                'total_cost' => $totalCost,
+                'status' => $trxStatus,
+            ]);
 
             // Deduct fund from vendor's wallet balance
             $vendor->decrement('wallet_balance', $totalCost);
@@ -256,6 +211,7 @@ class VendorProductController extends Controller
             // Record transaction in VendorWalletTransaction
             \App\Models\VendorWalletTransaction::create([
                 'vendor_id' => $vendor->id,
+                'product_id' => $product->id,
                 'admin_id' => $adminId,
                 'type' => 'stock_purchase',
                 'amount' => $totalCost,
@@ -268,7 +224,7 @@ class VendorProductController extends Controller
 
             DB::commit();
 
-            return redirect()->route('vendor.products.index', ['source' => 'my_products', 'status' => $statusTarget])
+            return redirect()->route('vendor.products.index', ['source' => 'my_products'])
                 ->with($flashType, $flashMessage);
 
         } catch (\Throwable $e) {

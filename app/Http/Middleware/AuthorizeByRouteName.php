@@ -23,8 +23,8 @@ class AuthorizeByRouteName
             return $next($request);
         }
 
-        // Allow subscription payments for all admin users
-        if (str_starts_with($name, 'admin.subscription-payments')) {
+        // Allow subscription payments and admin profile for all admin users
+        if (str_starts_with($name, 'admin.subscription-payments') || str_starts_with($name, 'admin.profile') || $name === 'admin.profile') {
             return $next($request);
         }
 

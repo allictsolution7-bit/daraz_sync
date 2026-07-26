@@ -5,27 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class VendorWalletTransaction extends Model
+class VendorProductAllocation extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'vendor_id',
         'product_id',
-        'admin_id',
-        'type',
-        'amount',
-        'payment_method',
-        'transaction_id',
-        'proof_file',
+        'requested_quantity',
+        'allocated_quantity',
+        'variation_allocations',
+        'total_cost',
         'status',
-        'admin_note',
-        'is_seen',
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
-        'is_seen' => 'boolean',
+        'variation_allocations' => 'array',
+        'total_cost' => 'decimal:2',
+        'requested_quantity' => 'integer',
+        'allocated_quantity' => 'integer',
     ];
 
     public function vendor()
@@ -36,10 +34,5 @@ class VendorWalletTransaction extends Model
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');
-    }
-
-    public function admin()
-    {
-        return $this->belongsTo(User::class, 'admin_id');
     }
 }
