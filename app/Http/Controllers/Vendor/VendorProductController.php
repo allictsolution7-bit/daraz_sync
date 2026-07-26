@@ -57,9 +57,9 @@ class VendorProductController extends Controller
 
         $source = $request->get('source', 'my_products');
 
-        $allocatedProductIds = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)
-            ->pluck('product_id')
-            ->toArray();
+        $allocationsQuery = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)->get();
+        $allocatedProductIds = $allocationsQuery->pluck('product_id')->toArray();
+        $productAllocations = $allocationsQuery->keyBy('product_id');
 
         if ($source === 'admin_products' && $canAccessAdminProducts) {
             $adminId = $vendor->created_by;
@@ -177,6 +177,7 @@ class VendorProductController extends Controller
             'source', 
             'copiedProductTitles', 
             'allocatedProductIds',
+            'productAllocations',
             'categories',
             'subCategories',
             'thirdCategories',
@@ -351,6 +352,8 @@ class VendorProductController extends Controller
                 ->with('error', 'No products selected for bulk copy.');
         }
 
+        $quantities = $request->input('quantities', []); // e.g. [product_id => qty] or [product_id => [comb_id => qty]]
+
         $adminId = $vendor->created_by;
         $allocatedProductIds = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)
             ->pluck('product_id')
@@ -373,7 +376,6 @@ class VendorProductController extends Controller
                 ->with('error', 'Selected products have already been copied or are unavailable.');
         }
 
-        // Calculate total cost for default 1 unit of stock for each product
         $totalCost = 0;
         $totalItemsCount = 0;
         $productCopyData = [];
@@ -382,24 +384,43 @@ class VendorProductController extends Controller
             $prodCost = 0;
             $prodQty = 0;
             $combStockMap = [];
+            $pReq = $quantities[$product->id] ?? null;
 
             if ($product->product_type === 'variable' && $product->variationCombinations->isNotEmpty()) {
                 foreach ($product->variationCombinations as $comb) {
-                    $qty = 1; // Default 1 unit per variation
-                    $unitCost = (float)($comb->product_cost > 0 ? $comb->product_cost : ($comb->offer_price > 0 ? $comb->offer_price : $comb->regular_price ?? 0));
-                    $combStockMap[$comb->id] = [
-                        'quantity' => $qty,
-                        'unit_cost' => $unitCost,
-                        'total_cost' => $qty * $unitCost
-                    ];
-                    $prodQty += $qty;
-                    $prodCost += ($qty * $unitCost);
+                    $qty = 1;
+                    if (is_array($pReq) && isset($pReq['variations'][$comb->id])) {
+                        $qty = max(0, (int)$pReq['variations'][$comb->id]);
+                    } elseif (is_numeric($pReq)) {
+                        $qty = max(0, (int)$pReq);
+                    }
+
+                    if ($qty > 0) {
+                        $unitCost = (float)($comb->product_cost > 0 ? $comb->product_cost : ($comb->offer_price > 0 ? $comb->offer_price : $comb->regular_price ?? 0));
+                        $combStockMap[$comb->id] = [
+                            'quantity' => $qty,
+                            'unit_cost' => $unitCost,
+                            'total_cost' => $qty * $unitCost
+                        ];
+                        $prodQty += $qty;
+                        $prodCost += ($qty * $unitCost);
+                    }
                 }
             } else {
-                $qty = 1; // Default 1 unit
+                $qty = 1;
+                if (is_numeric($pReq)) {
+                    $qty = max(1, (int)$pReq);
+                } elseif (is_array($pReq) && isset($pReq['quantity'])) {
+                    $qty = max(1, (int)$pReq['quantity']);
+                }
+
                 $unitCost = (float)($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : $product->old_price ?? 0));
                 $prodQty = $qty;
                 $prodCost = $qty * $unitCost;
+            }
+
+            if ($prodQty <= 0) {
+                continue; // Skip products with 0 stock requested
             }
 
             $totalCost += $prodCost;
@@ -410,6 +431,11 @@ class VendorProductController extends Controller
                 'total_cost' => $prodCost,
                 'comb_map' => $combStockMap,
             ];
+        }
+
+        if (empty($productCopyData)) {
+            return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
+                ->with('error', 'Please specify a valid quantity for at least one variation/product.');
         }
 
         // Wallet Balance Check
@@ -465,7 +491,7 @@ class VendorProductController extends Controller
             DB::commit();
 
             $msgType = $autoApprove ? 'success' : 'warning';
-            $msgContent = 'Successfully copied ' . $totalItemsCount . ' products to your catalog! ৳' . number_format($totalCost, 2) . ' deducted/held from your wallet balance.';
+            $msgContent = 'Successfully requested stock for ' . $totalItemsCount . ' products! ৳' . number_format($totalCost, 2) . ' deducted/held from your wallet balance.';
 
             return redirect()->route('vendor.products.index', ['source' => 'my_products'])
                 ->with($msgType, $msgContent);
@@ -475,6 +501,73 @@ class VendorProductController extends Controller
             \Log::error('Bulk Product Copy Exception: ' . $e->getMessage());
             return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
                 ->with('error', 'Bulk copy failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Return/Cancel product allocation request and refund vendor wallet
+     */
+    public function returnAllocation(Request $request, $productId)
+    {
+        $vendor = auth()->user();
+        $allocation = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)
+            ->where('product_id', $productId)
+            ->first();
+
+        if (!$allocation) {
+            return redirect()->back()->with('error', 'Allocation request not found.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $totalCost = (float)($allocation->total_cost ?? 0);
+            $productTitle = $allocation->product->title ?? 'Product';
+
+            // Find matching pending stock_purchase transaction if any
+            $trx = \App\Models\VendorWalletTransaction::where('vendor_id', $vendor->id)
+                ->where('product_id', $productId)
+                ->where('type', 'stock_purchase')
+                ->where('status', 'pending')
+                ->latest()
+                ->first();
+
+            $refundAmount = $trx ? (float)$trx->amount : $totalCost;
+
+            if ($refundAmount > 0) {
+                // Refund wallet balance
+                $vendor->increment('wallet_balance', $refundAmount);
+
+                // Log refund transaction
+                \App\Models\VendorWalletTransaction::create([
+                    'vendor_id' => $vendor->id,
+                    'product_id' => $productId,
+                    'admin_id' => $vendor->created_by,
+                    'type' => 'stock_purchase_refund',
+                    'amount' => $refundAmount,
+                    'payment_method' => 'Wallet',
+                    'transaction_id' => 'REF-' . strtoupper(Str::random(8)),
+                    'status' => 'approved',
+                    'admin_note' => 'Vendor return/cancel stock request for "' . $productTitle . '". Refunded ৳' . number_format($refundAmount, 2),
+                    'is_seen' => true,
+                ]);
+
+                if ($trx) {
+                    $trx->update(['status' => 'rejected']);
+                }
+            }
+
+            // Delete the allocation record
+            $allocation->delete();
+
+            DB::commit();
+
+            return redirect()->route('vendor.products.index', ['source' => 'my_products'])
+                ->with('success', 'Product stock request for "' . $productTitle . '" has been returned/cancelled. ৳' . number_format($refundAmount, 2) . ' refunded to your wallet.');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            \Log::error('Return Allocation Exception: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to return product: ' . $e->getMessage());
         }
     }
 

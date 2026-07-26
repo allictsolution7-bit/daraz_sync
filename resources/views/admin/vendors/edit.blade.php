@@ -256,9 +256,9 @@
                             <small class="text-muted">Current catalog: {{ $vendor->products()->count() }} items</small>
                         </div>
 
-                        <div class="form-check form-switch mb-3 pt-1">
-                            <input class="form-check-input" type="checkbox" id="autoApprove" name="auto_approve_products" value="1" {{ old('auto_approve_products', $vendorSettings->auto_approve_products) ? 'checked' : '' }}>
-                            <label class="form-check-label font-weight-bold" for="autoApprove">Auto-Approve Products</label>
+                        <div class="form-check form-switch mb-4 pt-2 d-flex align-items-center gap-2">
+                            <input class="form-check-input me-2" type="checkbox" id="autoApprove" name="auto_approve_products" value="1" style="width: 3.2em; height: 1.6em; cursor: pointer;" {{ old('auto_approve_products', $vendorSettings->auto_approve_products) ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold text-dark fs-6" for="autoApprove" style="cursor: pointer; user-select: none;">Auto-Approve Products</label>
                         </div>
 
                         <div class="mb-3">
