@@ -574,31 +574,39 @@
                                                                          </thead>
                                                                          <tbody>
                                                                              @foreach($product->variationCombinations as $comb)
-                                                                                 @php
-                                                                                     $unitCost = (float)($comb->product_cost > 0 ? $comb->product_cost : ($comb->offer_price > 0 ? $comb->offer_price : $comb->regular_price ?? 0));
-                                                                                     $optNames = method_exists($comb, 'getOptionNamesArray') ? $comb->getOptionNamesArray() : [];
-                                                                                     $optLabel = !empty($optNames) ? implode(' / ', $optNames) : (is_array($comb->variation_options) ? implode(' / ', $comb->variation_options) : $comb->variation_options);
-                                                                                 @endphp
-                                                                                 <tr>
-                                                                                     <td><span class="badge" style="color: #4f46e5; background: #eef2ff; font-weight: 700;">{{ $optLabel }}</span></td>
-                                                                                     <td class="font-weight-bold">৳{{ number_format($unitCost, 2) }}</td>
-                                                                                     <td class="text-muted small">{{ $comb->stock_quantity ?? 'Unlimited' }}</td>
-                                                                                     <td>
-                                                                                         <input type="number" name="quantities[{{ $product->id }}][variations][{{ $comb->id }}]" 
-                                                                                                class="form-control form-control-sm var-qty-input-{{ $product->id }}" 
-                                                                                                data-cost="{{ $unitCost }}"
-                                                                                                min="0" max="{{ $comb->stock_quantity ?? 99999 }}" value="1"
-                                                                                                oninput="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
-                                                                                     </td>
-                                                                                     <td class="text-end font-weight-bold text-dark var-subtotal-{{ $product->id }}">৳{{ number_format($unitCost, 2) }}</td>
-                                                                                 </tr>
-                                                                             @endforeach
+                                                                                  @php
+                                                                                      $unitCost = (float)(
+                                                                                          ($comb->wholesale_price > 0) ? $comb->wholesale_price : 
+                                                                                          (($comb->product_cost > 0) ? $comb->product_cost : 
+                                                                                          (($comb->offer_price > 0) ? $comb->offer_price : ($comb->regular_price ?? 0)))
+                                                                                      );
+                                                                                      $optNames = method_exists($comb, 'getOptionNamesArray') ? $comb->getOptionNamesArray() : [];
+                                                                                      $optLabel = !empty($optNames) ? implode(' / ', $optNames) : (is_array($comb->variation_options) ? implode(' / ', $comb->variation_options) : $comb->variation_options);
+                                                                                  @endphp
+                                                                                  <tr>
+                                                                                      <td><span class="badge" style="color: #4f46e5; background: #eef2ff; font-weight: 700;">{{ $optLabel }}</span></td>
+                                                                                      <td class="font-weight-bold">৳{{ number_format($unitCost, 2) }}</td>
+                                                                                      <td class="text-muted small">{{ $comb->stock_quantity ?? 'Unlimited' }}</td>
+                                                                                      <td>
+                                                                                          <input type="number" name="quantities[{{ $product->id }}][variations][{{ $comb->id }}]" 
+                                                                                                 class="form-control form-control-sm var-qty-input-{{ $product->id }}" 
+                                                                                                 data-cost="{{ $unitCost }}"
+                                                                                                 min="0" max="{{ $comb->stock_quantity ?? 99999 }}" value="1"
+                                                                                                 oninput="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
+                                                                                      </td>
+                                                                                      <td class="text-end font-weight-bold text-dark var-subtotal-{{ $product->id }}">৳{{ number_format($unitCost, 2) }}</td>
+                                                                                  </tr>
+                                                                              @endforeach
                                                                          </tbody>
                                                                      </table>
                                                                  </div>
                                                              @else
                                                                  @php
-                                                                     $unitCost = (float)($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : $product->old_price ?? 0));
+                                                                     $unitCost = (float)(
+                                                                         ($product->wholesale_price > 0) ? $product->wholesale_price : 
+                                                                         (($product->product_cost > 0) ? $product->product_cost : 
+                                                                         (($product->offer > 0) ? $product->offer : ($product->old_price ?? 0)))
+                                                                     );
                                                                  @endphp
                                                                  <div class="mb-3">
                                                                      <label class="form-label font-weight-bold">Stock Quantity to Purchase (Unit Cost: ৳{{ number_format($unitCost, 2) }})</label>

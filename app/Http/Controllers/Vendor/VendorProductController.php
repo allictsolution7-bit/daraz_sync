@@ -65,7 +65,9 @@ class VendorProductController extends Controller
             $adminId = $vendor->created_by;
             $query = Product::where(function ($q) use ($adminId) {
                 if ($adminId) {
-                    $q->where('vendor_id', $adminId)->orWhereNull('vendor_id');
+                    $q->where('created_by', $adminId)
+                      ->orWhere('vendor_id', $adminId)
+                      ->orWhereNull('vendor_id');
                 } else {
                     $q->whereNull('vendor_id');
                 }
@@ -232,7 +234,11 @@ class VendorProductController extends Controller
                             ->with('error', 'Requested quantity (' . $qty . ') exceeds available admin stock (' . $comb->stock_quantity . ') for combination options.');
                     }
 
-                    $unitCost = (float)($comb->product_cost > 0 ? $comb->product_cost : ($comb->offer_price > 0 ? $comb->offer_price : $comb->regular_price ?? 0));
+                    $unitCost = (float)(
+                        ($comb->wholesale_price > 0) ? $comb->wholesale_price : 
+                        (($comb->product_cost > 0) ? $comb->product_cost : 
+                        (($comb->offer_price > 0) ? $comb->offer_price : ($comb->regular_price ?? 0)))
+                    );
                     $combStockMap[$comb->id] = [
                         'quantity' => $qty,
                         'unit_cost' => $unitCost,
@@ -259,7 +265,11 @@ class VendorProductController extends Controller
                     ->with('error', 'Requested quantity (' . $qty . ') exceeds available admin stock (' . $product->quantity . ').');
             }
 
-            $unitCost = (float)($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : $product->old_price ?? 0));
+            $unitCost = (float)(
+                ($product->wholesale_price > 0) ? $product->wholesale_price : 
+                (($product->product_cost > 0) ? $product->product_cost : 
+                (($product->offer > 0) ? $product->offer : ($product->old_price ?? 0)))
+            );
             $totalQuantity = $qty;
             $totalCost = $qty * $unitCost;
         }
@@ -396,7 +406,11 @@ class VendorProductController extends Controller
                     }
 
                     if ($qty > 0) {
-                        $unitCost = (float)($comb->product_cost > 0 ? $comb->product_cost : ($comb->offer_price > 0 ? $comb->offer_price : $comb->regular_price ?? 0));
+                        $unitCost = (float)(
+                            ($comb->wholesale_price > 0) ? $comb->wholesale_price : 
+                            (($comb->product_cost > 0) ? $comb->product_cost : 
+                            (($comb->offer_price > 0) ? $comb->offer_price : ($comb->regular_price ?? 0)))
+                        );
                         $combStockMap[$comb->id] = [
                             'quantity' => $qty,
                             'unit_cost' => $unitCost,
@@ -414,7 +428,11 @@ class VendorProductController extends Controller
                     $qty = max(1, (int)$pReq['quantity']);
                 }
 
-                $unitCost = (float)($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : $product->old_price ?? 0));
+                $unitCost = (float)(
+                    ($product->wholesale_price > 0) ? $product->wholesale_price : 
+                    (($product->product_cost > 0) ? $product->product_cost : 
+                    (($product->offer > 0) ? $product->offer : ($product->old_price ?? 0)))
+                );
                 $prodQty = $qty;
                 $prodCost = $qty * $unitCost;
             }
@@ -719,6 +737,7 @@ class VendorProductController extends Controller
 
         // Set vendor-specific fields
         $validated['vendor_id'] = $vendor->id;
+        $validated['created_by'] = $vendor->id;
         
         // IMPORTANT: Always require admin approval for vendor products
         // Only auto-approve if explicitly enabled in vendor settings

@@ -138,6 +138,7 @@ class Product extends Model
         'views_unique',
         // Vendor fields
         'vendor_id',
+        'created_by',
         'approval_status',
         'approved_at',
         'approved_by',
@@ -540,6 +541,14 @@ class Product extends Model
     public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');
+    }
+
+    /**
+     * Admin/User who created this product record
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     /**

@@ -68,6 +68,14 @@ class ProductController extends Controller
             ->leftJoin('product_categories', 'products.category_id', '=', 'product_categories.id')
             ->leftJoin('sub_categories', 'products.sub_category_id', '=', 'sub_categories.id');
 
+        $user = auth()->user();
+        if ($user && !$user->hasRole(['super_admin', 'super admin'])) {
+            $query->where(function($q) use ($user) {
+                $q->where('products.created_by', $user->id)
+                  ->orWhere('products.vendor_id', $user->id);
+            });
+        }
+
         return DataTables::eloquent($query)
             ->filter(function ($q) use ($request) {
                 $search = $request->input('search.value');
@@ -404,6 +412,7 @@ class ProductController extends Controller
             'video_url' => $request->input('video_url'),
             'tags' => $request->input('tags'),
             'is_featured' => $request->has('is_featured') ? 1 : 0,
+            'created_by' => auth()->id(),
         ];
 
         // Add product type specific fields
