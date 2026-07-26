@@ -56,38 +56,148 @@
 </div>
 @endif
 
-<!-- Filter Tabs for My Products -->
-@if(($source ?? 'my_products') === 'my_products')
-<div class="card mb-4">
+<!-- Top Filter Panel -->
+<div class="card mb-4 shadow-sm border-0">
     <div class="card-body">
-        <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a class="nav-link {{ !request('status') ? 'active' : '' }}" 
-                   href="{{ route('vendor.products.index', ['source' => 'my_products']) }}">
-                    All Products
+        <form method="GET" action="{{ route('vendor.products.index') }}" id="vendorProductFilterForm">
+            <input type="hidden" name="source" value="{{ $source ?? 'my_products' }}">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <label for="vendor_category_id" class="form-label small fw-bold mb-1">Category</label>
+                    <select name="category_id" id="vendor_category_id" class="form-select form-select-sm">
+                        <option value="">All Categories</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="vendor_sub_category_id" class="form-label small fw-bold mb-1">Subcategory</label>
+                    <select name="sub_category_id" id="vendor_sub_category_id" class="form-select form-select-sm" {{ $subCategories->isEmpty() ? 'disabled' : '' }}>
+                        <option value="">{{ request('category_id') ? 'All Subcategories' : 'Select Category First' }}</option>
+                        @foreach($subCategories as $subCat)
+                            <option value="{{ $subCat->id }}" {{ request('sub_category_id') == $subCat->id ? 'selected' : '' }}>
+                                {{ $subCat->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="vendor_search" class="form-label small fw-bold mb-1">Search Product</label>
+                    <input type="text" name="search" id="vendor_search" class="form-select-sm form-control" placeholder="Search by name..." value="{{ request('search') }}">
+                </div>
+
+                @if(($source ?? 'my_products') === 'my_products')
+                <div class="col-md-2">
+                    <label for="vendor_status" class="form-label small fw-bold mb-1">Status</label>
+                    <select name="status" id="vendor_status" class="form-select form-select-sm">
+                        <option value="">All Statuses</option>
+                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                    </select>
+                </div>
+                @endif
+
+                <div class="col-md-1 text-end mt-4">
+                    <input type="hidden" name="view_mode" id="vendor_view_mode_input" value="{{ request('view_mode', 'table') }}">
+                    <div class="btn-group btn-group-sm w-100" role="group">
+                        <a href="{{ route('vendor.products.index', array_merge(request()->except(['view_mode']), ['view_mode' => 'table', 'source' => $source ?? 'my_products'])) }}" 
+                           class="btn {{ request('view_mode', 'table') === 'table' ? 'btn-primary' : 'btn-outline-secondary' }}" title="Table View">
+                            <i class="fas fa-list"></i>
+                        </a>
+                        <a href="{{ route('vendor.products.index', array_merge(request()->except(['view_mode']), ['view_mode' => 'grouped', 'source' => $source ?? 'my_products'])) }}" 
+                           class="btn {{ request('view_mode') === 'grouped' ? 'btn-primary' : 'btn-outline-secondary' }}" title="Grouped Category View">
+                            <i class="fas fa-layer-group"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a href="{{ route('vendor.products.index', ['source' => $source ?? 'my_products']) }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-undo me-1"></i> Reset Filters
                 </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request('status') === 'approved' ? 'active' : '' }}" 
-                   href="{{ route('vendor.products.index', ['source' => 'my_products', 'status' => 'approved']) }}">
-                    Approved
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request('status') === 'pending' ? 'active' : '' }}" 
-                   href="{{ route('vendor.products.index', ['source' => 'my_products', 'status' => 'pending']) }}">
-                    Pending
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request('status') === 'rejected' ? 'active' : '' }}" 
-                   href="{{ route('vendor.products.index', ['source' => 'my_products', 'status' => 'rejected']) }}">
-                    Rejected
-                </a>
-            </li>
-        </ul>
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="fas fa-filter me-1"></i> Apply Filters
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+
+<!-- Display Grouped Hierarchy View if selected -->
+@if(request('view_mode') === 'grouped' && !empty($groupedProducts) && $groupedProducts->isNotEmpty())
+    <div class="mb-4">
+        @foreach($groupedProducts as $catName => $subGroups)
+            <div class="card mb-3 border-0 shadow-sm">
+                <div class="card-header bg-light d-flex align-items-center justify-content-between py-2">
+                    <h5 class="mb-0 text-primary fw-bold">
+                        <i class="fas fa-folder me-2 text-warning"></i> Category: {{ $catName }}
+                    </h5>
+                    <span class="badge bg-primary rounded-pill">
+                        {{ $subGroups->flatten()->count() }} Products
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    @foreach($subGroups as $subName => $prods)
+                        <div class="p-3 border-bottom bg-white">
+                            <h6 class="text-secondary font-weight-bold mb-2">
+                                <i class="fas fa-folder-open me-2 text-info"></i> Subcategory: {{ $subName }}
+                                <span class="badge bg-secondary ms-1">{{ $prods->count() }}</span>
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 50px;">Image</th>
+                                            <th>Product Name</th>
+                                            <th>Price</th>
+                                            <th>Stock</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($prods as $product)
+                                            <tr>
+                                                <td>
+                                                    @if($product->thumb_image)
+                                                        <img src="{{ asset('storage/' . $product->thumb_image) }}" alt="{{ $product->title }}" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                                    @else
+                                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                            <i class="fas fa-image text-muted"></i>
+                                                        </div>
+                                                    @endif
+                                                </td>
+                                                <td><strong>{{ $product->title }}</strong></td>
+                                                <td>৳{{ number_format($product->price ?? $product->old_price, 2) }}</td>
+                                                <td>{{ $product->quantity ?? 0 }}</td>
+                                                <td>
+                                                    @if(($source ?? 'my_products') === 'admin_products')
+                                                        @if(in_array($product->title, $copiedProductTitles))
+                                                            <button class="btn btn-sm btn-outline-secondary" disabled>Already Copied</button>
+                                                        @else
+                                                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}">
+                                                                <i class="fas fa-copy me-1"></i> Copy
+                                                            </button>
+                                                        @endif
+                                                    @else
+                                                        <a href="{{ route('vendor.products.edit', $product->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+    </div>
 @endif
 
 <!-- Products Table -->
@@ -494,6 +604,54 @@ document.addEventListener('DOMContentLoaded', function() {
             let parts = this.id.split('_');
             let pId = parts[1];
             calculateProductStockCopy(pId, {{ auth()->user()->wallet_balance ?? 0 }});
+        });
+    }
+    // Dynamic Subcategory Fetching for Vendor Filter
+    const catSelect = document.getElementById('vendor_category_id');
+    const subCatSelect = document.getElementById('vendor_sub_category_id');
+
+    if (catSelect && subCatSelect) {
+        catSelect.addEventListener('change', function() {
+            const categoryId = this.value;
+            subCatSelect.innerHTML = '<option value="">Loading...</option>';
+            subCatSelect.disabled = true;
+
+            if (!categoryId) {
+                subCatSelect.innerHTML = '<option value="">Select Category First</option>';
+                return;
+            }
+
+            const rawUrl = '{{ route("vendor.products.subcategories", ":id") }}';
+            const url = rawUrl.replace('%3Aid', categoryId).replace(':id', categoryId);
+
+            fetch(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP error ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    subCatSelect.innerHTML = '<option value="">All Subcategories</option>';
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.id;
+                            option.textContent = item.name;
+                            subCatSelect.appendChild(option);
+                        });
+                        subCatSelect.disabled = false;
+                    } else {
+                        subCatSelect.innerHTML = '<option value="">No Subcategories Found</option>';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching subcategories:', err);
+                    subCatSelect.innerHTML = '<option value="">Failed to load subcategories</option>';
+                });
         });
     }
 });

@@ -77,15 +77,65 @@ class VendorProductController extends Controller
                   ->orWhereIn('id', $allocatedProductIds);
             })->with(['category', 'subCategory', 'brand', 'variationCombinations']);
 
-            if ($request->has('status') && !empty($request->status)) {
+            if ($request->filled('status')) {
                 $query->where('approval_status', $request->status);
             }
         }
 
-        $copiedProductTitles = Product::whereIn('id', $allocatedProductIds)->pluck('title')->toArray();
-        $products = $query->latest()->paginate(20)->withQueryString();
+        // Category Filter
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
 
-        return view('vendor.products.index', compact('products', 'canAccessAdminProducts', 'source', 'copiedProductTitles', 'allocatedProductIds'));
+        // SubCategory Filter
+        if ($request->filled('sub_category_id')) {
+            $query->where('sub_category_id', $request->sub_category_id);
+        }
+
+        // Keyword Search Filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('id', $search);
+            });
+        }
+
+        $categories = ProductCategory::orderBy('name')->get();
+        $subCategories = collect();
+        if ($request->filled('category_id')) {
+            $subCategories = SubCategory::where('product_category_id', $request->category_id)->orderBy('name')->get();
+        }
+
+        $viewMode = $request->get('view_mode', 'table'); // 'table' or 'grouped'
+        $copiedProductTitles = Product::whereIn('id', $allocatedProductIds)->pluck('title')->toArray();
+
+        if ($viewMode === 'grouped') {
+            $allProducts = (clone $query)->latest()->get();
+            $groupedProducts = $allProducts->groupBy(function($prod) {
+                return $prod->category ? $prod->category->name : 'Uncategorized';
+            })->map(function($categoryGroup) {
+                return $categoryGroup->groupBy(function($prod) {
+                    return $prod->subCategory ? $prod->subCategory->name : 'General / No Subcategory';
+                });
+            });
+            $products = $query->latest()->paginate(50)->withQueryString();
+        } else {
+            $groupedProducts = collect();
+            $products = $query->latest()->paginate(20)->withQueryString();
+        }
+
+        return view('vendor.products.index', compact(
+            'products', 
+            'canAccessAdminProducts', 
+            'source', 
+            'copiedProductTitles', 
+            'allocatedProductIds',
+            'categories',
+            'subCategories',
+            'viewMode',
+            'groupedProducts'
+        ));
     }
 
     /**
@@ -562,9 +612,7 @@ class VendorProductController extends Controller
     public function getSubcategories($categoryId)
     {
         $subcategories = SubCategory::where('product_category_id', $categoryId)
-            ->where('status', 1)
-            ->select('id', 'name')
-            ->get();
+            ->get(['id', 'name', 'slug']);
         
         return response()->json($subcategories);
     }

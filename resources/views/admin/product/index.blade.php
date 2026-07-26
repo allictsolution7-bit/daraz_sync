@@ -779,20 +779,29 @@
                 setSubcategoryOptions(null, 'Loading...', true);
                 setThirdCategoryOptions(null, 'Select a subcategory first', true);
 
-                const url = '{{ route("admin.get-product-subcategories", ':id') }}'.replace(':id', categoryId);
+                const rawUrl = '{{ route("admin.get-product-subcategories", ":id") }}';
+                const url = rawUrl.replace('%3Aid', categoryId).replace(':id', categoryId);
 
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    dataType: 'json',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    success: function(data) {
                         if (Array.isArray(data) && data.length) {
                             setSubcategoryOptions(data, 'All Subcategories', false);
                         } else {
                             setSubcategoryOptions(null, 'No subcategories available', true);
                         }
-                    })
-                    .catch(() => {
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading subcategories:', error, xhr.responseText);
                         setSubcategoryOptions(null, 'Failed to load subcategories', true);
-                    });
+                    }
+                });
             }
 
             function loadThirdCategories(subcategoryId) {

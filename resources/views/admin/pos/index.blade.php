@@ -1487,7 +1487,7 @@ function loadSubcategories(categoryId) {
     setSubcategoryOptions(null, 'Loading...', true);
     setThirdCategoryOptions(null, 'Select a subcategory first', true);
 
-    const url = '{{ route("admin.get-product-subcategories", ':id') }}'.replace(':id', categoryId);
+    const url = '{{ route("admin.get-product-subcategories", ":id") }}'.replace('%3Aid', categoryId).replace(':id', categoryId);
 
     fetch(url)
         .then(response => response.json())

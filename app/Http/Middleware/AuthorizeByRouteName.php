@@ -23,8 +23,14 @@ class AuthorizeByRouteName
             return $next($request);
         }
 
-        // Allow subscription payments and admin profile for all admin users
-        if (str_starts_with($name, 'admin.subscription-payments') || str_starts_with($name, 'admin.profile') || $name === 'admin.profile') {
+        // Allow subcategory, helper routes, subscription payments and admin profile for all admin users
+        if (
+            $name === 'admin.get-product-subcategories' || 
+            $name === 'admin.third-categories.by-subcategories' ||
+            str_starts_with($name, 'admin.subscription-payments') || 
+            str_starts_with($name, 'admin.profile') || 
+            $name === 'admin.profile'
+        ) {
             return $next($request);
         }
 
@@ -66,6 +72,11 @@ class AuthorizeByRouteName
             'landing-pages' => 'landing_pages',
             'postsubcategory' => 'post_subcategories',
             'category' => 'categories',
+            'catalog-groups' => 'product_categories',
+            'catalog-tiers' => 'sub_categories',
+            'catalog-levels' => 'sub_categories',
+            'third-categories' => 'sub_categories',
+            'third_categories' => 'sub_categories',
             'orders.reports' => 'orders',
             'customers.reports' => 'orders',
             'menus.items' => 'menu_items',

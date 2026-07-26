@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -187,12 +188,9 @@ class ProductCategoryController extends Controller
      */
     public function getSubcategories($categoryId)
     {
-        $category = ProductCategory::with('subCategories')->find($categoryId);
+        $subCategories = SubCategory::where('product_category_id', $categoryId)
+            ->get(['id', 'name', 'slug', 'product_category_id']);
 
-        if (!$category) {
-            return response()->json(['error' => 'Category not found'], 404);
-        }
-
-        return response()->json($category->subCategories);
+        return response()->json($subCategories);
     }
 }
