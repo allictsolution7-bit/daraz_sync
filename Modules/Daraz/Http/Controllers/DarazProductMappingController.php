@@ -96,7 +96,8 @@ class DarazProductMappingController extends Controller
 
         flash()->success('Product mapping created successfully.');
 
-        return redirect()->route('admin.daraz.mappings.index', ['store_id' => $validated['daraz_store_id']]);
+        $routePrefix = request()->is('vendor/*') ? 'vendor.daraz.' : 'admin.daraz.';
+        return redirect()->route($routePrefix . 'mappings.index', ['store_id' => $validated['daraz_store_id']]);
     }
 
     /**
@@ -149,7 +150,8 @@ class DarazProductMappingController extends Controller
 
         flash()->success('Product mapping deleted successfully.');
 
-        return redirect()->route('admin.daraz.mappings.index', ['store_id' => $storeId]);
+        $routePrefix = request()->is('vendor/*') ? 'vendor.daraz.' : 'admin.daraz.';
+        return redirect()->route($routePrefix . 'mappings.index', ['store_id' => $storeId]);
     }
 
     /**

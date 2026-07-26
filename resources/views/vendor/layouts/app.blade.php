@@ -17,6 +17,9 @@
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
+    @yield('styles')
+    @stack('styles')
+    
     <style>
         :root {
             --v-sidebar-width: 230px;
@@ -257,30 +260,30 @@
                 }
             @endphp
 
-            @if(module_enabled('Daraz') && Route::has('admin.daraz.index') && $hasDarazPermission)
+            @if(module_enabled('Daraz') && (Route::has('vendor.daraz.index') || Route::has('admin.daraz.index')) && $hasDarazPermission)
                 <div class="vendor-nav-header mt-3">Connected Apps</div>
                 <div class="vendor-sidebar-group">
-                    <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->is('admin/daraz*') ? 'active' : '' }}" 
+                    <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->is('vendor/daraz*') || request()->is('admin/daraz*') ? 'active' : '' }}" 
                        data-bs-toggle="collapse" 
                        href="#darazSyncVendorMenu" 
                        role="button" 
-                       aria-expanded="{{ request()->is('admin/daraz*') ? 'true' : 'false' }}">
+                       aria-expanded="{{ request()->is('vendor/daraz*') || request()->is('admin/daraz*') ? 'true' : 'false' }}">
                         <span class="d-flex align-items-center gap-2">
                             <i class="fas fa-rotate text-warning"></i> Daraz Sync
                         </span>
                         <i class="fas fa-chevron-down fs-8"></i>
                     </a>
-                    <div class="collapse {{ request()->is('admin/daraz*') ? 'show' : '' }} ps-3 mt-1" id="darazSyncVendorMenu">
-                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('admin.daraz.index') ? 'active text-white' : '' }}" href="{{ route('admin.daraz.index') }}">
+                    <div class="collapse {{ request()->is('vendor/daraz*') || request()->is('admin/daraz*') ? 'show' : '' }} ps-3 mt-1" id="darazSyncVendorMenu">
+                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('vendor.daraz.index') || request()->routeIs('admin.daraz.index') ? 'active text-white' : '' }}" href="{{ route('vendor.daraz.index') }}">
                             <i class="fas fa-chart-simple fs-7"></i> Dashboard
                         </a>
-                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('admin.daraz.stores.*') ? 'active text-white' : '' }}" href="{{ route('admin.daraz.stores.index') }}">
+                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('vendor.daraz.stores.*') || request()->routeIs('admin.daraz.stores.*') ? 'active text-white' : '' }}" href="{{ route('vendor.daraz.stores.index') }}">
                             <i class="fas fa-store fs-7"></i> Stores
                         </a>
-                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('admin.daraz.mappings.*') ? 'active text-white' : '' }}" href="{{ route('admin.daraz.mappings.index') }}">
+                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('vendor.daraz.mappings.*') || request()->routeIs('admin.daraz.mappings.*') ? 'active text-white' : '' }}" href="{{ route('vendor.daraz.mappings.index') }}">
                             <i class="fas fa-arrows-spin fs-7"></i> Product Mappings
                         </a>
-                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('admin.daraz.sync.logs') ? 'active text-white' : '' }}" href="{{ route('admin.daraz.sync.logs') }}">
+                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('vendor.daraz.sync.logs') || request()->routeIs('admin.daraz.sync.logs') ? 'active text-white' : '' }}" href="{{ route('vendor.daraz.sync.logs') }}">
                             <i class="fas fa-terminal fs-7"></i> Sync Logs
                         </a>
                     </div>

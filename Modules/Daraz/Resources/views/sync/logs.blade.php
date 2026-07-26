@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends(request()->is('vendor/*') ? 'vendor.layouts.app' : 'layouts.master')
 
 @section('title', 'System Operations Log')
 
@@ -162,6 +162,10 @@
 @endsection
 
 @section('content')
+@php
+    $isVendor = request()->is('vendor/*');
+    $routePrefix = $isVendor ? 'vendor.daraz.' : 'admin.daraz.';
+@endphp
 <div class="container-fluid daraz-logs-dashboard">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
         <div>
@@ -169,7 +173,7 @@
             <p class="text-muted small mb-0">Review background sync triggers, API payloads, and integration state changes</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.daraz.sync.index') }}" class="btn btn-sm btn-outline-secondary" style="padding: 6px 14px !important;">
+            <a href="{{ route($routePrefix . 'sync.index') }}" class="btn btn-sm btn-outline-secondary" style="padding: 6px 14px !important;">
                 <i class="fas fa-arrow-left me-1"></i> Dashboard
             </a>
             <button type="button" class="btn btn-sm btn-outline-danger" id="clearLogsBtn" style="padding: 6px 14px !important;">
@@ -181,7 +185,7 @@
     <!-- Filters -->
     <div class="card premium-card mb-4">
         <div class="card-body">
-            <form action="{{ route('admin.daraz.sync.logs') }}" method="GET" class="row g-3">
+            <form action="{{ route($routePrefix . 'sync.logs') }}" method="GET" class="row g-3">
                 <div class="col-md-3">
                     <select name="store_id" class="form-select">
                         <option value="">All Outlets</option>
@@ -217,7 +221,7 @@
                     </button>
                 </div>
                 <div class="col-md-3 col-sm-6">
-                    <a href="{{ route('admin.daraz.sync.logs') }}" class="btn btn-outline-secondary w-100">
+                    <a href="{{ route($routePrefix . 'sync.logs') }}" class="btn btn-outline-secondary w-100">
                         <i class="fas fa-times me-1"></i> Clear Filters
                     </a>
                 </div>
@@ -392,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
         btn.disabled = true;
 
-        fetch(`{{ route('admin.daraz.sync.logs.clear') }}?days=${days}`, {
+        fetch(`{{ route($routePrefix . 'sync.logs.clear') }}?days=${days}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',

@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends(request()->is('vendor/*') ? 'vendor.layouts.app' : 'layouts.master')
 
 @section('title', 'Edit Daraz Store')
 
@@ -183,6 +183,11 @@
 @endsection
 
 @section('content')
+@php
+    $isVendor = request()->is('vendor/*');
+    $routePrefix = $isVendor ? 'vendor.daraz.' : 'admin.daraz.';
+    $urlPrefix = $isVendor ? 'vendor/daraz' : 'admin/daraz';
+@endphp
 <div id="daraz-stores-page" class="container-fluid px-4 py-4">
 
     {{-- Header Banner --}}
@@ -191,7 +196,7 @@
             <h4>Edit Seller Account</h4>
             <p>{{ $store->name }} &bull; Integration settings and intervals</p>
         </div>
-        <a href="{{ route('admin.daraz.stores.index') }}" class="btn-hdr">
+        <a href="{{ route($routePrefix . 'stores.index') }}" class="btn-hdr">
             <i class="fas fa-arrow-left"></i> Back to Stores
         </a>
     </div>
@@ -205,7 +210,7 @@
                     <h2>Channel Configuration</h2>
                 </div>
                 <div class="module-body">
-                    <form action="{{ route('admin.daraz.stores.update', $store) }}" method="POST">
+                    <form action="{{ route($routePrefix . 'stores.update', $store) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -285,7 +290,7 @@
                             <button type="submit" class="btn-action indigo">
                                 <i class="fas fa-save"></i> Update Store
                             </button>
-                            <a href="{{ route('admin.daraz.stores.index') }}" class="btn-action ghost">
+                            <a href="{{ route($routePrefix . 'stores.index') }}" class="btn-action ghost">
                                 Cancel
                             </a>
                         </div>
@@ -329,7 +334,7 @@
                                 Integration is not authorized. Please authorize with Daraz.
                             @endif
                         </div>
-                        <a href="{{ route('admin.daraz.stores.authorize', $store) }}" class="btn-panel-action bpa-green">
+                        <a href="{{ route($routePrefix . 'stores.authorize', $store) }}" class="btn-panel-action bpa-green">
                             <i class="fas fa-key"></i> Authorize Channel
                         </a>
                     @endif
@@ -372,7 +377,7 @@
                 </div>
                 <div class="module-body">
                     <p style="font-size:0.8rem; color:#64748b; line-height:1.5; margin-bottom:14px;">Deleting this store will permanently clean all associated SKU links and mapped histories.</p>
-                    <form action="{{ route('admin.daraz.stores.destroy', $store) }}" method="POST" onsubmit="return confirm('Are you absolutely sure? This action cannot be undone.');" style="margin:0;">
+                    <form action="{{ route($routePrefix . 'stores.destroy', $store) }}" method="POST" onsubmit="return confirm('Are you absolutely sure? This action cannot be undone.');" style="margin:0;">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn-action danger" style="padding: 8px 18px; font-size: 0.8rem;">
                             <i class="fas fa-trash-alt"></i> Delete Channel
@@ -402,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             this.disabled = true;
 
-            fetch(`{{ url('admin/daraz/stores') }}/${storeId}/test`, {
+            fetch(`{{ url($urlPrefix . '/stores') }}/${storeId}/test`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -433,7 +438,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             this.disabled = true;
 
-            fetch(`{{ url('admin/daraz/stores') }}/${storeId}/refresh-token`, {
+            fetch(`{{ url($urlPrefix . '/stores') }}/${storeId}/refresh-token`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',

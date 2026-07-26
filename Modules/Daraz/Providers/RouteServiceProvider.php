@@ -40,6 +40,12 @@ class RouteServiceProvider extends ServiceProvider
             ->name('admin.daraz.')
             ->namespace($this->moduleNamespace)
             ->group(module_path('Daraz', 'Routes/web.php'));
+
+        Route::middleware(['web', 'auth'])
+            ->prefix('vendor/daraz')
+            ->name('vendor.daraz.')
+            ->namespace($this->moduleNamespace)
+            ->group(module_path('Daraz', 'Routes/web.php'));
     }
 
     /**

@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends(request()->is('vendor/*') ? 'vendor.layouts.app' : 'layouts.master')
 
 @section('title', 'Daraz Stores')
 
@@ -234,6 +234,11 @@
 @endsection
 
 @section('content')
+@php
+    $isVendor = request()->is('vendor/*');
+    $routePrefix = $isVendor ? 'vendor.daraz.' : 'admin.daraz.';
+    $urlPrefix = $isVendor ? 'vendor/daraz' : 'admin/daraz';
+@endphp
 <div id="daraz-stores-page" class="container-fluid px-4 py-4">
 
     @if(session('success'))
@@ -259,7 +264,7 @@
             <p>Configure and coordinate active seller accounts</p>
         </div>
         <div class="header-actions">
-            <a href="{{ route('admin.daraz.stores.create') }}" class="btn-hdr primary">
+            <a href="{{ route($routePrefix . 'stores.create') }}" class="btn-hdr primary">
                 <i class="fas fa-plus"></i> Integrate Channel
             </a>
         </div>
@@ -311,7 +316,7 @@
                 <div class="empty-icon"><i class="fas fa-store"></i></div>
                 <h4>No Seller Accounts Configured</h4>
                 <p>Integrate your initial seller account to begin mapping items.</p>
-                <a href="{{ route('admin.daraz.stores.create') }}" class="btn-hdr primary" style="margin: 0 auto; text-decoration: none;">
+                <a href="{{ route($routePrefix . 'stores.create') }}" class="btn-hdr primary" style="margin: 0 auto; text-decoration: none;">
                     <i class="fas fa-plus-circle"></i> Integrate Channel
                 </a>
             </div>
@@ -375,7 +380,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <form action="{{ route('admin.daraz.stores.toggle', $store) }}" method="POST" style="margin:0;">
+                                    <form action="{{ route($routePrefix . 'stores.toggle', $store) }}" method="POST" style="margin:0;">
                                         @csrf
                                         <input class="premium-toggle" type="checkbox"
                                                {{ $store->auto_sync ? 'checked' : '' }}
@@ -386,7 +391,7 @@
                                 <td>
                                     <div class="row-actions" style="justify-content: flex-end;">
                                         @if(!$store->isConnected())
-                                            <a href="{{ route('admin.daraz.stores.authorize', $store) }}" class="icon-btn ib-auth" title="Authorize Channel">
+                                            <a href="{{ route($routePrefix . 'stores.authorize', $store) }}" class="icon-btn ib-auth" title="Authorize Channel">
                                                 <i class="fas fa-fingerprint"></i> Authorize
                                             </a>
                                         @else
@@ -397,10 +402,10 @@
                                                 <i class="fas fa-sync-alt"></i>
                                             </button>
                                         @endif
-                                        <a href="{{ route('admin.daraz.stores.edit', $store) }}" class="icon-btn ib-edit" title="Edit Store Settings">
+                                        <a href="{{ route($routePrefix . 'stores.edit', $store) }}" class="icon-btn ib-edit" title="Edit Store Settings">
                                             <i class="fas fa-cog"></i>
                                         </a>
-                                        <form action="{{ route('admin.daraz.stores.destroy', $store) }}" method="POST" style="display:inline;"
+                                        <form action="{{ route($routePrefix . 'stores.destroy', $store) }}" method="POST" style="display:inline;"
                                               onsubmit="return confirm('Are you sure? This will remove all product mappings for this store.');">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="icon-btn ib-delete" title="Delete Channel">
@@ -431,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             this.disabled = true;
 
-            fetch(`{{ url('admin/daraz/stores') }}/${storeId}/test`, {
+            fetch(`{{ url($urlPrefix . '/stores') }}/${storeId}/test`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -462,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             this.disabled = true;
 
-            fetch(`{{ url('admin/daraz/stores') }}/${storeId}/refresh-token`, {
+            fetch(`{{ url($urlPrefix . '/stores') }}/${storeId}/refresh-token`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',

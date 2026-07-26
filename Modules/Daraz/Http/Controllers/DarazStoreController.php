@@ -74,7 +74,8 @@ class DarazStoreController extends Controller
 
         flash()->success('Store created successfully. Please authorize to connect.');
 
-        return redirect()->route('admin.daraz.stores.authorize', $store);
+        $routePrefix = request()->is('vendor/*') ? 'vendor.daraz.' : 'admin.daraz.';
+        return redirect()->route($routePrefix . 'stores.authorize', $store);
     }
 
     /**
@@ -148,7 +149,8 @@ class DarazStoreController extends Controller
 
         flash()->success('Store updated successfully.');
 
-        return redirect()->route('admin.daraz.stores.edit', $store);
+        $routePrefix = request()->is('vendor/*') ? 'vendor.daraz.' : 'admin.daraz.';
+        return redirect()->route($routePrefix . 'stores.edit', $store);
     }
 
     /**
@@ -162,7 +164,8 @@ class DarazStoreController extends Controller
 
         flash()->success('Store deleted successfully.');
 
-        return redirect()->route('admin.daraz.stores.index');
+        $routePrefix = request()->is('vendor/*') ? 'vendor.daraz.' : 'admin.daraz.';
+        return redirect()->route($routePrefix . 'stores.index');
     }
 
     /**
@@ -171,16 +174,21 @@ class DarazStoreController extends Controller
     public function startAuthorization(DarazStore $store)
     {
         $this->authorizeStoreAccess($store);
+        $routePrefix = request()->is('vendor/*') ? 'vendor.daraz.' : 'admin.daraz.';
+
         if (!$store->hasValidCredentials()) {
             flash()->error('Please configure app key and secret first.');
-            return redirect()->route('admin.daraz.stores.edit', $store);
+            return redirect()->route($routePrefix . 'stores.edit', $store);
         }
 
-        $redirectUri = route('admin.daraz.stores.callback');
+        $redirectUri = route($routePrefix . 'stores.callback');
         $authUrl = $this->authService->getAuthorizationUrl($store, $redirectUri);
 
-        // Store the store ID in session for callback
-        session(['daraz_auth_store_id' => $store->id]);
+        // Store the store ID and vendor context in session for callback
+        session([
+            'daraz_auth_store_id' => $store->id,
+            'daraz_auth_is_vendor' => request()->is('vendor/*'),
+        ]);
 
         return redirect()->away($authUrl);
     }
@@ -191,29 +199,32 @@ class DarazStoreController extends Controller
     public function callback(Request $request)
     {
         $storeId = session('daraz_auth_store_id');
-        session()->forget('daraz_auth_store_id');
+        $isVendor = session('daraz_auth_is_vendor', false);
+        session()->forget(['daraz_auth_store_id', 'daraz_auth_is_vendor']);
+
+        $routePrefix = $isVendor ? 'vendor.daraz.' : 'admin.daraz.';
 
         if (!$storeId) {
             flash()->error('Authorization session expired. Please try again.');
-            return redirect()->route('admin.daraz.stores.index');
+            return redirect()->route($routePrefix . 'stores.index');
         }
 
         $store = DarazStore::find($storeId);
         if (!$store) {
             flash()->error('Store not found.');
-            return redirect()->route('admin.daraz.stores.index');
+            return redirect()->route($routePrefix . 'stores.index');
         }
 
         // Check for errors
         if ($request->has('error')) {
             flash()->error('Authorization failed: ' . $request->get('error_description', 'Unknown error'));
-            return redirect()->route('admin.daraz.stores.edit', $store);
+            return redirect()->route($routePrefix . 'stores.edit', $store);
         }
 
         $code = $request->get('code');
         if (!$code) {
             flash()->error('No authorization code received.');
-            return redirect()->route('admin.daraz.stores.edit', $store);
+            return redirect()->route($routePrefix . 'stores.edit', $store);
         }
 
         // Exchange code for token
@@ -225,7 +236,7 @@ class DarazStoreController extends Controller
             flash()->error('Failed to connect: ' . ($result['error'] ?? 'Unknown error'));
         }
 
-        return redirect()->route('admin.daraz.stores.edit', $store);
+        return redirect()->route($routePrefix . 'stores.edit', $store);
     }
 
     /**
@@ -312,6 +323,7 @@ class DarazStoreController extends Controller
 
         flash()->success('Store disconnected successfully.');
 
-        return redirect()->route('admin.daraz.stores.edit', $store);
+        $routePrefix = request()->is('vendor/*') ? 'vendor.daraz.' : 'admin.daraz.';
+        return redirect()->route($routePrefix . 'stores.edit', $store);
     }
 }

@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends(request()->is('vendor/*') ? 'vendor.layouts.app' : 'layouts.master')
 
 @section('title', 'Daraz Sync Dashboard')
 
@@ -134,7 +134,7 @@
         .daraz-tabs .nav-link {
             font-weight: 700;
             color: #475569;
-            border-radius: 9px;
+            border-radius: 99px;
             padding: 8px 18px;
             font-size: 0.825rem;
             transition: all 0.2s ease;
@@ -164,6 +164,11 @@
 @endsection
 
 @section('content')
+@php
+    $isVendor = request()->is('vendor/*');
+    $routePrefix = $isVendor ? 'vendor.daraz.' : 'admin.daraz.';
+    $urlPrefix = $isVendor ? 'vendor/daraz' : 'admin/daraz';
+@endphp
 <div class="container-fluid daraz-dashboard">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
         <div>
@@ -264,10 +269,10 @@
                         </ul>
                     </div>
                     <div class="tab-actions">
-                        <a href="{{ route('admin.daraz.stores.index') }}" class="btn btn-sm btn-outline-primary" id="manage-stores-btn" style="border-radius: 8px; font-weight: 500;">
+                        <a href="{{ route($routePrefix . 'stores.index') }}" class="btn btn-sm btn-outline-primary" id="manage-stores-btn" style="border-radius: 8px; font-weight: 500;">
                             Manage Outlets
                         </a>
-                        <a href="{{ route('admin.daraz.sync.logs') }}" class="btn btn-sm btn-outline-primary d-none" id="view-all-logs-btn" style="border-radius: 8px; font-weight: 500;">
+                        <a href="{{ route($routePrefix . 'sync.logs') }}" class="btn btn-sm btn-outline-primary d-none" id="view-all-logs-btn" style="border-radius: 8px; font-weight: 500;">
                             Review Event Logs
                         </a>
                     </div>
@@ -279,7 +284,7 @@
                                 <div class="text-center py-5">
                                     <i class="fas fa-store-slash fs-1 text-muted opacity-50 mb-3"></i>
                                     <p class="text-muted">No stores connected yet.</p>
-                                    <a href="{{ route('admin.daraz.stores.create') }}" class="btn btn-primary btn-sm" style="border-radius: 8px;">
+                                    <a href="{{ route($routePrefix . 'stores.create') }}" class="btn btn-primary btn-sm" style="border-radius: 8px;">
                                         <i class="fas fa-plus"></i> Add Store
                                     </a>
                                 </div>
@@ -417,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
         btn.disabled = true;
 
-        fetch('{{ route("admin.daraz.sync.all") }}', {
+        fetch('{{ route($routePrefix . "sync.all") }}', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -445,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pulling...';
         btn.disabled = true;
 
-        fetch('{{ route("admin.daraz.sync.pull-all") }}', {
+        fetch('{{ route($routePrefix . "sync.pull-all") }}', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -473,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             this.disabled = true;
 
-            fetch(`{{ url('admin/daraz/sync/store') }}/${storeId}?direction=${direction}`, {
+            fetch(`{{ url($urlPrefix . '/sync/store') }}/${storeId}?direction=${direction}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -502,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
             this.disabled = true;
 
-            fetch(`{{ url('admin/daraz/sync/store-status') }}/${storeId}`, {
+            fetch(`{{ url($urlPrefix . '/sync/store-status') }}/${storeId}`, {
                 headers: { 'Accept': 'application/json' }
             })
             .then(res => res.json())

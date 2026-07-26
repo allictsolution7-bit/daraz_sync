@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends(request()->is('vendor/*') ? 'vendor.layouts.app' : 'layouts.master')
 
 @section('title', 'Product Mappings')
 
@@ -235,6 +235,11 @@
 @endsection
 
 @section('content')
+@php
+    $isVendor = request()->is('vendor/*');
+    $routePrefix = $isVendor ? 'vendor.daraz.' : 'admin.daraz.';
+    $urlPrefix = $isVendor ? 'vendor/daraz' : 'admin/daraz';
+@endphp
 <div id="daraz-mappings-page" class="container-fluid px-4 py-4">
 
     @if(session('success'))
@@ -263,7 +268,7 @@
             <button type="button" class="btn-hdr ghost" id="autoMapBtn" {{ $stores->isEmpty() ? 'disabled' : '' }}>
                 <i class="fas fa-magic"></i> Auto-Link
             </button>
-            <a href="{{ route('admin.daraz.mappings.create') }}" class="btn-hdr primary">
+            <a href="{{ route($routePrefix . 'mappings.create') }}" class="btn-hdr primary">
                 <i class="fas fa-plus"></i> Link Pair
             </a>
         </div>
@@ -271,7 +276,7 @@
 
     {{-- Filters --}}
     <div class="filter-card">
-        <form action="{{ route('admin.daraz.mappings.index') }}" method="GET" class="row g-2">
+        <form action="{{ route($routePrefix . 'mappings.index') }}" method="GET" class="row g-2">
             <div class="col-md-3">
                 <select name="store_id" class="field-select">
                     <option value="">All Stores</option>
@@ -299,7 +304,7 @@
                 </button>
             </div>
             <div class="col-md-2 col-6">
-                <a href="{{ route('admin.daraz.mappings.index') }}" class="btn-hdr ghost w-100" style="height:38px; justify-content:center;">
+                <a href="{{ route($routePrefix . 'mappings.index') }}" class="btn-hdr ghost w-100" style="height:38px; justify-content:center;">
                     <i class="fas fa-times"></i> Clear
                 </a>
             </div>
@@ -320,12 +325,12 @@
                 <div class="empty-icon"><i class="fas fa-link-slash"></i></div>
                 <h4>No Inventory Pairs Established</h4>
                 <p>Establish relations between catalog items and seller listing SKUs to activate inventory syncing.</p>
-                <a href="{{ route('admin.daraz.mappings.create') }}" class="btn-hdr primary" style="margin: 0 auto; text-decoration: none;">
+                <a href="{{ route($routePrefix . 'mappings.create') }}" class="btn-hdr primary" style="margin: 0 auto; text-decoration: none;">
                     <i class="fas fa-plus-circle"></i> Add Pair Bridge
                 </a>
             </div>
         @else
-            <form id="bulkForm" action="{{ route('admin.daraz.mappings.bulk-toggle') }}" method="POST">
+            <form id="bulkForm" action="{{ route($routePrefix . 'mappings.bulk-toggle') }}" method="POST">
                 @csrf
                 <div class="bulk-action-bar">
                     <span style="font-size:0.75rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.04em;">Bulk actions:</span>
@@ -415,10 +420,10 @@
                                             <button type="button" class="icon-btn ib-sync sync-single" data-mapping-id="{{ $mapping->id }}" title="Sync Now" {{ !$mapping->store->isConnected() ? 'disabled' : '' }}>
                                                 <i class="fas fa-sync"></i>
                                             </button>
-                                            <a href="{{ route('admin.daraz.mappings.edit', $mapping) }}" class="icon-btn ib-edit" title="Edit Link Settings">
+                                            <a href="{{ route($routePrefix . 'mappings.edit', $mapping) }}" class="icon-btn ib-edit" title="Edit Link Settings">
                                                 <i class="fas fa-pen"></i>
                                             </a>
-                                            <form action="{{ route('admin.daraz.mappings.destroy', $mapping) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this mapping?');">
+                                            <form action="{{ route($routePrefix . 'mappings.destroy', $mapping) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this mapping?');">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="icon-btn ib-delete" title="Delete Pair">
                                                     <i class="fas fa-trash-alt"></i>
@@ -450,7 +455,7 @@
                 <h5 class="modal-title fw-bold text-dark" style="font-size: 1rem;"><i class="fas fa-magic text-primary me-1"></i> Auto-Link Inventory Pairs</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" style="font-size:0.8rem;"></button>
             </div>
-            <form action="{{ route('admin.daraz.mappings.auto-map') }}" method="POST" style="margin:0;">
+            <form action="{{ route($routePrefix . 'mappings.auto-map') }}" method="POST" style="margin:0;">
                 @csrf
                 <div class="modal-body p-4">
                     <p style="font-size: 0.825rem; color:#64748b; line-height:1.5; margin-bottom:16px;">This will fetch seller listings from the marketplace and automatically establish bridge links by matching SKUs.</p>
@@ -496,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const mappingId = this.dataset.mappingId;
             const isChecked = this.checked;
 
-            fetch(`{{ url('admin/daraz/mappings') }}/${mappingId}/toggle-sync`, {
+            fetch(`{{ url($urlPrefix . '/mappings') }}/${mappingId}/toggle-sync`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -531,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             this.disabled = true;
 
-            fetch(`{{ url('admin/daraz/sync/single') }}/${mappingId}`, {
+            fetch(`{{ url($urlPrefix . '/sync/single') }}/${mappingId}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -567,7 +572,7 @@ function bulkAction(action) {
 
     if (action === 'delete') {
         if (!confirm('Delete ' + checked.length + ' mapping(s)?')) return;
-        form.action = '{{ route("admin.daraz.mappings.bulk-delete") }}';
+        form.action = '{{ route($routePrefix . "mappings.bulk-delete") }}';
         form.method = 'POST';
         const methodInput = document.createElement('input');
         methodInput.type = 'hidden';
@@ -575,7 +580,7 @@ function bulkAction(action) {
         methodInput.value = 'DELETE';
         form.appendChild(methodInput);
     } else {
-        form.action = '{{ route("admin.daraz.mappings.bulk-toggle") }}';
+        form.action = '{{ route($routePrefix . "mappings.bulk-toggle") }}';
         const actionInput = document.createElement('input');
         actionInput.type = 'hidden';
         actionInput.name = 'action';

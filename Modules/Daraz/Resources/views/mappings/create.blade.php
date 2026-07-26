@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends(request()->is('vendor/*') ? 'vendor.layouts.app' : 'layouts.master')
 
 @section('title', 'Establish Inventory Pair Bridge')
 
@@ -104,6 +104,10 @@
 @endsection
 
 @section('content')
+@php
+    $isVendor = request()->is('vendor/*');
+    $routePrefix = $isVendor ? 'vendor.daraz.' : 'admin.daraz.';
+@endphp
 <div class="container-fluid daraz-create-dashboard">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
         <div>
@@ -111,7 +115,7 @@
             <p class="text-muted small mb-0">Bridge a catalog product to a marketplace listing</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.daraz.mappings.index') }}" class="btn btn-sm btn-outline-secondary" style="padding: 6px 14px !important;">
+            <a href="{{ route($routePrefix . 'mappings.index') }}" class="btn btn-sm btn-outline-secondary" style="padding: 6px 14px !important;">
                 <i class="fas fa-arrow-left me-1"></i> Back to Bridges
             </a>
         </div>
@@ -124,7 +128,7 @@
                     <h5 class="mb-0">Bridge Details</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.daraz.mappings.store') }}" method="POST">
+                    <form action="{{ route($routePrefix . 'mappings.store') }}" method="POST">
                         @csrf
 
                         <div class="mb-4">
@@ -259,7 +263,7 @@
                             <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" style="background: #3b82f6; border-color: #3b82f6;">
                                 <i class="fas fa-save"></i> Add Bridge Link
                             </button>
-                            <a href="{{ route('admin.daraz.mappings.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route($routePrefix . 'mappings.index') }}" class="btn btn-outline-secondary">
                                 Cancel
                             </a>
                         </div>
@@ -340,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         searchTimeout = setTimeout(() => {
-            fetch(`{{ route('admin.daraz.mappings.search-products') }}?q=${encodeURIComponent(query)}`)
+            fetch(`{{ route($routePrefix . 'mappings.search-products') }}?q=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.products && data.products.length > 0) {

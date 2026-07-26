@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends(request()->is('vendor/*') ? 'vendor.layouts.app' : 'layouts.master')
 
 @section('title', 'Add Daraz Store')
 
@@ -85,6 +85,10 @@
 @endsection
 
 @section('content')
+@php
+    $isVendor = request()->is('vendor/*');
+    $routePrefix = $isVendor ? 'vendor.daraz.' : 'admin.daraz.';
+@endphp
 <div class="container-fluid daraz-create-dashboard">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
         <div>
@@ -92,7 +96,7 @@
             <p class="text-muted small mb-0">Establish connection with a new seller node</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.daraz.stores.index') }}" class="btn btn-sm btn-outline-secondary" style="padding: 6px 14px !important;">
+            <a href="{{ route($routePrefix . 'stores.index') }}" class="btn btn-sm btn-outline-secondary" style="padding: 6px 14px !important;">
                 <i class="fas fa-arrow-left me-1"></i> Back
             </a>
         </div>
@@ -105,7 +109,7 @@
                     <h5 class="mb-0">Outlet Settings</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.daraz.stores.store') }}" method="POST">
+                    <form action="{{ route($routePrefix . 'stores.store') }}" method="POST">
                         @csrf
 
                         <div class="mb-4">
@@ -218,7 +222,7 @@
                             <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" style="background: #3b82f6; border-color: #3b82f6;">
                                 <i class="fas fa-save"></i> Initialize Integration
                             </button>
-                            <a href="{{ route('admin.daraz.stores.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route($routePrefix . 'stores.index') }}" class="btn btn-outline-secondary">
                                 Cancel
                             </a>
                         </div>

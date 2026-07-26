@@ -1,8 +1,13 @@
-@extends('layouts.master')
+@extends(request()->is('vendor/*') ? 'vendor.layouts.app' : 'layouts.master')
 
 @section('title', 'Edit Product Mapping')
 
 @section('content')
+@php
+    $isVendor = request()->is('vendor/*');
+    $routePrefix = $isVendor ? 'vendor.daraz.' : 'admin.daraz.';
+    $urlPrefix = $isVendor ? 'vendor/daraz' : 'admin/daraz';
+@endphp
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-md-6">
@@ -10,7 +15,7 @@
             <p class="text-muted mb-0">{{ $mapping->product_title }}</p>
         </div>
         <div class="col-md-6 text-end">
-            <a href="{{ route('admin.daraz.mappings.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ route($routePrefix . 'mappings.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Mappings
             </a>
         </div>
@@ -23,7 +28,7 @@
                     <h5 class="mb-0">Mapping Details</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.daraz.mappings.update', $mapping) }}" method="POST">
+                    <form action="{{ route($routePrefix . 'mappings.update', $mapping) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -118,7 +123,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Update Mapping
                             </button>
-                            <a href="{{ route('admin.daraz.mappings.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route($routePrefix . 'mappings.index') }}" class="btn btn-outline-secondary">
                                 Cancel
                             </a>
                         </div>
@@ -205,7 +210,7 @@
                     <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h6>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.daraz.mappings.destroy', $mapping) }}"
+                    <form action="{{ route($routePrefix . 'mappings.destroy', $mapping) }}"
                           method="POST"
                           onsubmit="return confirm('Delete this mapping?');">
                         @csrf
@@ -230,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
         this.disabled = true;
 
-        fetch(`{{ url('admin/daraz/sync/single') }}/${mappingId}`, {
+        fetch(`{{ url($urlPrefix . '/sync/single') }}/${mappingId}`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
