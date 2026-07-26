@@ -588,12 +588,12 @@
                                                                                       <td class="font-weight-bold">৳{{ number_format($unitCost, 2) }}</td>
                                                                                       <td class="text-muted small">{{ $comb->stock_quantity ?? 'Unlimited' }}</td>
                                                                                       <td>
-                                                                                          <input type="number" name="quantities[{{ $product->id }}][variations][{{ $comb->id }}]" 
-                                                                                                 class="form-control form-control-sm var-qty-input-{{ $product->id }}" 
-                                                                                                 data-cost="{{ $unitCost }}"
-                                                                                                 min="0" max="{{ $comb->stock_quantity ?? 99999 }}" value="1"
-                                                                                                 oninput="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
-                                                                                      </td>
+                                                                                           <input type="number" name="quantities[{{ $product->id }}][variations][{{ $comb->id }}]" 
+                                                                                                  class="form-control form-control-sm var-qty-input-{{ $product->id }}" 
+                                                                                                  data-cost="{{ $unitCost }}"
+                                                                                                  min="0" {{ ($comb->stock_quantity !== null && $comb->stock_quantity > 0) ? 'max='.$comb->stock_quantity : '' }} value="0"
+                                                                                                  oninput="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
+                                                                                       </td>
                                                                                       <td class="text-end font-weight-bold text-dark var-subtotal-{{ $product->id }}">৳{{ number_format($unitCost, 2) }}</td>
                                                                                   </tr>
                                                                               @endforeach
@@ -613,7 +613,7 @@
                                                                      <input type="number" name="quantities[{{ $product->id }}][quantity]" id="simple_qty_{{ $product->id }}" 
                                                                             class="form-control form-control-lg font-weight-bold" 
                                                                             data-cost="{{ $unitCost }}" 
-                                                                            min="1" max="{{ $product->quantity ?? 99999 }}" value="1" required
+                                                                            min="1" {{ ($product->quantity !== null && $product->quantity > 0) ? 'max='.$product->quantity : '' }} value="1" required
                                                                             oninput="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
                                                                  </div>
                                                              @endif

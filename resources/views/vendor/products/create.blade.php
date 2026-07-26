@@ -898,10 +898,11 @@
                                         $oldThirdCategories = old('third_categories', []);
                                         @endphp
 
+                                        <input type="hidden" name="category_id" id="primary_category_id_input" value="{{ old('category_id') }}">
                                         @foreach ($categories as $category)
                                         <div class="category-list-item category-level-0" data-category-name="{{ strtolower($category->name) }}" data-level="0" data-category-id="{{ $category->id }}">
                                             <label>
-                                                <input type="checkbox" name="additional_categories[]" value="{{ $category->id }}" id="category_{{ $category->id }}" class="category-checkbox" {{ in_array($category->id, $oldAdditionalCategories) ? 'checked' : '' }}>
+                                                <input type="checkbox" name="additional_categories[]" value="{{ $category->id }}" id="category_{{ $category->id }}" class="category-checkbox" {{ (in_array($category->id, $oldAdditionalCategories) || old('category_id') == $category->id) ? 'checked' : '' }}>
                                                 <span class="category-name-text">{{ $category->name }}</span>
                                             </label>
                                         </div>
@@ -1522,6 +1523,11 @@
         }
 
         function updateSelectedCount() {
+            const checkedCategories = document.querySelectorAll('.category-checkbox[name="additional_categories[]"]:checked');
+            const primaryInput = document.getElementById('primary_category_id_input');
+            if (primaryInput && checkedCategories.length > 0) {
+                primaryInput.value = checkedCategories[0].value;
+            }
             const checkedCount = document.querySelectorAll('.category-checkbox:checked').length;
             if (selectedCountSpan) {
                 selectedCountSpan.textContent = checkedCount;

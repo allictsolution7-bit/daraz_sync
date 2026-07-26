@@ -226,8 +226,16 @@ class VendorProductController extends Controller
 
         if ($product->product_type === 'variable' && $product->variationCombinations->isNotEmpty()) {
             $requestedCombinations = $request->input('combinations', []);
+            $quantitiesReq = $request->input('quantities.' . $product->id . '.variations', []);
+            
             foreach ($product->variationCombinations as $comb) {
-                $qty = isset($requestedCombinations[$comb->id]['quantity']) ? (int)$requestedCombinations[$comb->id]['quantity'] : 0;
+                $qty = 0;
+                if (isset($quantitiesReq[$comb->id])) {
+                    $qty = (int)$quantitiesReq[$comb->id];
+                } elseif (isset($requestedCombinations[$comb->id]['quantity'])) {
+                    $qty = (int)$requestedCombinations[$comb->id]['quantity'];
+                }
+
                 if ($qty > 0) {
                     if ($comb->stock_quantity !== null && $qty > $comb->stock_quantity) {
                         return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
@@ -254,7 +262,13 @@ class VendorProductController extends Controller
                     ->with('error', 'Please enter a valid stock quantity for at least one variation option.');
             }
         } else {
-            $qty = (int)$request->input('quantity', 0);
+            $qty = 0;
+            if ($request->has('quantities.' . $product->id . '.quantity')) {
+                $qty = (int)$request->input('quantities.' . $product->id . '.quantity');
+            } else {
+                $qty = (int)$request->input('quantity', 0);
+            }
+
             if ($qty <= 0) {
                 return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
                     ->with('error', 'Please specify how many stock units you wish to purchase.');
