@@ -74,10 +74,8 @@ class VendorProductController extends Controller
             })->with(['category', 'subCategory', 'brand', 'variationCombinations']);
         } else {
             $source = 'my_products';
-            $query = Product::where(function ($q) use ($vendor, $allocatedProductIds) {
-                $q->where('vendor_id', $vendor->id)
-                  ->orWhereIn('id', $allocatedProductIds);
-            })->with(['category', 'subCategory', 'brand', 'variationCombinations']);
+            $query = Product::where('vendor_id', $vendor->id)
+                ->with(['category', 'subCategory', 'brand', 'variationCombinations']);
 
             if ($request->filled('status')) {
                 $query->where('approval_status', $request->status);
@@ -542,28 +540,45 @@ class VendorProductController extends Controller
     public function returnAllocation(Request $request, $productId)
     {
         $vendor = auth()->user();
-        $allocation = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)
-            ->where('product_id', $productId)
-            ->first();
 
-        if (!$allocation) {
-            return redirect()->back()->with('error', 'Allocation request not found.');
+        // Target either direct allocation or allocation linked via parent_product_id
+        $allocation = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)
+            ->where(function($q) use ($productId) {
+                $q->where('product_id', $productId);
+            })->first();
+
+        // Also check vendor product copy
+        $vendorProduct = \App\Models\Product::where('vendor_id', $vendor->id)
+            ->where(function($q) use ($productId) {
+                $q->where('id', $productId)->orWhere('parent_product_id', $productId);
+            })->first();
+
+        if (!$allocation && !$vendorProduct) {
+            return redirect()->back()->with('error', 'Allocation request or product not found.');
         }
+
+        $parentProductId = $vendorProduct ? ($vendorProduct->parent_product_id ?? $vendorProduct->id) : ($allocation->product_id ?? $productId);
+        $parentProduct = \App\Models\Product::find($parentProductId);
 
         DB::beginTransaction();
         try {
             $totalCost = (float)($allocation->total_cost ?? 0);
-            $productTitle = $allocation->product->title ?? 'Product';
+            $totalQty = max(1, (int)($allocation->requested_quantity ?? ($vendorProduct->quantity ?? 1)));
+            $unitPrice = $totalQty > 0 ? ($totalCost / $totalQty) : 0;
 
-            // Find matching pending stock_purchase transaction if any
-            $trx = \App\Models\VendorWalletTransaction::where('vendor_id', $vendor->id)
-                ->where('product_id', $productId)
-                ->where('type', 'stock_purchase')
-                ->where('status', 'pending')
-                ->latest()
-                ->first();
+            if ($unitPrice <= 0 && $parentProduct) {
+                $unitPrice = (float)(
+                    ($parentProduct->wholesale_price > 0) ? $parentProduct->wholesale_price : 
+                    (($parentProduct->product_cost > 0) ? $parentProduct->product_cost : 
+                    (($parentProduct->offer > 0) ? $parentProduct->offer : ($parentProduct->old_price ?? 0)))
+                );
+            }
 
-            $refundAmount = $trx ? (float)$trx->amount : $totalCost;
+            $returnQty = (int)$request->input('return_quantity', $vendorProduct ? $vendorProduct->quantity : $totalQty);
+            $returnQty = max(1, min($returnQty, $vendorProduct ? $vendorProduct->quantity : $totalQty));
+
+            $refundAmount = $returnQty * $unitPrice;
+            $productTitle = $vendorProduct ? $vendorProduct->title : ($parentProduct->title ?? 'Product');
 
             if ($refundAmount > 0) {
                 // Refund wallet balance
@@ -572,35 +587,46 @@ class VendorProductController extends Controller
                 // Log refund transaction
                 \App\Models\VendorWalletTransaction::create([
                     'vendor_id' => $vendor->id,
-                    'product_id' => $productId,
+                    'product_id' => $parentProductId,
                     'admin_id' => $vendor->created_by,
                     'type' => 'stock_purchase_refund',
                     'amount' => $refundAmount,
                     'payment_method' => 'Wallet',
                     'transaction_id' => 'REF-' . strtoupper(Str::random(8)),
                     'status' => 'approved',
-                    'admin_note' => 'Vendor return/cancel stock request for "' . $productTitle . '". Refunded ৳' . number_format($refundAmount, 2),
+                    'admin_note' => 'Returned ' . $returnQty . ' stock units for "' . $productTitle . '". Refunded ৳' . number_format($refundAmount, 2),
                     'is_seen' => true,
                 ]);
+            }
 
-                if ($trx) {
-                    $trx->update(['status' => 'rejected']);
+            // Return stock to parent admin product
+            if ($parentProduct) {
+                $parentProduct->increment('quantity', $returnQty);
+            }
+
+            // Reduce or delete vendor product & allocation
+            if ($vendorProduct) {
+                if ($vendorProduct->quantity <= $returnQty) {
+                    $vendorProduct->delete();
+                } else {
+                    $vendorProduct->decrement('quantity', $returnQty);
                 }
             }
 
-            // Delete the allocation record
-            $allocation->delete();
-
-            // Also delete copied product from vendor's catalog if this product belongs to vendor
-            $product = \App\Models\Product::find($productId);
-            if ($product && $product->vendor_id == $vendor->id) {
-                $product->delete();
+            if ($allocation) {
+                if ($allocation->requested_quantity <= $returnQty) {
+                    $allocation->delete();
+                } else {
+                    $allocation->decrement('requested_quantity', $returnQty);
+                    $allocation->decrement('allocated_quantity', $returnQty);
+                    $allocation->decrement('total_cost', $refundAmount);
+                }
             }
 
             DB::commit();
 
             return redirect()->route('vendor.products.index', ['source' => 'my_products'])
-                ->with('success', 'Product stock request for "' . $productTitle . '" has been returned/cancelled. ৳' . number_format($refundAmount, 2) . ' refunded to your wallet.');
+                ->with('success', 'Successfully returned ' . $returnQty . ' unit(s) of "' . $productTitle . '" to Admin. ৳' . number_format($refundAmount, 2) . ' refunded to your wallet.');
 
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -1084,6 +1110,11 @@ class VendorProductController extends Controller
             }
             
             $validated['images'] = json_encode($existingImages);
+        }
+
+        // Protect inventory fields if product was copied from parent admin catalog
+        if ($product->parent_product_id) {
+            unset($validated['quantity'], $validated['manage_stock'], $validated['low_stock_threshold']);
         }
 
         // Handle SEO data

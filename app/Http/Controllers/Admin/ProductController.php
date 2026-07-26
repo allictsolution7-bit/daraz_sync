@@ -72,7 +72,11 @@ class ProductController extends Controller
         if ($user && !$user->hasRole(['super_admin', 'super admin'])) {
             $query->where(function($q) use ($user) {
                 $q->where('products.created_by', $user->id)
-                  ->orWhere('products.vendor_id', $user->id);
+                  ->orWhere('products.vendor_id', $user->id)
+                  ->orWhere(function($subQ) {
+                      $subQ->whereNull('products.created_by')
+                           ->whereNull('products.vendor_id');
+                  });
             });
         }
 

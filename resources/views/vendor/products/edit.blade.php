@@ -298,20 +298,28 @@
 
                         <div class="form-section mb-4">
                             <h4>Inventory Management</h4>
+                            @if($product->parent_product_id)
+                                <div class="alert alert-info border-0 shadow-sm rounded-3 mb-3 d-flex align-items-center gap-2" style="background: rgba(99, 102, 241, 0.08); color: #3730a3;">
+                                    <i class="fas fa-info-circle fs-5"></i>
+                                    <div>
+                                        <strong>Admin Stock Allocated Product:</strong> Inventory for this copied product is allocated from the Parent Admin catalog. To add or return stock, use the <strong>Parent Admin Catalog / Return</strong> action in My Products.
+                                    </div>
+                                </div>
+                            @endif
                             <div class="form-check mb-3">
-                                <input type="checkbox" class="form-check-input" name="manage_stock" id="manage_stock" value="1" {{ old('manage_stock', $product->manage_stock) ? 'checked' : '' }}>
+                                <input type="checkbox" class="form-check-input" name="manage_stock" id="manage_stock" value="1" {{ old('manage_stock', $product->manage_stock) ? 'checked' : '' }} {{ $product->parent_product_id ? 'disabled' : '' }}>
                                 <label class="form-check-label fw-bold" for="manage_stock">Enable Stock Management</label>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        <input type="number" class="form-control" name="quantity" id="productQty" value="{{ old('quantity', $product->quantity) }}" min="0">
+                                        <input type="number" class="form-control" name="quantity" id="productQty" value="{{ old('quantity', $product->quantity) }}" min="0" {{ $product->parent_product_id ? 'disabled' : '' }}>
                                         <label for="productQty">Stock Quantity</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
-                                        <input type="number" class="form-control" name="low_stock_threshold" id="lowStockThreshold" value="{{ old('low_stock_threshold', $product->low_stock_threshold) }}" min="0">
+                                        <input type="number" class="form-control" name="low_stock_threshold" id="lowStockThreshold" value="{{ old('low_stock_threshold', $product->low_stock_threshold) }}" min="0" {{ $product->parent_product_id ? 'disabled' : '' }}>
                                         <label for="lowStockThreshold">Low Stock Alert Threshold</label>
                                     </div>
                                 </div>

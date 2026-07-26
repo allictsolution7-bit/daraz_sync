@@ -648,22 +648,87 @@
                                 @else
                                     <div class="d-flex align-items-center gap-2 justify-content-end pe-2">
                                         @php
-                                            $hasAllocation = isset($productAllocations[$product->id]);
+                                            $hasAllocation = isset($productAllocations[$product->id]) || ($product->parent_product_id && isset($productAllocations[$product->parent_product_id]));
+                                            $targetProductId = isset($productAllocations[$product->id]) ? $product->id : ($product->parent_product_id ?? $product->id);
                                         @endphp
-                                        @if($hasAllocation)
-                                            <form action="{{ route('vendor.products.return-allocation', $product->id) }}" 
-                                                  method="POST" 
-                                                  class="d-inline"
-                                                  onsubmit="return confirm('Are you sure you want to return/cancel this product stock request? The total cost will be refunded to your wallet balance immediately.');">
-                                                @csrf
-                                                <button type="submit"
-                                                        title="Return stock & get wallet refund"
-                                                        style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:0.8rem; font-weight:700; color:#92400e; background:linear-gradient(135deg,#fef3c7,#fde68a); border:1.5px solid #f59e0b; border-radius:10px; cursor:pointer; transition:all .2s;"
-                                                        onmouseover="this.style.background='linear-gradient(135deg,#fde68a,#fbbf24)'"
-                                                        onmouseout="this.style.background='linear-gradient(135deg,#fef3c7,#fde68a)'">
-                                                    <i class="fas fa-rotate-left"></i> Return
-                                                </button>
-                                            </form>
+                                        @if($hasAllocation || $product->parent_product_id)
+                                            <button type="button"
+                                                    title="Return stock & get wallet refund"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#returnModal_{{ $product->id }}"
+                                                    style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:0.8rem; font-weight:700; color:#92400e; background:linear-gradient(135deg,#fef3c7,#fde68a); border:1.5px solid #f59e0b; border-radius:10px; cursor:pointer; transition:all .2s;"
+                                                    onmouseover="this.style.background='linear-gradient(135deg,#fde68a,#fbbf24)'"
+                                                    onmouseout="this.style.background='linear-gradient(135deg,#fef3c7,#fde68a)'">
+                                                <i class="fas fa-rotate-left"></i> Return
+                                            </button>
+
+                                            <!-- Partial/Full Return Modal -->
+                                            <div class="modal fade text-start" id="returnModal_{{ $product->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content border-0 shadow-lg rounded-4">
+                                                        <div class="modal-header border-0 bg-light rounded-top-4">
+                                                            <h5 class="modal-title font-weight-bold text-dark">
+                                                                <i class="fas fa-undo text-warning me-2"></i> Return Stock & Refund
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        @php
+                                                            $alloc = $productAllocations[$product->id] ?? ($product->parent_product_id ? ($productAllocations[$product->parent_product_id] ?? null) : null);
+                                                            $allocTotalCost = (float)($alloc->total_cost ?? 0);
+                                                            $allocQty = max(1, (int)($alloc->requested_quantity ?? ($product->quantity ?? 1)));
+                                                            $unitPrice = $allocTotalCost > 0 ? ($allocTotalCost / $allocQty) : (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0))));
+                                                            $maxQty = max(1, (int)($product->quantity ?? 1));
+                                                        @endphp
+                                                        <form action="{{ route('vendor.products.return-allocation', $targetProductId) }}" method="POST">
+                                                            @csrf
+                                                            <div class="modal-body p-4">
+                                                                <p class="text-muted mb-3">Return stock units of <strong>{{ $product->title }}</strong> back to Admin catalog. The calculated refund will be credited directly to your wallet balance.</p>
+                                                                
+                                                                <div class="mb-3">
+                                                                    <label class="form-label font-weight-bold">Quantity to Return</label>
+                                                                    <input type="number" 
+                                                                           name="return_quantity" 
+                                                                           id="return_qty_{{ $product->id }}" 
+                                                                           class="form-control form-control-lg text-center font-weight-bold" 
+                                                                           min="1" 
+                                                                           max="{{ $maxQty }}" 
+                                                                           value="{{ $maxQty }}" 
+                                                                           oninput="updateRefundEstimate_{{ $product->id }}(this.value)"
+                                                                           required>
+                                                                    <div class="d-flex justify-content-between text-muted small mt-1">
+                                                                        <span>Available stock: <strong>{{ $maxQty }} units</strong></span>
+                                                                        <span>Unit Cost: <strong>৳{{ number_format($unitPrice, 2) }}</strong></span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="p-3 rounded-3 text-center" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1.5px solid #f59e0b;">
+                                                                    <span class="text-dark small d-block font-weight-bold text-uppercase">Estimated Wallet Refund</span>
+                                                                    <span class="fs-3 font-weight-bold text-dark" id="refund_estimate_{{ $product->id }}">
+                                                                        ৳{{ number_format($maxQty * $unitPrice, 2) }}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer border-0 bg-light rounded-bottom-4">
+                                                                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                                                                <button type="submit" class="btn btn-warning text-dark font-weight-bold px-4">
+                                                                    Confirm Return & Refund
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                        <script>
+                                                            function updateRefundEstimate_{{ $product->id }}(qty) {
+                                                                let unit = {{ $unitPrice }};
+                                                                let maxQ = {{ $maxQty }};
+                                                                let num = parseInt(qty) || 0;
+                                                                if(num > maxQ) num = maxQ;
+                                                                if(num < 0) num = 0;
+                                                                let total = num * unit;
+                                                                document.getElementById('refund_estimate_{{ $product->id }}').innerText = '৳' + total.toFixed(2);
+                                                            }
+                                                        </script>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @endif
 
                                         <a href="{{ route('vendor.products.edit', $product) }}"

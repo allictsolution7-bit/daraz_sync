@@ -272,6 +272,39 @@ class VendorService
                 ->where('product_id', $allocation->product_id)
                 ->where('status', 'pending')
                 ->update(['status' => 'approved']);
+
+            // Create separate vendor product copy if not created already
+            $parentProduct = Product::find($allocation->product_id);
+            if ($parentProduct) {
+                $existingVendorProduct = Product::where('vendor_id', $allocation->vendor_id)
+                    ->where('parent_product_id', $parentProduct->id)
+                    ->first();
+
+                if (!$existingVendorProduct) {
+                    // Create replicated product for vendor
+                    $vendorProductData = $parentProduct->toArray();
+                    unset($vendorProductData['id'], $vendorProductData['created_at'], $vendorProductData['updated_at']);
+                    
+                    $vendorProductData['vendor_id'] = $allocation->vendor_id;
+                    $vendorProductData['parent_product_id'] = $parentProduct->id;
+                    $vendorProductData['approval_status'] = 'approved';
+                    $vendorProductData['approved_at'] = now();
+                    $vendorProductData['status'] = 1;
+                    $vendorProductData['quantity'] = $allocation->requested_quantity;
+                    $vendorProductData['slug'] = $parentProduct->slug . '-v' . $allocation->vendor_id . '-' . time();
+
+                    $vendorProduct = Product::create($vendorProductData);
+
+                    // Link allocation to newly created vendor product if desired
+                    $allocation->update(['product_id' => $vendorProduct->id]);
+                } else {
+                    $existingVendorProduct->update([
+                        'status' => 1,
+                        'approval_status' => 'approved',
+                        'quantity' => $existingVendorProduct->quantity + $allocation->requested_quantity,
+                    ]);
+                }
+            }
         });
 
         return true;

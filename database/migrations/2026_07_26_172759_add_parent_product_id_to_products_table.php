@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasTable('products') && !Schema::hasColumn('products', 'parent_product_id')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->foreignId('parent_product_id')->nullable()->after('vendor_id')->constrained('products')->nullOnDelete();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasTable('products') && Schema::hasColumn('products', 'parent_product_id')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->dropForeign(['parent_product_id']);
+                $table->dropColumn('parent_product_id');
+            });
+        }
     }
 };
