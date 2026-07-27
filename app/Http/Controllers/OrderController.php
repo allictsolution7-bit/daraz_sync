@@ -17,25 +17,38 @@ use Yajra\DataTables\Facades\DataTables;
 class OrderController extends Controller
 {
     /**
+     * Exclude vendor product orders from main admin orders lists
+     */
+    protected function withoutVendorOrders($query)
+    {
+        return $query->whereDoesntHave('orderItems', function ($q) {
+            $q->whereNotNull('vendor_id')
+              ->orWhereHas('product', function ($pq) {
+                  $pq->whereNotNull('vendor_id')
+                    ->orWhereNotNull('parent_product_id');
+              });
+        });
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        // Get order counts for status filter bar (without loading full orders)
-        // Each status needs a fresh query to avoid accumulating where clauses
-        
+        $baseQuery = $this->withoutVendorOrders(order::query());
+
         // Get counts per status
         $statusCounts = [
-            'all' => order::count(),
-            'pending' => order::where('status', 'pending')->count(),
-            'phone_not_rcv' => order::where('status', 'phone_not_rcv')->count(),
-            'follow_up' => order::where('status', 'follow_up')->count(),
-            'processing' => order::where('status', 'processing')->count(),
-            'ready_for_delivery' => order::where('status', 'ready_for_delivery')->count(),
-            'shipped' => order::where('status', 'shipped')->count(),
-            'delivered' => order::where('status', 'delivered')->count(),
-            'on_hold' => order::where('status', 'on_hold')->count(),
-            'cancelled' => order::where('status', 'cancelled')->count(),
+            'all' => (clone $baseQuery)->count(),
+            'pending' => (clone $baseQuery)->where('status', 'pending')->count(),
+            'phone_not_rcv' => (clone $baseQuery)->where('status', 'phone_not_rcv')->count(),
+            'follow_up' => (clone $baseQuery)->where('status', 'follow_up')->count(),
+            'processing' => (clone $baseQuery)->where('status', 'processing')->count(),
+            'ready_for_delivery' => (clone $baseQuery)->where('status', 'ready_for_delivery')->count(),
+            'shipped' => (clone $baseQuery)->where('status', 'shipped')->count(),
+            'delivered' => (clone $baseQuery)->where('status', 'delivered')->count(),
+            'on_hold' => (clone $baseQuery)->where('status', 'on_hold')->count(),
+            'cancelled' => (clone $baseQuery)->where('status', 'cancelled')->count(),
         ];
         
         // Create empty collection for view compatibility (DataTables will load via AJAX)
@@ -52,11 +65,8 @@ class OrderController extends Controller
 
     public function asignedorders(Request $request)
     {
-        // Get order counts for status filter bar (without loading full orders)
-        // Each status needs a fresh query to avoid accumulating where clauses
-        
         // Base query for counts - only my assigned orders
-        $baseQuery = order::where('assigned_to', Auth::id());
+        $baseQuery = $this->withoutVendorOrders(order::where('assigned_to', Auth::id()));
 
         // Get counts per status
         $statusCounts = [
@@ -122,6 +132,7 @@ class OrderController extends Controller
     public function data(Request $request)
     {
         $query = order::with(['products', 'fraudCheckResult', 'assignedStaff', 'pendingPurchaseEvent']);
+        $query = $this->withoutVendorOrders($query);
 
         // Optional: default ordering if none provided by DT
         if (!$request->has('order')) {

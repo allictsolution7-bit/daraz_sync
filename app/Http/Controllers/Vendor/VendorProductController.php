@@ -1223,10 +1223,15 @@ class VendorProductController extends Controller
 
         $validated['seo'] = $seoData;
 
-        // If product was approved and edited, set back to pending
-        if ($product->isApproved()) {
+        // Check vendor auto-approve / edit permission settings
+        $autoApprove = $vendorSettings && ($vendorSettings->auto_approve_products || $vendorSettings->can_edit_after_approval);
+        
+        if ($autoApprove) {
+            $validated['approval_status'] = 'approved';
+            $validated['status'] = 1;
+        } elseif ($product->isApproved()) {
             $validated['approval_status'] = 'pending';
-            $validated['status'] = 0; // Deactivate until re-approved
+            $validated['status'] = 0; // Deactivate until re-approved if auto-approve is disabled
         }
 
         $product->update($validated);

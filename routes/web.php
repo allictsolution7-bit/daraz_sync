@@ -55,6 +55,7 @@ use App\Http\Controllers\Vendor\VendorWithdrawalController;
 use App\Http\Controllers\Admin\AdminVendorController;
 use App\Http\Controllers\Admin\AdminVendorProductController;
 use App\Http\Controllers\Admin\AdminVendorWithdrawalController;
+use App\Http\Controllers\Admin\AdminVendorOrderController;
 use App\Http\Controllers\Admin\VendorGlobalSettingsController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\BackupScheduleController;
@@ -396,6 +397,8 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
         Route::post('/check-pending-purchase-event', [BackOrderController::class, 'checkPendingPurchaseEvent'])->name('checkPendingPurchaseEvent');
     });
     Route::get('/my-assignments', [OrderController::class, 'asignedorders'])->name('asigned.orders');
+    Route::get('/vendor-orders', [AdminVendorOrderController::class, 'index'])->name('vendor-orders.index');
+    Route::get('/vendor-orders/data', [AdminVendorOrderController::class, 'data'])->name('vendor-orders.data');
 
     // Sales Reports
     Route::get('analytics/revenue', [SalesReportController::class, 'index'])->name('orders.reports');

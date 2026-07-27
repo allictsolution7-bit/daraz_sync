@@ -1249,28 +1249,36 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/my-assigned-sales*') ? 'display: block;' : '' }}">
-                                        @can('orders.view')
-                                        <li class="{{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.orders.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-list-ol" style="color:#1d600c;"></i>
-                                                    All Orders
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                        @can('orders.asigned')
-                                        <li class="{{ request()->routeIs('admin.asigned.orders') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.asigned.orders') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-clipboard-user" style="color:#1d600c;"></i>
-                                                    My Orders
-                                                </span>
-                                            </a>
-                                        </li>
-                                        @endcan
-                                    </ul>
+                                         style="{{ request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/vendor-orders*') || request()->is('admin/my-assigned-sales*') ? 'display: block;' : '' }}">
+                                         @can('orders.view')
+                                         <li class="{{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.orders.index') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-list-ol" style="color:#1d600c;"></i>
+                                                     All Orders
+                                                 </span>
+                                             </a>
+                                         </li>
+                                         @endcan
+                                         @can('orders.asigned')
+                                         <li class="{{ request()->routeIs('admin.asigned.orders') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.asigned.orders') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-clipboard-user" style="color:#1d600c;"></i>
+                                                     My Orders
+                                                 </span>
+                                             </a>
+                                         </li>
+                                         @endcan
+                                         <li class="{{ request()->routeIs('admin.vendor-orders.*') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.vendor-orders.index') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-store" style="color:#1d600c;"></i>
+                                                     Vendor Orders
+                                                 </span>
+                                             </a>
+                                         </li>
+                                     </ul>
                                 </li>
                                 @endcan
  

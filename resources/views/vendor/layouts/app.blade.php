@@ -224,8 +224,21 @@
                 <i class="fas fa-box"></i> Products
             </a>
 
-            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}" href="{{ route('vendor.orders.index') }}">
-                <i class="fas fa-shopping-cart"></i> Orders
+            @php
+                $vUser = auth()->user();
+                $vOrderIds = \App\Models\order_item::forVendor($vUser->id)->pluck('order_id')->unique();
+                $vTotalOrders = $vOrderIds->count();
+                $vPendingOrders = \App\Models\order::whereIn('id', $vOrderIds)->whereIn('status', ['pending', 'processing'])->count();
+                $vRecentOrders = \App\Models\order::whereIn('id', $vOrderIds)->with(['customer'])->latest()->take(5)->get();
+            @endphp
+
+            <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}" href="{{ route('vendor.orders.index') }}">
+                <span class="d-flex align-items-center gap-2">
+                    <i class="fas fa-shopping-cart"></i> Orders
+                </span>
+                @if($vTotalOrders > 0)
+                    <span class="badge bg-warning text-dark font-weight-bold px-2 py-1 rounded-pill" style="font-size: 0.72rem;">{{ $vTotalOrders }}</span>
+                @endif
             </a>
 
             <div class="vendor-nav-header">Finance & Wallet</div>
@@ -335,6 +348,58 @@
                 <a href="{{ url('/') }}" target="_blank" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="View Storefront">
                     <i class="fas fa-globe text-secondary"></i>
                 </a>
+
+                <!-- Order Notifications Bell Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 40px; height: 40px;" title="Order Notifications">
+                        <i class="fas fa-bell text-secondary"></i>
+                        @if(($vPendingOrders ?? 0) > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem; transform: translate(-30%, 10%) !important;">
+                                {{ $vPendingOrders }}
+                                <span class="visually-hidden">pending orders</span>
+                            </span>
+                        @endif
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2 p-0 overflow-hidden" style="width: 340px;">
+                        <div class="p-3 bg-primary text-white d-flex align-items-center justify-content-between">
+                            <h6 class="fw-bold mb-0 text-white"><i class="fas fa-bell me-2"></i> Order Notifications</h6>
+                            <span class="badge bg-white text-primary font-weight-bold">{{ $vTotalOrders ?? 0 }} Total</span>
+                        </div>
+                        <div class="p-2" style="max-height: 310px; overflow-y: auto;">
+                            @forelse(($vRecentOrders ?? []) as $rOrder)
+                                <a href="{{ route('vendor.orders.show', $rOrder) }}" class="dropdown-item p-2.5 rounded-3 mb-1 d-flex align-items-center gap-3 border-bottom text-wrap">
+                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
+                                        <i class="fas fa-shopping-bag fs-6"></i>
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <strong class="text-dark fs-7">#{{ $rOrder->invoice_no ?? $rOrder->order_number ?? $rOrder->id }}</strong>
+                                            <small class="text-muted" style="font-size: 0.7rem;">{{ $rOrder->created_at ? $rOrder->created_at->diffForHumans() : '' }}</small>
+                                        </div>
+                                        <div class="small text-muted text-truncate">{{ $rOrder->customer->name ?? 'Customer Order' }}</div>
+                                        <div class="mt-1">
+                                            <span class="badge bg-{{ in_array($rOrder->status, ['completed', 'delivered']) ? 'success' : ($rOrder->status === 'pending' ? 'warning' : 'info') }} bg-opacity-10 text-{{ in_array($rOrder->status, ['completed', 'delivered']) ? 'success' : ($rOrder->status === 'pending' ? 'warning' : 'info') }} border border-{{ in_array($rOrder->status, ['completed', 'delivered']) ? 'success' : ($rOrder->status === 'pending' ? 'warning' : 'info') }} border-opacity-25 px-2 py-0.5" style="font-size: 0.68rem;">
+                                                {{ ucfirst($rOrder->status ?? 'New') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </a>
+                            @empty
+                                <div class="text-center py-4 text-muted">
+                                    <i class="fas fa-bell-slash fs-3 d-block mb-2 text-muted opacity-50"></i>
+                                    <small>No order notifications yet</small>
+                                </div>
+                            @endforelse
+                        </div>
+                        @if(($vTotalOrders ?? 0) > 0)
+                            <div class="p-2 bg-light text-center border-top">
+                                <a href="{{ route('vendor.orders.index') }}" class="fw-bold text-primary text-decoration-none fs-7 d-block py-1">
+                                    View All Orders <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
 
                 <!-- User Dropdown -->
                 <div class="dropdown">

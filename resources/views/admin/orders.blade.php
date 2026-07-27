@@ -1097,6 +1097,7 @@
                         <div class="d-flex gap-1 flex-wrap">
                             <a href="{{ route('admin.orders.index') }}" class="btn-soft btn-soft-primary"><i class="fas fa-list"></i> All</a>
                             <a href="{{ route('admin.asigned.orders') }}" class="btn-soft btn-soft-primary"><i class="fas fa-user"></i> Mine</a>
+                            <a href="{{ route('admin.vendor-orders.index') }}" class="btn-soft btn-soft-success"><i class="fas fa-store"></i> Vendor Orders</a>
                             <a href="{{ route('admin.incomplete-orders.index') }}" class="btn-soft btn-soft-warning"><i class="fas fa-exclamation-circle"></i> Incomplete</a>
                             <button id="bulk-delete-orders" class="btn-soft btn-soft-danger"><i class="fas fa-trash-alt"></i> Delete</button>
                         </div>
@@ -1480,7 +1481,7 @@
                 serverSide: true,
                 dom: '<"top"Bf>rt<"bottom"lip>',
                 ajax: {
-                    url: '{{ route('admin.orders.data') }}',
+                    url: '{{ isset($isVendorOrdersPage) && $isVendorOrdersPage ? route('admin.vendor-orders.data') : route('admin.orders.data') }}',
                     data: function(d) {
                         d.status = $('#status-filter').val();
                         d.courier_status = $('#courier-filter').val();
