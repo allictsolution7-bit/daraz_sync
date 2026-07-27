@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class AdminVendorOrderController extends Controller
@@ -111,6 +112,34 @@ class AdminVendorOrderController extends Controller
             $query->where('status', $status);
         }
 
+        if ($courierStatus = $request->get('courier_status')) {
+            if ($courierStatus === 'steadfast_sent') {
+                $query->where('delivery_data->courier_provider', 'steadfast');
+            } elseif ($courierStatus === 'steadfast_not_sent') {
+                $query->where(function ($q) {
+                    $q->whereNull('delivery_data->courier_provider')
+                      ->orWhere('delivery_data->courier_provider', '!=', 'steadfast');
+                });
+            }
+        }
+
+        if ($orderType = $request->get('order_type')) {
+            if ($orderType === 'combo') {
+                $query->where('is_combo_order', true);
+            } elseif ($orderType === 'regular') {
+                $query->where(function ($q) {
+                    $q->whereNull('is_combo_order')->orWhere('is_combo_order', false);
+                });
+            }
+        }
+
+        if ($min = $request->get('amount_min')) {
+            $query->where('total', '>=', (float) $min);
+        }
+        if ($max = $request->get('amount_max')) {
+            $query->where('total', '<=', (float) $max);
+        }
+
         if ($from = $request->get('date_from')) {
             $query->whereDate('created_at', '>=', $from);
         }
@@ -151,7 +180,7 @@ class AdminVendorOrderController extends Controller
                 }
                 $productInfo .= implode('<br>', $titles);
 
-                return '<div class="customer-info"><div class="customer-name">'.$name.'</div><div class="customer-phone">'.$phone.'</div>'.$ipHtml.$cnHtml.'<div class="product-info-mobile mt-2">'.$productInfo.'</div><div class="mt-2 d-flex align-items-center gap-2"><a href="'.$editUrl.'" title="View" class="text-primary"><i class="fas fa-eye"></i></a><a href="'.$editUrl.'" title="Edit" class="text-success"><i class="fas fa-edit"></i></a><a href="/admin/pos/print-invoice/'.$order->id.'" title="Print Invoice" class="text-info" target="_blank"><i class="fas fa-file-invoice"></i></a><a href="/admin/pos/print-package-slip/'.$order->id.'" title="Print Package Slip" class="text-warning" target="_blank"><i class="fas fa-box"></i></a></div></div>';
+                return '<div class="customer-info"><div class="customer-name">'.$name.'</div><div class="customer-phone">'.$phone.'</div>'.$ipHtml.$cnHtml.'<div class="product-info-mobile mt-2">'.$productInfo.'</div><div class="mt-2 d-flex align-items-center gap-2"><a href="'.$editUrl.'" title="View" class="text-primary"><i class="fas fa-eye"></i></a><a href="'.$editUrl.'" title="Edit" class="text-success"><i class="fas fa-edit"></i></a><a href="/admin/pos/print-invoice/'.$order->id.'" title="Print Invoice" class="text-info" target="_blank"><i class="fas fa-file-invoice"></i></a><a href="/admin/pos/print-package-slip/'.$order->id.'" title="Print Package Slip" class="text-warning" target="_blank"><i class="fas fa-box"></i></a><div class="custom-dropdown"><button class="btn btn-sm btn-outline-secondary custom-dropdown-toggle" type="button" title="More Options"><i class="fas fa-ellipsis-v"></i></button><ul class="custom-dropdown-menu"><li><h6 class="custom-dropdown-header">Print Options</h6></li><li><a class="custom-dropdown-item" href="/admin/pos/print-receipt/'.$order->id.'" target="_blank"><i class="fas fa-receipt me-2"></i> Print Receipt</a></li><li><a class="custom-dropdown-item" href="/admin/pos/print-invoice/'.$order->id.'" target="_blank"><i class="fas fa-file-invoice me-2"></i> Print Invoice</a></li><li><a class="custom-dropdown-item" href="/admin/pos/print-package-slip/'.$order->id.'" target="_blank"><i class="fas fa-box me-2"></i> Print Package Slip</a></li></ul></div></div></div>';
             })
             ->filterColumn('name', function($query, $keyword) {
                 $query->where(function($q) use ($keyword) {
@@ -172,7 +201,63 @@ class AdminVendorOrderController extends Controller
                 $html .= implode('<br>', $titles);
                 return $html;
             })
-            ->rawColumns(['select', 'customer_info', 'product_price_and_name'])
+            ->addColumn('status_badge', function ($order) {
+                $text = ucfirst(str_replace('_', ' ', $order->status));
+                if ($order->status === 'ready_for_delivery') {
+                    $text = 'Ready Delivery';
+                }
+
+                $statusHtml = '<div class="order-status-container">
+                    <span class="order-status-badge order-status-'.e($order->status).' change-status-btn" data-order-id="'.$order->id.'" data-current-status="'.e($order->status).'" data-payment-method="'.e($order->payment_method).'" data-order-source="'.e($order->order_source ?? '').'" style="cursor:pointer;">'.$text.' <i class="fas fa-chevron-down" style="font-size: 12px; opacity: 0.7;"></i></span>';
+                
+                if (isset($order->delivery_data['courier_provider'])) {
+                    $courierProvider = $order->delivery_data['courier_provider'];
+                    $courierStatus = $order->courier_status;
+                    
+                    $statusHtml .= '<div class="courier-status-container mt-1"><div class="courier-status-display"><div class="courier-status-badge" data-order-id="'.$order->id.'" data-courier="'.$courierProvider.'" style="cursor: pointer; display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 500;"><i class="fas fa-truck me-1"></i><span>'.e($courierStatus ?? 'Check Status').'</span></div></div></div>';
+                }
+                
+                $assignee = $order->assignedStaff;
+                $assigneeName = $assignee?->name ?? 'Unassigned';
+                $assignedLabel = $assignee ? 'Assigned To' : 'Unassigned';
+
+                $statusHtml .= '<div class="assigned-user-profile d-flex align-items-center gap-2 mt-2">
+                    <div class="assigned-user-details">
+                        <div class="assigned-user-name" style="margin-bottom:-4px;">'.e($assigneeName).'</div>
+                        <small class="text-muted">'.$assignedLabel.'</small>
+                    </div>
+                </div>';
+
+                $statusHtml .= '</div>';
+                return $statusHtml;
+            })
+            ->addColumn('fraud_check', function ($order) {
+                $fraudCheckResult = $order->fraudCheckResult;
+                $canCheckFraud = !in_array($order->status, ['delivered', 'shipped', 'ready_for_delivery']);
+                if ($order->hasFraudCheck() && $fraudCheckResult) {
+                    $badge = $fraudCheckResult->risk_level_badge_class;
+                    $display = $fraudCheckResult->risk_level_display;
+                    $rate = $fraudCheckResult->success_rate_display;
+                    return '<div class="fraud-check-info fraud-check-column"><span class="'.$badge.' fraud-risk-badge">'.$display.'</span><div class="fraud-success-rate">'.$rate.'</div></div>';
+                } elseif ($canCheckFraud) {
+                    return '<div class="fraud-check-loading fraud-check-column" data-order-id="'.$order->id.'" data-phone="'.e($order->phone).'"><i class="fas fa-spinner fa-spin text-muted"></i> <small class="text-muted">Checking...</small></div>';
+                }
+                return '<div class="fraud-check-missing fraud-check-column"><small class="text-muted">No data</small></div>';
+            })
+            ->addColumn('order_at', function ($order) {
+                $ts = $order->created_at->timestamp;
+                $date = $order->created_at->format('m-d-y');
+                $time = $order->created_at->format('h:i:s A');
+                return '<span data-order="'.$ts.'"><div style="line-height: 1.2;"><div style="font-weight: 500; color: #333;">'.$date.'</div><div style="font-weight: 500;font-size: 12px; color: #666;">'.$time.'</div></div></span>';
+            })
+            ->addColumn('note', function ($order) {
+                $note = $order->admin_note ?? 'Add Note';
+                return '<span class="editable-note" data-order-id="'.$order->id.'">'.e($note).'</span>';
+            })
+            ->setRowClass(function ($order) {
+                return 'order-status-' . $order->status;
+            })
+            ->rawColumns(['select', 'customer_info', 'product_price_and_name', 'status_badge', 'fraud_check', 'order_at', 'note'])
             ->make(true);
     }
 }
