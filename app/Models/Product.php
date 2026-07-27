@@ -619,10 +619,29 @@ class Product extends Model
     }
 
     /**
-     * Check if product needs approval
+     * Scope: Products accessible by a specific user/admin in the backend
      */
-    public function needsApproval(): bool
+    public function scopeForUser($query, $user = null)
     {
-        return $this->vendor_id && !$this->isApproved();
+        $user = $user ?: auth()->user();
+        if (!$user) {
+            return $query;
+        }
+
+        // Super admins see all products
+        if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin'))) {
+            return $query;
+        }
+
+        // Get vendor IDs created by this admin user
+        $vendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
+
+        return $query->where(function ($q) use ($user, $vendorIds) {
+            $q->where('products.created_by', $user->id)
+              ->orWhere('products.vendor_id', $user->id);
+            if (!empty($vendorIds)) {
+                $q->orWhereIn('products.vendor_id', $vendorIds);
+            }
+        });
     }
 }

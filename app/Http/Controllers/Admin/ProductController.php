@@ -35,13 +35,14 @@ class ProductController extends Controller
     public function index()
     {
         // For server-side DataTables, view can fetch via AJAX
-        $products = Product::limit(50)->get(['id', 'title', 'thumb_image', 'old_price']);
+        $products = Product::forUser()->limit(50)->get(['id', 'title', 'thumb_image', 'old_price']);
         return view('admin.product.index', compact('products'));
     }
 
     public function data(Request $request)
     {
         $query = Product::query()
+            ->forUser()
             ->with([
                 'variationCombinations:id,product_id,regular_price,offer_price',
                 'category',
@@ -67,18 +68,6 @@ class ProductController extends Controller
             ])
             ->leftJoin('product_categories', 'products.category_id', '=', 'product_categories.id')
             ->leftJoin('sub_categories', 'products.sub_category_id', '=', 'sub_categories.id');
-
-        $user = auth()->user();
-        if ($user && !$user->hasRole(['super_admin', 'super admin'])) {
-            $query->where(function($q) use ($user) {
-                $q->where('products.created_by', $user->id)
-                  ->orWhere('products.vendor_id', $user->id)
-                  ->orWhere(function($subQ) {
-                      $subQ->whereNull('products.created_by')
-                           ->whereNull('products.vendor_id');
-                  });
-            });
-        }
 
         return DataTables::eloquent($query)
             ->filter(function ($q) use ($request) {
@@ -1482,7 +1471,7 @@ class ProductController extends Controller
         $productIds = array_map('intval', $productIds);
 
         // Fetch products to handle storage cleanup similar to destroy()
-        $products = Product::whereIn('id', $productIds)->get();
+        $products = Product::forUser()->whereIn('id', $productIds)->get();
 
         foreach ($products as $product) {
             // Delete thumbnail image
@@ -1544,7 +1533,7 @@ class ProductController extends Controller
         }
 
         // Delete the products
-        Product::whereIn('id', $productIds)->delete();
+        Product::forUser()->whereIn('id', $productIds)->delete();
 
         return response()->json([
             'success' => true,
@@ -1566,7 +1555,7 @@ class ProductController extends Controller
 
         $productIds = array_map('intval', $productIds);
         
-        Product::whereIn('id', $productIds)->update(['status' => $status]);
+        Product::forUser()->whereIn('id', $productIds)->update(['status' => $status]);
 
         $statusText = $status ? 'activated' : 'deactivated';
         return response()->json([
@@ -1583,7 +1572,7 @@ class ProductController extends Controller
             return response()->json(['error' => 'No products selected']);
         }
 
-        $products = Product::whereIn('id', $selectedIds)->get();
+        $products = Product::forUser()->whereIn('id', $selectedIds)->get();
 
         $filename = 'products_' . date('Y-m-d_H-i-s') . '.csv';
         $headers = [
@@ -1629,6 +1618,7 @@ class ProductController extends Controller
         $limit = max(1, min($limit, 20));
 
         $productsQuery = Product::query()
+            ->forUser()
             ->select('id', 'title', 'thumb_image', 'product_type', 'old_price', 'offer', 'status')
             ->where(function ($q) {
                 $q->where('status', true)

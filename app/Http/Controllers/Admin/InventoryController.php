@@ -26,7 +26,7 @@ class InventoryController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['variationCombinations' => function($query) {
+        $products = Product::forUser()->with(['variationCombinations' => function($query) {
                 $query->where('is_active', true)
                       ->select('id', 'product_id', 'stock_quantity', 'regular_price', 'offer_price', 'product_cost', 'wholesale_price');
             }])
@@ -133,7 +133,7 @@ class InventoryController extends Controller
         $lowStockConditionExpression = "products.manage_stock = 1 AND products.low_stock_threshold IS NOT NULL AND products.low_stock_threshold > 0 AND $computedQuantityExpression <= products.low_stock_threshold";
         $computedStatusExpression = "CASE WHEN $computedQuantityExpression <= 0 THEN 'out_of_stock' WHEN $lowStockConditionExpression THEN 'low_stock' ELSE 'in_stock' END";
 
-        $query = Product::with([
+        $query = Product::forUser()->with([
                 'category',
                 'additionalCategories',
                 'additionalSubCategories',
