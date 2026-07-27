@@ -23,13 +23,15 @@ class AuthorizeByRouteName
             return $next($request);
         }
 
-        // Allow subcategory, helper routes, subscription payments and admin profile for all admin users
+        // Allow subcategory, helper routes, subscription payments, courier balance, and admin profile for all admin users
         if (
             $name === 'admin.get-product-subcategories' || 
             $name === 'admin.third-categories.by-subcategories' ||
             str_starts_with($name, 'admin.subscription-payments') || 
             str_starts_with($name, 'admin.profile') || 
-            $name === 'admin.profile'
+            str_starts_with($name, 'admin.steadfast') ||
+            str_starts_with($name, 'admin.pathao') ||
+            str_starts_with($name, 'admin.delivery')
         ) {
             return $next($request);
         }

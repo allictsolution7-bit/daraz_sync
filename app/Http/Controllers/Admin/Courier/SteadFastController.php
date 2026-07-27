@@ -6,38 +6,62 @@ use App\Http\Controllers\Controller;
 use App\Models\order;
 use App\Services\Delivery\DeliveryServiceManager;
 use Illuminate\Http\Request;
-use Psy\Readline\Hoa\Console;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class SteadFastController extends Controller
 {
+    /**
+     * Format phone number to clean 11 digit mobile string
+     */
+    protected function formatPhone(?string $phone): string
+    {
+        $cleaned = preg_replace('/[^0-9]/', '', $phone ?? '');
+        if (str_starts_with($cleaned, '880') && strlen($cleaned) === 13) {
+            $cleaned = substr($cleaned, 2);
+        }
+        return $cleaned;
+    }
+
     public function sendToCourier(Request $request)
     {
         $order = order::with('order_items.product')->findOrFail($request->order_id);
-        $delivery = DeliveryServiceManager::forProvider('steadfast');
+        $userId = Auth::id();
+        $delivery = DeliveryServiceManager::forProvider('steadfast', $userId);
 
-        // Calculate weight from order items (using product weight)
+        if (!$delivery) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Steadfast integration not configured for your account. Please set up API keys in Delivery Settings.'
+            ]);
+        }
+
+        // Calculate weight from order items
         $weight = 0;
         foreach ($order->order_items as $item) {
             $productWeight = $item->product->weight ?? 0.5;
             $weight += ($productWeight * $item->quantity);
         }
         if ($weight < 0.5) {
-            $weight = 0.5; // Minimum weight
+            $weight = 0.5;
         }
 
+        // Calculate COD amount
+        $codAmount = (float) match($order->payment_type) {
+            'full_paid' => 0,
+            'partial' => $order->due_amount,
+            default => ($order->total_with_charge ?? $order->total ?? 0),
+        };
+
+        // Format parameters strictly adhering to Steadfast API specification
         $orderData = [
-            'invoice'           => $order->id,
-            'recipient_name'    => $order->name,
-            'recipient_phone'   => $order->phone,
-            'recipient_address' => $order->address,
-            'cod_amount'        => (float) match($order->payment_type) {
-                'full_paid' => 0,
-                'partial' => $order->due_amount,
-                default => $order->total_with_charge, // 'due' or old orders
-            },
-            'note'              => $order->courier_note ?? '',
-            'item_description'  => $order->order_items->pluck('product.title')->implode(', '),
-            'item_weight'       => (float) $weight,
+            'invoice'           => (string) ($order->invoice_no ?? $order->order_number ?? $order->id),
+            'recipient_name'    => Str::limit($order->name ?? 'Customer', 98, ''),
+            'recipient_phone'   => $this->formatPhone($order->phone),
+            'recipient_address' => Str::limit($order->address ?? 'N/A', 248, ''),
+            'cod_amount'        => $codAmount,
+            'note'              => Str::limit($order->courier_note ?? '', 200, ''),
+            'item_description'  => Str::limit($order->order_items->pluck('product.title')->filter()->implode(', '), 240, ''),
         ];
 
         try {
@@ -48,7 +72,7 @@ class SteadFastController extends Controller
             $deliveryData['courier_provider'] = 'steadfast';
             $deliveryData['courier_response'] = $response;
             
-            // Extract consignment_id and tracking_code
+            // Extract consignment_id and tracking_code from API response
             $consignmentId = $response['consignment']['consignment_id'] 
                 ?? $response['consignment_id'] 
                 ?? null;
@@ -65,7 +89,6 @@ class SteadFastController extends Controller
             
             $order->delivery_data = $deliveryData;
             
-            // Set initial courier status only if we have consignment_id
             if ($consignmentId) {
                 $order->courier_status = 'Order Created';
                 $order->courier_status_slug = 'order_created';
@@ -93,33 +116,32 @@ class SteadFastController extends Controller
     public function sendBulkToCourier(Request $request)
     {
         $orders = order::whereIn('id', $request->order_ids)->get();
-        $delivery = DeliveryServiceManager::forProvider('steadfast');
+        $userId = Auth::id();
+        $delivery = DeliveryServiceManager::forProvider('steadfast', $userId);
+
+        if (!$delivery) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Steadfast integration not configured for your account.'
+            ]);
+        }
+
         $bulkOrders = [];
 
         foreach ($orders as $order) {
-            // Calculate weight from order items (using product weight)
-            $weight = 0;
-            foreach ($order->order_items as $item) {
-                $productWeight = $item->product->weight ?? 0.5;
-                $weight += ($productWeight * $item->quantity);
-            }
-            if ($weight < 0.5) {
-                $weight = 0.5; // Minimum weight
-            }
+            $codAmount = (float) match($order->payment_type) {
+                'full_paid' => 0,
+                'partial' => $order->due_amount,
+                default => ($order->total_with_charge ?? $order->total ?? 0),
+            };
 
             $bulkOrders[] = [
-                'invoice'           => $order->id,
-                'recipient_name'    => $order->name,
-                'recipient_phone'   => $order->phone,
-                'recipient_address' => $order->address,
-                'cod_amount'        => (float) match($order->payment_type) {
-                    'full_paid' => 0,
-                    'partial' => $order->due_amount,
-                    default => $order->total_with_charge,
-                },
-                'note'              => $order->courier_note ?? '',
-                'item_description'  => $order->order_items->pluck('product.title')->implode(', '),
-                'item_weight'       => (float) $weight,
+                'invoice'           => (string) ($order->invoice_no ?? $order->order_number ?? $order->id),
+                'recipient_name'    => Str::limit($order->name ?? 'Customer', 98, ''),
+                'recipient_phone'   => $this->formatPhone($order->phone),
+                'recipient_address' => Str::limit($order->address ?? 'N/A', 248, ''),
+                'cod_amount'        => $codAmount,
+                'note'              => Str::limit($order->courier_note ?? '', 200, ''),
             ];
         }
 
@@ -130,7 +152,6 @@ class SteadFastController extends Controller
             foreach ($orders as $index => $order) {
                 $result = $response['data'][$index] ?? $response[$index] ?? [];
                 
-                // Extract consignment_id and tracking_code
                 $consignmentId = $result['consignment_id'] 
                     ?? $result['consignment']['consignment_id'] 
                     ?? null;
@@ -145,7 +166,6 @@ class SteadFastController extends Controller
                     'courier_response' => $result,
                 ]);
                 
-                // Set initial courier status only if we have consignment_id
                 if ($consignmentId) {
                     $order->courier_status = 'Order Created';
                     $order->courier_status_slug = 'order_created';
@@ -169,16 +189,18 @@ class SteadFastController extends Controller
         }
     }
 
-
     public function getBalance()
     {
-        $delivery = \App\Services\Delivery\DeliveryServiceManager::forProvider('steadfast');
+        $userId = Auth::id();
+        $delivery = DeliveryServiceManager::forProvider('steadfast', $userId);
+
         if (!$delivery) {
             return response()->json([
                 'success' => false,
                 'message' => 'Steadfast integration not configured for your account.'
             ]);
         }
+
         try {
             $response = $delivery->getBalance();
             return response()->json([
@@ -197,9 +219,8 @@ class SteadFastController extends Controller
     public function getCourierOrderStatus($orderId)
     {
         try {
-            $order = \App\Models\Order::findOrFail($orderId);
+            $order = order::findOrFail($orderId);
             
-            // Check for consignment_id, tracking_code, or use order ID as invoice
             $trackingId = $order->delivery_data['consignment_id'] 
                 ?? $order->delivery_data['tracking_code'] 
                 ?? $order->id;
@@ -211,16 +232,23 @@ class SteadFastController extends Controller
                 ]);
             }
 
-            $delivery = \App\Services\Delivery\DeliveryServiceManager::forProvider('steadfast');
-            $response = $delivery->trackOrder($trackingId);
+            $userId = Auth::id();
+            $delivery = DeliveryServiceManager::forProvider('steadfast', $userId);
+
+            if (!$delivery) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Steadfast integration not configured for your account.'
+                ]);
+            }
+
+            $response = $delivery->trackOrder((string) $trackingId);
             
-            // Steadfast API returns: {"status": 200, "delivery_status": "in_review"}
             if (isset($response['delivery_status'])) {
                 $statusText = is_string($response['delivery_status']) 
                     ? ucfirst(str_replace('_', ' ', $response['delivery_status']))
                     : ($response['delivery_status']['status'] ?? 'Unknown');
                 
-                // Update order with latest status
                 $order->courier_status = $statusText;
                 $order->courier_status_slug = is_string($response['delivery_status']) 
                     ? $response['delivery_status'] 
