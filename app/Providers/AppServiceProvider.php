@@ -44,6 +44,31 @@ class AppServiceProvider extends ServiceProvider
 
         // Run code modification checker (Telegram Alerts on local code changes)
         $this->checkCodeChanges();
+
+        // Automatic background courier sync check every 15 minutes when project is running
+        $this->autoRunCourierSync();
+    }
+
+    /**
+     * Auto-trigger courier status sync in background without needing manual cPanel setup
+     */
+    private function autoRunCourierSync(): void
+    {
+        if (app()->runningInConsole()) {
+            return;
+        }
+
+        try {
+            $lastRun = \Illuminate\Support\Facades\Cache::get('auto_courier_sync_last_run');
+            if (!$lastRun || now()->diffInMinutes($lastRun) >= 15) {
+                \Illuminate\Support\Facades\Cache::put('auto_courier_sync_last_run', now(), 1800);
+                
+                // Run status sync asynchronously
+                \Illuminate\Support\Facades\Artisan::queue('courier:sync-statuses');
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Auto courier sync failed: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -16,6 +16,11 @@ class Kernel extends ConsoleKernel
         // Generate sitemap daily at midnight
         $schedule->command('sitemap:generate')->daily();
         
+        // Sync courier delivery statuses every 15 minutes
+        $schedule->command('courier:sync-statuses')
+                 ->everyFifteenMinutes()
+                 ->withoutOverlapping();
+        
         // Process backup schedules every 5 minutes
         $schedule->command('backup:process-schedules')
                  ->everyFiveMinutes()
