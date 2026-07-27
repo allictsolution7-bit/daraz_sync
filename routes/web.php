@@ -136,6 +136,7 @@ Route::get('/order/{order}/print-package-slip', [App\Http\Controllers\OrderPdfCo
 Route::get('/order/{order}/download-receipt', [App\Http\Controllers\OrderPdfController::class, 'downloadReceipt'])->name('order.download-receipt');
 Route::get('/order/{order}/download-invoice', [App\Http\Controllers\OrderPdfController::class, 'downloadInvoice'])->name('order.download-invoice');
 Route::get('/order/{order}/download-package-slip', [App\Http\Controllers\OrderPdfController::class, 'downloadPackageSlip'])->name('order.download-package-slip');
+Route::get('/order/{order}/print-steadfast-invoice', [App\Http\Controllers\OrderPdfController::class, 'printSteadfastInvoice'])->name('order.print-steadfast-invoice');
 Route::post('/shop/filter', [OthersController::class, 'shopFilter'])->name("shop.filter");
 Route::get('/product/{id}/{slug}', [ProductController::class, 'index'])->name('product.single');
 Route::get('/search/ajax', [SearchController::class, 'ajaxSearch'])->name('search.ajax');

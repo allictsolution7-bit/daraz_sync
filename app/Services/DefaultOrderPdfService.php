@@ -407,4 +407,141 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
         </body>
         </html>";
     }
+
+    /**
+     * Print Steadfast style Invoice PDF for an order
+     */
+    public function printSteadfastInvoice($order)
+    {
+        $order = $this->resolveOrder($order);
+
+        try {
+            $mpdf = $this->createMpdf('A4');
+            $html = $this->generateSteadfastInvoiceHtml($order);
+            $mpdf->WriteHTML($html);
+
+            return response($mpdf->Output("steadfast-invoice-{$order->id}.pdf", 'S'))
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', 'inline; filename="steadfast-invoice-' . $order->id . '.pdf"');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error generating Steadfast invoice PDF: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Generate Steadfast format Invoice HTML matching courier receipt design
+     */
+    protected function generateSteadfastInvoiceHtml(order $order): string
+    {
+        $settings = $this->getSiteSettings();
+        
+        $deliveryData = $order->delivery_data ?? [];
+        $consignmentId = $deliveryData['consignment_id'] 
+            ?? $deliveryData['courier_response']['consignment']['consignment_id'] 
+            ?? $deliveryData['courier_response']['consignment_id'] 
+            ?? 'N/A';
+
+        $codAmount = (float) match($order->payment_type) {
+            'full_paid' => 0,
+            'partial' => $order->due_amount,
+            default => ($order->total_with_charge ?? $order->total ?? 0),
+        };
+
+        $dateFormatted = $order->created_at ? $order->created_at->format('d-m-Y') : date('d-m-Y');
+        $invoiceNo = $order->invoice_no ?? $order->order_number ?? $order->id;
+        $note = $order->courier_note ?? $order->admin_note ?? '';
+
+        return "
+        <html>
+        <head>
+            <style>
+                body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #000000; margin: 0; padding: 20px; }
+                
+                .header-table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+                
+                .circle-logo {
+                    width: 90px;
+                    height: 90px;
+                    background-color: #9e9e9e;
+                    border-radius: 50px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+                
+                .store-name { font-size: 16px; font-weight: bold; margin-top: 14px; margin-bottom: 4px; color: #000000; }
+                .store-info { font-size: 13px; color: #111111; margin: 3px 0; line-height: 1.4; }
+                
+                .invoice-heading { font-size: 34px; font-weight: bold; margin: 0 0 12px 0; text-align: right; color: #000000; }
+                .meta-line { font-size: 14px; text-align: right; color: #000000; margin: 4px 0; font-weight: normal; }
+                
+                .details-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 50px; }
+                .section-title { font-size: 17px; font-weight: bold; margin-bottom: 12px; color: #000000; }
+                .field-line { font-size: 14px; margin: 6px 0; color: #000000; line-height: 1.45; }
+                
+                .parcel-title { font-size: 15px; font-weight: bold; color: #000000; margin-bottom: 6px; }
+                
+                .cod-badge {
+                    border: 2px solid #000000;
+                    border-radius: 6px;
+                    padding: 6px 18px;
+                    font-weight: bold;
+                    font-size: 16px;
+                    display: inline-block;
+                    margin-top: 12px;
+                    color: #000000;
+                }
+                
+                .note-box { margin-top: 20px; font-size: 14px; font-weight: bold; color: #000000; }
+                .footer-brand { text-align: right; font-size: 12px; color: #333333; margin-top: 350px; }
+            </style>
+        </head>
+        <body>
+            <table class='header-table'>
+                <tr>
+                    <td style='vertical-align: top; width: 60%;'>
+                        <div class='circle-logo'>
+                            <img src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>' style='width: 48px; height: 48px; margin-top: 21px;' />
+                        </div>
+                        <div class='store-name'>{$settings['site_name']}</div>
+                        <div class='store-info'>&#9742; {$settings['phone_number']}</div>
+                        <div class='store-info'>&#128205; {$settings['address']}</div>
+                    </td>
+                    <td style='vertical-align: top; text-align: right; width: 40%;'>
+                        <div class='invoice-heading'>Invoice</div>
+                        <div class='meta-line'><strong>Invoice No :</strong> #{$invoiceNo}</div>
+                        <div class='meta-line'><strong>Date :</strong> {$dateFormatted}</div>
+                    </td>
+                </tr>
+            </table>
+
+            <table class='details-table'>
+                <tr>
+                    <td style='vertical-align: top; width: 55%;'>
+                        <div class='section-title'>Ship To</div>
+                        <div class='field-line'>Name : <strong>{$order->name}</strong></div>
+                        <div class='field-line'>Phone : <strong>{$order->phone}</strong></div>
+                        <div class='field-line'>Address : {$order->address}</div>
+                    </td>
+                    <td style='vertical-align: top; text-align: right; width: 45%;'>
+                        <div class='parcel-title'>Parcel ID : #{$consignmentId}</div>
+                        <div style='margin-top: 6px; margin-bottom: 10px;'>
+                            <barcode code='{$consignmentId}' type='C128A' size='1.2' height='1.3' />
+                        </div>
+                        <div>
+                            <div class='cod-badge'>COD : {$codAmount} BDT</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class='note-box'>
+                Note : {$note}
+            </div>
+
+            <div class='footer-brand'>
+                Powered By Steadfast Courier Ltd.
+            </div>
+        </body>
+        </html>";
+    }
 }

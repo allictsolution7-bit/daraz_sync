@@ -1681,11 +1681,7 @@
                                             <li><a class="custom-dropdown-item print-receipt" href="/order/${row.id}/print-receipt" target="_blank"><i class="fas fa-receipt"></i> Print Receipt</a></li>
                                             <li><a class="custom-dropdown-item print-invoice" href="/order/${row.id}/print-invoice" target="_blank"><i class="fas fa-file-invoice"></i> Print Invoice</a></li>
                                             <li><a class="custom-dropdown-item print-slip" href="/order/${row.id}/print-package-slip" target="_blank"><i class="fas fa-box"></i> Print Package Slip</a></li>
-                                            <li><hr class="custom-dropdown-divider"></li>
-                                            <li><h6 class="custom-dropdown-header"><i class="fas fa-download me-1"></i> Download Options</h6></li>
-                                            <li><a class="custom-dropdown-item download-receipt" href="/order/${row.id}/download-receipt"><i class="fas fa-download"></i> Download Receipt</a></li>
-                                            <li><a class="custom-dropdown-item download-invoice" href="/order/${row.id}/download-invoice"><i class="fas fa-download"></i> Download Invoice</a></li>
-                                            <li><a class="custom-dropdown-item download-slip" href="/order/${row.id}/download-package-slip"><i class="fas fa-download"></i> Download Package Slip</a></li>
+                                            <li><a class="custom-dropdown-item print-steadfast" href="/order/${row.id}/print-steadfast-invoice" target="_blank"><i class="fas fa-shipping-fast text-danger"></i> Print Steadfast Invoice</a></li>
                                         </ul>
                                     </div>
                                 </div>

@@ -666,21 +666,9 @@
                                     <i class="fas fa-box me-2"></i> Print Package Slip
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header">Download Options</h6></li>
                             <li>
-                                <a class="dropdown-item" href="{{ route('order.download-receipt', $order->id) }}">
-                                    <i class="fas fa-download me-2"></i> Download Receipt
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ route('order.download-invoice', $order->id) }}">
-                                    <i class="fas fa-download me-2"></i> Download Invoice
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ route('order.download-package-slip', $order->id) }}">
-                                    <i class="fas fa-download me-2"></i> Download Package Slip
+                                <a class="dropdown-item" href="{{ route('order.print-steadfast-invoice', $order->id) }}" target="_blank">
+                                    <i class="fas fa-shipping-fast me-2 text-danger"></i> Print Steadfast Invoice
                                 </a>
                             </li>
                         </ul>
