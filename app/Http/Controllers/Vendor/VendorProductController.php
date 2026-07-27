@@ -155,6 +155,11 @@ class VendorProductController extends Controller
 
         $viewMode = $request->get('view_mode', 'table'); // 'table' or 'grouped'
         $copiedProductTitles = Product::whereIn('id', $allocatedProductIds)->pluck('title')->toArray();
+        $vendorProductTitles = Product::where('vendor_id', $vendor->id)->pluck('title')->toArray();
+        $vendorParentIds = Product::where('vendor_id', $vendor->id)->whereNotNull('parent_product_id')->pluck('parent_product_id')->toArray();
+
+        $allCopiedIds = array_unique(array_merge($allocatedProductIds, $vendorParentIds));
+        $allCopiedTitles = array_unique(array_merge($copiedProductTitles, $vendorProductTitles));
 
         if ($viewMode === 'grouped') {
             $allProducts = (clone $query)->latest()->get();
@@ -177,6 +182,8 @@ class VendorProductController extends Controller
             'source', 
             'copiedProductTitles', 
             'allocatedProductIds',
+            'allCopiedIds',
+            'allCopiedTitles',
             'productAllocations',
             'categories',
             'subCategories',
@@ -207,13 +214,11 @@ class VendorProductController extends Controller
 
         // Check if vendor has already copied this product
         $alreadyCopied = Product::where('vendor_id', $vendor->id)
-            ->where('title', $product->title)
+            ->where(function($q) use ($product) {
+                $q->where('parent_product_id', $product->id)
+                  ->orWhere('title', $product->title);
+            })
             ->exists();
-
-        if ($alreadyCopied) {
-            return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
-                ->with('error', 'You have already copied "' . $product->title . '" to your catalog. Please select a different product.');
-        }
 
         // Calculate requested stock quantity & cost
         $totalQuantity = 0;
@@ -297,33 +302,56 @@ class VendorProductController extends Controller
         try {
             $vendorSettings = $vendor->vendorSettings;
 
-            // Respect vendor auto-approve settings or default to pending admin approval
+            // Respect vendor auto-approve settings or default to true for instant allocation
             $autoApprove = $vendorSettings && method_exists($vendorSettings, 'shouldAutoApproveProducts') 
                 ? $vendorSettings->shouldAutoApproveProducts() 
-                : false;
+                : true;
 
             if ($autoApprove) {
-                $statusTarget = 'approved';
                 $trxStatus = 'approved';
                 $flashType = 'success';
-                $flashMessage = 'Product "' . $product->title . '" stock allocated (' . $totalQuantity . ' units)! ৳' . number_format($totalCost, 2) . ' deducted from your wallet.';
+                $flashMessage = ($alreadyCopied ? 'Additional stock' : 'Product "' . $product->title . '" stock') . ' allocated (' . $totalQuantity . ' units)! ৳' . number_format($totalCost, 2) . ' deducted from your wallet.';
             } else {
-                $statusTarget = 'pending';
                 $trxStatus = 'pending';
                 $flashType = 'warning';
-                $flashMessage = 'Product "' . $product->title . '" stock copy requested (' . $totalQuantity . ' units)! ৳' . number_format($totalCost, 2) . ' held from wallet. Admin stock will transfer upon approval.';
+                $flashMessage = 'Stock purchase requested (' . $totalQuantity . ' units)! ৳' . number_format($totalCost, 2) . ' held from wallet. Admin stock will transfer upon approval.';
             }
 
-            // Record allocation without replicating Product row
-            $allocation = \App\Models\VendorProductAllocation::create([
-                'vendor_id' => $vendor->id,
-                'product_id' => $product->id,
-                'requested_quantity' => $totalQuantity,
-                'allocated_quantity' => $autoApprove ? $totalQuantity : 0,
-                'variation_allocations' => !empty($combStockMap) ? $combStockMap : null,
-                'total_cost' => $totalCost,
-                'status' => $trxStatus,
-            ]);
+            // Find or create allocation
+            $allocation = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)
+                ->where('product_id', $product->id)
+                ->first();
+
+            if ($allocation) {
+                $allocation->increment('requested_quantity', $totalQuantity);
+                if ($autoApprove) {
+                    $allocation->increment('allocated_quantity', $totalQuantity);
+                }
+                $allocation->increment('total_cost', $totalCost);
+                if (!empty($combStockMap)) {
+                    $existingVarAlloc = $allocation->variation_allocations ?? [];
+                    foreach ($combStockMap as $cId => $cData) {
+                        if (isset($existingVarAlloc[$cId])) {
+                            $existingVarAlloc[$cId]['quantity'] += $cData['quantity'];
+                            $existingVarAlloc[$cId]['total_cost'] += $cData['total_cost'];
+                        } else {
+                            $existingVarAlloc[$cId] = $cData;
+                        }
+                    }
+                    $allocation->variation_allocations = $existingVarAlloc;
+                    $allocation->save();
+                }
+            } else {
+                $allocation = \App\Models\VendorProductAllocation::create([
+                    'vendor_id' => $vendor->id,
+                    'product_id' => $product->id,
+                    'requested_quantity' => $totalQuantity,
+                    'allocated_quantity' => $autoApprove ? $totalQuantity : 0,
+                    'variation_allocations' => !empty($combStockMap) ? $combStockMap : null,
+                    'total_cost' => $totalCost,
+                    'status' => $trxStatus,
+                ]);
+            }
 
             // Deduct fund from vendor's wallet balance
             $vendor->decrement('wallet_balance', $totalCost);
@@ -338,9 +366,56 @@ class VendorProductController extends Controller
                 'payment_method' => 'Wallet',
                 'transaction_id' => 'TRX-PRD-' . strtoupper(Str::random(8)),
                 'status' => $trxStatus,
-                'admin_note' => 'Stock Purchase: Requested product "' . $product->title . '" (' . $totalQuantity . ' units)',
+                'admin_note' => ($alreadyCopied ? 'Additional Stock Purchase: ' : 'Stock Purchase: ') . 'Requested product "' . $product->title . '" (' . $totalQuantity . ' units)',
                 'is_seen' => true,
             ]);
+
+            // Adjust stocks (+ from vendor stock, - from admin stock)
+            if ($autoApprove) {
+                // Deduct stock from Admin product (-)
+                if ($product->manage_stock && $product->quantity !== null) {
+                    $product->decrement('quantity', $totalQuantity);
+                }
+
+                // Deduct stock from Admin variation combinations if variable (-)
+                if ($product->product_type === 'variable' && !empty($combStockMap)) {
+                    foreach ($combStockMap as $cId => $cData) {
+                        $combModel = \App\Models\VariationCombination::find($cId);
+                        if ($combModel && $combModel->stock_quantity !== null) {
+                            $combModel->decrement('stock_quantity', $cData['quantity']);
+                        }
+                    }
+                }
+
+                // Increase stock of vendor's product copy (+)
+                $vendorProduct = Product::where('vendor_id', $vendor->id)
+                    ->where(function($q) use ($product) {
+                        $q->where('parent_product_id', $product->id)
+                          ->orWhere('title', $product->title);
+                    })
+                    ->first();
+
+                if ($vendorProduct) {
+                    $vendorProduct->increment('quantity', $totalQuantity);
+
+                    if ($vendorProduct->product_type === 'variable' && !empty($combStockMap)) {
+                        foreach ($combStockMap as $cId => $cData) {
+                            $adminComb = \App\Models\VariationCombination::find($cId);
+                            if ($adminComb) {
+                                $vendorComb = \App\Models\VariationCombination::where('product_id', $vendorProduct->id)
+                                    ->where('combination_key', $adminComb->combination_key)
+                                    ->first();
+                                if ($vendorComb) {
+                                    $vendorComb->increment('stock_quantity', $cData['quantity']);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Create vendor product copy if not created yet
+                    $this->vendorService->approveAllocation($allocation->id, $adminId ?? 1);
+                }
+            }
 
             DB::commit();
 
@@ -989,10 +1064,17 @@ class VendorProductController extends Controller
         // Ensure vendor owns product or has stock allocation for this product
         $hasAllocation = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)->where('product_id', $product->id)->exists();
         if ($product->vendor_id != $vendor->id && !$hasAllocation) {
-            abort(403, 'Unauthorized');
+            abort(403, 'Permission required: (vendor.products.edit). You do not own this product.');
         }
 
         $vendorSettings = $vendor->vendorSettings;
+
+        // Check if product can be edited (if already approved, allow if auto_approve_products or can_edit_after_approval is enabled)
+        $canEditApproved = $vendorSettings && ($vendorSettings->can_edit_after_approval || $vendorSettings->auto_approve_products);
+        if ($product->isApproved() && !$canEditApproved) {
+            return redirect()->route('vendor.products.index')
+                ->with('error', 'You cannot edit approved products. Setting [can_edit_after_approval] or [auto_approve_products] is required in Vendor Store Settings.');
+        }
 
         // Get commission settings
         $commissionSettings = [
@@ -1027,12 +1109,14 @@ class VendorProductController extends Controller
         // Ensure vendor owns product or has stock allocation for this product
         $hasAllocation = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)->where('product_id', $product->id)->exists();
         if ($product->vendor_id != $vendor->id && !$hasAllocation) {
-            abort(403, 'Unauthorized');
+            abort(403, 'Permission required: (vendor.products.edit). You do not own this product.');
         }
 
-        // Check if product can be edited (if already approved)
-        if ($product->isApproved() && !$vendor->vendorSettings->can_edit_after_approval) {
-            return redirect()->back()->with('error', 'You cannot edit approved products.');
+        // Check if product can be edited (if already approved, allow if auto_approve_products or can_edit_after_approval is enabled)
+        $vendorSettings = $vendor->vendorSettings;
+        $canEditApproved = $vendorSettings && ($vendorSettings->can_edit_after_approval || $vendorSettings->auto_approve_products);
+        if ($product->isApproved() && !$canEditApproved) {
+            return redirect()->back()->with('error', 'You cannot edit approved products. Setting [can_edit_after_approval] or [auto_approve_products] is required in Vendor Store Settings.');
         }
 
         $validated = $request->validate([

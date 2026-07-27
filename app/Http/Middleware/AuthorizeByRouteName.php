@@ -39,7 +39,7 @@ class AuthorizeByRouteName
             if ($user->can('orders.asigned') || $user->can('orders.assigned') || $user->can('asigned.orders') || $user->can('assigned.orders') || $user->can('orders.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))) {
                 return $next($request);
             }
-            abort(403);
+            abort(403, 'Permission required: (orders.assigned). Please ask an administrator to grant this permission.');
         }
 
         $parts = explode('.', $name);
@@ -203,6 +203,6 @@ class AuthorizeByRouteName
             return $next($request);
         }
 
-        abort(403);
+        abort(403, 'Permission required: (' . $permission . '). Please ask an administrator to grant this permission.');
     }
 }

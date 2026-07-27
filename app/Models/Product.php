@@ -619,7 +619,7 @@ class Product extends Model
     }
 
     /**
-     * Scope: Products accessible by a specific user/admin in the backend
+     * Scope: Products accessible by a specific user/admin in the backend Product Catalog
      */
     public function scopeForUser($query, $user = null)
     {
@@ -628,20 +628,15 @@ class Product extends Model
             return $query;
         }
 
-        // Super admins see all products
+        // Only include Admin products (exclude vendor products)
+        $query->whereNull('products.vendor_id');
+
+        // Super admins see all admin products
         if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin'))) {
             return $query;
         }
 
-        // Get vendor IDs created by this admin user
-        $vendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
-
-        return $query->where(function ($q) use ($user, $vendorIds) {
-            $q->where('products.created_by', $user->id)
-              ->orWhere('products.vendor_id', $user->id);
-            if (!empty($vendorIds)) {
-                $q->orWhereIn('products.vendor_id', $vendorIds);
-            }
-        });
+        // Regular admins see products created by them
+        return $query->where('products.created_by', $user->id);
     }
 }
