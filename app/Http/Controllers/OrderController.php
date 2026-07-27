@@ -31,11 +31,44 @@ class OrderController extends Controller
     }
 
     /**
+     * Scope order queries by admin product ownership unless user is Super Admin
+     */
+    protected function scopeForAdminUser($query, $user = null)
+    {
+        $user = $user ?: Auth::user();
+        if (!$user) {
+            return $query;
+        }
+
+        $isSuperAdmin = false;
+        if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin'))) {
+            $isSuperAdmin = true;
+        } elseif ($user->is_super_admin ?? false) {
+            $isSuperAdmin = true;
+        }
+
+        if ($isSuperAdmin) {
+            return $query;
+        }
+
+        // Regular admin: only orders containing products created by this admin
+        $adminProductIds = Product::where('created_by', $user->id)->pluck('id')->toArray();
+
+        if (empty($adminProductIds)) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->whereHas('orderItems', function ($q) use ($adminProductIds) {
+            $q->whereIn('product_id', $adminProductIds);
+        });
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $baseQuery = $this->withoutVendorOrders(order::query());
+        $baseQuery = $this->withoutVendorOrders($this->scopeForAdminUser(order::query()));
 
         // Get counts per status
         $statusCounts = [
@@ -66,7 +99,7 @@ class OrderController extends Controller
     public function asignedorders(Request $request)
     {
         // Base query for counts - only my assigned orders
-        $baseQuery = $this->withoutVendorOrders(order::where('assigned_to', Auth::id()));
+        $baseQuery = $this->withoutVendorOrders($this->scopeForAdminUser(order::where('assigned_to', Auth::id())));
 
         // Get counts per status
         $statusCounts = [
@@ -132,6 +165,7 @@ class OrderController extends Controller
     public function data(Request $request)
     {
         $query = order::with(['products', 'fraudCheckResult', 'assignedStaff', 'pendingPurchaseEvent']);
+        $query = $this->scopeForAdminUser($query);
         $query = $this->withoutVendorOrders($query);
 
         // Optional: default ordering if none provided by DT

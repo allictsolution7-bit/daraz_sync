@@ -52,15 +52,58 @@ class IncompleteOrderController extends Controller
         return response()->json(['success' => true, 'id' => $order->id]);
     }
 
+    /**
+     * Scope incomplete orders by admin product ownership unless user is Super Admin
+     */
+    protected function scopeIncompleteOrdersForAdminUser($query, $user = null)
+    {
+        $user = $user ?: auth()->user();
+        if (!$user) {
+            return $query;
+        }
+
+        $isSuperAdmin = false;
+        if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin'))) {
+            $isSuperAdmin = true;
+        } elseif ($user->is_super_admin ?? false) {
+            $isSuperAdmin = true;
+        }
+
+        if ($isSuperAdmin) {
+            return $query;
+        }
+
+        // Regular admin: only incomplete orders containing products created by this admin
+        $adminProductIds = \App\Models\Product::where('created_by', $user->id)->pluck('id')->toArray();
+
+        if (empty($adminProductIds)) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->where(function ($subQ) use ($adminProductIds) {
+            foreach ($adminProductIds as $id) {
+                $subQ->orWhereJsonContains('product_details', [['product_id' => $id]])
+                     ->orWhereJsonContains('product_details', [['product_id' => (string)$id]])
+                     ->orWhereJsonContains('product_details', [['id' => $id]])
+                     ->orWhereJsonContains('product_details', [['id' => (string)$id]])
+                     ->orWhere('product_details', 'like', '%"product_id":' . $id . '%')
+                     ->orWhere('product_details', 'like', '%"product_id":"' . $id . '"%')
+                     ->orWhere('product_details', 'like', '%"product_id": "' . $id . '"%')
+                     ->orWhere('product_details', 'like', '%"id":' . $id . '%')
+                     ->orWhere('product_details', 'like', '%"id":"' . $id . '"%');
+            }
+        });
+    }
+
     public function index()
     {
-        $orders = IncompleteOrder::latest()->paginate(30);
+        $orders = $this->scopeIncompleteOrdersForAdminUser(IncompleteOrder::query())->latest()->paginate(30);
         return view('admin.incomplete_orders.index', compact('orders'));
     }
 
     public function myAssigned()
     {
-        $orders = IncompleteOrder::where('assigned_to', auth()->id())->latest()->paginate(30);
+        $orders = $this->scopeIncompleteOrdersForAdminUser(IncompleteOrder::where('assigned_to', auth()->id()))->latest()->paginate(30);
         return view('admin.incomplete_orders.index', compact('orders'));
     }
 
@@ -116,7 +159,7 @@ class IncompleteOrderController extends Controller
 
     public function data(Request $request)
     {
-        $query = IncompleteOrder::query()->orderByDesc('created_at');
+        $query = $this->scopeIncompleteOrdersForAdminUser(IncompleteOrder::query())->orderByDesc('created_at');
         
         // Add fraud check data to each incomplete order
         $query->addSelect([

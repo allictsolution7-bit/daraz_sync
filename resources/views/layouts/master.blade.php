@@ -686,51 +686,94 @@
                             $adminUser = auth()->user();
                             $adminUserId = $adminUser->id ?? 0;
 
-                            // Get vendor IDs created by this admin only
-                            $headerVendorIds = \App\Models\User::where('created_by', $adminUserId)->pluck('id')->toArray();
-                            // Get product IDs created by this admin only
-                            $headerAdminProductIds = \App\Models\Product::where('created_by', $adminUserId)->pluck('id')->toArray();
+                            $isSuperAdminHeader = false;
+                            if ($adminUser) {
+                                if (method_exists($adminUser, 'hasRole') && ($adminUser->hasRole('super_admin') || $adminUser->hasRole('super admin') || $adminUser->hasRole('Super Admin'))) {
+                                    $isSuperAdminHeader = true;
+                                } elseif ($adminUser->is_super_admin ?? false) {
+                                    $isSuperAdminHeader = true;
+                                }
+                            }
 
-                            // Pending wallet recharge requests — scoped to this admin's vendors only
-                            $headerPendingPayments = empty($headerVendorIds)
-                                ? collect()
-                                : \App\Models\VendorWalletTransaction::with('vendor')
-                                    ->whereIn('vendor_id', $headerVendorIds)
+                            if ($isSuperAdminHeader) {
+                                // Super admin sees all vendor requests and orders
+                                $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
                                     ->where('status', 'pending')
                                     ->where('type', 'recharge_request')
                                     ->latest()
                                     ->take(5)
                                     ->get();
-                            $headerPendingCount = $headerPendingPayments->count();
+                                $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')->where('type', 'recharge_request')->count();
 
-                            // Pending product approvals — scoped to this admin's vendors only
-                            $headerPendingProducts = empty($headerVendorIds)
-                                ? collect()
-                                : \App\Models\Product::with('vendor')
+                                $headerPendingProducts = \App\Models\Product::with('vendor')
                                     ->whereNotNull('vendor_id')
-                                    ->whereIn('vendor_id', $headerVendorIds)
                                     ->where('approval_status', 'pending')
                                     ->latest()
                                     ->take(5)
                                     ->get();
-                            $headerPendingProdCount = empty($headerVendorIds)
-                                ? 0
-                                : \App\Models\Product::whereNotNull('vendor_id')->whereIn('vendor_id', $headerVendorIds)->where('approval_status', 'pending')->count();
+                                $headerPendingProdCount = \App\Models\Product::whereNotNull('vendor_id')->where('approval_status', 'pending')->count();
 
-                            // Vendor orders — only if this admin has vendors or copied products
-                            if (empty($headerVendorIds) && empty($headerAdminProductIds)) {
-                                $headerVendorOrderIds = collect();
-                            } else {
-                                $headerVendorOrderIds = \App\Models\order_item::where(function($subQ) use ($headerVendorIds, $headerAdminProductIds) {
-                                    if (!empty($headerVendorIds)) {
-                                        $subQ->whereIn('vendor_id', $headerVendorIds);
-                                    }
-                                    if (!empty($headerAdminProductIds)) {
-                                        $subQ->orWhereHas('product', function ($pq) use ($headerAdminProductIds) {
-                                            $pq->whereIn('parent_product_id', $headerAdminProductIds);
-                                        });
-                                    }
+                                $headerVendorOrderIds = \App\Models\order_item::where(function($subQ) {
+                                    $subQ->whereNotNull('vendor_id')
+                                         ->orWhereHas('product', function ($pq) {
+                                             $pq->whereNotNull('vendor_id')->orWhereNotNull('parent_product_id');
+                                         });
                                 })->pluck('order_id')->unique();
+                            } else {
+                                // Get vendor IDs created by this admin only
+                                $headerVendorIds = \App\Models\User::where('created_by', $adminUserId)->pluck('id')->toArray();
+                                // Get product IDs created by this admin only
+                                $headerAdminProductIds = \App\Models\Product::where('created_by', $adminUserId)->pluck('id')->toArray();
+
+                                // Pending wallet recharge requests — scoped to this admin's vendors only
+                                $headerPendingPayments = empty($headerVendorIds)
+                                    ? collect()
+                                    : \App\Models\VendorWalletTransaction::with('vendor')
+                                        ->whereIn('vendor_id', $headerVendorIds)
+                                        ->where('status', 'pending')
+                                        ->where('type', 'recharge_request')
+                                        ->latest()
+                                        ->take(5)
+                                        ->get();
+                                $headerPendingCount = $headerPendingPayments->count();
+
+                                // Pending product approvals — scoped to this admin's vendors only
+                                $headerPendingProducts = empty($headerVendorIds)
+                                    ? collect()
+                                    : \App\Models\Product::with('vendor')
+                                        ->whereNotNull('vendor_id')
+                                        ->whereIn('vendor_id', $headerVendorIds)
+                                        ->where('approval_status', 'pending')
+                                        ->latest()
+                                        ->take(5)
+                                        ->get();
+                                $headerPendingProdCount = empty($headerVendorIds)
+                                    ? 0
+                                    : \App\Models\Product::whereNotNull('vendor_id')->whereIn('vendor_id', $headerVendorIds)->where('approval_status', 'pending')->count();
+
+                                // Vendor orders — only if this admin has vendors or copied products
+                                if (empty($headerVendorIds) && empty($headerAdminProductIds)) {
+                                    $headerVendorOrderIds = collect();
+                                } else {
+                                    $headerVendorOrderIds = \App\Models\order_item::where(function($subQ) use ($headerVendorIds, $headerAdminProductIds) {
+                                        $hasCond = false;
+                                        if (!empty($headerVendorIds)) {
+                                            $subQ->whereIn('vendor_id', $headerVendorIds);
+                                            $hasCond = true;
+                                        }
+                                        if (!empty($headerAdminProductIds)) {
+                                            if ($hasCond) {
+                                                $subQ->orWhereHas('product', function ($pq) use ($headerAdminProductIds) {
+                                                    $pq->whereIn('parent_product_id', $headerAdminProductIds);
+                                                });
+                                            } else {
+                                                $subQ->whereHas('product', function ($pq) use ($headerAdminProductIds) {
+                                                    $pq->whereIn('parent_product_id', $headerAdminProductIds);
+                                                });
+                                            }
+                                        }
+                                    })->pluck('order_id')->unique();
+                                }
                             }
 
                             $headerVendorOrders = $headerVendorOrderIds->isEmpty()
