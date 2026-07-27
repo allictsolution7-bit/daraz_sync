@@ -20,6 +20,7 @@ class PermissionSeeder extends Seeder
             // orders
             'orders.view','orders.create','orders.update','orders.delete','orders.asigned',
             'orders.update_item','orders.update_status','orders.update_note','orders.delete_multiple','orders.export_selected',
+            'vendor_orders.view','vendor_orders.data',
             // reports
             'reports.sales.view','reports.customers.view',
             // incomplete orders

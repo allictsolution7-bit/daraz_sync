@@ -42,6 +42,14 @@ class AuthorizeByRouteName
             abort(403, 'Permission required: (orders.assigned). Please ask an administrator to grant this permission.');
         }
 
+        // Direct mapping for vendor orders route
+        if ($name === 'admin.vendor-orders.index' || $name === 'admin.vendor-orders.data' || $name === 'vendor-orders.index' || $name === 'vendor-orders.data') {
+            if ($user->can('vendor_orders.view') || $user->can('orders.view') || $user->can('vendor_orders.index') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {
+                return $next($request);
+            }
+            abort(403, 'Permission required: (vendor_orders.view). Please ask an administrator to grant this permission.');
+        }
+
         $parts = explode('.', $name);
         if (count($parts) < 2 || $parts[0] !== 'admin') {
             return $next($request);

@@ -345,6 +345,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::post('/catalog/export-selected', [AdminProductController::class, 'exportSelected'])->name('items.export-selected');
     Route::get('/catalog/data', [AdminProductController::class, 'data'])->name('items.data');
     Route::get('/catalog/search', [AdminProductController::class, 'search'])->name('items.search');
+    Route::get('/catalog/search-products', [AdminProductController::class, 'search'])->name('products.search');
     Route::get('/item-slug-availability', [AdminProductController::class, 'checkSlugAvailability'])->name('item-slug-availability');
 
     // Inventory Management
