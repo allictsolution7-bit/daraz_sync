@@ -4,6 +4,7 @@ namespace App\Services\Delivery;
 
 use Exception;
 use App\Models\DeliveryIntegration;
+use Illuminate\Support\Facades\Auth;
 
 class DeliveryServiceManager
 {
@@ -18,21 +19,57 @@ class DeliveryServiceManager
     }
 
     /**
-     * Resolve a delivery service for a given provider (system-wide, not per user)
+     * Resolve a delivery service for a given provider scoped to a specific user/vendor ID
      */
-    public static function forProvider($provider): ?DeliveryServiceInterface
+    public static function forProvider($provider, $userId = null): ?DeliveryServiceInterface
     {
-        $integration = \App\Models\DeliveryIntegration::where('provider', $provider)->first();
-        if(! isset($integration)) return null;
-        return self::resolve($provider, $integration?->credentials ?? []);
+        $userId = $userId ?: Auth::id();
+
+        // 1. Try to find active integration for specific user ID
+        $integration = DeliveryIntegration::where('provider', $provider)
+            ->where('is_active', true)
+            ->when($userId, function($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->first();
+
+        // 2. Fallback to any active integration if specific user has no configuration
+        if (!$integration) {
+            $integration = DeliveryIntegration::where('provider', $provider)
+                ->where('is_active', true)
+                ->first();
+        }
+
+        if (!isset($integration)) return null;
+        return self::resolve($provider, $integration->credentials ?? []);
     }
 
     /**
-     * @deprecated Use forProvider instead
+     * Get integration record for user or fallback
      */
-    public static function forUser($user, $provider): DeliveryServiceInterface
+    public static function getIntegration($provider, $userId = null): ?DeliveryIntegration
     {
-        // Deprecated: always use forProvider for single-store systems
-        return self::forProvider($provider);
+        $userId = $userId ?: Auth::id();
+
+        $integration = DeliveryIntegration::where('provider', $provider)
+            ->where('is_active', true)
+            ->when($userId, function($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->first();
+
+        if (!$integration) {
+            $integration = DeliveryIntegration::where('provider', $provider)
+                ->where('is_active', true)
+                ->first();
+        }
+
+        return $integration;
+    }
+
+    public static function forUser($user, $provider): ?DeliveryServiceInterface
+    {
+        $userId = is_object($user) ? $user->id : $user;
+        return self::forProvider($provider, $userId);
     }
 }

@@ -205,6 +205,9 @@
                     <thead>
                         <tr>
                             <th>Courier Provider</th>
+                            @if($isSuperAdmin ?? false)
+                                <th>Assigned Account</th>
+                            @endif
                             <th>Integration Status</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -220,6 +223,13 @@
                                         <div class="font-weight-bold text-dark">{{ ucfirst($item->provider) }}</div>
                                     </div>
                                 </td>
+                                @if($isSuperAdmin ?? false)
+                                    <td>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary font-weight-bold" style="font-size: 0.8rem; padding: 4px 10px; border-radius: 6px;">
+                                            <i class="fas fa-user-circle me-1"></i> {{ $item->user->name ?? $item->user->email ?? 'System Default' }}
+                                        </span>
+                                    </td>
+                                @endif
                                 <td>
                                     <span class="status-badge {{ $item->is_active ? 'status-active' : 'status-inactive' }}">
                                         {{ $item->is_active ? 'Active' : 'Inactive' }}

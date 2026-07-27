@@ -38,11 +38,11 @@ class PathaoController extends Controller
 
     public function sendToCourier(Request $request)
     {
-        $order = order::with('order_items.product')->findOrFail($request->order_id);
-        $delivery = DeliveryServiceManager::forProvider('pathao');
+        $userId = Auth::id();
+        $delivery = DeliveryServiceManager::forProvider('pathao', $userId);
 
         // Get default store_id from credentials
-        $integration = \App\Models\DeliveryIntegration::where('provider', 'pathao')->where('is_active', true)->first();
+        $integration = DeliveryServiceManager::getIntegration('pathao', $userId);
         $storeId = $integration?->credentials['store_id'] ?? null;
 
         if (!$storeId) {
@@ -128,8 +128,8 @@ class PathaoController extends Controller
         $orders = order::whereIn('id', $request->order_ids)->get();
         $delivery = DeliveryServiceManager::forProvider('pathao');
 
-        // Get default store_id from credentials
-        $integration = \App\Models\DeliveryIntegration::where('provider', 'pathao')->where('is_active', true)->first();
+        $userId = Auth::id();
+        $integration = DeliveryServiceManager::getIntegration('pathao', $userId);
         $storeId = $integration?->credentials['store_id'] ?? null;
 
         if (!$storeId) {
