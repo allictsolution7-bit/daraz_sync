@@ -698,7 +698,36 @@
                                 ->take(5)
                                 ->get();
                             $headerPendingProdCount = \App\Models\Product::whereNotNull('vendor_id')->where('approval_status', 'pending')->count();
-                            $headerTotalCount = $headerPendingCount + $headerPendingProdCount;
+
+                            $adminUser = auth()->user();
+                            $headerVendorIds = \App\Models\User::where('created_by', $adminUser->id ?? 0)->pluck('id')->toArray();
+                            $headerAdminProductIds = \App\Models\Product::where('created_by', $adminUser->id ?? 0)->pluck('id')->toArray();
+
+                            $headerVendorOrderIds = \App\Models\order_item::where(function($subQ) use ($headerVendorIds, $headerAdminProductIds) {
+                                if (!empty($headerVendorIds)) {
+                                    $subQ->whereIn('vendor_id', $headerVendorIds);
+                                }
+                                $subQ->orWhereHas('product', function ($pq) use ($headerVendorIds, $headerAdminProductIds) {
+                                    if (!empty($headerVendorIds)) {
+                                        $pq->whereIn('vendor_id', $headerVendorIds);
+                                    }
+                                    if (!empty($headerAdminProductIds)) {
+                                        $pq->orWhereIn('parent_product_id', $headerAdminProductIds);
+                                    }
+                                });
+                            })->pluck('order_id')->unique();
+
+                            $headerVendorOrders = \App\Models\order::whereIn('id', $headerVendorOrderIds)
+                                ->whereIn('status', ['pending', 'processing'])
+                                ->latest()
+                                ->take(5)
+                                ->get();
+
+                            $headerVendorOrderCount = \App\Models\order::whereIn('id', $headerVendorOrderIds)
+                                ->whereIn('status', ['pending', 'processing'])
+                                ->count();
+
+                            $headerTotalCount = $headerPendingCount + $headerPendingProdCount + $headerVendorOrderCount;
                         @endphp
                         <a href="#" class="nav-link user position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
                             <i class="fa-regular fa-bell" style="font-size: 20px; color: #ffaa00;"></i>
@@ -745,15 +774,32 @@
                                     </a>
                                 @endforeach
 
+                                <!-- Vendor Orders -->
+                                @foreach($headerVendorOrders as $nVOrder)
+                                    <a href="{{ route('admin.vendor-orders.index') }}" class="list-group-item list-group-item-action p-3 border-bottom" style="background: #f0fdf4;">
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <span class="fw-bold text-dark small"><i class="fas fa-shopping-bag text-success me-1"></i> #{{ $nVOrder->invoice_no ?? $nVOrder->order_number ?? $nVOrder->id }}</span>
+                                            <span class="badge bg-success text-white font-weight-bold" style="font-size: 0.68rem;">Vendor Order</span>
+                                        </div>
+                                        <div class="small text-dark fw-semibold mb-1">
+                                            New vendor order from: <strong>{{ $nVOrder->name ?? 'Customer' }}</strong> — ৳{{ number_format($nVOrder->total, 2) }}
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.7rem;">
+                                            <i class="fas fa-clock me-1"></i> {{ $nVOrder->created_at ? $nVOrder->created_at->diffForHumans() : 'Just now' }}
+                                        </div>
+                                    </a>
+                                @endforeach
+
                                 @if($headerTotalCount === 0)
                                     <div class="p-4 text-center text-muted small">
                                         <i class="fas fa-bell-slash fs-4 d-block mb-1 opacity-50"></i>
-                                        No pending approval or payment requests.
+                                        No pending approval, payment, or order requests.
                                     </div>
                                 @endif
                             </div>
                             <div class="p-2 text-center bg-light border-top d-flex justify-content-around">
-                                <a href="{{ route('admin.vendor-products.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">Product Approvals ({{ $headerPendingProdCount }}) &rarr;</a>
+                                <a href="{{ route('admin.vendor-orders.index') }}" class="text-success fw-bold text-decoration-none" style="font-size: 0.75rem;">Vendor Orders ({{ $headerVendorOrderCount }}) &rarr;</a>
+                                <a href="{{ route('admin.vendor-products.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">Approvals ({{ $headerPendingProdCount }}) &rarr;</a>
                                 <a href="{{ route('admin.vendor-payments.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">Payments ({{ $headerPendingCount }}) &rarr;</a>
                             </div>
                         </div>
@@ -1271,13 +1317,16 @@
                                          </li>
                                          @endcan
                                          <li class="{{ request()->routeIs('admin.vendor-orders.*') ? 'active' : '' }}">
-                                             <a href="{{ route('admin.vendor-orders.index') }}">
-                                                 <span class="menu-content">
-                                                     <i class="fas fa-store" style="color:#1d600c;"></i>
-                                                     Vendor Orders
-                                                 </span>
-                                             </a>
-                                         </li>
+                                              <a href="{{ route('admin.vendor-orders.index') }}" class="d-flex align-items-center justify-content-between">
+                                                  <span class="menu-content">
+                                                      <i class="fas fa-store" style="color:#1d600c;"></i>
+                                                      Vendor Orders
+                                                  </span>
+                                                  @if(($headerVendorOrderCount ?? 0) > 0)
+                                                      <span class="badge rounded-pill bg-warning text-dark font-weight-bold ms-auto" style="font-size: 0.7rem; padding: 2px 7px;">{{ $headerVendorOrderCount }}</span>
+                                                  @endif
+                                              </a>
+                                          </li>
                                      </ul>
                                 </li>
                                 @endcan

@@ -481,12 +481,14 @@ class OrderController extends Controller
                     ($request->payment_method === 'nagad' ? $request->nagad_charge : 0) +
                     ($request->payment_method === 'rocket' ? $request->rocket_charge : 0);
 
-                // Payment type: automated gateway = pending, manual online = full_paid
+                // Payment type: COD/automated gateway = due (pending), manual online = full_paid
+                $isCod = in_array(strtolower($request->payment_method ?? 'cod'), ['cod', 'cash_on_delivery', 'cash']);
                 $isAutomatedGateway = \App\Services\PaymentGateway\PaymentGatewayManager::isAutomatedGateway($request->payment_method);
-                $orderData['payment_type'] = $isAutomatedGateway ? 'due' : 'full_paid';
-                $orderData['paid_amount'] = $isAutomatedGateway ? 0 : $orderData['total_with_charge'];
-                $orderData['due_amount'] = $isAutomatedGateway ? $orderData['total_with_charge'] : 0;
-                $orderData['payment_status'] = $isAutomatedGateway ? 'pending' : 'paid';
+                $isPaymentPending = $isCod || $isAutomatedGateway;
+                $orderData['payment_type'] = $isPaymentPending ? 'due' : 'full_paid';
+                $orderData['paid_amount'] = $isPaymentPending ? 0 : $orderData['total_with_charge'];
+                $orderData['due_amount'] = $isPaymentPending ? $orderData['total_with_charge'] : 0;
+                $orderData['payment_status'] = $isPaymentPending ? 'pending' : 'paid';
 
                 $order = order::create($orderData);
 

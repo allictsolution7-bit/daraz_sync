@@ -480,37 +480,56 @@
         }
         
         .custom-dropdown-toggle {
-            padding: 4px 8px;
-            border: none;
-            background: transparent;
-            color: var(--secondary);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            border-radius: 6px;
             transition: all 0.2s ease;
         }
         
-        .custom-dropdown-toggle:hover {
-            background-color: var(--secondary-light);
-            color: var(--dark);
+        .custom-dropdown-toggle:hover,
+        .custom-dropdown-toggle.active {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            border-color: #cbd5e1;
         }
-        
+
         .custom-dropdown-menu {
             position: absolute;
             top: 100%;
             right: 0;
-            min-width: 180px;
-            background-color: #fff;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            z-index: 1050;
+            min-width: 220px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.2), 0 8px 16px -4px rgba(0, 0, 0, 0.08);
+            z-index: 999999 !important;
             list-style: none;
-            padding: 4px 0;
-            margin: 4px 0 0 0;
+            padding: 8px;
+            margin: 6px 0 0 0;
             display: none;
             opacity: 0;
-            transform: translateY(-5px);
-            transition: all 0.2s ease;
+            transform: translateY(-6px);
+            transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .table-responsive-wrapper,
+        .table-responsive,
+        .dataTables_wrapper,
+        .dataTables_scroll,
+        .dataTables_scrollBody {
+            overflow: visible !important;
+        }
+
+        table.dataTable tbody tr.dropdown-active-row {
+            position: relative;
+            z-index: 99999 !important;
         }
         
         .custom-dropdown-menu.show {
@@ -518,22 +537,85 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        .custom-dropdown-menu.dropup {
+            top: auto !important;
+            bottom: 100% !important;
+            margin-top: 0 !important;
+            margin-bottom: 6px !important;
+            transform: translateY(6px);
+        }
+
+        .custom-dropdown-menu.dropup.show {
+            transform: translateY(0);
+        }
         
+        .custom-dropdown-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #94a3b8;
+            padding: 6px 12px 4px 12px;
+            margin: 0;
+        }
+
         .custom-dropdown-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             padding: 8px 12px;
             font-size: 13px;
-            color: var(--dark);
+            font-weight: 500;
+            color: #334155;
             text-decoration: none;
-            transition: background-color 0.2s ease;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .custom-dropdown-item i {
+            font-size: 14px;
+            width: 18px;
+            text-align: center;
+            transition: transform 0.15s ease;
         }
         
         .custom-dropdown-item:hover {
-            background-color: var(--secondary-light);
-            color: var(--primary);
+            background-color: #f1f5f9;
+            color: #0f172a;
+            transform: translateX(2px);
             text-decoration: none;
+        }
+
+        .custom-dropdown-item:hover i {
+            transform: scale(1.15);
+        }
+
+        /* Color accents per option */
+        .custom-dropdown-item.print-receipt i { color: #0284c7; }
+        .custom-dropdown-item.print-receipt:hover { background-color: #e0f2fe; color: #0369a1; }
+
+        .custom-dropdown-item.print-invoice i { color: #16a34a; }
+        .custom-dropdown-item.print-invoice:hover { background-color: #dcfce7; color: #15803d; }
+
+        .custom-dropdown-item.print-slip i { color: #d97706; }
+        .custom-dropdown-item.print-slip:hover { background-color: #fef3c7; color: #b45309; }
+
+        .custom-dropdown-item.download-receipt i { color: #6366f1; }
+        .custom-dropdown-item.download-receipt:hover { background-color: #e0e7ff; color: #4338ca; }
+
+        .custom-dropdown-item.download-invoice i { color: #0d9488; }
+        .custom-dropdown-item.download-invoice:hover { background-color: #ccfbf1; color: #0f766e; }
+
+        .custom-dropdown-item.download-slip i { color: #9333ea; }
+        .custom-dropdown-item.download-slip:hover { background-color: #f3e8ff; color: #6b21a8; }
+
+        .custom-dropdown-divider {
+            height: 1px;
+            margin: 6px 0;
+            overflow: hidden;
+            background-color: #f1f5f9;
+            border: 0;
         }
 
         /* Checkbox styling */
@@ -1595,15 +1677,15 @@
                                             <i class="fas fa-ellipsis-h"></i>
                                         </button>
                                         <ul class="custom-dropdown-menu">
-                                            <li><h6 class="custom-dropdown-header">Print Options</h6></li>
-                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/print-receipt" target="_blank"><i class="fas fa-receipt me-2"></i> Print Receipt</a></li>
-                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/print-invoice" target="_blank"><i class="fas fa-file-invoice me-2"></i> Print Invoice</a></li>
-                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/print-package-slip" target="_blank"><i class="fas fa-box me-2"></i> Print Package Slip</a></li>
+                                            <li><h6 class="custom-dropdown-header"><i class="fas fa-print me-1"></i> Print Options</h6></li>
+                                            <li><a class="custom-dropdown-item print-receipt" href="/order/${row.id}/print-receipt" target="_blank"><i class="fas fa-receipt"></i> Print Receipt</a></li>
+                                            <li><a class="custom-dropdown-item print-invoice" href="/order/${row.id}/print-invoice" target="_blank"><i class="fas fa-file-invoice"></i> Print Invoice</a></li>
+                                            <li><a class="custom-dropdown-item print-slip" href="/order/${row.id}/print-package-slip" target="_blank"><i class="fas fa-box"></i> Print Package Slip</a></li>
                                             <li><hr class="custom-dropdown-divider"></li>
-                                            <li><h6 class="custom-dropdown-header">Download Options</h6></li>
-                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/download-receipt"><i class="fas fa-download me-2"></i> Download Receipt</a></li>
-                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/download-invoice"><i class="fas fa-download me-2"></i> Download Invoice</a></li>
-                                            <li><a class="custom-dropdown-item" href="/order/${row.id}/download-package-slip"><i class="fas fa-download me-2"></i> Download Package Slip</a></li>
+                                            <li><h6 class="custom-dropdown-header"><i class="fas fa-download me-1"></i> Download Options</h6></li>
+                                            <li><a class="custom-dropdown-item download-receipt" href="/order/${row.id}/download-receipt"><i class="fas fa-download"></i> Download Receipt</a></li>
+                                            <li><a class="custom-dropdown-item download-invoice" href="/order/${row.id}/download-invoice"><i class="fas fa-download"></i> Download Invoice</a></li>
+                                            <li><a class="custom-dropdown-item download-slip" href="/order/${row.id}/download-package-slip"><i class="fas fa-download"></i> Download Package Slip</a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -1685,28 +1767,49 @@
                 const isCurrentlyOpen = menu.hasClass('show');
                 
                 // Close all other dropdowns and remove active state
-                $('.custom-dropdown-menu').removeClass('show');
+                $('.custom-dropdown-menu').removeClass('show dropup');
                 $('.custom-dropdown-toggle').removeClass('active');
+                $('tr').removeClass('dropdown-active-row');
                 
                 // Toggle current dropdown only if it wasn't already open
                 if (!isCurrentlyOpen) {
+                    const toggleOffset = toggle.offset();
+                    const toggleHeight = toggle.outerHeight();
+                    const windowHeight = $(window).height();
+                    const scrollTop = $(window).scrollTop();
+                    const spaceBelow = windowHeight - (toggleOffset.top - scrollTop + toggleHeight);
+                    
+                    // Measure actual menu height dynamically
+                    menu.css({ display: 'block', visibility: 'hidden' });
+                    const actualMenuHeight = menu.outerHeight() || 340;
+                    menu.css({ display: '', visibility: '' });
+                    
+                    if (spaceBelow < actualMenuHeight + 15) {
+                        menu.addClass('dropup');
+                    } else {
+                        menu.removeClass('dropup');
+                    }
+                    
                     menu.addClass('show');
                     toggle.addClass('active');
+                    dropdown.closest('tr').addClass('dropdown-active-row');
                 }
             });
             
             // Close dropdown when clicking outside
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('.custom-dropdown').length) {
-                    $('.custom-dropdown-menu').removeClass('show');
+                    $('.custom-dropdown-menu').removeClass('show dropup');
                     $('.custom-dropdown-toggle').removeClass('active');
+                    $('tr').removeClass('dropdown-active-row');
                 }
             });
             
             // Close dropdown when clicking on menu items
             $(document).on('click', '.custom-dropdown-item', function() {
-                $('.custom-dropdown-menu').removeClass('show');
+                $('.custom-dropdown-menu').removeClass('show dropup');
                 $('.custom-dropdown-toggle').removeClass('active');
+                $('tr').removeClass('dropdown-active-row');
             });
 
             // Remove client-side custom filter. Filters are passed with ajax.data

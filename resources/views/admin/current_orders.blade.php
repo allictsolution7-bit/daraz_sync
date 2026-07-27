@@ -880,8 +880,8 @@
             background-color: #fff;
             border: 1px solid #dee2e6;
             border-radius: 4px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 1050;
+            box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.22), 0 6px 12px -4px rgba(0, 0, 0, 0.15);
+            z-index: 999999 !important;
             list-style: none;
             padding: 0;
             margin: 0;
@@ -895,6 +895,31 @@
             display: block;
             opacity: 1;
             transform: translateY(0);
+        }
+
+        .custom-dropdown-menu.dropup {
+            top: auto !important;
+            bottom: 100% !important;
+            margin-top: 0 !important;
+            margin-bottom: 6px !important;
+            transform: translateY(10px);
+        }
+
+        .custom-dropdown-menu.dropup.show {
+            transform: translateY(0);
+        }
+
+        .table-responsive-wrapper,
+        .table-responsive,
+        .dataTables_wrapper,
+        .dataTables_scroll,
+        .dataTables_scrollBody {
+            overflow: visible !important;
+        }
+
+        table.dataTable tbody tr.dropdown-active-row {
+            position: relative;
+            z-index: 99999 !important;
         }
         
         .custom-dropdown-item {
@@ -1188,40 +1213,40 @@
                                         <i class="fas fa-ellipsis-v"></i>
                                     </button>
                                     <ul class="custom-dropdown-menu">
-                                        <li><h6 class="custom-dropdown-header">Print Options</h6></li>
-                                        <li>
-                                            <a class="custom-dropdown-item" href="{{ route('order.print-receipt', $order->id) }}" target="_blank">
-                                                <i class="fas fa-receipt me-2"></i> Print Receipt
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="custom-dropdown-item" href="{{ route('order.print-invoice', $order->id) }}" target="_blank">
-                                                <i class="fas fa-file-invoice me-2"></i> Print Invoice
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="custom-dropdown-item" href="{{ route('order.print-package-slip', $order->id) }}" target="_blank">
-                                                <i class="fas fa-box me-2"></i> Print Package Slip
-                                            </a>
-                                        </li>
-                                        <li><hr class="custom-dropdown-divider"></li>
-                                        <li><h6 class="custom-dropdown-header">Download Options</h6></li>
-                                        <li>
-                                            <a class="custom-dropdown-item" href="{{ route('order.download-receipt', $order->id) }}">
-                                                <i class="fas fa-download me-2"></i> Download Receipt
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="custom-dropdown-item" href="{{ route('order.download-invoice', $order->id) }}">
-                                                <i class="fas fa-download me-2"></i> Download Invoice
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="custom-dropdown-item" href="{{ route('order.download-package-slip', $order->id) }}">
-                                                <i class="fas fa-download me-2"></i> Download Package Slip
-                                            </a>
-                                        </li>
-                                    </ul>
+                                         <li><h6 class="custom-dropdown-header"><i class="fas fa-print me-1"></i> Print Options</h6></li>
+                                         <li>
+                                             <a class="custom-dropdown-item print-receipt" href="{{ route('order.print-receipt', $order->id) }}" target="_blank">
+                                                 <i class="fas fa-receipt"></i> Print Receipt
+                                             </a>
+                                         </li>
+                                         <li>
+                                             <a class="custom-dropdown-item print-invoice" href="{{ route('order.print-invoice', $order->id) }}" target="_blank">
+                                                 <i class="fas fa-file-invoice"></i> Print Invoice
+                                             </a>
+                                         </li>
+                                         <li>
+                                             <a class="custom-dropdown-item print-slip" href="{{ route('order.print-package-slip', $order->id) }}" target="_blank">
+                                                 <i class="fas fa-box"></i> Print Package Slip
+                                             </a>
+                                         </li>
+                                         <li><hr class="custom-dropdown-divider"></li>
+                                         <li><h6 class="custom-dropdown-header"><i class="fas fa-download me-1"></i> Download Options</h6></li>
+                                         <li>
+                                             <a class="custom-dropdown-item download-receipt" href="{{ route('order.download-receipt', $order->id) }}">
+                                                 <i class="fas fa-download"></i> Download Receipt
+                                             </a>
+                                         </li>
+                                         <li>
+                                             <a class="custom-dropdown-item download-invoice" href="{{ route('order.download-invoice', $order->id) }}">
+                                                 <i class="fas fa-download"></i> Download Invoice
+                                             </a>
+                                         </li>
+                                         <li>
+                                             <a class="custom-dropdown-item download-slip" href="{{ route('order.download-package-slip', $order->id) }}">
+                                                 <i class="fas fa-download"></i> Download Package Slip
+                                             </a>
+                                         </li>
+                                     </ul>
                                 </div>
                             </div>
 
@@ -1301,28 +1326,49 @@
                 const isCurrentlyOpen = menu.hasClass('show');
                 
                 // Close all other dropdowns and remove active state
-                $('.custom-dropdown-menu').removeClass('show');
+                $('.custom-dropdown-menu').removeClass('show dropup');
                 $('.custom-dropdown-toggle').removeClass('active');
+                $('tr').removeClass('dropdown-active-row');
                 
                 // Toggle current dropdown only if it wasn't already open
                 if (!isCurrentlyOpen) {
+                    const toggleOffset = toggle.offset();
+                    const toggleHeight = toggle.outerHeight();
+                    const windowHeight = $(window).height();
+                    const scrollTop = $(window).scrollTop();
+                    const spaceBelow = windowHeight - (toggleOffset.top - scrollTop + toggleHeight);
+                    
+                    // Measure actual menu height dynamically
+                    menu.css({ display: 'block', visibility: 'hidden' });
+                    const actualMenuHeight = menu.outerHeight() || 340;
+                    menu.css({ display: '', visibility: '' });
+                    
+                    if (spaceBelow < actualMenuHeight + 15) {
+                        menu.addClass('dropup');
+                    } else {
+                        menu.removeClass('dropup');
+                    }
+                    
                     menu.addClass('show');
                     toggle.addClass('active');
+                    dropdown.closest('tr').addClass('dropdown-active-row');
                 }
             });
             
             // Close dropdown when clicking outside
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('.custom-dropdown').length) {
-                    $('.custom-dropdown-menu').removeClass('show');
+                    $('.custom-dropdown-menu').removeClass('show dropup');
                     $('.custom-dropdown-toggle').removeClass('active');
+                    $('tr').removeClass('dropdown-active-row');
                 }
             });
             
             // Close dropdown when clicking on menu items
             $(document).on('click', '.custom-dropdown-item', function() {
-                $('.custom-dropdown-menu').removeClass('show');
+                $('.custom-dropdown-menu').removeClass('show dropup');
                 $('.custom-dropdown-toggle').removeClass('active');
+                $('tr').removeClass('dropdown-active-row');
             });
 
             // Initialize DataTable with advanced features
