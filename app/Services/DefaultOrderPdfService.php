@@ -440,6 +440,16 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
             ?? $deliveryData['courier_response']['consignment']['consignment_id'] 
             ?? $deliveryData['courier_response']['consignment_id'] 
             ?? 'N/A';
+        $trackingCode = $deliveryData['tracking_code'] 
+            ?? $deliveryData['courier_response']['consignment']['tracking_code'] 
+            ?? $deliveryData['courier_response']['tracking_code'] 
+            ?? null;
+
+        if (!$trackingCode && $consignmentId !== 'N/A') {
+            $trackingCode = $consignmentId;
+        }
+
+        $trackingLink = $trackingCode ? "https://steadfast.com.bd/tl/{$trackingCode}" : null;
 
         $codAmount = (float) match($order->payment_type) {
             'full_paid' => 0,
@@ -451,17 +461,30 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
         $invoiceNo = $order->invoice_no ?? $order->order_number ?? $order->id;
         $note = $order->courier_note ?? $order->admin_note ?? '';
 
+        $qrCodeUrl = $trackingLink 
+            ? "https://quickchart.io/qr?text=" . urlencode($trackingLink) . "&size=90"
+            : ($consignmentId !== 'N/A' ? "https://quickchart.io/qr?text=" . urlencode($consignmentId) . "&size=90" : null);
+
+        $qrCodeHtml = $qrCodeUrl ? "<div style='margin-top: 10px; text-align: right;'><img src='{$qrCodeUrl}' style='width: 80px; height: 80px;' /></div>" : "";
+
+        $trackingHtml = '';
+        if ($trackingCode) {
+            $trackingHtml = "
+                <div class='field-line' style='margin-top: 10px;'>Tracking Code : <strong>{$trackingCode}</strong></div>
+                <div class='field-line'>Tracking Link : <a href='{$trackingLink}' target='_blank' style='color:#0284c7; text-decoration:none;'>{$trackingLink}</a></div>";
+        }
+
         return "
         <html>
         <head>
             <style>
                 body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #000000; margin: 0; padding: 20px; }
                 
-                .header-table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+                .header-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
                 
                 .circle-logo {
-                    width: 90px;
-                    height: 90px;
+                    width: 75px;
+                    height: 75px;
                     background-color: #9e9e9e;
                     border-radius: 50px;
                     text-align: center;
@@ -474,9 +497,9 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
                 .invoice-heading { font-size: 34px; font-weight: bold; margin: 0 0 12px 0; text-align: right; color: #000000; }
                 .meta-line { font-size: 14px; text-align: right; color: #000000; margin: 4px 0; font-weight: normal; }
                 
-                .details-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 50px; }
+                .details-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 30px; }
                 .section-title { font-size: 17px; font-weight: bold; margin-bottom: 12px; color: #000000; }
-                .field-line { font-size: 14px; margin: 6px 0; color: #000000; line-height: 1.45; }
+                .field-line { font-size: 14px; margin: 6px 0; color: #000000; line-height: 1.45; word-wrap: break-word; }
                 
                 .parcel-title { font-size: 15px; font-weight: bold; color: #000000; margin-bottom: 6px; }
                 
@@ -492,7 +515,7 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
                 }
                 
                 .note-box { margin-top: 20px; font-size: 14px; font-weight: bold; color: #000000; }
-                .footer-brand { text-align: right; font-size: 12px; color: #333333; margin-top: 350px; }
+                .footer-brand { text-align: right; font-size: 12px; color: #333333; margin-top: 250px; }
             </style>
         </head>
         <body>
@@ -500,11 +523,11 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
                 <tr>
                     <td style='vertical-align: top; width: 60%;'>
                         <div class='circle-logo'>
-                            <img src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>' style='width: 48px; height: 48px; margin-top: 21px;' />
+                            <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSI5IiBjeT0iMjEiIHI9IjEiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjIxIiByPSIxIi8+PHBhdGggZD0iTTEgMWg0bDIuNjggMTMuMzlhMiAyIDAgMCAwIDIgMS42MWg5LjcyYTIgMiAwIDAgMCAyLTEuNjFMMjMgNkg2Ii8+PC9zdmc+' style='width: 42px; height: 42px; margin-top: 16px;' />
                         </div>
                         <div class='store-name'>{$settings['site_name']}</div>
-                        <div class='store-info'>&#9742; {$settings['phone_number']}</div>
-                        <div class='store-info'>&#128205; {$settings['address']}</div>
+                        <div class='store-info'>Phone: {$settings['phone_number']}</div>
+                        <div class='store-info'>Address: {$settings['address']}</div>
                     </td>
                     <td style='vertical-align: top; text-align: right; width: 40%;'>
                         <div class='invoice-heading'>Invoice</div>
@@ -521,6 +544,7 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
                         <div class='field-line'>Name : <strong>{$order->name}</strong></div>
                         <div class='field-line'>Phone : <strong>{$order->phone}</strong></div>
                         <div class='field-line'>Address : {$order->address}</div>
+                        {$trackingHtml}
                     </td>
                     <td style='vertical-align: top; text-align: right; width: 45%;'>
                         <div class='parcel-title'>Parcel ID : #{$consignmentId}</div>
@@ -530,6 +554,7 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
                         <div>
                             <div class='cod-badge'>COD : {$codAmount} BDT</div>
                         </div>
+                        {$qrCodeHtml}
                     </td>
                 </tr>
             </table>

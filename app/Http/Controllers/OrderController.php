@@ -221,14 +221,17 @@ class OrderController extends Controller
         return DataTables::eloquent($query)
             ->addColumn('select', function ($order) {
                 $courierProvider = $order->delivery_data['courier_provider'] ?? null;
-                $isSteadfast = $courierProvider === 'steadfast';
-                $isPathao = $courierProvider === 'pathao';
-                $hasCourier = !empty($courierProvider);
+                $hasConsignment = !empty($order->delivery_data['consignment_id']) || !empty($order->delivery_data['tracking_code']);
+                
+                $hasCourier = !empty($courierProvider) && $hasConsignment;
+                $isSteadfast = ($courierProvider === 'steadfast') && $hasConsignment;
+                $isPathao = ($courierProvider === 'pathao') && $hasConsignment;
+                
                 $steadfastSent = $isSteadfast ? 'true' : 'false';
                 $pathaoSent = $isPathao ? 'true' : 'false';
                 $courierSent = $hasCourier ? 'true' : 'false';
                 $ipAddress = $order->ip_address ?? $order->ip ?? ($order->delivery_data['ip'] ?? null);
-                return '<input type="checkbox" class="order-checkbox" value="'.$order->id.'" data-steadfast-sent="'.$steadfastSent.'" data-pathao-sent="'.$pathaoSent.'" data-courier-sent="'.$courierSent.'" data-courier-provider="'.e($courierProvider).'" data-phone="'.e($order->phone).'" data-ip="'.e($ipAddress ?? '').'" />';
+                return '<input type="checkbox" class="order-checkbox" value="'.$order->id.'" data-steadfast-sent="'.$steadfastSent.'" data-pathao-sent="'.$pathaoSent.'" data-courier-sent="'.$courierSent.'" data-courier-provider="'.e($hasCourier ? $courierProvider : '').'" data-phone="'.e($order->phone).'" data-ip="'.e($ipAddress ?? '').'" />';
             })
             ->addColumn('customer_info', function ($order) {
                 $name = e($order->name);
@@ -350,8 +353,9 @@ class OrderController extends Controller
                 $statusHtml = '<div class="order-status-container">
                     <span class="order-status-badge order-status-'.e($order->status).' change-status-btn" data-order-id="'.$order->id.'" data-current-status="'.e($order->status).'" data-payment-method="'.e($order->payment_method).'" data-order-source="'.e($order->order_source ?? '').'" style="cursor:pointer;">'.$text.' <i class="fas fa-chevron-down" style="font-size: 12px; opacity: 0.7;"></i></span>';
                 
-                // Add courier status if order is sent to courier
-                if (isset($order->delivery_data['courier_provider'])) {
+                // Add courier status if order is sent to courier and has a valid consignment
+                $hasValidConsignment = !empty($order->delivery_data['consignment_id']) || !empty($order->delivery_data['tracking_code']);
+                if (isset($order->delivery_data['courier_provider']) && $hasValidConsignment) {
                     $courierProvider = $order->delivery_data['courier_provider'];
                     $courierStatus = $order->courier_status;
                     $courierStatusUpdated = $order->courier_status_updated_at;
@@ -1035,18 +1039,26 @@ class OrderController extends Controller
 
                 // Handle Steadfast response
                 if ($courierProvider === 'steadfast' && isset($response['delivery_status'])) {
-                    $statusText = is_string($response['delivery_status'])
-                        ? ucfirst(str_replace('_', ' ', $response['delivery_status']))
-                        : ($response['delivery_status']['status'] ?? 'Unknown');
-
-                    $order->courier_status = $statusText;
-                    $order->courier_status_slug = is_string($response['delivery_status'])
-                        ? $response['delivery_status']
-                        : strtolower(str_replace(' ', '_', $statusText));
-                    $order->courier_status_updated_at = now();
-                    $order->courier_status_details = $response;
-                    $order->save();
-                    $updated++;
+                    $rawStatus = is_string($response['delivery_status']) ? $response['delivery_status'] : ($response['delivery_status']['status'] ?? 'unknown');
+                    
+                    if (in_array(strtolower($rawStatus), ['unknown', 'not_found', 'invalid', '404'])) {
+                        // Order deleted/invalid on Steadfast portal - clear delivery data to allow re-sending
+                        $order->courier_status = null;
+                        $order->courier_status_slug = null;
+                        $order->courier_status_updated_at = now();
+                        $order->courier_status_details = null;
+                        $order->delivery_data = null;
+                        $order->save();
+                        $updated++;
+                    } else {
+                        $statusText = ucfirst(str_replace('_', ' ', $rawStatus));
+                        $order->courier_status = $statusText;
+                        $order->courier_status_slug = strtolower(str_replace(' ', '_', $rawStatus));
+                        $order->courier_status_updated_at = now();
+                        $order->courier_status_details = $response;
+                        $order->save();
+                        $updated++;
+                    }
                 }
                 // Handle Pathao response
                 elseif ($courierProvider === 'pathao' && isset($response['data']['order_status'])) {

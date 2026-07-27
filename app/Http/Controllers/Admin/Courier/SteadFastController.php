@@ -53,15 +53,28 @@ class SteadFastController extends Controller
             default => ($order->total_with_charge ?? $order->total ?? 0),
         };
 
+        $itemNames = $order->order_items->map(function($item) {
+            return ($item->product->title ?? $item->product_name ?? 'Item') . ($item->quantity > 1 ? ' x' . $item->quantity : '');
+        })->filter()->implode(', ');
+
+        $totalLot = $order->order_items->sum('quantity') ?: 1;
+
+        $baseInvoice = (string) ($order->invoice_no ?? $order->order_number ?? $order->id);
+        // If order had previous delivery_data (e.g. was previously sent/cancelled), append unique suffix so Steadfast accepts it
+        $invoice = !empty($order->delivery_data['consignment_id']) || !empty($order->delivery_data['courier_response'])
+            ? $baseInvoice . '-' . time()
+            : $baseInvoice;
+
         // Format parameters strictly adhering to Steadfast API specification
         $orderData = [
-            'invoice'           => (string) ($order->invoice_no ?? $order->order_number ?? $order->id),
+            'invoice'           => $invoice,
             'recipient_name'    => Str::limit($order->name ?? 'Customer', 98, ''),
             'recipient_phone'   => $this->formatPhone($order->phone),
             'recipient_address' => Str::limit($order->address ?? 'N/A', 248, ''),
             'cod_amount'        => $codAmount,
             'note'              => Str::limit($order->courier_note ?? '', 200, ''),
-            'item_description'  => Str::limit($order->order_items->pluck('product.title')->filter()->implode(', '), 240, ''),
+            'item_description'  => Str::limit($itemNames ?: 'Products', 240, ''),
+            'total_lot'         => $totalLot,
         ];
 
         try {
@@ -85,6 +98,7 @@ class SteadFastController extends Controller
             }
             if ($trackingCode) {
                 $deliveryData['tracking_code'] = $trackingCode;
+                $deliveryData['tracking_url'] = "https://steadfast.com.bd/tl/" . $trackingCode;
             }
             
             $order->delivery_data = $deliveryData;
@@ -135,13 +149,26 @@ class SteadFastController extends Controller
                 default => ($order->total_with_charge ?? $order->total ?? 0),
             };
 
+            $itemNames = $order->order_items->map(function($item) {
+                return ($item->product->title ?? $item->product_name ?? 'Item') . ($item->quantity > 1 ? ' x' . $item->quantity : '');
+            })->filter()->implode(', ');
+
+            $totalLot = $order->order_items->sum('quantity') ?: 1;
+
+            $baseInvoice = (string) ($order->invoice_no ?? $order->order_number ?? $order->id);
+            $invoice = !empty($order->delivery_data['consignment_id']) || !empty($order->delivery_data['courier_response'])
+                ? $baseInvoice . '-' . time()
+                : $baseInvoice;
+
             $bulkOrders[] = [
-                'invoice'           => (string) ($order->invoice_no ?? $order->order_number ?? $order->id),
+                'invoice'           => $invoice,
                 'recipient_name'    => Str::limit($order->name ?? 'Customer', 98, ''),
                 'recipient_phone'   => $this->formatPhone($order->phone),
                 'recipient_address' => Str::limit($order->address ?? 'N/A', 248, ''),
                 'cod_amount'        => $codAmount,
                 'note'              => Str::limit($order->courier_note ?? '', 200, ''),
+                'item_description'  => Str::limit($itemNames ?: 'Products', 240, ''),
+                'total_lot'         => $totalLot,
             ];
         }
 
@@ -150,21 +177,28 @@ class SteadFastController extends Controller
 
             // Save delivery data for each order
             foreach ($orders as $index => $order) {
-                $result = $response['data'][$index] ?? $response[$index] ?? [];
+                // Bulk API response can return array of items, or data key indexed by order invoice / array index
+                $result = $response['data'][$index] 
+                    ?? $response[$index] 
+                    ?? $response['data'][$order->invoice_no] 
+                    ?? $response['data'][$order->id] 
+                    ?? $response;
                 
                 $consignmentId = $result['consignment_id'] 
                     ?? $result['consignment']['consignment_id'] 
-                    ?? null;
+                    ?? ($result['status'] == 200 ? ($result['id'] ?? null) : null);
+
                 $trackingCode = $result['tracking_code'] 
                     ?? $result['consignment']['tracking_code'] 
-                    ?? null;
+                    ?? $consignmentId;
                 
-                $order->delivery_data = array_merge($order->delivery_data ?? [], [
+                $order->delivery_data = [
                     'courier_provider' => 'steadfast',
                     'consignment_id'   => $consignmentId,
                     'tracking_code'    => $trackingCode,
+                    'tracking_url'     => $trackingCode ? "https://steadfast.com.bd/tl/" . $trackingCode : null,
                     'courier_response' => $result,
-                ]);
+                ];
                 
                 if ($consignmentId) {
                     $order->courier_status = 'Order Created';

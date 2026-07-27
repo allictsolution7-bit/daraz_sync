@@ -1620,11 +1620,15 @@
                                 html += `<div class="customer-ip text-muted" style="font-size: 10.5px;">IP: ${ipAddress}</div>`;
                             }
                             
-                            if (row.delivery_data && row.delivery_data.consignment_id) {
-                                html += `<div class="courier-cn-id" style="font-size: 10.5px; margin-top: 2px;">
-                                    <span style="background: #e3f2fd; color: #1565c0; padding: 1px 4px; border-radius: 3px; font-weight: 500;">
-                                        <i class="fas fa-truck" style="font-size: 9px; margin-right: 2px;"></i>CN: ${row.delivery_data.consignment_id}
-                                    </span>
+                            if (row.delivery_data && (row.delivery_data.consignment_id || row.delivery_data.tracking_code)) {
+                                const cnId = row.delivery_data.consignment_id || row.delivery_data.tracking_code;
+                                const trCode = row.delivery_data.tracking_code || row.delivery_data.consignment_id;
+                                const trUrl = row.delivery_data.tracking_url || `https://steadfast.com.bd/tl/${trCode}`;
+                                html += `<div class="courier-cn-id" style="font-size: 10.5px; margin-top: 3px;">
+                                    <a href="${trUrl}" target="_blank" style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 4px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Track on Steadfast">
+                                        <i class="fas fa-truck" style="font-size: 10px;"></i> CN: ${cnId}
+                                        <i class="fas fa-external-link-alt" style="font-size: 8px;"></i>
+                                    </a>
                                 </div>`;
                             }
                             // Action icons removed from here
