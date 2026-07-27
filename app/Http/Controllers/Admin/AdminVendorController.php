@@ -20,12 +20,13 @@ class AdminVendorController extends Controller
     }
 
     /**
-     * Display all vendors
+     * Display all vendors created by this admin
      */
     public function index(Request $request)
     {
         $query = User::role('vendor')
-            ->with('vendorSettings');
+            ->with('vendorSettings')
+            ->where('created_by', auth()->id()); // Scope to current admin's vendors only
 
         // Search
         if ($request->has('search') && $request->search) {

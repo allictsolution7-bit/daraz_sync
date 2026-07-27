@@ -173,11 +173,17 @@ class SteadFastController extends Controller
     public function getBalance()
     {
         $delivery = \App\Services\Delivery\DeliveryServiceManager::forProvider('steadfast');
+        if (!$delivery) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Steadfast integration not configured for your account.'
+            ]);
+        }
         try {
             $response = $delivery->getBalance();
             return response()->json([
                 'success' => true,
-                'balance' => $response['current_balance'] ?? null,
+                'balance' => $response['current_balance'] ?? 0,
                 'raw' => $response
             ]);
         } catch (\Exception $e) {

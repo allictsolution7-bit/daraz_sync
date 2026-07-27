@@ -1,207 +1,377 @@
 @extends('layouts.master')
 
 @section('styles')
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .delivery-container {
-            font-family: 'Outfit', sans-serif;
+        .delivery-wrapper {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 1rem;
+            padding: 1.75rem;
+            min-height: 100vh;
         }
-        .page-header-premium {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            padding: 2rem;
-            border-radius: 1rem;
-            color: white;
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
-            margin-bottom: 2rem;
+        .header-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #2563eb 100%);
+            border-radius: 1.25rem;
+            padding: 2.25rem;
+            color: #ffffff;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+            margin-bottom: 2rem;
         }
-        .page-header-premium::after {
+        .header-banner::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            top: -40%;
+            right: -10%;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(255, 255, 255, 0) 70%);
             border-radius: 50%;
             pointer-events: none;
         }
-        .card-premium {
-            border: none;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            background-color: #ffffff;
-            transition: all 0.3s ease;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .card-premium:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
-            transform: translateY(-2px);
-        }
-        .balance-value {
-            font-size: 1.75rem;
+        .header-badge {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #60a5fa;
+            font-size: 0.75rem;
             font-weight: 700;
-            color: #1e293b;
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .btn-premium {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
+            padding: 0.35rem 0.85rem;
+            border-radius: 2rem;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.85rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
         }
-        .btn-premium-primary {
-            background-color: #3b82f6;
-            border-color: #3b82f6;
-            color: white;
+        .metric-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.25rem;
+            padding: 1.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+            transition: all 0.25s ease-in-out;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .btn-premium-primary:hover {
-            background-color: #2563eb;
-            border-color: #2563eb;
-            color: white;
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+            border-color: #cbd5e1;
         }
-        .btn-premium-secondary {
-            background-color: #f1f5f9;
-            border-color: #e2e8f0;
-            color: #475569;
-        }
-        .btn-premium-secondary:hover {
-            background-color: #e2e8f0;
-            color: #334155;
-        }
-        .table-premium {
-            border-collapse: separate;
-            border-spacing: 0 0.5rem;
-            width: 100% !important;
-        }
-        .table-premium thead th {
-            background-color: #1e293b !important;
-            color: #ffffff !important;
-            font-weight: 600 !important;
-            text-transform: uppercase !important;
-            font-size: 0.75rem !important;
-            letter-spacing: 0.05em !important;
-            padding: 1.1rem 1rem !important;
-            border: none !important;
-        }
-        .table-premium thead th:first-child {
-            border-top-left-radius: 0.75rem !important;
-        }
-        .table-premium thead th:last-child {
-            border-top-right-radius: 0.75rem !important;
-        }
-        .table-premium td {
-            background-color: #ffffff;
-            border-top: 1px solid #f1f5f9;
-            border-bottom: 1px solid #f1f5f9;
-            padding: 1.25rem 1rem;
-            vertical-align: middle;
-        }
-        .table-premium tr td:first-child {
-            border-left: 1px solid #f1f5f9;
-            border-top-left-radius: 0.75rem;
-            border-bottom-left-radius: 0.75rem;
-        }
-        .table-premium tr td:last-child {
-            border-right: 1px solid #f1f5f9;
-            border-top-right-radius: 0.75rem;
-            border-bottom-right-radius: 0.75rem;
-        }
-        .table-premium tr:hover td {
-            background-color: #f8fafc;
-        }
-        .status-badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.35rem 0.6rem;
-            border-radius: 2rem;
-            display: inline-block;
-        }
-        .status-active { background-color: #d1fae5; color: #065f46; }
-        .status-inactive { background-color: #fee2e2; color: #991b1b; }
-        .provider-icon {
-            width: 40px;
-            height: 40px;
+        .provider-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .avatar-steadfast {
+            background-color: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+        .avatar-pathao {
+            background-color: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #fed7aa;
+        }
+        .balance-num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+        .action-btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff !important;
+            border: none;
+            border-radius: 0.65rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.6rem 1.25rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+            transition: all 0.2s ease;
+        }
+        .action-btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+            transform: translateY(-1px);
+        }
+        .action-btn-subtle {
+            background: #f1f5f9;
+            color: #475569 !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.65rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.55rem 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        .action-btn-subtle:hover {
+            background: #e2e8f0;
+            color: #1e293b !important;
+        }
+        .table-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+        .table-header-box {
+            padding: 1.35rem 1.75rem;
+            border-bottom: 1px solid #f1f5f9;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .table-modern {
+            width: 100%;
+            margin-bottom: 0;
+            border-collapse: collapse;
+        }
+        .table-modern thead th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 1rem 1.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            border-top: none;
+        }
+        .table-modern tbody td {
+            padding: 1.25rem 1.75rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+        .table-modern tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .table-modern tbody tr:hover td {
+            background-color: #f8fafc;
+        }
+        .pill-active {
+            background-color: #d1fae5;
+            color: #047857;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            border-radius: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .pill-active::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+        }
+        .pill-inactive {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            border-radius: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .pill-inactive::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #ef4444;
+        }
+        .user-owner-badge {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            padding: 0.3rem 0.75rem;
             border-radius: 0.5rem;
-            font-size: 1.25rem;
-            background-color: #eff6ff;
-            color: #3b82f6;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
         }
     </style>
 @endsection
 
 @section('content')
-    <div class="delivery-container">
-        <!-- Header -->
-        <div class="page-header-premium shadow-sm">
-            <nav aria-label="breadcrumb" class="breadcrumb-premium mb-2">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin') }}" class="text-white-50 text-decoration-none">Dashboard</a></li>
-                    <li class="breadcrumb-item active text-white" aria-current="page">Delivery Integrations</li>
-                </ol>
-            </nav>
-            <div class="d-flex justify-content-between align-items-center">
+    <div class="delivery-wrapper">
+        <!-- Header Banner -->
+        <div class="header-banner">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 2;">
                 <div>
-                    <h3 class="mb-1 font-weight-bold text-white">Delivery Integrations</h3>
-                    <p class="mb-0 text-white-50">Manage credentials and verify API balances for Steadfast and Pathao courier networks.</p>
+                    <div class="header-badge mb-2">
+                        <i class="fas fa-shipping-fast"></i> Logistics & Courier Gateway
+                    </div>
+                    <h2 class="fw-extrabold text-white mb-2" style="font-size: 1.85rem; letter-spacing: -0.02em;">Courier Integrations</h2>
+                    <p class="mb-0 text-white-50" style="font-size: 0.95rem; max-width: 650px;">
+                        Manage direct API connections, verify realtime wallet balances, and configure delivery parameters for Steadfast & Pathao networks.
+                    </p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('admin.delivery.integration') }}" class="action-btn-primary">
+                        <i class="fas fa-plus-circle"></i> Add New Integration
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Courier Balance Cards -->
-        <div class="row">
-            <div class="col-md-6 col-lg-4">
-                <div class="card-premium">
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <div class="provider-icon bg-success-light text-success" style="background-color: #ecfdf5; color: #10b981;">
-                            <i class="fas fa-wallet"></i>
+        @php
+            $hasSteadfast = $integrations->where('provider', 'steadfast')->where('is_active', true)->first();
+            $hasPathao = $integrations->where('provider', 'pathao')->where('is_active', true)->first();
+        @endphp
+
+        <!-- 2 Courier Cards Grid -->
+        <div class="row g-4">
+            <!-- Steadfast Balance Card -->
+            <div class="col-12 col-md-6">
+                <div class="metric-card">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="provider-avatar avatar-steadfast">
+                                    <i class="fas fa-truck-loading"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">Steadfast Courier</h5>
+                                    <span class="text-muted" style="font-size: 0.82rem;">Merchant Account Balance</span>
+                                </div>
+                            </div>
+                            @if($hasSteadfast)
+                                <span class="badge bg-success bg-opacity-10 text-success fw-bold" style="font-size: 0.75rem; padding: 5px 10px; border-radius: 6px;">
+                                    API Active
+                                </span>
+                            @else
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold" style="font-size: 0.75rem; padding: 5px 10px; border-radius: 6px;">
+                                    Not Configured
+                                </span>
+                            @endif
                         </div>
-                        <h6 class="font-weight-bold text-muted mb-0">Steadfast Balance</h6>
+                        <div class="my-4">
+                            <div class="balance-num" id="steadfast-balance-value">
+                                @if($hasSteadfast)
+                                    <span class="text-muted fs-6"><i class="fas fa-spinner fa-spin me-2 text-primary"></i> Querying balance...</span>
+                                @else
+                                    <span class="text-muted fs-6 fw-semibold"><i class="fas fa-info-circle text-secondary me-1"></i> Not Configured for this Account</span>
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                    <div class="balance-value" id="steadfast-balance-value">
-                        Loading...
+                    <div class="pt-3 border-top border-light d-flex align-items-center justify-content-between">
+                        <span class="text-muted small" style="font-size: 0.82rem;">
+                            <i class="fas fa-satellite-dish me-1 text-primary"></i> Live API Query
+                        </span>
+                        @if($hasSteadfast)
+                            <button id="refresh-steadfast-balance" class="action-btn-subtle py-1.5 px-3" style="font-size: 0.82rem;">
+                                <i class="fas fa-sync-alt"></i> Refresh Balance
+                            </button>
+                        @else
+                            <a href="{{ route('admin.delivery.integration') }}" class="action-btn-primary py-1 px-3" style="font-size: 0.78rem;">
+                                <i class="fas fa-plus-circle"></i> Configure
+                            </a>
+                        @endif
                     </div>
-                    <button id="refresh-steadfast-balance" class="btn btn-premium btn-premium-primary">
-                        <i class="fas fa-sync-alt"></i> Refresh Balance
-                    </button>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="card-premium">
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <div class="provider-icon" style="background-color: #fff7ed; color: #f97316;">
-                            <i class="fas fa-ban"></i>
+
+            <!-- Pathao Balance Card -->
+            <div class="col-12 col-md-6">
+                <div class="metric-card">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="provider-avatar avatar-pathao">
+                                    <i class="fas fa-paper-plane"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">Pathao Courier</h5>
+                                    <span class="text-muted" style="font-size: 0.82rem;">Merchant Account Balance</span>
+                                </div>
+                            </div>
+                            @if($hasPathao)
+                                <span class="badge bg-primary bg-opacity-10 text-primary fw-bold" style="font-size: 0.75rem; padding: 5px 10px; border-radius: 6px;">
+                                    Connected
+                                </span>
+                            @else
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold" style="font-size: 0.75rem; padding: 5px 10px; border-radius: 6px;">
+                                    Not Configured
+                                </span>
+                            @endif
                         </div>
-                        <h6 class="font-weight-bold text-muted mb-0">Pathao Balance</h6>
+                        <div class="my-4">
+                            <div class="balance-num text-muted" style="font-size: 1.25rem; font-weight: 700; color: #64748b !important;">
+                                <i class="fas fa-info-circle text-warning me-1"></i> Not supported by Pathao API
+                            </div>
+                            <p class="text-muted mb-0 mt-1" style="font-size: 0.82rem;">
+                                Pathao API handles billing & wallet balances directly via merchant portal.
+                            </p>
+                        </div>
                     </div>
-                    <div class="balance-value text-muted" style="font-size: 1rem;">
-                        Not supported by Pathao API
+                    <div class="pt-3 border-top border-light d-flex align-items-center justify-content-between">
+                        <span class="text-muted small" style="font-size: 0.82rem;">Webhook & Auto-dispatch</span>
+                        <span class="text-secondary fw-semibold" style="font-size: 0.82rem;">
+                            @if($hasPathao)
+                                <i class="fas fa-check-circle text-success me-1"></i> Integration Ready
+                            @else
+                                <a href="{{ route('admin.delivery.integration') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.78rem;">
+                                    <i class="fas fa-plus-circle me-1"></i> Configure
+                                </a>
+                            @endif
+                        </span>
                     </div>
-                    <button id="refresh-pathao-balance" class="btn btn-premium btn-premium-secondary" disabled>
-                        <i class="fas fa-sync-alt"></i> Not Available
-                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Table Listing -->
-        <div class="card-premium mt-3">
-            <h5 class="font-weight-bold text-dark mb-4"><i class="fas fa-network-wired text-primary"></i> Configured Integrations</h5>
+        <div class="table-card">
+            <div class="table-header-box">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-sliders-h fs-6"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0" style="font-size: 1.05rem;">Active Courier Credentials</h5>
+                        <p class="text-muted mb-0" style="font-size: 0.8rem;">Direct API keys and dispatch access configured for this admin</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="{{ route('admin.delivery.integration') }}" class="action-btn-subtle py-1.5 px-3">
+                        <i class="fas fa-plus text-primary"></i> Add Provider
+                    </a>
+                </div>
+            </div>
+            
             <div class="table-responsive">
-                <table class="table table-premium">
+                <table class="table table-modern">
                     <thead>
                         <tr>
                             <th>Courier Provider</th>
@@ -213,37 +383,57 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($integrations as $item)
+                        @forelse($integrations as $item)
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="provider-icon">
-                                            <i class="fas fa-truck-loading"></i>
+                                        <div class="provider-avatar {{ $item->provider === 'steadfast' ? 'avatar-steadfast' : 'avatar-pathao' }}" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                            <i class="fas {{ $item->provider === 'steadfast' ? 'fa-truck-loading' : 'fa-paper-plane' }}"></i>
                                         </div>
-                                        <div class="font-weight-bold text-dark">{{ ucfirst($item->provider) }}</div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ ucfirst($item->provider) }} Express</div>
+                                            <span class="text-muted" style="font-size: 0.78rem;">
+                                                {{ $item->provider === 'steadfast' ? 'API Key & Secret Configured' : 'Client ID & Store ID Configured' }}
+                                            </span>
+                                        </div>
                                     </div>
                                 </td>
                                 @if($isSuperAdmin ?? false)
                                     <td>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary font-weight-bold" style="font-size: 0.8rem; padding: 4px 10px; border-radius: 6px;">
-                                            <i class="fas fa-user-circle me-1"></i> {{ $item->user->name ?? $item->user->email ?? 'System Default' }}
+                                        <span class="user-owner-badge">
+                                            <i class="fas fa-user-circle"></i> {{ $item->user->name ?? $item->user->email ?? 'System Default' }}
                                         </span>
                                     </td>
                                 @endif
                                 <td>
-                                    <span class="status-badge {{ $item->is_active ? 'status-active' : 'status-inactive' }}">
-                                        {{ $item->is_active ? 'Active' : 'Inactive' }}
-                                    </span>
+                                    @if($item->is_active)
+                                        <span class="pill-active">Active</span>
+                                    @else
+                                        <span class="pill-inactive">Inactive</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="text-end">
-                                        <a href="{{ route('admin.delivery.integration', $item->id) }}" class="btn btn-premium btn-premium-primary btn-sm">
-                                            <i class="fas fa-edit"></i> Edit Credentials
+                                        <a href="{{ route('admin.delivery.integration', $item->id) }}" class="action-btn-subtle py-1.5 px-3">
+                                            <i class="fas fa-pen-to-square text-primary"></i> Edit Credentials
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="{{ ($isSuperAdmin ?? false) ? 4 : 3 }}" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-truck-loading fs-2 mb-3 opacity-40"></i>
+                                        <h6>No Courier Integrations Found</h6>
+                                        <p class="small mb-3">Click below to set up your Steadfast or Pathao credentials.</p>
+                                        <a href="{{ route('admin.delivery.integration') }}" class="action-btn-primary">
+                                            <i class="fas fa-plus-circle"></i> Add Integration
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -252,27 +442,39 @@
 @endsection
 
 @section('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function fetchSteadfastBalance() {
-            const balanceDiv = document.getElementById('steadfast-balance-value');
-            balanceDiv.textContent = 'Loading...';
-            fetch("{{ route('admin.steadfast.balance') }}")
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        balanceDiv.textContent = data.balance !== null ? data.balance + ' BDT' : 'N/A';
-                    } else {
-                        balanceDiv.textContent = 'Error: ' + (data.message || 'Could not fetch balance');
-                    }
-                })
-                .catch(() => {
-                    balanceDiv.textContent = 'Error fetching balance';
-                });
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchSteadfastBalance();
-            document.getElementById('refresh-steadfast-balance').addEventListener('click', fetchSteadfastBalance);
-        });
-    </script>
+    @if($hasSteadfast)
+        <script>
+            function fetchSteadfastBalance() {
+                const balanceDiv = document.getElementById('steadfast-balance-value');
+                const btn = document.getElementById('refresh-steadfast-balance');
+                
+                balanceDiv.innerHTML = '<span class="text-muted fs-6"><i class="fas fa-spinner fa-spin me-2 text-primary"></i> Querying balance...</span>';
+                if(btn) btn.classList.add('disabled');
+
+                fetch("{{ route('admin.steadfast.balance') }}")
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.balance !== null && data.balance !== undefined) {
+                            balanceDiv.innerHTML = '<span class="text-success fw-extrabold">৳' + Number(data.balance).toLocaleString('en-US', {minimumFractionDigits: 2}) + ' <small class="fs-6 text-muted font-weight-normal">BDT</small></span>';
+                        } else {
+                            balanceDiv.innerHTML = '<span class="text-danger fs-6 fw-bold"><i class="fas fa-exclamation-triangle me-1"></i> ' + (data.message || 'Error fetching balance') + '</span>';
+                        }
+                    })
+                    .catch(() => {
+                        balanceDiv.innerHTML = '<span class="text-danger fs-6 fw-bold"><i class="fas fa-exclamation-circle me-1"></i> Error fetching balance</span>';
+                    })
+                    .finally(() => {
+                        if(btn) btn.classList.remove('disabled');
+                    });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                fetchSteadfastBalance();
+                const refreshBtn = document.getElementById('refresh-steadfast-balance');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', fetchSteadfastBalance);
+                }
+            });
+        </script>
+    @endif
 @endsection
