@@ -8,49 +8,68 @@
     <link href="https://cdn.datatables.net/colreorder/1.7.0/css/colReorder.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet">
     <style>
-        /* Add hover effect to rows */
-        .clickable-row:hover {
-            background-color: #fa2b2b !important;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        /* Modern Table Redesign - OrderFlow Style */
+        .table-responsive-wrapper {
+            border: 1px solid rgba(200, 196, 213, 0.4) !important;
+            border-radius: 2rem !important;
+            overflow: hidden !important;
+            background: #ffffff !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+        }
+
+        table.dataTable {
+            border-collapse: collapse !important;
+            margin: 0 !important;
+            width: 100% !important;
+        }
+
+        table.dataTable thead th {
+            background: #f2f4f6 !important;
+            color: #464553 !important;
+            font-size: 11.5px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+            padding: 16px 20px !important;
+            border-bottom: 1px solid rgba(200, 196, 213, 0.3) !important;
+        }
+
+        table.dataTable tbody td {
+            padding: 16px 18px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid rgba(200, 196, 213, 0.15) !important;
+            font-size: 13.5px !important;
+            color: #191c1e !important;
+            background-color: #ffffff;
         }
 
         /* Order Status Row Colors */
-        table#Products tr.order-status-pending td {
-            background-color: #fff3e0 !important;
-        }
+        table#Products tr.order-status-pending td { background-color: #fffdfa !important; }
+        table#Products tr.order-status-pending td:first-child { border-left: 5px solid #752c00 !important; }
 
-        table#Products tr.order-status-processing td {
-            background-color: #e3f2fd !important;
-        }
+        table#Products tr.order-status-processing td { background-color: #f7f7fe !important; }
+        table#Products tr.order-status-processing td:first-child { border-left: 5px solid #1f108e !important; }
 
-        table#Products tr.order-status-delivered td {
-            background-color: #e8f5e9 !important;
-        }
+        table#Products tr.order-status-delivered td { background-color: #f5fdf9 !important; }
+        table#Products tr.order-status-delivered td:first-child { border-left: 5px solid #10b981 !important; }
 
-        table#Products tr.order-status-on_hold td {
-            background-color: #f3e5f5 !important;
-        }
+        table#Products tr.order-status-on_hold td { background-color: #faf6fe !important; }
+        table#Products tr.order-status-on_hold td:first-child { border-left: 5px solid #8b5cf6 !important; }
 
-        table#Products tr.order-status-shipped td {
-            background-color: #e0f7fa !important;
-        }
+        table#Products tr.order-status-shipped td { background-color: #f3fdfd !important; }
+        table#Products tr.order-status-shipped td:first-child { border-left: 5px solid #06b6d4 !important; }
 
-        table#Products tr.order-status-cancelled td {
-            background-color: #ffebee !important;
-        }
+        table#Products tr.order-status-cancelled td { background-color: #fff6f6 !important; }
+        table#Products tr.order-status-cancelled td:first-child { border-left: 5px solid #ba1a1a !important; }
 
-        table#Products tr.order-status-phone_not_rcv td {
-            background-color: #eceff1 !important;
-        }
+        table#Products tr.order-status-phone_not_rcv td { background-color: #f9fafb !important; }
+        table#Products tr.order-status-phone_not_rcv td:first-child { border-left: 5px solid #464553 !important; }
 
-        table#Products tr.order-status-follow_up td {
-            background-color: #f3e5f5 !important;
-        }
+        table#Products tr.order-status-follow_up td { background-color: #fff9f6 !important; }
+        table#Products tr.order-status-follow_up td:first-child { border-left: 5px solid #f97316 !important; }
 
-        table#Products tr.order-status-ready_for_delivery td {
-            background-color: #e0f2f1 !important;
-        }
+        table#Products tr.order-status-ready_for_delivery td { background-color: #f2fdfb !important; }
+        table#Products tr.order-status-ready_for_delivery td:first-child { border-left: 5px solid #14b8a6 !important; }
 
         span.editable-note {
             position: relative;

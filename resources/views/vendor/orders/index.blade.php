@@ -62,53 +62,67 @@
     }
 
     /* Premium Table Styling */
+    /* Modern Table Redesign - OrderFlow Style */
+    .table-modern-card {
+        border: 1px solid rgba(200, 196, 213, 0.4) !important;
+        border-radius: 2rem !important;
+        overflow: hidden !important;
+        background: #ffffff !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+    }
+
     .table-modern {
         width: 100%;
         margin-bottom: 0;
-        border-collapse: separate;
-        border-spacing: 0;
+        border-collapse: collapse;
     }
 
     .table-modern thead th {
-        background: #f1f5f9;
-        color: #475569;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.72rem;
-        letter-spacing: 0.06em;
-        border-bottom: 1px solid #cbd5e1;
-        padding: 0.85rem 1.25rem;
+        background: #f2f4f6 !important;
+        color: #464553 !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 0.08em !important;
+        border-bottom: 1px solid rgba(200, 196, 213, 0.3) !important;
+        padding: 1rem 1.25rem !important;
         white-space: nowrap;
     }
 
     .table-modern tbody td {
-        padding: 1.1rem 1.25rem;
-        vertical-align: middle;
-        border-bottom: 1px solid #f1f5f9;
-        font-size: 0.875rem;
+        padding: 1.1rem 1.25rem !important;
+        vertical-align: middle !important;
+        border-bottom: 1px solid rgba(200, 196, 213, 0.15) !important;
+        font-size: 0.875rem !important;
+        color: #191c1e !important;
+    }
+
+    .table-modern tbody tr {
+        transition: background-color 0.15s ease-in-out;
     }
 
     .table-modern tbody tr:hover {
-        background-color: #f8fafc;
+        background-color: #f2f4f6 !important;
     }
 
-    /* Badges */
+    /* Badges - OrderFlow theme */
     .badge-status {
-        padding: 5px 12px;
-        border-radius: 50px;
-        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-weight: 600;
         font-size: 0.75rem;
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 6px;
+        border: none;
     }
 
-    .badge-status.pending { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-    .badge-status.processing { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
-    .badge-status.shipped { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
-    .badge-status.delivered { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .badge-status.completed { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .badge-status.cancelled { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .badge-status.pending { background: #ffdbcc; color: #511c00; }
+    .badge-status.processing { background: #e1e0ff; color: #07006c; }
+    .badge-status.shipped { background: #cffafe; color: #155e75; }
+    .badge-status.delivered { background: #d1fae5; color: #065f46; }
+    .badge-status.completed { background: #d1fae5; color: #065f46; }
+    .badge-status.cancelled { background: #ffdad6; color: #93000a; }
 
     .badge-earning {
         padding: 4px 10px;

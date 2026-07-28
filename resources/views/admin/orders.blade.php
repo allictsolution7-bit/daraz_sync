@@ -260,37 +260,38 @@
             color: var(--primary);
         }
 
-        /* Modern Table Redesign */
+        /* Modern Table Redesign - OrderFlow Style */
         .table-responsive-wrapper {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow-x: auto;
-            background: #fff;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(200, 196, 213, 0.4) !important;
+            border-radius: 2rem !important;
+            overflow: hidden !important;
+            background: #ffffff !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
         }
 
         table.dataTable {
             border-collapse: collapse !important;
             margin: 0 !important;
+            width: 100% !important;
         }
 
         table.dataTable thead th {
-            background: #f8fafc !important;
-            color: #475569 !important;
-            font-size: 11.5px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 10px 12px !important;
-            border-bottom: 1px solid var(--border-color) !important;
+            background: #f2f4f6 !important;
+            color: #464553 !important;
+            font-size: 11.5px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+            padding: 16px 20px !important;
+            border-bottom: 1px solid rgba(200, 196, 213, 0.3) !important;
         }
 
         table.dataTable tbody td {
-            padding: 8px 12px !important;
+            padding: 16px 18px !important;
             vertical-align: middle !important;
-            border-bottom: 1px solid var(--border-color) !important;
-            font-size: 12.5px;
-            color: #334155;
+            border-bottom: 1px solid rgba(200, 196, 213, 0.15) !important;
+            font-size: 13.5px !important;
+            color: #191c1e !important;
             background-color: #ffffff;
         }
 
@@ -302,7 +303,7 @@
         /* Soft Premium Pastel Backgrounds & Left Border Accents per Status */
         table#Products tbody tr td {
             background-color: #ffffff !important;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.15s ease-in-out;
         }
 
         table#Products tbody tr td:first-child {
@@ -310,12 +311,12 @@
         }
 
         /* Status: Pending (Soft Yellow/Gold) */
-        table#Products tr.order-status-pending td { background-color: #fefdf6 !important; }
-        table#Products tr.order-status-pending td:first-child { border-left-color: #f59e0b !important; }
+        table#Products tr.order-status-pending td { background-color: #fffdfa !important; }
+        table#Products tr.order-status-pending td:first-child { border-left-color: #752c00 !important; }
 
         /* Status: Processing (Soft Indigo/Blue) */
-        table#Products tr.order-status-processing td { background-color: #f7f9fe !important; }
-        table#Products tr.order-status-processing td:first-child { border-left-color: #4f46e5 !important; }
+        table#Products tr.order-status-processing td { background-color: #f7f7fe !important; }
+        table#Products tr.order-status-processing td:first-child { border-left-color: #1f108e !important; }
 
         /* Status: Delivered (Soft Emerald/Green) */
         table#Products tr.order-status-delivered td { background-color: #f5fdf9 !important; }
@@ -331,11 +332,11 @@
 
         /* Status: Cancelled (Soft Rose/Red) */
         table#Products tr.order-status-cancelled td { background-color: #fff6f6 !important; }
-        table#Products tr.order-status-cancelled td:first-child { border-left-color: #ef4444 !important; }
+        table#Products tr.order-status-cancelled td:first-child { border-left-color: #ba1a1a !important; }
 
         /* Status: Call Not Received (Soft Slate/Grey) */
         table#Products tr.order-status-phone_not_rcv td { background-color: #f9fafb !important; }
-        table#Products tr.order-status-phone_not_rcv td:first-child { border-left-color: #6b7280 !important; }
+        table#Products tr.order-status-phone_not_rcv td:first-child { border-left-color: #464553 !important; }
 
         /* Status: Follow up (Soft Orange) */
         table#Products tr.order-status-follow_up td { background-color: #fff9f6 !important; }
@@ -347,31 +348,32 @@
 
         /* Row Hover states */
         table.dataTable tbody tr:hover td {
-            background-color: #f8fafc !important;
+            background-color: #f2f4f6 !important;
             cursor: pointer;
         }
 
-        /* Order Status Badges */
+        /* Order Status Badges - Rounded Pill Design */
         .order-status-badge {
             display: inline-flex;
             align-items: center;
-            padding: 4px 10px;
-            border-radius: 20px;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
             font-weight: 600;
-            font-size: 11px;
+            font-size: 12.5px;
             text-transform: capitalize;
-            border: 1px solid transparent;
+            border: none;
         }
 
-        .order-status-badge.order-status-pending { background: #fef3c7; color: #d97706; border-color: #fde68a; }
-        .order-status-badge.order-status-processing { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
-        .order-status-badge.order-status-delivered { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
-        .order-status-badge.order-status-on_hold { background: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; }
-        .order-status-badge.order-status-shipped { background: #cffafe; color: #155e75; border-color: #a5f3fc; }
-        .order-status-badge.order-status-cancelled { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
-        .order-status-badge.order-status-phone_not_rcv { background: #e5e7eb; color: #374151; border-color: #d1d5db; }
-        .order-status-badge.order-status-follow_up { background: #ffedd5; color: #9a3412; border-color: #fed7aa; }
-        .order-status-badge.order-status-ready_for_delivery { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+        .order-status-badge.order-status-pending { background: #ffdbcc; color: #511c00; }
+        .order-status-badge.order-status-processing { background: #e1e0ff; color: #07006c; }
+        .order-status-badge.order-status-delivered { background: #d1fae5; color: #065f46; }
+        .order-status-badge.order-status-on_hold { background: #f3e8ff; color: #6b21a8; }
+        .order-status-badge.order-status-shipped { background: #cffafe; color: #155e75; }
+        .order-status-badge.order-status-cancelled { background: #ffdad6; color: #93000a; }
+        .order-status-badge.order-status-phone_not_rcv { background: #e0e3e5; color: #191c1e; }
+        .order-status-badge.order-status-follow_up { background: #ffedd5; color: #9a3412; }
+        .order-status-badge.order-status-ready_for_delivery { background: #ccfbf1; color: #0f766e; }
 
         /* Customer Info */
         .customer-info-container {
@@ -417,28 +419,29 @@
             transform: scale(1.05);
         }
 
-        /* Fraud Check badge style */
+        /* Fraud Check badge style - OrderFlow theme */
         .fraud-risk-badge {
-            display: inline-block;
-            font-size: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11.5px;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 2px 8px;
-            border-radius: 12px;
+            text-transform: capitalize;
+            padding: 4px 10px;
+            border-radius: 8px;
             margin-bottom: 4px;
+            border: none !important;
         }
 
-        .fraud-risk-badge.bg-success { background-color: var(--success-light) !important; color: var(--success) !important; border: 1px solid #a7f3d0; }
-        .fraud-risk-badge.bg-warning { background-color: var(--warning-light) !important; color: var(--warning) !important; border: 1px solid #fde68a; }
-        .fraud-risk-badge.bg-danger { background-color: var(--danger-light) !important; color: var(--danger) !important; border: 1px solid #fecaca; }
-        .fraud-risk-badge.bg-info { background-color: var(--info-light) !important; color: var(--info) !important; border: 1px solid #a5f3fc; }
-        .fraud-risk-badge.bg-secondary { background-color: var(--secondary-light) !important; color: var(--secondary) !important; border: 1px solid #e5e7eb; }
+        .fraud-risk-badge.bg-success, .fraud-risk-badge.bg-info { background-color: #e1e0ff !important; color: #07006c !important; }
+        .fraud-risk-badge.bg-warning { background-color: #ffdbcc !important; color: #7a3003 !important; }
+        .fraud-risk-badge.bg-danger { background-color: #ffdad6 !important; color: #93000a !important; }
+        .fraud-risk-badge.bg-secondary { background-color: #e0e3e5 !important; color: #464553 !important; }
 
         .fraud-success-rate {
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 600;
-            color: var(--dark);
+            color: #191c1e;
         }
 
         /* Note field */
@@ -519,12 +522,9 @@
             transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .table-responsive-wrapper,
-        .table-responsive,
-        .dataTables_wrapper,
-        .dataTables_scroll,
-        .dataTables_scrollBody {
-            overflow: visible !important;
+        .table-responsive-wrapper {
+            overflow-x: auto !important;
+            position: relative;
         }
 
         table.dataTable tbody tr.dropdown-active-row {
@@ -797,46 +797,147 @@
             font-size: 10px;
         }
 
-        /* Force proper widths for each column on desktop */
-        @media (min-width: 769px) {
-            #Products thead th:nth-child(1), #Products tbody td:nth-child(1) {
-                width: 40px !important;
-                min-width: 40px !important;
-                max-width: 40px !important;
-            }
-            #Products thead th:nth-child(2), #Products tbody td:nth-child(2) {
-                width: 200px !important;
-                min-width: 180px !important;
-                max-width: 250px !important;
-                white-space: normal !important;
-            }
-            #Products thead th:nth-child(3), #Products tbody td:nth-child(3) {
-                width: 240px !important;
-                min-width: 200px !important;
-                max-width: 300px !important;
-                white-space: normal !important;
-                word-break: break-word !important;
-            }
-            #Products thead th:nth-child(4), #Products tbody td:nth-child(4) {
-                width: 140px !important;
-                min-width: 120px !important;
-                max-width: 160px !important;
-            }
-            #Products thead th:nth-child(5), #Products tbody td:nth-child(5) {
-                width: 140px !important;
-                min-width: 120px !important;
-                max-width: 160px !important;
-            }
-            #Products thead th:nth-child(6), #Products tbody td:nth-child(6) {
-                width: 120px !important;
-                min-width: 100px !important;
-                max-width: 140px !important;
-            }
-            #Products thead th:nth-child(7), #Products tbody td:nth-child(7) {
-                width: 150px !important;
-                min-width: 120px !important;
-                max-width: 180px !important;
-            }
+        }
+
+        /* === COMPACT PRODUCT COLUMN === */
+        .prod-col {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            max-width: 190px;
+            min-width: 150px;
+        }
+        .prod-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1f108e;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+        }
+        .prod-item {
+            margin-top: 2px;
+        }
+        .prod-name {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #191c1e;
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 185px;
+        }
+        .prod-pills {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            flex-wrap: nowrap;
+            margin-top: 2px;
+            overflow: hidden;
+        }
+        .prod-pill {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .prod-pill-var { background: #e1e0ff; color: #1f108e; }
+        .prod-pill-qty { background: #f2f4f6; color: #464553; }
+        .prod-badge-combo {
+            display: inline-block;
+            background: #1f108e;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 4px;
+            margin-left: 4px;
+        }
+        .prod-more {
+            font-size: 10.5px;
+            color: #9e9e9e;
+            margin-top: 1px;
+        }
+
+        /* === TABLE HEADER & STICKY LAST (ACTION) COLUMN === */
+        table#Products {
+            border-collapse: separate !important;
+            border-spacing: 0;
+            width: 100% !important;
+        }
+        table#Products thead th {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            font-size: 11.5px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            padding: 12px 14px !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+            vertical-align: middle !important;
+            white-space: nowrap !important;
+        }
+        table#Products tbody td {
+            vertical-align: middle !important;
+            padding: 12px 14px !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+        table#Products thead th:last-child,
+        table#Products tbody td:last-child {
+            position: sticky !important;
+            right: 0 !important;
+            z-index: 10 !important;
+            box-shadow: -4px 0 10px -2px rgba(0,0,0,0.06);
+        }
+        table#Products thead th:last-child {
+            background-color: #f8fafc !important;
+        }
+        table#Products tbody td:last-child {
+            background-color: #ffffff !important;
+        }
+        table#Products tbody tr.order-status-pending td:last-child { background-color: #fffdfa !important; }
+        table#Products tbody tr.order-status-processing td:last-child { background-color: #f7f7fe !important; }
+        table#Products tbody tr.order-status-delivered td:last-child { background-color: #f5fdf9 !important; }
+        table#Products tbody tr.order-status-on_hold td:last-child { background-color: #faf6fe !important; }
+        table#Products tbody tr.order-status-shipped td:last-child { background-color: #f3fdfd !important; }
+        table#Products tbody tr.order-status-cancelled td:last-child { background-color: #fff6f6 !important; }
+        table#Products tbody tr.order-status-phone_not_rcv td:last-child { background-color: #f9fafb !important; }
+        table#Products tbody tr.order-status-follow_up td:last-child { background-color: #fff9f6 !important; }
+        table#Products tbody tr.order-status-ready_for_delivery td:last-child { background-color: #f2fdfb !important; }
+        table#Products tbody tr:hover td:last-child { background-color: #f2f4f6 !important; }
+
+        /* Note Modal */
+        #noteModal .modal-content {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        #noteModal textarea {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            padding: 12px;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+        #noteModal textarea:focus {
+            border-color: #1f108e;
+            box-shadow: 0 0 0 3px rgba(31,16,142,0.1);
+            outline: none;
+        }
+        #noteModal .btn-save-note {
+            background: #1f108e;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        #noteModal .btn-save-note:hover {
+            background: #160b70;
         }
 
         /* Premium Status Change Modal Styling */
@@ -1228,13 +1329,13 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" id="select-all-orders"></th>
-                        <th>Customer Info</th>
-                        <th>Product Price & Name</th>
-                        <th>Status</th>
-                        <th>Fraud Check</th>
-                        <th>Order at</th>
-                        <th>Note</th>
-                        <th>Actions</th>
+                        <th>Customer Profile</th>
+                        <th>Product &amp; Logistics</th>
+                        <th>Courier</th>
+                        <th>Order Status</th>
+                        <th>Fraud Analysis</th>
+                        <th>Timeline</th>
+                        <th class="text-end">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1244,7 +1345,34 @@
         </div>
     </div>
 
+    <!-- Note Modal -->
+    <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+            <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
+                <div class="modal-header border-0 px-4 py-3" style="background: linear-gradient(135deg, #1f108e 0%, #3730a3 100%);">
+                    <div class="d-flex align-items-center gap-2 text-white">
+                        <i class="fas fa-sticky-note fs-5"></i>
+                        <h5 class="modal-title fw-bold mb-0 text-white" id="noteModalLabel">Order Note</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <label class="form-label fw-semibold text-secondary mb-2" style="font-size: 13px;">Write a note for this order</label>
+                    <textarea id="noteModalTextarea" class="form-control" rows="4" placeholder="Add your note here..."></textarea>
+                    <div id="noteModalFeedback" class="mt-2" style="font-size: 12px;"></div>
+                </div>
+                <div class="modal-footer border-0 px-4 pb-4 pt-0 gap-2">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px; font-size: 14px;">Cancel</button>
+                    <button type="button" class="btn btn-save-note px-4" id="saveNoteBtn">
+                        <i class="fas fa-save me-1"></i> Save Note
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Status Change Modal -->
+
     <div class="modal fade" id="statusChangeModal" tabindex="-1" aria-labelledby="statusChangeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -1579,106 +1707,85 @@
                     }
                 },
                 columns: [
-                    { data: 'select', name: 'select', orderable: false, searchable: false, width: '50px' },
+                    { data: 'select', name: 'select', orderable: false, searchable: false, width: '45px' },
                     { 
                         data: 'customer_info', 
                         name: 'name', 
                         orderable: false, 
                         searchable: true, 
-                        width: '180px',
+                        width: '240px',
                         render: function(data, type, row) {
-                            const name = row.name || '';
+                            const name = row.name || 'Customer';
                             const phone = row.phone || '';
                             const address = row.address || '';
                             const ipAddress = row.ip_address || (row.delivery_data && row.delivery_data.ip) || '';
-                            const editUrl = `/admin/transactions/${row.id}/edit`;
+                            const totalCount = row.total_orders_count || 1;
+                            const isElite = totalCount > 1;
                             
-                            let html = `<div class="customer-info">`;
-                            html += `<div class="customer-name">${name}</div>`;
-                            
-                            // Phone & social icons
+                            let html = `<div class="d-flex flex-column gap-1">`;
                             html += `
-                                <div class="customer-phone d-flex align-items-center gap-2">
-                                    <span>${phone}</span>
-                                    <a href="tel:${phone}" class="text-success" title="Call"><i class="fas fa-phone" style="font-size: 11px;"></i></a>
-                                    <a href="https://wa.me/88${phone.replace(/\D/g, '')}" class="text-success" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp" style="font-size: 13px; color: #25D366;"></i></a>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-bold text-dark" style="font-size: 14px;">${escapeHtml(name)}</span>
+                                    ${isElite ? '<span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 20px;">Elite</span>' : ''}
                                 </div>
                             `;
-                            
-                            // Location Address
-                            if (address) {
+                            if (phone) {
                                 html += `
-                                    <div class="customer-address text-muted d-flex align-items-start gap-1" style="font-size: 11.5px; margin-top: 2px; line-height: 1.2;">
-                                        <i class="fas fa-map-marker-alt text-danger" style="margin-top: 3px; font-size: 11px;"></i>
-                                        <span>${address}</span>
+                                    <div class="text-muted d-flex align-items-center gap-1" style="font-size: 12.5px;">
+                                        <i class="fas fa-phone-alt text-secondary" style="font-size: 11px;"></i>
+                                        <span>${escapeHtml(phone)}</span>
+                                        <a href="tel:${phone}" class="text-success ms-1"><i class="fas fa-phone" style="font-size: 11px;"></i></a>
+                                        <a href="https://wa.me/88${phone.replace(/\D/g, '')}" class="ms-1" target="_blank"><i class="fab fa-whatsapp" style="font-size: 13px; color: #25D366;"></i></a>
                                     </div>
                                 `;
                             }
-                            
-                            // IP and CN
+                            if (address) {
+                                html += `
+                                    <div class="text-muted d-flex align-items-start gap-1" style="font-size: 12px; line-height: 1.3; max-width: 210px;">
+                                        <i class="fas fa-map-marker-alt text-danger" style="margin-top: 2px; font-size: 11px;"></i>
+                                        <span class="text-truncate" title="${escapeHtml(address)}">${escapeHtml(address)}</span>
+                                    </div>
+                                `;
+                            }
                             if (ipAddress) {
-                                html += `<div class="customer-ip text-muted" style="font-size: 10.5px;">IP: ${ipAddress}</div>`;
+                                html += `<div class="mt-1"><span class="text-muted" style="font-size: 10.5px; font-family: monospace;">IP: ${escapeHtml(ipAddress)}</span></div>`;
                             }
-                            
-                            if (row.delivery_data && (row.delivery_data.consignment_id || row.delivery_data.tracking_code)) {
-                                const cnId = row.delivery_data.consignment_id || row.delivery_data.tracking_code;
-                                const trCode = row.delivery_data.tracking_code || row.delivery_data.consignment_id;
-                                const trUrl = row.delivery_data.tracking_url || `https://steadfast.com.bd/tl/${trCode}`;
-                                html += `<div class="courier-cn-id" style="font-size: 10.5px; margin-top: 3px;">
-                                    <a href="${trUrl}" target="_blank" style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 4px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Track on Steadfast">
-                                        <i class="fas fa-truck" style="font-size: 10px;"></i> CN: ${cnId}
-                                        <i class="fas fa-external-link-alt" style="font-size: 8px;"></i>
-                                    </a>
-                                </div>`;
-                            }
-                            // Action icons removed from here
-                            
-                            // History Badges
-                            const totalCount = row.total_orders_count || (phone === '01636008925' ? 2 : 1);
-                            const successCount = row.success_orders_count || (phone === '01636008925' ? 1 : 1);
-                            const cancelCount = row.cancel_orders_count || 0;
-                            const statusLabel = row.status ? row.status.charAt(0).toUpperCase() + row.status.slice(1).replace('_', ' ') : 'Pending';
-                            
-                            html += `
-                                <div class="mt-2 d-flex align-items-center gap-2 flex-wrap" style="font-size: 11px;">
-                                    <span class="badge bg-success-light text-success border-success-subtle d-inline-flex align-items-center gap-1" style="padding: 2px 6px; border-radius: 4px; font-weight: 500; background-color: var(--success-light); border: 1px solid #a7f3d0;">
-                                        <i class="fas fa-shopping-bag"></i> ${totalCount}
-                                    </span>
-                                    <span class="badge bg-info-light text-info border-info-subtle d-inline-flex align-items-center gap-1" style="padding: 2px 6px; border-radius: 4px; font-weight: 500; background-color: var(--info-light); border: 1px solid #a5f3fc;">
-                                        <i class="fas fa-check"></i> ${successCount}
-                                    </span>
-                                    <span class="badge bg-danger-light text-danger border-danger-subtle d-inline-flex align-items-center gap-1" style="padding: 2px 6px; border-radius: 4px; font-weight: 500; background-color: var(--danger-light); border: 1px solid #fecaca;">
-                                        <i class="fas fa-times"></i> ${cancelCount}
-                                    </span>
-                                    <span class="badge bg-secondary-light text-secondary border-secondary-subtle" style="padding: 2px 6px; border-radius: 4px; font-weight: 500; background-color: var(--secondary-light); border: 1px solid #e5e7eb;">
-                                        ${statusLabel}
-                                    </span>
-                                </div>
-                            `;
-                            
                             html += `</div>`;
                             return html;
                         }
                     },
+                    // Product & Logistics — uses server-rendered HTML directly (compact with truncated names)
                     { data: 'product_price_and_name', name: 'total', orderable: false, searchable: true, width: '200px' },
-                    { data: 'status_badge', name: 'status', orderable: false, searchable: false, width: '120px' },
-                    { data: 'fraud_check', name: 'fraud_check', orderable: false, searchable: false, className: 'fraud-check-column', width: '140px' },
-                    { data: 'order_at', name: 'created_at', width: '120px' },
-                    { data: 'note', name: 'admin_note', orderable: false, searchable: true, width: '150px' },
+                    // Courier — uses server-rendered HTML (empty string when no courier sent)
+                    { data: 'courier_column', name: 'courier_column', orderable: false, searchable: false, width: '150px' },
+                    { data: 'status_badge', name: 'status', orderable: false, searchable: false, width: '160px' },
+                    { data: 'fraud_check', name: 'fraud_check', orderable: false, searchable: false, className: 'fraud-check-column', width: '150px' },
+                    { data: 'order_at', name: 'created_at', width: '125px' },
                     { 
                         data: null, 
                         name: 'actions', 
                         orderable: false, 
                         searchable: false, 
-                        width: '180px',
+                        width: '120px',
+                        className: 'text-end',
                         render: function(data, type, row) {
                             const editUrl = `/admin/transactions/${row.id}/edit`;
+                            const hasNote = row.admin_note && row.admin_note.trim().length > 0;
+                            const noteTitle = hasNote ? escapeHtml(row.admin_note) : 'Add Note';
+                            const noteIconColor = hasNote ? '#4f46e5' : '#9e9e9e';
                             let html = `
-                                <div class="d-flex align-items-center gap-2">
-                                    <a href="${editUrl}" title="Edit" class="action-icon-btn text-success"><i class="fas fa-pencil-alt"></i></a>
+                                <div class="d-flex align-items-center justify-content-end gap-2">
+                                    <button type="button" 
+                                        class="action-icon-btn editable-note ${hasNote ? 'has-note' : ''}" 
+                                        data-order-id="${row.id}" 
+                                        title="${noteTitle}"
+                                        style="color: ${noteIconColor};">
+                                        <i class="fas ${hasNote ? 'fa-comment-alt' : 'fa-sticky-note'}"></i>
+                                    </button>
+                                    <a href="${editUrl}" title="Edit" class="action-icon-btn" style="color: #2e7d32;"><i class="fas fa-pencil-alt"></i></a>
                                     <div class="custom-dropdown">
                                         <button class="action-icon-btn custom-dropdown-toggle" type="button" title="More Options">
-                                            <i class="fas fa-ellipsis-h"></i>
+                                            <i class="fas fa-ellipsis-v"></i>
                                         </button>
                                         <ul class="custom-dropdown-menu">
                                             <li><h6 class="custom-dropdown-header"><i class="fas fa-print me-1"></i> Print Options</h6></li>
@@ -1715,8 +1822,8 @@
                 scrollX: true,
                 pageLength: 25,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-                // Sort by "Order at" column (index 5) using numeric data-order timestamp
-                order: [[5, 'desc']]
+                // Sort by "Order at / Timeline" column (index 6) using numeric data-order timestamp
+                order: [[6, 'desc']]
             });
 
             window.ordersDataTable = table;
@@ -1812,7 +1919,59 @@
                 $('tr').removeClass('dropdown-active-row');
             });
 
+            // Note icon click → open modal
+            $(document).on('click', '.editable-note', function(event) {
+                event.stopPropagation();
+                const orderId = $(this).data('order-id');
+                const currentNote = $(this).attr('title') || '';
+                const displayNote = (currentNote === 'Add Note') ? '' : currentNote;
+                $('#noteModal').data('order-id', orderId);
+                $('#noteModalTextarea').val(displayNote);
+                $('#noteModalFeedback').html('');
+                $('#noteModal').modal('show');
+                setTimeout(function() { $('#noteModalTextarea').focus(); }, 300);
+            });
+
+            // Save note button
+            $('#saveNoteBtn').on('click', function() {
+                const orderId = $('#noteModal').data('order-id');
+                const newNote = $('#noteModalTextarea').val().trim();
+                const btn = $(this);
+                btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...').prop('disabled', true);
+
+                $.ajax({
+                    url: '{{ route('admin.orders.updateNote') }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        order_id: orderId,
+                        note: newNote
+                    },
+                    success: function(response) {
+                        btn.html('<i class="fas fa-save me-1"></i> Save Note').prop('disabled', false);
+                        if (response.success) {
+                            $('#noteModal').modal('hide');
+                            // Update the note icon tooltip and color
+                            const noteBtn = $(`.editable-note[data-order-id="${orderId}"]`);
+                            const displayTitle = newNote || 'Add Note';
+                            const hasNote = newNote.length > 0;
+                            noteBtn.attr('title', displayTitle);
+                            noteBtn.css('color', hasNote ? '#4f46e5' : '#9e9e9e');
+                            noteBtn.find('i').attr('class', hasNote ? 'fas fa-comment-alt' : 'fas fa-sticky-note');
+                            $('#noteModalFeedback').html('');
+                        } else {
+                            $('#noteModalFeedback').html('<span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i>' + (response.message || 'Error saving note') + '</span>');
+                        }
+                    },
+                    error: function() {
+                        btn.html('<i class="fas fa-save me-1"></i> Save Note').prop('disabled', false);
+                        $('#noteModalFeedback').html('<span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i> An error occurred. Please try again.</span>');
+                    }
+                });
+            });
+
             // Remove client-side custom filter. Filters are passed with ajax.data
+
 
             // AJAX call to update status (delegated for dynamic rows)
             $(document).on('change', '.status-dropdown', function() {
@@ -1858,66 +2017,15 @@
                 });
             });
 
-            // Editable note functionality (delegated)
+            // Note icon click → open modal
             $(document).on('click', '.editable-note', function(event) {
-                event.stopPropagation(); // Prevent row click
-                
-                // Check if already in edit mode
-                if ($(this).find('input').length > 0) {
-                    return; // Already editing, don't start another edit session
-                }
-                
-                const noteElement = $(this);
-                const orderId = noteElement.data('order-id');
-                const currentNote = noteElement.text().trim() === 'Add Note' ? '' : noteElement.text().trim();
-                
-                // Store the original text for restoration if needed
-                const originalText = noteElement.text().trim();
-                
-                // Replace with input field
-                noteElement.html(`<input type="text" class="editable-note-input" value="${currentNote}" style="width: 100%; padding: 2px; border: 1px solid #197A94; border-radius: 3px;" />`);
-                
-                const inputField = noteElement.find('input');
-                
-                // Focus and select input field
-                inputField.focus().select();
-                
-                // Save on blur or Enter key
-                inputField.on('blur keyup', function(e) {
-                    if (e.type === 'blur' || (e.type === 'keyup' && e.key === 'Enter')) {
-                        const newNote = inputField.val().trim();
-                        
-                        // Update via AJAX
-                        $.ajax({
-                            url: '{{ route('admin.orders.updateNote') }}',
-                            method: 'POST',
-                            data: {
-                                _token: '{{ csrf_token() }}',
-                                order_id: orderId,
-                                note: newNote
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    noteElement.text(newNote || 'Add Note');
-                                } else {
-                                    alert('Error: ' + response.message);
-                                    noteElement.text(originalText);
-                                }
-                            },
-                            error: function() {
-                                alert('An error occurred while updating the note.');
-                                noteElement.text(originalText);
-                            }
-                        });
-                    }
-                });
-                
-                // Handle Escape key to cancel editing
-                inputField.on('keydown', function(e) {
-                    if (e.key === 'Escape') {
-                        noteElement.text(originalText);
-                    }
-                });
+                event.stopPropagation();
+                const orderId = $(this).data('order-id');
+                const currentNote = $(this).attr('title') || '';
+                const displayNote = (currentNote === 'Add Note') ? '' : currentNote;
+                $('#noteModal').data('order-id', orderId);
+                $('#noteModalTextarea').val(displayNote);
+                $('#noteModal').modal('show');
             });
 
             // Offline order sources that can have delayed purchase events

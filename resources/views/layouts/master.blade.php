@@ -1002,31 +1002,10 @@
                 overflow-y: auto !important;
                 top: 65px !important;
                 height: calc(100vh - 65px) !important;
-                padding-bottom: 200px !important;
+                padding-bottom: 20px !important;
             }
             .sidebar-footer {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 240px;
-                background: #ffffff;
-                border-top: 1px solid #e2e8f0;
-                padding: 16px;
-                z-index: 1000;
-                box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.04);
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                transition: transform 0.5s ease;
-                /* Prevent footer from intercepting mouse events on list items below it */
-                pointer-events: none;
-            }
-            /* Re-enable pointer-events only for interactive children inside the footer */
-            .sidebar-footer > * {
-                pointer-events: auto;
-            }
-            .left-menu.hide .sidebar-footer {
-                transform: translateX(-240px);
+                display: none !important;
             }
             .menu-section-toggle {
                 padding: 10px 18px !important;

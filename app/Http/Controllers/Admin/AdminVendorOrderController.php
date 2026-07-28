@@ -31,11 +31,17 @@ class AdminVendorOrderController extends Controller
 
         if ($isSuperAdmin) {
             // Super Admin sees all vendor items
-            return order::whereHas('orderItems', function ($q) {
-                $q->whereNotNull('vendor_id')
-                  ->orWhereHas('product', function ($pq) {
-                      $pq->whereNotNull('vendor_id')
-                         ->orWhereNotNull('parent_product_id');
+            return order::whereIn('id', function ($q) {
+                $q->select('order_id')
+                  ->from('order_items')
+                  ->where(function($sub) {
+                      $sub->whereNotNull('vendor_id')
+                          ->orWhereIn('product_id', function($pq) {
+                              $pq->select('id')
+                                 ->from('products')
+                                 ->whereNotNull('vendor_id')
+                                 ->orWhereNotNull('parent_product_id');
+                          });
                   });
             });
         }
@@ -48,30 +54,38 @@ class AdminVendorOrderController extends Controller
             return order::whereRaw('1 = 0');
         }
 
-        return order::whereHas('orderItems', function ($q) use ($vendorIds, $adminProductIds) {
-            $q->where(function ($subQ) use ($vendorIds, $adminProductIds) {
-                $hasCondition = false;
+        return order::whereIn('id', function ($q) use ($vendorIds, $adminProductIds) {
+            $q->select('order_id')
+              ->from('order_items')
+              ->where(function ($subQ) use ($vendorIds, $adminProductIds) {
+                  $hasCondition = false;
 
-                if (!empty($vendorIds)) {
-                    $subQ->whereIn('vendor_id', $vendorIds)
-                         ->orWhereHas('product', function ($pq) use ($vendorIds) {
-                             $pq->whereIn('vendor_id', $vendorIds);
-                         });
-                    $hasCondition = true;
-                }
+                  if (!empty($vendorIds)) {
+                      $subQ->whereIn('vendor_id', $vendorIds)
+                           ->orWhereIn('product_id', function ($pq) use ($vendorIds) {
+                               $pq->select('id')
+                                  ->from('products')
+                                  ->whereIn('vendor_id', $vendorIds);
+                           });
+                      $hasCondition = true;
+                  }
 
-                if (!empty($adminProductIds)) {
-                    if ($hasCondition) {
-                        $subQ->orWhereHas('product', function ($pq) use ($adminProductIds) {
-                            $pq->whereIn('parent_product_id', $adminProductIds);
-                        });
-                    } else {
-                        $subQ->whereHas('product', function ($pq) use ($adminProductIds) {
-                            $pq->whereIn('parent_product_id', $adminProductIds);
-                        });
-                    }
-                }
-            });
+                  if (!empty($adminProductIds)) {
+                      if ($hasCondition) {
+                          $subQ->orWhereIn('product_id', function ($pq) use ($adminProductIds) {
+                              $pq->select('id')
+                                 ->from('products')
+                                 ->whereIn('parent_product_id', $adminProductIds);
+                          });
+                      } else {
+                          $subQ->whereIn('product_id', function ($pq) use ($adminProductIds) {
+                              $pq->select('id')
+                                 ->from('products')
+                                 ->whereIn('parent_product_id', $adminProductIds);
+                          });
+                      }
+                  }
+              });
         });
     }
 
@@ -79,17 +93,23 @@ class AdminVendorOrderController extends Controller
     {
         $baseQuery = $this->getVendorOrdersQuery();
 
+        $rawCounts = (clone $baseQuery)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
         $statusCounts = [
-            'all' => (clone $baseQuery)->count(),
-            'pending' => (clone $baseQuery)->where('status', 'pending')->count(),
-            'phone_not_rcv' => (clone $baseQuery)->where('status', 'phone_not_rcv')->count(),
-            'follow_up' => (clone $baseQuery)->where('status', 'follow_up')->count(),
-            'processing' => (clone $baseQuery)->where('status', 'processing')->count(),
-            'ready_for_delivery' => (clone $baseQuery)->where('status', 'ready_for_delivery')->count(),
-            'shipped' => (clone $baseQuery)->where('status', 'shipped')->count(),
-            'delivered' => (clone $baseQuery)->where('status', 'delivered')->count(),
-            'on_hold' => (clone $baseQuery)->where('status', 'on_hold')->count(),
-            'cancelled' => (clone $baseQuery)->where('status', 'cancelled')->count(),
+            'all' => array_sum($rawCounts),
+            'pending' => $rawCounts['pending'] ?? 0,
+            'phone_not_rcv' => $rawCounts['phone_not_rcv'] ?? 0,
+            'follow_up' => $rawCounts['follow_up'] ?? 0,
+            'processing' => $rawCounts['processing'] ?? 0,
+            'ready_for_delivery' => $rawCounts['ready_for_delivery'] ?? 0,
+            'shipped' => $rawCounts['shipped'] ?? 0,
+            'delivered' => $rawCounts['delivered'] ?? 0,
+            'on_hold' => $rawCounts['on_hold'] ?? 0,
+            'cancelled' => $rawCounts['cancelled'] ?? 0,
         ];
 
         $orders = collect([]);
@@ -195,16 +215,50 @@ class AdminVendorOrderController extends Controller
                 });
             })
             ->addColumn('product_price_and_name', function ($order) {
-                $amountClass = 'amount-' . ($order->status ?? 'default');
                 $amount = number_format($order->total, 2);
-                $html = '<div class="'.$amountClass.'">৳'.$amount.'</div> - ';
+                $html = '<div class="d-flex flex-column gap-1">';
+                $html .= '<span class="font-title-sm text-primary fw-bold" style="color: #1f108e; font-size: 15px; letter-spacing: -0.01em;">৳ '.$amount.'</span>';
 
                 $titles = [];
                 foreach ($order->orderItems as $item) {
                     $vendorName = $item->vendor->name ?? ($item->product->vendor->name ?? 'Vendor');
-                    $titles[] = e($item->product->title ?? 'Product') . ' <span class="badge bg-warning text-dark font-weight-bold ms-1" style="font-size: 11px; padding: 2px 6px;"><i class="fas fa-store me-1"></i>'.$vendorName.'</span>';
+                    $titles[] = '<span class="text-on-surface" style="font-size: 13px; color: #191c1e; line-height: 1.3;">- '.e($item->product->title ?? 'Product').' <span class="badge bg-warning-subtle text-warning border px-2 py-0.5" style="font-size: 10px;"><i class="fas fa-store me-1"></i>'.$vendorName.'</span></span>';
                 }
                 $html .= implode('<br>', $titles);
+                $html .= '</div>';
+                return $html;
+            })
+            ->addColumn('courier_column', function ($order) {
+                $deliveryData = $order->delivery_data;
+                if (!$deliveryData || empty($deliveryData['courier_provider'])) {
+                    return '';
+                }
+
+                $courierProvider = ucfirst($deliveryData['courier_provider']);
+                $cnId = $deliveryData['consignment_id'] ?? $deliveryData['tracking_code'] ?? '';
+                $trackingCode = $deliveryData['tracking_code'] ?? $deliveryData['consignment_id'] ?? '';
+                $trackUrl = $deliveryData['tracking_url'] ?? ($trackingCode ? 'https://steadfast.com.bd/tl/'.$trackingCode : '#');
+                $courierStatus = $order->courier_status ?? null;
+                $courierStatusUpdated = $order->courier_status_updated_at ?? null;
+
+                $html = '<div class="d-flex flex-column gap-1">';
+                $html .= '<div class="d-flex align-items-center gap-2">';
+                $html .= '<span class="fw-bold text-dark" style="font-size: 13.5px;">'.e($courierProvider).'</span>';
+                if ($cnId) {
+                    $html .= '<a href="'.e($trackUrl).'" target="_blank" class="fw-bold text-decoration-none" style="color: #1f108e; font-size: 11.5px;">Track</a>';
+                }
+                $html .= '</div>';
+
+                if ($cnId) {
+                    $html .= '<span class="text-muted" style="font-size: 11.5px; font-family: monospace;">ID: '.e($cnId).'</span>';
+                }
+
+                if ($courierStatus) {
+                    $html .= '<div class="courier-status-badge mt-1" data-order-id="'.$order->id.'" data-courier="'.e($deliveryData['courier_provider']).'" style="cursor:pointer; display:inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 500;">';
+                    $html .= '<i class="fas fa-truck me-1"></i><span class="courier-status-text">'.e($courierStatus).'</span></div>';
+                }
+
+                $html .= '</div>';
                 return $html;
             })
             ->addColumn('status_badge', function ($order) {
@@ -214,23 +268,16 @@ class AdminVendorOrderController extends Controller
                 }
 
                 $statusHtml = '<div class="order-status-container">
-                    <span class="order-status-badge order-status-'.e($order->status).' change-status-btn" data-order-id="'.$order->id.'" data-current-status="'.e($order->status).'" data-payment-method="'.e($order->payment_method).'" data-order-source="'.e($order->order_source ?? '').'" style="cursor:pointer;">'.$text.' <i class="fas fa-chevron-down" style="font-size: 12px; opacity: 0.7;"></i></span>';
-                
-                if (isset($order->delivery_data['courier_provider'])) {
-                    $courierProvider = $order->delivery_data['courier_provider'];
-                    $courierStatus = $order->courier_status;
-                    
-                    $statusHtml .= '<div class="courier-status-container mt-1"><div class="courier-status-display"><div class="courier-status-badge" data-order-id="'.$order->id.'" data-courier="'.$courierProvider.'" style="cursor: pointer; display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 500;"><i class="fas fa-truck me-1"></i><span>'.e($courierStatus ?? 'Check Status').'</span></div></div></div>';
-                }
-                
+                    <span class="order-status-badge order-status-'.e($order->status).' change-status-btn shadow-sm" data-order-id="'.$order->id.'" data-current-status="'.e($order->status).'" data-payment-method="'.e($order->payment_method).'" data-order-source="'.e($order->order_source ?? '').'" style="cursor:pointer;">'.$text.' <i class="fas fa-chevron-down" style="font-size: 11px; opacity: 0.8;"></i></span>';
+
                 $assignee = $order->assignedStaff;
                 $assigneeName = $assignee?->name ?? 'Unassigned';
                 $assignedLabel = $assignee ? 'Assigned To' : 'Unassigned';
 
                 $statusHtml .= '<div class="assigned-user-profile d-flex align-items-center gap-2 mt-2">
                     <div class="assigned-user-details">
-                        <div class="assigned-user-name" style="margin-bottom:-4px;">'.e($assigneeName).'</div>
-                        <small class="text-muted">'.$assignedLabel.'</small>
+                        <div class="assigned-user-name" style="margin-bottom:-4px; font-size: 11.5px; font-weight: 600; color: #191c1e;">'.e($assigneeName).'</div>
+                        <small class="text-muted" style="font-size: 10px;">'.$assignedLabel.'</small>
                     </div>
                 </div>';
 
@@ -244,7 +291,7 @@ class AdminVendorOrderController extends Controller
                     $badge = $fraudCheckResult->risk_level_badge_class;
                     $display = $fraudCheckResult->risk_level_display;
                     $rate = $fraudCheckResult->success_rate_display;
-                    return '<div class="fraud-check-info fraud-check-column"><span class="'.$badge.' fraud-risk-badge">'.$display.'</span><div class="fraud-success-rate">'.$rate.'</div></div>';
+                    return '<div class="fraud-check-info fraud-check-column"><span class="'.$badge.' fraud-risk-badge">'.$display.'</span><div class="fraud-success-rate" style="font-size: 12px; font-weight: 600; color: #191c1e;">'.$rate.'</div></div>';
                 } elseif ($canCheckFraud) {
                     return '<div class="fraud-check-loading fraud-check-column" data-order-id="'.$order->id.'" data-phone="'.e($order->phone).'"><i class="fas fa-spinner fa-spin text-muted"></i> <small class="text-muted">Checking...</small></div>';
                 }
@@ -254,16 +301,12 @@ class AdminVendorOrderController extends Controller
                 $ts = $order->created_at->timestamp;
                 $date = $order->created_at->format('m-d-y');
                 $time = $order->created_at->format('h:i:s A');
-                return '<span data-order="'.$ts.'"><div style="line-height: 1.2;"><div style="font-weight: 500; color: #333;">'.$date.'</div><div style="font-weight: 500;font-size: 12px; color: #666;">'.$time.'</div></div></span>';
-            })
-            ->addColumn('note', function ($order) {
-                $note = $order->admin_note ?? 'Add Note';
-                return '<span class="editable-note" data-order-id="'.$order->id.'">'.e($note).'</span>';
+                return '<span data-order="'.$ts.'"><div style="line-height: 1.3;"><div style="font-weight: 500; color: #191c1e; font-size: 13.5px;">'.$date.'</div><div style="font-weight: 400; font-size: 12px; color: #464553;">'.$time.'</div></div></span>';
             })
             ->setRowClass(function ($order) {
                 return 'order-status-' . $order->status;
             })
-            ->rawColumns(['select', 'customer_info', 'product_price_and_name', 'status_badge', 'fraud_check', 'order_at', 'note'])
+            ->rawColumns(['select', 'customer_info', 'product_price_and_name', 'courier_column', 'status_badge', 'fraud_check', 'order_at'])
             ->make(true);
     }
 }

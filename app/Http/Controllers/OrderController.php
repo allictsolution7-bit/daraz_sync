@@ -21,11 +21,17 @@ class OrderController extends Controller
      */
     protected function withoutVendorOrders($query)
     {
-        return $query->whereDoesntHave('orderItems', function ($q) {
-            $q->whereNotNull('vendor_id')
-              ->orWhereHas('product', function ($pq) {
-                  $pq->whereNotNull('vendor_id')
-                    ->orWhereNotNull('parent_product_id');
+        return $query->whereNotIn('id', function($q) {
+            $q->select('order_id')
+              ->from('order_items')
+              ->where(function($sub) {
+                  $sub->whereNotNull('vendor_id')
+                      ->orWhereIn('product_id', function($pq) {
+                          $pq->select('id')
+                             ->from('products')
+                             ->whereNotNull('vendor_id')
+                             ->orWhereNotNull('parent_product_id');
+                      });
               });
         });
     }
@@ -58,8 +64,10 @@ class OrderController extends Controller
             return $query->whereRaw('1 = 0');
         }
 
-        return $query->whereHas('orderItems', function ($q) use ($adminProductIds) {
-            $q->whereIn('product_id', $adminProductIds);
+        return $query->whereIn('id', function($q) use ($adminProductIds) {
+            $q->select('order_id')
+              ->from('order_items')
+              ->whereIn('product_id', $adminProductIds);
         });
     }
 
@@ -70,18 +78,24 @@ class OrderController extends Controller
     {
         $baseQuery = $this->withoutVendorOrders($this->scopeForAdminUser(order::query()));
 
-        // Get counts per status
+        // Get counts per status in a single aggregate query
+        $rawCounts = (clone $baseQuery)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
         $statusCounts = [
-            'all' => (clone $baseQuery)->count(),
-            'pending' => (clone $baseQuery)->where('status', 'pending')->count(),
-            'phone_not_rcv' => (clone $baseQuery)->where('status', 'phone_not_rcv')->count(),
-            'follow_up' => (clone $baseQuery)->where('status', 'follow_up')->count(),
-            'processing' => (clone $baseQuery)->where('status', 'processing')->count(),
-            'ready_for_delivery' => (clone $baseQuery)->where('status', 'ready_for_delivery')->count(),
-            'shipped' => (clone $baseQuery)->where('status', 'shipped')->count(),
-            'delivered' => (clone $baseQuery)->where('status', 'delivered')->count(),
-            'on_hold' => (clone $baseQuery)->where('status', 'on_hold')->count(),
-            'cancelled' => (clone $baseQuery)->where('status', 'cancelled')->count(),
+            'all' => array_sum($rawCounts),
+            'pending' => $rawCounts['pending'] ?? 0,
+            'phone_not_rcv' => $rawCounts['phone_not_rcv'] ?? 0,
+            'follow_up' => $rawCounts['follow_up'] ?? 0,
+            'processing' => $rawCounts['processing'] ?? 0,
+            'ready_for_delivery' => $rawCounts['ready_for_delivery'] ?? 0,
+            'shipped' => $rawCounts['shipped'] ?? 0,
+            'delivered' => $rawCounts['delivered'] ?? 0,
+            'on_hold' => $rawCounts['on_hold'] ?? 0,
+            'cancelled' => $rawCounts['cancelled'] ?? 0,
         ];
         
         // Create empty collection for view compatibility (DataTables will load via AJAX)
@@ -101,18 +115,24 @@ class OrderController extends Controller
         // Base query for counts - only my assigned orders
         $baseQuery = $this->withoutVendorOrders($this->scopeForAdminUser(order::where('assigned_to', Auth::id())));
 
-        // Get counts per status
+        // Get counts per status in a single aggregate query
+        $rawCounts = (clone $baseQuery)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
         $statusCounts = [
-            'all' => (clone $baseQuery)->count(),
-            'pending' => (clone $baseQuery)->where('status', 'pending')->count(),
-            'phone_not_rcv' => (clone $baseQuery)->where('status', 'phone_not_rcv')->count(),
-            'follow_up' => (clone $baseQuery)->where('status', 'follow_up')->count(),
-            'processing' => (clone $baseQuery)->where('status', 'processing')->count(),
-            'ready_for_delivery' => (clone $baseQuery)->where('status', 'ready_for_delivery')->count(),
-            'shipped' => (clone $baseQuery)->where('status', 'shipped')->count(),
-            'delivered' => (clone $baseQuery)->where('status', 'delivered')->count(),
-            'on_hold' => (clone $baseQuery)->where('status', 'on_hold')->count(),
-            'cancelled' => (clone $baseQuery)->where('status', 'cancelled')->count(),
+            'all' => array_sum($rawCounts),
+            'pending' => $rawCounts['pending'] ?? 0,
+            'phone_not_rcv' => $rawCounts['phone_not_rcv'] ?? 0,
+            'follow_up' => $rawCounts['follow_up'] ?? 0,
+            'processing' => $rawCounts['processing'] ?? 0,
+            'ready_for_delivery' => $rawCounts['ready_for_delivery'] ?? 0,
+            'shipped' => $rawCounts['shipped'] ?? 0,
+            'delivered' => $rawCounts['delivered'] ?? 0,
+            'on_hold' => $rawCounts['on_hold'] ?? 0,
+            'cancelled' => $rawCounts['cancelled'] ?? 0,
         ];
         
         // Create empty collection for view compatibility (DataTables will load via AJAX)
@@ -164,7 +184,15 @@ class OrderController extends Controller
      */
     public function data(Request $request)
     {
-        $query = order::with(['products', 'fraudCheckResult', 'assignedStaff', 'pendingPurchaseEvent']);
+        $query = order::with([
+            'order_items.product',
+            'order_items.variationCombination',
+            'comboOffer', // needed for combo order title (no extra query per row)
+            'fraudCheckResult',
+            'assignedStaff',
+            'pendingPurchaseEvent',
+        ])
+        ->select('orders.*'); // ensure only orders columns are selected for DataTables
         $query = $this->scopeForAdminUser($query);
         $query = $this->withoutVendorOrders($query);
 
@@ -251,34 +279,19 @@ class OrderController extends Controller
                 $productInfo = '<div class="'.$amountClass.'">৳'.$amount.'</div>';
                 
                 if ($order->is_combo_order && $order->combo_offer_id) {
-                    $comboOffer = \App\Models\ComboOffer::find($order->combo_offer_id);
-                    $comboSelections = $order->combo_selections;
-                    if (is_string($comboSelections)) {
-                        $comboSelections = json_decode($comboSelections, true);
-                    }
+                    $comboOffer = $order->comboOffer;
                     if ($comboOffer) {
-                        $productInfo .= '<div class="combo-order-display"><strong>'.e($comboOffer->title).'</strong> <span class="badge bg-primary ms-1">COMBO</span>';
-                        if ($comboSelections && is_array($comboSelections)) {
-                            $productInfo .= '<div class="combo-selections-list" style="font-size: 12px; color: #666; margin-top: 2px;">';
-                            foreach ($comboSelections as $selection) {
-                                $selectedProduct = \App\Models\Product::find($selection['product_id'] ?? null);
-                                $selectedVariation = \App\Models\VariationCombination::find($selection['variation_id'] ?? null);
-                                if ($selectedProduct) {
-                                    $productInfo .= '<div>• '.e($selectedProduct->title);
-                                    if ($selectedVariation) {
-                                        $productInfo .= ' ('.e($selectedVariation->display_name).')';
-                                    }
-                                    $productInfo .= '</div>';
-                                }
-                            }
-                            $productInfo .= '</div>';
-                        }
-                        $productInfo .= '</div>';
+                        $productInfo .= '<div class="combo-order-display"><strong>'.e($comboOffer->title).'</strong> <span class="badge bg-primary ms-1">COMBO</span></div>';
                     }
                 } else {
                     $titles = [];
-                    foreach ($order->products as $product) {
-                        $titles[] = e($product->title);
+                    foreach ($order->order_items->take(2) as $item) {
+                        if ($item->product) {
+                            $titles[] = e($item->product->title);
+                        }
+                    }
+                    if ($order->order_items->count() > 2) {
+                        $titles[] = '+'.($order->order_items->count() - 2).' more';
                     }
                     $productInfo .= implode('<br>', $titles);
                 }
@@ -292,52 +305,53 @@ class OrderController extends Controller
                 });
             })
             ->addColumn('product_price_and_name', function ($order) {
-                $amountClass = 'amount-' . ($order->status ?? 'default');
                 $amount = number_format($order->total, 2);
-                $html = '<div class="'.$amountClass.'">৳'.$amount.'</div> - ';
+                $html = '<div class="prod-col">';
+                $html .= '<span class="prod-price">৳ '.$amount.'</span>';
 
                 if ($order->is_combo_order && $order->combo_offer_id) {
-                    $comboOffer = \App\Models\ComboOffer::find($order->combo_offer_id);
-                    $comboSelections = $order->combo_selections;
-                    if (is_string($comboSelections)) {
-                        $comboSelections = json_decode($comboSelections, true);
-                    }
-                    if ($comboOffer) {
-                        $html .= '<div class="combo-order-display"><strong>'.e($comboOffer->title).'</strong> <span class="badge bg-primary ms-1">COMBO</span>';
-                        if ($comboSelections && is_array($comboSelections)) {
-                            $html .= '<div class="combo-selections-list" style="font-size: 12px; color: #666; margin-top: 2px;">';
-                            foreach ($comboSelections as $selection) {
-                                $selectedProduct = \App\Models\Product::find($selection['product_id'] ?? null);
-                                $selectedVariation = \App\Models\VariationCombination::find($selection['variation_id'] ?? null);
-                                if ($selectedProduct) {
-                                    $html .= '<div>• '.e($selectedProduct->title);
-                                    if ($selectedVariation) {
-                                        $html .= ' ('.e($selectedVariation->display_name).')';
-                                    }
-                                    $html .= '</div>';
-                                }
+                    // Combo: use eager loaded comboOffer relation (no N+1)
+                    $comboTitle = e($order->comboOffer?->title ?? 'Combo Order');
+                    $html .= '<div class="prod-name">'.$comboTitle.' <span class="prod-badge-combo">COMBO</span></div>';
+                } else {
+                    $items = $order->order_items;
+                    $shown = $items->take(2);
+                    foreach ($shown as $item) {
+                        $productTitle = $item->product ? e($item->product->title) : '–';
+                        $html .= '<div class="prod-item">';
+                        $html .= '<div class="prod-name" title="'.$productTitle.'">'.$productTitle.'</div>';
+                        // Variation + Qty pills on one line
+                        $pills = [];
+                        if ($item->variationCombination && $item->variationCombination->display_name) {
+                            foreach (explode(',', $item->variationCombination->display_name) as $attr) {
+                                $attr = trim($attr);
+                                if ($attr) $pills[] = '<span class="prod-pill prod-pill-var">'.$attr.'</span>';
                             }
-                            $html .= '</div>';
+                        }
+                        if ($item->qty > 0) {
+                            $pills[] = '<span class="prod-pill prod-pill-qty">×'.$item->qty.'</span>';
+                        }
+                        if ($pills) {
+                            $html .= '<div class="prod-pills">'.implode('', $pills).'</div>';
                         }
                         $html .= '</div>';
                     }
-                } else {
-                    $titles = [];
-                    foreach ($order->products as $product) {
-                        $titles[] = e($product->title);
+                    $extra = $items->count() - 2;
+                    if ($extra > 0) {
+                        $html .= '<div class="prod-more">+'.$extra.' more item'.($extra > 1 ? 's' : '').'</div>';
                     }
-                    $html .= implode('<br>', $titles);
                 }
-
+                $html .= '</div>';
                 return $html;
             })
             ->filterColumn('total', function($query, $keyword) {
                 $query->where(function($q) use ($keyword) {
-                    // Search in related products
-                    $q->whereHas('products', function($subQ) use ($keyword) {
-                        $subQ->where('title', 'like', "%{$keyword}%");
+                    $q->whereIn('id', function($subQ) use ($keyword) {
+                        $subQ->select('order_id')
+                             ->from('order_items')
+                             ->join('products', 'products.id', '=', 'order_items.product_id')
+                             ->where('products.title', 'like', "%{$keyword}%");
                     })
-                    // Search in combo offers
                     ->orWhereHas('comboOffer', function($subQ) use ($keyword) {
                         $subQ->where('title', 'like', "%{$keyword}%");
                     });
@@ -350,49 +364,10 @@ class OrderController extends Controller
                     $text = 'Ready Delivery';
                 }
 
+                // Only the order status pill + assignee — courier info moved to courier_column
                 $statusHtml = '<div class="order-status-container">
-                    <span class="order-status-badge order-status-'.e($order->status).' change-status-btn" data-order-id="'.$order->id.'" data-current-status="'.e($order->status).'" data-payment-method="'.e($order->payment_method).'" data-order-source="'.e($order->order_source ?? '').'" style="cursor:pointer;">'.$text.' <i class="fas fa-chevron-down" style="font-size: 12px; opacity: 0.7;"></i></span>';
-                
-                // Add courier status if order is sent to courier and has a valid consignment
-                $hasValidConsignment = !empty($order->delivery_data['consignment_id']) || !empty($order->delivery_data['tracking_code']);
-                if (isset($order->delivery_data['courier_provider']) && $hasValidConsignment) {
-                    $courierProvider = $order->delivery_data['courier_provider'];
-                    $courierStatus = $order->courier_status;
-                    $courierStatusUpdated = $order->courier_status_updated_at;
-                    
-                    $statusHtml .= '<div class="courier-status-container mt-1">
-                        <div class="courier-status-display">';
-                    
-                    if ($courierStatus) {
-                        // Get colors based on status
-                        $statusColors = $this->getCourierStatusColors(strtolower($courierStatus));
-                        
-                        $statusHtml .= '<div class="courier-status-badge" data-order-id="'.$order->id.'" data-courier="'.$courierProvider.'" style="cursor: pointer; display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; background: '.$statusColors['bg'].'; color: '.$statusColors['text'].'; border: 1px solid '.$statusColors['border'].'; font-weight: 500;">
-                            <i class="fas fa-truck me-1"></i>
-                            <span class="courier-status-text">'.e($courierStatus).'</span>
-                            <i class="fas fa-sync-alt ms-1" style="font-size: 10px;"></i>
-                        </div>';
-                        
-                        if ($courierStatusUpdated) {
-                            $updatedTime = is_string($courierStatusUpdated) ? \Carbon\Carbon::parse($courierStatusUpdated) : $courierStatusUpdated;
-                            $statusHtml .= '<small class="text-muted d-block" style="font-size: 10px;margin-top:-3px;">Updated '.$updatedTime->diffForHumans().'</small>';
-                        }
-                    } else {
-                        $statusHtml .= '<div class="courier-status-badge" data-order-id="'.$order->id.'" data-courier="'.$courierProvider.'" style="cursor: pointer; display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; background: #fff3e0; color: #f57c00; border: 1px solid #ffb74d; font-weight: 500;">
-                            <i class="fas fa-truck me-1"></i>
-                            <span class="courier-status-text">Check Status</span>
-                            <i class="fas fa-sync-alt ms-1" style="font-size: 10px;"></i>
-                        </div>';
-                    }
-                    
-                    $statusHtml .= '<div class="courier-provider-name" style="font-size: 10px;color: #666; margin-top:-7px;">
-                        <i class="fas fa-shipping-fast me-1"></i>
-                        '.ucfirst($courierProvider).'
-                    </div>
-                </div>
-            </div>';
-                }
-                
+                    <span class="order-status-badge order-status-'.e($order->status).' change-status-btn shadow-sm" data-order-id="'.$order->id.'" data-current-status="'.e($order->status).'" data-payment-method="'.e($order->payment_method).'" data-order-source="'.e($order->order_source ?? '').'" style="cursor:pointer;">'.$text.' <i class="fas fa-chevron-down" style="font-size: 11px; opacity: 0.8;"></i></span>';
+
                 $assignee = $order->assignedStaff;
                 $assigneeName = $assignee?->name ?? 'Unassigned';
                 $profilePhoto = $assignee?->profile_photo_path ?? $assignee?->image ?? null;
@@ -408,10 +383,10 @@ class OrderController extends Controller
                 $assignedLabel = $assignee ? 'Assigned To' : 'Unassigned';
 
                 $statusHtml .= '<div class="assigned-user-profile d-flex align-items-center gap-2 mt-2">
-                    <img src="'.e($avatarSrc).'" alt="'.e($assigneeName).'" class="user-img">
+                    <img src="'.e($avatarSrc).'" alt="'.e($assigneeName).'" class="user-img" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
                     <div class="assigned-user-details">
-                        <div class="assigned-user-name" style="margin-bottom:-4px;">'.e($assigneeName).'</div>
-                        <small class="text-muted">'.$assignedLabel.'</small>
+                        <div class="assigned-user-name" style="margin-bottom:-4px; font-size: 11.5px; font-weight: 600; color: #191c1e;">'.e($assigneeName).'</div>
+                        <small class="text-muted" style="font-size: 10px;">'.$assignedLabel.'</small>
                     </div>
                 </div>';
 
@@ -427,11 +402,54 @@ class OrderController extends Controller
                     $rate = $fraudCheckResult->success_rate_display;
                     $stale = $fraudCheckResult->isStale();
                     $time = $fraudCheckResult->last_checked_at?->diffForHumans();
-                    return '<div class="fraud-check-info fraud-check-column"><span class="'.$badge.' fraud-risk-badge">'.$display.'</span><div class="fraud-success-rate">'.$rate.'</div>'.($stale ? '<small class="text-warning">(Stale - '.$time.')</small>' : '<small class="text-muted">('.$time.')</small>').'</div>';
+                    return '<div class="fraud-check-info fraud-check-column"><span class="'.$badge.' fraud-risk-badge">'.$display.'</span><div class="fraud-success-rate" style="font-size: 12px; font-weight: 600; color: #191c1e;">'.$rate.'</div>'.($stale ? '<small class="text-warning" style="font-size: 10.5px;">(Stale - '.$time.')</small>' : '<small class="text-muted" style="font-size: 10.5px;">('.$time.')</small>').'</div>';
                 } elseif ($canCheckFraud) {
                     return '<div class="fraud-check-loading fraud-check-column" data-order-id="'.$order->id.'" data-phone="'.e($order->phone).'"><i class="fas fa-spinner fa-spin text-muted"></i> <small class="text-muted">Checking...</small></div>';
                 }
                 return '<div class="fraud-check-missing fraud-check-column"><small class="text-muted">No data</small><button class="btn btn-sm btn-outline-secondary check-fraud-cache-btn" data-order-id="'.$order->id.'" data-phone="'.e($order->phone).'" title="Check from cache"><i class="fas fa-database"></i></button></div>';
+            })
+            ->addColumn('courier_column', function ($order) {
+                $deliveryData = $order->delivery_data;
+                if (!$deliveryData || empty($deliveryData['courier_provider'])) {
+                    return '';
+                }
+
+                $courierProvider = ucfirst($deliveryData['courier_provider']);
+                $cnId = $deliveryData['consignment_id'] ?? $deliveryData['tracking_code'] ?? '';
+                $trackingCode = $deliveryData['tracking_code'] ?? $deliveryData['consignment_id'] ?? '';
+                $trackUrl = $deliveryData['tracking_url'] ?? ($trackingCode ? 'https://steadfast.com.bd/tl/'.$trackingCode : '#');
+                $courierStatus = $order->courier_status ?? null;
+                $courierStatusUpdated = $order->courier_status_updated_at ?? null;
+
+                $html = '<div class="d-flex flex-column gap-1">';
+
+                // Courier name + Track link
+                $html .= '<div class="d-flex align-items-center gap-2">';
+                $html .= '<span class="fw-bold text-dark" style="font-size: 13.5px;">'.e($courierProvider).'</span>';
+                if ($cnId) {
+                    $html .= '<a href="'.e($trackUrl).'" target="_blank" class="fw-bold text-decoration-none" style="color: #1f108e; font-size: 11.5px;">Track</a>';
+                }
+                $html .= '</div>';
+
+                // CN ID
+                if ($cnId) {
+                    $html .= '<span class="text-muted" style="font-size: 11.5px; font-family: monospace;">ID: '.e($cnId).'</span>';
+                }
+
+                // Courier delivery status badge (Order Created / In Transit / etc.)
+                if ($courierStatus) {
+                    $statusColors = $this->getCourierStatusColors(strtolower($courierStatus));
+                    $html .= '<div class="courier-status-badge mt-1" data-order-id="'.$order->id.'" data-courier="'.e($deliveryData['courier_provider']).'" style="cursor:pointer; display:inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; background: '.$statusColors['bg'].'; color: '.$statusColors['text'].'; border: 1px solid '.$statusColors['border'].'; font-weight: 500;">';
+                    $html .= '<i class="fas fa-truck me-1"></i><span class="courier-status-text">'.e($courierStatus).'</span>';
+                    $html .= '<i class="fas fa-sync-alt ms-1" style="font-size: 10px;"></i></div>';
+                    if ($courierStatusUpdated) {
+                        $updatedTime = is_string($courierStatusUpdated) ? \Carbon\Carbon::parse($courierStatusUpdated) : $courierStatusUpdated;
+                        $html .= '<small class="text-muted d-block" style="font-size: 10px;">Updated '.$updatedTime->diffForHumans().'</small>';
+                    }
+                }
+
+                $html .= '</div>';
+                return $html;
             })
             ->addColumn('order_at', function ($order) {
                 $ts = $order->created_at->timestamp;
@@ -443,24 +461,20 @@ class OrderController extends Controller
                 $event = $order->pendingPurchaseEvent;
                 if ($event) {
                     if ($event->isFired()) {
-                        $eventIcon = '<div style="margin-top: 3px;" title="Purchase event sent at '.$event->fired_at->format('m-d-y h:i A').'"><i class="fas fa-chart-line" style="font-size: 11px; color: #2e7d32;"></i> <span style="font-size: 10px; color: #2e7d32; font-weight: 500;">Event Sent</span></div>';
+                        $eventIcon = '<div style="margin-top: 3px;" title="Purchase event sent at '.$event->fired_at->format('m-d-y h:i A').'"><i class="fas fa-chart-line" style="font-size: 11px; color: #10b981;"></i> <span style="font-size: 10.5px; color: #10b981; font-weight: 600;">Event Sent</span></div>';
                     } elseif ($event->fire_failed) {
-                        $eventIcon = '<div style="margin-top: 3px;" title="Purchase event failed: '.e($event->fire_error).'"><i class="fas fa-chart-line" style="font-size: 11px; color: #c62828;"></i> <span style="font-size: 10px; color: #c62828; font-weight: 500;">Event Failed</span></div>';
+                        $eventIcon = '<div style="margin-top: 3px;" title="Purchase event failed: '.e($event->fire_error).'"><i class="fas fa-chart-line" style="font-size: 11px; color: #ba1a1a;"></i> <span style="font-size: 10.5px; color: #ba1a1a; font-weight: 600;">Event Failed</span></div>';
                     } else {
-                        $eventIcon = '<div style="margin-top: 3px;" title="Purchase event pending"><i class="fas fa-chart-line" style="font-size: 11px; color: #f57c00;"></i> <span style="font-size: 10px; color: #f57c00; font-weight: 500;">Event Pending</span></div>';
+                        $eventIcon = '<div style="margin-top: 3px;" title="Purchase event pending"><i class="fas fa-chart-line" style="font-size: 11px; color: #f97316;"></i> <span style="font-size: 10.5px; color: #f97316; font-weight: 600;">Event Pending</span></div>';
                     }
                 }
 
-                return '<span data-order="'.$ts.'"><div style="line-height: 1.2;"><div style="font-weight: 500; color: #333;">'.$date.'</div><div style="font-weight: 500;font-size: 12px; color: #666;">'.$time.'</div>'.$eventIcon.'</div></span>';
-            })
-            ->addColumn('note', function ($order) {
-                $note = $order->admin_note ?? 'Add Note';
-                return '<span class="editable-note" data-order-id="'.$order->id.'">'.e($note).'</span>';
+                return '<span data-order="'.$ts.'"><div style="line-height: 1.3;"><div style="font-weight: 500; color: #191c1e; font-size: 13.5px;">'.$date.'</div><div style="font-weight: 400; font-size: 12px; color: #464553;">'.$time.'</div>'.$eventIcon.'</div></span>';
             })
             ->setRowClass(function ($order) {
                 return 'order-status-' . $order->status;
             })
-            ->rawColumns(['select','customer_info','product_price_and_name','status_badge','fraud_check','order_at','note'])
+            ->rawColumns(['select','customer_info','product_price_and_name','status_badge','fraud_check','courier_column','order_at'])
             ->toJson();
     }
 
