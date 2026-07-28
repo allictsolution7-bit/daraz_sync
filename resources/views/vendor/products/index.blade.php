@@ -2,23 +2,245 @@
 
 @section('title', 'My Products')
 
+@push('styles')
+<style>
+    .page-header-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+    }
+
+    .nav-pills-modern {
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 12px;
+    }
+
+    .nav-pills-modern .nav-link {
+        border-radius: 9px;
+        padding: 6px 14px;
+        font-weight: 600;
+        font-size: 0.825rem;
+        color: #64748b;
+        transition: all 0.2s ease;
+    }
+
+    .nav-pills-modern .nav-link.active {
+        background: #ffffff;
+        color: #4f46e5;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-card-modern {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+        transition: all 0.2s ease;
+    }
+
+    .filter-label {
+        font-size: 0.725rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #64748b;
+        margin-bottom: 5px;
+    }
+
+    .modern-form-control, .modern-form-select {
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        font-size: 0.85rem;
+        color: #1e293b;
+        font-weight: 500;
+        padding: 0.4rem 0.75rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .modern-form-control:focus, .modern-form-select:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+        outline: none;
+    }
+
+    .btn-gradient-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+        color: #ffffff;
+        border: none;
+        font-weight: 600;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.22);
+        transition: all 0.2s ease;
+    }
+
+    .btn-gradient-primary:hover {
+        background: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
+        color: #ffffff;
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        transform: translateY(-1px);
+    }
+
+    .btn-gradient-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #ffffff;
+        border: none;
+        font-weight: 600;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.22);
+        transition: all 0.2s ease;
+    }
+
+    .btn-gradient-success:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: #ffffff;
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+        transform: translateY(-1px);
+    }
+
+    .btn-gradient-blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: #ffffff;
+        border: none;
+        font-weight: 600;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+        transition: all 0.2s ease;
+    }
+
+    .btn-gradient-blue:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: #ffffff;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-modern {
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #475569;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-outline-modern:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        color: #1e293b;
+    }
+
+    .bulk-action-bar {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1rem;
+    }
+
+    .table-modern {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+
+    .table-modern thead th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 0.725rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 14px 16px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .table-modern tbody tr {
+        transition: all 0.15s ease-in-out;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f8fafc !important;
+    }
+
+    .table-modern tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    .copied-badge-pill {
+        background: #ecfdf5;
+        color: #059669;
+        border: 1px solid #a7f3d0;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-weight: 700;
+        font-size: 0.78rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .stock-badge-pill {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        border-radius: 20px;
+        padding: 3px 10px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .stock-dot {
+        width: 7px;
+        height: 7px;
+        background-color: #22c55e;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .cat-tag {
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 0.725rem;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+<!-- Page Header -->
+<div class="page-header-card p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
     <div class="d-flex align-items-center gap-3">
-        <h4 class="mb-0 fw-bold text-dark fs-5"><i class="fas fa-box me-1 text-primary"></i> {{ ($source ?? 'my_products') === 'admin_products' ? 'Parent Admin Catalog' : 'My Products' }}</h4>
+        <div class="d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-3 p-2" style="width: 42px; height: 42px;">
+            <i class="fas fa-boxes fs-5 text-primary"></i>
+        </div>
+        <div>
+            <h4 class="mb-0 fw-bold text-dark fs-5">{{ ($source ?? 'my_products') === 'admin_products' ? 'Parent Admin Catalog' : 'My Products' }}</h4>
+            <small class="text-muted">Manage your store inventory & catalog items</small>
+        </div>
         
         @if($canAccessAdminProducts ?? false)
-        <ul class="nav nav-pills border-0 bg-light p-1 rounded-3">
+        <ul class="nav nav-pills-modern ms-2">
             <li class="nav-item">
-                <a class="nav-link py-1 px-3 fw-bold small {{ ($source ?? 'my_products') === 'my_products' ? 'active bg-white text-primary shadow-sm' : 'text-secondary' }}" 
+                <a class="nav-link {{ ($source ?? 'my_products') === 'my_products' ? 'active' : '' }}" 
                    href="{{ route('vendor.products.index', ['source' => 'my_products']) }}">
-                    <i class="fas fa-boxes me-1"></i> My Products
+                    <i class="fas fa-boxes me-1.5"></i> My Products
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link py-1 px-3 fw-bold small {{ ($source ?? 'my_products') === 'admin_products' ? 'active bg-white text-success shadow-sm' : 'text-secondary' }}" 
+                <a class="nav-link {{ ($source ?? 'my_products') === 'admin_products' ? 'active' : '' }}" 
                    href="{{ route('vendor.products.index', ['source' => 'admin_products']) }}">
-                    <i class="fas fa-store me-1"></i> Parent Admin Catalog
+                    <i class="fas fa-store me-1.5"></i> Parent Admin Catalog
                     <span class="badge bg-success ms-1" style="font-size: 0.65rem;">Shared</span>
                 </a>
             </li>
@@ -26,27 +248,27 @@
         @endif
     </div>
 
-    <a href="{{ route('vendor.products.create') }}" class="btn btn-sm btn-primary py-1 px-3 font-weight-bold">
-        <i class="fas fa-plus-circle me-1"></i> Add New Product
+    <a href="{{ route('vendor.products.create') }}" class="btn btn-gradient-primary px-3 py-2 text-decoration-none">
+        <i class="fas fa-plus-circle me-1.5"></i> Add New Product
     </a>
 </div>
 
 @if(session('warning'))
-    <div class="alert alert-warning alert-dismissible fade show mb-2 py-2 small shadow-sm border-warning" role="alert">
+    <div class="alert alert-warning alert-dismissible fade show mb-3 py-2.5 small shadow-sm border-warning rounded-3" role="alert">
         <i class="fas fa-clock me-2"></i> <strong>Pending Admin Approval:</strong> {{ session('warning') }}
         <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
 @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show mb-2 py-2 small shadow-sm border-success" role="alert">
+    <div class="alert alert-success alert-dismissible fade show mb-3 py-2.5 small shadow-sm border-success rounded-3" role="alert">
         <i class="fas fa-check-circle me-2"></i> <strong>Success:</strong> {{ session('success') }}
         <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
 @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show mb-2 py-2 small shadow-sm border-danger" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show mb-3 py-2.5 small shadow-sm border-danger rounded-3" role="alert">
         <i class="fas fa-exclamation-triangle me-2"></i> <strong>Error:</strong> {{ session('error') }}
         <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -255,29 +477,29 @@
 @endif
 
 <!-- Products Table -->
-<div class="card shadow-sm border-0">
-    <div class="card-body">
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4" style="border: 1px solid #e2e8f0 !important;">
+    <div class="card-body p-0">
         @if(($source ?? 'my_products') === 'admin_products')
             <!-- Bulk Action Bar -->
             <form id="bulkCopyForm" action="{{ route('vendor.products.bulk-copy') }}" method="POST">
                 @csrf
-                <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 mb-3 border">
+                <div class="bulk-action-bar m-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div class="d-flex align-items-center gap-3">
                         <div class="form-check m-0">
-                            <input type="checkbox" class="form-check-input" id="select_all_header_checkbox" style="cursor: pointer;">
-                            <label class="form-check-label fw-bold small" for="select_all_header_checkbox" style="cursor: pointer;">Select All Available Products</label>
+                            <input type="checkbox" class="form-check-input" id="select_all_header_checkbox" style="cursor: pointer; width: 1.15em; height: 1.15em;">
+                            <label class="form-check-label fw-bold text-dark ms-1" for="select_all_header_checkbox" style="cursor: pointer; font-size: 0.875rem;">Select All Available Products</label>
                         </div>
-                        <span class="badge bg-secondary font-weight-bold" id="selected_count_badge">0 Selected</span>
+                        <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2.5 py-1.5 rounded-pill" id="selected_count_badge" style="font-size: 0.75rem;">0 Selected</span>
                     </div>
-                    <button type="button" class="btn btn-sm btn-success font-weight-bold d-inline-flex align-items-center gap-1" id="bulk_copy_btn" onclick="openBulkCopyCartModal()" disabled>
+                    <button type="button" class="btn btn-gradient-success d-inline-flex align-items-center gap-1.5 px-3 py-2" id="bulk_copy_btn" onclick="openBulkCopyCartModal()" disabled>
                         <i class="fas fa-shopping-cart"></i> Copy Selected Products
                     </button>
                 </div>
             <!-- Bulk Stock Purchase Cart Modal -->
             <div class="modal fade text-start" id="bulkCopyCartModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-xl">
-                    <div class="modal-content rounded-4 border-0 shadow">
-                        <div class="modal-header bg-primary text-white">
+                    <div class="modal-content rounded-4 border-0 shadow-lg">
+                        <div class="modal-header bg-primary text-white p-3.5">
                             <h5 class="modal-title font-weight-bold"><i class="fas fa-shopping-cart me-2"></i> Bulk Stock Purchase & Copy Cart</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -320,7 +542,7 @@
                         </div>
                         <div class="modal-footer bg-light">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-success font-weight-bold px-4" id="submit_bulk_copy_cart_btn" form="bulkCopyForm">
+                            <button type="submit" class="btn btn-gradient-success font-weight-bold px-4" id="submit_bulk_copy_cart_btn" form="bulkCopyForm">
                                 <i class="fas fa-check-circle me-1"></i> Confirm & Deduct Wallet Fund
                             </button>
                         </div>
@@ -344,209 +566,216 @@
                 @endif
             </div>
         @else
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
-                        <thead style="background: rgba(248, 250, 252, 0.95); border-bottom: 2px solid #e2e8f0;">
-                            <tr>
-                                <th style="width: 45px;" class="ps-4 py-3">
-                                    @if(($source ?? 'my_products') === 'admin_products')
-                                        <input type="checkbox" class="form-check-input select-all-products" title="Select All">
-                                    @else
-                                        #
-                                    @endif
-                                </th>
-                                <th style="width: 70px;" class="py-3">Image</th>
-                                <th class="py-3">Product Info</th>
-                                <th class="py-3">Price</th>
-                                @if(($source ?? 'my_products') === 'my_products')
-                                    <th class="py-3">Commission</th>
-                                @endif
-                                <th class="py-3">Stock</th>
-                                @if(($source ?? 'my_products') === 'my_products')
-                                    <th class="py-3">Status</th>
-                                @endif
-                                <th class="py-3">Created</th>
-                                <th class="text-end pe-4 py-3">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($products as $product)
+            <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0">
+                    <thead>
                         <tr>
-                            <td>
+                            <th style="width: 45px;" class="ps-4">
                                 @if(($source ?? 'my_products') === 'admin_products')
-                                    @if(in_array($product->id, $allocatedProductIds ?? []) || in_array($product->title, $copiedProductTitles ?? []))
-                                        <input type="checkbox" class="form-check-input" disabled>
-                                    @else
-                                        <input type="checkbox" class="form-check-input product-select-checkbox" value="{{ $product->id }}" name="product_ids[]" form="bulkCopyForm">
-                                    @endif
+                                    <input type="checkbox" class="form-check-input select-all-products" title="Select All">
                                 @else
-                                    <small class="text-muted">{{ $loop->iteration }}</small>
+                                    #
                                 @endif
-                            </td>
-                            <td class="ps-2">
-                                @if($product->thumb_image)
-                                    <img src="{{ asset('storage/' . $product->thumb_image) }}" 
-                                         alt="{{ $product->title }}"
-                                         style="width: 56px; height: 56px; object-fit: cover; border-radius: 14px; border: 2px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                                @else
-                                    <div class="d-flex align-items-center justify-content-center"
-                                         style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border: 2px dashed #cbd5e1;">
-                                        <i class="fas fa-image" style="color: #94a3b8; font-size: 18px;"></i>
-                                    </div>
-                                @endif
-                            </td>
-                            <td>
-                                <strong>{{ $product->title }}</strong><br>
-                                @php
-                                    $catParts = [];
-                                    if ($product->category) {
-                                        $catParts[] = $product->category->name;
-                                    }
-                                    if ($product->subCategory) {
-                                        $catParts[] = $product->subCategory->name;
-                                    }
-                                @endphp
-                                <small class="text-muted">{{ count($catParts) > 0 ? implode(' > ', $catParts) : 'N/A' }}</small>
-                            </td>
-                            <td>
-                                @php
-                                    $displayPrice = '৳0.00';
-                                    $displayOldPrice = null;
-
-                                    if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
-                                        $prices = [];
-                                        $regularPrices = [];
-                                        foreach ($product->variationCombinations as $comb) {
-                                            $p = $comb->offer_price ?? $comb->regular_price ?? 0;
-                                            $reg = $comb->regular_price ?? 0;
-                                            if ($p > 0) $prices[] = (float)$p;
-                                            if ($reg > 0) $regularPrices[] = (float)$reg;
-                                        }
-                                        if (!empty($prices)) {
-                                            $minP = min($prices);
-                                            $maxP = max($prices);
-                                            if ($minP === $maxP) {
-                                                $displayPrice = '৳' . number_format($minP, 2);
-                                            } else {
-                                                $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
-                                            }
-                                        } elseif (!empty($regularPrices)) {
-                                            $minP = min($regularPrices);
-                                            $maxP = max($regularPrices);
-                                            if ($minP === $maxP) {
-                                                $displayPrice = '৳' . number_format($minP, 2);
-                                            } else {
-                                                $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
-                                            }
-                                        }
-                                    } else {
-                                        $offerPrice = (float)($product->offer ?? 0);
-                                        $oldPrice = (float)($product->old_price ?? 0);
-
-                                        if ($offerPrice > 0) {
-                                            $displayPrice = '৳' . number_format($offerPrice, 2);
-                                            if ($oldPrice > $offerPrice) {
-                                                $displayOldPrice = '৳' . number_format($oldPrice, 2);
-                                            }
-                                        } elseif ($oldPrice > 0) {
-                                            $displayPrice = '৳' . number_format($oldPrice, 2);
-                                        }
-                                    }
-                                @endphp
-
-                                @if($displayOldPrice)
-                                    <span class="text-decoration-line-through text-muted" style="font-size: 0.8rem;">{{ $displayOldPrice }}</span><br>
-                                @endif
-                                <strong class="text-dark">{{ $displayPrice }}</strong>
-                            </td>
+                            </th>
+                            <th style="width: 70px;">Image</th>
+                            <th>Product Info</th>
+                            <th>Price</th>
                             @if(($source ?? 'my_products') === 'my_products')
-                            <td>
-                                @if($product->vendor_commission_rate)
-                                    <span class="badge bg-info">{{ $product->vendor_commission_rate }}%</span>
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
-                                @if($product->vendor_proposed_commission && $product->vendor_proposed_commission != $product->vendor_commission_rate)
-                                    <br><small class="text-warning">Proposed: {{ $product->vendor_proposed_commission }}%</small>
-                                @endif
-                            </td>
+                                <th>Commission</th>
                             @endif
-                            <td>
-                                @if($product->manage_stock)
-                                    @if($product->quantity > 0)
-                                        <span class="text-success fw-bold">{{ $product->quantity }}</span>
-                                    @else
-                                        <span class="text-danger fw-bold">Out of Stock</span>
-                                    @endif
-                                @else
-                                    <span class="text-muted">In Stock</span>
-                                @endif
-                            </td>
+                            <th>Stock</th>
                             @if(($source ?? 'my_products') === 'my_products')
-                            <td>
-                                @php
-                                    $allocation = $productAllocations[$product->id] ?? null;
-                                @endphp
-                                @if($allocation)
-                                    @if($allocation->status === 'approved')
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check-circle"></i> Approved
-                                        </span>
-                                    @elseif($allocation->status === 'pending')
-                                        <span class="badge bg-warning text-dark">
-                                            <i class="fas fa-clock"></i> Pending Approval
-                                        </span>
-                                    @else
-                                        <span class="badge bg-danger">
-                                            <i class="fas fa-times-circle"></i> Allocation Rejected
-                                        </span>
-                                    @endif
-                                @else
-                                    @if($product->approval_status === 'approved')
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check-circle"></i> Approved
-                                        </span>
-                                    @elseif($product->approval_status === 'pending')
-                                        <span class="badge bg-warning text-dark">
-                                            <i class="fas fa-clock"></i> Pending
-                                        </span>
-                                    @else
-                                        <span class="badge bg-danger">
-                                            <i class="fas fa-times-circle"></i> Rejected
-                                        </span>
-                                    @endif
-                                @endif
-                                @if(!$product->status)
-                                    <br><small class="text-muted">Inactive</small>
-                                @endif
-                            </td>
+                                <th>Status</th>
                             @endif
-                            <td>
-                                <small>{{ $product->created_at ? $product->created_at->format('d M Y') : 'N/A' }}</small>
-                            </td>
-                            <td class="text-end">
-                                @php
-                                    $isCopied = in_array($product->id, $allocatedProductIds ?? []) 
-                                             || in_array($product->title, $copiedProductTitles ?? [])
-                                             || in_array($product->id, $allCopiedIds ?? [])
-                                             || in_array($product->title, $allCopiedTitles ?? []);
-                                @endphp
-                                @if(($source ?? 'my_products') === 'admin_products')
-                                    @if($isCopied)
-                                        <div class="d-inline-flex align-items-center gap-1 justify-content-end">
-                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1.5 font-weight-bold d-inline-flex align-items-center gap-1" title="Already Copied to Your Store" style="font-size: 0.8rem; border-radius: 6px;">
-                                                <i class="fas fa-check-circle text-success"></i> Already Copied
-                                            </span>
-                                            <button type="button" class="btn btn-primary btn-sm font-weight-bold d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}" onclick="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})" title="Get More Stock for this product" style="border-radius: 6px;">
-                                                <i class="fas fa-plus-circle"></i> Get More Stock
-                                            </button>
-                                        </div>
-                                    @else
-                                        <button type="button" class="btn btn-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}" onclick="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})" style="border-radius: 6px;">
-                                            <i class="fas fa-copy"></i> Copy to My Products
+                            <th>Created</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($products as $product)
+                    <tr>
+                        <td class="ps-4">
+                            @if(($source ?? 'my_products') === 'admin_products')
+                                @if(in_array($product->id, $allocatedProductIds ?? []) || in_array($product->title, $copiedProductTitles ?? []))
+                                    <input type="checkbox" class="form-check-input" disabled>
+                                @else
+                                    <input type="checkbox" class="form-check-input product-select-checkbox" value="{{ $product->id }}" name="product_ids[]" form="bulkCopyForm">
+                                @endif
+                            @else
+                                <small class="text-muted fw-bold">{{ $loop->iteration }}</small>
+                            @endif
+                        </td>
+                        <td>
+                            @if($product->thumb_image)
+                                <img src="{{ asset('storage/' . $product->thumb_image) }}" 
+                                     alt="{{ $product->title }}"
+                                     style="width: 52px; height: 52px; object-fit: cover; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                            @else
+                                <div class="d-flex align-items-center justify-content-center"
+                                     style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border: 1px dashed #cbd5e1;">
+                                    <i class="fas fa-image" style="color: #94a3b8; font-size: 18px;"></i>
+                                </div>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark fs-6" style="line-height: 1.3;">{{ $product->title }}</div>
+                            @php
+                                $catParts = [];
+                                if ($product->category) {
+                                    $catParts[] = $product->category->name;
+                                }
+                                if ($product->subCategory) {
+                                    $catParts[] = $product->subCategory->name;
+                                }
+                            @endphp
+                            <span class="cat-tag mt-1">
+                                <i class="fas fa-tag me-1 text-primary opacity-75"></i>{{ count($catParts) > 0 ? implode(' > ', $catParts) : 'N/A' }}
+                            </span>
+                        </td>
+                        <td>
+                            @php
+                                $displayPrice = '৳0.00';
+                                $displayOldPrice = null;
+
+                                if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
+                                    $prices = [];
+                                    $regularPrices = [];
+                                    foreach ($product->variationCombinations as $comb) {
+                                        $p = $comb->offer_price ?? $comb->regular_price ?? 0;
+                                        $reg = $comb->regular_price ?? 0;
+                                        if ($p > 0) $prices[] = (float)$p;
+                                        if ($reg > 0) $regularPrices[] = (float)$reg;
+                                    }
+                                    if (!empty($prices)) {
+                                        $minP = min($prices);
+                                        $maxP = max($prices);
+                                        if ($minP === $maxP) {
+                                            $displayPrice = '৳' . number_format($minP, 2);
+                                        } else {
+                                            $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                        }
+                                    } elseif (!empty($regularPrices)) {
+                                        $minP = min($regularPrices);
+                                        $maxP = max($regularPrices);
+                                        if ($minP === $maxP) {
+                                            $displayPrice = '৳' . number_format($minP, 2);
+                                        } else {
+                                            $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                        }
+                                    }
+                                } else {
+                                    $offerPrice = (float)($product->offer ?? 0);
+                                    $oldPrice = (float)($product->old_price ?? 0);
+
+                                    if ($offerPrice > 0) {
+                                        $displayPrice = '৳' . number_format($offerPrice, 2);
+                                        if ($oldPrice > $offerPrice) {
+                                            $displayOldPrice = '৳' . number_format($oldPrice, 2);
+                                        }
+                                    } elseif ($oldPrice > 0) {
+                                        $displayPrice = '৳' . number_format($oldPrice, 2);
+                                    }
+                                }
+                            @endphp
+
+                            @if($displayOldPrice)
+                                <small class="text-decoration-line-through text-muted d-block" style="font-size: 0.75rem;">{{ $displayOldPrice }}</small>
+                            @endif
+                            <strong class="text-dark fs-6">{{ $displayPrice }}</strong>
+                        </td>
+                        @if(($source ?? 'my_products') === 'my_products')
+                        <td>
+                            @if($product->vendor_commission_rate)
+                                <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-2 py-1 rounded-2 fw-bold">{{ $product->vendor_commission_rate }}%</span>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                            @if($product->vendor_proposed_commission && $product->vendor_proposed_commission != $product->vendor_commission_rate)
+                                <br><small class="text-warning fw-bold">Proposed: {{ $product->vendor_proposed_commission }}%</small>
+                            @endif
+                        </td>
+                        @endif
+                        <td>
+                            @if($product->manage_stock)
+                                @if($product->quantity > 0)
+                                    <span class="stock-badge-pill">
+                                        <span class="stock-dot"></span> {{ $product->quantity }} units
+                                    </span>
+                                @else
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2.5 py-1 rounded-pill fw-bold">
+                                        <i class="fas fa-times-circle me-1"></i> Out of Stock
+                                    </span>
+                                @endif
+                            @else
+                                <span class="stock-badge-pill">
+                                    <span class="stock-dot"></span> In Stock
+                                </span>
+                            @endif
+                        </td>
+                        @if(($source ?? 'my_products') === 'my_products')
+                        <td>
+                            @php
+                                $allocation = $productAllocations[$product->id] ?? null;
+                            @endphp
+                            @if($allocation)
+                                @if($allocation->status === 'approved')
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2.5 py-1.5 rounded-pill fw-bold">
+                                        <i class="fas fa-check-circle me-1"></i> Approved
+                                    </span>
+                                @elseif($allocation->status === 'pending')
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-2.5 py-1.5 rounded-pill fw-bold">
+                                        <i class="fas fa-clock me-1"></i> Pending Approval
+                                    </span>
+                                @else
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2.5 py-1.5 rounded-pill fw-bold">
+                                        <i class="fas fa-times-circle me-1"></i> Allocation Rejected
+                                    </span>
+                                @endif
+                            @else
+                                @if($product->approval_status === 'approved')
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2.5 py-1.5 rounded-pill fw-bold">
+                                        <i class="fas fa-check-circle me-1"></i> Approved
+                                    </span>
+                                @elseif($product->approval_status === 'pending')
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-2.5 py-1.5 rounded-pill fw-bold">
+                                        <i class="fas fa-clock me-1"></i> Pending
+                                    </span>
+                                @else
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2.5 py-1.5 rounded-pill fw-bold">
+                                        <i class="fas fa-times-circle me-1"></i> Rejected
+                                    </span>
+                                @endif
+                            @endif
+                            @if(!$product->status)
+                                <br><small class="text-muted fw-semibold">Inactive</small>
+                            @endif
+                        </td>
+                        @endif
+                        <td>
+                            <small class="text-muted fw-semibold">{{ $product->created_at ? $product->created_at->format('d M Y') : 'N/A' }}</small>
+                        </td>
+                        <td class="text-end pe-4">
+                            @php
+                                $isCopied = in_array($product->id, $allocatedProductIds ?? []) 
+                                         || in_array($product->title, $copiedProductTitles ?? [])
+                                         || in_array($product->id, $allCopiedIds ?? [])
+                                         || in_array($product->title, $allCopiedTitles ?? []);
+                            @endphp
+                            @if(($source ?? 'my_products') === 'admin_products')
+                                @if($isCopied)
+                                    <div class="d-inline-flex align-items-center gap-2 justify-content-end">
+                                        <span class="copied-badge-pill" title="Already Copied to Your Store">
+                                            <i class="fas fa-check-circle"></i> Already Copied
+                                        </span>
+                                        <button type="button" class="btn btn-gradient-blue btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}" onclick="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})" title="Get More Stock for this product">
+                                            <i class="fas fa-plus-circle"></i> Get More Stock
                                         </button>
-                                    @endif
+                                    </div>
+                                @else
+                                    <button type="button" class="btn btn-gradient-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}" onclick="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
+                                        <i class="fas fa-copy me-1"></i> Copy to My Products
+                                    </button>
+                                @endif
 
                                     <!-- Modal for Stock Allocation & Purchase -->
                                     <div class="modal fade text-start" id="copyStockModal_{{ $product->id }}" tabindex="-1" aria-hidden="true">

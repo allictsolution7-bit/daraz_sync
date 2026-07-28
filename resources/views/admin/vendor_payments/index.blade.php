@@ -153,12 +153,21 @@
                                         <span class="badge bg-info bg-opacity-10 text-info border border-info px-2 py-1 rounded-pill" style="font-size: 0.7rem;">Recharge</span>
                                     @elseif($trx->type === 'admin_grant')
                                         <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1 rounded-pill" style="font-size: 0.7rem;">Grant</span>
+                                    @elseif(in_array(strtolower($trx->type), ['stock_purchase_refund', 'refund', 'admin_refund']))
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1 rounded-pill" style="font-size: 0.7rem;">Refund</span>
+                                    @elseif(in_array(strtolower($trx->type), ['stock_purchase']))
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2 py-1 rounded-pill" style="font-size: 0.7rem;">Stock Purchase</span>
                                     @else
                                         <span class="badge bg-secondary px-2 py-1 rounded-pill" style="font-size: 0.7rem;">{{ strtoupper($trx->type) }}</span>
                                     @endif
                                 </td>
                                 <td class="py-2">
-                                    <span class="fw-bold text-success" style="font-size: 0.85rem;">৳{{ number_format($trx->amount, 2) }}</span>
+                                    @php
+                                        $isCredit = in_array(strtolower($trx->type), ['recharge_request', 'admin_grant', 'transfer_received', 'stock_purchase_refund', 'refund', 'admin_refund']);
+                                    @endphp
+                                    <span class="fw-bold {{ $isCredit ? 'text-success' : 'text-danger' }}" style="font-size: 0.85rem;">
+                                        {{ $isCredit ? '+' : '-' }} ৳{{ number_format($trx->amount, 2) }}
+                                    </span>
                                 </td>
                                 <td class="py-2">
                                     <div class="fw-semibold text-dark">{{ $trx->payment_method ?? '-' }}</div>

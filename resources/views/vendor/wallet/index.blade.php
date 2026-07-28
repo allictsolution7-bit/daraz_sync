@@ -114,13 +114,20 @@
                                         <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2 py-1 rounded-pill" style="font-size: 0.7rem;">Sent</span>
                                     @elseif($trx->type === 'transfer_received')
                                         <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1 rounded-pill" style="font-size: 0.7rem;">Received</span>
+                                    @elseif(in_array(strtolower($trx->type), ['stock_purchase_refund', 'refund', 'admin_refund']))
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1 rounded-pill" style="font-size: 0.7rem;">Refund</span>
+                                    @elseif(in_array(strtolower($trx->type), ['stock_purchase']))
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2 py-1 rounded-pill" style="font-size: 0.7rem;">Stock Purchase</span>
                                     @else
                                         <span class="badge bg-secondary px-2 py-1 rounded-pill" style="font-size: 0.7rem;">{{ strtoupper($trx->type) }}</span>
                                     @endif
                                 </td>
                                 <td class="py-2">
-                                    <span class="fw-bold {{ in_array($trx->type, ['recharge_request', 'admin_grant', 'transfer_received']) ? 'text-success' : 'text-danger' }}" style="font-size: 0.85rem;">
-                                        {{ in_array($trx->type, ['recharge_request', 'admin_grant', 'transfer_received']) ? '+' : '-' }} ৳{{ number_format($trx->amount, 2) }}
+                                    @php
+                                        $isCredit = in_array(strtolower($trx->type), ['recharge_request', 'admin_grant', 'transfer_received', 'stock_purchase_refund', 'refund', 'admin_refund']);
+                                    @endphp
+                                    <span class="fw-bold {{ $isCredit ? 'text-success' : 'text-danger' }}" style="font-size: 0.85rem;">
+                                        {{ $isCredit ? '+' : '-' }} ৳{{ number_format($trx->amount, 2) }}
                                     </span>
                                 </td>
                                 <td class="py-2">
