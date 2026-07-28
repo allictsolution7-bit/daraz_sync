@@ -16,7 +16,7 @@ class AdminVendorOrderController extends Controller
     /**
      * Get vendor orders base query scoped to current admin's vendors and copied products
      */
-    protected function getVendorOrdersQuery($user = null)
+    public function getVendorOrdersQuery($user = null)
     {
         $user = $user ?: Auth::user();
 
@@ -91,25 +91,10 @@ class AdminVendorOrderController extends Controller
 
     public function index(Request $request)
     {
-        $baseQuery = $this->getVendorOrdersQuery();
-
-        $rawCounts = (clone $baseQuery)
-            ->selectRaw('status, COUNT(*) as total')
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->toArray();
-
         $statusCounts = [
-            'all' => array_sum($rawCounts),
-            'pending' => $rawCounts['pending'] ?? 0,
-            'phone_not_rcv' => $rawCounts['phone_not_rcv'] ?? 0,
-            'follow_up' => $rawCounts['follow_up'] ?? 0,
-            'processing' => $rawCounts['processing'] ?? 0,
-            'ready_for_delivery' => $rawCounts['ready_for_delivery'] ?? 0,
-            'shipped' => $rawCounts['shipped'] ?? 0,
-            'delivered' => $rawCounts['delivered'] ?? 0,
-            'on_hold' => $rawCounts['on_hold'] ?? 0,
-            'cancelled' => $rawCounts['cancelled'] ?? 0,
+            'all' => '...', 'pending' => '...', 'phone_not_rcv' => '...', 'follow_up' => '...',
+            'processing' => '...', 'ready_for_delivery' => '...', 'shipped' => '...',
+            'delivered' => '...', 'on_hold' => '...', 'cancelled' => '...'
         ];
 
         $orders = collect([]);

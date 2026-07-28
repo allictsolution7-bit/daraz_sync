@@ -1512,7 +1512,7 @@
 
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
@@ -1673,7 +1673,31 @@
             }
         }
 
+        function fetchStatusCounts() {
+            let params = {};
+            @if(isset($isAssignedOrdersPage) && $isAssignedOrdersPage)
+                params.assigned_to_me = 1;
+            @elseif(isset($isVendorOrdersPage) && $isVendorOrdersPage)
+                params.vendor_orders = 1;
+            @endif
+
+            $.ajax({
+                url: '{{ route("admin.orders.status-counts") }}',
+                data: params,
+                success: function(counts) {
+                    $.each(counts, function(statusKey, countVal) {
+                        const badge = $(`.status-filter-item[data-status="${statusKey === 'all' ? '' : statusKey}"] .status-pill-badge`);
+                        if (badge.length) {
+                            badge.text(countVal);
+                        }
+                    });
+                }
+            });
+        }
+
         $(document).ready(function() {
+            fetchStatusCounts();
+
             // Check for status parameter in URL and select/filter accordingly
             const urlParams = new URLSearchParams(window.location.search);
             const urlStatus = urlParams.get('status');
@@ -2892,4 +2916,4 @@
             }
         });
     </script>
-@endsection
+@endpush

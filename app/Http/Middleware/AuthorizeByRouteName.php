@@ -12,6 +12,9 @@ class AuthorizeByRouteName
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
+        if ($user && !$user->relationLoaded('roles')) {
+            $user->load('roles.permissions', 'permissions');
+        }
         $route = $request->route();
 
         if (!$route || !$user) {

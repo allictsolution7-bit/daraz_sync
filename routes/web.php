@@ -379,6 +379,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::prefix('transactions')->name('orders.')->group(function () {
         Route::get('/', [BackOrderController::class, 'index'])->name('index');
         Route::get('/data', [BackOrderController::class, 'data'])->name('data');
+        Route::get('/status-counts', [BackOrderController::class, 'statusCounts'])->name('status-counts');
         Route::get('/create', [BackOrderController::class, 'create'])->name('create');
         Route::post('/', [BackOrderController::class, 'store'])->name('store');
         Route::get('/product-options/{product}', [BackOrderController::class, 'productOptions'])->name('product-options');

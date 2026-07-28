@@ -22,8 +22,8 @@ class TrackInstallation
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Track installation on first access (only once)
-        if ($this->shouldTrackInstallation($request)) {
+        // Track installation on first access (only once, skip in dev mode)
+        if (!env('LICENSE_DEV_MODE', false) && $this->shouldTrackInstallation($request)) {
             try {
                 $this->installationTrackingService->trackInstallation();
             } catch (\Exception $e) {

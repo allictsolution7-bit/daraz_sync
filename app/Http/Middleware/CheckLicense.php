@@ -47,8 +47,10 @@ class CheckLicense
             return $next($request);
         }
 
-        // Heartbeat Check: Send heartbeat every 6 hours
-        $this->heartbeatService->startHeartbeat();
+        // Heartbeat Check: Send heartbeat every 6 hours (skip in dev mode)
+        if (!env('LICENSE_DEV_MODE', false)) {
+            $this->heartbeatService->startHeartbeat();
+        }
 
         // Security Check 1: Enhanced system integrity (only if strict security is enabled)
         if (config('license.strict_security_checks', false)) {
