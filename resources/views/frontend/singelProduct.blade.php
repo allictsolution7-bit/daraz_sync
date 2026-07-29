@@ -3,94 +3,106 @@
 @section('styles')
 <link rel="preload" as="image" href="{{ asset('storage/' . $product->thumb_image) }}">
 <link rel="stylesheet" href="{{ asset('css/combo-offer.css') }}">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#dbdad9",
+                        "charcoal": "#222222",
+                        "error-ruby": "#EF4444",
+                        "surface-container-low": "#f5f3f3",
+                        "outline-variant": "#c3c6cf",
+                        "inverse-primary": "#abc8f5",
+                        "background": "#fbf9f8",
+                        "navy-deep": "#113257",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#7e9bc6",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#abc8f5",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container": "#efeded",
+                        "on-primary-fixed": "#001c39",
+                        "surface": "#fbf9f8",
+                        "surface-container-highest": "#e4e2e2",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "surface-bright": "#fbf9f8",
+                        "on-error": "#ffffff",
+                        "primary-container": "#113257",
+                        "surface-tint": "#436087",
+                        "secondary": "#904d00",
+                        "tertiary": "#1b1d1d",
+                        "primary-fixed": "#d4e3ff",
+                        "on-surface-variant": "#43474e",
+                        "secondary-fixed": "#ffdcc3",
+                        "surface-container-high": "#eae8e7",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#2f1500",
+                        "surface-off-white": "#F9FAFB",
+                        "energy-orange": "#F68C20",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#6e3900",
+                        "outline": "#74777f",
+                        "on-tertiary-container": "#999a9a",
+                        "inverse-on-surface": "#f2f0f0",
+                        "on-secondary-container": "#663500",
+                        "secondary-container": "#ff9328",
+                        "secondary-fixed-dim": "#ffb77d",
+                        "on-surface": "#1b1c1c",
+                        "inverse-surface": "#303030",
+                        "tertiary-container": "#303232",
+                        "surface-variant": "#e4e2e2",
+                        "on-primary-fixed-variant": "#2a486e",
+                        "success-emerald": "#10B981",
+                        "primary": "#001d3b",
+                        "on-background": "#1b1c1c"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "stack-sm": "8px"
+                    },
+                    fontFamily: {
+                        "body": ["Inter", "sans-serif"],
+                        "headline": ["Plus Jakarta Sans", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
 <style>
+        .zoom { overflow: hidden; cursor: crosshair; }
+        .zoom img { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .zoom:hover img { transform: scale(1.2); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .tab-active { border-bottom: 2px solid #113257; color: #113257; }
+
     .pcontainer {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 0rem;
         margin: 1rem auto;
         padding: 1rem;
         background: var(--body-bg);
         margin-top: 0;
         padding-top: 0;
-    }
-
-    .image-area {
-        width: 30%;
-    }
-
-    .product-title-section {
-        margin-bottom: 10px;
-    }
-
-    .product-title {
-        margin-bottom: 0;
-        font-size: 25px;
-        color: var(--dark-color);
-        white-space: wrap;
-        flex: 1;
-    }
-
-    .product-rating-summary {
-        display: flex;
-        width: 280px;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 12px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        margin-top: 5px;
-    }
-
-    .product-rating-summary:hover {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
-        transform: translateY(-1px);
-    }
-
-    .rating-display {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .rating-display .stars {
-        display: flex;
-        align-items: center;
-        gap: 1px;
-    }
-
-    .product-ratings .rating-number {
-        font-weight: 600;
-        color: #1e293b;
-        font-size: 2.3rem;
-    }
-
-    .review-count {
-        color: #64748b;
-        font-size: 12px;
-    }
-
-    .arrow-icon {
-        color: #64748b;
-        transition: transform 0.2s ease;
-    }
-
-    .product-rating-summary:hover .arrow-icon {
-        transform: translateY(1px);
-    }
-
-
-    .variation-cart-area {
-        width: 40%;
-    }
-
-    .info-area {
-        width: 25%;
     }
 
 
@@ -1787,19 +1799,20 @@
 </div>
 
 {{-- Product Container --}}
-<div class="base-container pcontainer" data-product-id="{{ $product->id }}" data-category="{{ $product->category->name ?? ($product->additionalCategories->first()->name ?? ($product->getAllCategories()->first()->name ?? '')) }}">
-
-    {{-- Product main image area --}}
-    <div class="image-area">
-        <div class="product-images">
-            @php
-            $productImages = $product->images ?? [];
-            // Handle the case where images might be a string
-            if (is_string($productImages)) {
-            $decodedImages = json_decode($productImages, true);
-            $productImages = is_array($decodedImages) ? $decodedImages : [];
-            }
-            @endphp
+<main class="py-12 bg-surface font-body text-on-surface">
+<div class="max-w-container-max mx-auto px-margin-desktop space-y-16">
+<!-- Top Section: 2-Column Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-[48%_48%] justify-between gap-gutter pcontainer" data-product-id="{{ $product->id }}" data-category="{{ $product->category->name ?? ($product->additionalCategories->first()->name ?? ($product->getAllCategories()->first()->name ?? '')) }}">
+<!-- Left Column: Image Gallery -->
+<div class="space-y-6 image-area">
+<div class="product-images">
+@php
+$productImages = $product->images ?? [];
+if (is_string($productImages)) {
+    $decodedImages = json_decode($productImages, true);
+    $productImages = is_array($decodedImages) ? $decodedImages : [];
+}
+@endphp
 
             <style>
                 figure.zoom {
@@ -1818,9 +1831,83 @@
                     display: block;
                     width: 100%;
                 }
+
+                .image-gallery-container {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    width: 100%;
+                    margin-top: 12px;
+                    padding: 0 40px;
+                }
+
+                .image-gallery {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    gap: 12px;
+                    overflow-x: auto;
+                    scroll-behavior: smooth;
+                    flex: 1;
+                    padding: 4px 6px;
+                }
+
+                .product-gallery-image {
+                    width: 72px;
+                    height: 72px;
+                    object-fit: cover;
+                    border-radius: 12px;
+                    border: 2px solid #e2e8f0;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    flex-shrink: 0;
+                }
+
+                .product-gallery-image.active,
+                .product-gallery-image:hover {
+                    border-color: #2563eb !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+                }
+
+                .gallery-nav {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    z-index: 10;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background: #ffffff;
+                    border: 1px solid #cbd5e1;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    color: #475569;
+                    transition: all 0.2s ease;
+                    flex-shrink: 0;
+                }
+
+                .gallery-nav.prev-btn {
+                    left: 2px;
+                }
+
+                .gallery-nav.next-btn {
+                    right: 2px;
+                }
+
+                .gallery-nav:hover {
+                    background: #ffffff;
+                    color: #1e293b;
+                    border-color: #2563eb;
+                    transform: translateY(-50%) scale(1.1);
+                    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+                }
             </style>
 
-            <div class="mainimage" style="position:relative;">
+            <div class="mainimage aspect-square max-h-[420px] w-full bg-white rounded-3xl overflow-hidden border border-surface-container shadow-sm flex items-center justify-center" style="position:relative;">
                 @php
                 $percentOff = null;
                 if (
@@ -1830,308 +1917,149 @@
                 $product->offer < $product->old_price
                     ) {
                     $percentOff = round((($product->old_price - $product->offer) / $product->old_price) * 100);
-                    }
-                    @endphp
-                    @if ($percentOff)
-                    <div class="starburst-badge" style="position:absolute;top:2px;left:2px;">
+                }
+                @endphp
+                @if ($percentOff)
+                    <div class="starburst-badge z-10" style="position:absolute;top:10px;left:10px;">
                         {{ $percentOff }}%<br>ছাড়
                     </div>
-                    @endif
-                    <figure class="zoom" onmousemove="zoom(event)"
+                @endif
+                    <figure class="zoom w-full h-full" onmousemove="zoom(event)"
                         style="background-image: url('{{ asset('storage/' . $product->thumb_image) }}')">
-                        <img id="main-product-image" src="{{ asset('storage/' . $product->thumb_image) }}"
+                        <img id="main-product-image" class="w-full h-full object-cover" src="{{ asset('storage/' . $product->thumb_image) }}"
                             alt="{{ $product->title }}">
                     </figure>
             </div>
 
-
-
             @if ($productImages && is_array($productImages) && count($productImages) > 0)
             <div class="image-gallery-container">
-                <button class="gallery-nav prev-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <button class="gallery-nav prev-btn" type="button" title="Previous Image">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
                     </svg>
                 </button>
-                <div class="image-gallery" id="product-gallery" data-gallery-images='@json($productImages)'>
-                    <img class="product-gallery-image active" id="main-product-image"
+                <div class="image-gallery scrollbar-hide" id="product-gallery" data-gallery-images='@json($productImages)'>
+                    <img class="product-gallery-image active"
                         src="{{ asset('storage/' . $product->thumb_image) }}" alt="{{ $product->title }}">
                 </div>
-                <button class="gallery-nav next-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-                    </svg>
+                <button class="gallery-nav next-btn" type="button" title="Next Image">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" /></svg>
                 </button>
             </div>
             @endif
         </div>
     </div>
 
-    {{-- Product all meta and others info area --}}
-    <div class="variation-cart-area">
+    {{-- Right Column: Product Details --}}
+    <div class="space-y-4 variation-cart-area">
 
         <div id="variation-errors" class="variation-errors"
             style="display: none; margin-bottom: 15px; padding: 10px; border-radius: 6px; background-color: #fee2e2; color: #dc2626; border: 1px solid #fecaca;">
         </div>
 
-        <div class="product-title-section">
-            <h1 class="product-title">{{ $product->title }}</h1>
-            @if (setting('single_product', 'enable_rating_summary', '1') == '1' && $reviewStats['review_count'] > 0)
-            <div class="product-rating-summary" onclick="scrollToReviews()">
-                <div class="rating-display">
-                    <div class="stars">
+        <div class="space-y-3">
+            {{-- Title & Wishlist Top Row --}}
+            <div class="flex items-start justify-between gap-4">
+                <h1 class="text-2xl lg:text-3xl font-headline font-bold text-navy-deep leading-tight tracking-tight product-title flex-1">{{ $product->title }}</h1>
+                <button type="button" title="Add to Wishlist" onclick="toggleWishlistProduct({{ $product->id }}, '{{ addslashes($product->title) }}', '{{ $product->old_price ?? $product->price ?? 0 }}', '{{ asset('storage/' . $product->thumb_image) }}', '{{ route('product.single', ['id' => $product->id, 'slug' => $product->slug]) }}')"
+                    class="btn-wishlist-toggle flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold hover:bg-rose-100 hover:scale-105 transition-all shadow-sm shrink-0">
+                    <i class="fa-solid fa-heart text-xs" id="wishlist-heart-icon-{{ $product->id }}"></i>
+                    <span id="wishlist-btn-text-{{ $product->id }}">Add to Wishlist</span>
+                </button>
+            </div>
+
+            {{-- Line 1: Rating & Category --}}
+            <div class="flex items-center gap-3 text-xs text-on-surface-variant font-medium">
+                @php
+                $revCount = isset($reviewStats['review_count']) ? $reviewStats['review_count'] : 0;
+                $revAvg = isset($reviewStats['average_rating']) ? $reviewStats['average_rating'] : 0;
+                @endphp
+                @if (setting('single_product', 'enable_rating_summary', '1') == '1' && $revCount > 0)
+                <div class="flex items-center gap-1 py-0.5 px-2 bg-surface-container rounded-full cursor-pointer hover:bg-surface-container-high transition-colors" onclick="scrollToReviews()">
+                    <div class="flex text-energy-orange">
                         @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <=$reviewStats['average_rating'])
-                            <svg class="star-icon filled" viewBox="0 0 24 24" width="20" height="20">
-                            <path
-                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                fill="#f59e0b" />
-                            </svg>
-                            @elseif($i <= $reviewStats['average_rating'] + 0.5)
-                                <svg class="star-icon half-filled" viewBox="0 0 24 24" width="20"
-                                height="20">
-                                <defs>
-                                    <linearGradient id="halfStarTitle">
-                                        <stop offset="50%" stop-color="#f59e0b" />
-                                        <stop offset="50%" stop-color="#e5e7eb" />
-                                    </linearGradient>
-                                </defs>
-                                <path
-                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                    fill="url(#halfStarTitle)" />
-                                </svg>
-                                @else
-                                <svg class="star-icon empty" viewBox="0 0 24 24" width="20" height="20">
-                                    <path
-                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                        fill="#e5e7eb" />
-                                </svg>
-                                @endif
-                                @endfor
+                            @if ($i <= $revAvg)
+                            <i class="fa-solid fa-star text-energy-orange text-[10px]"></i>
+                            @else
+                            <i class="fa-regular fa-star text-outline-variant text-[10px]"></i>
+                            @endif
+                        @endfor
                     </div>
-                    <span class="rating-number">{{ number_format($reviewStats['average_rating'], 1) }}</span>
-                    <span class="review-count">({{ $reviewStats['review_count'] }} reviews)</span>
+                    <span class="text-[11px] font-bold text-navy-deep">{{ number_format($revAvg, 1) }}</span>
+                    <span class="text-[10px] text-on-surface-variant">({{ $revCount }})</span>
                 </div>
-                <svg class="arrow-icon" viewBox="0 0 24 24" width="16" height="16">
-                    <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"
-                        stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </div>
-            @endif
-        </div>
-
-        <!-- Product Details Section -->
-        @if (setting('general', 'show_product_details_section', '1') == '1')
-        <style>
-            .product-details-table {
-                margin-top: 10px;
-                font-size: 14px;
-            }
-
-            .product-details-table div {
-                margin-bottom: 3px;
-            }
-        </style>
-        <div class="product-details-table">
-            @if($product->brand && setting('general', 'show_product_brand_single', '1') == '1')
-            <div><b>Brand:</b> <a href="{{ route('shop') }}?brand={{ $product->brand->id }}"
-                    style="color:#e74c3c;">{{ $product->brand->name }}</a></div>
-            @endif
-            @php
-            // Get all categories (primary + additional)
-            $allCategories = collect();
-            if ($product->category) {
-            $allCategories->push($product->category);
-            }
-            if ($product->additionalCategories) {
-            $allCategories = $allCategories->merge($product->additionalCategories);
-            }
-            $allCategories = $allCategories->unique('id');
-
-            // Get all subcategories (primary + additional)
-            $allSubCategories = collect();
-            if ($product->subCategory) {
-            $allSubCategories->push($product->subCategory);
-            }
-            if ($product->additionalSubCategories) {
-            $allSubCategories = $allSubCategories->merge($product->additionalSubCategories);
-            }
-            $allSubCategories = $allSubCategories->unique('id');
-
-            // Get all third-level categories
-            $allThirdCategories = $product->thirdCategories ?? collect();
-            @endphp
-
-            @if ($allCategories->count() > 0 || $allSubCategories->count() > 0 || $allThirdCategories->count() > 0)
-            <div><b>{{ setting('general', 'category_label_text', 'বিষয়') }} :</b>
-                {{-- Display all primary and additional categories --}}
-                @foreach ($allCategories as $category)
-                <a href="{{ url('shop/' . $category->slug) }}"
-                    style="color:#e74c3c;">{{ $category->name }}</a>@if (!$loop->last || $allSubCategories->count() > 0 || $allThirdCategories->count() > 0), @endif
-                @endforeach
-
-                {{-- Display all primary and additional subcategories --}}
-                @foreach ($allSubCategories as $subCategory)
-                @php
-                $subCategoryCategory = $subCategory->category;
-                $subCategoryUrl = $subCategoryCategory
-                ? url('shop/' . $subCategoryCategory->slug . '/' . $subCategory->slug)
-                : url('shop/' . $subCategory->slug);
-                @endphp
-                <a href="{{ $subCategoryUrl }}"
-                    style="color:#e74c3c;">{{ $subCategory->name }}</a>@if (!$loop->last || $allThirdCategories->count() > 0), @endif
-                @endforeach
-
-                {{-- Display all third-level categories --}}
-                @foreach ($allThirdCategories as $thirdCategory)
-                @php
-                $thirdSubCategory = $thirdCategory->subCategory;
-                $thirdCategoryCategory = $thirdSubCategory ? $thirdSubCategory->category : null;
-                $thirdCategoryUrl = ($thirdCategoryCategory && $thirdSubCategory)
-                ? url('shop/' . $thirdCategoryCategory->slug . '/' . $thirdSubCategory->slug . '/' . $thirdCategory->slug)
-                : ($thirdSubCategory ? url('shop/' . $thirdSubCategory->slug . '/' . $thirdCategory->slug) : '#');
-                @endphp
-                <a href="{{ $thirdCategoryUrl }}"
-                    style="color:#e74c3c;">{{ $thirdCategory->name }}</a>@if (!$loop->last), @endif
-                @endforeach
-            </div>
-            @endif
-            @if (is_iterable($product?->book?->writers) && count($product?->book?->writers) > 0)
-            <div>
-                <b>{{ setting('general', 'writer_label_text', 'লেখক') }} :</b>
-                @foreach ($product?->book?->writers as $writer)
-                <a href="{{ route('shop', ['writer' => $writer->id]) }}"
-                    style="color:#e74c3c;">{{ $writer->name }}</a>
-                @if (!$loop->last)
-                ,
+                <span class="text-outline-variant">•</span>
                 @endif
-                @endforeach
+
+                @if ($product->category)
+                <div>
+                    <span class="font-bold text-navy-deep">Category :</span>
+                    <a href="{{ url('shop/' . $product->category->slug) }}" class="text-energy-orange font-semibold hover:underline">{{ $product->category->name }}</a>
+                </div>
+                @endif
             </div>
-            @endif
-            @if (!empty($product?->book?->publisher?->name))
-            <div>
-                <b>{{ setting('general', 'publisher_label_text', 'প্রকাশক') }} :</b>
-                <a href="{{ route('shop', ['publisher' => $product->book->publisher->id]) }}"
-                    style="color:#e74c3c;">{{ $product->book->publisher->name }}</a>
-            </div>
-            @endif
-            @if (!empty($product?->book?->isbn))
-            <div><b>{{ setting('general', 'isbn_label_text', 'আইএসবিএন') }} :</b> <span
-                    style="color:#e74c3c;">{{ $product?->book?->isbn }}</span></div>
-            @endif
-            @if (!empty($product?->book?->edition))
-            <div><b>সংস্করণ :</b> <span style="color:#e74c3c;">{{ $product?->book?->edition }}</span></div>
-            @endif
-            @if (!empty($product?->book?->pages))
-            <div><b>{{ setting('general', 'pages_label_text', 'পৃষ্ঠা') }} :</b> <span
-                    style="color:#e74c3c;">{{ $product?->book?->pages }}</span></div>
-            @endif
-            @if (!empty($product?->book?->cover))
-            <div><b>কভার :</b> <span style="color:#e74c3c;">{{ $product?->book?->cover }}</span></div>
-            @endif
-            @if (!empty($product?->book?->language))
-            <div><b>{{ setting('general', 'language_label_text', 'ভাষা') }} :</b> <span
-                    style="color:#e74c3c;">{{ $product?->book?->language }}</span></div>
-            @endif
-            @if (!empty($product?->book?->country))
-            <div><b>দেশ :</b> <span style="color:#e74c3c;">{{ $product?->book?->country }}</span></div>
-            @endif
-        </div>
-        @endif
 
-        <div class="price-area">
-            @if ($product->product_type === 'variable')
-            @php
-            // Find min and max prices from variation combinations
-            $prices = [];
-            $hasDiscount = false;
-            $maxDiscountPercentage = 0;
-
-            if ($product->variationCombinations && $product->variationCombinations->count() > 0) {
-            foreach ($product->variationCombinations as $combination) {
-            $effectivePrice =
-            $combination->offer_price ?? ($combination->regular_price ?? $combination->price);
-            if ($effectivePrice) {
-            $prices[] = $effectivePrice;
-
-            // Check for discounts
-            if (
-            $combination->offer_price &&
-            $combination->regular_price &&
-            $combination->offer_price < $combination->regular_price
-                ) {
-                $hasDiscount = true;
-                $discountPercentage = round(
-                (($combination->regular_price - $combination->offer_price) /
-                $combination->regular_price) *
-                100,
-                );
-                if ($discountPercentage > $maxDiscountPercentage) {
-                $maxDiscountPercentage = $discountPercentage;
-                }
-                }
-                }
-                }
+            {{-- Line 2: Price, Old Price & Discount Badge --}}
+            <div class="flex items-baseline gap-3 py-1">
+                @if ($product->product_type === 'variable')
+                @php
+                $prices = [];
+                if ($product->variationCombinations && $product->variationCombinations->count() > 0) {
+                    foreach ($product->variationCombinations as $combination) {
+                        $effectivePrice = $combination->offer_price ?? ($combination->regular_price ?? $combination->price);
+                        if ($effectivePrice) $prices[] = $effectivePrice;
+                    }
                 }
                 $minPrice = !empty($prices) ? min($prices) : 0;
                 $maxPrice = !empty($prices) ? max($prices) : 0;
                 @endphp
-
-                @if ($minPrice === $maxPrice)
-                <h1 class="pricearea">
-                    <span id="updateOfferPrice">{{ $minPrice }}৳</span>
-                </h1>
-                @else
-                <h1 class="pricearea">
-                    <span id="updateOfferPrice">{{ $minPrice }}৳ - {{ $maxPrice }}৳</span>
-                </h1>
-                @endif
+                <span class="text-3xl font-headline font-extrabold text-navy-deep tracking-tight" id="updateOfferPrice">{{ $minPrice === $maxPrice ? $minPrice : $minPrice.'৳ - '.$maxPrice }}৳</span>
                 @else
                 @if ($product->offer)
                 @php
-                $discountPercentage = round(
-                (($product->old_price - $product->offer) / $product->old_price) * 100,
-                );
+                $discountPercentage = round((($product->old_price - $product->offer) / $product->old_price) * 100);
                 @endphp
-                <h1 class="pricearea">
-                    <span class="oldprice">{{ $product->old_price }}৳</span>
-                    <span id="updateOfferPrice">{{ $product->offer }}৳</span>
-                    <span class="discount-badge">{{ $discountPercentage }}% OFF</span>
-                </h1>
+                <span class="text-3xl font-headline font-extrabold text-navy-deep tracking-tight" id="updateOfferPrice">{{ $product->offer }}৳</span>
+                <span class="text-lg text-on-surface-variant line-through oldprice">{{ $product->old_price }}৳</span>
+                
+                {{-- Celebration Firework Animated Discount Badge --}}
+                <div class="relative inline-flex items-center">
+                    <span class="discount-badge relative z-10 px-2.5 py-1 text-xs font-extrabold text-white uppercase tracking-wider rounded-full shadow-lg overflow-hidden flex items-center gap-1 bg-gradient-to-r from-red-600 via-amber-500 to-rose-600 bg-[length:200%_200%] animate-firework-shimmer">
+                        <i class="fa-solid fa-fire text-amber-300 animate-bounce"></i>
+                        <span>{{ $discountPercentage }}% OFF</span>
+                        <i class="fa-solid fa-sparkles text-amber-300 animate-spin"></i>
+                    </span>
+                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                    </span>
+                </div>
+                
+                <style>
+                    @keyframes fireworkShimmer {
+                        0% { background-position: 0% 50%; transform: scale(1); }
+                        50% { background-position: 100% 50%; transform: scale(1.05); }
+                        100% { background-position: 0% 50%; transform: scale(1); }
+                    }
+                    .animate-firework-shimmer {
+                        animation: fireworkShimmer 2.5s infinite ease-in-out;
+                        box-shadow: 0 0 12px rgba(239, 68, 68, 0.6), 0 0 20px rgba(245, 158, 11, 0.4);
+                    }
+                </style>
                 @else
-                <h1 class="pricearea">
-                    <span id="updateOfferPrice">{{ $product->old_price }}৳</span>
-                </h1>
+                <span class="text-3xl font-headline font-extrabold text-navy-deep tracking-tight" id="updateOfferPrice">{{ $product->old_price }}৳</span>
                 @endif
                 @endif
-        </div>
+            </div>
 
-        {{-- Product bottom meta --}}
-        @if (setting('general', 'show_product_meta_section', '1') == '1')
-        <div class="meta">
-            @if (setting('general', 'show_sku_field', '1') == '1' && $product->sku !== null)
-            <div class="meta-item">
-                <span class="meta-label"><i class="fa-solid fa-box-open"></i> SKU:</span>
-                <span class="meta-value sku">{{ $product->sku }}</span>
-            </div>
-            @endif
-            <!-- Only show availability if quantity is not null -->
-            @if (setting('general', 'show_availability_field', '1') == '1' && $product->quantity !== null)
-            <div class="meta-item">
-                <span class="meta-label"><i
-                        class="fa-solid fa-check-circle"></i>{{ setting('general', 'availability_label_text', 'Availability') }}
-                    : </span>
-                <span class="meta-value {{ $product->quantity > 0 ? 'in-stock' : 'out-of-stock' }}">
-                    @if ($product->quantity > 0)
-                    In Stock ({{ $product->quantity }} {{ $product->quantity > 1 ? 'items' : 'item' }})
-                    @else
-                    Out of Stock
-                    @endif
-                </span>
+            {{-- Line 3: Stock Status Badge --}}
+            @if (setting('general', 'show_product_meta_section', '1') == '1' && setting('general', 'show_availability_field', '1') == '1' && $product->quantity !== null)
+            <div class="inline-flex items-center gap-1.5 text-xs font-bold text-success-emerald bg-success-emerald/10 py-1 px-3 rounded-lg border border-success-emerald/20">
+                <i class="fa-solid fa-circle-check text-xs"></i>
+                In Stock ({{ $product->quantity }} items)
             </div>
             @endif
         </div>
-        @endif
 
         @if (setting('general', 'show_short_description_section', '1') == '1')
         <div class="short-description-container">
@@ -2553,65 +2481,70 @@
             @endif
         </div>
 
-        <!-- Shared quantity input and cart buy now-->
-        <div class="sharedQuantityarea flex" id="productActionsContainer">
+        <!-- Actions Area: Quantity + Add to Cart + Buy Now in ONE ROW -->
+        <div class="my-2" id="productActionsContainer">
             @if ($product->product_type !== 'affiliate')
-            <input type="number" id="sharedQuantity" class="quanity" value="1" min="1"
-                max="{{ $product->product_type === 'variable' ? '999' : $product->quantity ?? 999 }}"
-                style="" />
-            <!-- Add to Cart Form -->
-            <form id="cartForm" class="cartFormArea" action="{{ route('cart.store') }}" method="post">
-                @csrf
-                <input type="hidden" name="product_id" id="product_id" value="{{ $product->id }}" />
-                <input type="hidden" name="quantity" id="cartQuantity" value="1" />
+            <div class="flex items-center gap-2">
+                {{-- Quantity Stepper --}}
+                <div class="flex items-center bg-white rounded-xl p-1 border border-outline-variant shadow-sm w-24 shrink-0 h-11">
+                    <button type="button" class="w-7 h-full flex items-center justify-center text-on-surface-variant hover:text-navy-deep transition-colors" onclick="changeQty(-1)">
+                        <i class="fa-solid fa-minus text-[10px]"></i>
+                    </button>
+                    <input class="w-full text-center bg-transparent border-none focus:ring-0 font-bold text-sm text-navy-deep quanity px-0" id="sharedQuantity" type="number" value="1" min="1" max="{{ $product->product_type === 'variable' ? '999' : $product->quantity ?? 999 }}">
+                    <button type="button" class="w-7 h-full flex items-center justify-center text-on-surface-variant hover:text-navy-deep transition-colors" onclick="changeQty(1)">
+                        <i class="fa-solid fa-plus text-[10px]"></i>
+                    </button>
+                </div>
 
-                <div id="variationInputs"></div> <!-- Variations will be added dynamically -->
+                {{-- Add to Cart Form --}}
+                <form id="cartForm" class="cartFormArea flex-1 min-w-0" action="{{ route('cart.store') }}" method="post">
+                    @csrf
+                    <input type="hidden" name="product_id" id="product_id" value="{{ $product->id }}" />
+                    <input type="hidden" name="quantity" id="cartQuantity" value="1" />
+                    <div id="variationInputs"></div>
+                    <button type="submit" onclick="updateCartForm(event)" class="w-full bg-navy-deep text-white border border-navy-deep h-11 rounded-xl font-bold hover:bg-navy-deep/90 transition-all flex items-center justify-center gap-1.5 shadow-md text-xs px-2 whitespace-nowrap single-cart-btn"
+                        @if ($product->product_type === 'variable') disabled style="opacity: 0.6; cursor: not-allowed;" @endif>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        Add to Cart
+                    </button>
+                </form>
 
-                <button type="submit" onclick="updateCartForm(event)" class="single-cart-btn"
-                    @if ($product->product_type === 'variable') disabled style="opacity: 0.6; cursor: not-allowed;" @endif>
-                    <svg width="18" height="18" viewBox="0 0 21 21" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M20.8256 4.51906C20.6831 4.34851 20.4723 4.24996 20.25 4.25H5.12625L4.66781 1.73187C4.53823 1.01862 3.91711 0.500105 3.19219 0.5H1.5C1.08579 0.5 0.75 0.835786 0.75 1.25C0.75 1.66421 1.08579 2 1.5 2H3.1875L5.58375 15.1522C5.65434 15.5422 5.82671 15.9067 6.08344 16.2087C5.09996 17.1273 4.97046 18.6409 5.7836 19.7132C6.59675 20.7855 8.08911 21.0692 9.23899 20.37C10.3889 19.6709 10.8238 18.2154 10.2459 17H14.5041C14.3363 17.3513 14.2495 17.7357 14.25 18.125C14.25 19.5747 15.4253 20.75 16.875 20.75C18.3247 20.75 19.5 19.5747 19.5 18.125C19.5 16.6753 18.3247 15.5 16.875 15.5H7.79719C7.43472 15.4999 7.12417 15.2407 7.05937 14.8841L6.76219 13.25H17.6372C18.7246 13.2498 19.6563 12.4721 19.8506 11.4022L20.9906 5.13406C21.0297 4.91473 20.9692 4.68938 20.8256 4.51906V4.51906ZM9 18.125C9 18.7463 8.49632 19.25 7.875 19.25C7.25368 19.25 6.75 18.7463 6.75 18.125C6.75 17.5037 7.25368 17 7.875 17C8.49632 17 9 17.5037 9 18.125V18.125ZM18 18.125C18 18.7463 17.4963 19.25 16.875 19.25C16.2537 19.25 15.75 18.7463 15.75 18.125C15.75 17.5037 16.2537 17 16.875 17C17.4963 17 18 17.5037 18 18.125V18.125ZM18.375 11.1341C18.31 11.4917 17.9979 11.7513 17.6344 11.75H6.48938L5.39906 5.75H19.3509L18.375 11.1341Z"
-                            fill="#ffffff"></path>
-                    </svg>
-                    Add To Cart
-                </button>
-
-            </form>
-
-            <!-- Buy Now Form -->
-            <form id="buyNowForm" action="{{ route('buy.store.post') }}" method="post"
-                class="buyNowFormarea inline">
-                @csrf
-                <input type="hidden" name="quantity" id="buyQuantity" value="1" />
-                <input type="hidden" name="product_id" value="{{ $product->id }}" />
-                <input type="hidden" name="price" id="buyPriceId"
-                    value="{{ $product->offer ?? $product->old_price }}" />
-                <input name="main_price" type="hidden" id="buyMainPrice"
-                    value="{{ $product->offer ?? $product->old_price }}">
-
-                <!-- Hidden Inputs for Selected Variations -->
-                <div id="buyVariationInputs"></div>
-
-                <button type="submit" onclick="updateBuyNowForm(event)" class="single-buynow-btn"
-                    onsubmit="return false;"
-                    @if ($product->product_type === 'variable') disabled style="opacity: 0.6; cursor: not-allowed;" @endif>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M7 2v11h3v9l7-12h-4l4-8z" />
-                    </svg> Buy Now
-                </button>
-
-            </form>
+                {{-- Buy Now Form --}}
+                <form id="buyNowForm" action="{{ route('buy.store.post') }}" method="post" class="buyNowFormarea flex-1 min-w-0">
+                    @csrf
+                    <input type="hidden" name="quantity" id="buyQuantity" value="1" />
+                    <input type="hidden" name="product_id" value="{{ $product->id }}" />
+                    <input type="hidden" name="price" id="buyPriceId" value="{{ $product->offer ?? $product->old_price }}" />
+                    <input name="main_price" type="hidden" id="buyMainPrice" value="{{ $product->offer ?? $product->old_price }}">
+                    <div id="buyVariationInputs"></div>
+                    <button type="submit" onclick="updateBuyNowForm(event)" class="w-full relative overflow-hidden bg-gradient-to-r from-rose-600 via-pink-500 to-amber-500 bg-[length:200%_200%] animate-firework-shimmer animate-periodic-nudge text-white h-11 rounded-xl font-extrabold shadow-lg shadow-rose-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs px-2 whitespace-nowrap tracking-wide flex items-center justify-center gap-1.5 single-buynow-btn"
+                        onsubmit="return false;"
+                        @if ($product->product_type === 'variable') disabled style="opacity: 0.6; cursor: not-allowed;" @endif>
+                        <i class="fa-solid fa-bolt text-amber-300"></i>
+                        <span>Buy Now</span>
+                        <i class="fa-solid fa-arrow-right text-white text-[10px]"></i>
+                    </button>
+                </form>
+            </div>
             @else
-            <!-- Affiliate Product External Link -->
-            <a href="{{ $product->external_url }}" target="_blank" class="single-buynow-btn affiliate-btn"
-                style="display: inline-block; text-align: center; width: 100%;"
-                onclick="return checkAffiliateStock(event)">
+            <a href="{{ $product->external_url }}" target="_blank" class="w-full relative overflow-hidden bg-gradient-to-r from-rose-600 via-pink-500 to-amber-500 bg-[length:200%_200%] animate-firework-shimmer animate-periodic-nudge text-white h-11 rounded-xl font-extrabold shadow-lg shadow-rose-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs tracking-wide flex items-center justify-center gap-2 single-buynow-btn affiliate-btn" onclick="return checkAffiliateStock(event)">
                 <i class="fa-solid fa-external-link"></i> Buy Now
             </a>
             @endif
 
+            <style>
+                @keyframes periodicNudge {
+                    0%, 90%, 100% { transform: translateX(0); }
+                    91% { transform: translateX(-6px) rotate(-1deg); }
+                    93% { transform: translateX(6px) rotate(1deg); }
+                    95% { transform: translateX(-4px) rotate(-1deg); }
+                    97% { transform: translateX(4px) rotate(1deg); }
+                    99% { transform: translateX(-2px); }
+                }
+                .animate-periodic-nudge {
+                    animation: fireworkShimmer 2.5s infinite ease-in-out, periodicNudge 12s infinite ease-in-out;
+                }
+            </style>
         </div>
 
         {{-- Short book red something --}}
@@ -2786,122 +2719,7 @@
         </div>
         @endif
 
-        {{-- Bottom Action buttons --}}
-        @if (setting('general', 'show_bottom_action_buttons', '1') == '1')
-        <div class="action-buttons">
-            @if (setting('general', 'show_whatsapp_button', '1') == '1')
-            <a href="https://api.whatsapp.com/send?phone={{ setting('general', 'whatsapp_number') }}&text={{ urlencode('I am interested in: ' . $product->title . ' - ' . url()->current()) }}"
-                target="_blank" class="whatsapp_action_button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.464 3.488" />
-                </svg>
-                {{ setting('general', 'whatsapp_number') }}</a>
-            @endif
-            @if (setting('general', 'show_phone_button', '1') == '1')
-            <a href="tel:+{{ setting('general', 'phone_number') }}" class="phonecall_action_button">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-                </svg>
-                {{ setting('general', 'phone_number') }}</a>
-            @endif
-        </div>
-        @endif
-
-        <!-- Wishlist Button -->
-        <div class="wishlist-btn-container" style="margin: 15px 0;">
-            <button type="button" class="btn-wishlist-toggle" onclick="toggleWishlistProduct({{ $product->id }}, '{{ addslashes($product->title) }}', '{{ $product->old_price ?? $product->price ?? 0 }}', '{{ asset('storage/' . $product->thumb_image) }}', '{{ route('product.single', ['id' => $product->id, 'slug' => $product->slug]) }}')" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 25px; border: 1.5px solid #ef4444; background: #fff0f0; color: #ef4444; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
-                <i class="fa-solid fa-heart" id="wishlist-heart-icon-{{ $product->id }}"></i>
-                <span id="wishlist-btn-text-{{ $product->id }}">Add to Wishlist</span>
-            </button>
-        </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                let wishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
-                let exists = wishlist.some(item => item.id == {{ $product->id }});
-                if (exists) {
-                    let btnText = document.getElementById('wishlist-btn-text-{{ $product->id }}');
-                    if (btnText) btnText.textContent = 'Saved in Wishlist';
-                }
-            });
-
-            function toggleWishlistProduct(id, title, price, image, url) {
-                let wishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
-                let index = wishlist.findIndex(item => item.id == id);
-                let btnText = document.getElementById('wishlist-btn-text-' + id);
-
-                if (index > -1) {
-                    wishlist.splice(index, 1);
-                    if (btnText) btnText.textContent = 'Add to Wishlist';
-                    alert('Removed from your Wishlist!');
-                } else {
-                    wishlist.push({ id: id, title: title, price: price, image: image, url: url });
-                    if (btnText) btnText.textContent = 'Saved in Wishlist';
-                    alert('Added to your Wishlist!');
-                }
-                localStorage.setItem('user_wishlist', JSON.stringify(wishlist));
-            }
-        </script>
-
-        {{-- Social Share --}}
-        @if (setting('single_product', 'enable_social_share', '1') == '1')
-        <div class="social-share">
-            <h6>Share:</h6>
-            <div class="share-icons">
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
-                    target="_blank" class="share-icon facebook">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                    </svg>
-                </a>
-                <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->title) }}"
-                    target="_blank" class="share-icon twitter">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                </a>
-                <a href="https://api.whatsapp.com/send?text={{ urlencode($product->title . ' - ' . url()->current()) }}"
-                    target="_blank" class="share-icon whatsapp">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.464 3.488" />
-                    </svg>
-                </a>
-                <a href="mailto:?subject={{ urlencode($product->title) }}&body={{ urlencode('Check out this product: ' . url()->current()) }}"
-                    class="share-icon email">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z">
-                        </path>
-                    </svg>
-                </a>
-                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(url()->current()) }}"
-                    target="_blank" class="share-icon linkedin">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                    </svg>
-                </a>
-                <a href="#" class="share-icon print" onclick="window.print(); return false;" title="Print">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M6 9V2h12v7H6zm10-2V4H8v3h8zm2 4h2a2 2 0 012 2v4a2 2 0 01-2 2h-2v3H6v-3H4a2 2 0 01-2-2v-4a2 2 0 012-2h2v2H4v4h16v-4h-2v-2zm-2 10v-5H8v5h8z" />
-                    </svg>
-                </a>
-            </div>
-        </div>
-        @endif
-
-        {{-- Order Delivery timeline --}}
+        {{-- Order Delivery Timeline (Placed right after Buy Now & Actions) --}}
         @php
         $showTimeline = setting('general', 'show_order_timeline', '1');
         @endphp
@@ -2915,76 +2733,143 @@
             .order-time-timeline-container {
                 width: 100%;
                 position: relative;
-                border: 1px solid #cecece;
-                border-radius: 8px;
-                margin-top: 15px;
-                padding-bottom: 5px;
+                border: 1px solid #e2e8f0;
+                background: #ffffff;
+                border-radius: 12px;
+                margin-top: 8px;
+                padding: 10px 4px 6px 4px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             }
         </style>
 
-        <div class="order-time-container">
+        <div class="order-time-container my-2">
             <div class="order-time-timeline-container" id="timeline-container">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 150" width="100%">
                     <!-- Connection Lines -->
-                    <line x1="100" y1="60" x2="400" y2="60" stroke="#000000"
-                        stroke-width="2" />
-                    <line x1="400" y1="60" x2="700" y2="60" stroke="#000000"
-                        stroke-width="2" />
+                    <line x1="100" y1="60" x2="400" y2="60" stroke="#113257" stroke-width="2.5" />
+                    <line x1="400" y1="60" x2="700" y2="60" stroke="#cbd5e1" stroke-width="2.5" stroke-dasharray="4 4" />
 
                     <!-- Circle 1: Ordered -->
-                    <circle cx="100" cy="60" r="40" fill="#1a1a1a" />
-                    <!-- Shopping Cart Icon -->
+                    <circle cx="100" cy="60" r="32" fill="#113257" />
                     <path d="M90 60 L85 45 L115 45 L110 60 Z" fill="none" stroke="#ffffff" stroke-width="2" />
                     <rect x="85" y="60" width="30" height="2" fill="#ffffff" />
                     <circle cx="90" cy="65" r="3" fill="#ffffff" />
                     <circle cx="110" cy="65" r="3" fill="#ffffff" />
                     <path d="M100 50 L100 42 M95 47 L105 47" fill="none" stroke="#ffffff" stroke-width="2" />
 
-                    <!-- Circle 2: Order Ready with Improved Truck Icon -->
-                    <circle cx="400" cy="60" r="40" fill="#1a1a1a" />
-                    <!-- Improved Delivery Truck Icon -->
-                    <path d="M375 60 L375 48 L390 48 L390 45 L410 45 L415 50 L425 50 L425 60 Z" fill="#ffffff"
-                        stroke="#ffffff" stroke-width="1" />
+                    <!-- Circle 2: Order Ready -->
+                    <circle cx="400" cy="60" r="32" fill="#113257" />
+                    <path d="M375 60 L375 48 L390 48 L390 45 L410 45 L415 50 L425 50 L425 60 Z" fill="#ffffff" stroke="#ffffff" stroke-width="1" />
                     <rect x="375" y="60" width="50" height="5" fill="#ffffff" />
-                    <circle cx="385" cy="65" r="4" fill="#1a1a1a" stroke="#ffffff"
-                        stroke-width="1" />
-                    <circle cx="415" cy="65" r="4" fill="#1a1a1a" stroke="#ffffff"
-                        stroke-width="1" />
-                    <rect x="390" y="50" width="20" height="10" fill="#1a1a1a" stroke="#ffffff"
-                        stroke-width="1" /> <!-- Window -->
+                    <circle cx="385" cy="65" r="4" fill="#113257" stroke="#ffffff" stroke-width="1" />
+                    <circle cx="415" cy="65" r="4" fill="#113257" stroke="#ffffff" stroke-width="1" />
+                    <rect x="390" y="50" width="20" height="10" fill="#113257" stroke="#ffffff" stroke-width="1" />
 
                     <!-- Circle 3: Delivered -->
-                    <circle cx="700" cy="60" r="40" fill="#1a1a1a" />
-                    <!-- Gift Box Icon -->
-                    <rect x="685" y="50" width="30" height="20" fill="none" stroke="#ffffff"
-                        stroke-width="2" />
-                    <line x1="685" y1="50" x2="700" y2="40" stroke="#ffffff"
-                        stroke-width="2" />
-                    <line x1="700" y1="40" x2="715" y2="50" stroke="#ffffff"
-                        stroke-width="2" />
-                    <line x1="700" y1="50" x2="700" y2="70" stroke="#ffffff"
-                        stroke-width="2" />
-                    <path d="M695 45 Q700 40 705 45" fill="none" stroke="#ffffff" stroke-width="1.5" />
+                    <circle cx="700" cy="60" r="32" fill="#94a3b8" />
+                    <rect x="685" y="50" width="30" height="20" fill="none" stroke="#ffffff" stroke-width="2" />
+                    <line x1="685" y1="50" x2="700" y2="40" stroke="#ffffff" stroke-width="2" />
+                    <line x1="700" y1="40" x2="715" y2="50" stroke="#ffffff" stroke-width="2" />
+                    <line x1="700" y1="50" x2="700" y2="70" stroke="#ffffff" stroke-width="2" />
 
-                    <!-- Text Labels (will be updated by JS) -->
-                    <text id="ordered-date" x="100" y="120" font-family="Arial, sans-serif" font-size="16"
-                        text-anchor="middle" font-weight="bold"></text>
-                    <text x="100" y="145" font-family="Arial, sans-serif" font-size="16"
-                        text-anchor="middle">Ordered</text>
+                    <!-- Text Labels -->
+                    <text id="ordered-date" x="100" y="115" font-family="'Inter', sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#113257"></text>
+                    <text x="100" y="135" font-family="'Inter', sans-serif" font-size="13" text-anchor="middle" fill="#64748b">Ordered</text>
 
-                    <text id="ready-date" x="400" y="120" font-family="Arial, sans-serif" font-size="16"
-                        text-anchor="middle" font-weight="bold"></text>
-                    <text x="400" y="145" font-family="Arial, sans-serif" font-size="16"
-                        text-anchor="middle">Order
-                        Ready</text>
+                    <text id="ready-date" x="400" y="115" font-family="'Inter', sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#113257"></text>
+                    <text x="400" y="135" font-family="'Inter', sans-serif" font-size="13" text-anchor="middle" fill="#64748b">Order Ready</text>
 
-                    <text id="delivered-date" x="700" y="120" font-family="Arial, sans-serif" font-size="16"
-                        text-anchor="middle" font-weight="bold"></text>
-                    <text x="700" y="145" font-family="Arial, sans-serif" font-size="16"
-                        text-anchor="middle">Delivered</text>
+                    <text id="delivered-date" x="700" y="115" font-family="'Inter', sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#64748b"></text>
+                    <text x="700" y="135" font-family="'Inter', sans-serif" font-size="13" text-anchor="middle" fill="#64748b">Delivered</text>
                 </svg>
             </div>
         </div>
+        @endif
+
+        {{-- Separate Section: Contact & Instant Support --}}
+        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl my-2">
+            <span class="text-xs font-bold text-navy-deep uppercase tracking-wider">Quick Support:</span>
+            <div class="flex items-center gap-2">
+                @if (setting('general', 'show_whatsapp_button', '1') == '1')
+                <a href="https://api.whatsapp.com/send?phone={{ setting('general', 'whatsapp_number') }}&text={{ urlencode('I am interested in: ' . $product->title . ' - ' . url()->current()) }}"
+                    target="_blank" title="WhatsApp: {{ setting('general', 'whatsapp_number') }}"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 hover:scale-105 transition-all shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                </a>
+                @endif
+
+                @if (setting('general', 'show_phone_button', '1') == '1')
+                <a href="tel:+{{ setting('general', 'phone_number') }}" title="Call: {{ setting('general', 'phone_number') }}"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500 text-white text-xs font-bold hover:bg-sky-600 hover:scale-105 transition-all shadow-sm">
+                    <i class="fa-solid fa-phone text-xs"></i> Call Us
+                </a>
+                @endif
+            </div>
+        </div>
+
+        {{-- Separate Section: Social Share --}}
+        @if (setting('single_product', 'enable_social_share', '1') == '1')
+        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl my-2">
+            <span class="text-xs font-bold text-navy-deep uppercase tracking-wider">Share Product:</span>
+            <div class="flex items-center gap-2">
+                <button type="button" title="Copy Product Link" onclick="copyProductLink()"
+                    class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center hover:scale-110 hover:bg-slate-300 transition-all shadow-sm">
+                    <i class="fa-solid fa-link text-xs"></i>
+                </button>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" title="Share on Facebook"
+                    class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm">
+                    <i class="fa-brands fa-facebook-f text-xs"></i>
+                </a>
+                <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->title) }}" target="_blank" title="Share on Twitter"
+                    class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm">
+                    <i class="fa-brands fa-x-twitter text-xs"></i>
+                </a>
+            </div>
+        </div>
+        <script>
+            function copyProductLink() {
+                navigator.clipboard.writeText(window.location.href).then(function() {
+                    alert('Product link copied to clipboard!');
+                }).catch(function(err) {
+                    let dummy = document.createElement('input');
+                    document.body.appendChild(dummy);
+                    dummy.value = window.location.href;
+                    dummy.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(dummy);
+                    alert('Product link copied to clipboard!');
+                });
+            }
+        </script>
+        @endif
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let wishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
+                let exists = wishlist.some(item => item.id == {{ $product->id }});
+                if (exists) {
+                    let heartIcon = document.getElementById('wishlist-heart-icon-{{ $product->id }}');
+                    if (heartIcon) heartIcon.classList.add('text-rose-600');
+                }
+            });
+
+            function toggleWishlistProduct(id, title, price, image, url) {
+                let wishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
+                let index = wishlist.findIndex(item => item.id == id);
+                let heartIcon = document.getElementById('wishlist-heart-icon-' + id);
+
+                if (index > -1) {
+                    wishlist.splice(index, 1);
+                    if (heartIcon) heartIcon.classList.remove('text-rose-600');
+                    alert('Removed from your Wishlist!');
+                } else {
+                    wishlist.push({ id: id, title: title, price: price, image: image, url: url });
+                    if (heartIcon) heartIcon.classList.add('text-rose-600');
+                    alert('Added to your Wishlist!');
+                }
+                localStorage.setItem('user_wishlist', JSON.stringify(wishlist));
+            }
+        </script>
 
         <script>
             // Function to format date as Month Day (e.g., May 20th)
@@ -3031,24 +2916,25 @@
                 const deliveredEndDate = addDays(orderedDate, 5);
 
                 // Update the SVG text elements
-                document.getElementById('ordered-date').textContent = formatDate(orderedDate);
-                document.getElementById('ready-date').textContent =
-                    `${formatDate(readyStartDate)} - ${formatDate(readyEndDate)}`;
-                document.getElementById('delivered-date').textContent =
-                    `${formatDate(deliveredStartDate)} - ${formatDate(deliveredEndDate)}`;
+                const el1 = document.getElementById('ordered-date');
+                const el2 = document.getElementById('ready-date');
+                const el3 = document.getElementById('delivered-date');
+
+                if (el1) el1.textContent = formatDate(orderedDate);
+                if (el2) el2.textContent = `${formatDate(readyStartDate)} - ${formatDate(readyEndDate)}`;
+                if (el3) el3.textContent = `${formatDate(deliveredStartDate)} - ${formatDate(deliveredEndDate)}`;
             }
 
             // Initialize the timeline when the page loads
             document.addEventListener('DOMContentLoaded', updateTimeline);
         </script>
-        @endif
 
         {{-- @include('frontend.partials.quickfaq') --}}
 
     </div>
-
-    {{-- Shop Right sidebar info area --}}
-    <div class="info-area">
+</div>
+<!-- Middle Section: Rules, Related List, Opinion -->
+<div class="space-y-12 info-area">
 
         <style>
             .product-video {
@@ -3301,38 +3187,51 @@
                 }
             }
         </style>
-        @if (setting('single_product', 'enable_related_products', '1') == '1' &&
-        setting('general', 'show_related_products_section', '1') == '1')
-        <div class="product-list-sidebar-section">
-            <div class="product-list-sidebar-header">
-                <span class="product-list-sidebar-line"></span>
-                <h2>{{ setting('general', 'related_products_section_title', 'আরো দেখুন') }}</h2>
-                <span class="product-list-sidebar-line"></span>
+        <!-- Delivery Rules & Related List Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter items-stretch">
+            <!-- Delivery Rules & Shipping Info Card -->
+            @php
+            $showDelivery = setting('general', 'show_delivery_info', '1');
+            $deliveryInfo = setting('general', 'delivery_info', '');
+            @endphp
+
+            @if ($showDelivery == '1' && $deliveryInfo)
+            <div class="bg-white border-2 border-dashed border-navy-deep/20 p-6 lg:p-7 rounded-3xl space-y-5 shadow-sm flex flex-col justify-between h-full">
+                <div class="flex items-center gap-3 pb-3.5 border-b border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-navy-deep/10 text-navy-deep flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-truck-fast text-base"></i>
+                    </div>
+                    <h4 class="text-base font-extrabold uppercase tracking-wider text-navy-deep font-headline m-0">RULES / শিপিং সংক্রান্ত তথ্য</h4>
+                </div>
+                <div class="space-y-3.5 text-xs text-slate-700 leading-relaxed overflow-y-auto max-h-[340px] pr-2 scrollbar-hide flex-1">
+                    {!! $deliveryInfo !!}
+                </div>
             </div>
-            @if (!empty($related_products) && count($related_products) > 0)
-            <div class="product-list-sidebar-box">
-                @foreach ($related_products as $dproduct)
-                @include('frontend.partials.list-product-item', ['product' => $dproduct])
-                @endforeach
+            @endif
+
+            <!-- Related Products List (আরো দেখুন) - Fixed Height 4 Items Scrollable -->
+            @if (setting('single_product', 'enable_related_products', '1') == '1' &&
+            setting('general', 'show_related_products_section', '1') == '1')
+            <div class="space-y-4 product-list-sidebar-section flex flex-col h-full">
+                <div class="flex items-center gap-3 product-list-sidebar-header">
+                    <div class="w-8 h-8 rounded-lg bg-energy-orange/10 text-energy-orange flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-fire-flame-curved text-sm"></i>
+                    </div>
+                    <span class="text-base font-extrabold uppercase tracking-wider text-navy-deep font-headline">{{ setting('general', 'related_products_section_title', 'আরো দেখুন') }}</span>
+                    <div class="h-0.5 flex-1 bg-slate-200"></div>
+                </div>
+
+                @if (!empty($related_products) && count($related_products) > 0)
+                <div class="bg-white border border-slate-200 rounded-3xl p-3 shadow-sm flex-1 overflow-y-auto max-h-[360px] space-y-2.5 scrollbar-hide product-list-sidebar-box">
+                    @foreach ($related_products as $dproduct)
+                    @include('frontend.partials.list-product-item', ['product' => $dproduct])
+                    @endforeach
+                </div>
+                @endif
             </div>
             @endif
         </div>
-        @endif
-
-        @php
-        $showDelivery = setting('general', 'show_delivery_info', '1');
-        $deliveryInfo = setting('general', 'delivery_info', '');
-        @endphp
-
-        @if ($showDelivery == '1' && $deliveryInfo)
-        <div class="info">
-            {!! $deliveryInfo !!}
-        </div>
-        @endif
-
-    </div>
-
-</div>
+</main>
 
 {{-- --- product review form section -- --}}
 
@@ -4606,6 +4505,64 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
 
         document.getElementById('cart_option_id').value = id;
         document.getElementById('buy_option_id').value = id;
+    }
+
+    function updateMainImage(src, btn) {
+        const main = document.getElementById('main-product-image');
+        if (!main) return;
+        const btns = btn.parentElement.querySelectorAll('button, img');
+        btns.forEach(b => {
+            b.classList.remove('border-navy-deep', 'border-2', 'ring-4', 'ring-navy-deep/5');
+            b.classList.add('border-outline-variant', 'border');
+        });
+        btn.classList.add('border-navy-deep', 'border-2', 'ring-4', 'ring-navy-deep/5');
+        btn.classList.remove('border-outline-variant', 'border');
+        main.style.opacity = '0.3';
+        setTimeout(() => {
+            main.src = src;
+            main.style.opacity = '1';
+        }, 150);
+    }
+
+    function changeQty(amount) {
+        const input = document.getElementById('sharedQuantity');
+        if (!input) return;
+        let current = parseInt(input.value) || 1;
+        if (current + amount >= 1) {
+            input.value = current + amount;
+            handleQuantityChange();
+        }
+    }
+
+    function switchTab(tab) {
+        const descTab = document.getElementById('desc-tab');
+        const revTab = document.getElementById('rev-tab');
+        const descContent = document.getElementById('description');
+        const revContent = document.getElementById('ratings');
+
+        if (tab === 'desc') {
+            if (descTab) {
+                descTab.classList.add('tab-active');
+                descTab.classList.remove('text-on-surface-variant/60', 'border-transparent');
+            }
+            if (revTab) {
+                revTab.classList.add('text-on-surface-variant/60', 'border-transparent');
+                revTab.classList.remove('tab-active');
+            }
+            if (descContent) descContent.classList.remove('hidden');
+            if (revContent) revContent.classList.add('hidden');
+        } else {
+            if (revTab) {
+                revTab.classList.add('tab-active');
+                revTab.classList.remove('text-on-surface-variant/60', 'border-transparent');
+            }
+            if (descTab) {
+                descTab.classList.add('text-on-surface-variant/60', 'border-transparent');
+                descTab.classList.remove('tab-active');
+            }
+            if (revContent) revContent.classList.remove('hidden');
+            if (descContent) descContent.classList.add('hidden');
+        }
     }
 </script>
 
@@ -6110,25 +6067,6 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
     });
 </script>
 
-{{-- Buy now animation --}}
-<script>
-    const buyanibutton = document.querySelector('.single-buynow-btn');
-
-    function triggerShake() {
-        buyanibutton.style.animation = 'shake 0.8s ease';
-
-        // Remove animation after it finishes so we can re-apply it again later
-        setTimeout(() => {
-            buyanibutton.style.animation = '';
-        }, 3000); // match the animation duration
-    }
-
-    // Shake immediately when page loads
-    window.addEventListener('load', () => {
-        triggerShake();
-        setInterval(triggerShake, 4000); // every 3 seconds
-    });
-</script>
 
 <script>
     // Wait for the DOM to be fully loaded
