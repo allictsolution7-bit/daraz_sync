@@ -293,6 +293,9 @@
                         <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('vendor.daraz.stores.*') || request()->routeIs('admin.daraz.stores.*') ? 'active text-white' : '' }}" href="{{ route('vendor.daraz.stores.index') }}">
                             <i class="fas fa-store fs-7"></i> Stores
                         </a>
+                        <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('vendor.daraz.orders.*') || request()->routeIs('admin.daraz.orders.*') ? 'active text-white' : '' }}" href="{{ route('vendor.daraz.orders.index') }}">
+                            <i class="fas fa-shopping-cart fs-7"></i> Daraz Orders
+                        </a>
                         <a class="vendor-sidebar-link py-1 text-white-50 {{ request()->routeIs('vendor.daraz.mappings.*') || request()->routeIs('admin.daraz.mappings.*') ? 'active text-white' : '' }}" href="{{ route('vendor.daraz.mappings.index') }}">
                             <i class="fas fa-arrows-spin fs-7"></i> Product Mappings
                         </a>

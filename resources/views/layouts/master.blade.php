@@ -1239,7 +1239,7 @@
                                     <ul class="left-menu-dp"
                                          style="{{ request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/vendor-orders*') || request()->is('admin/my-assigned-sales*') ? 'display: block;' : '' }}">
                                          @can('orders.view')
-                                         <li class="{{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
+                                         <li class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                                              <a href="{{ route('admin.orders.index') }}">
                                                  <span class="menu-content">
                                                      <i class="fas fa-list-ol" style="color:#1d600c;"></i>
@@ -1454,18 +1454,26 @@
                                                 </span>
                                             </a>
                                         </li>
-                                        <li class="{{ request()->routeIs('admin.daraz.stores.*') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.daraz.stores.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-store"></i>
-                                                    Stores
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li class="{{ request()->routeIs('admin.daraz.mappings.*') ? 'active' : '' }}">
-                                            <a href="{{ route('admin.daraz.mappings.index') }}">
-                                                <span class="menu-content">
-                                                    <i class="fas fa-arrows-spin"></i>
+                                         <li class="{{ request()->routeIs('admin.daraz.stores.*') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.daraz.stores.index') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-store"></i>
+                                                     Stores
+                                                 </span>
+                                             </a>
+                                         </li>
+                                         <li class="{{ request()->routeIs('admin.daraz.orders.*') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.daraz.orders.index') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-shopping-bag"></i>
+                                                     Daraz Orders
+                                                 </span>
+                                             </a>
+                                         </li>
+                                         <li class="{{ request()->routeIs('admin.daraz.mappings.*') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.daraz.mappings.index') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-arrows-spin"></i>
                                                     Product Mappings
                                                 </span>
                                             </a>

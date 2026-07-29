@@ -334,4 +334,73 @@ class DarazApiService
     {
         return $this->getSeller($store);
     }
+
+    /**
+     * Get orders list from Daraz API (/orders/get).
+     */
+    public function getOrders(DarazStore $store, array $params = []): array
+    {
+        $queryParams = array_merge([
+            'limit' => $params['limit'] ?? 50,
+            'offset' => $params['offset'] ?? 0,
+            'sort_by' => $params['sort_by'] ?? 'updated_at',
+            'sort_direction' => $params['sort_direction'] ?? 'DESC',
+        ], $params);
+
+        // Remove empty filters
+        $queryParams = array_filter($queryParams, fn($v) => $v !== null && $v !== '');
+
+        return $this->request($store, '/orders/get', $queryParams, 'GET');
+    }
+
+    /**
+     * Get a single order detail from Daraz API (/order/get).
+     */
+    public function getOrder(DarazStore $store, string $orderId): array
+    {
+        return $this->request($store, '/order/get', [
+            'order_id' => $orderId,
+        ], 'GET');
+    }
+
+    /**
+     * Get order items from Daraz API (/order/items/get).
+     */
+    public function getOrderItems(DarazStore $store, string $orderId): array
+    {
+        return $this->request($store, '/order/items/get', [
+            'order_id' => $orderId,
+        ], 'GET');
+    }
+
+    /**
+     * Get order logistics details from Daraz API (/order/logistic/get).
+     * Returns tracking number, 3PL provider, shipping provider status, package details.
+     */
+    public function getOrderLogistic(DarazStore $store, string $orderId): array
+    {
+        return $this->request($store, '/order/logistic/get', [
+            'order_id' => $orderId,
+        ], 'GET');
+    }
+
+    /**
+     * Get document (invoice, shippingLabel, carrierManifest) from Daraz API (/order/document/get).
+     *
+     * @param DarazStore $store
+     * @param string $docType Values: 'invoice', 'shippingLabel', 'carrierManifest'
+     * @param array $orderItemIds Array of integer/string order_item_id
+     */
+    public function getOrderDocument(DarazStore $store, string $docType, array $orderItemIds): array
+    {
+        // Format array of order_item_ids as JSON string like "[123,456]"
+        $formattedIds = json_encode(array_map('intval', $orderItemIds));
+
+        return $this->request($store, '/order/document/get', [
+            'doc_type' => $docType,
+            'order_item_ids' => $formattedIds,
+        ], 'GET');
+    }
 }
+
+

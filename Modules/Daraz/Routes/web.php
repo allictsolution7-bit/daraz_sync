@@ -80,3 +80,13 @@ Route::prefix('sync')->name('sync.')->group(function () {
     Route::get('/logs', [DarazSyncController::class, 'logs'])->name('logs');
     Route::delete('/logs/clear', [DarazSyncController::class, 'clearLogs'])->name('logs.clear');
 });
+
+// Orders Management
+Route::prefix('orders')->name('orders.')->group(function () {
+    Route::get('/', [\Modules\Daraz\Http\Controllers\DarazOrderController::class, 'index'])->name('index');
+    Route::get('/fetch', [\Modules\Daraz\Http\Controllers\DarazOrderController::class, 'fetchOrders'])->name('fetch');
+    Route::get('/{orderId}/items', [\Modules\Daraz\Http\Controllers\DarazOrderController::class, 'fetchOrderItems'])->name('items');
+    Route::get('/{orderId}/logistic', [\Modules\Daraz\Http\Controllers\DarazOrderController::class, 'fetchOrderLogistic'])->name('logistic');
+    Route::get('/document', [\Modules\Daraz\Http\Controllers\DarazOrderController::class, 'downloadDocument'])->name('document');
+});
+
