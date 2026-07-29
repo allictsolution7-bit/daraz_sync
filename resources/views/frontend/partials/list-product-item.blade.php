@@ -47,6 +47,17 @@
             $displayPrice = number_format($product->old_price);
         }
     }
+
+    // Calculate total stock count
+    $totalStock = 0;
+    if ($product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
+        $totalStock = $product->variationCombinations->sum('stock_quantity');
+    } else {
+        $totalStock = $product->quantity ?? $product->stock ?? 0;
+    }
+    
+    // Check if stock status is explicitly in stock or stock > 0
+    $isAvailableInStock = ($totalStock > 0) || ($product->stock_status === 'in_stock') || ($product->stock_status === 'instock');
 @endphp
 
 <a href="{{ route('product.single', ['id' => $product->id, 'slug' => $product->slug]) }}"
@@ -66,39 +77,47 @@
         </div>
         <div class="product-list-sidebar-info flex-1 min-w-0">
             @if ($product->category)
-            <div class="text-[10px] font-bold text-energy-orange uppercase tracking-wider mb-0.5 truncate">
+            <div class="text-[10px] font-bold text-blue-900 uppercase tracking-wider mb-0.5 truncate">
                 {{ $product->category->name }}
             </div>
             @endif
-            <div class="product-list-sidebar-title text-xs font-bold text-slate-800 group-hover:text-navy-deep transition-colors truncate">{{ $product->title }}</div>
-            <div class="product-list-sidebar-pricing flex items-baseline gap-1.5 mt-0.5">
+            <div class="product-list-sidebar-title text-xs font-bold text-slate-800 group-hover:text-blue-900 transition-colors truncate">{{ $product->title }}</div>
+            <div class="product-list-sidebar-pricing flex items-center gap-2 mt-0.5">
                 @if ($displayPrice)
-                    <span class="product-list-sidebar-price text-sm font-extrabold text-navy-deep">৳{{ $displayPrice }}</span>
+                    <span class="product-list-sidebar-price text-sm font-extrabold text-blue-900">৳{{ $displayPrice }}</span>
                     @if ($displayOldPrice)
                         <span class="product-list-sidebar-oldprice text-xs text-slate-400 line-through">৳{{ $displayOldPrice }}</span>
                     @endif
                 @else
-                    <span class="product-list-sidebar-price text-sm font-extrabold text-navy-deep">৳0</span>
+                    <span class="product-list-sidebar-price text-sm font-extrabold text-blue-900">৳0</span>
+                @endif
+                
+                @if($isAvailableInStock)
+                    <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 ml-auto shrink-0">
+                        In Stock @if($totalStock > 0)({{ $totalStock }})@endif
+                    </span>
+                @else
+                    <span class="text-[10px] font-semibold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200/60 ml-auto shrink-0">
+                        Out of Stock
+                    </span>
                 @endif
             </div>
-            @if ($reviewCount > 0)
-                <div class="product-list-sidebar-rating flex items-center gap-1 mt-0.5">
-                    <span class="product-list-sidebar-stars flex items-center text-blue-900 text-[10px]">
-                        @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <= $averageRating)
-                            <i class="fa-solid fa-star text-blue-900"></i>
-                            @elseif($i <= $averageRating + 0.5 && $averageRating > 0)
-                            <i class="fa-solid fa-star-half-stroke text-blue-900"></i>
-                            @else
-                            <i class="fa-regular fa-star text-slate-300 text-[10px]"></i>
-                            @endif
-                        @endfor
-                    </span>
-                    <span class="product-list-sidebar-rating-value text-[10px] text-slate-500 font-medium">
-                        {{ number_format($averageRating, 1) }} ({{ $reviewCount }})
-                    </span>
-                </div>
-            @endif
+            <div class="product-list-sidebar-rating flex items-center gap-1 mt-0.5">
+                <span class="product-list-sidebar-stars flex items-center text-blue-900 text-[10px]">
+                    @for ($i = 1; $i <= 5; $i++)
+                        @if ($i <= $averageRating)
+                        <i class="fa-solid fa-star text-blue-900"></i>
+                        @elseif($i <= $averageRating + 0.5 && $averageRating > 0)
+                        <i class="fa-solid fa-star-half-stroke text-blue-900"></i>
+                        @else
+                        <i class="fa-regular fa-star text-slate-300 text-[10px]"></i>
+                        @endif
+                    @endfor
+                </span>
+                <span class="product-list-sidebar-rating-value text-[10px] text-slate-500 font-medium">
+                    {{ number_format($averageRating, 1) }} ({{ $reviewCount }})
+                </span>
+            </div>
         </div>
     </div>
 </a> 
