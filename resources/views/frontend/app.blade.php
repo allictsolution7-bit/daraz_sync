@@ -5057,7 +5057,7 @@
     <!-- Start Footer -->
     <style>
         .footer {
-            background-color: #222222;
+            background-color: #0f172a;
             color: #ffffff;
             padding: 60px 0 30px;
         }
@@ -5085,7 +5085,7 @@
         .footer-about {
             font-size: 14px;
             line-height: 1.6;
-            color: var(--text-light);
+            color: #94a3b8;
             margin-bottom: 20px;
         }
 
@@ -5110,7 +5110,7 @@
             transition: all 0.3s;
         }
         .social-icon:hover {
-            background-color: var(--primary-color);
+            background-color: #1d4ed8;
             transform: translateY(-3px);
         }
 
@@ -5129,7 +5129,7 @@
             left: 0;
             width: 40px;
             height: 2px;
-            background-color: var(--primary-color);
+            background-color: #1d4ed8;
         }
 
         .footer-links {
@@ -5139,7 +5139,7 @@
         }
 
         .footer-link {
-            color: var(--text-light);
+            color: #94a3b8;
             font-size: 14px;
             transition: all 0.3s;
             display: flex;
@@ -5156,7 +5156,7 @@
         }
 
         .footer-link:hover {
-            color: var(--primary-color);
+            color: #60a5fa;
             transform: translateX(5px);
         }
 
@@ -5170,12 +5170,12 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            color: var(--text-light);
+            color: #94a3b8;
             font-size: 14px;
         }
 
         .contact-icon {
-            color: var(--primary-color);
+            color: #60a5fa;
             font-size: 16px;
             margin-top: 3px;
         }
@@ -5187,7 +5187,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            color: var(--text-light);
+            color: #94a3b8;
             font-size: 14px;
         }
 
@@ -5218,21 +5218,21 @@
             width: 100%;
             padding: 12px 15px;
             border-radius: 4px;
-            border: none;
-            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background-color: rgba(255, 255, 255, 0.08);
             color: #fff;
             font-size: 14px;
         }
 
         .newsletter-input::placeholder {
-            color: var(--text-light);
+            color: #94a3b8;
         }
 
         .newsletter-btn {
             position: absolute;
             right: 5px;
             top: 5px;
-            background-color: var(--primary-color);
+            background-color: #1e3a8a;
             color: #fff;
             border: none;
             padding: 7px 15px;
@@ -5242,7 +5242,7 @@
         }
 
         .newsletter-btn:hover {
-            background-color: #b08c55;
+            background-color: #1d4ed8;
         }
 
         @media (max-width: 992px) {
@@ -5323,7 +5323,7 @@
                     @endif
                 </div>
                 <p class="footer-about">
-                    {{ setting('general', 'about_website', 'Lorem ipsum...') }}
+                    {{ setting('general', 'about_website', 'Welcome to our online store! Discover premium quality products crafted for everyday lifestyle and modern trends.') }}
                 </p>
                 <div class="footer-social">
                     @if (setting('general', 'facebook_url'))
@@ -5508,13 +5508,14 @@
             right: {{ setting('general', 'floating_cart_right_desktop', '30') }}px;
             width: 50px;
             height: 50px;
-            background-color: var(--primary-color);
+            background-color: #1e3a8a !important;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.4);
             cursor: pointer;
             z-index: 20;
         }
@@ -5532,7 +5533,7 @@
             position: absolute;
             top: -5px;
             right: -5px;
-            background-color: var(--accent-color);
+            background-color: #1d4ed8 !important;
             color: white;
             width: 22px;
             height: 22px;
@@ -5553,20 +5554,7 @@
     </style>
     <style>
         .free-shipping-progress-bar {
-            background: #fff;
-            border-radius: 8px;
-            border: 1px solid #e2e2e2;
-            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
-            padding: 7px 10px;
-            margin: 18px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: inherit;
-            position: fixed;
-            bottom: {{ setting('general', 'free_shipping_progress_bottom_desktop', '0') }}px;
-            right: {{ setting('general', 'free_shipping_progress_right_desktop', '69') }}px;
-            z-index: 15;
+            display: none !important;
         }
 
 
@@ -6417,33 +6405,41 @@
     <!-- Scroll to Top Button -->
     @if (setting('homepage', 'enable_scroll_to_top', '1') == '1')
         <style>
-            /* Scroll to top button styles */
+            /* Scroll to top button styles (Left Side, Deep Navy) */
             #scrollToTopBtn {
-                position: fixed;
-                bottom: {{ $scrollToTopBottomDesktop }}px;
-                right: {{ $scrollToTopRightDesktop }}px;
-                width: 50px;
-                height: 50px;
-                background-color: var(--primary-color);
+                position: fixed !important;
+                bottom: 25px !important;
+                left: 20px !important;
+                right: auto !important;
+                width: 44px;
+                height: 44px;
+                background-color: #1e3a8a !important;
+                background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
                 border: none;
                 border-radius: 50%;
                 cursor: pointer;
                 display: none;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                transition: opacity 0.3s ease-in-out;
-                z-index: 1000;
+                box-shadow: 0 4px 15px rgba(30, 58, 138, 0.4);
+                transition: all 0.3s ease;
+                z-index: 9999 !important;
+            }
+
+            #scrollToTopBtn:hover {
+                background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%) !important;
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(30, 58, 138, 0.6);
             }
 
             #scrollToTopBtn svg {
-                width: 24px;
-                height: 24px;
+                width: 22px;
+                height: 22px;
                 fill: white;
             }
 
             #scrollToTopBtn.show {
-                display: flex;
+                display: flex !important;
             }
 
             html {
@@ -6452,8 +6448,9 @@
 
             @media (max-width: 768px) {
                 #scrollToTopBtn {
-                    bottom: {{ $scrollToTopBottomMobile }}px;
-                    right: {{ $scrollToTopRightMobile }}px;
+                    bottom: 25px !important;
+                    left: 20px !important;
+                    right: auto !important;
                 }
             }
 
@@ -7501,17 +7498,8 @@
         $whatsAppMessage = urlencode(setting('general', 'whatsapp_message', "Hello, I'm interested in your services"));
     @endphp
 
-    <!-- Scroll to Top Fixed Button (Left Side) -->
-    <div class="scroll-to-top-container">
-        <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll to top">
-            <svg class="scroll-to-top-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 15l-6-6-6 6"/>
-            </svg>
-        </button>
-    </div>
-
     @if ($showWhatsAppButton && !empty($formattedWhatsAppNumber))
-        <!-- Whatsapp fixed button for chat (Right Side, before cart) -->
+        <!-- Whatsapp fixed button for chat (Right Side, above cart) -->
         <div class="whatsapp-button-container">
             <a href="https://wa.me/{{ $formattedWhatsAppNumber }}?text={{ $whatsAppMessage }}"
                 class="whatsapp-button" id="whatsappButton">

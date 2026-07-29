@@ -2749,28 +2749,28 @@ if (is_string($productImages)) {
                     <line x1="100" y1="60" x2="400" y2="60" stroke="#113257" stroke-width="2.5" />
                     <line x1="400" y1="60" x2="700" y2="60" stroke="#cbd5e1" stroke-width="2.5" stroke-dasharray="4 4" />
 
-                    <!-- Circle 1: Ordered -->
+                    <!-- Circle 1: Ordered (Shopping Bag / Checkbox Icon) -->
                     <circle cx="100" cy="60" r="32" fill="#113257" />
-                    <path d="M90 60 L85 45 L115 45 L110 60 Z" fill="none" stroke="#ffffff" stroke-width="2" />
-                    <rect x="85" y="60" width="30" height="2" fill="#ffffff" />
-                    <circle cx="90" cy="65" r="3" fill="#ffffff" />
-                    <circle cx="110" cy="65" r="3" fill="#ffffff" />
-                    <path d="M100 50 L100 42 M95 47 L105 47" fill="none" stroke="#ffffff" stroke-width="2" />
+                    <!-- Shopping Bag / Order Icon -->
+                    <path d="M91 52 C91 48 95 44 100 44 C105 44 109 48 109 52" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                    <rect x="88" y="52" width="24" height="22" rx="3" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+                    <path d="M96 63 L99 66 L105 60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-                    <!-- Circle 2: Order Ready -->
+                    <!-- Circle 2: Order Ready (Box / Package Prepared Icon) -->
                     <circle cx="400" cy="60" r="32" fill="#113257" />
-                    <path d="M375 60 L375 48 L390 48 L390 45 L410 45 L415 50 L425 50 L425 60 Z" fill="#ffffff" stroke="#ffffff" stroke-width="1" />
-                    <rect x="375" y="60" width="50" height="5" fill="#ffffff" />
-                    <circle cx="385" cy="65" r="4" fill="#113257" stroke="#ffffff" stroke-width="1" />
-                    <circle cx="415" cy="65" r="4" fill="#113257" stroke="#ffffff" stroke-width="1" />
-                    <rect x="390" y="50" width="20" height="10" fill="#113257" stroke="#ffffff" stroke-width="1" />
+                    <!-- Box Icon -->
+                    <path d="M386 52 L400 45 L414 52 L400 59 Z" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M386 52 L386 67 L400 74 L400 59" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M414 52 L414 67 L400 74" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M393 48.5 L407 55.5" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
 
-                    <!-- Circle 3: Delivered -->
+                    <!-- Circle 3: Delivered (Delivery Van / Home Arrival Icon) -->
                     <circle cx="700" cy="60" r="32" fill="#94a3b8" />
-                    <rect x="685" y="50" width="30" height="20" fill="none" stroke="#ffffff" stroke-width="2" />
-                    <line x1="685" y1="50" x2="700" y2="40" stroke="#ffffff" stroke-width="2" />
-                    <line x1="700" y1="40" x2="715" y2="50" stroke="#ffffff" stroke-width="2" />
-                    <line x1="700" y1="50" x2="700" y2="70" stroke="#ffffff" stroke-width="2" />
+                    <!-- Delivery Truck Icon -->
+                    <rect x="683" y="50" width="22" height="15" rx="2" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+                    <path d="M705 54 L713 54 L717 59 L717 65 L705 65 Z" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
+                    <circle cx="690" cy="67" r="3.5" fill="#94a3b8" stroke="#ffffff" stroke-width="2.2"/>
+                    <circle cx="711" cy="67" r="3.5" fill="#94a3b8" stroke="#ffffff" stroke-width="2.2"/>
 
                     <!-- Text Labels -->
                     <text id="ordered-date" x="100" y="115" font-family="'Inter', sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#113257"></text>
