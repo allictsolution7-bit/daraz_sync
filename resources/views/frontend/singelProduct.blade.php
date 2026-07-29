@@ -3187,47 +3187,115 @@ if (is_string($productImages)) {
                 }
             }
         </style>
-        <!-- Delivery Rules & Related List Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter items-stretch">
-            <!-- Delivery Rules & Shipping Info Card -->
-            @php
-            $showDelivery = setting('general', 'show_delivery_info', '1');
-            $deliveryInfo = setting('general', 'delivery_info', '');
-            @endphp
+        <!-- Middle Section: Rules + Write Review (Left) & Related Products List (Right) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter items-start">
+            <!-- Left Column: Delivery Rules + Review Form -->
+            <div class="space-y-6 flex flex-col h-full justify-between">
+                <!-- Delivery Rules & Shipping Info Card -->
+                @php
+                $showDelivery = setting('general', 'show_delivery_info', '1');
+                $deliveryInfo = setting('general', 'delivery_info', '');
+                @endphp
 
-            @if ($showDelivery == '1' && $deliveryInfo)
-            <div class="bg-white border-2 border-dashed border-navy-deep/20 p-6 lg:p-7 rounded-3xl space-y-5 shadow-sm flex flex-col justify-between h-full">
-                <div class="flex items-center gap-3 pb-3.5 border-b border-slate-100">
-                    <div class="w-10 h-10 rounded-xl bg-navy-deep/10 text-navy-deep flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-truck-fast text-base"></i>
+                @if ($showDelivery == '1' && $deliveryInfo)
+                <div class="bg-white border-2 border-dashed border-navy-deep/20 p-5 lg:p-6 rounded-3xl space-y-4 shadow-sm">
+                    <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                        <div class="w-9 h-9 rounded-xl bg-navy-deep/10 text-navy-deep flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-truck-fast text-sm"></i>
+                        </div>
+                        <h4 class="text-sm font-extrabold uppercase tracking-wider text-navy-deep font-headline m-0">RULES / শিপিং সংক্রান্ত তথ্য</h4>
                     </div>
-                    <h4 class="text-base font-extrabold uppercase tracking-wider text-navy-deep font-headline m-0">RULES / শিপিং সংক্রান্ত তথ্য</h4>
+                    <div class="space-y-3 text-xs text-slate-700 leading-relaxed overflow-y-auto max-h-[220px] pr-2 custom-scrollbar">
+                        {!! $deliveryInfo !!}
+                    </div>
                 </div>
-                <div class="space-y-3.5 text-xs text-slate-700 leading-relaxed overflow-y-auto max-h-[340px] pr-2 scrollbar-hide flex-1">
-                    {!! $deliveryInfo !!}
-                </div>
-            </div>
-            @endif
+                @endif
 
-            <!-- Related Products List (আরো দেখুন) - Fixed Height 4 Items Scrollable -->
+                <!-- Write a Review Form Card (Underneath Rules) -->
+                @if (setting('general', 'show_review_form_section', '1') == '1')
+                <div class="bg-white border border-slate-200 rounded-3xl p-5 lg:p-6 shadow-sm space-y-3" id="review-form-section">
+                    <div class="flex items-center gap-3 pb-2.5 border-b border-slate-100">
+                        <div class="w-9 h-9 rounded-xl bg-amber-400/15 text-amber-500 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-pen-to-square text-sm"></i>
+                        </div>
+                        <h4 class="text-sm font-extrabold text-navy-deep font-headline m-0">{{ setting('general', 'review_form_header_title', 'এই পণ্য সম্পর্কে আপনার মূল্যবান মতামত লিখুন') }}</h4>
+                    </div>
+
+                    <form id="product-review-form" enctype="multipart/form-data" class="space-y-3">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+                        <div class="flex items-center gap-2">
+                            <div class="star-rating-group flex items-center gap-1.5 flex-1">
+                                @for ($r = 1; $r <= 5; $r++)
+                                <div class="individual-star-item cursor-pointer text-amber-400 text-lg hover:scale-110 transition-transform @if($r == 4) selected-active @endif" data-rating="{{ $r }}" title="{{ $r }} Star">
+                                    <i class="@if($r <= 4) fa-solid @else fa-regular @endif fa-star"></i>
+                                </div>
+                                @endfor
+                            </div>
+                        </div>
+                        <input type="hidden" name="rating" id="selected-rating" value="4">
+
+                        <textarea class="w-full h-20 p-2.5 border border-slate-200 rounded-xl text-xs font-body focus:ring-2 focus:ring-navy-deep/20 focus:border-navy-deep transition-all resize-none text-slate-700" name="review_text"
+                            placeholder="{{ setting('general', 'review_form_comment_placeholder', 'Write your comment...') }}" required></textarea>
+
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex-1">
+                                <label class="block text-[11px] font-bold text-slate-500 mb-1">Upload Image (Optional)</label>
+                                <input type="file" class="text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-slate-100 file:text-navy-deep hover:file:bg-slate-200 cursor-pointer" name="review_images[]" accept="image/*" multiple>
+                            </div>
+                            <button type="submit" class="bg-navy-deep hover:bg-navy-deep/90 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md shrink-0 self-end">
+                                {{ setting('general', 'review_form_submit_button_text', 'আপনার মতামত সাবমিট করুন') }}
+                            </button>
+                        </div>
+
+                        @guest
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <input type="text" name="reviewer_name" placeholder="Your Name *" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs" required>
+                            <input type="email" name="reviewer_email" placeholder="Your Email *" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs" required>
+                        </div>
+                        @endguest
+                    </form>
+                </div>
+                @endif
+            </div>
+
+            <!-- Right Column: Related Products List (আরো দেখুন) -->
             @if (setting('single_product', 'enable_related_products', '1') == '1' &&
             setting('general', 'show_related_products_section', '1') == '1')
-            <div class="space-y-4 product-list-sidebar-section flex flex-col h-full">
-                <div class="flex items-center gap-3 product-list-sidebar-header">
-                    <div class="w-8 h-8 rounded-lg bg-energy-orange/10 text-energy-orange flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-fire-flame-curved text-sm"></i>
+            <div class="product-list-sidebar-section flex flex-col h-full !m-0 !p-0">
+                <div class="flex items-center gap-3 product-list-sidebar-header !mb-2 !mt-0">
+                    <div class="w-7 h-7 rounded-lg bg-energy-orange/10 text-energy-orange flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-fire-flame-curved text-xs"></i>
                     </div>
-                    <span class="text-base font-extrabold uppercase tracking-wider text-navy-deep font-headline">{{ setting('general', 'related_products_section_title', 'আরো দেখুন') }}</span>
+                    <span class="text-sm font-extrabold uppercase tracking-wider text-navy-deep font-headline">{{ setting('general', 'related_products_section_title', 'আরো দেখুন') }}</span>
                     <div class="h-0.5 flex-1 bg-slate-200"></div>
                 </div>
 
                 @if (!empty($related_products) && count($related_products) > 0)
-                <div class="bg-white border border-slate-200 rounded-3xl p-3 shadow-sm flex-1 overflow-y-auto max-h-[360px] space-y-2.5 scrollbar-hide product-list-sidebar-box">
+                <div class="bg-white border border-slate-200 rounded-3xl p-2.5 shadow-sm overflow-y-auto max-h-[560px] space-y-2 custom-scrollbar product-list-sidebar-box flex-1">
                     @foreach ($related_products as $dproduct)
                     @include('frontend.partials.list-product-item', ['product' => $dproduct])
                     @endforeach
                 </div>
                 @endif
+
+                <style>
+                    .custom-scrollbar::-webkit-scrollbar {
+                        width: 5px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-track {
+                        background: #f1f5f9;
+                        border-radius: 10px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb {
+                        background: #cbd5e1;
+                        border-radius: 10px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: #94a3b8;
+                    }
+                </style>
             </div>
             @endif
         </div>
@@ -3595,104 +3663,7 @@ if (is_string($productImages)) {
         }
     }
 </style>
-<section class="base-container ecom-feedback-section" id="review-form-section">
-    <div class="feedback-header-title">
-        {{ setting('general', 'review_form_header_title', 'এই পণ্য সম্পর্কে আপনার মূল্যবান মতামত লিখুন') }}
-    </div>
 
-    <form id="product-review-form" enctype="multipart/form-data">
-        @csrf
-        <input type="hidden" name="product_id" value="{{ $product->id }}">
-
-        <div class="rating-evaluation-container">
-            <div class="user-profile-avatar"></div>
-            <div class="star-rating-group">
-                <div class="individual-star-item" data-rating="1">
-                    <div class="star-svg-container">
-                        <svg class="star-svg-icon" viewBox="0 0 24 24" width="24" height="24">
-                            <path
-                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                fill="currentColor" />
-                        </svg>
-                    </div>
-                    <span class="star-rating-label">Bad(1/5)</span>
-                </div>
-                <div class="individual-star-item" data-rating="2">
-                    <div class="star-svg-container">
-                        <svg class="star-svg-icon" viewBox="0 0 24 24" width="24" height="24">
-                            <path
-                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                fill="currentColor" />
-                        </svg>
-                    </div>
-                    <span class="star-rating-label">So-so(2/5)</span>
-                </div>
-                <div class="individual-star-item" data-rating="3">
-                    <div class="star-svg-container">
-                        <svg class="star-svg-icon" viewBox="0 0 24 24" width="24" height="24">
-                            <path
-                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                fill="currentColor" />
-                        </svg>
-                    </div>
-                    <span class="star-rating-label">ok(3/5)</span>
-                </div>
-                <div class="individual-star-item selected-active" data-rating="4">
-                    <div class="star-svg-container">
-                        <svg class="star-svg-icon" viewBox="0 0 24 24" width="24" height="24">
-                            <path
-                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                fill="currentColor" />
-                        </svg>
-                    </div>
-                    <span class="star-rating-label">Good(4/5)</span>
-                </div>
-                <div class="individual-star-item" data-rating="5">
-                    <div class="star-svg-container">
-                        <svg class="star-svg-icon" viewBox="0 0 24 24" width="24" height="24">
-                            <path
-                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                fill="currentColor" />
-                        </svg>
-                    </div>
-                    <span class="star-rating-label">Better(5/5)</span>
-                </div>
-            </div>
-        </div>
-
-        <input type="hidden" name="rating" id="selected-rating" value="4">
-
-        <textarea class="comment-input-textarea" name="review_text"
-            placeholder="{{ setting('general', 'review_form_comment_placeholder', 'Write your comment...') }}" required></textarea>
-
-        <div class="image-upload-container">
-            <label class="image-upload-label">Upload Images (Optional)</label>
-            <div class="image-upload-wrapper">
-                <input type="file" class="image-upload-input" name="review_images[]" accept="image/*"
-                    multiple>
-            </div>
-            <div class="image-preview-container">
-                <div class="image-preview-grid"></div>
-            </div>
-        </div>
-
-        @guest
-        <div class="guest-info-container">
-            <div class="form-group">
-                <label for="reviewer_name">{{ setting('general', 'guest_name_label', 'আপনার নাম') }} *</label>
-                <input type="text" name="reviewer_name" id="reviewer_name" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="reviewer_email">{{ setting('general', 'guest_email_label', 'আপনার ইমেইল') }} *</label>
-                <input type="email" name="reviewer_email" id="reviewer_email" class="form-control" required>
-            </div>
-        </div>
-        @endguest
-
-        <button type="submit"
-            class="submit-feedback-button">{{ setting('general', 'review_form_submit_button_text', 'আপনার মতামত সাবমিট করুন') }}</button>
-    </form>
-</section>
 <script>
     class EcomFeedbackRating {
         constructor() {
@@ -3743,10 +3714,17 @@ if (is_string($productImages)) {
 
         updateStarDisplay() {
             this.starItems.forEach((starItem, index) => {
+                const icon = starItem.querySelector('i');
                 if (index < this.selectedRating) {
                     starItem.classList.add('selected-active');
+                    if (icon) {
+                        icon.className = 'fa-solid fa-star text-amber-400';
+                    }
                 } else {
                     starItem.classList.remove('selected-active');
+                    if (icon) {
+                        icon.className = 'fa-regular fa-star text-slate-300';
+                    }
                 }
             });
             // Update hidden input
@@ -3757,10 +3735,17 @@ if (is_string($productImages)) {
 
         previewRating(previewRating) {
             this.starItems.forEach((starItem, index) => {
+                const icon = starItem.querySelector('i');
                 if (index < previewRating) {
                     starItem.classList.add('selected-active');
+                    if (icon) {
+                        icon.className = 'fa-solid fa-star text-amber-400';
+                    }
                 } else {
                     starItem.classList.remove('selected-active');
+                    if (icon) {
+                        icon.className = 'fa-regular fa-star text-slate-300';
+                    }
                 }
             });
         }
@@ -3900,160 +3885,208 @@ if (is_string($productImages)) {
 
 @if (setting('general', 'show_product_description_section', '1') == '1' ||
 setting('general', 'show_ratings_reviews_section', '1') == '1')
-<div class="base-container product-sections">
-    <div class="section-navigation">
+<div class="base-container product-sections max-w-container-max mx-auto px-margin-desktop my-6">
+    <!-- Premium Navigation Tabs -->
+    <div class="bg-slate-100/80 p-1 rounded-xl flex items-center gap-1.5 border border-slate-200/80 shadow-inner max-w-fit mb-4 section-navigation">
         @if (setting('general', 'show_product_description_section', '1') == '1' && !empty(trim($product->description)))
-        <button class="section-nav-button"
-            data-section="description">{{ setting('general', 'description_section_title', 'Product Description') }}</button>
+        <button class="section-nav-button px-4 py-2 rounded-lg font-headline font-bold text-xs text-slate-600 transition-all flex items-center gap-1.5 hover:text-navy-deep active-tab shadow-sm bg-white text-navy-deep"
+            data-section="description">
+            <i class="fa-solid fa-file-lines text-xs text-navy-deep"></i>
+            <span>{{ setting('general', 'description_section_title', 'Product Description') }}</span>
+        </button>
         @endif
         @if (setting('general', 'show_ratings_reviews_section', '1') == '1' && $reviewStats['review_count'] > 0)
-        <button class="section-nav-button"
-            data-section="ratings">{{ setting('general', 'ratings_section_title', 'Ratings & Reviews') }}</button>
+        <button class="section-nav-button px-4 py-2 rounded-lg font-headline font-bold text-xs text-slate-600 transition-all flex items-center gap-1.5 hover:text-navy-deep"
+            data-section="ratings">
+            <i class="fa-solid fa-star text-xs text-amber-400"></i>
+            <span>{{ setting('general', 'ratings_section_title', 'Ratings & Reviews') }}</span>
+            <span class="bg-navy-deep/10 text-navy-deep text-[10px] px-1.5 py-0.5 rounded-full">{{ $reviewStats['review_count'] }}</span>
+        </button>
         @endif
     </div>
 
+    <!-- Product Description Card -->
     @if (setting('general', 'show_product_description_section', '1') == '1' && !empty(trim($product->description)))
     <div class="product-description-section" id="description">
-        <div class="product-description">
-            <h3>{{ setting('general', 'description_section_title', 'Product Description') }}</h3>
-            <div class="description-content">
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 lg:p-6 shadow-sm">
+            <div class="description-formatted-wrapper text-slate-700 font-body text-xs leading-relaxed w-full">
                 {!! $product->description !!}
             </div>
         </div>
+
+        <style>
+            .product-description-section .description-formatted-wrapper {
+                line-height: 1.6;
+                color: #334155;
+                width: 100%;
+                overflow-x: auto;
+            }
+            .product-description-section .description-formatted-wrapper h1,
+            .product-description-section .description-formatted-wrapper h2,
+            .product-description-section .description-formatted-wrapper h3,
+            .product-description-section .description-formatted-wrapper h4 {
+                color: #113257;
+                font-weight: 800;
+                margin-top: 1rem;
+                margin-bottom: 0.5rem;
+                clear: both;
+            }
+            .product-description-section .description-formatted-wrapper p {
+                margin-bottom: 0.75rem;
+                color: #475569;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            .product-description-section .description-formatted-wrapper strong {
+                color: #0f172a;
+                font-weight: 700;
+            }
+            .product-description-section .description-formatted-wrapper hr {
+                border: 0;
+                height: 1px;
+                background: #e2e8f0;
+                margin: 1rem 0;
+            }
+            /* Full Width Table Styling */
+            .product-description-section .description-formatted-wrapper table {
+                width: 100% !important;
+                min-width: 100%;
+                border-collapse: collapse;
+                margin: 1rem 0;
+                border-radius: 10px;
+                overflow: hidden;
+                border: 1px solid #e2e8f0;
+                table-layout: auto;
+            }
+            .product-description-section .description-formatted-wrapper table th {
+                background-color: #113257;
+                color: #ffffff;
+                font-weight: 700;
+                text-align: left;
+                padding: 10px 14px;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+            .product-description-section .description-formatted-wrapper table td {
+                padding: 10px 14px;
+                border-bottom: 1px solid #f1f5f9;
+                font-size: 11px;
+                color: #334155;
+                vertical-align: top;
+            }
+            .product-description-section .description-formatted-wrapper table tr:nth-child(even) td {
+                background-color: #f8fafc;
+            }
+            .product-description-section .description-formatted-wrapper ul,
+            .product-description-section .description-formatted-wrapper ol {
+                padding-left: 1.5rem;
+                margin: 0.75rem 0;
+            }
+            .product-description-section .description-formatted-wrapper li {
+                margin-bottom: 0.35rem;
+                font-size: 11px;
+                color: #1e293b;
+            }
+        </style>
     </div>
     @endif
 
+    <!-- Customer Ratings & Reviews Card -->
     @if (setting('general', 'show_ratings_reviews_section', '1') == '1' && $reviewStats['review_count'] > 0)
-    <div class="product-ratings-section" id="ratings">
-        <div class="product-ratings">
-            <h3>{{ setting('general', 'ratings_section_title', 'Customer Ratings & Reviews') }}</h3>
-            <div class="rating-summary">
-                <div class="average-rating">
-                    <div class="rating-number">{{ number_format($reviewStats['average_rating'], 1) }}</div>
-                    <div class="stars">
-                        @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <=$reviewStats['average_rating'])
-                            <svg class="star-icon filled" viewBox="0 0 24 24" width="20"
-                            height="20">
-                            <path
-                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                fill="#f59e0b" />
-                            </svg>
-                            @elseif($i <= $reviewStats['average_rating'] + 0.5)
-                                <svg class="star-icon half-filled" viewBox="0 0 24 24" width="20"
-                                height="20">
-                                <defs>
-                                    <linearGradient id="halfStar">
-                                        <stop offset="50%" stop-color="#f59e0b" />
-                                        <stop offset="50%" stop-color="#e5e7eb" />
-                                    </linearGradient>
-                                </defs>
-                                <path
-                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                    fill="url(#halfStar)" />
-                                </svg>
-                                @else
-                                <svg class="star-icon empty" viewBox="0 0 24 24" width="20"
-                                    height="20">
-                                    <path
-                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                        fill="#e5e7eb" />
-                                </svg>
-                                @endif
-                                @endfor
-                    </div>
-                    <div class="total-reviews">Based on {{ $reviewStats['review_count'] }} reviews</div>
+    <div class="product-ratings-section hidden mt-4" id="ratings">
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 lg:p-6 shadow-sm space-y-5">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-amber-400/15 text-amber-500 flex items-center justify-center font-bold text-xs">
+                    <i class="fa-solid fa-star"></i>
                 </div>
-                <div class="rating-bars">
+                <h3 class="text-base font-extrabold text-navy-deep font-headline m-0">{{ setting('general', 'ratings_section_title', 'Customer Ratings & Reviews') }}</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <!-- Average Rating Big Badge -->
+                <div class="text-center space-y-1 border-b md:border-b-0 md:border-r border-slate-200/80 pb-3 md:pb-0 md:pr-4">
+                    <div class="text-3xl font-black text-navy-deep tracking-tight font-headline">{{ number_format($reviewStats['average_rating'], 1) }}</div>
+                    <div class="flex justify-center text-amber-400 gap-1 text-sm">
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= $reviewStats['average_rating'])
+                            <i class="fa-solid fa-star"></i>
+                            @elseif($i <= $reviewStats['average_rating'] + 0.5)
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                            @else
+                            <i class="fa-regular fa-star text-slate-300"></i>
+                            @endif
+                        @endfor
+                    </div>
+                    <div class="text-[11px] font-semibold text-slate-500">Based on {{ $reviewStats['review_count'] }} reviews</div>
+                </div>
+
+                <!-- Rating Distribution Bars -->
+                <div class="md:col-span-2 space-y-1.5">
                     @for ($rating = 5; $rating >= 1; $rating--)
                     @php
                     $count = $reviewStats['rating_distribution'][$rating] ?? 0;
-                    $percentage =
-                    $reviewStats['review_count'] > 0
-                    ? ($count / $reviewStats['review_count']) * 100
-                    : 0;
+                    $percentage = $reviewStats['review_count'] > 0 ? ($count / $reviewStats['review_count']) * 100 : 0;
                     @endphp
-                    <div class="rating-bar-item">
-                        <span class="rating-label">{{ $rating }}
-                            <svg class="star-icon small" viewBox="0 0 24 24" width="16"
-                                height="16">
-                                <path
-                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                    fill="#f59e0b" />
-                            </svg>
+                    <div class="flex items-center gap-2.5 text-[11px]">
+                        <span class="w-8 font-bold text-slate-600 flex items-center gap-1">
+                            {{ $rating }} <i class="fa-solid fa-star text-[9px] text-amber-400"></i>
                         </span>
-                        <div class="rating-bar">
-                            <div class="rating-fill" style="width: {{ $percentage }}%"></div>
+                        <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500" style="width: {{ $percentage }}%"></div>
                         </div>
-                        <span class="rating-count">{{ $count }}</span>
+                        <span class="w-6 text-right font-medium text-slate-400 text-[10px]">{{ $count }}</span>
                     </div>
                     @endfor
                 </div>
             </div>
 
-            <div class="customer-reviews">
+            <!-- Review Items List -->
+            <div class="space-y-3 divide-y divide-slate-100">
                 @forelse($reviews as $review)
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <div class="reviewer-avatar">
+                <div class="pt-3 first:pt-0 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-200 border border-slate-300 shrink-0">
                                 @if ($review->reviewer_image)
-                                <img src="{{ asset($review->reviewer_image) }}"
-                                    alt="{{ $review->reviewer_name }}">
+                                <img class="w-full h-full object-cover" src="{{ asset($review->reviewer_image) }}" alt="{{ $review->reviewer_name }}">
                                 @else
-                                <img src="{{ asset('assets/img/man.png') }}"
-                                    alt="{{ $review->reviewer_name }}">
-                                @endif
-                                @if ($review->is_verified_purchase)
-                                <span class="verified-badge" title="Verified Purchase">
-                                    <svg viewBox="0 0 24 24" width="12" height="12">
-                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
-                                            fill="#ffffff" />
-                                    </svg>
-                                </span>
+                                <img class="w-full h-full object-cover" src="{{ asset('assets/img/man.png') }}" alt="{{ $review->reviewer_name }}">
                                 @endif
                             </div>
-                            <div class="reviewer-details">
-                                <div class="reviewer-name">{{ $review->reviewer_name }}</div>
-                                <div class="review-date">{{ $review->created_at->format('F d, Y') }}
+                            <div>
+                                <div class="font-bold text-xs text-navy-deep flex items-center gap-1.5">
+                                    <span>{{ $review->reviewer_name }}</span>
+                                    @if ($review->is_verified_purchase)
+                                    <span class="inline-flex items-center gap-0.5 text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.2 rounded-full">
+                                        <i class="fa-solid fa-circle-check text-[8px]"></i> Verified
+                                    </span>
+                                    @endif
                                 </div>
+                                <div class="text-[10px] text-slate-400">{{ $review->created_at->format('F d, Y') }}</div>
                             </div>
                         </div>
-                        <div class="review-rating">
+                        <div class="flex text-amber-400 text-[11px] gap-0.5">
                             @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <=$review->rating)
-                                <svg class="star-icon filled" viewBox="0 0 24 24" width="16"
-                                    height="16">
-                                    <path
-                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                        fill="#f59e0b" />
-                                </svg>
+                                @if ($i <= $review->rating)
+                                <i class="fa-solid fa-star"></i>
                                 @else
-                                <svg class="star-icon empty" viewBox="0 0 24 24" width="16"
-                                    height="16">
-                                    <path
-                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                        fill="#e5e7eb" />
-                                </svg>
+                                <i class="fa-regular fa-star text-slate-200"></i>
                                 @endif
-                                @endfor
+                            @endfor
                         </div>
                     </div>
-                    <div class="review-content">
-                        <p>{{ $review->review_text }}</p>
-                        @if ($review->review_images && is_array($review->review_images) && count($review->review_images) > 0)
-                        <div class="review-images">
-                            @foreach ($review->review_images as $image)
-                            <img src="{{ asset($image) }}" alt="Review Image"
-                                class="review-image">
-                            @endforeach
-                        </div>
-                        @endif
+                    <p class="text-xs text-slate-700 leading-relaxed font-body m-0">{{ $review->review_text }}</p>
+                    @if ($review->review_images && is_array($review->review_images) && count($review->review_images) > 0)
+                    <div class="flex gap-2 pt-1">
+                        @foreach ($review->review_images as $image)
+                        <img src="{{ asset($image) }}" alt="Review Image" class="w-12 h-12 object-cover rounded-lg border border-slate-200">
+                        @endforeach
                     </div>
+                    @endif
                 </div>
                 @empty
-                <div class="no-reviews">
-                    <p>No reviews yet. Be the first to review this product!</p>
+                <div class="text-center py-4 text-slate-400 text-xs">
+                    No reviews yet. Be the first to review this product!
                 </div>
                 @endforelse
             </div>
@@ -4061,6 +4094,30 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
     </div>
     @endif
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navButtons = document.querySelectorAll('.section-nav-button');
+        navButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const target = this.dataset.section;
+                navButtons.forEach(btn => {
+                    btn.classList.remove('bg-white', 'text-navy-deep', 'shadow-sm', 'active-tab');
+                    btn.classList.add('text-slate-600');
+                });
+                this.classList.add('bg-white', 'text-navy-deep', 'shadow-sm', 'active-tab');
+                this.classList.remove('text-slate-600');
+
+                document.getElementById('description')?.classList.add('hidden');
+                document.getElementById('ratings')?.classList.add('hidden');
+
+                const activeSection = document.getElementById(target);
+                if (activeSection) {
+                    activeSection.classList.remove('hidden');
+                }
+            });
+        });
+    });
+</script>
 @endif
 
 <style>

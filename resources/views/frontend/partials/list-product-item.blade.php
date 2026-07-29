@@ -51,8 +51,8 @@
 
 <a href="{{ route('product.single', ['id' => $product->id, 'slug' => $product->slug]) }}"
     class="block group hover:no-underline transition-all">
-    <div class="product-list-sidebar-item flex items-center gap-3 p-2 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all">
-        <div class="product-list-sidebar-img relative w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
+    <div class="product-list-sidebar-item flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all">
+        <div class="product-list-sidebar-img relative w-14 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
             <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="{{ asset('storage/' . $product->thumb_image) }}"
                 alt="{{ $product->title }}">
             @if ($product->offer && $product->old_price && $product->old_price > $product->offer)
