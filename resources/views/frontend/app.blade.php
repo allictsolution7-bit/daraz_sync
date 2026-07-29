@@ -7501,8 +7501,17 @@
         $whatsAppMessage = urlencode(setting('general', 'whatsapp_message', "Hello, I'm interested in your services"));
     @endphp
 
+    <!-- Scroll to Top Fixed Button (Left Side) -->
+    <div class="scroll-to-top-container">
+        <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll to top">
+            <svg class="scroll-to-top-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 15l-6-6-6 6"/>
+            </svg>
+        </button>
+    </div>
+
     @if ($showWhatsAppButton && !empty($formattedWhatsAppNumber))
-        <!-- Whatsapp fixed button for chat -->
+        <!-- Whatsapp fixed button for chat (Right Side, before cart) -->
         <div class="whatsapp-button-container">
             <a href="https://wa.me/{{ $formattedWhatsAppNumber }}?text={{ $whatsAppMessage }}"
                 class="whatsapp-button" id="whatsappButton">
@@ -7512,150 +7521,192 @@
                 </svg>
             </a>
         </div>
-        <style>
-            .whatsapp-button-container {
-                position: fixed;
-              bottom: 30px;
-          left: 20px;
-                z-index: 1000;
-            }
-    
-            .whatsapp-button {
-                position: relative;
-                width: 60px;
-                height: 60px;
-                background: #25d366;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-                transition: all 0.3s ease;
-                text-decoration: none;
-            }
-    
-            .whatsapp-button:hover {
-                transform: scale(1.1);
-                box-shadow: 0 6px 25px rgba(37, 211, 102, 0.6);
-            }
-    
-            .whatsapp-button::before {
-                content: '';
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                border-radius: 50%;
-                background: rgba(37, 211, 102, 0.3);
-                animation: whatsappPulse 2s infinite;
-            }
-    
-            .whatsapp-button::after {
-                content: '';
-                position: absolute;
-                width: 140%;
-                height: 140%;
-                border-radius: 50%;
-                background: rgba(37, 211, 102, 0.15);
-                animation: whatsappPulse 2s infinite 0.5s;
-            }
-    
-            .whatsapp-icon {
-                width: 30px;
-                height: 30px;
-                fill: white;
-                z-index: 10;
-                position: relative;
-            }
-    
-            @keyframes whatsappPulse {
-                0% {
-                    transform: scale(1);
-                    opacity: 0.8;
-                }
-    
-                50% {
-                    transform: scale(1.2);
-                    opacity: 0.4;
-                }
-    
-                100% {
-                    transform: scale(1.4);
-                    opacity: 0;
-                }
-            }
-    
-            @media (max-width: 768px) {
-                .whatsapp-button-container {
-                    bottom:50px;
-                  left:20px;
-                }
-    
-                .whatsapp-button {
-                    width: 55px;
-                    height: 55px;
-                }
-    
-                .whatsapp-icon {
-                    width: 26px;
-                    height: 26px;
-                }
-            }
-    
-            .whatsapp-button.clicked::before {
-                animation: whatsappRipple 0.6s ease-out;
-            }
-    
-            @keyframes whatsappRipple {
-                0% {
-                    transform: scale(1);
-                    opacity: 0.8;
-                }
-    
-                100% {
-                    transform: scale(2);
-                    opacity: 0;
-                }
-            }
-    
-            .whatsapp-button {
-                animation: float 3s ease-in-out infinite;
-            }
-    
-            @keyframes float {
-    
-                0%,
-                100% {
-                    transform: translateY(0px);
-                }
-    
-                50% {
-                    transform: translateY(-5px);
-                }
-            }
-        </style>
-        <script>
-            const whatsappButton = document.getElementById('whatsappButton');
-    
-            if (whatsappButton) {
-                whatsappButton.addEventListener('click', function() {
-                    this.classList.add('clicked');
-                    setTimeout(() => {
-                        this.classList.remove('clicked');
-                    }, 600);
-                });
-    
-                whatsappButton.addEventListener('click', function() {
-                    if (navigator.vibrate) {
-                        navigator.vibrate(100);
-                    }
-                });
-            }
-        </script>
-    
     @endif
 
-   
+    <style>
+        /* Scroll To Top Left Button */
+        .scroll-to-top-container {
+            position: fixed !important;
+            bottom: 30px !important;
+            left: 20px !important;
+            right: auto !important;
+            z-index: 9999 !important;
+        }
+
+        .scroll-to-top-btn {
+            width: 44px;
+            height: 44px;
+            background: #1e3a8a;
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .scroll-to-top-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.6);
+        }
+
+        /* WhatsApp Button Position (Right Side directly ABOVE Cart) */
+        .whatsapp-button-container {
+            position: fixed;
+            bottom: 85px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .whatsapp-button {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            background: #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .whatsapp-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+
+        .whatsapp-button::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(37, 211, 102, 0.3);
+            animation: whatsappPulse 2s infinite;
+        }
+
+        .whatsapp-button::after {
+            content: '';
+            position: absolute;
+            width: 140%;
+            height: 140%;
+            border-radius: 50%;
+            background: rgba(37, 211, 102, 0.15);
+            animation: whatsappPulse 2s infinite 0.5s;
+        }
+
+        .whatsapp-icon {
+            width: 22px;
+            height: 22px;
+            fill: white;
+            z-index: 10;
+            position: relative;
+        }
+
+        @keyframes whatsappPulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .scroll-to-top-container {
+                bottom: 25px;
+                left: 15px;
+            }
+
+            .whatsapp-button-container {
+                bottom: 25px;
+                right: 75px;
+            }
+
+            .whatsapp-button, .scroll-to-top-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            .whatsapp-icon {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .whatsapp-button.clicked::before {
+            animation: whatsappRipple 0.6s ease-out;
+        }
+
+        @keyframes whatsappRipple {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .whatsapp-button {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+    <script>
+        const whatsappButton = document.getElementById('whatsappButton');
+
+        if (whatsappButton) {
+            whatsappButton.addEventListener('click', function() {
+                this.classList.add('clicked');
+                setTimeout(() => {
+                    this.classList.remove('clicked');
+                }, 600);
+            });
+
+            whatsappButton.addEventListener('click', function() {
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+            });
+        }
+
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+        if (scrollToTopBtn) {
+            scrollToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+    </script>
+    
     <!-- Custom Footer Code -->
     @if(setting('general', 'custom_footer_code', ''))
         {!! setting('general', 'custom_footer_code', '') !!}

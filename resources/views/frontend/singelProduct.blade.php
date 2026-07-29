@@ -3228,7 +3228,7 @@ if (is_string($productImages)) {
                         <div class="flex items-center gap-2">
                             <div class="star-rating-group flex items-center gap-1.5 flex-1">
                                 @for ($r = 1; $r <= 5; $r++)
-                                <div class="individual-star-item cursor-pointer text-amber-400 text-lg hover:scale-110 transition-transform @if($r == 4) selected-active @endif" data-rating="{{ $r }}" title="{{ $r }} Star">
+                                <div class="individual-star-item cursor-pointer text-blue-900 text-lg hover:scale-110 transition-transform @if($r == 4) selected-active @endif" data-rating="{{ $r }}" title="{{ $r }} Star">
                                     <i class="@if($r <= 4) fa-solid @else fa-regular @endif fa-star"></i>
                                 </div>
                                 @endfor
@@ -3273,7 +3273,7 @@ if (is_string($productImages)) {
                 </div>
 
                 @if (!empty($related_products) && count($related_products) > 0)
-                <div class="bg-white border border-slate-200 rounded-3xl p-2.5 shadow-sm overflow-y-auto max-h-[560px] space-y-2 custom-scrollbar product-list-sidebar-box flex-1">
+                <div class="bg-white border border-slate-200 rounded-3xl p-2.5 shadow-sm overflow-y-auto max-h-[560px] space-y-2 custom-scrollbar product-list-sidebar-box flex-1 scroll-smooth" id="related-products-scroll-container">
                     @foreach ($related_products as $dproduct)
                     @include('frontend.partials.list-product-item', ['product' => $dproduct])
                     @endforeach
@@ -3281,6 +3281,18 @@ if (is_string($productImages)) {
                 @endif
 
                 <style>
+                    #related-products-scroll-container {
+                        scroll-behavior: smooth;
+                    }
+                    #related-products-scroll-container .product-list-sidebar-item {
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    }
+                    #related-products-scroll-container .product-list-sidebar-item:hover {
+                        transform: translateX(4px);
+                        background-color: #f8fafc;
+                        border-color: #cbd5e1;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                    }
                     .custom-scrollbar::-webkit-scrollbar {
                         width: 5px;
                     }
@@ -3296,6 +3308,32 @@ if (is_string($productImages)) {
                         background: #94a3b8;
                     }
                 </style>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const scrollContainer = document.getElementById('related-products-scroll-container');
+                        if (!scrollContainer) return;
+
+                        let isHovered = false;
+                        let autoScrollTimer = null;
+
+                        scrollContainer.addEventListener('mouseenter', () => { isHovered = true; });
+                        scrollContainer.addEventListener('mouseleave', () => { isHovered = false; });
+
+                        // Smooth automatic scrolling interval
+                        autoScrollTimer = setInterval(() => {
+                            if (!isHovered && scrollContainer.scrollHeight > scrollContainer.clientHeight) {
+                                const step = 70; // Scroll by roughly 1 item height
+                                if (scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 10) {
+                                    // Reset to top smoothly when reaching bottom
+                                    scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                                } else {
+                                    scrollContainer.scrollBy({ top: step, behavior: 'smooth' });
+                                }
+                            }
+                        }, 4000); // Auto-scroll every 4 seconds
+                    });
+                </script>
             </div>
             @endif
         </div>
@@ -3718,7 +3756,7 @@ if (is_string($productImages)) {
                 if (index < this.selectedRating) {
                     starItem.classList.add('selected-active');
                     if (icon) {
-                        icon.className = 'fa-solid fa-star text-amber-400';
+                        icon.className = 'fa-solid fa-star text-blue-900';
                     }
                 } else {
                     starItem.classList.remove('selected-active');
@@ -3739,7 +3777,7 @@ if (is_string($productImages)) {
                 if (index < previewRating) {
                     starItem.classList.add('selected-active');
                     if (icon) {
-                        icon.className = 'fa-solid fa-star text-amber-400';
+                        icon.className = 'fa-solid fa-star text-blue-900';
                     }
                 } else {
                     starItem.classList.remove('selected-active');
@@ -3868,145 +3906,116 @@ if (is_string($productImages)) {
     document.addEventListener('DOMContentLoaded', () => {
         new EcomFeedbackRating();
     });
-
-    // Function to scroll to reviews section
-    function scrollToReviews() {
-        const reviewsSection = document.getElementById('ratings');
-        if (reviewsSection) {
-            reviewsSection.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    }
 </script>
 @endif
 
-
 @if (setting('general', 'show_product_description_section', '1') == '1' ||
 setting('general', 'show_ratings_reviews_section', '1') == '1')
-<div class="base-container product-sections max-w-container-max mx-auto px-margin-desktop my-6">
-    <!-- Premium Navigation Tabs -->
-    <div class="bg-slate-100/80 p-1 rounded-xl flex items-center gap-1.5 border border-slate-200/80 shadow-inner max-w-fit mb-4 section-navigation">
+<div class="base-container product-sections max-w-container-max mx-auto px-margin-desktop my-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Product Description Card (7 Columns) -->
         @if (setting('general', 'show_product_description_section', '1') == '1' && !empty(trim($product->description)))
-        <button class="section-nav-button px-4 py-2 rounded-lg font-headline font-bold text-xs text-slate-600 transition-all flex items-center gap-1.5 hover:text-navy-deep active-tab shadow-sm bg-white text-navy-deep"
-            data-section="description">
-            <i class="fa-solid fa-file-lines text-xs text-navy-deep"></i>
-            <span>{{ setting('general', 'description_section_title', 'Product Description') }}</span>
-        </button>
-        @endif
-        @if (setting('general', 'show_ratings_reviews_section', '1') == '1' && $reviewStats['review_count'] > 0)
-        <button class="section-nav-button px-4 py-2 rounded-lg font-headline font-bold text-xs text-slate-600 transition-all flex items-center gap-1.5 hover:text-navy-deep"
-            data-section="ratings">
-            <i class="fa-solid fa-star text-xs text-amber-400"></i>
-            <span>{{ setting('general', 'ratings_section_title', 'Ratings & Reviews') }}</span>
-            <span class="bg-navy-deep/10 text-navy-deep text-[10px] px-1.5 py-0.5 rounded-full">{{ $reviewStats['review_count'] }}</span>
-        </button>
-        @endif
-    </div>
-
-    <!-- Product Description Card -->
-    @if (setting('general', 'show_product_description_section', '1') == '1' && !empty(trim($product->description)))
-    <div class="product-description-section" id="description">
-        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 lg:p-6 shadow-sm">
-            <div class="description-formatted-wrapper text-slate-700 font-body text-xs leading-relaxed w-full">
-                {!! $product->description !!}
-            </div>
-        </div>
-
-        <style>
-            .product-description-section .description-formatted-wrapper {
-                line-height: 1.6;
-                color: #334155;
-                width: 100%;
-                overflow-x: auto;
-            }
-            .product-description-section .description-formatted-wrapper h1,
-            .product-description-section .description-formatted-wrapper h2,
-            .product-description-section .description-formatted-wrapper h3,
-            .product-description-section .description-formatted-wrapper h4 {
-                color: #113257;
-                font-weight: 800;
-                margin-top: 1rem;
-                margin-bottom: 0.5rem;
-                clear: both;
-            }
-            .product-description-section .description-formatted-wrapper p {
-                margin-bottom: 0.75rem;
-                color: #475569;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-            .product-description-section .description-formatted-wrapper strong {
-                color: #0f172a;
-                font-weight: 700;
-            }
-            .product-description-section .description-formatted-wrapper hr {
-                border: 0;
-                height: 1px;
-                background: #e2e8f0;
-                margin: 1rem 0;
-            }
-            /* Full Width Table Styling */
-            .product-description-section .description-formatted-wrapper table {
-                width: 100% !important;
-                min-width: 100%;
-                border-collapse: collapse;
-                margin: 1rem 0;
-                border-radius: 10px;
-                overflow: hidden;
-                border: 1px solid #e2e8f0;
-                table-layout: auto;
-            }
-            .product-description-section .description-formatted-wrapper table th {
-                background-color: #113257;
-                color: #ffffff;
-                font-weight: 700;
-                text-align: left;
-                padding: 10px 14px;
-                font-size: 11px;
-                white-space: nowrap;
-            }
-            .product-description-section .description-formatted-wrapper table td {
-                padding: 10px 14px;
-                border-bottom: 1px solid #f1f5f9;
-                font-size: 11px;
-                color: #334155;
-                vertical-align: top;
-            }
-            .product-description-section .description-formatted-wrapper table tr:nth-child(even) td {
-                background-color: #f8fafc;
-            }
-            .product-description-section .description-formatted-wrapper ul,
-            .product-description-section .description-formatted-wrapper ol {
-                padding-left: 1.5rem;
-                margin: 0.75rem 0;
-            }
-            .product-description-section .description-formatted-wrapper li {
-                margin-bottom: 0.35rem;
-                font-size: 11px;
-                color: #1e293b;
-            }
-        </style>
-    </div>
-    @endif
-
-    <!-- Customer Ratings & Reviews Card -->
-    @if (setting('general', 'show_ratings_reviews_section', '1') == '1' && $reviewStats['review_count'] > 0)
-    <div class="product-ratings-section hidden mt-4" id="ratings">
-        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 lg:p-6 shadow-sm space-y-5">
-            <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                <div class="w-8 h-8 rounded-lg bg-amber-400/15 text-amber-500 flex items-center justify-center font-bold text-xs">
-                    <i class="fa-solid fa-star"></i>
+        <div class="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-4 lg:p-5 shadow-sm relative overflow-hidden" id="description">
+            <div class="flex items-center gap-2 pb-3 border-b border-slate-100 mb-3">
+                <div class="w-7 h-7 rounded-lg bg-navy-deep/10 text-navy-deep flex items-center justify-center font-bold text-xs">
+                    <i class="fa-solid fa-file-lines text-xs"></i>
                 </div>
-                <h3 class="text-base font-extrabold text-navy-deep font-headline m-0">{{ setting('general', 'ratings_section_title', 'Customer Ratings & Reviews') }}</h3>
+                <h3 class="text-sm font-extrabold text-navy-deep font-headline m-0">{{ setting('general', 'description_section_title', 'Product Description') }}</h3>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div class="relative">
+                <div id="description-content" class="description-formatted-wrapper text-slate-700 font-body text-xs leading-relaxed max-h-[360px] overflow-hidden transition-all duration-300">
+                    {!! $product->description !!}
+                </div>
+                <div id="description-overlay" class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none"></div>
+            </div>
+
+            <div class="text-center pt-2">
+                <button type="button" id="toggle-description-btn" class="inline-flex items-center gap-1.5 text-xs font-bold text-navy-deep hover:text-navy-deep/80 bg-slate-100 hover:bg-slate-200 px-4 py-1.5 rounded-full transition-all shadow-xs">
+                    <span>Show More</span>
+                    <i class="fa-solid fa-chevron-down text-[10px]" id="toggle-description-icon"></i>
+                </button>
+            </div>
+
+            <style>
+                .description-formatted-wrapper {
+                    line-height: 1.6;
+                    color: #334155;
+                }
+                .description-formatted-wrapper h1,
+                .description-formatted-wrapper h2,
+                .description-formatted-wrapper h3,
+                .description-formatted-wrapper h4 {
+                    color: #113257;
+                    font-weight: 800;
+                    margin-top: 0.75rem;
+                    margin-bottom: 0.35rem;
+                }
+                .description-formatted-wrapper p {
+                    margin-bottom: 0.5rem;
+                    color: #475569;
+                }
+                .description-formatted-wrapper strong {
+                    color: #0f172a;
+                    font-weight: 700;
+                }
+                .description-formatted-wrapper hr {
+                    border: 0;
+                    height: 1px;
+                    background: #e2e8f0;
+                    margin: 0.75rem 0;
+                }
+                .description-formatted-wrapper table {
+                    width: 100% !important;
+                    border-collapse: collapse;
+                    margin: 0.75rem 0;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    border: 1px solid #e2e8f0;
+                }
+                .description-formatted-wrapper table th {
+                    background-color: #113257;
+                    color: #ffffff;
+                    font-weight: 700;
+                    text-align: left;
+                    padding: 8px 10px;
+                    font-size: 11px;
+                }
+                .description-formatted-wrapper table td {
+                    padding: 8px 10px;
+                    border-bottom: 1px solid #f1f5f9;
+                    font-size: 11px;
+                    color: #334155;
+                }
+                .description-formatted-wrapper ul,
+                .description-formatted-wrapper ol {
+                    padding-left: 1.25rem;
+                    margin: 0.5rem 0;
+                }
+                .description-formatted-wrapper li {
+                    margin-bottom: 0.25rem;
+                    font-size: 11px;
+                }
+            </style>
+        </div>
+        @endif
+
+        <!-- Customer Ratings & Reviews Card (5 Columns) -->
+        @if (setting('general', 'show_ratings_reviews_section', '1') == '1' && $reviewStats['review_count'] > 0)
+        <div class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-4 lg:p-5 shadow-sm space-y-4" id="ratings">
+            <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+                <div class="w-7 h-7 rounded-lg bg-amber-400/15 text-amber-500 flex items-center justify-center font-bold text-xs">
+                    <i class="fa-solid fa-star text-xs"></i>
+                </div>
+                <h3 class="text-sm font-extrabold text-navy-deep font-headline m-0">{{ setting('general', 'ratings_section_title', 'Ratings & Reviews') }}</h3>
+                <span class="ml-auto bg-navy-deep/10 text-navy-deep text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $reviewStats['review_count'] }}</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
                 <!-- Average Rating Big Badge -->
-                <div class="text-center space-y-1 border-b md:border-b-0 md:border-r border-slate-200/80 pb-3 md:pb-0 md:pr-4">
-                    <div class="text-3xl font-black text-navy-deep tracking-tight font-headline">{{ number_format($reviewStats['average_rating'], 1) }}</div>
-                    <div class="flex justify-center text-amber-400 gap-1 text-sm">
+                <div class="text-center space-y-0.5 border-b sm:border-b-0 sm:border-r border-slate-200/80 pb-2 sm:pb-0 sm:pr-3">
+                    <div class="text-2xl font-black text-navy-deep tracking-tight font-headline">{{ number_format($reviewStats['average_rating'], 1) }}</div>
+                    <div class="flex justify-center text-amber-400 gap-0.5 text-xs">
                         @for ($i = 1; $i <= 5; $i++)
                             @if ($i <= $reviewStats['average_rating'])
                             <i class="fa-solid fa-star"></i>
@@ -4017,36 +4026,36 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
                             @endif
                         @endfor
                     </div>
-                    <div class="text-[11px] font-semibold text-slate-500">Based on {{ $reviewStats['review_count'] }} reviews</div>
+                    <div class="text-[10px] font-semibold text-slate-500">Based on {{ $reviewStats['review_count'] }} reviews</div>
                 </div>
 
                 <!-- Rating Distribution Bars -->
-                <div class="md:col-span-2 space-y-1.5">
+                <div class="sm:col-span-2 space-y-1">
                     @for ($rating = 5; $rating >= 1; $rating--)
                     @php
                     $count = $reviewStats['rating_distribution'][$rating] ?? 0;
                     $percentage = $reviewStats['review_count'] > 0 ? ($count / $reviewStats['review_count']) * 100 : 0;
                     @endphp
-                    <div class="flex items-center gap-2.5 text-[11px]">
-                        <span class="w-8 font-bold text-slate-600 flex items-center gap-1">
-                            {{ $rating }} <i class="fa-solid fa-star text-[9px] text-amber-400"></i>
+                    <div class="flex items-center gap-2 text-[10px]">
+                        <span class="w-6 font-bold text-slate-600 flex items-center gap-0.5">
+                            {{ $rating }} <i class="fa-solid fa-star text-[8px] text-amber-400"></i>
                         </span>
-                        <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                             <div class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500" style="width: {{ $percentage }}%"></div>
                         </div>
-                        <span class="w-6 text-right font-medium text-slate-400 text-[10px]">{{ $count }}</span>
+                        <span class="w-5 text-right font-medium text-slate-400 text-[9px]">{{ $count }}</span>
                     </div>
                     @endfor
                 </div>
             </div>
 
             <!-- Review Items List -->
-            <div class="space-y-3 divide-y divide-slate-100">
+            <div class="space-y-2.5 divide-y divide-slate-100 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                 @forelse($reviews as $review)
-                <div class="pt-3 first:pt-0 space-y-2">
+                <div class="pt-2.5 first:pt-0 space-y-1.5">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-200 border border-slate-300 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-full overflow-hidden bg-slate-200 border border-slate-300 shrink-0">
                                 @if ($review->reviewer_image)
                                 <img class="w-full h-full object-cover" src="{{ asset($review->reviewer_image) }}" alt="{{ $review->reviewer_name }}">
                                 @else
@@ -4054,18 +4063,16 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
                                 @endif
                             </div>
                             <div>
-                                <div class="font-bold text-xs text-navy-deep flex items-center gap-1.5">
+                                <div class="font-bold text-xs text-navy-deep flex items-center gap-1">
                                     <span>{{ $review->reviewer_name }}</span>
                                     @if ($review->is_verified_purchase)
-                                    <span class="inline-flex items-center gap-0.5 text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.2 rounded-full">
-                                        <i class="fa-solid fa-circle-check text-[8px]"></i> Verified
-                                    </span>
+                                    <span class="inline-flex items-center text-[8px] font-bold bg-emerald-100 text-emerald-700 px-1 py-0.2 rounded-full">Verified</span>
                                     @endif
                                 </div>
-                                <div class="text-[10px] text-slate-400">{{ $review->created_at->format('F d, Y') }}</div>
+                                <div class="text-[9px] text-slate-400">{{ $review->created_at->format('M d, Y') }}</div>
                             </div>
                         </div>
-                        <div class="flex text-amber-400 text-[11px] gap-0.5">
+                        <div class="flex text-amber-400 text-[10px] gap-0.5">
                             @for ($i = 1; $i <= 5; $i++)
                                 @if ($i <= $review->rating)
                                 <i class="fa-solid fa-star"></i>
@@ -4077,9 +4084,9 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
                     </div>
                     <p class="text-xs text-slate-700 leading-relaxed font-body m-0">{{ $review->review_text }}</p>
                     @if ($review->review_images && is_array($review->review_images) && count($review->review_images) > 0)
-                    <div class="flex gap-2 pt-1">
+                    <div class="flex gap-1.5 pt-0.5">
                         @foreach ($review->review_images as $image)
-                        <img src="{{ asset($image) }}" alt="Review Image" class="w-12 h-12 object-cover rounded-lg border border-slate-200">
+                        <img src="{{ asset($image) }}" alt="Review Image" class="w-10 h-10 object-cover rounded-md border border-slate-200">
                         @endforeach
                     </div>
                     @endif
@@ -4091,31 +4098,41 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
                 @endforelse
             </div>
         </div>
+        @endif
     </div>
-    @endif
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const navButtons = document.querySelectorAll('.section-nav-button');
-        navButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const target = this.dataset.section;
-                navButtons.forEach(btn => {
-                    btn.classList.remove('bg-white', 'text-navy-deep', 'shadow-sm', 'active-tab');
-                    btn.classList.add('text-slate-600');
-                });
-                this.classList.add('bg-white', 'text-navy-deep', 'shadow-sm', 'active-tab');
-                this.classList.remove('text-slate-600');
+        const toggleBtn = document.getElementById('toggle-description-btn');
+        const descContent = document.getElementById('description-content');
+        const descOverlay = document.getElementById('description-overlay');
+        const toggleIcon = document.getElementById('toggle-description-icon');
 
-                document.getElementById('description')?.classList.add('hidden');
-                document.getElementById('ratings')?.classList.add('hidden');
+        if (toggleBtn && descContent) {
+            // Check if content exceeds max height
+            if (descContent.scrollHeight <= 360) {
+                descOverlay?.classList.add('hidden');
+                toggleBtn.parentElement.classList.add('hidden');
+            }
 
-                const activeSection = document.getElementById(target);
-                if (activeSection) {
-                    activeSection.classList.remove('hidden');
+            toggleBtn.addEventListener('click', function() {
+                const isExpanded = descContent.classList.contains('max-h-none');
+                if (isExpanded) {
+                    descContent.classList.remove('max-h-none');
+                    descContent.classList.add('max-h-[360px]');
+                    descOverlay?.classList.remove('hidden');
+                    toggleBtn.querySelector('span').textContent = 'Show More';
+                    toggleIcon.className = 'fa-solid fa-chevron-down text-[10px]';
+                } else {
+                    descContent.classList.remove('max-h-[360px]');
+                    descContent.classList.add('max-h-none');
+                    descOverlay?.classList.add('hidden');
+                    toggleBtn.querySelector('span').textContent = 'Show Less';
+                    toggleIcon.className = 'fa-solid fa-chevron-up text-[10px]';
                 }
             });
-        });
+        }
     });
 </script>
 @endif
@@ -4265,22 +4282,89 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
     }
 
     .products-container {
-        display: flex;
+        display: flex !important;
+        align-items: stretch !important;
         gap: 15px;
         overflow-x: auto;
         scroll-behavior: smooth;
         scrollbar-width: none;
-        /* Firefox */
         -ms-overflow-style: none;
-        /* IE and Edge */
         padding: 15px 0px 15px 0;
-        /* Added bottom padding for arrows */
         margin-bottom: 0px;
     }
 
-    products-container::-webkit-scrollbar {
-        display: none;
-        /* Chrome, Safari, Opera */
+    .products-container .product-card {
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 270px !important;
+        box-sizing: border-box;
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.4s ease !important;
+    }
+
+    .products-container .product-card .product-info {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        gap: 3px !important;
+        padding: 6px 8px 8px 8px !important;
+    }
+
+    .products-container .product-card .product-title {
+        margin: 0 0 2px 0 !important;
+        padding: 0 !important;
+        line-height: 1.25 !important;
+    }
+
+    .products-container .product-card .product-card-rating {
+        margin: 0 0 2px 0 !important;
+        padding: 0 !important;
+    }
+
+    .products-container .product-card .product-price {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .products-container .product-card .add-to-cart-btn,
+    .products-container .product-card .buy-now-btn {
+        background-color: #1e3a8a !important;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
+        color: #ffffff !important;
+        border-color: #1e3a8a !important;
+        margin-top: auto !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .products-container .product-card .add-to-cart-btn:hover,
+    .products-container .product-card .buy-now-btn:hover {
+        background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%) !important;
+        box-shadow: 0 4px 14px rgba(30, 58, 138, 0.4) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    .products-container .product-card .product-badge {
+        background-color: #1d4ed8 !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        color: #ffffff !important;
+    }
+
+    .products-container .product-card .current-price,
+    .products-container .product-card .price {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+
+    .products-container .product-card .product-image {
+        height: 160px !important;
+        width: 100% !important;
+        flex-shrink: 0;
+    }
+
+    .products-container .product-card:hover {
+        transform: translateY(-8px) scale(1.02) !important;
+        box-shadow: 0 14px 28px rgba(17, 50, 87, 0.12) !important;
+        border-color: rgba(17, 50, 87, 0.2) !important;
     }
 
     .view-all-btn {
@@ -4423,75 +4507,130 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
                 const enableInfiniteScroll = productCards.length >= 4;
 
                 if (enableInfiniteScroll) {
-                    // Clone the product cards for infinite scrolling
+                    // Clone the product cards for circular infinite scrolling
                     productCards.forEach(card => {
                         const clone = card.cloneNode(true);
                         productsContainer.appendChild(clone);
                     });
 
-                    // Set the amount to scroll by (width of one product card + gap)
-                    const scrollAmount = 270; // Adjust as needed
+                    const singleSetWidth = productsContainer.scrollWidth / 2;
 
-                    // Auto-sliding functionality
-                    let autoSlideInterval;
-                    let currentPosition = 0;
-                    const totalWidth = productCards.length * scrollAmount;
+                    let isHovered = false;
+                    let isMouseDown = false;
+                    let startX, startScrollLeft;
+                    let isDragging = false;
+                    const scrollSpeed = 0.8;
 
-                    function infiniteScroll() {
-                        if (currentPosition >= totalWidth) {
-                            productsContainer.scrollTo({
-                                left: 0,
-                                behavior: 'auto'
-                            });
-                            currentPosition = 0;
+                    function stepMarquee() {
+                        if (!isHovered && !isMouseDown) {
+                            productsContainer.scrollLeft += scrollSpeed;
+                            if (productsContainer.scrollLeft >= singleSetWidth) {
+                                productsContainer.scrollLeft = 0;
+                            } else if (productsContainer.scrollLeft <= 0) {
+                                productsContainer.scrollLeft = singleSetWidth;
+                            }
                         }
-                        currentPosition += scrollAmount;
-                        productsContainer.scrollTo({
-                            left: currentPosition,
-                            behavior: 'smooth'
-                        });
+                        requestAnimationFrame(stepMarquee);
                     }
 
-                    function startAutoSlide() {
-                        autoSlideInterval = setInterval(infiniteScroll, 3000);
-                    }
+                    requestAnimationFrame(stepMarquee);
 
-                    function stopAutoSlide() {
-                        clearInterval(autoSlideInterval);
-                    }
+                    productsContainer.addEventListener('mouseenter', () => { isHovered = true; });
+                    productsContainer.addEventListener('mouseleave', () => { 
+                        isHovered = false; 
+                        isMouseDown = false; 
+                        productsContainer.style.cursor = 'grab';
+                    });
+                    
+                    // Intuitive Drag Scrolling (Drag right -> scroll left, Drag left -> scroll right)
+                    productsContainer.addEventListener('mousedown', (e) => {
+                        isMouseDown = true;
+                        isHovered = true;
+                        isDragging = false;
+                        startX = e.pageX;
+                        startScrollLeft = productsContainer.scrollLeft;
+                        productsContainer.style.cursor = 'grabbing';
+                        productsContainer.style.userSelect = 'none';
+                    });
 
-                    startAutoSlide();
+                    window.addEventListener('mouseup', () => {
+                        if (isMouseDown) {
+                            isMouseDown = false;
+                            productsContainer.style.cursor = 'grab';
+                            setTimeout(() => { isDragging = false; }, 50);
+                        }
+                    });
 
-                    productsContainer.addEventListener('mouseenter', stopAutoSlide);
-                    productsContainer.addEventListener('touchstart', stopAutoSlide);
-                    productsContainer.addEventListener('mouseleave', startAutoSlide);
-                    productsContainer.addEventListener('touchend', startAutoSlide);
+                    window.addEventListener('mousemove', (e) => {
+                        if (!isMouseDown) return;
+                        const dist = e.pageX - startX;
+                        if (Math.abs(dist) > 5) isDragging = true;
+                        
+                        // Dragging right moves backward (shows previous items 10,9,8...)
+                        let newScroll = startScrollLeft - dist;
+                        if (newScroll < 0) {
+                            newScroll += singleSetWidth;
+                        } else if (newScroll >= singleSetWidth) {
+                            newScroll -= singleSetWidth;
+                        }
+                        productsContainer.scrollLeft = newScroll;
+                    });
+
+                    // Prevent click navigation while dragging
+                    productsContainer.addEventListener('click', (e) => {
+                        if (isDragging) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    }, true);
+
+                    // Touch Drag support
+                    productsContainer.addEventListener('touchstart', (e) => {
+                        isHovered = true;
+                        startX = e.touches[0].pageX;
+                        startScrollLeft = productsContainer.scrollLeft;
+                    });
+
+                    productsContainer.addEventListener('touchmove', (e) => {
+                        const dist = e.touches[0].pageX - startX;
+                        let newScroll = startScrollLeft - dist;
+                        if (newScroll < 0) {
+                            newScroll += singleSetWidth;
+                        } else if (newScroll >= singleSetWidth) {
+                            newScroll -= singleSetWidth;
+                        }
+                        productsContainer.scrollLeft = newScroll;
+                    });
+
+                    productsContainer.addEventListener('touchend', () => {
+                        isHovered = false;
+                    });
+
+                    // Pause auto-scroll when hovering over prev/next navigation arrows
+                    [prevArrow, nextArrow].forEach(arrow => {
+                        if (arrow) {
+                            arrow.addEventListener('mouseenter', () => { isHovered = true; });
+                            arrow.addEventListener('mouseleave', () => { isHovered = false; });
+                        }
+                    });
 
                     if (nextArrow) {
                         nextArrow.addEventListener('click', () => {
-                            infiniteScroll();
-                            stopAutoSlide();
-                            startAutoSlide();
+                            let newPos = productsContainer.scrollLeft + 270;
+                            if (newPos >= singleSetWidth) {
+                                newPos -= singleSetWidth;
+                            }
+                            productsContainer.scrollTo({ left: newPos, behavior: 'smooth' });
                         });
                     }
 
                     if (prevArrow) {
                         prevArrow.addEventListener('click', () => {
-                            currentPosition -= scrollAmount;
-                            if (currentPosition < 0) {
-                                currentPosition = totalWidth - scrollAmount;
-                                productsContainer.scrollTo({
-                                    left: currentPosition,
-                                    behavior: 'auto'
-                                });
-                            } else {
-                                productsContainer.scrollTo({
-                                    left: currentPosition,
-                                    behavior: 'smooth'
-                                });
+                            let newPos = productsContainer.scrollLeft - 270;
+                            if (newPos < 0) {
+                                newPos += singleSetWidth;
                             }
-                            stopAutoSlide();
-                            startAutoSlide();
+                            productsContainer.scrollTo({ left: newPos, behavior: 'smooth' });
                         });
                     }
                 } else {

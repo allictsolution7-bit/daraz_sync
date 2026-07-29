@@ -62,40 +62,38 @@
                 $averageRating = $product->active_reviews_avg_rating ?? 0;
                 $reviewCount = $product->active_reviews_count ?? 0;
             @endphp
-            @if ($reviewCount > 0)
-                <div class="product-card-rating">
-                    <div class="rating-stars">
-                        @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <= $averageRating)
-                                <svg class="star-icon filled" viewBox="0 0 24 24" width="14" height="14">
-                                    <path
-                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                        fill="#f59e0b" />
-                                </svg>
-                            @elseif($i <= $averageRating + 0.5)
-                                <svg class="star-icon half-filled" viewBox="0 0 24 24" width="14" height="14">
-                                    <defs>
-                                        <linearGradient id="halfStarCard{{ $product->id }}{{ $i }}">
-                                            <stop offset="50%" stop-color="#f59e0b" />
-                                            <stop offset="50%" stop-color="#e5e7eb" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path
-                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                        fill="url(#halfStarCard{{ $product->id }}{{ $i }})" />
-                                </svg>
-                            @else
-                                <svg class="star-icon empty" viewBox="0 0 24 24" width="14" height="14">
-                                    <path
-                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                        fill="#e5e7eb" />
-                                </svg>
-                            @endif
-                        @endfor
-                    </div>
-                    <span class="rating-text">{{ number_format($averageRating, 1) }} ({{ $reviewCount }})</span>
+            <div class="product-card-rating">
+                <div class="rating-stars">
+                    @for ($i = 1; $i <= 5; $i++)
+                        @if ($i <= $averageRating)
+                            <svg class="star-icon filled" viewBox="0 0 24 24" width="14" height="14">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    fill="#1e3a8a" />
+                            </svg>
+                        @elseif($i <= $averageRating + 0.5 && $averageRating > 0)
+                            <svg class="star-icon half-filled" viewBox="0 0 24 24" width="14" height="14">
+                                <defs>
+                                    <linearGradient id="halfStarCard{{ $product->id }}{{ $i }}">
+                                        <stop offset="50%" stop-color="#1e3a8a" />
+                                        <stop offset="50%" stop-color="#e5e7eb" />
+                                    </linearGradient>
+                                </defs>
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    fill="url(#halfStarCard{{ $product->id }}{{ $i }})" />
+                            </svg>
+                        @else
+                            <svg class="star-icon empty" viewBox="0 0 24 24" width="14" height="14">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    fill="#e5e7eb" />
+                            </svg>
+                        @endif
+                    @endfor
                 </div>
-            @endif
+                <span class="rating-text">{{ number_format($averageRating, 1) }} ({{ $reviewCount }})</span>
+            </div>
         @endif
 
         @if(($productSettings['show_product_writer'] ?? '1') == '1')
