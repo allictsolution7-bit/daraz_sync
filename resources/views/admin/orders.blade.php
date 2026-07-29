@@ -1892,42 +1892,61 @@
                 e.preventDefault();
                 e.stopPropagation();
                 
-                const dropdown = $(this).closest('.custom-dropdown');
-                const menu = dropdown.find('.custom-dropdown-menu');
                 const toggle = $(this);
-                const isCurrentlyOpen = menu.hasClass('show');
+                const dropdown = toggle.closest('.custom-dropdown');
+                const menu = dropdown.find('.custom-dropdown-menu');
+                const isCurrentlyOpen = toggle.hasClass('active');
                 
-                // Close all other dropdowns and remove active state
-                $('.custom-dropdown-menu').removeClass('show dropup');
+                // Close all open menus
+                $('.custom-dropdown-menu').removeClass('show dropup').css({ position: '', top: '', left: '', right: '' });
                 $('.custom-dropdown-toggle').removeClass('active');
                 $('tr').removeClass('dropdown-active-row');
                 
-                // Toggle current dropdown only if it wasn't already open
                 if (!isCurrentlyOpen) {
-                    const toggleOffset = toggle.offset();
-                    const toggleHeight = toggle.outerHeight();
+                    toggle.addClass('active');
+                    dropdown.closest('tr').addClass('dropdown-active-row');
+
+                    // Measure menu dimensions
+                    menu.css({ display: 'block', visibility: 'hidden', position: 'fixed' });
+                    const menuWidth = menu.outerWidth() || 220;
+                    const menuHeight = menu.outerHeight() || 200;
+                    menu.css({ display: '', visibility: '', position: '' });
+
+                    const toggleRect = toggle[0].getBoundingClientRect();
                     const windowHeight = $(window).height();
-                    const scrollTop = $(window).scrollTop();
-                    const spaceBelow = windowHeight - (toggleOffset.top - scrollTop + toggleHeight);
-                    
-                    // Measure actual menu height dynamically
-                    menu.css({ display: 'block', visibility: 'hidden' });
-                    const actualMenuHeight = menu.outerHeight() || 340;
-                    menu.css({ display: '', visibility: '' });
-                    
-                    if (spaceBelow < actualMenuHeight + 15) {
+                    const windowWidth = $(window).width();
+
+                    let top = toggleRect.bottom + 4;
+                    let left = toggleRect.right - menuWidth;
+
+                    // If space below is limited, open dropup above toggle button
+                    if (windowHeight - toggleRect.bottom < menuHeight + 15 && toggleRect.top > menuHeight + 15) {
+                        top = toggleRect.top - menuHeight - 4;
                         menu.addClass('dropup');
                     } else {
                         menu.removeClass('dropup');
                     }
-                    
-                    menu.addClass('show');
-                    toggle.addClass('active');
-                    dropdown.closest('tr').addClass('dropdown-active-row');
+
+                    // Keep inside left window boundary
+                    if (left < 10) left = 10;
+
+                    menu.css({
+                        position: 'fixed',
+                        top: top + 'px',
+                        left: left + 'px',
+                        right: 'auto',
+                        zIndex: 999999
+                    }).addClass('show');
                 }
             });
             
-            // Close dropdown when clicking outside
+            // Close dropdown when scrolling or clicking outside
+            $(window).on('scroll resize', function() {
+                $('.custom-dropdown-menu').removeClass('show dropup');
+                $('.custom-dropdown-toggle').removeClass('active');
+                $('tr').removeClass('dropdown-active-row');
+            });
+            
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('.custom-dropdown').length) {
                     $('.custom-dropdown-menu').removeClass('show dropup');
@@ -2471,11 +2490,16 @@
                         })
                         .then(response => response.json())
                         .then(data => {
+                            console.log('=== Steadfast Courier Send Response ===');
+                            console.dir(data);
                             if (data.success) {
                                 alert(data.message || 'Order sent to Steadfast successfully!');
                                 sendBtn.disabled = true;
                                 sendBtn.classList.add('sent-sf');
                                 sendBtn.innerHTML = '<i class="fas fa-check"></i> Steadfast';
+                                if (window.ordersDataTable) {
+                                    window.ordersDataTable.ajax.reload(null, false);
+                                }
                             } else {
                                 alert(data.message || 'Failed to send order to Steadfast.');
                             }
@@ -2573,7 +2597,7 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.getElementById('laravel-csrf-token').value
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
                             body: JSON.stringify({
                                 order_ids: selected
@@ -2581,9 +2605,15 @@
                         })
                         .then(res => res.json())
                         .then(data => {
+                            console.log('=== Steadfast Bulk Courier Send Response ===');
+                            console.dir(data);
                             if (data.success) {
                                 alert(data.message || 'Bulk orders sent to Steadfast successfully!');
-                                location.reload(); // Reload to update UI
+                                if (window.ordersDataTable) {
+                                    window.ordersDataTable.ajax.reload(null, false);
+                                } else {
+                                    location.reload();
+                                }
                             } else {
                                 alert(data.message || 'Failed to send bulk orders.');
                             }
@@ -2631,7 +2661,7 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.getElementById('laravel-csrf-token').value
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
                             body: JSON.stringify({
                                 order_ids: selected
@@ -2639,14 +2669,21 @@
                         })
                         .then(res => res.json())
                         .then(data => {
+                            console.log('=== Pathao Bulk Courier Send Response ===');
+                            console.dir(data);
                             if (data.success) {
                                 alert(data.message || 'Bulk orders sent to Pathao successfully!');
-                                location.reload(); // Reload to update UI
+                                if (window.ordersDataTable) {
+                                    window.ordersDataTable.ajax.reload(null, false);
+                                } else {
+                                    location.reload();
+                                }
                             } else {
                                 alert(data.message || 'Failed to send bulk orders to Pathao.');
                             }
                         })
-                        .catch(() => {
+                        .catch((err) => {
+                            console.error('Pathao Bulk Send JS Error:', err);
                             alert('An error occurred while sending bulk orders to Pathao.');
                         })
                         .finally(() => {

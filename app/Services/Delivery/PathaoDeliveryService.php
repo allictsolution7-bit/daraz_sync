@@ -3,6 +3,7 @@
 namespace App\Services\Delivery;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class PathaoDeliveryService implements DeliveryServiceInterface
 {
@@ -17,23 +18,35 @@ class PathaoDeliveryService implements DeliveryServiceInterface
     }
 
     /**
-     * Issue an access token from Pathao API
+     * Issue or retrieve cached access token from Pathao API
      */
     public function issueAccessToken()
     {
-        $response = Http::post($this->baseUrl . '/aladdin/api/v1/issue-token', [
-            'client_id' => $this->credentials['client_id'],
-            'client_secret' => $this->credentials['client_secret'],
-            'grant_type' => 'password',
-            'username' => $this->credentials['username'],
-            'password' => $this->credentials['password'],
-        ]);
+        $cacheKey = 'pathao_access_token_' . md5($this->credentials['client_id'] ?? '');
+
+        if (Cache::has($cacheKey)) {
+            $this->accessToken = Cache::get($cacheKey);
+            return ['access_token' => $this->accessToken];
+        }
+
+        $response = Http::withHeaders(['Content-Type' => 'application/json'])
+            ->post($this->baseUrl . '/aladdin/api/v1/issue-token', [
+                'client_id' => $this->credentials['client_id'] ?? '',
+                'client_secret' => $this->credentials['client_secret'] ?? '',
+                'grant_type' => 'password',
+                'username' => $this->credentials['username'] ?? '',
+                'password' => $this->credentials['password'] ?? '',
+            ]);
+
         if ($response->successful()) {
             $data = $response->json();
             $this->accessToken = $data['access_token'];
+            $expiresIn = ($data['expires_in'] ?? 432000) - 300; // Cache 5 minutes less than expiry
+            Cache::put($cacheKey, $this->accessToken, max(60, $expiresIn));
             return $data;
         }
-        throw new \Exception('Failed to get access token: ' . $response->body());
+
+        throw new \Exception('Pathao Auth Failed: ' . ($response->json('message') ?? $response->body()));
     }
 
     /**

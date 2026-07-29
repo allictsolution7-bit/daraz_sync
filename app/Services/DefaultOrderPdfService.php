@@ -449,7 +449,10 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
             $trackingCode = $consignmentId;
         }
 
-        $trackingLink = $trackingCode ? "https://steadfast.com.bd/tl/{$trackingCode}" : null;
+        $trackingLink = $deliveryData['tracking_url'] 
+            ?? $deliveryData['courier_response']['consignment']['tracking_url']
+            ?? $deliveryData['courier_response']['tracking_url']
+            ?? ($trackingCode ? "https://steadfast.com.bd/tl/{$trackingCode}" : null);
 
         $codAmount = (float) match($order->payment_type) {
             'full_paid' => 0,

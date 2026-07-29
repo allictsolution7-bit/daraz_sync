@@ -92,13 +92,21 @@ class SteadFastController extends Controller
             $trackingCode = $response['consignment']['tracking_code'] 
                 ?? $response['tracking_code'] 
                 ?? null;
+
+            $trackingUrl = $response['consignment']['tracking_url']
+                ?? $response['consignment']['tracking_link']
+                ?? $response['tracking_url']
+                ?? $response['tracking_link']
+                ?? ($trackingCode ? "https://steadfast.com.bd/tl/" . $trackingCode : null);
             
             if ($consignmentId) {
                 $deliveryData['consignment_id'] = $consignmentId;
             }
             if ($trackingCode) {
                 $deliveryData['tracking_code'] = $trackingCode;
-                $deliveryData['tracking_url'] = "https://steadfast.com.bd/tl/" . $trackingCode;
+            }
+            if ($trackingUrl) {
+                $deliveryData['tracking_url'] = $trackingUrl;
             }
             
             $order->delivery_data = $deliveryData;
@@ -111,6 +119,13 @@ class SteadFastController extends Controller
             }
             
             $order->save();
+
+            \Illuminate\Support\Facades\Log::info('Steadfast API Response (Single Send)', [
+                'order_id' => $order->id,
+                'consignment_id' => $consignmentId,
+                'tracking_code' => $trackingCode,
+                'response' => $response
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -192,11 +207,17 @@ class SteadFastController extends Controller
                     ?? $result['consignment']['tracking_code'] 
                     ?? $consignmentId;
                 
+                $trackingUrl = $result['tracking_url']
+                    ?? $result['tracking_link']
+                    ?? $result['consignment']['tracking_url']
+                    ?? $result['consignment']['tracking_link']
+                    ?? ($trackingCode ? "https://steadfast.com.bd/tl/" . $trackingCode : null);
+
                 $order->delivery_data = [
                     'courier_provider' => 'steadfast',
                     'consignment_id'   => $consignmentId,
                     'tracking_code'    => $trackingCode,
-                    'tracking_url'     => $trackingCode ? "https://steadfast.com.bd/tl/" . $trackingCode : null,
+                    'tracking_url'     => $trackingUrl,
                     'courier_response' => $result,
                 ];
                 

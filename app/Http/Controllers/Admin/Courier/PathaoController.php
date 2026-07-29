@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\order;
 use App\Services\Delivery\DeliveryServiceManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PathaoController extends Controller
 {
@@ -38,6 +39,7 @@ class PathaoController extends Controller
 
     public function sendToCourier(Request $request)
     {
+        $order = order::findOrFail($request->order_id);
         $userId = Auth::id();
         $delivery = DeliveryServiceManager::forProvider('pathao', $userId);
 
@@ -98,6 +100,7 @@ class PathaoController extends Controller
             if ($consignmentId) {
                 $deliveryData['consignment_id'] = $consignmentId;
                 $deliveryData['tracking_code'] = $consignmentId;
+                $deliveryData['tracking_url'] = "https://merchant.pathao.com/tracking?consignment_id=" . $consignmentId;
                 
                 // Set initial courier status
                 $order->courier_status = 'Order Created';
@@ -217,6 +220,7 @@ class PathaoController extends Controller
                     'courier_provider' => 'pathao',
                     'consignment_id'   => $consignmentId,
                     'tracking_code'    => $consignmentId,
+                    'tracking_url'     => $consignmentId ? "https://merchant.pathao.com/tracking?consignment_id=" . $consignmentId : null,
                     'courier_response' => $result,
                 ]);
                 
@@ -236,9 +240,12 @@ class PathaoController extends Controller
                 'courier_response' => $response
             ]);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Pathao Bulk Send Exception: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'Pathao Error: ' . $e->getMessage()
             ]);
         }
     }

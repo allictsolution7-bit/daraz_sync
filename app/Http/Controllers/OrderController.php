@@ -420,7 +420,11 @@ class OrderController extends Controller
                 $courierProvider = ucfirst($deliveryData['courier_provider']);
                 $cnId = $deliveryData['consignment_id'] ?? $deliveryData['tracking_code'] ?? '';
                 $trackingCode = $deliveryData['tracking_code'] ?? $deliveryData['consignment_id'] ?? '';
-                $trackUrl = $deliveryData['tracking_url'] ?? ($trackingCode ? 'https://steadfast.com.bd/tl/'.$trackingCode : '#');
+                $providerKey = strtolower($deliveryData['courier_provider'] ?? '');
+                $trackUrl = $deliveryData['tracking_url'] ?? match($providerKey) {
+                    'pathao' => $cnId ? "https://merchant.pathao.com/tracking?consignment_id={$cnId}" : '#',
+                    default => $trackingCode ? "https://steadfast.com.bd/tl/{$trackingCode}" : '#',
+                };
                 $courierStatus = $order->courier_status ?? null;
                 $courierStatusUpdated = $order->courier_status_updated_at ?? null;
 

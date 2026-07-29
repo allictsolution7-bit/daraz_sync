@@ -55,6 +55,22 @@ class AuthorizeByRouteName
             abort(403, 'Permission required: (vendor_orders.view). Please ask an administrator to grant this permission.');
         }
 
+        // Direct mapping for basic shipping settings route
+        if (str_starts_with($name, 'admin.basic.shipping.settings') || str_starts_with($name, 'basic.shipping.settings')) {
+            if ($user->can('shipping.basic.view') || $user->can('shipping.basic.update') || $user->can('basic_shipping.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {
+                return $next($request);
+            }
+            abort(403, 'Permission required: (shipping.basic.view). Please ask an administrator to grant this permission.');
+        }
+
+        // Direct mapping for delayed purchase events queue routes
+        if (str_starts_with($name, 'admin.delayed-events') || str_starts_with($name, 'delayed-events')) {
+            if ($user->can('delayed_events.view') || $user->can('orders.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {
+                return $next($request);
+            }
+            abort(403, 'Permission required: (delayed_events.view). Please ask an administrator to grant this permission.');
+        }
+
         $parts = explode('.', $name);
         if (count($parts) < 2 || $parts[0] !== 'admin') {
             return $next($request);
