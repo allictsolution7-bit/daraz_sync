@@ -213,25 +213,44 @@
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
 
-    /* Tik mark styling */
-    .option-btn.selected::after {
-        content: "✔";
-        position: absolute;
-        top: 0%;
-        right: -4px;
-        background-color: var(--primary-color);
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        color: #fff;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        transform: translateY(-45%);
+    /* Daraz variation option styling */
+    .variation-option-btn {
+        border: 1px solid #dadada !important;
+        background: #fff !important;
+        color: #212121 !important;
+        border-radius: 2px !important;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .variation-option-btn:hover {
+        border-color: #f57224 !important;
+    }
+
+    .variation-option-btn.selected {
+        border: 2px solid #f57224 !important;
+        position: relative !important;
+    }
+
+    .variation-option-btn.selected::after {
+        content: "✓" !important;
+        position: absolute !important;
+        bottom: -1px !important;
+        right: -1px !important;
+        background: #f57224 !important;
+        color: #fff !important;
+        font-size: 8px !important;
+        font-weight: bold !important;
+        width: 12px !important;
+        height: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-top-left-radius: 3px !important;
+        top: auto !important;
+        box-shadow: none !important;
+        transform: none !important;
+        border-radius: 0 !important;
     }
 
     /* Quantity and buttons */
@@ -1812,6 +1831,54 @@ if (is_string($productImages)) {
     $decodedImages = json_decode($productImages, true);
     $productImages = is_array($decodedImages) ? $decodedImages : [];
 }
+
+$imageOptionMap = []; // image_path => [optionId1, optionId2, ...]
+
+if ($product->thumb_image && !in_array($product->thumb_image, $productImages)) {
+    array_unshift($productImages, $product->thumb_image);
+}
+
+// Merge all images from variation combinations & map each image to ALL its option IDs
+if ($product->product_type === 'variable' && $product->variationCombinations) {
+    foreach ($product->variationCombinations as $combination) {
+        $comboOptions = is_array($combination->variation_options)
+            ? $combination->variation_options
+            : json_decode($combination->variation_options, true);
+        $comboOptions = array_map('intval', (array)($comboOptions ?? []));
+
+        if (!empty($combination->featured_image)) {
+            if (!in_array($combination->featured_image, $productImages)) {
+                $productImages[] = $combination->featured_image;
+            }
+            // Merge option IDs for this image
+            if (!isset($imageOptionMap[$combination->featured_image])) {
+                $imageOptionMap[$combination->featured_image] = [];
+            }
+            $imageOptionMap[$combination->featured_image] = array_unique(array_merge(
+                $imageOptionMap[$combination->featured_image], $comboOptions
+            ));
+        }
+        $combGallery = $combination->gallery_images;
+        if (is_string($combGallery)) {
+            $combGallery = json_decode($combGallery, true);
+        }
+        if (is_array($combGallery)) {
+            foreach ($combGallery as $cImg) {
+                if (!empty($cImg)) {
+                    if (!in_array($cImg, $productImages)) {
+                        $productImages[] = $cImg;
+                    }
+                    if (!isset($imageOptionMap[$cImg])) {
+                        $imageOptionMap[$cImg] = [];
+                    }
+                    $imageOptionMap[$cImg] = array_unique(array_merge(
+                        $imageOptionMap[$cImg], $comboOptions
+                    ));
+                }
+            }
+        }
+    }
+}
 @endphp
 
             <style>
@@ -1939,126 +2006,171 @@ if (is_string($productImages)) {
                     </svg>
                 </button>
                 <div class="image-gallery scrollbar-hide" id="product-gallery" data-gallery-images='@json($productImages)'>
-                    <img class="product-gallery-image active"
-                        src="{{ asset('storage/' . $product->thumb_image) }}" alt="{{ $product->title }}">
+                    @foreach ($productImages as $index => $img)
+                    @php $optIds = $imageOptionMap[$img] ?? []; @endphp
+                    <img class="product-gallery-image {{ $index === 0 ? 'active' : '' }}"
+                        src="{{ asset('storage/' . $img) }}" alt="{{ $product->title }}"
+                        data-option-ids='@json($optIds)'
+                        data-img-src="{{ $img }}"
+                        onclick="changeMainImage(this, '{{ asset('storage/' . $img) }}')">  
+                    @endforeach
                 </div>
                 <button class="gallery-nav next-btn" type="button" title="Next Image">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" /></svg>
                 </button>
             </div>
             @endif
+            <script>
+                function changeMainImage(thumb, src) {
+                    const mainImg = document.getElementById('main-product-image');
+                    if (mainImg) mainImg.src = src;
+                    const zoomFig = mainImg ? mainImg.closest('figure.zoom') : null;
+                    if (zoomFig) zoomFig.style.backgroundImage = `url('${src}')`;
+                    document.querySelectorAll('.product-gallery-image').forEach(img => img.classList.remove('active'));
+                    if (thumb) thumb.classList.add('active');
+
+                    // Auto-select matching variation option button (Color group)
+                    if (thumb) {
+                        let tOptIds = [];
+                        try {
+                            const raw = thumb.dataset.optionIds;
+                            if (raw) tOptIds = JSON.parse(raw).map(o => parseInt(o));
+                        } catch(e) {}
+
+                        let imgSrc = thumb.dataset.imgSrc;
+                        let matchingBtn = null;
+
+                        // Try matching by option IDs — look for a color button (non-size) in tOptIds
+                        if (tOptIds.length > 0) {
+                            tOptIds.forEach(oid => {
+                                if (!matchingBtn) {
+                                    const btn = document.querySelector(`.variation-option-btn[data-option-id="${oid}"]`);
+                                    if (btn) {
+                                        // Only match color buttons (second variation group)
+                                        const allGroups = document.querySelectorAll('.variation-group');
+                                        if (allGroups.length > 1) {
+                                            if (allGroups[1].contains(btn)) matchingBtn = btn;
+                                        } else {
+                                            matchingBtn = btn;
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        // Fallback: match by thumb image src
+                        if (!matchingBtn && imgSrc) {
+                            document.querySelectorAll('.variation-option-btn').forEach(btn => {
+                                let thumbImg = btn.dataset.thumbImage;
+                                if (thumbImg && (thumbImg === imgSrc || src.includes(thumbImg))) {
+                                    matchingBtn = btn;
+                                }
+                            });
+                        }
+
+                        if (matchingBtn && !matchingBtn.classList.contains('selected')) {
+                            matchingBtn.click();
+                        }
+                    }
+                }
+            </script>
         </div>
     </div>
 
     {{-- Right Column: Product Details --}}
     <div class="space-y-4 variation-cart-area">
 
-        <div id="variation-errors" class="variation-errors"
-            style="display: none; margin-bottom: 15px; padding: 10px; border-radius: 6px; background-color: #fee2e2; color: #dc2626; border: 1px solid #fecaca;">
-        </div>
 
-        <div class="space-y-3">
-            {{-- Title & Wishlist Top Row --}}
-            <div class="flex items-start justify-between gap-4">
-                <h1 class="text-2xl lg:text-3xl font-headline font-bold text-navy-deep leading-tight tracking-tight product-title flex-1">{{ $product->title }}</h1>
-                <button type="button" title="Add to Wishlist" onclick="toggleWishlistProduct({{ $product->id }}, '{{ addslashes($product->title) }}', '{{ $product->old_price ?? $product->price ?? 0 }}', '{{ asset('storage/' . $product->thumb_image) }}', '{{ route('product.single', ['id' => $product->id, 'slug' => $product->slug]) }}')"
-                    class="btn-wishlist-toggle flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold hover:bg-rose-100 hover:scale-105 transition-all shadow-sm shrink-0">
-                    <i class="fa-solid fa-heart text-xs" id="wishlist-heart-icon-{{ $product->id }}"></i>
-                    <span id="wishlist-btn-text-{{ $product->id }}">Add to Wishlist</span>
-                </button>
-            </div>
 
-            {{-- Line 1: Rating & Category --}}
-            <div class="flex items-center gap-3 text-xs text-on-surface-variant font-medium">
-                @php
-                $revCount = isset($reviewStats['review_count']) ? $reviewStats['review_count'] : 0;
-                $revAvg = isset($reviewStats['average_rating']) ? $reviewStats['average_rating'] : 0;
-                @endphp
-                @if (setting('single_product', 'enable_rating_summary', '1') == '1' && $revCount > 0)
-                <div class="flex items-center gap-1 py-0.5 px-2 bg-surface-container rounded-full cursor-pointer hover:bg-surface-container-high transition-colors" onclick="scrollToReviews()">
-                    <div class="flex text-energy-orange">
-                        @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <= $revAvg)
-                            <i class="fa-solid fa-star text-energy-orange text-[10px]"></i>
-                            @else
-                            <i class="fa-regular fa-star text-outline-variant text-[10px]"></i>
-                            @endif
-                        @endfor
+        <div class="space-y-2">
+            {{-- Title --}}
+            <h1 class="text-xl font-normal text-[#212121] leading-snug product-title">{{ $product->title }}</h1>
+
+            {{-- Ratings, Category & Wishlist Row --}}
+            <div class="flex items-center justify-between text-xs py-1 my-1 border-b border-gray-200">
+                <div class="flex items-center gap-3">
+                    @php
+                    $revCount = isset($reviewStats['review_count']) ? $reviewStats['review_count'] : 0;
+                    $revAvg = isset($reviewStats['average_rating']) ? $reviewStats['average_rating'] : 0;
+                    @endphp
+                    @if (setting('single_product', 'enable_rating_summary', '1') == '1' && $revCount > 0)
+                    <div class="flex items-center gap-1.5 cursor-pointer" onclick="scrollToReviews()">
+                        <div class="flex text-[#f5a623]">
+                            @for ($i = 1; $i <= 5; $i++)
+                                @if ($i <= $revAvg)
+                                <i class="fa-solid fa-star text-[11px]"></i>
+                                @else
+                                <i class="fa-regular fa-star text-gray-300 text-[11px]"></i>
+                                @endif
+                            @endfor
+                        </div>
+                        <span class="text-xs text-[#1a9cb7] hover:underline font-medium">Ratings {{ $revCount }}</span>
                     </div>
-                    <span class="text-[11px] font-bold text-navy-deep">{{ number_format($revAvg, 1) }}</span>
-                    <span class="text-[10px] text-on-surface-variant">({{ $revCount }})</span>
-                </div>
-                <span class="text-outline-variant">•</span>
-                @endif
+                    <span class="text-gray-300">|</span>
+                    @endif
 
-                @if ($product->category)
-                <div>
-                    <span class="font-bold text-navy-deep">Category :</span>
-                    <a href="{{ url('shop/' . $product->category->slug) }}" class="text-energy-orange font-semibold hover:underline">{{ $product->category->name }}</a>
+                    @if ($product->category)
+                    <div class="text-xs">
+                        <span class="text-gray-500">Category:</span>
+                        <a href="{{ url('shop/' . $product->category->slug) }}" class="text-[#1a9cb7] hover:underline font-medium">{{ $product->category->name }}</a>
+                    </div>
+                    @endif
                 </div>
-                @endif
+
+                <div class="flex items-center gap-3">
+                    <button type="button" title="Add to Wishlist" onclick="toggleWishlistProduct({{ $product->id }}, '{{ addslashes($product->title) }}', '{{ $product->old_price ?? $product->price ?? 0 }}', '{{ asset('storage/' . $product->thumb_image) }}', '{{ route('product.single', ['id' => $product->id, 'slug' => $product->slug]) }}')" class="text-gray-400 hover:text-rose-500 transition-colors">
+                        <i class="fa-regular fa-heart text-lg" id="wishlist-heart-icon-{{ $product->id }}"></i>
+                    </button>
+                </div>
             </div>
 
-            {{-- Line 2: Price, Old Price & Discount Badge --}}
-            <div class="flex items-baseline gap-3 py-1">
-                @if ($product->product_type === 'variable')
-                @php
-                $prices = [];
-                if ($product->variationCombinations && $product->variationCombinations->count() > 0) {
-                    foreach ($product->variationCombinations as $combination) {
-                        $effectivePrice = $combination->offer_price ?? ($combination->regular_price ?? $combination->price);
-                        if ($effectivePrice) $prices[] = $effectivePrice;
+            {{-- Price Display with Stock Status Badge on exact right --}}
+            <div class="py-2 flex items-center justify-between gap-3 my-1 border-b border-gray-200">
+                <div class="flex items-baseline gap-2.5" id="top-price-area">
+                    @if ($product->product_type === 'variable')
+                    @php
+                    $regularPrices = [];
+                    $offerPrices = [];
+                    if ($product->variationCombinations && $product->variationCombinations->count() > 0) {
+                        foreach ($product->variationCombinations as $combination) {
+                            if ($combination->regular_price) $regularPrices[] = $combination->regular_price;
+                            $eff = $combination->offer_price ?? ($combination->regular_price ?? $combination->price);
+                            if ($eff) $offerPrices[] = $eff;
+                        }
                     }
-                }
-                $minPrice = !empty($prices) ? min($prices) : 0;
-                $maxPrice = !empty($prices) ? max($prices) : 0;
-                @endphp
-                <span class="text-3xl font-headline font-extrabold text-navy-deep tracking-tight" id="updateOfferPrice">{{ $minPrice === $maxPrice ? $minPrice : $minPrice.'৳ - '.$maxPrice }}৳</span>
-                @else
-                @if ($product->offer)
-                @php
-                $discountPercentage = round((($product->old_price - $product->offer) / $product->old_price) * 100);
-                @endphp
-                <span class="text-3xl font-headline font-extrabold text-navy-deep tracking-tight" id="updateOfferPrice">{{ $product->offer }}৳</span>
-                <span class="text-lg text-on-surface-variant line-through oldprice">{{ $product->old_price }}৳</span>
-                
-                {{-- Celebration Firework Animated Discount Badge --}}
-                <div class="relative inline-flex items-center">
-                    <span class="discount-badge relative z-10 px-2.5 py-1 text-xs font-extrabold text-white uppercase tracking-wider rounded-full shadow-lg overflow-hidden flex items-center gap-1 bg-gradient-to-r from-red-600 via-amber-500 to-rose-600 bg-[length:200%_200%] animate-firework-shimmer">
-                        <i class="fa-solid fa-fire text-amber-300 animate-bounce"></i>
-                        <span>{{ $discountPercentage }}% OFF</span>
-                        <i class="fa-solid fa-sparkles text-amber-300 animate-spin"></i>
-                    </span>
-                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-                    </span>
+                    $minOffer = !empty($offerPrices) ? min($offerPrices) : ($product->offer ?? $product->old_price ?? 0);
+                    $minRegular = !empty($regularPrices) ? max($regularPrices) : ($product->old_price ?? 0);
+                    $disc = ($minRegular > 0 && $minOffer < $minRegular) ? round((($minRegular - $minOffer) / $minRegular) * 100) : 0;
+                    @endphp
+                    <span class="text-sm text-gray-400 line-through oldprice" id="topOldPrice" style="display: {{ $minRegular > $minOffer ? 'inline' : 'none' }};">৳{{ number_format($minRegular) }}</span>
+                    <span class="text-3xl font-bold text-[#f57224]" id="topOfferPrice">৳{{ number_format($minOffer) }}</span>
+                    <span class="text-xs text-white bg-[#ef4444] px-2 py-1 rounded font-bold uppercase tracking-wider" id="topDiscountBadge" style="display: {{ $disc > 0 ? 'inline-block' : 'none' }};">{{ $disc }}% OFF</span>
+                    @else
+                    @if ($product->offer && $product->old_price > $product->offer)
+                    @php
+                    $discountPercentage = round((($product->old_price - $product->offer) / $product->old_price) * 100);
+                    @endphp
+                    <span class="text-sm text-gray-400 line-through oldprice" id="topOldPrice">৳{{ number_format($product->old_price) }}</span>
+                    <span class="text-3xl font-bold text-[#f57224]" id="topOfferPrice">৳{{ number_format($product->offer) }}</span>
+                    <span class="text-xs text-white bg-[#ef4444] px-2 py-1 rounded font-bold uppercase tracking-wider" id="topDiscountBadge">{{ $discountPercentage }}% OFF</span>
+                    @else
+                    <span class="text-sm text-gray-400 line-through oldprice" id="topOldPrice" style="display:none;"></span>
+                    <span class="text-3xl font-bold text-[#f57224]" id="topOfferPrice">৳{{ number_format($product->old_price ?? $product->price) }}</span>
+                    <span class="text-xs text-white bg-[#ef4444] px-2 py-1 rounded font-bold uppercase tracking-wider" id="topDiscountBadge" style="display:none;"></span>
+                    @endif
+                    @endif
                 </div>
-                
-                <style>
-                    @keyframes fireworkShimmer {
-                        0% { background-position: 0% 50%; transform: scale(1); }
-                        50% { background-position: 100% 50%; transform: scale(1.05); }
-                        100% { background-position: 0% 50%; transform: scale(1); }
-                    }
-                    .animate-firework-shimmer {
-                        animation: fireworkShimmer 2.5s infinite ease-in-out;
-                        box-shadow: 0 0 12px rgba(239, 68, 68, 0.6), 0 0 20px rgba(245, 158, 11, 0.4);
-                    }
-                </style>
-                @else
-                <span class="text-3xl font-headline font-extrabold text-navy-deep tracking-tight" id="updateOfferPrice">{{ $product->old_price }}৳</span>
-                @endif
-                @endif
-            </div>
 
-            {{-- Line 3: Stock Status Badge --}}
-            @if (setting('general', 'show_product_meta_section', '1') == '1' && setting('general', 'show_availability_field', '1') == '1' && $product->quantity !== null)
-            <div class="inline-flex items-center gap-1.5 text-xs font-bold text-success-emerald bg-success-emerald/10 py-1 px-3 rounded-lg border border-success-emerald/20">
-                <i class="fa-solid fa-circle-check text-xs"></i>
-                In Stock ({{ $product->quantity }} items)
+                {{-- Stock Status Badge on exact right side --}}
+                <div class="shrink-0">
+                    @if (($product->product_type === 'variable' && ($product->quantity ?? 0) <= 0) || ($product->product_type !== 'variable' && $product->quantity !== null && $product->quantity <= 0))
+                    <span class="text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1 rounded-full" id="topStockBadge">This product is out of stock.</span>
+                    @elseif ($product->quantity !== null && $product->quantity > 0)
+                    <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full" id="topStockBadge">In Stock ({{ $product->quantity }})</span>
+                    @else
+                    <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full" id="topStockBadge">In Stock (400)</span>
+                    @endif
+                </div>
             </div>
-            @endif
         </div>
 
         @if (setting('general', 'show_short_description_section', '1') == '1')
@@ -2101,10 +2213,8 @@ if (is_string($productImages)) {
         $product->product_type === 'variable' &&
         $product->variationCombinations &&
         $product->variationCombinations->count() > 0)
-        {{-- Show Regular Variations --}}
-        <div class="variation-selection-area">
-            <h4 style="margin-bottom: 15px; font-size: 1.2rem; color: #333;">Select Options:</h4>
-
+        {{-- Show Regular Variations (Daraz Style) --}}
+        <div class="variation-selection-area my-3">
             @php
             // Extract unique variations and their options from combinations
             $variations = [];
@@ -2142,54 +2252,45 @@ if (is_string($productImages)) {
             @endphp
 
             @foreach ($variations as $variation)
-            <div class="variation-group" style="margin-bottom: 25px;">
-                <label
-                    style="display: block; margin-bottom: 10px; font-weight: 600; color: #333; font-size: 16px;">
-                    {{ $variation['name'] }}: <span style="color: red;">*</span>
-                </label>
-                <div class="variation-options" data-variation-id="{{ $variation['id'] }}"
-                    style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <div class="variation-group my-3">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xs text-gray-500 min-w-[90px] font-normal">{{ $variation['name'] }}</span>
+                    <span class="text-xs text-gray-800 font-semibold" id="selected-val-{{ $variation['id'] }}"></span>
+                </div>
+                <div class="variation-options flex flex-wrap gap-2" data-variation-id="{{ $variation['id'] }}">
                     @foreach ($variation['options'] as $option)
-                    <button type="button" class="variation-option-btn"
+                    @if(!empty($option['featured_image']))
+                    <button type="button" class="variation-option-btn daraz-thumb-option border border-gray-300 rounded-sm p-0.5 hover:border-[#f57224] transition-all bg-white"
                         data-option-id="{{ $option['id'] }}" data-variation-id="{{ $variation['id'] }}"
+                        data-option-name="{{ $option['name'] }}"
                         data-description="{{ $option['description'] }}"
                         data-thumb-image="{{ $option['featured_image'] }}"
                         data-additional-images="{{ $option['images'] }}"
                         onclick="selectVariationOption(this)"
-                        style="
-                                                            padding: 12px 20px;
-                                                            border: 2px solid #ddd;
-                                                            background: #fff;
-                                                            color: #333;
-                                                            border-radius: 8px;
-                                                            cursor: pointer;
-                                                            font-size: 14px;
-                                                            font-weight: 500;
-                                                            transition: all 0.3s ease;
-                                                            min-width: 80px;
-                                                            text-align: center;
-                                                        ">
+                        title="{{ $option['name'] }}"
+                        style="width: 44px; height: 44px; position: relative;">
+                        <img src="{{ asset('storage/' . $option['featured_image']) }}" alt="{{ $option['name'] }}" class="w-full h-full object-cover rounded-sm">
+                    </button>
+                    @else
+                    <button type="button" class="variation-option-btn daraz-text-option border border-gray-300 text-gray-700 hover:border-[#f57224] hover:text-[#f57224] px-3.5 py-1 text-xs rounded-sm transition-all bg-white font-medium"
+                        data-option-id="{{ $option['id'] }}" data-variation-id="{{ $variation['id'] }}"
+                        data-option-name="{{ $option['name'] }}"
+                        data-description="{{ $option['description'] }}"
+                        data-thumb-image="{{ $option['featured_image'] }}"
+                        data-additional-images="{{ $option['images'] }}"
+                        onclick="selectVariationOption(this)">
                         {{ $option['name'] }}
                     </button>
+                    @endif
                     @endforeach
                 </div>
             </div>
             @endforeach
 
-            <!-- Price and Stock Display -->
-            <div id="combination-info"
-                style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; display: none;">
-                <div id="combination-price"
-                    style="font-size: 1.5rem; font-weight: bold; color: #e74c3c; margin-bottom: 10px;"></div>
-                <div id="combination-stock" style="font-size: 14px; color: #6c757d;"></div>
-                <div id="combination-description" style="margin-top: 10px; font-size: 14px; color: #495057;">
-                </div>
-            </div>
-
             <!-- Error Messages -->
             <div id="variation-selection-error"
-                style="display: none; margin: 10px 0; padding: 10px; background: #fee2e2; color: #dc2626; border-radius: 6px; border: 1px solid #fecaca;">
-                Please select all required options.
+                style="display: none; margin: 8px 0; padding: 6px 10px; background: #fee2e2; color: #dc2626; border-radius: 4px; border: 1px solid #fecaca; font-size: 11px;">
+                This combination is not available.
             </div>
         </div>
 
@@ -2205,38 +2306,51 @@ if (is_string($productImages)) {
             window.productManageStock = @json($product->manage_stock ?? false);
             window.selectedVariations = {};
 
-            // Add CSS for selected state
-            const style = document.createElement('style');
-            style.textContent = `
-                                    .variation-option-btn:hover {
-                                        border-color: #007bff !important;
-                                        background: #f8f9fa !important;
-                                        transform: translateY(-1px);
-                                    }
-                                    .variation-option-btn.selected {
-                                        border-color: #007bff !important;
-                                        background: #007bff !important;
-                                        color: white !important;
-                                        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-                                    }
-                                    .variation-option-btn:active {
-                                        transform: translateY(0);
-                                    }
-                                `;
-            document.head.appendChild(style);
-
             function selectVariationOption(button) {
                 const variationId = button.dataset.variationId;
                 const optionId = button.dataset.optionId;
+                const optionName = button.dataset.optionName;
+                const thumbImage = button.dataset.thumbImage;
 
                 // Remove selected class from other buttons in same variation group
                 const variationGroup = button.closest('.variation-options');
-                variationGroup.querySelectorAll('.variation-option-btn').forEach(btn => {
-                    btn.classList.remove('selected');
-                });
+                if (variationGroup) {
+                    variationGroup.querySelectorAll('.variation-option-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                }
 
                 // Add selected class to clicked button
                 button.classList.add('selected');
+
+                if (optionName) {
+                    const labelSpan = document.getElementById('selected-val-' + variationId);
+                    if (labelSpan) labelSpan.textContent = optionName;
+                }
+
+                // Filter gallery images based on selected option (Small / Medium / Color)
+                filterGalleryImages();
+
+                // Highlight/Active matching gallery thumbnail if available
+                if (optionId || thumbImage) {
+                    let matchingThumb = document.querySelector(`.product-gallery-image[data-option-id="${optionId}"]`);
+                    if (!matchingThumb && thumbImage) {
+                        document.querySelectorAll('.product-gallery-image').forEach(tImg => {
+                            let imgSrc = tImg.dataset.imgSrc || tImg.src;
+                            if (imgSrc && (imgSrc === thumbImage || imgSrc.includes(thumbImage) || thumbImage.includes(imgSrc))) {
+                                matchingThumb = tImg;
+                            }
+                        });
+                    }
+                    if (matchingThumb && matchingThumb.style.display !== 'none') {
+                        const mainImg = document.getElementById('main-product-image');
+                        if (mainImg) mainImg.src = matchingThumb.src;
+                        const zoomFig = mainImg ? mainImg.closest('figure.zoom') : null;
+                        if (zoomFig) zoomFig.style.backgroundImage = `url('${matchingThumb.src}')`;
+                        document.querySelectorAll('.product-gallery-image').forEach(img => img.classList.remove('active'));
+                        matchingThumb.classList.add('active');
+                    }
+                }
 
                 // Update selected variations tracking
                 window.selectedVariations[variationId] = {
@@ -2245,20 +2359,206 @@ if (is_string($productImages)) {
                     button: button
                 };
 
-                // Update combination info with image loading (manual selection)
-                updateVariationCombination(true);
+                // Update combination info
+                updateVariationCombination(false);
+            }
+
+            function filterGalleryImages() {
+                const galleryImgs = document.querySelectorAll('.product-gallery-image');
+                if (galleryImgs.length === 0) return;
+
+                const selectedBtns = document.querySelectorAll('.variation-option-btn.selected');
+                if (selectedBtns.length === 0) {
+                    galleryImgs.forEach(img => img.style.display = 'inline-block');
+                    return;
+                }
+
+                // Build map: variationId -> selected optionId
+                const selectedByVariation = {};
+                const variationIds = [];
+                selectedBtns.forEach(btn => {
+                    const vId = btn.dataset.variationId;
+                    const oId = parseInt(btn.dataset.optionId);
+                    if (vId && oId && !selectedByVariation[vId]) {
+                        selectedByVariation[vId] = oId;
+                        variationIds.push(vId);
+                    }
+                });
+
+                const sizeOptionId = variationIds.length > 0 ? selectedByVariation[variationIds[0]] : null;
+                const selectedColorId = variationIds.length > 1 ? selectedByVariation[variationIds[1]] : null;
+
+                if (!sizeOptionId) {
+                    galleryImgs.forEach(img => img.style.display = 'inline-block');
+                    return;
+                }
+
+                // Find combos that include selected SIZE
+                const sizeCombos = (window.variationCombinations || []).filter(combo => {
+                    let opts = combo.variation_options;
+                    if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { return false; } }
+                    if (!Array.isArray(opts)) return false;
+                    return opts.map(o => parseInt(o)).includes(sizeOptionId);
+                });
+
+                if (sizeCombos.length === 0) {
+                    galleryImgs.forEach(img => img.style.display = 'inline-block');
+                    return;
+                }
+
+                // Valid option IDs for this size
+                const validOptionIds = new Set();
+                sizeCombos.forEach(combo => {
+                    let opts = combo.variation_options;
+                    if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { opts = []; } }
+                    if (Array.isArray(opts)) opts.forEach(o => validOptionIds.add(parseInt(o)));
+                });
+
+                // Allowed image paths for this size
+                const allowedImages = new Set();
+                sizeCombos.forEach(combo => {
+                    if (combo.featured_image) {
+                        const path = combo.featured_image.trim().toLowerCase();
+                        allowedImages.add(path);
+                        const filename = path.split('/').pop();
+                        if (filename) allowedImages.add(filename);
+                    }
+                    let gImgs = combo.gallery_images;
+                    if (typeof gImgs === 'string') { try { gImgs = JSON.parse(gImgs); } catch(e) { gImgs = []; } }
+                    if (Array.isArray(gImgs)) {
+                        gImgs.forEach(img => {
+                            if (img) {
+                                const path = img.trim().toLowerCase();
+                                allowedImages.add(path);
+                                const filename = path.split('/').pop();
+                                if (filename) allowedImages.add(filename);
+                            }
+                        });
+                    }
+                });
+
+                // Exact combo images for selected Size + Color
+                const exactImages = new Set();
+                if (selectedColorId) {
+                    const exactCombos = sizeCombos.filter(combo => {
+                        let opts = combo.variation_options;
+                        if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { return false; } }
+                        if (!Array.isArray(opts)) return false;
+                        return opts.map(o => parseInt(o)).includes(selectedColorId);
+                    });
+                    exactCombos.forEach(combo => {
+                        if (combo.featured_image) {
+                            const path = combo.featured_image.trim().toLowerCase();
+                            exactImages.add(path);
+                            const fn = path.split('/').pop();
+                            if (fn) exactImages.add(fn);
+                        }
+                        let gImgs = combo.gallery_images;
+                        if (typeof gImgs === 'string') { try { gImgs = JSON.parse(gImgs); } catch(e) { gImgs = []; } }
+                        if (Array.isArray(gImgs)) {
+                            gImgs.forEach(img => {
+                                if (img) {
+                                    const path = img.trim().toLowerCase();
+                                    exactImages.add(path);
+                                    const fn = path.split('/').pop();
+                                    if (fn) exactImages.add(fn);
+                                }
+                            });
+                        }
+                    });
+                }
+
+                let visibleCount = 0;
+                let firstVisible = null;
+                let selectedColorThumb = null;
+
+                galleryImgs.forEach(tImg => {
+                    let tOptIds = [];
+                    try {
+                        const raw = tImg.dataset.optionIds;
+                        if (raw) tOptIds = JSON.parse(raw).map(o => parseInt(o));
+                    } catch(e) {}
+
+                    const tImgSrc = (tImg.dataset.imgSrc || tImg.src || '').trim().toLowerCase();
+                    const tFilename = tImgSrc.split('/').pop();
+                    let show = false;
+
+                    // Match 1: Option ID match
+                    if (tOptIds.length > 0 && tOptIds.some(oid => validOptionIds.has(oid))) {
+                        show = true;
+                    }
+
+                    // Match 2: Image URL or filename match
+                    if (!show && allowedImages.size > 0) {
+                        allowedImages.forEach(aImg => {
+                            if (tImgSrc && (tImgSrc.includes(aImg) || aImg.includes(tImgSrc) || (tFilename && tFilename === aImg))) {
+                                show = true;
+                            }
+                        });
+                    }
+
+                    if (show) {
+                        tImg.style.display = 'inline-block';
+                        visibleCount++;
+                        if (!firstVisible) firstVisible = tImg;
+
+                        if (selectedColorId && tOptIds.includes(selectedColorId)) {
+                            selectedColorThumb = tImg;
+                        } else if (selectedColorId && exactImages.size > 0) {
+                            exactImages.forEach(eImg => {
+                                if (tImgSrc && (tImgSrc.includes(eImg) || eImg.includes(tImgSrc) || (tFilename && tFilename === eImg))) {
+                                    selectedColorThumb = tImg;
+                                }
+                            });
+                        }
+                    } else {
+                        tImg.style.display = 'none';
+                    }
+                });
+
+                // Fallback: If 0 visible, show all
+                if (visibleCount === 0) {
+                    galleryImgs.forEach(img => img.style.display = 'inline-block');
+                }
+
+                // Update main image preview and active thumbnail
+                const targetThumb = selectedColorThumb || firstVisible;
+                if (targetThumb) {
+                    const mainImg = document.getElementById('main-product-image');
+                    if (mainImg) mainImg.src = targetThumb.src;
+                    const zoomFig = mainImg ? mainImg.closest('figure.zoom') : null;
+                    if (zoomFig) zoomFig.style.backgroundImage = `url('${targetThumb.src}')`;
+                    galleryImgs.forEach(img => img.classList.remove('active'));
+                    targetThumb.classList.add('active');
+                }
+            }
+
+            function updateButtonStates() {
+                const hiddenCombo = document.getElementById('selected_combination_id');
+                const buyBtn = document.querySelector('#buyNowForm button[type="submit"]');
+                const cartBtn = document.querySelector('#cartForm button[type="submit"]');
+
+                const isVariable = window.productType === 'variable';
+                const hasValidCombination = hiddenCombo && hiddenCombo.value && hiddenCombo.value !== '';
+
+                const isEnabled = !isVariable || hasValidCombination;
+
+                [buyBtn, cartBtn].forEach(btn => {
+                    if (btn) {
+                        btn.disabled = !isEnabled;
+                        btn.style.opacity = isEnabled ? '1' : '0.6';
+                        btn.style.cursor = isEnabled ? 'pointer' : 'not-allowed';
+                    }
+                });
             }
 
             function updateVariationCombination(loadImages = false) {
-                const combinationInfo = document.getElementById('combination-info');
                 const errorDiv = document.getElementById('variation-selection-error');
                 const variationGroups = document.querySelectorAll('.variation-options');
 
-                // Collect selected options
                 let selectedOptions = [];
                 let allSelected = true;
 
-                // Check each variation group for selection
                 variationGroups.forEach(group => {
                     const selectedBtn = group.querySelector('.variation-option-btn.selected');
                     if (selectedBtn) {
@@ -2269,176 +2569,103 @@ if (is_string($productImages)) {
                 });
 
                 if (!allSelected) {
-                    combinationInfo.style.display = 'none';
-                    errorDiv.style.display = 'none';
-                    document.getElementById('selected_combination_id').value = '';
-
-                    // Restore original gallery when not all variations are selected
-                    restoreOriginalGallery();
-
-                    updateTotalPrice(); // Reset price display
-                    updateButtonStates(); // Update button states
+                    if (errorDiv) errorDiv.style.display = 'none';
+                    const hiddenCombo = document.getElementById('selected_combination_id');
+                    if (hiddenCombo) hiddenCombo.value = '';
+                    updateTotalPrice();
+                    updateButtonStates();
                     return;
                 }
 
-                // Sort options to match combination key (ensure all are integers)
                 selectedOptions.sort((a, b) => a - b);
 
-                console.log('Selected options:', selectedOptions);
-                console.log('Available combinations:', window.variationCombinations);
-
-                // Find matching combination with robust comparison
                 const combination = window.variationCombinations.find(combo => {
-                    // Ensure combo.variation_options is an array of integers
                     let comboOptions = combo.variation_options;
                     if (typeof comboOptions === 'string') {
                         comboOptions = JSON.parse(comboOptions);
                     }
-                    if (!Array.isArray(comboOptions)) {
-                        return false;
-                    }
-
-                    // Convert all to integers and sort
+                    if (!Array.isArray(comboOptions)) return false;
                     comboOptions = comboOptions.map(opt => parseInt(opt)).sort((a, b) => a - b);
-
-                    // Compare arrays
-                    if (comboOptions.length !== selectedOptions.length) {
-                        return false;
-                    }
-
-                    // Deep comparison
+                    if (comboOptions.length !== selectedOptions.length) return false;
                     for (let i = 0; i < comboOptions.length; i++) {
-                        if (comboOptions[i] !== selectedOptions[i]) {
-                            return false;
-                        }
+                        if (comboOptions[i] !== selectedOptions[i]) return false;
                     }
-
-                    console.log('Match found:', combo.id, comboOptions);
                     return true;
                 });
 
-                console.log('🔍 BEFORE CHECK - combination result:', combination);
-
                 if (combination) {
-                    console.log('✅✅✅ COMBINATION FOUND!', combination);
-                    console.log('Price:', combination.offer_price || combination.regular_price || combination.price);
-                    console.log('Stock:', combination.stock_quantity);
-                    console.log('Elements exist?', {
-                        combinationInfo: !!combinationInfo,
-                        errorDiv: !!errorDiv,
-                        priceElement: !!document.getElementById('combination-price'),
-                        stockElement: !!document.getElementById('combination-stock')
-                    });
+                    if (errorDiv) errorDiv.style.display = 'none';
 
-                    // FORCE HIDE ERROR FIRST (multiple methods for reliability)
-                    console.log('Hiding error div...');
-                    errorDiv.style.display = 'none';
-                    errorDiv.style.visibility = 'hidden';
-                    errorDiv.style.opacity = '0';
-                    errorDiv.setAttribute('style', 'display: none !important;');
-                    errorDiv.classList.add('hidden');
-
-                    // Display combination info with rich data
                     const effectivePrice = combination.offer_price || combination.regular_price || combination.price;
-                    let priceHTML = `৳${effectivePrice}`;
-                    let discountHTML = '';
+                    const regularPrice = combination.regular_price || combination.price;
 
-                    if (combination.offer_price && combination.regular_price && combination.offer_price < combination
-                        .regular_price) {
-                        priceHTML =
-                            `<span style="text-decoration: line-through; color: #999;">৳${combination.regular_price}</span> <span style="color: #e74c3c; font-weight: bold;">৳${combination.offer_price}</span>`;
+                    // Update individual price elements
+                    const topOldPrice = document.getElementById('topOldPrice');
+                    const topOfferPrice = document.getElementById('topOfferPrice');
+                    const topDiscountBadge = document.getElementById('topDiscountBadge');
 
-                        // Calculate discount percentage
-                        const discountPercentage = Math.round(((combination.regular_price - combination.offer_price) /
-                            combination.regular_price) * 100);
-                        discountHTML =
-                            `<span class="discount-badge" style="margin-left: 10px;">${discountPercentage}% OFF</span>`;
+                    if (topOfferPrice) topOfferPrice.textContent = `৳${effectivePrice}`;
+
+                    if (regularPrice && combination.offer_price && combination.offer_price < regularPrice) {
+                        const disc = Math.round(((regularPrice - combination.offer_price) / regularPrice) * 100);
+                        if (topOldPrice) {
+                            topOldPrice.textContent = `৳${regularPrice}`;
+                            topOldPrice.style.display = 'inline';
+                        }
+                        if (topDiscountBadge) {
+                            topDiscountBadge.textContent = `${disc}% OFF`;
+                            topDiscountBadge.style.display = 'inline-block';
+                        }
+                    } else {
+                        if (topOldPrice) topOldPrice.style.display = 'none';
+                        if (topDiscountBadge) topDiscountBadge.style.display = 'none';
                     }
 
-                    document.getElementById('combination-price').innerHTML = priceHTML + discountHTML;
-                    document.getElementById('combination-stock').textContent =
-                        combination.stock_quantity > 0 ?
-                        `In Stock: ${combination.stock_quantity} available` :
-                        'Out of Stock';
+                    // Update main image if combination has a featured_image
+                    if (combination.featured_image) {
+                        const mainImg = document.getElementById('main-product-image');
+                        const fullSrc = combination.featured_image.startsWith('http') ? combination.featured_image : `${window.location.origin}/storage/${combination.featured_image}`;
+                        if (mainImg) mainImg.src = fullSrc;
+                        const zoomFig = mainImg ? mainImg.closest('figure.zoom') : null;
+                        if (zoomFig) zoomFig.style.backgroundImage = `url('${fullSrc}')`;
+                    }
 
-                    // Store selected combination
-                    document.getElementById('selected_combination_id').value = combination.id;
-
-                    // Update descriptions
-                    updateVariationDescriptions();
-
-                    // Update gallery images if combination has them (only for manual selection)
-                    if (loadImages) {
-                        if (combination.featured_image || (combination.gallery_images && combination.gallery_images.length >
-                                0)) {
-                            updateGalleryForCombination(combination.featured_image, combination.gallery_images);
+                    // Update top stock status badge
+                    const topStockBadge = document.getElementById('topStockBadge');
+                    if (topStockBadge) {
+                        if (combination.stock_quantity > 0) {
+                            topStockBadge.textContent = `In Stock (${combination.stock_quantity})`;
+                            topStockBadge.className = 'text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full';
                         } else {
-                            // If no combination images, restore original gallery
-                            restoreOriginalGallery();
+                            topStockBadge.textContent = 'This product is out of stock.';
+                            topStockBadge.className = 'text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1 rounded-full';
                         }
                     }
 
-                    // FORCE SHOW COMBINATION INFO (multiple methods for reliability)
-                    console.log('Showing combination info...');
-                    combinationInfo.style.display = 'block';
-                    combinationInfo.style.visibility = 'visible';
-                    combinationInfo.style.opacity = '1';
-                    combinationInfo.setAttribute('style', 'display: block !important; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;');
-                    combinationInfo.classList.remove('hidden');
+                    const hiddenCombo = document.getElementById('selected_combination_id');
+                    if (hiddenCombo) hiddenCombo.value = combination.id;
 
-                    console.log('✅✅✅ DISPLAY UPDATED!');
-                    console.log('Combination Info Display:', combinationInfo.style.display);
-                    console.log('Combination Info Visibility:', combinationInfo.style.visibility);
-                    console.log('Combination Info Opacity:', combinationInfo.style.opacity);
-                    console.log('Error Div Display:', errorDiv.style.display);
-                    console.log('Error Div Visibility:', errorDiv.style.visibility);
-                    console.log('Computed styles:', {
-                        comboComputed: window.getComputedStyle(combinationInfo).display,
-                        errorComputed: window.getComputedStyle(errorDiv).display
-                    });
-
-                    // Update main price display
+                    updateVariationDescriptions();
                     updateTotalPrice();
-
-                    // Update button states based on new combination
                     updateButtonStates();
                 } else {
-
-                    // FORCE HIDE COMBINATION INFO (multiple methods)
-                    combinationInfo.style.display = 'none';
-                    combinationInfo.style.visibility = 'hidden';
-                    combinationInfo.style.opacity = '0';
-                    combinationInfo.setAttribute('style', 'display: none !important;');
-                    combinationInfo.classList.add('hidden');
-
-                    // FORCE SHOW ERROR (multiple methods)
-                    errorDiv.textContent = 'This combination is not available.';
-                    errorDiv.style.display = 'block';
-                    errorDiv.style.visibility = 'visible';
-                    errorDiv.style.opacity = '1';
-                    errorDiv.setAttribute('style', 'display: block !important; margin: 10px 0; padding: 10px; background: #fee2e2; color: #dc2626; border-radius: 6px; border: 1px solid #fecaca;');
-                    errorDiv.classList.remove('hidden');
-
-                    document.getElementById('selected_combination_id').value = '';
-
-                    // Restore original gallery when no combination is found (only for manual selection)
-                    if (loadImages) {
-                        restoreOriginalGallery();
+                    if (errorDiv) {
+                        errorDiv.textContent = 'This combination is not available.';
+                        errorDiv.style.display = 'block';
                     }
-
-                    // Reset price to base price
+                    const hiddenCombo = document.getElementById('selected_combination_id');
+                    if (hiddenCombo) hiddenCombo.value = '';
                     updateTotalPrice();
-
-                    // Update button states
                     updateButtonStates();
                 }
             }
 
             function updateVariationDescriptions() {
                 const descriptionDiv = document.getElementById('combination-description');
-                const combinationId = document.getElementById('selected_combination_id').value;
+                const hiddenCombo = document.getElementById('selected_combination_id');
+                const combinationId = hiddenCombo ? hiddenCombo.value : null;
 
-                if (combinationId) {
+                if (combinationId && descriptionDiv) {
                     const combination = window.variationCombinations.find(combo => combo.id == combinationId);
                     if (combination && combination.short_description) {
                         descriptionDiv.innerHTML = combination.short_description;
@@ -2447,7 +2674,6 @@ if (is_string($productImages)) {
                     }
                 }
 
-                // Fallback to option descriptions if no combination description
                 const descriptions = [];
                 document.querySelectorAll('.variation-option-btn.selected').forEach(btn => {
                     const description = btn.dataset.description;
@@ -2456,81 +2682,71 @@ if (is_string($productImages)) {
                     }
                 });
 
-                if (descriptions.length > 0) {
-                    descriptionDiv.innerHTML = descriptions.join('<br>');
-                    descriptionDiv.style.display = 'block';
-                } else {
-                    descriptionDiv.style.display = 'none';
+                if (descriptionDiv) {
+                    if (descriptions.length > 0) {
+                        descriptionDiv.innerHTML = descriptions.join('<br>');
+                        descriptionDiv.style.display = 'block';
+                    } else {
+                        descriptionDiv.style.display = 'none';
+                    }
                 }
             }
-        </script>
 
-        <script>
             document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('.option-btn.selected').forEach(btn => {
-                    btn.click();
+                document.querySelectorAll('.variation-options').forEach(group => {
+                    if (!group.querySelector('.variation-option-btn.selected')) {
+                        const firstBtn = group.querySelector('.variation-option-btn');
+                        if (firstBtn) firstBtn.click();
+                    }
                 });
+                updateButtonStates();
             });
         </script>
 
-        <!-- Stock warning message -->
-        <div id="stock-warning" class="stock-warning"
-            style="display: @if($product->product_type === 'variable') block @else none @endif; color: #e74c3c; font-size: 14px; margin-bottom: 10px; padding: 8px; background: #fdf2f2; border: 1px solid #fecaca; border-radius: 4px;">
-            @if ($product->product_type === 'variable')
-            Please select all required options.
-            @endif
-        </div>
 
-        <!-- Actions Area: Quantity + Add to Cart + Buy Now in ONE ROW -->
-        <div class="my-2" id="productActionsContainer">
-            @if ($product->product_type !== 'affiliate')
-            <div class="flex items-center gap-2">
-                {{-- Quantity Stepper --}}
-                <div class="flex items-center bg-white rounded-xl p-1 border border-outline-variant shadow-sm w-24 shrink-0 h-11">
-                    <button type="button" class="w-7 h-full flex items-center justify-center text-on-surface-variant hover:text-navy-deep transition-colors" onclick="changeQty(-1)">
-                        <i class="fa-solid fa-minus text-[10px]"></i>
-                    </button>
-                    <input class="w-full text-center bg-transparent border-none focus:ring-0 font-bold text-sm text-navy-deep quanity px-0" id="sharedQuantity" type="number" value="1" min="1" max="{{ $product->product_type === 'variable' ? '999' : $product->quantity ?? 999 }}">
-                    <button type="button" class="w-7 h-full flex items-center justify-center text-on-surface-variant hover:text-navy-deep transition-colors" onclick="changeQty(1)">
-                        <i class="fa-solid fa-plus text-[10px]"></i>
-                    </button>
-                </div>
 
-                {{-- Add to Cart Form --}}
-                <form id="cartForm" class="cartFormArea flex-1 min-w-0" action="{{ route('cart.store') }}" method="post">
-                    @csrf
-                    <input type="hidden" name="product_id" id="product_id" value="{{ $product->id }}" />
-                    <input type="hidden" name="quantity" id="cartQuantity" value="1" />
-                    <div id="variationInputs"></div>
-                    <button type="submit" onclick="updateCartForm(event)" class="w-full bg-navy-deep text-white border border-navy-deep h-11 rounded-xl font-bold hover:bg-navy-deep/90 transition-all flex items-center justify-center gap-1.5 shadow-md text-xs px-2 whitespace-nowrap single-cart-btn"
-                        @if ($product->product_type === 'variable') disabled style="opacity: 0.6; cursor: not-allowed;" @endif>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                        Add to Cart
-                    </button>
-                </form>
-
-                {{-- Buy Now Form --}}
-                <form id="buyNowForm" action="{{ route('buy.store.post') }}" method="post" class="buyNowFormarea flex-1 min-w-0">
-                    @csrf
-                    <input type="hidden" name="quantity" id="buyQuantity" value="1" />
-                    <input type="hidden" name="product_id" value="{{ $product->id }}" />
-                    <input type="hidden" name="price" id="buyPriceId" value="{{ $product->offer ?? $product->old_price }}" />
-                    <input name="main_price" type="hidden" id="buyMainPrice" value="{{ $product->offer ?? $product->old_price }}">
-                    <div id="buyVariationInputs"></div>
-                    <button type="submit" onclick="updateBuyNowForm(event)" class="w-full relative overflow-hidden bg-gradient-to-r from-rose-600 via-pink-500 to-amber-500 bg-[length:200%_200%] animate-firework-shimmer animate-periodic-nudge text-white h-11 rounded-xl font-extrabold shadow-lg shadow-rose-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs px-2 whitespace-nowrap tracking-wide flex items-center justify-center gap-1.5 single-buynow-btn"
-                        onsubmit="return false;"
-                        @if ($product->product_type === 'variable') disabled style="opacity: 0.6; cursor: not-allowed;" @endif>
-                        <i class="fa-solid fa-bolt text-amber-300"></i>
-                        <span>Buy Now</span>
-                        <i class="fa-solid fa-arrow-right text-white text-[10px]"></i>
-                    </button>
-                </form>
+        <!-- Quantity Stepper + Buy Now + Add to Cart ALL IN ONE ROW -->
+        <div class="flex items-center gap-1.5 sm:gap-3 my-4" id="productActionsContainer">
+            {{-- Quantity Stepper --}}
+            <div class="flex items-center bg-gray-50 rounded border border-gray-300 h-10 px-1 shrink-0">
+                <button type="button" class="w-6 sm:w-7 h-full flex items-center justify-center text-gray-600 hover:bg-gray-200 text-xs sm:text-sm font-bold rounded-l transition-colors" onclick="changeQty(-1)">-</button>
+                <input class="w-7 sm:w-10 text-center bg-transparent border-none focus:ring-0 text-xs font-bold text-gray-800 quanity px-0" id="sharedQuantity" type="number" value="1" min="1" max="{{ $product->product_type === 'variable' ? '999' : $product->quantity ?? 999 }}">
+                <button type="button" class="w-6 sm:w-7 h-full flex items-center justify-center text-gray-600 hover:bg-gray-200 text-xs sm:text-sm font-bold rounded-r transition-colors" onclick="changeQty(1)">+</button>
             </div>
+
+            @if ($product->product_type !== 'affiliate')
+            {{-- Buy Now Form --}}
+            <form id="buyNowForm" action="{{ route('buy.store.post') }}" method="post" class="flex-1 min-w-0">
+                @csrf
+                <input type="hidden" name="quantity" id="buyQuantity" value="1" />
+                <input type="hidden" name="product_id" value="{{ $product->id }}" />
+                <input type="hidden" name="price" id="buyPriceId" value="{{ $product->offer ?? $product->old_price }}" />
+                <input name="main_price" type="hidden" id="buyMainPrice" value="{{ $product->offer ?? $product->old_price }}">
+                <div id="buyVariationInputs"></div>
+                <button type="submit" onclick="updateBuyNowForm(event)" class="w-full bg-[#2bbed6] hover:bg-[#20a4bb] text-white h-10 rounded font-semibold text-[11px] sm:text-sm uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1 single-buynow-btn px-1.5 whitespace-nowrap"
+                    onsubmit="return false;">
+                    <i class="fa-solid fa-bolt text-amber-300 text-[10px] sm:text-xs"></i>
+                    <span class="truncate">Buy Now</span>
+                </button>
+            </form>
+
+            {{-- Add to Cart Form --}}
+            <form id="cartForm" class="cartFormArea flex-1 min-w-0" action="{{ route('cart.store') }}" method="post">
+                @csrf
+                <input type="hidden" name="product_id" id="product_id" value="{{ $product->id }}" />
+                <input type="hidden" name="quantity" id="cartQuantity" value="1" />
+                <div id="variationInputs"></div>
+                <button type="submit" onclick="updateCartForm(event)" class="w-full bg-[#f57224] hover:bg-[#d85c14] text-white h-10 rounded font-semibold text-[11px] sm:text-sm uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1 single-cart-btn px-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-cart-shopping text-[10px] sm:text-xs"></i>
+                    <span class="truncate">Add to Cart</span>
+                </button>
+            </form>
             @else
-            <a href="{{ $product->external_url }}" target="_blank" class="w-full relative overflow-hidden bg-gradient-to-r from-rose-600 via-pink-500 to-amber-500 bg-[length:200%_200%] animate-firework-shimmer animate-periodic-nudge text-white h-11 rounded-xl font-extrabold shadow-lg shadow-rose-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs tracking-wide flex items-center justify-center gap-2 single-buynow-btn affiliate-btn" onclick="return checkAffiliateStock(event)">
-                <i class="fa-solid fa-external-link"></i> Buy Now
+            <a href="{{ $product->external_url }}" target="_blank" class="w-full bg-[#2bbed6] hover:bg-[#20a4bb] text-white h-10 rounded font-semibold text-[11px] sm:text-sm uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1 single-buynow-btn affiliate-btn px-1.5 whitespace-nowrap" onclick="return checkAffiliateStock(event)">
+                <i class="fa-solid fa-external-link text-[10px] sm:text-xs"></i> <span class="truncate">Buy Now</span>
             </a>
             @endif
+        </div>
 
             <style>
                 @keyframes periodicNudge {
@@ -2545,7 +2761,6 @@ if (is_string($productImages)) {
                     animation: fireworkShimmer 2.5s infinite ease-in-out, periodicNudge 12s infinite ease-in-out;
                 }
             </style>
-        </div>
 
         {{-- Short book red something --}}
         @if (setting('single_product', 'enable_book_sample', '1') == '1')
@@ -5583,20 +5798,12 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
 
     // Function to check stock availability
     function checkStockAvailability(quantity) {
-        console.log('Checking stock availability:', {
-            productType: window.productType,
-            productStock: window.productStock,
-            productManageStock: window.productManageStock,
-            quantity: quantity
-        });
-
-        // For variable products, check if combination is selected
         if (window.productType === 'variable') {
             const combinationId = document.getElementById('selected_combination_id');
-            if (!combinationId || !combinationId.value) {
+            if (!combinationId || !combinationId.value || combinationId.value.trim() === '') {
                 return {
                     available: false,
-                    message: 'Please select all required options.'
+                    message: 'This combination is not available.'
                 };
             }
 
@@ -5604,21 +5811,22 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
             if (!combination) {
                 return {
                     available: false,
-                    message: 'Selected combination not found.'
+                    message: 'This combination is not available.'
                 };
             }
 
-            if (combination.stock_quantity <= 0) {
+            const stockQty = (combination.stock_quantity !== undefined && combination.stock_quantity !== null) ? parseInt(combination.stock_quantity) : 0;
+            if (stockQty <= 0) {
                 return {
                     available: false,
-                    message: 'Selected combination is out of stock.'
+                    message: 'This combination is out of stock.'
                 };
             }
 
-            if (quantity > combination.stock_quantity) {
+            if (quantity > stockQty) {
                 return {
                     available: false,
-                    message: `Only ${combination.stock_quantity} items available for this combination.`
+                    message: `Only ${stockQty} items available for this combination.`
                 };
             }
 
@@ -5627,17 +5835,7 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
                 message: ''
             };
         } else {
-            // Simple product
-            console.log('Simple product stock check:', {
-                productStock: window.productStock,
-                quantity: quantity,
-                isOutOfStock: window.productStock <= 0,
-                exceedsStock: quantity > window.productStock
-            });
-
-            // For simple products, check stock even if manage_stock is false but quantity is 0
             if (window.productStock <= 0) {
-                console.log('Simple product with zero stock, blocking purchase');
                 return {
                     available: false,
                     message: 'This product is out of stock.'
@@ -5645,14 +5843,12 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
             }
 
             if (quantity > window.productStock) {
-                console.log('Quantity exceeds available stock');
                 return {
                     available: false,
                     message: `Only ${window.productStock} items available.`
                 };
             }
 
-            console.log('Stock check passed');
             return {
                 available: true,
                 message: ''
@@ -5660,71 +5856,42 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
         }
     }
 
-    // Function to update button states based on stock
+    // Function to update button states based on stock and combination validity
     function updateButtonStates() {
-        const quantity = parseInt(document.getElementById('sharedQuantity').value) || 1;
+        const sharedQtyEl = document.getElementById('sharedQuantity');
+        const quantity = sharedQtyEl ? (parseInt(sharedQtyEl.value) || 1) : 1;
         const stockCheck = checkStockAvailability(quantity);
-        const cartBtn = document.querySelector('.single-cart-btn');
-        const buyNowBtn = document.querySelector('.single-buynow-btn');
-        const stockWarning = document.getElementById('stock-warning');
-
-        console.log('Updating button states:', {
-            quantity: quantity,
-            stockCheck: stockCheck,
-            cartBtnFound: !!cartBtn,
-            buyNowBtnFound: !!buyNowBtn,
-            stockWarningFound: !!stockWarning
-        });
+        const cartBtn = document.querySelector('.single-cart-btn') || document.querySelector('#cartForm button');
+        const buyNowBtn = document.querySelector('.single-buynow-btn') || document.querySelector('#buyNowForm button');
+        const errorDiv = document.getElementById('variation-selection-error');
 
         if (!stockCheck.available) {
-            console.log('Stock not available, disabling buttons');
-            // Show stock warning
-            if (stockWarning) {
-                stockWarning.textContent = stockCheck.message;
-                stockWarning.style.display = 'block';
+            if (errorDiv) {
+                errorDiv.textContent = stockCheck.message || 'This combination is not available.';
+                errorDiv.style.display = 'block';
             }
 
-            // Disable buttons
-            if (cartBtn) {
-                cartBtn.disabled = true;
-                cartBtn.style.opacity = '0.6';
-                cartBtn.style.cursor = 'not-allowed';
-                console.log('Cart button disabled');
-            }
-            if (buyNowBtn) {
-                // Handle both button and anchor elements
-                if (buyNowBtn.tagName === 'BUTTON') {
-                    buyNowBtn.disabled = true;
+            [cartBtn, buyNowBtn].forEach(btn => {
+                if (btn) {
+                    if (btn.tagName === 'BUTTON') btn.disabled = true;
+                    btn.style.opacity = '0.4';
+                    btn.style.cursor = 'not-allowed';
+                    btn.style.pointerEvents = 'none';
                 }
-                buyNowBtn.style.opacity = '0.6';
-                buyNowBtn.style.cursor = 'not-allowed';
-                buyNowBtn.style.pointerEvents = 'none';
-                console.log('Buy now button disabled');
-            }
+            });
         } else {
-            console.log('Stock available, enabling buttons');
-            // Hide stock warning
-            if (stockWarning) {
-                stockWarning.style.display = 'none';
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
             }
 
-            // Enable buttons
-            if (cartBtn) {
-                cartBtn.disabled = false;
-                cartBtn.style.opacity = '1';
-                cartBtn.style.cursor = 'pointer';
-                console.log('Cart button enabled');
-            }
-            if (buyNowBtn) {
-                // Handle both button and anchor elements
-                if (buyNowBtn.tagName === 'BUTTON') {
-                    buyNowBtn.disabled = false;
+            [cartBtn, buyNowBtn].forEach(btn => {
+                if (btn) {
+                    if (btn.tagName === 'BUTTON') btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.style.pointerEvents = 'auto';
                 }
-                buyNowBtn.style.opacity = '1';
-                buyNowBtn.style.cursor = 'pointer';
-                buyNowBtn.style.pointerEvents = 'auto';
-                console.log('Buy now button enabled');
-            }
+            });
         }
     }
 
@@ -5845,23 +6012,27 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
         // If we reach here, it's a regular product (not a combo)
         console.log('Processing regular product add to cart');
 
-        const errorDiv = document.getElementById('variation-errors');
+        const errorDiv = document.getElementById('variation-selection-error');
         const quantity = parseInt(document.getElementById('sharedQuantity').value) || 1;
 
         // Check stock availability
         const stockCheck = checkStockAvailability(quantity);
         if (!stockCheck.available) {
-            errorDiv.textContent = stockCheck.message;
-            errorDiv.style.display = "block";
-            errorDiv.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
+            if (errorDiv) {
+                errorDiv.textContent = stockCheck.message || 'This combination is not available.';
+                errorDiv.style.display = "block";
+                errorDiv.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
             return false;
         }
 
         // Clear any existing error messages
-        errorDiv.style.display = "none";
+        if (errorDiv) {
+            errorDiv.style.display = "none";
+        }
 
         // Update hidden input
         document.getElementById('cartQuantity').value = quantity;
@@ -5887,23 +6058,27 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
     function updateBuyNowForm(event) {
         event.preventDefault(); // Prevent default form submission
 
-        const errorDiv = document.getElementById('variation-errors');
+        const errorDiv = document.getElementById('variation-selection-error');
         const quantity = parseInt(document.getElementById('sharedQuantity').value) || 1;
 
         // Check stock availability
         const stockCheck = checkStockAvailability(quantity);
         if (!stockCheck.available) {
-            errorDiv.textContent = stockCheck.message;
-            errorDiv.style.display = "block";
-            errorDiv.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
+            if (errorDiv) {
+                errorDiv.textContent = stockCheck.message || 'This combination is not available.';
+                errorDiv.style.display = "block";
+                errorDiv.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
             return false;
         }
 
         // Clear any existing error messages
-        errorDiv.style.display = "none";
+        if (errorDiv) {
+            errorDiv.style.display = "none";
+        }
 
         let totalPrice = 0;
 
