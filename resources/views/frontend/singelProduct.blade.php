@@ -2400,27 +2400,6 @@ if (empty($productImages)) {
                 // Filter gallery images based on selected option (Small / Medium / Color)
                 filterGalleryImages();
 
-                // Highlight/Active matching gallery thumbnail if available
-                if (optionId || thumbImage) {
-                    let matchingThumb = document.querySelector(`.product-gallery-image[data-option-id="${optionId}"]`);
-                    if (!matchingThumb && thumbImage) {
-                        document.querySelectorAll('.product-gallery-image').forEach(tImg => {
-                            let imgSrc = tImg.dataset.imgSrc || tImg.src;
-                            if (imgSrc && (imgSrc === thumbImage || imgSrc.includes(thumbImage) || thumbImage.includes(imgSrc))) {
-                                matchingThumb = tImg;
-                            }
-                        });
-                    }
-                    if (matchingThumb && matchingThumb.style.display !== 'none') {
-                        const mainImg = document.getElementById('main-product-image');
-                        if (mainImg) mainImg.src = matchingThumb.src;
-                        const zoomFig = mainImg ? mainImg.closest('figure.zoom') : null;
-                        if (zoomFig) zoomFig.style.backgroundImage = `url('${matchingThumb.src}')`;
-                        document.querySelectorAll('.product-gallery-image').forEach(img => img.classList.remove('active'));
-                        matchingThumb.classList.add('active');
-                    }
-                }
-
                 // Update selected variations tracking
                 window.selectedVariations[variationId] = {
                     optionId: parseInt(optionId),
@@ -2442,98 +2421,88 @@ if (empty($productImages)) {
                     return;
                 }
 
-                // Find Size button (1st category) and Color button (2nd category)
-                let selectedSizeBtn = null;
+                // Find selected color option and selected size option
                 let selectedColorBtn = null;
+                let selectedSizeBtn = null;
 
                 selectedBtns.forEach(btn => {
                     const group = btn.closest('.variation-group');
                     const groupLabel = group ? (group.querySelector('.text-gray-500')?.textContent || '').toLowerCase() : '';
-                    if (groupLabel.includes('size')) {
-                        selectedSizeBtn = btn;
-                    } else if (groupLabel.includes('color') || groupLabel.includes('colour')) {
+                    if (groupLabel.includes('color') || groupLabel.includes('colour') || btn.dataset.thumbImage) {
                         selectedColorBtn = btn;
+                    } else if (groupLabel.includes('size')) {
+                        selectedSizeBtn = btn;
                     }
                 });
 
-                // Fallback to position if labels aren't matched
-                if (!selectedSizeBtn && selectedBtns.length > 0) selectedSizeBtn = selectedBtns[0];
-                if (!selectedColorBtn && selectedBtns.length > 1) selectedColorBtn = selectedBtns[1];
-
-                const sizeOptionId = selectedSizeBtn ? parseInt(selectedSizeBtn.dataset.optionId) : null;
-                const selectedColorId = selectedColorBtn ? parseInt(selectedColorBtn.dataset.optionId) : null;
-
-                if (!sizeOptionId) {
-                    galleryImgs.forEach(img => img.style.display = 'inline-block');
-                    return;
-                }
-
-                // Find all combinations matching ONLY the 1st category (Size)
-                const sizeCombos = (window.variationCombinations || []).filter(combo => {
-                    let opts = combo.variation_options;
-                    if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { return false; } }
-                    if (!Array.isArray(opts)) return false;
-                    return opts.map(o => parseInt(o)).includes(sizeOptionId);
-                });
-
-                if (sizeCombos.length === 0) {
-                    galleryImgs.forEach(img => img.style.display = 'inline-block');
-                    return;
-                }
-
-                // Collect valid option IDs and allowed images for the selected Size
-                const validOptionIds = new Set();
-                const allowedImages = new Set();
-
-                sizeCombos.forEach(combo => {
-                    let opts = combo.variation_options;
-                    if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { opts = []; } }
-                    if (Array.isArray(opts)) opts.forEach(o => validOptionIds.add(parseInt(o)));
-
-                    if (combo.featured_image) {
-                        const path = combo.featured_image.trim().toLowerCase();
-                        allowedImages.add(path);
-                        const filename = path.split('/').pop();
-                        if (filename) allowedImages.add(filename);
-                    }
-                    let gImgs = combo.gallery_images;
-                    if (typeof gImgs === 'string') { try { gImgs = JSON.parse(gImgs); } catch(e) { gImgs = []; } }
-                    if (Array.isArray(gImgs)) {
-                        gImgs.forEach(img => {
-                            if (img) {
-                                const path = img.trim().toLowerCase();
-                                allowedImages.add(path);
-                                const filename = path.split('/').pop();
-                                if (filename) allowedImages.add(filename);
-                            }
-                        });
-                    }
-                });
-
-                // Find exact image paths for selected Color
-                const colorImages = new Set();
-                if (selectedColorId) {
-                    const colorCombos = sizeCombos.filter(combo => {
-                        let opts = combo.variation_options;
-                        if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { return false; } }
-                        if (!Array.isArray(opts)) return false;
-                        return opts.map(o => parseInt(o)).includes(selectedColorId);
+                // Fallback: if selectedColorBtn not found by label, pick button with thumbImage
+                if (!selectedColorBtn) {
+                    selectedBtns.forEach(btn => {
+                        if (btn.dataset.thumbImage) selectedColorBtn = btn;
                     });
-                    colorCombos.forEach(combo => {
-                        if (combo.featured_image) {
-                            const path = combo.featured_image.trim().toLowerCase();
-                            colorImages.add(path);
-                            const fn = path.split('/').pop();
-                            if (fn) colorImages.add(fn);
+                }
+
+                const selectedColorId = selectedColorBtn ? parseInt(selectedColorBtn.dataset.optionId) : null;
+                const selectedSizeId = selectedSizeBtn ? parseInt(selectedSizeBtn.dataset.optionId) : null;
+
+                // Collect target option IDs and image filenames to match
+                const targetOptionIds = new Set();
+                const targetImages = new Set();
+
+                if (selectedColorId) {
+                    targetOptionIds.add(selectedColorId);
+                    if (selectedColorBtn.dataset.thumbImage) {
+                        const img = selectedColorBtn.dataset.thumbImage.trim().toLowerCase();
+                        targetImages.add(img);
+                        const fn = img.split('/').pop();
+                        if (fn) targetImages.add(fn);
+                    }
+                }
+
+                if (selectedSizeId) {
+                    targetOptionIds.add(selectedSizeId);
+                }
+
+                // Collect images from variationCombinations matching selected options
+                if (window.variationCombinations && window.variationCombinations.length > 0) {
+                    window.variationCombinations.forEach(combo => {
+                        let opts = combo.variation_options;
+                        if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { opts = []; } }
+                        if (!Array.isArray(opts)) return;
+                        opts = opts.map(o => parseInt(o));
+
+                        // Match if combo contains selectedColorId (or selectedSizeId if no color selected)
+                        const matchesColor = selectedColorId ? opts.includes(selectedColorId) : true;
+                        const matchesSize = selectedSizeId ? opts.includes(selectedSizeId) : true;
+
+                        if (matchesColor && matchesSize) {
+                            opts.forEach(o => targetOptionIds.add(o));
+                            if (combo.featured_image) {
+                                const path = combo.featured_image.trim().toLowerCase();
+                                targetImages.add(path);
+                                const fn = path.split('/').pop();
+                                if (fn) targetImages.add(fn);
+                            }
+                            let gImgs = combo.gallery_images;
+                            if (typeof gImgs === 'string') { try { gImgs = JSON.parse(gImgs); } catch(e) { gImgs = []; } }
+                            if (Array.isArray(gImgs)) {
+                                gImgs.forEach(img => {
+                                    if (img) {
+                                        const path = img.trim().toLowerCase();
+                                        targetImages.add(path);
+                                        const fn = path.split('/').pop();
+                                        if (fn) targetImages.add(fn);
+                                    }
+                                });
+                            }
                         }
                     });
                 }
 
                 let visibleCount = 0;
                 let firstVisible = null;
-                let activeColorThumb = null;
+                let activeMatchThumb = null;
 
-                // Show all thumbnails belonging to the 1st category (Size)
                 galleryImgs.forEach(tImg => {
                     let tOptIds = [];
                     try {
@@ -2545,15 +2514,30 @@ if (empty($productImages)) {
                     const tFilename = tImgSrc.split('/').pop();
                     let show = false;
 
-                    if (tOptIds.length > 0 && tOptIds.some(oid => validOptionIds.has(oid))) {
+                    if (selectedColorId) {
+                        // When a color is selected, thumbnail must belong to that color or its combo images
+                        if (tOptIds.includes(selectedColorId)) {
+                            show = true;
+                        } else if (targetImages.size > 0) {
+                            targetImages.forEach(tPath => {
+                                if (tImgSrc && (tImgSrc.includes(tPath) || tPath.includes(tImgSrc) || (tFilename && tFilename === tPath))) {
+                                    show = true;
+                                }
+                            });
+                        }
+                    } else if (selectedSizeId) {
+                        // When only size is selected
+                        if (tOptIds.length > 0 && tOptIds.some(oid => targetOptionIds.has(oid))) {
+                            show = true;
+                        } else if (targetImages.size > 0) {
+                            targetImages.forEach(tPath => {
+                                if (tImgSrc && (tImgSrc.includes(tPath) || tPath.includes(tImgSrc) || (tFilename && tFilename === tPath))) {
+                                    show = true;
+                                }
+                            });
+                        }
+                    } else {
                         show = true;
-                    }
-                    if (!show && allowedImages.size > 0) {
-                        allowedImages.forEach(aImg => {
-                            if (tImgSrc && (tImgSrc.includes(aImg) || aImg.includes(tImgSrc) || (tFilename && tFilename === aImg))) {
-                                show = true;
-                            }
-                        });
                     }
 
                     if (show) {
@@ -2561,14 +2545,8 @@ if (empty($productImages)) {
                         visibleCount++;
                         if (!firstVisible) firstVisible = tImg;
 
-                        if (selectedColorId && tOptIds.includes(selectedColorId)) {
-                            activeColorThumb = tImg;
-                        } else if (selectedColorId && colorImages.size > 0) {
-                            colorImages.forEach(cImg => {
-                                if (tImgSrc && (tImgSrc.includes(cImg) || cImg.includes(tImgSrc) || (tFilename && tFilename === cImg))) {
-                                    activeColorThumb = tImg;
-                                }
-                            });
+                        if (selectedColorId && (tOptIds.includes(selectedColorId) || (selectedColorBtn && selectedColorBtn.dataset.thumbImage && tImgSrc.includes(selectedColorBtn.dataset.thumbImage.trim().toLowerCase())))) {
+                            if (!activeMatchThumb) activeMatchThumb = tImg;
                         }
                     } else {
                         tImg.style.display = 'none';
@@ -2579,8 +2557,8 @@ if (empty($productImages)) {
                     galleryImgs.forEach(img => img.style.display = 'inline-block');
                 }
 
-                // Update BIG main image preview to selected Color (or first visible for Size)
-                const targetThumb = activeColorThumb || firstVisible;
+                // Update BIG main image preview
+                const targetThumb = activeMatchThumb || firstVisible;
                 if (targetThumb) {
                     const mainImg = document.getElementById('main-product-image');
                     if (mainImg) mainImg.src = targetThumb.src;
