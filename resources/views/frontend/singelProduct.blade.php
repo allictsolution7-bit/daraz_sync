@@ -1818,8 +1818,8 @@
 </div>
 
 {{-- Product Container --}}
-<main class="py-12 bg-surface font-body text-on-surface">
-<div class="max-w-container-max mx-auto px-margin-desktop space-y-16">
+<main class="py-2 bg-surface font-body text-on-surface">
+<div class="max-w-container-max mx-auto px-margin-desktop space-y-1">
 <!-- Top Section: 2-Column Grid -->
 <div class="grid grid-cols-1 lg:grid-cols-[48%_48%] justify-between gap-gutter pcontainer" data-product-id="{{ $product->id }}" data-category="{{ $product->category->name ?? ($product->additionalCategories->first()->name ?? ($product->getAllCategories()->first()->name ?? '')) }}">
 <!-- Left Column: Image Gallery -->
@@ -2973,143 +2973,139 @@ if (empty($productImages)) {
                 }
             }
         </style>
-        @if (setting('single_product', 'enable_short_info', '1') == '1')
-        <div class="product-meta-bar">
-            <div class="meta-item">
-                <svg width="1.1em" height="1.1em" viewBox="0 0 24 24" fill="none"
-                    xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 0.5em;">
-                    <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                    <path
-                        d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                        stroke="currentColor" stroke-width="2" />
-                    <path d="M16 8L8 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                </svg>
-                ডেলিভারি করা হবে {{ today()->addWeek()->format('l, d M Y') }} পর্যন্ত
-            </div>
-            <div class="meta-item">
-                <svg width="1.3em" height="1.3em" viewBox="0 0 24 24" fill="none"
-                    xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 0.5em;">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"
-                        stroke="currentColor" stroke-width="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor"
-                        stroke-width="2" />
-                    <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor"
-                        stroke-width="2" />
-                    <path d="M6 7H18" stroke="currentColor" stroke-width="1.5" />
-                    <path d="M6 10H12" stroke="currentColor" stroke-width="1.5" />
-                    <circle cx="16" cy="10" r="1" fill="currentColor" />
-                </svg>
-                ক্যাশ অন ডেলিভারি
-            </div>
-        </div>
-        @endif
-
-        {{-- Order Delivery Timeline (Placed right after Buy Now & Actions) --}}
-        @php
-        $showTimeline = setting('general', 'show_order_timeline', '1');
-        @endphp
-        @if ($showTimeline == '1')
-        <style>
-            .order-time-container {
-                width: 100%;
-                max-width: 800px;
-            }
-
-            .order-time-timeline-container {
-                width: 100%;
-                position: relative;
-                border: 1px solid #e2e8f0;
-                background: #ffffff;
-                border-radius: 12px;
-                margin-top: 8px;
-                padding: 10px 4px 6px 4px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            }
-        </style>
-
-        <div class="order-time-container my-2">
-            <div class="order-time-timeline-container" id="timeline-container">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 150" width="100%">
-                    <!-- Connection Lines -->
-                    <line x1="100" y1="60" x2="400" y2="60" stroke="#113257" stroke-width="2.5" />
-                    <line x1="400" y1="60" x2="700" y2="60" stroke="#cbd5e1" stroke-width="2.5" stroke-dasharray="4 4" />
-
-                    <!-- Circle 1: Ordered (Shopping Bag / Checkbox Icon) -->
-                    <circle cx="100" cy="60" r="32" fill="#113257" />
-                    <!-- Shopping Bag / Order Icon -->
-                    <path d="M91 52 C91 48 95 44 100 44 C105 44 109 48 109 52" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-                    <rect x="88" y="52" width="24" height="22" rx="3" fill="none" stroke="#ffffff" stroke-width="2.5"/>
-                    <path d="M96 63 L99 66 L105 60" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-
-                    <!-- Circle 2: Order Ready (Box / Package Prepared Icon) -->
-                    <circle cx="400" cy="60" r="32" fill="#113257" />
-                    <!-- Box Icon -->
-                    <path d="M386 52 L400 45 L414 52 L400 59 Z" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
-                    <path d="M386 52 L386 67 L400 74 L400 59" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
-                    <path d="M414 52 L414 67 L400 74" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
-                    <path d="M393 48.5 L407 55.5" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
-
-                    <!-- Circle 3: Delivered (Delivery Van / Home Arrival Icon) -->
-                    <circle cx="700" cy="60" r="32" fill="#94a3b8" />
-                    <!-- Delivery Truck Icon -->
-                    <rect x="683" y="50" width="22" height="15" rx="2" fill="none" stroke="#ffffff" stroke-width="2.2"/>
-                    <path d="M705 54 L713 54 L717 59 L717 65 L705 65 Z" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
-                    <circle cx="690" cy="67" r="3.5" fill="#94a3b8" stroke="#ffffff" stroke-width="2.2"/>
-                    <circle cx="711" cy="67" r="3.5" fill="#94a3b8" stroke="#ffffff" stroke-width="2.2"/>
-
-                    <!-- Text Labels -->
-                    <text id="ordered-date" x="100" y="115" font-family="'Inter', sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#113257"></text>
-                    <text x="100" y="135" font-family="'Inter', sans-serif" font-size="13" text-anchor="middle" fill="#64748b">Ordered</text>
-
-                    <text id="ready-date" x="400" y="115" font-family="'Inter', sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#113257"></text>
-                    <text x="400" y="135" font-family="'Inter', sans-serif" font-size="13" text-anchor="middle" fill="#64748b">Order Ready</text>
-
-                    <text id="delivered-date" x="700" y="115" font-family="'Inter', sans-serif" font-size="14" text-anchor="middle" font-weight="bold" fill="#64748b"></text>
-                    <text x="700" y="135" font-family="'Inter', sans-serif" font-size="13" text-anchor="middle" fill="#64748b">Delivered</text>
-                </svg>
-            </div>
-        </div>
-        @endif
-
-        {{-- Separate Section: Contact & Instant Support --}}
-        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl my-2">
-            <span class="text-xs font-bold text-navy-deep uppercase tracking-wider">Quick Support:</span>
+        {{-- Quick Support & Social Share in one line directly under Buy Now / Cart --}}
+        <div class="flex flex-wrap items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-xl my-2 gap-2 text-xs">
             <div class="flex items-center gap-2">
+                <span class="font-bold text-navy-deep uppercase tracking-wider text-[11px]">Quick Support:</span>
                 @if (setting('general', 'show_whatsapp_button', '1') == '1')
-                <a href="https://api.whatsapp.com/send?phone={{ setting('general', 'whatsapp_number') }}&text={{ urlencode('I am interested in: ' . $product->title . ' - ' . url()->current()) }}"
+                <a href="https://api.whatsapp.com/send?phone={{ setting('general', 'whatsapp_number') }}&text=I%20am%20interested%20in%20this%20product"
                     target="_blank" title="WhatsApp: {{ setting('general', 'whatsapp_number') }}"
-                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 hover:scale-105 transition-all shadow-sm">
-                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                    class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500 text-white text-[11px] font-bold hover:bg-emerald-600 hover:scale-105 transition-all shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-xs"></i> WhatsApp
                 </a>
                 @endif
 
                 @if (setting('general', 'show_phone_button', '1') == '1')
                 <a href="tel:+{{ setting('general', 'phone_number') }}" title="Call: {{ setting('general', 'phone_number') }}"
-                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500 text-white text-xs font-bold hover:bg-sky-600 hover:scale-105 transition-all shadow-sm">
-                    <i class="fa-solid fa-phone text-xs"></i> Call Us
+                    class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-500 text-white text-[11px] font-bold hover:bg-sky-600 hover:scale-105 transition-all shadow-sm">
+                    <i class="fa-solid fa-phone text-[10px]"></i> Call Us
                 </a>
                 @endif
             </div>
+
+            @if (setting('single_product', 'enable_social_share', '1') == '1')
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-navy-deep uppercase tracking-wider text-[11px]">Share Product:</span>
+                <div class="flex items-center gap-1.5">
+                    <button type="button" title="Copy Product Link" onclick="copyProductLink()"
+                        class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center hover:scale-110 hover:bg-slate-300 transition-all shadow-sm">
+                        <i class="fa-solid fa-link text-[10px]"></i>
+                    </button>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ url('/') }}" target="_blank" title="Share on Facebook"
+                        class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm">
+                        <i class="fa-brands fa-facebook-f text-[10px]"></i>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url={{ url('/') }}" target="_blank" title="Share on Twitter"
+                        class="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm">
+                        <i class="fa-brands fa-x-twitter text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+            @endif
         </div>
 
-        {{-- Separate Section: Social Share --}}
-        @if (setting('single_product', 'enable_social_share', '1') == '1')
-        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl my-2">
-            <span class="text-xs font-bold text-navy-deep uppercase tracking-wider">Share Product:</span>
-            <div class="flex items-center gap-2">
-                <button type="button" title="Copy Product Link" onclick="copyProductLink()"
-                    class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center hover:scale-110 hover:bg-slate-300 transition-all shadow-sm">
-                    <i class="fa-solid fa-link text-xs"></i>
-                </button>
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" title="Share on Facebook"
-                    class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm">
-                    <i class="fa-brands fa-facebook-f text-xs"></i>
-                </a>
-                <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->title) }}" target="_blank" title="Share on Twitter"
-                    class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm">
-                    <i class="fa-brands fa-x-twitter text-xs"></i>
-                </a>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 my-2">
+            {{-- Left Column: Delivery, Cash on Delivery, Return & Warranty (Compact) --}}
+            <div class="p-2.5 bg-slate-50/60 border border-slate-200 rounded-xl flex flex-col justify-between space-y-1.5 text-xs text-slate-700">
+                <!-- Delivery Section -->
+                <div class="space-y-1.5">
+                    <div class="flex items-start gap-2">
+                        <div class="text-slate-400 text-sm mt-0.5">
+                            <i class="fa-solid fa-truck-ramp-box"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium text-slate-900 text-xs">Standard Delivery</span>
+                                <span class="font-bold text-slate-900 text-xs">৳ {{ setting('general', 'delivery_charge', '85') }}</span>
+                            </div>
+                            <div class="text-slate-400 text-[10px] leading-none">Guaranteed by {{ today()->addDays(2)->format('j') }}-{{ today()->addDays(5)->format('j M') }}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="text-slate-400 text-sm">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </div>
+                        <span class="font-medium text-slate-900 text-xs">Cash on Delivery Available</span>
+                    </div>
+                </div>
+
+                <!-- Return & Warranty Section -->
+                <div class="border-t border-slate-200/80 pt-1.5 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold text-slate-500 text-[10px]">Return & Warranty</span>
+                        <i class="fa-regular fa-circle-question text-slate-400 text-[10px]"></i>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="text-slate-400 text-xs w-4 text-center">
+                            <i class="fa-regular fa-heart"></i>
+                        </div>
+                        <span class="text-slate-800 text-xs font-medium">Change of Mind</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="text-slate-400 text-xs w-4 text-center">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </div>
+                        <span class="text-slate-800 text-xs font-medium">14 days easy return</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="text-slate-400 text-xs w-4 text-center">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <span class="text-slate-800 text-xs font-medium">Warranty not available</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Right Column: Seller Details (Compact) --}}
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between space-y-1.5 text-xs text-slate-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-medium leading-none">Sold by</div>
+                        <div class="text-slate-900 font-bold text-xs mt-0.5 hover:text-blue-600 cursor-pointer">
+                            {{ $product->shop_name ?? setting('general', 'site_title', 'Hollyland Bangladesh') }}
+                        </div>
+                    </div>
+                    @if (setting('general', 'show_whatsapp_button', '1') == '1')
+                    <a href="https://api.whatsapp.com/send?phone={{ setting('general', 'whatsapp_number') }}" target="_blank" class="flex items-center gap-1 text-blue-600 font-bold text-xs hover:underline">
+                        <i class="fa-solid fa-comments"></i> Chat Now
+                    </a>
+                    @endif
+                </div>
+
+                <div class="grid grid-cols-3 gap-1 border-t border-slate-200 pt-1.5 text-center">
+                    <div>
+                        <div class="text-[9px] text-slate-400 leading-tight">Positive Seller Ratings</div>
+                        <div class="text-sm font-bold text-slate-800 mt-0.5">93%</div>
+                    </div>
+                    <div class="border-x border-slate-200 px-0.5">
+                        <div class="text-[9px] text-slate-400 leading-tight">Ship on Time</div>
+                        <div class="text-sm font-bold text-slate-800 mt-0.5">100%</div>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 leading-tight">Chat Response Rate</div>
+                        <div class="text-[10px] text-slate-400 mt-1">Not enough data</div>
+                    </div>
+                </div>
+
+                <div class="text-center border-t border-slate-200 pt-1.5">
+                    <a href="{{ url('/') }}" class="text-blue-600 font-bold text-xs hover:underline uppercase tracking-wide">
+                        GO TO STORE
+                    </a>
+                </div>
             </div>
         </div>
         <script>
@@ -3127,7 +3123,6 @@ if (empty($productImages)) {
                 });
             }
         </script>
-        @endif
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -3220,7 +3215,7 @@ if (empty($productImages)) {
     </div>
 </div>
 <!-- Middle Section: Rules, Related List, Opinion -->
-<div class="space-y-12 info-area">
+<div class="mt-1 space-y-3 info-area">
 
         <style>
             .product-video {
