@@ -1826,57 +1826,126 @@
 <div class="space-y-6 image-area">
 <div class="product-images">
 @php
-$productImages = $product->images ?? [];
-if (is_string($productImages)) {
-    $decodedImages = json_decode($productImages, true);
-    $productImages = is_array($decodedImages) ? $decodedImages : [];
-}
-
-$imageOptionMap = []; // image_path => [optionId1, optionId2, ...]
-
-if ($product->thumb_image && !in_array($product->thumb_image, $productImages)) {
-    array_unshift($productImages, $product->thumb_image);
-}
-
-// Merge all images from variation combinations & map each image to ALL its option IDs
+// 1. Build variations array
+$variations = [];
 if ($product->product_type === 'variable' && $product->variationCombinations) {
     foreach ($product->variationCombinations as $combination) {
         $comboOptions = is_array($combination->variation_options)
             ? $combination->variation_options
             : json_decode($combination->variation_options, true);
-        $comboOptions = array_map('intval', (array)($comboOptions ?? []));
+        if (!is_array($comboOptions)) continue;
 
-        if (!empty($combination->featured_image)) {
-            if (!in_array($combination->featured_image, $productImages)) {
-                $productImages[] = $combination->featured_image;
-            }
-            // Merge option IDs for this image
-            if (!isset($imageOptionMap[$combination->featured_image])) {
-                $imageOptionMap[$combination->featured_image] = [];
-            }
-            $imageOptionMap[$combination->featured_image] = array_unique(array_merge(
-                $imageOptionMap[$combination->featured_image], $comboOptions
-            ));
-        }
-        $combGallery = $combination->gallery_images;
-        if (is_string($combGallery)) {
-            $combGallery = json_decode($combGallery, true);
-        }
-        if (is_array($combGallery)) {
-            foreach ($combGallery as $cImg) {
-                if (!empty($cImg)) {
-                    if (!in_array($cImg, $productImages)) {
-                        $productImages[] = $cImg;
-                    }
-                    if (!isset($imageOptionMap[$cImg])) {
-                        $imageOptionMap[$cImg] = [];
-                    }
-                    $imageOptionMap[$cImg] = array_unique(array_merge(
-                        $imageOptionMap[$cImg], $comboOptions
-                    ));
+        foreach ($comboOptions as $optionId) {
+            $option = \App\Models\VariationOption::find($optionId);
+            if ($option && $option->variation) {
+                $vId = $option->variation->id;
+                $vName = $option->variation->name;
+                if (!isset($variations[$vId])) {
+                    $variations[$vId] = [
+                        'id' => $vId,
+                        'name' => $vName,
+                        'options' => [],
+                    ];
+                }
+                if (!isset($variations[$vId]['options'][$optionId])) {
+                    $variations[$vId]['options'][$optionId] = [
+                        'id' => $optionId,
+                        'name' => $option->name,
+                        'description' => $option->description ?? '',
+                        'featured_image' => $option->featured_image ?? '',
+                        'images' => $option->images ?? '',
+                    ];
                 }
             }
         }
+    }
+}
+
+// 2. Build productImages & imageOptionMap from variation options & combinations
+$productImages = [];
+$imageOptionMap = []; // image_path => [optionId1, optionId2, ...]
+$seenFilenames = [];
+
+if ($product->product_type === 'variable') {
+    // Collect from variation options (e.g. Red, Pink, Black option images)
+    foreach ($variations as $var) {
+        foreach ($var['options'] as $opt) {
+            $optId = (int)$opt['id'];
+            if (!empty($opt['featured_image'])) {
+                $fImg = trim($opt['featured_image']);
+                $fn = strtolower(basename($fImg));
+                if (!in_array($fn, $seenFilenames)) {
+                    $seenFilenames[] = $fn;
+                    $productImages[] = $fImg;
+                }
+                if (!isset($imageOptionMap[$fImg])) {
+                    $imageOptionMap[$fImg] = [];
+                }
+                if (!in_array($optId, $imageOptionMap[$fImg])) {
+                    $imageOptionMap[$fImg][] = $optId;
+                }
+            }
+        }
+    }
+
+    // Collect from combinations
+    if ($product->variationCombinations) {
+        foreach ($product->variationCombinations as $combination) {
+            $comboOptions = is_array($combination->variation_options)
+                ? $combination->variation_options
+                : json_decode($combination->variation_options, true);
+            $comboOptions = array_map('intval', (array)($comboOptions ?? []));
+
+            if (!empty($combination->featured_image)) {
+                $cImg = trim($combination->featured_image);
+                $fn = strtolower(basename($cImg));
+                if (!in_array($fn, $seenFilenames)) {
+                    $seenFilenames[] = $fn;
+                    $productImages[] = $cImg;
+                }
+                if (!isset($imageOptionMap[$cImg])) {
+                    $imageOptionMap[$cImg] = [];
+                }
+                $imageOptionMap[$cImg] = array_unique(array_merge(
+                    $imageOptionMap[$cImg], $comboOptions
+                ));
+            }
+
+            $combGallery = $combination->gallery_images;
+            if (is_string($combGallery)) {
+                $combGallery = json_decode($combGallery, true);
+            }
+            if (is_array($combGallery)) {
+                foreach ($combGallery as $cgImg) {
+                    if (!empty($cgImg)) {
+                        $gImg = trim($cgImg);
+                        $fn = strtolower(basename($gImg));
+                        if (!in_array($fn, $seenFilenames)) {
+                            $seenFilenames[] = $fn;
+                            $productImages[] = $gImg;
+                        }
+                        if (!isset($imageOptionMap[$gImg])) {
+                            $imageOptionMap[$gImg] = [];
+                        }
+                        $imageOptionMap[$gImg] = array_unique(array_merge(
+                            $imageOptionMap[$gImg], $comboOptions
+                        ));
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 3. Fallback if no variation images collected
+if (empty($productImages)) {
+    $mainImgs = $product->images ?? [];
+    if (is_string($mainImgs)) {
+        $mainImgs = json_decode($mainImgs, true) ?? [];
+    }
+    $productImages = is_array($mainImgs) ? $mainImgs : [];
+    if ($product->thumb_image && !in_array($product->thumb_image, $productImages)) {
+        array_unshift($productImages, $product->thumb_image);
     }
 }
 @endphp
@@ -2373,27 +2442,33 @@ if ($product->product_type === 'variable' && $product->variationCombinations) {
                     return;
                 }
 
-                // Build map: variationId -> selected optionId
-                const selectedByVariation = {};
-                const variationIds = [];
+                // Find Size button (1st category) and Color button (2nd category)
+                let selectedSizeBtn = null;
+                let selectedColorBtn = null;
+
                 selectedBtns.forEach(btn => {
-                    const vId = btn.dataset.variationId;
-                    const oId = parseInt(btn.dataset.optionId);
-                    if (vId && oId && !selectedByVariation[vId]) {
-                        selectedByVariation[vId] = oId;
-                        variationIds.push(vId);
+                    const group = btn.closest('.variation-group');
+                    const groupLabel = group ? (group.querySelector('.text-gray-500')?.textContent || '').toLowerCase() : '';
+                    if (groupLabel.includes('size')) {
+                        selectedSizeBtn = btn;
+                    } else if (groupLabel.includes('color') || groupLabel.includes('colour')) {
+                        selectedColorBtn = btn;
                     }
                 });
 
-                const sizeOptionId = variationIds.length > 0 ? selectedByVariation[variationIds[0]] : null;
-                const selectedColorId = variationIds.length > 1 ? selectedByVariation[variationIds[1]] : null;
+                // Fallback to position if labels aren't matched
+                if (!selectedSizeBtn && selectedBtns.length > 0) selectedSizeBtn = selectedBtns[0];
+                if (!selectedColorBtn && selectedBtns.length > 1) selectedColorBtn = selectedBtns[1];
+
+                const sizeOptionId = selectedSizeBtn ? parseInt(selectedSizeBtn.dataset.optionId) : null;
+                const selectedColorId = selectedColorBtn ? parseInt(selectedColorBtn.dataset.optionId) : null;
 
                 if (!sizeOptionId) {
                     galleryImgs.forEach(img => img.style.display = 'inline-block');
                     return;
                 }
 
-                // Find combos that include selected SIZE
+                // Find all combinations matching ONLY the 1st category (Size)
                 const sizeCombos = (window.variationCombinations || []).filter(combo => {
                     let opts = combo.variation_options;
                     if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { return false; } }
@@ -2406,17 +2481,15 @@ if ($product->product_type === 'variable' && $product->variationCombinations) {
                     return;
                 }
 
-                // Valid option IDs for this size
+                // Collect valid option IDs and allowed images for the selected Size
                 const validOptionIds = new Set();
+                const allowedImages = new Set();
+
                 sizeCombos.forEach(combo => {
                     let opts = combo.variation_options;
                     if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { opts = []; } }
                     if (Array.isArray(opts)) opts.forEach(o => validOptionIds.add(parseInt(o)));
-                });
 
-                // Allowed image paths for this size
-                const allowedImages = new Set();
-                sizeCombos.forEach(combo => {
                     if (combo.featured_image) {
                         const path = combo.featured_image.trim().toLowerCase();
                         allowedImages.add(path);
@@ -2437,41 +2510,30 @@ if ($product->product_type === 'variable' && $product->variationCombinations) {
                     }
                 });
 
-                // Exact combo images for selected Size + Color
-                const exactImages = new Set();
+                // Find exact image paths for selected Color
+                const colorImages = new Set();
                 if (selectedColorId) {
-                    const exactCombos = sizeCombos.filter(combo => {
+                    const colorCombos = sizeCombos.filter(combo => {
                         let opts = combo.variation_options;
                         if (typeof opts === 'string') { try { opts = JSON.parse(opts); } catch(e) { return false; } }
                         if (!Array.isArray(opts)) return false;
                         return opts.map(o => parseInt(o)).includes(selectedColorId);
                     });
-                    exactCombos.forEach(combo => {
+                    colorCombos.forEach(combo => {
                         if (combo.featured_image) {
                             const path = combo.featured_image.trim().toLowerCase();
-                            exactImages.add(path);
+                            colorImages.add(path);
                             const fn = path.split('/').pop();
-                            if (fn) exactImages.add(fn);
-                        }
-                        let gImgs = combo.gallery_images;
-                        if (typeof gImgs === 'string') { try { gImgs = JSON.parse(gImgs); } catch(e) { gImgs = []; } }
-                        if (Array.isArray(gImgs)) {
-                            gImgs.forEach(img => {
-                                if (img) {
-                                    const path = img.trim().toLowerCase();
-                                    exactImages.add(path);
-                                    const fn = path.split('/').pop();
-                                    if (fn) exactImages.add(fn);
-                                }
-                            });
+                            if (fn) colorImages.add(fn);
                         }
                     });
                 }
 
                 let visibleCount = 0;
                 let firstVisible = null;
-                let selectedColorThumb = null;
+                let activeColorThumb = null;
 
+                // Show all thumbnails belonging to the 1st category (Size)
                 galleryImgs.forEach(tImg => {
                     let tOptIds = [];
                     try {
@@ -2483,12 +2545,9 @@ if ($product->product_type === 'variable' && $product->variationCombinations) {
                     const tFilename = tImgSrc.split('/').pop();
                     let show = false;
 
-                    // Match 1: Option ID match
                     if (tOptIds.length > 0 && tOptIds.some(oid => validOptionIds.has(oid))) {
                         show = true;
                     }
-
-                    // Match 2: Image URL or filename match
                     if (!show && allowedImages.size > 0) {
                         allowedImages.forEach(aImg => {
                             if (tImgSrc && (tImgSrc.includes(aImg) || aImg.includes(tImgSrc) || (tFilename && tFilename === aImg))) {
@@ -2503,11 +2562,11 @@ if ($product->product_type === 'variable' && $product->variationCombinations) {
                         if (!firstVisible) firstVisible = tImg;
 
                         if (selectedColorId && tOptIds.includes(selectedColorId)) {
-                            selectedColorThumb = tImg;
-                        } else if (selectedColorId && exactImages.size > 0) {
-                            exactImages.forEach(eImg => {
-                                if (tImgSrc && (tImgSrc.includes(eImg) || eImg.includes(tImgSrc) || (tFilename && tFilename === eImg))) {
-                                    selectedColorThumb = tImg;
+                            activeColorThumb = tImg;
+                        } else if (selectedColorId && colorImages.size > 0) {
+                            colorImages.forEach(cImg => {
+                                if (tImgSrc && (tImgSrc.includes(cImg) || cImg.includes(tImgSrc) || (tFilename && tFilename === cImg))) {
+                                    activeColorThumb = tImg;
                                 }
                             });
                         }
@@ -2516,13 +2575,12 @@ if ($product->product_type === 'variable' && $product->variationCombinations) {
                     }
                 });
 
-                // Fallback: If 0 visible, show all
                 if (visibleCount === 0) {
                     galleryImgs.forEach(img => img.style.display = 'inline-block');
                 }
 
-                // Update main image preview and active thumbnail
-                const targetThumb = selectedColorThumb || firstVisible;
+                // Update BIG main image preview to selected Color (or first visible for Size)
+                const targetThumb = activeColorThumb || firstVisible;
                 if (targetThumb) {
                     const mainImg = document.getElementById('main-product-image');
                     if (mainImg) mainImg.src = targetThumb.src;
@@ -2535,19 +2593,28 @@ if ($product->product_type === 'variable' && $product->variationCombinations) {
 
             function updateButtonStates() {
                 const hiddenCombo = document.getElementById('selected_combination_id');
-                const buyBtn = document.querySelector('#buyNowForm button[type="submit"]');
-                const cartBtn = document.querySelector('#cartForm button[type="submit"]');
+                const buyBtn = document.querySelector('.single-buynow-btn') || document.querySelector('#buyNowForm button');
+                const cartBtn = document.querySelector('.single-cart-btn') || document.querySelector('#cartForm button');
 
                 const isVariable = window.productType === 'variable';
-                const hasValidCombination = hiddenCombo && hiddenCombo.value && hiddenCombo.value !== '';
+                const hasValidCombination = hiddenCombo && hiddenCombo.value && hiddenCombo.value.trim() !== '';
 
                 const isEnabled = !isVariable || hasValidCombination;
 
                 [buyBtn, cartBtn].forEach(btn => {
                     if (btn) {
                         btn.disabled = !isEnabled;
-                        btn.style.opacity = isEnabled ? '1' : '0.6';
-                        btn.style.cursor = isEnabled ? 'pointer' : 'not-allowed';
+                        if (!isEnabled) {
+                            btn.style.opacity = '0.35';
+                            btn.style.cursor = 'not-allowed';
+                            btn.style.pointerEvents = 'none';
+                            btn.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+                        } else {
+                            btn.style.opacity = '1';
+                            btn.style.cursor = 'pointer';
+                            btn.style.pointerEvents = 'auto';
+                            btn.classList.remove('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+                        }
                     }
                 });
             }
@@ -2696,9 +2763,11 @@ if ($product->product_type === 'variable' && $product->variationCombinations) {
                 document.querySelectorAll('.variation-options').forEach(group => {
                     if (!group.querySelector('.variation-option-btn.selected')) {
                         const firstBtn = group.querySelector('.variation-option-btn');
-                        if (firstBtn) firstBtn.click();
+                        if (firstBtn) firstBtn.classList.add('selected');
                     }
                 });
+                updateVariationCombination(false);
+                filterGalleryImages();
                 updateButtonStates();
             });
         </script>
