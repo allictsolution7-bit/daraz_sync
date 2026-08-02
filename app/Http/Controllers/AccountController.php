@@ -19,7 +19,72 @@ class AccountController extends Controller
     public function show()
     {
         $user = auth()->user();
-        return view('frontend.user.profile', compact('user'));
+        try {
+            $locations = $user->deliveryLocations;
+        } catch (\Throwable $e) {
+            $locations = collect();
+        }
+        return view('frontend.user.profile', compact('user', 'locations'));
+    }
+
+    /**
+     * Store a new delivery location.
+     */
+    public function storeLocation(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:100',
+            'address' => 'required|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'upazila' => 'nullable|string|max:100',
+            'latitude' => 'nullable|string|max:50',
+            'longitude' => 'nullable|string|max:50',
+            'is_default' => 'nullable|boolean',
+        ]);
+
+        $user = auth()->user();
+
+        if ($request->has('is_default') && $request->is_default) {
+            $user->deliveryLocations()->update(['is_default' => false]);
+        }
+
+        $isDefault = $request->has('is_default') ? (bool)$request->is_default : ($user->deliveryLocations()->count() === 0);
+
+        $user->deliveryLocations()->create([
+            'title' => $request->title,
+            'address' => $request->address,
+            'city' => $request->city,
+            'upazila' => $request->upazila,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'is_default' => $isDefault,
+        ]);
+
+        return redirect()->back()->with('success', 'Delivery location saved successfully.');
+    }
+
+    /**
+     * Delete a delivery location.
+     */
+    public function deleteLocation($id)
+    {
+        $location = auth()->user()->deliveryLocations()->findOrFail($id);
+        $location->delete();
+
+        return redirect()->back()->with('success', 'Delivery location deleted.');
+    }
+
+    /**
+     * Set a delivery location as default.
+     */
+    public function setDefaultLocation($id)
+    {
+        $user = auth()->user();
+        $user->deliveryLocations()->update(['is_default' => false]);
+        $location = $user->deliveryLocations()->findOrFail($id);
+        $location->update(['is_default' => true]);
+
+        return redirect()->back()->with('success', 'Default location updated.');
     }
 
     /**

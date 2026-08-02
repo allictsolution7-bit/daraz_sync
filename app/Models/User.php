@@ -114,6 +114,11 @@ class User extends Authenticatable
         return $this->hasMany(order::class);
     }
 
+    public function deliveryLocations()
+    {
+        return $this->hasMany(DeliveryLocation::class)->orderBy('is_default', 'desc')->latest();
+    }
+
     // ==========================================
     // VENDOR RELATIONSHIPS & METHODS
     // ==========================================
