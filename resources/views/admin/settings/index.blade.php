@@ -3550,6 +3550,52 @@
                                 <small class="form-text text-muted">You can use lists, bold, links, etc.</small>
                             </div>
 
+                            <hr>
+                            <h6 class="text-primary font-weight-bold mb-3">Delivery & Return Options</h6>
+                            
+                            <div class="form-group row">
+                                <label class="col-md-6 col-form-label">Cash on Delivery Available?</label>
+                                <div class="col-md-6">
+                                    <select name="settings[enable_cod_option]" class="form-control">
+                                        <option value="1" {{ setting('general', 'enable_cod_option', '1') == '1' ? 'selected' : '' }}>Available</option>
+                                        <option value="0" {{ setting('general', 'enable_cod_option', '1') == '0' ? 'selected' : '' }}>Not Available</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-6 col-form-label">Change of Mind Option?</label>
+                                <div class="col-md-6">
+                                    <select name="settings[enable_change_of_mind]" class="form-control">
+                                        <option value="1" {{ setting('general', 'enable_change_of_mind', '1') == '1' ? 'selected' : '' }}>Available</option>
+                                        <option value="0" {{ setting('general', 'enable_change_of_mind', '1') == '0' ? 'selected' : '' }}>Not Available</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-6 col-form-label">Easy Return Option</label>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" name="settings[return_days_option]" class="form-control" placeholder="14" value="{{ setting('general', 'return_days_option', '14') }}">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">Days</span>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">Enter 0 to mark return as Not Available.</small>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-md-6 col-form-label">Warranty Status</label>
+                                <div class="col-md-6">
+                                    <select name="settings[warranty_status_option]" class="form-control">
+                                        <option value="0" {{ setting('general', 'warranty_status_option', '0') == '0' ? 'selected' : '' }}>Warranty not available</option>
+                                        <option value="1" {{ setting('general', 'warranty_status_option', '0') == '1' ? 'selected' : '' }}>Warranty available</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="form-group row">
                                 <label class="col-md-6 col-form-label">Show Product Brand on Single Page</label>
                                 <div class="col-md-6">

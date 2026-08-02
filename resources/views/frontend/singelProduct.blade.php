@@ -3058,29 +3058,52 @@ if ($product->product_type === 'variable') {
                     $deliveryDaysText = "Guaranteed by " . today()->addDays(2)->format('j') . '-' . today()->addDays(5)->format('j M');
                 }
 
-                // Parse COD (Cash on Delivery) status
-                $hasCod = (preg_match('/মূল্য পরিশোধ|Cash on Delivery|COD/iu', $deliveryInfoRaw) && !preg_match('/COD[^\w]*not|নয়|নাই/iu', $deliveryInfoRaw));
+                // Read direct settings or parse text strictly without hardcoded fallbacks
+                $hasCod = isset($product->is_cod_available) 
+                    ? (bool)$product->is_cod_available 
+                    : (setting('general', 'enable_cod_option', null) !== null 
+                        ? (setting('general', 'enable_cod_option') == '1')
+                        : (preg_match('/মূল্য পরিশোধ|Cash on Delivery|COD/iu', $deliveryInfoRaw) && !preg_match('/COD[^\w]*not|নয়|নাই/iu', $deliveryInfoRaw)));
 
-                // Parse Return Days
-                $returnDaysText = "14 days easy return";
-                $hasReturn = true;
-                if (preg_match('/Return|রিটার্ন/iu', $deliveryInfoRaw)) {
-                    if (preg_match('/([0-9\x{09E6}-\x{09EF}]+)\s*(?:দিনের|দিন|days|day)[^\.\!\n]*Return|রিটার্ন/iu', $deliveryInfoRaw, $mRet)) {
-                        $rDays = str_replace($bnNum, $enNum, $mRet[1]);
-                        $returnDaysText = "{$rDays} days easy return";
-                    } elseif (preg_match('/Return|রিটার্ন/iu', $deliveryInfoRaw) && preg_match('/সুযোগ|Available|পরিশোধ/iu', $deliveryInfoRaw)) {
-                        $returnDaysText = "Easy return available";
+                // Return Days Evaluation
+                $productReturnDays = $product->return_days ?? setting('general', 'return_days_option', null);
+                $hasReturn = false;
+                $returnDaysText = "Return Not Available";
+
+                if ($productReturnDays !== null && trim($productReturnDays) !== '') {
+                    $rVal = (int)str_replace($bnNum, $enNum, trim($productReturnDays));
+                    if ($rVal > 0) {
+                        $hasReturn = true;
+                        $formattedDays = sprintf("%02d", $rVal);
+                        $returnDaysText = "{$formattedDays} days easy return";
                     }
-                } else {
-                    $hasReturn = false;
+                } elseif (preg_match('/([0-9\x{09E6}-\x{09EF}]+)\s*(?:দিনের|দিন|days|day)/iu', $deliveryInfoRaw, $mRet)) {
+                    $rVal = (int)str_replace($bnNum, $enNum, $mRet[1]);
+                    if ($rVal > 0) {
+                        $hasReturn = true;
+                        $formattedDays = sprintf("%02d", $rVal);
+                        $returnDaysText = "{$formattedDays} days easy return";
+                    }
                 }
 
-                // Parse Change of Mind
-                $hasChangeOfMind = (bool)preg_match('/Change of Mind|পছন্দ না হলে/iu', $deliveryInfoRaw);
+                // Change of Mind Evaluation
+                $hasChangeOfMind = isset($product->is_change_of_mind_available) 
+                    ? (bool)$product->is_change_of_mind_available 
+                    : (setting('general', 'enable_change_of_mind', null) !== null
+                        ? (setting('general', 'enable_change_of_mind') == '1')
+                        : (bool)preg_match('/Change of Mind|পছন্দ না হলে/iu', $deliveryInfoRaw));
 
-                // Parse Warranty
-                $hasWarranty = (bool)preg_match('/Warranty|ওয়ারেন্টি|ওয়ারেন্টি/iu', $deliveryInfoRaw) && !preg_match('/Warranty[^\w]*not|ওয়ারেন্টি[^\w]*নাই/iu', $deliveryInfoRaw);
-                $warrantyText = $hasWarranty ? "Warranty available" : "Warranty not available";
+                // Warranty Evaluation
+                $productWarranty = $product->warranty ?? null;
+                if (!empty($productWarranty)) {
+                    $hasWarranty = true;
+                    $warrantyText = $productWarranty;
+                } else {
+                    $hasWarranty = setting('general', 'warranty_status_option', null) !== null
+                        ? (setting('general', 'warranty_status_option') == '1')
+                        : ((bool)preg_match('/Warranty|ওয়ারেন্টি|ওয়ারেন্টি/iu', $deliveryInfoRaw) && !preg_match('/Warranty[^\w]*not|ওয়ারেন্টি[^\w]*নাই/iu', $deliveryInfoRaw));
+                    $warrantyText = $hasWarranty ? "Warranty available" : "Warranty not available";
+                }
                 @endphp
                 <div class="space-y-1.5">
                     <div class="flex items-start gap-2">

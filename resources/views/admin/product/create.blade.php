@@ -814,6 +814,42 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Delivery & Warranty Services -->
+                            <div class="mt-4 pt-3 border-top">
+                                <h5 class="fw-bold mb-3"><i class="bi bi-shield-check text-primary me-2"></i>Delivery & Warranty Services</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label font-weight-bold">Cash on Delivery</label>
+                                        <select name="settings[enable_cod_option]" class="form-select">
+                                            <option value="1" {{ setting('general', 'enable_cod_option', '1') == '1' ? 'selected' : '' }}>Available</option>
+                                            <option value="0" {{ setting('general', 'enable_cod_option', '1') == '0' ? 'selected' : '' }}>Not Available</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label font-weight-bold">Change of Mind Option</label>
+                                        <select name="settings[enable_change_of_mind]" class="form-select">
+                                            <option value="1" {{ setting('general', 'enable_change_of_mind', '1') == '1' ? 'selected' : '' }}>Available</option>
+                                            <option value="0" {{ setting('general', 'enable_change_of_mind', '1') == '0' ? 'selected' : '' }}>Not Available</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label font-weight-bold">Easy Return Period</label>
+                                        <div class="input-group">
+                                            <input type="text" name="settings[return_days_option]" class="form-control" placeholder="14" value="{{ setting('general', 'return_days_option', '14') }}">
+                                            <span class="input-group-text">Days</span>
+                                        </div>
+                                        <small class="form-text text-muted">Enter 0 to mark return as Not Available</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label font-weight-bold">Warranty Status</label>
+                                        <select name="settings[warranty_status_option]" class="form-select">
+                                            <option value="0" {{ setting('general', 'warranty_status_option', '0') == '0' ? 'selected' : '' }}>Warranty not available</option>
+                                            <option value="1" {{ setting('general', 'warranty_status_option', '0') == '1' ? 'selected' : '' }}>Warranty available</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Variations Section -->

@@ -442,6 +442,16 @@ class ProductController extends Controller
             $product->update(['seo' => $seoData]);
         }
 
+        // NEW: Save custom delivery and warranty settings if submitted
+        if ($request->has('settings')) {
+            foreach ($request->input('settings', []) as $key => $val) {
+                \App\Models\SiteSetting::updateOrCreate(
+                    ['group' => 'general', 'key' => $key],
+                    ['value' => $val]
+                );
+            }
+        }
+
         // NEW: Sync additional categories if provided (Hybrid Approach)
         if ($request->has('additional_categories')) {
             $additionalCategories = [];
@@ -1295,15 +1305,14 @@ class ProductController extends Controller
             $product->additionalSubCategories()->sync($additionalSubcategories);
         }
 
-        // NEW: Sync third categories if provided
-        if ($request->has('third_categories')) {
-            $thirdCategories = [];
-            foreach ($request->input('third_categories', []) as $index => $thirdCategoryId) {
-                if ($thirdCategoryId) {
-                    $thirdCategories[$thirdCategoryId] = ['sort_order' => $index];
-                }
+        // Save custom delivery and warranty settings if submitted
+        if ($request->has('settings')) {
+            foreach ($request->input('settings', []) as $key => $val) {
+                \App\Models\SiteSetting::updateOrCreate(
+                    ['group' => 'general', 'key' => $key],
+                    ['value' => $val]
+                );
             }
-            $product->thirdCategories()->sync($thirdCategories);
         }
 
         if ($update) {
