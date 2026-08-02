@@ -385,7 +385,7 @@ class CartController extends Controller
             ));
         }
         
-        // Handle regular product purchase (POST request)
+        // Handle regular product purchase
         if ($request->isMethod('post')) {
             $product = Product::findOrFail($request->product_id);
             
@@ -395,15 +395,27 @@ class CartController extends Controller
                 'price' => 'required|numeric|min:0',
             ];
 
-            // Add combination validation for variable products
             if ($product->product_type === 'variable') {
                 $baseValidation['combination_id'] = 'required|integer|exists:variation_combinations,id';
             }
 
             $request->validate($baseValidation);
         } else {
-            // GET request without product data - redirect to home
-            return redirect()->route('home')->with('error', 'Invalid buy now request.');
+            // GET request - try to load last product or latest active product
+            $productId = $request->input('product_id');
+            if ($productId) {
+                $product = Product::find($productId);
+            }
+            if (!isset($product) || !$product) {
+                $product = Product::where('status', '1')->latest()->first();
+            }
+            if (!$product) {
+                return redirect()->route('cart.index')->with('error', 'No products available for checkout.');
+            }
+            $request->merge([
+                'quantity' => $request->input('quantity', 1),
+                'price' => $product->offer ?: $product->old_price ?: 0
+            ]);
         }
 
         $pqty = $request->quantity;

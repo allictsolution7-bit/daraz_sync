@@ -159,6 +159,14 @@
                                                     @endif
                                                 </div>
                                                 <p style="margin: 4px 0 0 0; color: #475569; font-size: 13px; line-height: 1.4;">{{ $loc->address }}</p>
+                                                @if($loc->district || $loc->division || $loc->upazila || $loc->post_code)
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
+                                                        @if($loc->upazila)<span style="background: #e2e8f0; color: #334155; font-size: 11px; padding: 1px 6px; border-radius: 4px;">{{ $loc->upazila }}</span>@endif
+                                                        @if($loc->district)<span style="background: #e2e8f0; color: #334155; font-size: 11px; padding: 1px 6px; border-radius: 4px;">{{ $loc->district }}</span>@endif
+                                                        @if($loc->division)<span style="background: #e2e8f0; color: #334155; font-size: 11px; padding: 1px 6px; border-radius: 4px;">{{ $loc->division }}</span>@endif
+                                                        @if($loc->post_code)<span style="background: #e2e8f0; color: #334155; font-size: 11px; padding: 1px 6px; border-radius: 4px;">Post: {{ $loc->post_code }}</span>@endif
+                                                    </div>
+                                                @endif
                                                 @if($loc->latitude && $loc->longitude)
                                                     <small style="color: #64748b; font-size: 11px; display: block; margin-top: 2px;">
                                                         <i class="fa-solid fa-crosshairs text-success me-1"></i> GPS: {{ $loc->latitude }}, {{ $loc->longitude }}
@@ -246,8 +254,15 @@
             <form action="{{ route('account.locations.store') }}" method="POST" id="locationForm">
                 @csrf
                 <div style="margin-bottom: 14px;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Location Name / Title</label>
-                    <input type="text" name="title" placeholder="e.g. Home, Office, Warehouse" required style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Location Type / Title</label>
+                    <select name="title_select" id="locationTitleSelect" onchange="toggleOtherTitleInput(this)" required style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: #ffffff;">
+                        <option value="Home">Home</option>
+                        <option value="Office">Office</option>
+                        <option value="Warehouse">Warehouse</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" name="custom_title" id="customTitleInput" placeholder="Enter custom location name (e.g. Warehouse)" style="display: none; width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; margin-top: 8px;">
+                    <input type="hidden" name="title" id="finalLocationTitle" value="Home">
                 </div>
 
                 <div style="margin-bottom: 14px;">
@@ -263,15 +278,27 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px;">City / District</label>
-                        <input type="text" name="city" id="locationCity" placeholder="e.g. Dhaka" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px;">Division</label>
+                        <input type="text" name="division" id="locationDivision" placeholder="e.g. Dhaka Division" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px;">Upazila / Thana</label>
-                        <input type="text" name="upazila" placeholder="e.g. Mirpur" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px;">District / City</label>
+                        <input type="text" name="district" id="locationDistrict" placeholder="e.g. Dhaka District" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
                     </div>
                 </div>
 
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px;">Upazila / Thana / Sub-district</label>
+                        <input type="text" name="upazila" id="locationUpazila" placeholder="e.g. Mohammadpur" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px;">Post Code</label>
+                        <input type="text" name="post_code" id="locationPostCode" placeholder="e.g. 1207" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+                    </div>
+                </div>
+
+                <input type="hidden" name="city" id="locationCity">
                 <input type="hidden" name="latitude" id="locationLat">
                 <input type="hidden" name="longitude" id="locationLng">
 
@@ -289,6 +316,42 @@
     </div>
 
     <script>
+        function toggleOtherTitleInput(selectEl) {
+            const customInput = document.getElementById('customTitleInput');
+            const finalTitle = document.getElementById('finalLocationTitle');
+            if (selectEl.value === 'Other') {
+                customInput.style.display = 'block';
+                customInput.required = true;
+                finalTitle.value = customInput.value || 'Other';
+            } else {
+                customInput.style.display = 'none';
+                customInput.required = false;
+                finalTitle.value = selectEl.value;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const customInput = document.getElementById('customTitleInput');
+            if (customInput) {
+                customInput.addEventListener('input', function() {
+                    document.getElementById('finalLocationTitle').value = this.value || 'Other';
+                });
+            }
+            const form = document.getElementById('locationForm');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    const select = document.getElementById('locationTitleSelect');
+                    const custom = document.getElementById('customTitleInput');
+                    const finalTitle = document.getElementById('finalLocationTitle');
+                    if (select.value === 'Other') {
+                        finalTitle.value = custom.value.trim() || 'Other';
+                    } else {
+                        finalTitle.value = select.value;
+                    }
+                });
+            }
+        });
+
         function openLocationModal() {
             document.getElementById('locationModal').style.display = 'flex';
         }
@@ -309,50 +372,60 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Detecting...';
             btn.disabled = true;
 
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
+            const handleSuccess = function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
 
-                    document.getElementById('locationLat').value = lat;
-                    document.getElementById('locationLng').value = lng;
+                document.getElementById('locationLat').value = lat;
+                document.getElementById('locationLng').value = lng;
 
-                    // Reverse geocode via OpenStreetMap Nominatim API
-                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use Current Live Location';
-                            btn.disabled = false;
-                            
-                            if (data && data.display_name) {
-                                document.getElementById('locationAddress').value = data.display_name;
-                                if (data.address) {
-                                    const city = data.address.city || data.address.town || data.address.state_district || data.address.county || '';
-                                    if (city) {
-                                        document.getElementById('locationCity').value = city;
-                                    }
-                                }
-                            } else {
-                                document.getElementById('locationAddress').value = `GPS Location (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, { signal: controller.signal })
+                    .then(res => res.json())
+                    .then(data => {
+                        clearTimeout(timeoutId);
+                        btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use Current Live Location';
+                        btn.disabled = false;
+                        
+                        if (data && data.display_name) {
+                            document.getElementById('locationAddress').value = data.display_name;
+                            if (data.address) {
+                                const addr = data.address;
+                                document.getElementById('locationDivision').value = addr.state || addr.region || '';
+                                document.getElementById('locationDistrict').value = addr.state_district || addr.district || addr.city || addr.county || '';
+                                document.getElementById('locationUpazila').value = addr.suburb || addr.subdistrict || addr.neighbourhood || addr.city_district || addr.town || '';
+                                document.getElementById('locationPostCode').value = addr.postcode || '';
+                                document.getElementById('locationCity').value = addr.city || addr.town || addr.district || '';
                             }
-
-                            status.style.display = 'block';
-                            status.innerHTML = `<i class="fa-solid fa-check-circle"></i> Live location detected (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-                        })
-                        .catch(() => {
-                            btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use Current Live Location';
-                            btn.disabled = false;
+                        } else {
                             document.getElementById('locationAddress').value = `GPS Location (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
-                            status.style.display = 'block';
-                            status.innerHTML = `<i class="fa-solid fa-check-circle"></i> Live location detected (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-                        });
-                },
-                function(err) {
-                    btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use Current Live Location';
-                    btn.disabled = false;
-                    alert('Unable to retrieve location: ' + err.message);
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                        }
+
+                        status.style.display = 'block';
+                        status.innerHTML = `<i class="fa-solid fa-check-circle"></i> Live exact location detected (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+                    })
+                    .catch(() => {
+                        clearTimeout(timeoutId);
+                        btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use Current Live Location';
+                        btn.disabled = false;
+                        document.getElementById('locationAddress').value = `GPS Location (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+                        status.style.display = 'block';
+                        status.innerHTML = `<i class="fa-solid fa-check-circle"></i> Live location coordinates detected (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+                    });
+            };
+
+            const handleError = function(err) {
+                btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Use Current Live Location';
+                btn.disabled = false;
+                alert('Unable to retrieve exact location: ' + err.message);
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                handleSuccess,
+                handleError,
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
             );
         }
     </script>

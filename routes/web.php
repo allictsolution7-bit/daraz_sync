@@ -169,8 +169,8 @@ Route::get('/cart/sidebar', [CartController::class, 'sidebar'])->name('cart.side
 Route::get('/wishlist', function() { return view('frontend.user.wishlist'); })->name('wishlist.index');
 
 // Buy Now Routes
+Route::match(['get', 'post'], '/buy/store', [CartController::class, 'buystore'])->name('buy.store.post');
 Route::get('/buy/store', [CartController::class, 'buystore'])->name('buy.store');
-Route::post('/buy/store', [CartController::class, 'buystore'])->name('buy.store.post');
 Route::post('/buy/combo/store', [CartController::class, 'buyComboStore'])->name('buy.combo.store');
 Route::post('/buy/order', [CartController::class, 'buynoworder'])->name('buynow.order');
 Route::post('/buy/verifyOtp', [CartController::class, 'verifyBuynowOtp'])->name('otp.verify.buynow');
