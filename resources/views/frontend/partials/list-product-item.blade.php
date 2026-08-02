@@ -81,7 +81,25 @@
                 {{ $product->category->name }}
             </div>
             @endif
-            <div class="product-list-sidebar-title text-xs font-bold text-slate-800 group-hover:text-blue-900 transition-colors truncate">{{ $product->title }}</div>
+            <div class="flex items-center gap-1.5 min-w-0">
+                <div class="product-list-sidebar-title text-xs font-bold text-slate-800 group-hover:text-blue-900 transition-colors truncate flex-1 min-w-0">{{ $product->title }}</div>
+                <div class="product-list-sidebar-rating flex items-center gap-0.5 shrink-0">
+                    <span class="product-list-sidebar-stars flex items-center text-amber-500 text-[9px]">
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= $averageRating)
+                            <i class="fa-solid fa-star"></i>
+                            @elseif($i <= $averageRating + 0.5 && $averageRating > 0)
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                            @else
+                            <i class="fa-regular fa-star text-slate-300 text-[9px]"></i>
+                            @endif
+                        @endfor
+                    </span>
+                    <span class="product-list-sidebar-rating-value text-[9px] text-slate-500 font-medium">
+                        {{ number_format($averageRating, 1) }} ({{ $reviewCount }})
+                    </span>
+                </div>
+            </div>
             <div class="product-list-sidebar-pricing flex items-center gap-2 mt-0.5">
                 @if ($displayPrice)
                     <span class="product-list-sidebar-price text-sm font-extrabold text-blue-900">৳{{ $displayPrice }}</span>
@@ -101,22 +119,6 @@
                         Out of Stock
                     </span>
                 @endif
-            </div>
-            <div class="product-list-sidebar-rating flex items-center gap-1 mt-0.5">
-                <span class="product-list-sidebar-stars flex items-center text-blue-900 text-[10px]">
-                    @for ($i = 1; $i <= 5; $i++)
-                        @if ($i <= $averageRating)
-                        <i class="fa-solid fa-star text-blue-900"></i>
-                        @elseif($i <= $averageRating + 0.5 && $averageRating > 0)
-                        <i class="fa-solid fa-star-half-stroke text-blue-900"></i>
-                        @else
-                        <i class="fa-regular fa-star text-slate-300 text-[10px]"></i>
-                        @endif
-                    @endfor
-                </span>
-                <span class="product-list-sidebar-rating-value text-[10px] text-slate-500 font-medium">
-                    {{ number_format($averageRating, 1) }} ({{ $reviewCount }})
-                </span>
             </div>
         </div>
     </div>

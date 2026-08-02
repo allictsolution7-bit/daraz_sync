@@ -1866,6 +1866,28 @@ $productImages = [];
 $imageOptionMap = []; // image_path => [optionId1, optionId2, ...]
 $seenFilenames = [];
 
+// Start with main product images & thumb image first
+$mainImgs = $product->images ?? [];
+if (is_string($mainImgs)) {
+    $mainImgs = json_decode($mainImgs, true) ?? [];
+}
+if (!is_array($mainImgs)) $mainImgs = [];
+
+if ($product->thumb_image && !in_array($product->thumb_image, $mainImgs)) {
+    array_unshift($mainImgs, $product->thumb_image);
+}
+
+foreach ($mainImgs as $mImg) {
+    if (!empty($mImg)) {
+        $mImg = trim($mImg);
+        $fn = strtolower(basename($mImg));
+        if (!in_array($fn, $seenFilenames)) {
+            $seenFilenames[] = $fn;
+            $productImages[] = $mImg;
+        }
+    }
+}
+
 if ($product->product_type === 'variable') {
     // Collect from variation options (e.g. Red, Pink, Black option images)
     foreach ($variations as $var) {
@@ -1928,18 +1950,6 @@ if ($product->product_type === 'variable') {
                 }
             }
         }
-    }
-}
-
-// 3. Fallback if no variation images collected
-if (empty($productImages)) {
-    $mainImgs = $product->images ?? [];
-    if (is_string($mainImgs)) {
-        $mainImgs = json_decode($mainImgs, true) ?? [];
-    }
-    $productImages = is_array($mainImgs) ? $mainImgs : [];
-    if ($product->thumb_image && !in_array($product->thumb_image, $productImages)) {
-        array_unshift($productImages, $product->thumb_image);
     }
 }
 @endphp
@@ -2411,6 +2421,9 @@ if (empty($productImages)) {
                 const galleryImgs = document.querySelectorAll('.product-gallery-image');
                 if (galleryImgs.length === 0) return;
 
+                // Always ensure all gallery images are visible
+                galleryImgs.forEach(tImg => tImg.style.display = 'inline-block');
+
                 const selectedBtns = document.querySelectorAll('.variation-option-btn.selected');
                 let selectedColorBtn = null;
 
@@ -2501,15 +2514,7 @@ if (empty($productImages)) {
                     });
                 }
 
-                let activeThumb = null;
-                if (matchingThumbs.length > 0) {
-                    galleryImgs.forEach(tImg => {
-                        tImg.style.display = matchingThumbs.includes(tImg) ? 'inline-block' : 'none';
-                    });
-                    activeThumb = matchingThumbs[0];
-                } else {
-                    galleryImgs.forEach(tImg => tImg.style.display = 'inline-block');
-                }
+                let activeThumb = matchingThumbs.length > 0 ? matchingThumbs[0] : null;
 
                 let targetSrc = null;
                 if (activeThumb) {
@@ -3018,6 +3023,65 @@ if (empty($productImages)) {
             {{-- Left Column: Delivery, Cash on Delivery, Return & Warranty (Compact) --}}
             <div class="p-2.5 bg-slate-50/60 border border-slate-200 rounded-xl flex flex-col justify-between space-y-1.5 text-xs text-slate-700">
                 <!-- Delivery Section -->
+                @php
+                $deliveryInfoRaw = html_entity_decode(strip_tags(setting('general', 'delivery_info', '')));
+                
+                $bnNum = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+                $enNum = ['0','1','2','3','4','5','6','7','8','9'];
+
+                // Parse delivery rates dynamically from delivery_info setting
+                $insideDhakaCharge = null;
+                $outsideDhakaCharge = null;
+                
+                if (preg_match('/ভিতরে[^\d\x{09E6}-\x{09EF}]*([\d\x{09E6}-\x{09EF}]+)/iu', $deliveryInfoRaw, $m1)) {
+                    $insideDhakaCharge = str_replace($bnNum, $enNum, $m1[1]);
+                }
+                if (preg_match('/বাইরে[^\d\x{09E6}-\x{09EF}]*([\d\x{09E6}-\x{09EF}]+)/iu', $deliveryInfoRaw, $m2)) {
+                    $outsideDhakaCharge = str_replace($bnNum, $enNum, $m2[1]);
+                }
+
+                // Format charge display string
+                if ($insideDhakaCharge && $outsideDhakaCharge) {
+                    $deliveryChargeText = "৳ {$insideDhakaCharge} / ৳ {$outsideDhakaCharge}";
+                } elseif ($insideDhakaCharge) {
+                    $deliveryChargeText = "৳ {$insideDhakaCharge}";
+                } else {
+                    $deliveryChargeText = "৳ " . setting('general', 'delivery_charge', '85');
+                }
+
+                // Parse delivery timeline days dynamically (e.g. 02-04 দিন / 2-4 days)
+                $deliveryDaysText = null;
+                if (preg_match('/([\d\x{09E6}-\x{09EF}]+[\s\-\–_to]*[\d\x{09E6}-\x{09EF}]+)\s*(?:দিনের|দিন|days|day)/iu', $deliveryInfoRaw, $m3)) {
+                    $cleanDays = str_replace($bnNum, $enNum, $m3[1]);
+                    $deliveryDaysText = "Guaranteed in {$cleanDays} days";
+                } else {
+                    $deliveryDaysText = "Guaranteed by " . today()->addDays(2)->format('j') . '-' . today()->addDays(5)->format('j M');
+                }
+
+                // Parse COD (Cash on Delivery) status
+                $hasCod = (preg_match('/মূল্য পরিশোধ|Cash on Delivery|COD/iu', $deliveryInfoRaw) && !preg_match('/COD[^\w]*not|নয়|নাই/iu', $deliveryInfoRaw));
+
+                // Parse Return Days
+                $returnDaysText = "14 days easy return";
+                $hasReturn = true;
+                if (preg_match('/Return|রিটার্ন/iu', $deliveryInfoRaw)) {
+                    if (preg_match('/([0-9\x{09E6}-\x{09EF}]+)\s*(?:দিনের|দিন|days|day)[^\.\!\n]*Return|রিটার্ন/iu', $deliveryInfoRaw, $mRet)) {
+                        $rDays = str_replace($bnNum, $enNum, $mRet[1]);
+                        $returnDaysText = "{$rDays} days easy return";
+                    } elseif (preg_match('/Return|রিটার্ন/iu', $deliveryInfoRaw) && preg_match('/সুযোগ|Available|পরিশোধ/iu', $deliveryInfoRaw)) {
+                        $returnDaysText = "Easy return available";
+                    }
+                } else {
+                    $hasReturn = false;
+                }
+
+                // Parse Change of Mind
+                $hasChangeOfMind = (bool)preg_match('/Change of Mind|পছন্দ না হলে/iu', $deliveryInfoRaw);
+
+                // Parse Warranty
+                $hasWarranty = (bool)preg_match('/Warranty|ওয়ারেন্টি|ওয়ারেন্টি/iu', $deliveryInfoRaw) && !preg_match('/Warranty[^\w]*not|ওয়ারেন্টি[^\w]*নাই/iu', $deliveryInfoRaw);
+                $warrantyText = $hasWarranty ? "Warranty available" : "Warranty not available";
+                @endphp
                 <div class="space-y-1.5">
                     <div class="flex items-start gap-2">
                         <div class="text-slate-400 text-sm mt-0.5">
@@ -3026,9 +3090,9 @@ if (empty($productImages)) {
                         <div class="flex-1">
                             <div class="flex items-center justify-between">
                                 <span class="font-medium text-slate-900 text-xs">Standard Delivery</span>
-                                <span class="font-bold text-slate-900 text-xs">৳ {{ setting('general', 'delivery_charge', '85') }}</span>
+                                <span class="font-bold text-slate-900 text-xs">{{ $deliveryChargeText }}</span>
                             </div>
-                            <div class="text-slate-400 text-[10px] leading-none">Guaranteed by {{ today()->addDays(2)->format('j') }}-{{ today()->addDays(5)->format('j M') }}</div>
+                            <div class="text-slate-400 text-[10px] leading-none">{{ $deliveryDaysText }}</div>
                         </div>
                     </div>
 
@@ -3036,7 +3100,9 @@ if (empty($productImages)) {
                         <div class="text-slate-400 text-sm">
                             <i class="fa-solid fa-money-bill-transfer"></i>
                         </div>
-                        <span class="font-medium text-slate-900 text-xs">Cash on Delivery Available</span>
+                        <span class="font-medium text-slate-900 text-xs">
+                            Cash on Delivery {{ $hasCod ? 'Available' : 'Not Available' }}
+                        </span>
                     </div>
                 </div>
 
@@ -3048,24 +3114,30 @@ if (empty($productImages)) {
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <div class="text-slate-400 text-xs w-4 text-center">
+                        <div class="{{ $hasChangeOfMind ? 'text-slate-400' : 'text-slate-300' }} text-xs w-4 text-center">
                             <i class="fa-regular fa-heart"></i>
                         </div>
-                        <span class="text-slate-800 text-xs font-medium">Change of Mind</span>
+                        <span class="text-slate-800 text-xs font-medium {{ !$hasChangeOfMind ? 'line-through text-slate-400' : '' }}">
+                            Change of Mind {{ $hasChangeOfMind ? 'Available' : 'Not Available' }}
+                        </span>
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <div class="text-slate-400 text-xs w-4 text-center">
+                        <div class="{{ $hasReturn ? 'text-slate-400' : 'text-slate-300' }} text-xs w-4 text-center">
                             <i class="fa-solid fa-rotate-left"></i>
                         </div>
-                        <span class="text-slate-800 text-xs font-medium">14 days easy return</span>
+                        <span class="text-slate-800 text-xs font-medium {{ !$hasReturn ? 'line-through text-slate-400' : '' }}">
+                            {{ $hasReturn ? $returnDaysText : 'Return Not Available' }}
+                        </span>
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <div class="text-slate-400 text-xs w-4 text-center">
+                        <div class="{{ $hasWarranty ? 'text-slate-400' : 'text-slate-300' }} text-xs w-4 text-center">
                             <i class="fa-solid fa-shield-halved"></i>
                         </div>
-                        <span class="text-slate-800 text-xs font-medium">Warranty not available</span>
+                        <span class="text-slate-800 text-xs font-medium">
+                            {{ $warrantyText }}
+                        </span>
                     </div>
                 </div>
             </div>
