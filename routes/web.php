@@ -80,6 +80,11 @@ if (!module_enabled('MultiVendor')) {
     Route::post('/vendor/register/check-slug', [App\Http\Controllers\Auth\VendorRegisterController::class, 'checkSlug'])->name('vendor.register.check-slug');
 }
 
+// CSRF Token Refresh Route – used by admin auto-refresh to prevent 419 errors
+Route::get('/csrf-token-refresh', function () {
+    return response()->json(['token' => csrf_token()]);
+})->middleware('web')->name('csrf.refresh');
+
 Route::get('/clear-cache', function () {
     try {
         // Clear all caches

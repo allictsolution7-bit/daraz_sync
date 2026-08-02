@@ -2473,6 +2473,74 @@
 
     <!-- Push scripts section -->
     @stack('scripts')
+
+    <script>
+    // ── CSRF Token Auto-Refresh ──────────────────────────────────────────────
+    // Refreshes the CSRF token silently every 30 minutes so admin forms never
+    // expire and throw a 419 Page Expired error.
+    (function() {
+        function refreshCsrfToken() {
+            fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' })
+                .then(function() {
+                    // After refreshing the cookie, get the new token from Laravel
+                    return fetch('/csrf-token-refresh', {
+                        headers: { 'Accept': 'application/json' },
+                        credentials: 'same-origin'
+                    });
+                })
+                .then(function(res) {
+                    if (res.ok) return res.json();
+                })
+                .then(function(data) {
+                    if (data && data.token) {
+                        // Update meta tag
+                        var metaTag = document.querySelector('meta[name="csrf-token"]');
+                        if (metaTag) metaTag.setAttribute('content', data.token);
+
+                        // Update all hidden CSRF inputs in forms
+                        document.querySelectorAll('input[name="_token"]').forEach(function(el) {
+                            el.value = data.token;
+                        });
+
+                        // Update jQuery AJAX default header if jQuery is loaded
+                        if (typeof $ !== 'undefined') {
+                            $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': data.token } });
+                        }
+                    }
+                })
+                .catch(function() {
+                    // Silently fail - token refresh is best-effort
+                });
+        }
+
+        // Refresh every 30 minutes
+        setInterval(refreshCsrfToken, 30 * 60 * 1000);
+
+        // Intercept 419 responses globally using fetch override
+        var originalFetch = window.fetch;
+        window.fetch = function() {
+            return originalFetch.apply(this, arguments).then(function(response) {
+                if (response.status === 419) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Session Expired',
+                            text: 'Your session has expired. The page will reload to refresh your token.',
+                            confirmButtonText: 'Reload Now',
+                            allowOutsideClick: false
+                        }).then(function() {
+                            location.reload();
+                        });
+                    } else {
+                        alert('Your session expired. Please reload and try again.');
+                        location.reload();
+                    }
+                }
+                return response;
+            });
+        };
+    })();
+    </script>
 </body>
 
 </html>

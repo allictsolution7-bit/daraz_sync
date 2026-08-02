@@ -4443,17 +4443,42 @@
         const targetTab = hash || tabParam || 'general';
         switchToTab(targetTab);
 
-        // Preserve hash when form is submitted
+        // Preserve hash when form is submitted + refresh CSRF token to prevent 419
         const form = document.getElementById('settingsForm');
         if (form) {
-            form.addEventListener('submit', function() {
+            // Store the original clean action URL (without any tab params)
+            const baseAction = '{{ route('admin.settings.update') }}';
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Stop default submission
+
+                // Always reset to clean base URL first (prevents duplicate ?tab= bug)
                 const currentHash = window.location.hash;
                 if (currentHash) {
-                    // Add the hash to the form action URL
-                    const currentAction = form.action;
-                    const separator = currentAction.includes('?') ? '&' : '?';
-                    form.action = currentAction + separator + 'tab=' + currentHash.substring(1);
+                    form.action = baseAction + '?tab=' + currentHash.substring(1);
+                } else {
+                    form.action = baseAction;
                 }
+
+                // Fetch a fresh CSRF token before submitting to prevent 419
+                fetch('/csrf-token-refresh', { credentials: 'same-origin' })
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data && data.token) {
+                            // Update the hidden _token input in the form
+                            var tokenInput = form.querySelector('input[name="_token"]');
+                            if (tokenInput) tokenInput.value = data.token;
+
+                            // Also update the meta tag
+                            var metaTag = document.querySelector('meta[name="csrf-token"]');
+                            if (metaTag) metaTag.setAttribute('content', data.token);
+                        }
+                        form.submit(); // Now submit with fresh token
+                    })
+                    .catch(function() {
+                        // If token refresh fails, submit anyway (token may still be valid)
+                        form.submit();
+                    });
             });
         }
 

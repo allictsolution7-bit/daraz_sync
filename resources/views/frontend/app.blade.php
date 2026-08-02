@@ -886,18 +886,12 @@
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
                 position: relative;
                 z-index: 1000;
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
             .top-header-section.show-topbar {
                 position: fixed;
                 top: 0;
                 left: 0;
-                transform: translateY(0);
-                animation: slideDown 0.3s forwards;
-            }
-            @keyframes slideDown {
-                from { transform: translateY(-100%); }
-                to { transform: translateY(0); }
+                z-index: 1001;
             }
 
             .top-header-bar {
@@ -2988,7 +2982,8 @@
                 background-color: #ffffff !important;
                 border-bottom: 1px solid #f1f5f9;
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-                position: relative;
+                position: sticky;
+                top: 0;
                 z-index: 100;
             }
             .header {
@@ -7716,21 +7711,27 @@
             const topbar = document.getElementById('topHeaderSection');
             if (topbar) {
                 let lastScrollTop = 0;
-                window.addEventListener('scroll', function() {
+                
+                function checkPosition() {
                     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    if (scrollTop < lastScrollTop) {
-                        // Scrolling Up
-                        if (scrollTop > 100) {
+                    
+                    if (scrollTop > 250) {
+                        if (scrollTop < lastScrollTop) {
+                            // Scrolling Up
                             topbar.classList.add('show-topbar');
                         } else {
+                            // Scrolling Down
                             topbar.classList.remove('show-topbar');
                         }
                     } else {
-                        // Scrolling Down
+                        // Near the top of the page (0 - 250px)
                         topbar.classList.remove('show-topbar');
                     }
                     lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-                }, { passive: true });
+                }
+
+                // Run only on scroll
+                window.addEventListener('scroll', checkPosition, { passive: true });
             }
         })();
     </script>

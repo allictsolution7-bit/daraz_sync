@@ -4403,13 +4403,17 @@
             .reviewer-details {
                 display: flex;
                 flex-direction: column;
+                max-width: 140px;
             }
 
             .reviewer-name {
-                font-size: 16px;
+                font-size: 15px;
                 font-weight: 600;
                 color: var(--secondary-color);
                 margin-bottom: 3px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .review-date {
@@ -4420,6 +4424,8 @@
             .review-rating {
                 color: var(--primary-color);
                 font-size: 14px;
+                white-space: nowrap;
+                flex-shrink: 0;
             }
 
             .review-product {
