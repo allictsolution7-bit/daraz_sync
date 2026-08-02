@@ -379,9 +379,11 @@ class CartController extends Controller
 
             $isComboPurchase = true;
 
+            $locations = auth()->check() ? auth()->user()->deliveryLocations : collect();
+
             return view('frontend.buynow', compact(
                 'product', 'pqty', 'price', 'sub_total', 'shipping',
-                'shippingSetting', 'activeShippingOptions', 'specificShippingRules', 'isComboPurchase', 'comboData'
+                'shippingSetting', 'activeShippingOptions', 'specificShippingRules', 'isComboPurchase', 'comboData', 'locations'
             ));
         }
         
@@ -455,6 +457,11 @@ class CartController extends Controller
             $activeShippingOptions = array_filter($shippingSetting->shipping_options ?? [], fn($option) => $option['active'] ?? false);
             uasort($activeShippingOptions, fn($a, $b) => ($a['position'] ?? 999) <=> ($b['position'] ?? 999));
         }
+        // Make sure the default shipping rate value matches the selected option
+        if (!empty($activeShippingOptions)) {
+            $firstOption = reset($activeShippingOptions);
+            $shipping = $firstOption['cost'];
+        }
 
         // Handle variable products with combinations
         if ($product->product_type === 'variable' && $request->has('combination_id')) {
@@ -497,6 +504,8 @@ class CartController extends Controller
             $specificShippingRules = $product->shippingRules()->active()->get();
 
             $isComboPurchase = false;
+            $locations = auth()->check() ? auth()->user()->deliveryLocations : collect();
+
             return view('frontend.buynow', compact(
                 'product',
                 'pqty',
@@ -507,7 +516,8 @@ class CartController extends Controller
                 'shippingSetting',
                 'activeShippingOptions',
                 'specificShippingRules',
-                'isComboPurchase'
+                'isComboPurchase',
+                'locations'
             ));
         }
         // Handle simple products or legacy option_id approach
@@ -538,6 +548,8 @@ class CartController extends Controller
 
             $option_id = $request->option_id;
             $isComboPurchase = false;
+            $locations = auth()->check() ? auth()->user()->deliveryLocations : collect();
+
             return view('frontend.buynow', compact(
                 'product',
                 'pqty',
@@ -548,7 +560,8 @@ class CartController extends Controller
                 'shippingSetting',
                 'activeShippingOptions',
                 'specificShippingRules',
-                'isComboPurchase'
+                'isComboPurchase',
+                'locations'
             ));
         }
         // Handle simple products (no variations)
@@ -582,6 +595,8 @@ class CartController extends Controller
             $specificShippingRules = $product->shippingRules()->active()->get();
 
             $isComboPurchase = false;
+            $locations = auth()->check() ? auth()->user()->deliveryLocations : collect();
+
             return view('frontend.buynow', compact(
                 'product',
                 'pqty',
@@ -591,7 +606,8 @@ class CartController extends Controller
                 'shippingSetting',
                 'activeShippingOptions',
                 'specificShippingRules',
-                'isComboPurchase'
+                'isComboPurchase',
+                'locations'
             ));
         }
     }

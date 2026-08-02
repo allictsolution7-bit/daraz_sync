@@ -13,6 +13,23 @@ if (!function_exists('setting')) {
      */
     function setting($group, $key, $default = null)
     {
+        // Check if a vendor-scoped prefix is requested
+        if (strpos($group, 'vendor_') === 0) {
+            $parts = explode('_', $group, 3);
+            if (count($parts) >= 3 && is_numeric($parts[1])) {
+                $vendorId = (int)$parts[1];
+                $subGroup = $parts[2];
+                // Query custom SiteSetting row for this vendor
+                $vendorSetting = \App\Models\SiteSetting::where('group', 'vendor_' . $vendorId . '_' . $subGroup)
+                    ->where('key', $key)
+                    ->first();
+                if ($vendorSetting) {
+                    return $vendorSetting->value;
+                }
+                // Fallback to base group
+                $group = $subGroup;
+            }
+        }
         return SettingsService::get($group, $key, $default);
     }
 }

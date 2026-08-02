@@ -3024,7 +3024,14 @@ if ($product->product_type === 'variable') {
             <div class="p-2.5 bg-slate-50/60 border border-slate-200 rounded-xl flex flex-col justify-between space-y-1.5 text-xs text-slate-700">
                 <!-- Delivery Section -->
                 @php
-                $deliveryInfoRaw = html_entity_decode(strip_tags(setting('general', 'delivery_info', '')));
+                $vendorPrefix = '';
+                if (isset($product)) {
+                    $ownerId = $product->vendor_id ?: $product->created_by ?: null;
+                    if ($ownerId) {
+                        $vendorPrefix = 'vendor_' . $ownerId . '_';
+                    }
+                }
+                $deliveryInfoRaw = html_entity_decode(strip_tags(setting($vendorPrefix . 'general', 'delivery_info', '')));
                 
                 $bnNum = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
                 $enNum = ['0','1','2','3','4','5','6','7','8','9'];
@@ -3046,7 +3053,7 @@ if ($product->product_type === 'variable') {
                 } elseif ($insideDhakaCharge) {
                     $deliveryChargeText = "৳ {$insideDhakaCharge}";
                 } else {
-                    $deliveryChargeText = "৳ " . setting('general', 'delivery_charge', '85');
+                    $deliveryChargeText = "৳ " . setting($vendorPrefix . 'general', 'delivery_charge', '85');
                 }
 
                 // Parse delivery timeline days dynamically (e.g. 02-04 দিন / 2-4 days)

@@ -376,13 +376,19 @@
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
 
-                document.getElementById('locationLat').value = lat;
-                document.getElementById('locationLng').value = lng;
-
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 7000);
 
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, { signal: controller.signal })
+                document.getElementById('locationLat').value = lat;
+                document.getElementById('locationLng').value = lng;
+
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&countrycodes=bd`, { 
+                    signal: controller.signal,
+                    headers: {
+                        'User-Agent': 'PurnoBDSyncApp/1.0 (contact@purnobd.com)',
+                        'Accept-Language': 'en-US,en;q=0.9'
+                    }
+                })
                     .then(res => res.json())
                     .then(data => {
                         clearTimeout(timeoutId);
@@ -402,7 +408,7 @@
                         } else {
                             document.getElementById('locationAddress').value = `GPS Location (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
                         }
-
+ 
                         status.style.display = 'block';
                         status.innerHTML = `<i class="fa-solid fa-check-circle"></i> Live exact location detected (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
                     })
