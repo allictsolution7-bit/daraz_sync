@@ -877,17 +877,33 @@
         <!-- Top Header Bar v1 -->
         <style>
             .top-header-section {
-                background: {{ $topHeaderBgColor }};
-                color: {{ $topHeaderTextColor }};
-                font-size: {{ $topHeaderFontSize }};
-                font-weight: 400;
+                background: #0f172a;
+                color: #e2e8f0;
+                font-size: 13px;
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
                 width: 100%;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                position: relative;
+                z-index: 1000;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .top-header-section.show-topbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                transform: translateY(0);
+                animation: slideDown 0.3s forwards;
+            }
+            @keyframes slideDown {
+                from { transform: translateY(-100%); }
+                to { transform: translateY(0); }
             }
 
             .top-header-bar {
                 max-width: var(--container-max-width, 1340px);
                 margin: 0 auto;
-                padding: 8px 0 6px 0;
+                padding: 10px 15px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -897,38 +913,49 @@
             .top-header-bar .right {
                 display: flex;
                 align-items: center;
-                gap: 30px;
+                gap: 24px;
             }
 
-            .top-header-bar .right {
-                gap: 25px;
+            .top-header-bar a {
+                color: #e2e8f0;
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+
+            .top-header-bar a:hover {
+                color: var(--primary-color);
+            }
+
+            .top-header-bar span {
+                display: flex;
+                align-items: center;
             }
 
             .top-header-bar svg {
-                vertical-align: middle;
-                margin-right: 6px;
-                width: 18px;
-                height: 18px;
-                fill: {{ $topHeaderTextColor }};
+                margin-right: 8px;
+                width: 16px;
+                height: 16px;
+                fill: currentColor;
             }
 
             @media (max-width: 768px) {
                 @if ($showTopHeaderMobile == '0')
-                    .top-header-section {
-                        display: none !important;
-                    }
+                     .top-header-section {
+                         display: none !important;
+                     }
                 @else
                     .top-header-bar {
                         flex-direction: column;
-                        font-size: 10px;
-                        padding: 8px 0;
+                        font-size: 11px;
+                        padding: 8px 10px;
                         text-align: center;
+                        gap: 8px;
                     }
 
                     .top-header-bar .left,
                     .top-header-bar .right {
                         margin: 0;
-                        gap: 10px;
+                        gap: 12px;
                     }
 
                     .top-header-bar .left {
@@ -1291,7 +1318,7 @@
     @endif
 
     @php
-        $headerLayout = setting('general', 'header_layout', 'v1');
+        $headerLayout = setting('general', 'header_layout', 'v4');
     @endphp
 
     @if ($headerLayout == 'v1')
@@ -2957,9 +2984,12 @@
             }
         @endphp
         <style>
-            .main-header-section{
-                background-color: #fff !important;
-                border-bottom: 3px solid var(--border-color);
+            .main-header-section {
+                background-color: #ffffff !important;
+                border-bottom: 1px solid #f1f5f9;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+                position: relative;
+                z-index: 100;
             }
             .header {
                 width: 100%;
@@ -2968,7 +2998,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                padding: 8px 15px;
+                padding: 16px 15px;
             }
 
             .logo {
@@ -2978,53 +3008,58 @@
             .logo img {
                 width: {{ setting('general', 'logo_width', '140px') }}px;
                 height: auto;
-                transition: transform 0.3s ease;
+                transition: transform 0.25s ease;
             }
 
             .logo img:hover {
-                transform: scale(1.05);
+                transform: scale(1.02);
             }
 
             .search-bar {
                 display: flex;
                 align-items: center;
-                border: 1.5px solid var(--primary-color);
-                background: #fff;
-                border-radius: 30px;
+                border: 2px solid #e2e8f0;
+                background: #f8fafc;
+                border-radius: 50px;
                 padding: 0;
                 width: 100%;
-                max-width: 500px;
+                max-width: 380px;
                 box-shadow: none;
                 position: relative;
                 margin: 0 30px;
+                transition: all 0.2s ease;
+            }
+            
+            .search-bar:focus-within {
+                border-color: var(--primary-color);
+                background: #fff;
+                box-shadow: 0 0 0 4px rgba(255, 105, 37, 0.15);
             }
 
             .search-bar input {
                 border: none;
                 outline: none;
                 width: 100%;
-                font-size: 16px;
-                padding: 16px 24px;
-                border-radius: 30px 0 0 30px;
+                font-size: 14px;
+                padding: 12px 20px;
+                border-radius: 50px 0 0 50px;
                 background: transparent;
-                color: #444;
+                color: #334155;
             }
 
             .search-bar .search-btn {
                 background: none;
                 border: none;
                 outline: none;
-                margin-right: 0px;
-                margin-left: -46px;
+                margin-right: 2px;
                 border-radius: 50%;
-                width: 43px;
-                height: 43px;
+                width: 38px;
+                height: 38px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 background: var(--primary-color);
                 cursor: pointer;
-                box-shadow: 0 2px 8px rgba(229, 57, 53, 0.08);
                 transition: background 0.2s;
             }
 
@@ -3139,11 +3174,8 @@
             }
 
             .wishlist-icon {
-                margin-bottom: -6px;
-            }
-
-            .nav-icons a:not(:last-of-type) {
-                margin-bottom: -6px;
+                display: flex;
+                align-items: center;
             }
 
 
@@ -3236,10 +3268,10 @@
                 <div class="search-bar">
                     <input type="text" id="header-search-input"
                         placeholder="Search Your Product Here...">
-                    <button type="button" class="search-btn">
+                    <button type="button" class="search-btn" style="background: #1e293b;">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="10"
-                                fill="{{ \App\Services\SettingsService::getPrimaryColor() }}" />
+                                fill="#1e293b" />
                             <path
                                 d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
                                 fill="#ffffff" />
@@ -3249,161 +3281,144 @@
                 </div>
     
                 <div class="nav-icons">
-                    <!-- HTML -->
                     <style>
-                        /* CSS */
                         .track-box {
                             display: flex;
                             align-items: center;
                             gap: 8px;
-                            font-family: Arial, sans-serif;
+                            font-family: 'Inter', sans-serif;
+                            text-decoration: none;
+                            transition: all 0.2s ease;
+                        }
+                        .track-box:hover {
+                            opacity: 0.85;
+                            transform: translateY(-1px);
                         }
                         
                         .track-icon {
-                            width: 24px;
-                            height: 24px;
+                            width: 22px;
+                            height: 22px;
                             flex-shrink: 0;
                         }
                         
                         .track-text span {
                             display: block;
-                            font-size: 14px;
-                            color: #555;
+                            font-size: 11px;
+                            color: #64748b;
+                            font-weight: 500;
                         }
                         
                         .track-text strong {
                             display: block;
-                            font-size: 16px;
-                            font-weight: bold;
-                            color: #000;
+                            font-size: 13px;
+                            font-weight: 700;
+                            color: #1e293b;
                         }
                         
                         .web-primary-color {
-                            fill: var(--header-icons-color, var(--primary-color));
+                            fill: #1e293b;
+                        }
+                        .web-primary-stroke {
+                            stroke: #1e293b;
                         }
                         </style>
                         <a href="{{ route('order.track') }}" class="track-box">
-                        <svg class="track-icon web-primary-color" width="35" height="35" viewBox="0 0 422.518 422.518">
-                            <path d="M422.512,215.424c0-0.079-0.004-0.158-0.005-0.237c-0.116-5.295-4.368-9.514-9.727-9.514h-2.554l-39.443-76.258
-                                                                                                                                                                                                        c-1.664-3.22-4.983-5.225-8.647-5.226l-67.34-0.014l2.569-20.364c0.733-8.138-1.783-15.822-7.086-21.638
-                                                                                                                                                                                                        c-5.293-5.804-12.683-9.001-20.81-9.001h-209c-5.255,0-9.719,4.066-10.22,9.308l-2.095,16.778h119.078
-                                                                                                                                                                                                        c7.732,0,13.836,6.268,13.634,14c-0.203,7.732-6.635,14-14.367,14H126.78c0.007,0.02,0.014,0.04,0.021,0.059H10.163
-                                                                                                                                                                                                        c-5.468,0-10.017,4.432-10.16,9.9c-0.143,5.468,4.173,9.9,9.641,9.9H164.06c7.168,1.104,12.523,7.303,12.326,14.808
-                                                                                                                                                                                                        c-0.216,8.242-7.039,14.925-15.267,14.994H54.661c-5.523,0-10.117,4.477-10.262,10c-0.145,5.523,4.215,10,9.738,10h105.204
-                                                                                                                                                                                                        c7.273,1.013,12.735,7.262,12.537,14.84c-0.217,8.284-7.109,15-15.393,15H35.792v0.011H25.651c-5.523,0-10.117,4.477-10.262,10
-                                                                                                                                                                                                        c-0.145,5.523,4.214,10,9.738,10h8.752l-3.423,35.818c-0.734,8.137,1.782,15.821,7.086,21.637c5.292,5.805,12.683,9.001,20.81,9.001
-                                                                                                                                                                                                        h7.55C69.5,333.8,87.3,349.345,109.073,349.345c21.773,0,40.387-15.545,45.06-36.118h94.219c7.618,0,14.83-2.913,20.486-7.682
-                                                                                                                                                                                                        c5.172,4.964,12.028,7.682,19.514,7.682h1.55c3.597,20.573,21.397,36.118,43.171,36.118c21.773,0,40.387-15.545,45.06-36.118h6.219
-                                                                                                                                                                                                        c16.201,0,30.569-13.171,32.029-29.36l6.094-67.506c0.008-0.091,0.004-0.181,0.01-0.273c0.01-0.139,0.029-0.275,0.033-0.415
-                                                                                                                                                                                                        C422.52,215.589,422.512,215.508,422.512,215.424z M109.597,329.345c-13.785,0-24.707-11.214-24.346-24.999
-                                                                                                                                                                                                        c0.361-13.786,11.87-25.001,25.655-25.001c13.785,0,24.706,11.215,24.345,25.001C134.89,318.131,123.382,329.345,109.597,329.345z
-                                                                                                                                                                                                         M333.597,329.345c-13.785,0-24.706-11.214-24.346-24.999c0.361-13.786,11.87-25.001,25.655-25.001
-                                                                                                                                                                                                        c13.785,0,24.707,11.215,24.345,25.001C358.89,318.131,347.382,329.345,333.597,329.345z M396.457,282.588
-                                                                                                                                                                                                        c-0.52,5.767-5.823,10.639-11.58,10.639h-6.727c-4.454-19.453-21.744-33.882-42.721-33.882c-20.977,0-39.022,14.429-44.494,33.882
-                                                                                                                                                                                                        h-2.059c-2.542,0-4.81-0.953-6.389-2.685c-1.589-1.742-2.337-4.113-2.106-6.676l12.609-139.691l28.959,0.006l-4.59,50.852
-                                                                                                                                                                                                        c-0.735,8.137,1.78,15.821,7.083,21.637c5.292,5.806,12.685,9.004,20.813,9.004h56.338L396.457,282.588z" />
-                        </svg>
-                        <div class="track-text">
-                            <strong>Track Order</strong>
-                        </div>
-                    </a>
+                            <svg class="track-icon web-primary-color" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5 0.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5 0.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H17V9h2.5l2 3.5H19.5z"/>
+                            </svg>
+                            <div class="track-text">
+                                <span>Shipping</span>
+                                <strong>Track Order</strong>
+                            </div>
+                        </a>
 
                     <style>
                     .call-box {
                         display: flex;
                         align-items: center;
                         gap: 8px;
-                        font-family: Arial, sans-serif;
+                        font-family: 'Inter', sans-serif;
+                        text-decoration: none;
+                        transition: all 0.2s ease;
+                    }
+                    .call-box:hover {
+                        opacity: 0.85;
+                        transform: translateY(-1px);
                     }
                     
                     .call-icon {
-                        width: 21px;
-                        height: 21px;
+                        width: 20px;
+                        height: 20px;
                         flex-shrink: 0;
                     }
                     
                     .call-text span {
                         display: block;
-                        font-size: 14px;
-                        color: #555;
-                    }
-
-                    .call-text > span:first-child {
-                        display: inline-block; 
-                        margin-bottom: 5px;
+                        font-size: 11px;
+                        color: #64748b;
+                        font-weight: 500;
                     }
                     
                     .call-text strong {
                         display: block;
-                        font-size: 16px;
-                        font-weight: bold;
-                        color: #000;
-                        margin-top:-5px;
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: #1e293b;
                     }
-                    @media (max-width: 800px) {
+                    @media (max-width: 992px) {
                       .track-box,
                       .call-box {
-                        display: none !important; /* force hide if overridden elsewhere */
+                        display: none !important;
                       }
                     }
                     </style>
                     <a href="tel:{{ setting('general', 'phone_number', '01821772211') }}" class="call-box">
-                        <svg class="call-icon web-primary-color" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                            <path d="M391 351c-24-24-51-16-78-5-19 8-42-10-67-35s-43-48-35-67c11-27 19-54-5-78l-46-46c-21-21-55-21-76 0l-20 20c-22 22-25 57-9 84 31 53 76 106 129 159s106 98 159 129c27 16 62 13 84-9l20-20c21-21 21-55 0-76l-46-46z"/>
+                        <svg class="call-icon web-primary-color" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1c-9.39 0-17-7.61-17-17a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"/>
                         </svg>
                         <div class="call-text">
                             <span>Call Us Now</span>
                             <strong>{{ setting('general', 'phone_number', '01821772211') }}</strong>
                         </div>
                     </a>
-                    <a href="#" title="Wishlist">
+                    
+                    <a href="#" title="Wishlist" style="transition: all 0.2s ease;">
                         <div class="wishlist-icon">
-                            <svg class="web-primary-color" width="22" height="18" viewBox="0 0 22 18" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M15.6875 0C13.7516 0 12.0566 0.8325 11 2.23969C9.94344 0.8325 8.24844 0 6.3125 0C3.10384 0.00361655 0.503617 2.60384 0.5 5.8125C0.5 12.375 10.2303 17.6869 10.6447 17.9062C10.8665 18.0256 11.1335 18.0256 11.3553 17.9062C11.7697 17.6869 21.5 12.375 21.5 5.8125C21.4964 2.60384 18.8962 0.00361655 15.6875 0V0ZM11 16.3875C9.28813 15.39 2 10.8459 2 5.8125C2.0031 3.43206 3.93206 1.5031 6.3125 1.5C8.13594 1.5 9.66687 2.47125 10.3062 4.03125C10.4218 4.31259 10.6959 4.49627 11 4.49627C11.3041 4.49627 11.5782 4.31259 11.6938 4.03125C12.3331 2.46844 13.8641 1.5 15.6875 1.5C18.0679 1.5031 19.9969 3.43206 20 5.8125C20 10.8384 12.71 15.3891 11 16.3875V16.3875Z" />
+                            <svg class="web-primary-stroke" width="22" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                             </svg>
-    
                         </div>
                     </a>
     
-                    <a href="{{ route('cart.index') }}" title="Shopping Cart" class="cart-drawer-trigger">
-    
-    
-                        <div class="cart-icon">
-                            <svg class="web-primary-color" width="21" height="21" viewBox="0 0 21 21" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M20.8256 4.51906C20.6831 4.34851 20.4723 4.24996 20.25 4.25H5.12625L4.66781 1.73187C4.53823 1.01862 3.91711 0.500105 3.19219 0.5H1.5C1.08579 0.5 0.75 0.835786 0.75 1.25C0.75 1.66421 1.08579 2 1.5 2H3.1875L5.58375 15.1522C5.65434 15.5422 5.82671 15.9067 6.08344 16.2087C5.09996 17.1273 4.97046 18.6409 5.7836 19.7132C6.59675 20.7855 8.08911 21.0692 9.23899 20.37C10.3889 19.6709 10.8238 18.2154 10.2459 17H14.5041C14.3363 17.3513 14.2495 17.7357 14.25 18.125C14.25 19.5747 15.4253 20.75 16.875 20.75C18.3247 20.75 19.5 19.5747 19.5 18.125C19.5 16.6753 18.3247 15.5 16.875 15.5H7.79719C7.43472 15.4999 7.12417 15.2407 7.05937 14.8841L6.76219 13.25H17.6372C18.7246 13.2498 19.6563 12.4721 19.8506 11.4022L20.9906 5.13406C21.0297 4.91473 20.9692 4.68938 20.8256 4.51906V4.51906ZM9 18.125C9 18.7463 8.49632 19.25 7.875 19.25C7.25368 19.25 6.75 18.7463 6.75 18.125C6.75 17.5037 7.25368 17 7.875 17C8.49632 17 9 17.5037 9 18.125V18.125ZM18 18.125C18 18.7463 17.4963 19.25 16.875 19.25C16.2537 19.25 15.75 18.7463 15.75 18.125C15.75 17.5037 16.2537 17 16.875 17C17.4963 17 18 17.5037 18 18.125V18.125ZM18.375 11.1341C18.31 11.4917 17.9979 11.7513 17.6344 11.75H6.48938L5.39906 5.75H19.3509L18.375 11.1341Z" />
+                    <a href="{{ route('cart.index') }}" title="Shopping Cart" class="cart-drawer-trigger" style="transition: all 0.2s ease;">
+                        <div class="cart-icon" style="position: relative;">
+                            <svg class="web-primary-stroke" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                             </svg>
+                            <span class="cart-count" style="position: absolute; top: -6px; right: -8px; background-color: #1e293b; color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; border: 2px solid #fff;">{{ $cartCount }}</span>
                         </div>
-                        <span class="cart-count">{{ $cartCount }}</span>
                     </a>
-                    <a href="{{ route('account.show') }}" title="My Account" class="profile-icon-area">
+                    
+                    <a href="{{ route('account.show') }}" title="My Account" class="profile-icon-area" style="transition: all 0.2s ease;">
                         <div class="profile-icon">
-                            <svg class="web-primary-color" width="21" height="21" viewBox="0 0 21 21" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M20.2313 18.375C18.8319 15.9269 16.6716 14.1685 14.1455 13.3374C16.7168 11.8055 17.9799 8.74371 17.1836 5.86726C16.3874 2.99081 13.7903 0.997722 10.5 0.997722C7.20975 0.997722 4.61261 2.99081 3.81637 5.86726C3.02013 8.74371 4.28324 11.8055 6.85453 13.3374C4.32844 14.1675 2.16812 15.9259 0.76875 18.375C0.619540 18.6129 0.614176 18.9107 0.751669 19.1533C0.889162 19.3959 1.14893 19.5453 1.42689 19.5429C1.70486 19.5404 1.96256 19.3861 2.09718 19.1406C3.88774 16.0513 7.06471 14.2031 10.5 14.2031C13.9353 14.2031 17.1123 16.0513 18.9028 19.1406C19.0374 19.3861 19.2951 19.5404 19.5731 19.5429C19.8511 19.5453 20.1108 19.3959 20.2483 19.1533C20.3858 18.9107 20.3805 18.6129 20.2313 18.375V18.375ZM4.9875 7.4531C4.9875 4.60539 7.35229 2.2406 10.5 2.2406C13.6477 2.2406 16.0125 4.60539 16.0125 7.4531C16.0125 10.3008 13.6477 12.6656 10.5 12.6656C7.35356 12.6625 4.99044 10.2994 4.9875 7.4531V7.4531Z" />
+                            <svg class="web-primary-stroke" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                             </svg>
                         </div>
                     </a>
                     @if (auth()->check())
-                        <a href="{{ route('account.show') }}" class="register-btn">
-                            <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2"
-                                style="margin-right:8px;">
-                                <circle cx="10" cy="7" r="4" />
-                                <path d="M2 19c0-4 8-4 8-4s8 0 8 4" />
+                        <a href="{{ route('account.show') }}" class="register-btn" style="background: #1e293b; border-radius: 50px; font-size: 13px; font-weight: 600; padding: 10px 20px; transition: all 0.2s ease;">
+                            <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2" style="margin-right:6px;" viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                             </svg>
-                            My Account
+                            Account
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="mainmenulogin" style="margin: 0 10px; font-size: 18px;">Log In</a>
-                        <a href="{{ route('register') }}" class="register-btn">
-                            <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2"
-                                style="margin-right:8px;">
-                                <circle cx="10" cy="7" r="4" />
-                                <path d="M2 19c0-4 8-4 8-4s8 0 8 4" />
+                        <a href="{{ route('login') }}" class="mainmenulogin" style="margin: 0 10px; font-size: 14px; font-weight: 600; color: #475569; transition: all 0.2s;">Log In</a>
+                        <a href="{{ route('register') }}" class="register-btn" style="background: #1e293b; border-radius: 50px; font-size: 13px; font-weight: 600; padding: 10px 20px; transition: all 0.2s ease;">
+                            <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2" style="margin-right:6px;" viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                             </svg>
                             Register
                         </a>
@@ -3988,64 +4003,66 @@
             align-items: center;
             padding: 0;
             background: transparent;
-            
             position: relative;
-            z-index: 10;
+            z-index: 50;
         }
         .mainnav-section {
-                background: {{ setting('general', 'main_nav_background_color', '#ff6925') }};
-                color: {{ setting('general', 'main_nav_text_color', '#fff') }};
-                margin-top: -3px;
-                box-shadow: {{ \App\Services\SettingsService::getMainNavBoxShadow() }};
-            }
+            background: #1e293b;
+            color: #ffffff;
+            margin-top: -3px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 40;
+        }
 
         /* Navigation Links */
         .navigation a {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: {{ setting('general', 'main_nav_padding', '18px 24px') }};
+            padding: 14px 20px;
             text-decoration: none;
             color: {{ setting('general', 'main_nav_text_color', '#fff') }};
-            font-weight: 500;
-            font-size: {{ setting('general', 'main_nav_font_size', '16px') }};
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             position: relative;
-            /* border-radius: var(--nav-border-radius); */
-            transition: var(--nav-transition);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
-            border-right: 1px solid {{ setting('general', 'main_nav_border_right_color', '#ffffffb5') }};
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         /* Active state */
         .navigation a.active {
-            color: var(--primary-color);
-            background: rgba(var(--primary-color-rgb), 0.08);
+            color: #fff;
+            background: rgba(0, 0, 0, 0.15);
         }
 
         /* Hover effects */
         .navigation a:hover {
-            color: {{ setting('general', 'main_nav_hover_text_color', 'var(--primary-color)') }};
-            background: {{ setting('general', 'main_nav_hover_bg_color', 'var(--light-color)') }};
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
             transform: translateY(-1px);
         }
 
         /* Bottom border animation */
-        /* .navigation a::after {
+        .navigation a::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 50%;
             width: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--primary-color), var(--accent-color, var(--primary-color)));
+            background: #fff;
             border-radius: 3px 3px 0 0;
             transform: translateX(-50%);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        } */
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
         .navigation a:hover::after,
         .navigation a.active::after {
-            width: 80%;
+            width: 70%;
         }
 
         /* Dropdown Container */
@@ -7693,6 +7710,29 @@
                 });
             });
         }
+
+        // Scroll topbar detection script
+        (function() {
+            const topbar = document.getElementById('topHeaderSection');
+            if (topbar) {
+                let lastScrollTop = 0;
+                window.addEventListener('scroll', function() {
+                    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    if (scrollTop < lastScrollTop) {
+                        // Scrolling Up
+                        if (scrollTop > 100) {
+                            topbar.classList.add('show-topbar');
+                        } else {
+                            topbar.classList.remove('show-topbar');
+                        }
+                    } else {
+                        // Scrolling Down
+                        topbar.classList.remove('show-topbar');
+                    }
+                    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+                }, { passive: true });
+            }
+        })();
     </script>
     
     <!-- Custom Footer Code -->

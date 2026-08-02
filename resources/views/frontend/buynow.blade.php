@@ -30,6 +30,8 @@
         padding: 0 0 24px;
         display: flex;
         flex-direction: column;
+        position: relative;
+        z-index: 1;
     }
 
     /* ─── Top Bar ─── */
@@ -968,9 +970,21 @@
                     <div style="margin-top: 10px; border-top: 1px solid var(--co-border); padding-top: 10px;">
                         <span class="co-label" style="margin-bottom: 6px; font-weight: 700; color: var(--co-text);"><i class="fa-solid fa-truck-fast"></i> Delivery Area</span>
                         <div style="display: flex; gap: 8px; width: 100%;">
+                            @php
+                                $firstActiveOption = null;
+                                foreach ($activeShippingOptions as $key => $option) {
+                                    if ($option['active'] ?? false) {
+                                        $firstActiveOption = $key;
+                                        break;
+                                    }
+                                }
+                            @endphp
                             @foreach ($activeShippingOptions as $key => $option)
-                                <label class="co-shipping-opt {{ $shipping == $option['cost'] ? 'selected' : '' }}" for="ship_{{ $key }}" style="flex: 1; padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px; margin: 0; background: #f8fafc; border-radius: 6px; border: 1.5px solid var(--co-border); cursor: pointer;">
-                                    <input type="radio" name="shipping_area" id="ship_{{ $key }}" value="{{ $key }}" {{ $shipping == $option['cost'] ? 'checked' : '' }} style="display:none;">
+                                @php
+                                    $isSelected = ($shipping == $option['cost']) || (!$shipping && $key === $firstActiveOption);
+                                @endphp
+                                <label class="co-shipping-opt {{ $isSelected ? 'selected' : '' }}" for="ship_{{ $key }}" style="flex: 1; padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px; margin: 0; background: {{ $isSelected ? '#fff7ed' : '#f8fafc' }}; border-radius: 6px; border: 1.5px solid {{ $isSelected ? 'var(--co-primary)' : 'var(--co-border)' }}; cursor: pointer;">
+                                    <input type="radio" name="shipping_area" id="ship_{{ $key }}" value="{{ $key }}" {{ $isSelected ? 'checked' : '' }} style="display:none;">
                                     <span class="co-shipping-name" style="font-size: 11px;">{{ $option['name'] }}</span>
                                     <span class="co-shipping-price" style="font-size: 12px; font-weight: 700;">
                                         {{ $option['cost'] == 0 ? 'FREE' : 'Tk '.number_format($option['cost'], 0) }}
