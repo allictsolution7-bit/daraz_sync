@@ -9,7 +9,9 @@ class BasicShippingSettingController extends Controller
 {
     public function edit()
     {
-        $setting = BasicShippingSetting::first() ?? new BasicShippingSetting([
+        $userId = auth()->id();
+        $setting = BasicShippingSetting::where('user_id', $userId)->first() ?? new BasicShippingSetting([
+            'user_id' => $userId,
             'flat_rate' => 80.00,
             'shipping_options' => [
                 'inside_dhaka' => ['name' => 'Inside Dhaka', 'cost' => 80.00, 'active' => true, 'position' => 1],
@@ -70,12 +72,14 @@ class BasicShippingSettingController extends Controller
             return back()->withErrors(['shipping_options' => 'At least one shipping option must be active.']);
         }
 
-        $setting = BasicShippingSetting::first() ?? new BasicShippingSetting();
-        $setting->update([
+        $userId = auth()->id();
+        $setting = BasicShippingSetting::where('user_id', $userId)->first() ?? new BasicShippingSetting(['user_id' => $userId]);
+        $setting->fill([
             'flat_rate' => floatval($validated['flat_rate']),
             'shipping_options' => $shippingOptions,
             'free_shipping_threshold' => floatval($validated['free_shipping_threshold']),
         ]);
+        $setting->save();
 
         return redirect()->route('admin.basic.shipping.settings.edit')
             ->with('success', 'BasicShipping settings updated.');

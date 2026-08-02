@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Model;
 class BasicShippingSetting extends Model
 {
     use HasFactory;
-    protected $fillable = ['flat_rate', 'shipping_options', 'free_shipping_threshold'];
+    protected $fillable = ['user_id', 'flat_rate', 'shipping_options', 'free_shipping_threshold'];
 
     protected $casts = [
         'shipping_options' => 'array',

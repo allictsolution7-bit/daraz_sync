@@ -3036,21 +3036,35 @@ if ($product->product_type === 'variable') {
                 $bnNum = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
                 $enNum = ['0','1','2','3','4','5','6','7','8','9'];
 
-                // Parse delivery rates dynamically from delivery_info setting
+                // Retrieve delivery rates from BasicShippingSetting table dynamically (scoped to owner/vendor)
                 $insideDhakaCharge = null;
                 $outsideDhakaCharge = null;
-                
-                if (preg_match('/ভিতরে[^\d\x{09E6}-\x{09EF}]*([\d\x{09E6}-\x{09EF}]+)/iu', $deliveryInfoRaw, $m1)) {
-                    $insideDhakaCharge = str_replace($bnNum, $enNum, $m1[1]);
+                $ownerId = null;
+                if (isset($product)) {
+                    $ownerId = $product->vendor_id ?: $product->created_by ?: null;
                 }
-                if (preg_match('/বাইরে[^\d\x{09E6}-\x{09EF}]*([\d\x{09E6}-\x{09EF}]+)/iu', $deliveryInfoRaw, $m2)) {
-                    $outsideDhakaCharge = str_replace($bnNum, $enNum, $m2[1]);
+                $shippingSettingObj = null;
+                if ($ownerId) {
+                    $shippingSettingObj = \App\Models\BasicShippingSetting::where('user_id', $ownerId)->first();
+                }
+                if (!$shippingSettingObj) {
+                    $shippingSettingObj = \App\Models\BasicShippingSetting::first();
+                }
+                if ($shippingSettingObj && isset($shippingSettingObj->shipping_options)) {
+                    $opts = $shippingSettingObj->shipping_options;
+                    foreach ($opts as $k => $o) {
+                        if (strpos($k, 'inside') !== false || strpos(strtolower($o['name'] ?? ''), 'ভিতরে') !== false) {
+                            $insideDhakaCharge = $o['cost'] ?? null;
+                        } elseif (strpos($k, 'outside') !== false || strpos(strtolower($o['name'] ?? ''), 'বাইরে') !== false) {
+                            $outsideDhakaCharge = $o['cost'] ?? null;
+                        }
+                    }
                 }
 
                 // Format charge display string
-                if ($insideDhakaCharge && $outsideDhakaCharge) {
+                if ($insideDhakaCharge !== null && $outsideDhakaCharge !== null) {
                     $deliveryChargeText = "৳ {$insideDhakaCharge} / ৳ {$outsideDhakaCharge}";
-                } elseif ($insideDhakaCharge) {
+                } elseif ($insideDhakaCharge !== null) {
                     $deliveryChargeText = "৳ {$insideDhakaCharge}";
                 } else {
                     $deliveryChargeText = "৳ " . setting($vendorPrefix . 'general', 'delivery_charge', '85');

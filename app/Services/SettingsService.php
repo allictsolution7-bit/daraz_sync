@@ -15,9 +15,28 @@ class SettingsService
     public static function initialize()
     {
         if (!self::$initialized) {
-            self::$settings = SiteSetting::all()->groupBy('group')->map(function ($group) {
-                return $group->pluck('value', 'key')->toArray();
-            })->toArray();
+            $rawSettings = SiteSetting::all();
+            
+            // Map settings into groups, strip the vendor_{id}_ prefix for in-memory access if it matches the current user
+            $userId = auth()->id();
+            $vendorPrefix = $userId ? 'vendor_' . $userId . '_' : '';
+            
+            $settingsGrouped = [];
+            foreach ($rawSettings as $s) {
+                $group = $s->group;
+                if ($userId && strpos($group, 'vendor_') === 0) {
+                    // Check if it belongs to the current user
+                    if (strpos($group, $vendorPrefix) === 0) {
+                        $group = substr($group, strlen($vendorPrefix));
+                    } else {
+                        // Skip other users' settings in this session's memory
+                        continue;
+                    }
+                }
+                $settingsGrouped[$group][$s->key] = $s->value;
+            }
+            
+            self::$settings = $settingsGrouped;
             self::$initialized = true;
         }
     }
@@ -54,8 +73,14 @@ class SettingsService
      */
     public static function set($group, $key, $value)
     {
+        $userId = auth()->id();
+        $dbGroup = $group;
+        if ($userId && strpos($group, 'vendor_') !== 0) {
+            $dbGroup = 'vendor_' . $userId . '_' . $group;
+        }
+        
         $setting = SiteSetting::updateOrCreate(
-            ['group' => $group, 'key' => $key],
+            ['group' => $dbGroup, 'key' => $key],
             ['value' => $value]
         );
 

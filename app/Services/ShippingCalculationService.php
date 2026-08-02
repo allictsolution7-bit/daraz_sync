@@ -49,8 +49,20 @@ class ShippingCalculationService
             }
         }
 
-        // Step 3: Fall back to global basic shipping settings
-        return $this->getGlobalShipping($subtotal);
+        // Step 3: Fall back to global basic shipping settings (scoped to product owner/vendor)
+        $userId = null;
+        if ($context && isset($context->vendor_id)) {
+            $userId = $context->vendor_id ?: (isset($context->created_by) ? $context->created_by : null);
+        } elseif (!empty($items)) {
+            $firstItem = reset($items);
+            if (isset($firstItem['product_id'])) {
+                $p = Product::find($firstItem['product_id']);
+                if ($p) {
+                    $userId = $p->vendor_id ?: $p->created_by ?: null;
+                }
+            }
+        }
+        return $this->getGlobalShipping($subtotal, $userId);
     }
 
     /**
@@ -93,7 +105,17 @@ class ShippingCalculationService
             }
         }
 
-        return $this->getGlobalShipping($subtotal);
+        $userId = null;
+        if (!empty($items)) {
+            $firstItem = reset($items);
+            if (isset($firstItem['product_id'])) {
+                $p = Product::find($firstItem['product_id']);
+                if ($p) {
+                    $userId = $p->vendor_id ?: $p->created_by ?: null;
+                }
+            }
+        }
+        return $this->getGlobalShipping($subtotal, $userId);
     }
 
     /**
@@ -101,92 +123,66 @@ class ShippingCalculationService
      */
     private function processRule($rule, $subtotal, $items)
     {
+        // Check conditions
+        if ($rule->conditions) {
+            foreach ($rule->conditions as $cond) {
+                if (!$this->checkCondition($cond, $subtotal, $items)) {
+                    return null;
+                }
+            }
+        }
+
+        // Apply rule action
         switch ($rule->rule_type) {
             case BasicShippingRule::RULE_TYPE_OVERRIDE:
                 return [
-                    'cost' => 0,
-                    'method' => 'Free shipping (override)',
-                    'rules_applied' => [$rule->id => $rule->rule_type]
-                ];
-
-            case BasicShippingRule::RULE_TYPE_FREE_SHIPPING:
-                if ($subtotal >= $rule->free_shipping_threshold) {
-                    return [
-                        'cost' => 0,
-                        'method' => 'Free shipping (threshold met)',
-                        'rules_applied' => [$rule->id => $rule->rule_type]
-                    ];
-                } else {
-                    // Return the fallback cost when threshold is not met
-                    return [
-                        'cost' => $rule->rule_value ?? 0,
-                        'method' => 'Shipping cost (threshold not met)',
-                        'rules_applied' => [$rule->id => $rule->rule_type]
-                    ];
-                }
-
-            case BasicShippingRule::RULE_TYPE_CUSTOM_COST:
-                return [
                     'cost' => $rule->rule_value,
-                    'method' => 'Custom shipping cost',
-                    'rules_applied' => [$rule->id => $rule->rule_type]
+                    'method' => 'Rule override cost',
+                    'rules_applied' => [$rule->id]
                 ];
-
             case BasicShippingRule::RULE_TYPE_PERCENTAGE:
-                $cost = ($subtotal * $rule->rule_value) / 100;
                 return [
-                    'cost' => $cost,
-                    'method' => 'Percentage-based shipping',
-                    'rules_applied' => [$rule->id => $rule->rule_type]
+                    'cost' => ($subtotal * $rule->rule_value) / 100,
+                    'method' => 'Rule percentage cost',
+                    'rules_applied' => [$rule->id]
                 ];
-
-            case BasicShippingRule::RULE_TYPE_CONDITIONAL:
-                if ($this->evaluateConditions($rule->conditions, $subtotal, $items)) {
-                    return [
-                        'cost' => $rule->rule_value ?? 0,
-                        'method' => 'Conditional shipping',
-                        'rules_applied' => [$rule->id => $rule->rule_type]
-                    ];
-                }
-                break;
+            // Add more actions as needed
         }
 
-        return null; // Rule didn't apply, try next rule
+        return null;
     }
 
     /**
-     * Evaluate conditional rules.
+     * Check individual condition.
      */
-    private function evaluateConditions($conditions, $subtotal, $items)
+    private function checkCondition($cond, $subtotal, $items)
     {
-        if (!$conditions) {
-            return true;
-        }
+        $type = $cond['type'] ?? '';
+        $operator = $cond['operator'] ?? '=';
+        $value = $cond['value'] ?? '';
 
-        // Example conditions evaluation
-        foreach ($conditions as $condition => $value) {
-            switch ($condition) {
-                case 'min_quantity':
-                    $totalQuantity = array_sum(array_column($items, 'quantity'));
-                    if ($totalQuantity < $value) {
-                        return false;
-                    }
-                    break;
+        // Add actual check implementation
+        switch ($type) {
+            case 'total_items':
+                $totalQuantity = array_sum(array_column($items, 'quantity'));
+                if ($totalQuantity < $value) {
+                    return false;
+                }
+                break;
 
-                case 'min_amount':
-                    if ($subtotal < $value) {
-                        return false;
-                    }
-                    break;
+            case 'min_amount':
+                if ($subtotal < $value) {
+                    return false;
+                }
+                break;
 
-                case 'max_items':
-                    if (count($items) > $value) {
-                        return false;
-                    }
-                    break;
+            case 'max_items':
+                if (count($items) > $value) {
+                    return false;
+                }
+                break;
 
-                // Add more conditions as needed
-            }
+            // Add more conditions as needed
         }
 
         return true;
@@ -195,16 +191,27 @@ class ShippingCalculationService
     /**
      * Get global shipping cost from BasicShippingSetting.
      */
-    private function getGlobalShipping($subtotal)
+    private function getGlobalShipping($subtotal, $userId = null)
     {
-        $shippingSetting = BasicShippingSetting::first() ?? new BasicShippingSetting([
-            'flat_rate' => 80.00,
-            'shipping_options' => [
-                'inside_dhaka' => ['name' => 'Inside Dhaka', 'cost' => 80.00, 'active' => true, 'position' => 1],
-                'outside_dhaka' => ['name' => 'Outside Dhaka', 'cost' => 110.00, 'active' => true, 'position' => 2],
-            ],
-            'free_shipping_threshold' => 1500.00,
-        ]);
+        $query = BasicShippingSetting::query();
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->whereNull('user_id');
+        }
+        $shippingSetting = $query->first();
+
+        // Fallback to first settings or defaults if scoped row not set
+        if (!$shippingSetting) {
+            $shippingSetting = BasicShippingSetting::first() ?? new BasicShippingSetting([
+                'flat_rate' => 80.00,
+                'shipping_options' => [
+                    'inside_dhaka' => ['name' => 'Inside Dhaka', 'cost' => 80.00, 'active' => true, 'position' => 1],
+                    'outside_dhaka' => ['name' => 'Outside Dhaka', 'cost' => 110.00, 'active' => true, 'position' => 2],
+                ],
+                'free_shipping_threshold' => 1500.00,
+            ]);
+        }
 
         // Filter active shipping options and sort by position
         $activeShippingOptions = array_filter($shippingSetting->shipping_options ?? [], fn($option) => $option['active'] ?? false);
@@ -250,8 +257,37 @@ class ShippingCalculationService
             }
         }
 
-        // Otherwise return global options
-        $shippingSetting = BasicShippingSetting::first();
+        // Retrieve product creator / vendor ID to load appropriate settings options
+        $userId = null;
+        if ($context) {
+            if ($context instanceof Product) {
+                $userId = $context->vendor_id ?: $context->created_by ?: null;
+            } elseif (isset($context->vendor_id)) {
+                $userId = $context->vendor_id ?: (isset($context->created_by) ? $context->created_by : null);
+            }
+        } elseif (!empty($this->cartItems)) {
+            $firstItem = reset($this->cartItems);
+            if (isset($firstItem['product_id'])) {
+                $p = Product::find($firstItem['product_id']);
+                if ($p) {
+                    $userId = $p->vendor_id ?: $p->created_by ?: null;
+                }
+            }
+        }
+
+        $query = BasicShippingSetting::query();
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->whereNull('user_id');
+        }
+        $shippingSetting = $query->first();
+
+        // Fallback to first available setting row if vendor setting row is empty
+        if (!$shippingSetting) {
+            $shippingSetting = BasicShippingSetting::first();
+        }
+
         if ($shippingSetting && $shippingSetting->shipping_options) {
             $activeOptions = array_filter($shippingSetting->shipping_options, fn($option) => $option['active'] ?? false);
             uasort($activeOptions, fn($a, $b) => ($a['position'] ?? 999) <=> ($b['position'] ?? 999));
