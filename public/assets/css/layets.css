@@ -296,6 +296,8 @@ img.user-email {
 
 .left-menu.hide {
     width: 0;
+    box-shadow: none !important;
+    overflow: hidden !important;
 }
 
 nav.animated {

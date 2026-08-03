@@ -603,17 +603,17 @@
                     </div>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <!-- Package Details -->
-                        <div class="package-details-card d-flex align-items-center gap-3 px-3 py-2 bg-white bg-opacity-10 rounded-3 text-white" style="backdrop-filter: blur(5px); font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.15);">
+                        <div class="package-details-card d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 gap-sm-3 px-3 py-2 bg-white bg-opacity-10 rounded-3 text-white" style="backdrop-filter: blur(5px); font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.15);">
                             <div class="d-flex align-items-center gap-2">
                                 <span style="color: #c7d2fe; font-weight: 500; font-size: 0.75rem;">Plan:</span>
                                 <span class="fw-bold" style="font-size: 0.8rem;">Enterprise Package</span>
                             </div>
-                            <div style="width: 1px; height: 16px; background: rgba(255,255,255,0.25);"></div>
+                            <div class="d-none d-sm-block" style="width: 1px; height: 16px; background: rgba(255,255,255,0.25);"></div>
                             <div class="d-flex align-items-center gap-2">
                                 <span style="color: #c7d2fe; font-weight: 500; font-size: 0.75rem;">Expires:</span>
                                 <span class="fw-bold" style="font-size: 0.8rem;">Dec 31, 2026</span>
                             </div>
-                            <a href="{{ route('admin.users', ['view' => 'packages']) }}" class="btn btn-sm btn-light fw-bold text-indigo-900 px-3 ms-1" style="border-radius: 6px; color: #1e1b4b; background-color: #ffffff; transition: transform 0.2s; font-size: 0.75rem; height: 26px; padding: 0 10px; display: inline-flex; align-items: center; text-decoration: none;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">Renew Plan</a>
+                            <a href="{{ route('admin.users', ['view' => 'packages']) }}" class="btn btn-sm btn-light fw-bold text-indigo-900 px-3 ms-sm-1 mt-1 mt-sm-0" style="border-radius: 6px; color: #1e1b4b; background-color: #ffffff; transition: transform 0.2s; font-size: 0.75rem; height: 26px; padding: 0 10px; display: inline-flex; align-items: center; text-decoration: none;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">Renew Plan</a>
                         </div>
 
                         <!-- System Status & Clock -->

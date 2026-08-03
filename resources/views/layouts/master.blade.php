@@ -984,6 +984,7 @@
                 top: 65px !important;
                 height: calc(100vh - 65px) !important;
                 padding-bottom: 20px !important;
+                z-index: 1050 !important;
             }
             .sidebar-footer {
                 display: none !important;
@@ -2549,6 +2550,41 @@
             height: 4px !important;
             border-radius: 0 0 16px 16px !important;
             overflow: hidden !important;
+        }
+
+        /* Mobile styling for notifications (fl-flasher and toastr) */
+        @media (max-width: 768px) {
+            .fl-wrapper,
+            #toast-container {
+                top: 10px !important;
+                right: 10px !important;
+                width: 280px !important;
+            }
+            .fl-wrapper[data-position],
+            .fl-wrapper[data-position^=top-],
+            .fl-wrapper[data-position^=bottom-] {
+                top: 10px !important;
+                right: 10px !important;
+            }
+            .fl-wrapper .fl-flasher,
+            #toast-container > div {
+                padding: 10px 12px !important;
+                border-radius: 10px !important;
+            }
+            .fl-wrapper .fl-flasher .fl-icon {
+                font-size: 20px !important;
+            }
+            .fl-wrapper .fl-flasher .fl-content {
+                gap: 10px !important;
+            }
+            .fl-wrapper .fl-flasher .fl-title,
+            #toast-container .toast-title {
+                font-size: 14px !important;
+            }
+            .fl-wrapper .fl-flasher .fl-message,
+            #toast-container .toast-message {
+                font-size: 12px !important;
+            }
         }
     </style>
 
