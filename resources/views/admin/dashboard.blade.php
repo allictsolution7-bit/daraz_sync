@@ -522,16 +522,24 @@
         }
 
         @media (max-width: 576px) {
+            .content-wrapper {
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+            }
             .container-fluid {
                 padding-left: 8px !important;
                 padding-right: 8px !important;
+                max-width: 100% !important;
+                overflow-x: hidden !important;
             }
             .kpi-container,
             .status-matrix-grid {
                 grid-template-columns: 1fr !important;
+                max-width: 100% !important;
             }
             .matrix-card {
                 padding: 12px !important;
+                max-width: 100% !important;
             }
             .range-selector-container {
                 display: flex;
@@ -545,6 +553,8 @@
             }
             .analytics-card {
                 padding: 16px !important;
+                max-width: 100% !important;
+                overflow: hidden !important;
             }
             .analytics-card .row {
                 margin-left: 0 !important;
