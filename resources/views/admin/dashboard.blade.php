@@ -522,6 +522,17 @@
         }
 
         @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+            }
+            .kpi-container,
+            .status-matrix-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .matrix-card {
+                padding: 12px !important;
+            }
             .range-selector-container {
                 display: flex;
                 flex-wrap: wrap;
