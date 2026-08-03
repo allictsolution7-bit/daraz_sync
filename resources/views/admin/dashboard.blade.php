@@ -232,6 +232,7 @@
             height: 100%;
             text-decoration: none !important;
             color: inherit !important;
+            min-width: 0 !important;
         }
 
         .kpi-card:hover {
@@ -346,6 +347,7 @@
             text-align: left;
             text-decoration: none !important;
             color: inherit !important;
+            min-width: 0 !important;
         }
 
         .matrix-card:hover {
@@ -540,6 +542,15 @@
             .matrix-card {
                 padding: 12px !important;
                 max-width: 100% !important;
+                min-width: 0 !important;
+            }
+            .matrix-right {
+                min-width: 0 !important;
+                flex-grow: 1;
+            }
+            .matrix-label {
+                white-space: normal !important;
+                word-break: break-word !important;
             }
             .range-selector-container {
                 display: flex;
