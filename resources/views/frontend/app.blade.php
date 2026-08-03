@@ -5122,7 +5122,7 @@
             transition: all 0.3s;
         }
         .social-icon:hover {
-            background-color: #1d4ed8;
+            background-color: var(--primary-color, #f97316);
             transform: translateY(-3px);
         }
 
@@ -5141,7 +5141,7 @@
             left: 0;
             width: 40px;
             height: 2px;
-            background-color: #1d4ed8;
+            background-color: var(--primary-color, #f97316);
         }
 
         .footer-links {
@@ -5168,7 +5168,7 @@
         }
 
         .footer-link:hover {
-            color: #60a5fa;
+            color: var(--primary-color, #f97316);
             transform: translateX(5px);
         }
 
@@ -5392,9 +5392,9 @@
                 </div>
             </div>
 
-            <!-- Column 2: DAD -->
+            <!-- Column 2: Information -->
             <div class="footer-column">
-                <h4 class="footer-heading">DAD</h4>
+                <h4 class="footer-heading">Information</h4>
                 <div class="footer-links">
                     <a href="{{ url('/p/terms-conditions') }}" class="footer-link">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -5419,9 +5419,9 @@
                 </div>
             </div>
 
-            <!-- Column 3: ASDASD -->
+            <!-- Column 3: Customer Care -->
             <div class="footer-column">
-                <h4 class="footer-heading">ASDASD</h4>
+                <h4 class="footer-heading">Customer Care</h4>
                 <div class="footer-links">
                     <a href="{{ url('/user/dashboard') }}" class="footer-link">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -5451,9 +5451,9 @@
                 </div>
             </div>
 
-            <!-- Column 4: ASDASD -->
+            <!-- Column 4: Categories -->
             <div class="footer-column">
-                <h4 class="footer-heading">ASDASD</h4>
+                <h4 class="footer-heading">Categories</h4>
                 <div class="footer-links">
                     <a href="{{ url('/shop/watches') }}" class="footer-link">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
