@@ -325,6 +325,7 @@ class ProductController extends Controller
                 'combinations.*.offer_price' => 'nullable|numeric|min:0',
                 'combinations.*.product_cost' => 'nullable|numeric|min:0',
                 'combinations.*.wholesale_price' => 'nullable|numeric|min:0',
+                'combinations.*.reseller_price' => 'nullable|numeric|min:0',
                 'combinations.*.stock_quantity' => 'nullable|numeric|min:0',
                 'combinations.*.short_description' => 'nullable|string|max:1000',
                 'combinations.*.featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,avif|max:15360',
@@ -396,6 +397,7 @@ class ProductController extends Controller
             'offer' => $request->input('offer'),
             'product_cost' => $request->input('product_cost'),
             'wholesale_price' => $request->input('wholesale_price'),
+            'reseller_price' => $request->input('reseller_price'),
             'quantity' => $request->input('quantity'),
             'weight' => $request->input('weight', 0.5),
             'status' => $request->input('status'),
@@ -755,6 +757,10 @@ class ProductController extends Controller
                 $combinationData['wholesale_price'] = floatval($customData['wholesale_price']);
             }
             
+            if (isset($customData['reseller_price']) && is_numeric($customData['reseller_price'])) {
+                $combinationData['reseller_price'] = floatval($customData['reseller_price']);
+            }
+            
             // Handle stock_quantity: if provided (even as empty string), set to 0 if empty/null
             if (isset($customData['stock_quantity'])) {
                 if ($customData['stock_quantity'] === '' || $customData['stock_quantity'] === null) {
@@ -963,6 +969,7 @@ class ProductController extends Controller
                 'offer_price' => $combinationData['offer_price'] ?? null,
                 'product_cost' => $combinationData['product_cost'] ?? null,
                 'wholesale_price' => $combinationData['wholesale_price'] ?? null,
+                'reseller_price' => $combinationData['reseller_price'] ?? null,
                 'stock_quantity' => $combinationData['stock_quantity'] ?? 0,
                 'short_description' => $combinationData['short_description'] ?? null,
             ];
@@ -1003,7 +1010,7 @@ class ProductController extends Controller
                 if ($existingCombination) {
                     // Only update fields that were actually provided
                     foreach ($data as $key => $value) {
-                        if ($value !== null || $key === 'offer_price' || $key === 'product_cost' || $key === 'wholesale_price') {
+                        if ($value !== null || $key === 'offer_price' || $key === 'product_cost' || $key === 'wholesale_price' || $key === 'reseller_price') {
                             $existingCombination->$key = $value;
                         }
                     }
@@ -1118,6 +1125,7 @@ class ProductController extends Controller
                 'combinations.*.offer_price' => 'nullable|numeric|min:0',
                 'combinations.*.product_cost' => 'nullable|numeric|min:0',
                 'combinations.*.wholesale_price' => 'nullable|numeric|min:0',
+                'combinations.*.reseller_price' => 'nullable|numeric|min:0',
                 'combinations.*.stock_quantity' => 'nullable|numeric|min:0',
                 'combinations.*.short_description' => 'nullable|string|max:1000',
                 'combinations.*.featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,avif|max:15360',
@@ -1214,6 +1222,7 @@ class ProductController extends Controller
             'offer' => $request->input('offer'),
             'product_cost' => $request->input('product_cost'),
             'wholesale_price' => $request->input('wholesale_price'),
+            'reseller_price' => $request->input('reseller_price'),
             'quantity' => $request->input('quantity'),
             'weight' => $request->input('weight', 0.5),
             'status' => $request->input('status'),

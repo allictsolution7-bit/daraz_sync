@@ -420,12 +420,13 @@
                             <div id="pricingFields" @if(in_array($product->product_type, ['variable','affiliate'])) style="display:none;" @endif>
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Regular Price</label>
+                                        <label class="form-label">Product Cost</label>
                                         <div class="input-group">
                                             <span class="input-group-text">৳</span>
-                                            <input type="number" class="form-control @error('old_price') is-invalid @enderror" id="oldPrice" name="old_price" step="0.01" value="{{ old('old_price', $product->old_price) }}" @if(!in_array($product->product_type, ['variable','affiliate'])) required @endif>
+                                            <input type="number" class="form-control @error('product_cost') is-invalid @enderror" id="productCost" name="product_cost" step="0.01" value="{{ old('product_cost', $product->product_cost) }}">
                                         </div>
-                                        @error('old_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        <div class="form-text">What you pay for this product</div>
+                                        @error('product_cost')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Sale Price</label>
@@ -439,13 +440,12 @@
                                 <div id="additionalPricingFields" @if(in_array($product->product_type, ['variable','affiliate'])) style="display:none;" @endif>
                                     <div class="row g-3 mb-3">
                                         <div class="col-md-6">
-                                            <label class="form-label">Product Cost</label>
+                                            <label class="form-label">Old Price</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">৳</span>
-                                                <input type="number" class="form-control @error('product_cost') is-invalid @enderror" id="productCost" name="product_cost" step="0.01" value="{{ old('product_cost', $product->product_cost) }}">
+                                                <input type="number" class="form-control @error('old_price') is-invalid @enderror" id="oldPrice" name="old_price" step="0.01" value="{{ old('old_price', $product->old_price) }}" @if(!in_array($product->product_type, ['variable','affiliate'])) required @endif>
                                             </div>
-                                            <div class="form-text">What you pay for this product</div>
-                                            @error('product_cost')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                            @error('old_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Wholesale Price</label>
@@ -455,6 +455,17 @@
                                             </div>
                                             <div class="form-text">Price for bulk/wholesale customers</div>
                                             @error('wholesale_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Reseller Price</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">৳</span>
+                                                <input type="number" class="form-control @error('reseller_price') is-invalid @enderror" id="resellerPrice" name="reseller_price" step="0.01" value="{{ old('reseller_price', $product->reseller_price) }}">
+                                            </div>
+                                            <div class="form-text">Price for resellers</div>
+                                            @error('reseller_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
                                     </div>
                                 </div>
@@ -602,6 +613,7 @@
                                                     <th>Offer Price (৳)</th>
                                                     <th>Product Cost (৳)</th>
                                                     <th>Wholesale Price (৳)</th>
+                                                    <th>Reseller Price (৳)</th>
                                                     <th>Stock</th>
                                                     <th>Description</th>
                                                     <th>Images</th>
@@ -619,6 +631,7 @@
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-offer-price" name="combinations[{{ $index }}][offer_price]" value="{{ $combination->offer_price }}" placeholder="Optional" style="width: 90px;"></td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-product-cost" name="combinations[{{ $index }}][product_cost]" value="{{ $combination->product_cost }}" placeholder="Cost" style="width: 90px;"></td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-wholesale-price" name="combinations[{{ $index }}][wholesale_price]" value="{{ $combination->wholesale_price }}" placeholder="Wholesale" style="width: 90px;"></td>
+                                                    <td><input type="number" step="0.01" min="0" class="form-control combination-reseller-price" name="combinations[{{ $index }}][reseller_price]" value="{{ $combination->reseller_price }}" placeholder="Reseller" style="width: 90px;"></td>
                                                     <td><input type="number" min="0" class="form-control combination-stock" name="combinations[{{ $index }}][stock_quantity]" value="{{ $combination->stock_quantity }}" placeholder="0" style="width: 70px;"></td>
                                                     <td><textarea class="form-control combination-description" name="combinations[{{ $index }}][short_description]" rows="2" placeholder="Brief description..." style="width: 200px; resize: vertical;">{{ $combination->short_description }}</textarea></td>
                                                     <td>
@@ -1158,6 +1171,7 @@
             <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][offer_price]" value="" placeholder="Optional" style="width: 90px;"></td>
             <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][product_cost]" value="" placeholder="Cost" style="width: 90px;"></td>
             <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][wholesale_price]" value="" placeholder="Wholesale" style="width: 90px;"></td>
+            <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][reseller_price]" value="" placeholder="Reseller" style="width: 90px;"></td>
             <td><input type="number" min="0" class="form-control" name="combinations[${currentIndex}][stock_quantity]" value="0" placeholder="0" style="width: 70px;"></td>
             <td><textarea class="form-control" name="combinations[${currentIndex}][short_description]" rows="2" placeholder="Brief description..." style="width: 200px; resize: vertical;"></textarea></td>
             <td>
@@ -1168,18 +1182,18 @@
             <input type="hidden" name="combinations[${currentIndex}][key]" value="${combinationKey}">
         </tr>`;
         tbody.insertAdjacentHTML('beforeend', rowHTML);
-    }
+     }
 
-    function createCombinationsTableStructure() {
+     function createCombinationsTableStructure() {
         const tableDiv = document.getElementById('combinationsTable');
         const variations = document.querySelectorAll('.variation');
         const variationNames = [];
         variations.forEach(variation => { const nameInput = variation.querySelector('input[name*="[name]"]'); if (nameInput && nameInput.value.trim()) variationNames.push(nameInput.value.trim()); });
         let tableHTML = `<div class="table-responsive"><table class="table table-bordered table-striped"><thead class="table-dark"><tr><th>#</th>`;
         variationNames.forEach(name => tableHTML += `<th>${name}</th>`);
-        tableHTML += `<th>Regular Price (৳)</th><th>Offer Price (৳)</th><th>Product Cost (৳)</th><th>Wholesale Price (৳)</th><th>Stock</th><th>Description</th><th>Images</th><th>Actions</th></tr></thead><tbody></tbody></table></div>`;
+        tableHTML += `<th>Regular Price (৳)</th><th>Offer Price (৳)</th><th>Product Cost (৳)</th><th>Wholesale Price (৳)</th><th>Reseller Price (৳)</th><th>Stock</th><th>Description</th><th>Images</th><th>Actions</th></tr></thead><tbody></tbody></table></div>`;
         tableDiv.innerHTML = tableHTML;
-    }
+     }
 
     function deleteNewCombination(button) {
         if (confirm('Delete this combination?')) { button.closest('tr').remove(); reindexCombinations(); updateCombinationsCount(); }

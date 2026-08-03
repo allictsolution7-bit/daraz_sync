@@ -764,9 +764,10 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="number" class="form-control" name="old_price" id="productOldPrice"
-                                                placeholder="Enter regular price" value="{{ old('old_price') }}" step="0.01" required>
-                                            <label for="productOldPrice">Regular Price</label>
+                                            <input type="number" class="form-control" name="product_cost" id="productCost"
+                                                placeholder="Enter product cost" value="{{ old('product_cost') }}" step="0.01">
+                                            <label for="productCost">Product Cost</label>
+                                            <div class="form-text">What you pay for this product</div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -780,10 +781,9 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-floating mb-3">
-                                            <input type="number" class="form-control" name="product_cost" id="productCost"
-                                                placeholder="Enter product cost" value="{{ old('product_cost') }}" step="0.01">
-                                            <label for="productCost">Product Cost</label>
-                                            <div class="form-text">What you pay for this product</div>
+                                            <input type="number" class="form-control" name="old_price" id="productOldPrice"
+                                                placeholder="Enter regular price" value="{{ old('old_price') }}" step="0.01" required>
+                                            <label for="productOldPrice">Old Price</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -792,6 +792,16 @@
                                                 placeholder="Enter wholesale price" value="{{ old('wholesale_price') }}" step="0.01">
                                             <label for="wholesalePrice">Wholesale Price</label>
                                             <div class="form-text">Price for bulk/wholesale customers</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" name="reseller_price" id="resellerPrice"
+                                                placeholder="Enter reseller price" value="{{ old('reseller_price') }}" step="0.01">
+                                            <label for="resellerPrice">Reseller Price</label>
+                                            <div class="form-text">Price for resellers</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1523,7 +1533,6 @@
                         <thead class="table-dark">
                             <tr>
                                 <th>#</th>`;
-
         variationNames.forEach(name => {
             tableHTML += `<th>${name}</th>`;
         });
@@ -1533,6 +1542,7 @@
                                 <th>Offer Price (৳)</th>
                                 <th>Product Cost (৳)</th>
                                 <th>Wholesale Price (৳)</th>
+                                <th>Reseller Price (৳)</th>
                                 <th>Stock</th>
                                 <th>Description</th>
                                 <th>Images</th>
@@ -1591,6 +1601,16 @@
                                name="combinations[${index}][wholesale_price]" 
                                value=""
                                placeholder="Wholesale"
+                               style="width: 90px;">
+                    </td>
+                    <td>
+                        <input type="number" 
+                               step="0.01" 
+                               min="0" 
+                               class="form-control combination-reseller-price" 
+                               name="combinations[${index}][reseller_price]" 
+                               value=""
+                               placeholder="Reseller"
                                style="width: 90px;">
                     </td>
                     <td>

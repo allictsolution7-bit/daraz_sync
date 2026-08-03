@@ -118,6 +118,7 @@ class Product extends Model
         'offer',
         'product_cost',
         'wholesale_price',
+        'reseller_price',
         'status',
         'quantity',
         'weight',
@@ -158,6 +159,7 @@ class Product extends Model
         'offer' => 'decimal:2',
         'product_cost' => 'decimal:2',
         'wholesale_price' => 'decimal:2',
+        'reseller_price' => 'decimal:2',
         'views_total' => 'integer',
         'views_unique' => 'integer',
         // Vendor casts
