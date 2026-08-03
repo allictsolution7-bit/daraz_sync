@@ -755,6 +755,8 @@
                         </div>
                         <button type="button" class="btn btn-perm-tool select-all-perms"><i class="fas fa-check-double mr-1"></i> Select all</button>
                         <button type="button" class="btn btn-perm-tool clear-all-perms"><i class="fas fa-times mr-1"></i> Clear</button>
+                        <button type="button" class="btn btn-perm-tool copy-perms"><i class="fas fa-copy mr-1"></i> Copy (Export)</button>
+                        <button type="button" class="btn btn-perm-tool paste-perms"><i class="fas fa-paste mr-1"></i> Paste (Import)</button>
                         <button type="button" class="btn btn-perm-tool expand-all"><i class="fas fa-chevron-down mr-1"></i> Expand</button>
                         <button type="button" class="btn btn-perm-tool collapse-all"><i class="fas fa-chevron-up mr-1"></i> Collapse</button>
                     </div>
