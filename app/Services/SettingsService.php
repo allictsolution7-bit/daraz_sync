@@ -8,17 +8,18 @@ class SettingsService
 {
     private static $settings = null;
     private static $initialized = false;
+    private static $initializedUserId = null;
 
     /**
      * Initialize settings - load all settings from database once
      */
     public static function initialize()
     {
-        if (!self::$initialized) {
+        $userId = auth()->id();
+        if (!self::$initialized || self::$initializedUserId !== $userId) {
             $rawSettings = SiteSetting::all();
             
             // Map settings into groups, strip the vendor_{id}_ prefix for in-memory access if it matches the current user
-            $userId = auth()->id();
             $vendorPrefix = $userId ? 'vendor_' . $userId . '_' : '';
             
             $settingsGrouped = [];
@@ -38,6 +39,7 @@ class SettingsService
             
             self::$settings = $settingsGrouped;
             self::$initialized = true;
+            self::$initializedUserId = $userId;
         }
     }
 

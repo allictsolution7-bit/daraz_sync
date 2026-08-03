@@ -480,6 +480,74 @@
             font-weight: 600 !important;
             padding: 10px 24px !important;
         }
+
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 576px) {
+            .dashboard-container {
+                padding: 10px 8px !important;
+            }
+            .modern-card {
+                padding: 12px 10px !important;
+                margin-bottom: 12px !important;
+                border-radius: 8px !important;
+            }
+            .table-responsive-wrapper {
+                padding: 8px !important;
+                border-radius: 8px !important;
+            }
+            
+            /* Header fonts */
+            .page-title {
+                font-size: 1.15rem !important;
+            }
+            .page-subtitle {
+                font-size: 0.75rem !important;
+            }
+            .page-header-block {
+                margin-bottom: 0.75rem !important;
+                gap: 8px !important;
+            }
+
+            /* Action Buttons 2-column Grid */
+            .left-actions {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 6px !important;
+                width: 100% !important;
+            }
+            .left-actions .btn-modern {
+                height: 34px !important;
+                padding: 0 8px !important;
+                font-size: 11px !important;
+                border-radius: 6px !important;
+                width: 100% !important;
+            }
+            
+            /* Datatables filters and buttons */
+            .dataTables_wrapper .dataTables_filter {
+                margin-bottom: 1rem !important;
+            }
+            .dataTables_wrapper .dataTables_filter input {
+                width: 100% !important;
+                font-size: 12px !important;
+                height: 34px !important;
+                padding: 0 10px !important;
+            }
+            .dataTables_wrapper .dt-buttons {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 4px !important;
+                margin-bottom: 0.75rem !important;
+                width: 100% !important;
+            }
+            .dt-button-modern {
+                padding: 6px 4px !important;
+                font-size: 11px !important;
+                border-radius: 6px !important;
+                text-align: center !important;
+                width: 100% !important;
+            }
+        }
     </style>
 @endsection
 

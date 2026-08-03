@@ -528,6 +528,108 @@
         background: transparent !important;
         padding: 0 !important;
     }
+
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 576px) {
+        .d-flex.justify-content-between.align-items-center.mb-4 {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            padding: 12px !important;
+        }
+        .d-flex.justify-content-between.align-items-center.mb-4 h4 {
+            font-size: 1.15rem !important;
+            text-align: center !important;
+        }
+        .d-flex.justify-content-between.align-items-center.mb-4 .d-flex.align-items-center.gap-3 {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+        .d-flex.justify-content-between.align-items-center.mb-4 .d-flex.align-items-center.gap-3 a.btn {
+            font-size: 0.8rem !important;
+            padding: 6px 12px !important;
+            width: 100% !important;
+            text-align: center !important;
+        }
+        .modern-breadcrumb {
+            display: none !important; /* Hide breadcrumbs on small mobile to save space */
+        }
+        
+        /* Floating labels overflow and overlapping fixes */
+        .form-floating > label {
+            font-size: 11px !important;
+            padding: 12px 10px !important;
+            text-overflow: ellipsis !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+            width: 100% !important;
+        }
+        .form-floating > .form-control {
+            font-size: 13px !important;
+            height: 52px !important;
+            padding: 22px 10px 6px !important;
+        }
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            transform: scale(0.8) translateY(-0.75rem) translateX(0.15rem) !important;
+            width: auto !important;
+        }
+
+        /* Footer Action Panel */
+        .form-section.mt-4.d-flex.flex-wrap.justify-content-between.align-items-center {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 15px !important;
+            padding: 15px !important;
+        }
+        .form-section.mt-4.d-flex.flex-wrap.justify-content-between.align-items-center label {
+            font-size: 11px !important;
+        }
+        .form-section.mt-4.d-flex.flex-wrap.justify-content-between.align-items-center select {
+            font-size: 11px !important;
+            height: 36px !important;
+            padding: 4px 8px !important;
+            width: 130px !important;
+        }
+        .form-section.mt-4.d-flex.flex-wrap.justify-content-between.align-items-center > div:first-child {
+            width: 100% !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+        .form-section.mt-4.d-flex.flex-wrap.justify-content-between.align-items-center > div:last-child {
+            width: 100% !important;
+            display: flex !important;
+            gap: 8px !important;
+        }
+        .form-section.mt-4.d-flex.flex-wrap.justify-content-between.align-items-center > div:last-child a,
+        .form-section.mt-4.d-flex.flex-wrap.justify-content-between.align-items-center > div:last-child button {
+            flex: 1 !important;
+            text-align: center !important;
+            font-size: 11px !important;
+            padding: 6px 8px !important;
+            height: auto !important;
+            white-space: nowrap !important;
+        }
+
+        /* Modern Tabs Font and Size Reduction on Mobile */
+        .modern-tabs {
+            padding: 4px !important;
+            border-radius: 12px !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 4px !important;
+        }
+        .modern-tabs .nav-link {
+            font-size: 0.75rem !important;
+            padding: 6px 12px !important;
+            border-radius: 8px !important;
+            text-align: center !important;
+        }
+    }
 </style>
 @endsection
 
@@ -761,47 +863,40 @@
 
                             <!-- Pricing Fields -->
                             <div id="pricingFields">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <div class="form-floating">
                                             <input type="number" class="form-control" name="product_cost" id="productCost"
                                                 placeholder="Enter product cost" value="{{ old('product_cost') }}" step="0.01">
                                             <label for="productCost">Product Cost</label>
-                                            <div class="form-text">What you pay for this product</div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <div class="form-floating">
                                             <input type="number" class="form-control" name="offer" id="productOfferPrice"
                                                 placeholder="Enter sale price" value="{{ old('offer') }}" step="0.01">
-                                            <label for="productOfferPrice">Sale Price</label>
+                                            <label for="productOfferPrice">Sale Price ({{ \App\Services\SettingsService::get('single_product', 'sale_price_percent', 10) }}%)</label>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <div class="form-floating">
                                             <input type="number" class="form-control" name="old_price" id="productOldPrice"
                                                 placeholder="Enter regular price" value="{{ old('old_price') }}" step="0.01" required>
-                                            <label for="productOldPrice">Old Price</label>
+                                            <label for="productOldPrice">Old Price ({{ \App\Services\SettingsService::get('single_product', 'old_price_percent', 20) }}%)</label>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <div class="form-floating">
                                             <input type="number" class="form-control" name="wholesale_price" id="wholesalePrice"
                                                 placeholder="Enter wholesale price" value="{{ old('wholesale_price') }}" step="0.01">
-                                            <label for="wholesalePrice">Wholesale Price</label>
-                                            <div class="form-text">Price for bulk/wholesale customers</div>
+                                            <label for="wholesalePrice">Wholesale Price ({{ \App\Services\SettingsService::get('single_product', 'wholesale_price_percent', 2) }}%)</label>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <div class="form-floating">
                                             <input type="number" class="form-control" name="reseller_price" id="resellerPrice"
                                                 placeholder="Enter reseller price" value="{{ old('reseller_price') }}" step="0.01">
-                                            <label for="resellerPrice">Reseller Price</label>
-                                            <div class="form-text">Price for resellers</div>
+                                            <label for="resellerPrice">Reseller Price ({{ \App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5) }}%)</label>
                                         </div>
                                     </div>
                                 </div>
@@ -2468,6 +2563,65 @@
         if (isBookCheckbox && isBookCheckbox.checked) {
             toggleBookDetails();
         }
+    });
+
+    // Product pricing auto-calculation logic based on percentages
+    document.addEventListener('DOMContentLoaded', function() {
+        const pricingPercentages = {
+            sale: {{ \App\Services\SettingsService::get('single_product', 'sale_price_percent', 10) }},
+            old: {{ \App\Services\SettingsService::get('single_product', 'old_price_percent', 20) }},
+            wholesale: {{ \App\Services\SettingsService::get('single_product', 'wholesale_price_percent', 2) }},
+            reseller: {{ \App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5) }}
+        };
+
+        const productCostInput = document.getElementById('productCost');
+        const salePriceInput = document.getElementById('productOfferPrice');
+        const oldPriceInput = document.getElementById('productOldPrice');
+        const wholesalePriceInput = document.getElementById('wholesalePrice');
+        const resellerPriceInput = document.getElementById('resellerPrice');
+
+        if (productCostInput) {
+            productCostInput.addEventListener('input', function() {
+                const cost = parseFloat(this.value);
+                if (!isNaN(cost) && cost > 0) {
+                    if (salePriceInput) salePriceInput.value = (cost * (1 + pricingPercentages.sale / 100)).toFixed(2);
+                    if (oldPriceInput) oldPriceInput.value = (cost * (1 + pricingPercentages.old / 100)).toFixed(2);
+                    if (wholesalePriceInput) wholesalePriceInput.value = (cost * (1 + pricingPercentages.wholesale / 100)).toFixed(2);
+                    if (resellerPriceInput) resellerPriceInput.value = (cost * (1 + pricingPercentages.reseller / 100)).toFixed(2);
+                } else if (this.value === '') {
+                    if (salePriceInput) salePriceInput.value = '';
+                    if (oldPriceInput) oldPriceInput.value = '';
+                    if (wholesalePriceInput) wholesalePriceInput.value = '';
+                    if (resellerPriceInput) resellerPriceInput.value = '';
+                }
+            });
+        }
+
+        // Delegate listener for variation combination table cost inputs
+        document.addEventListener('input', function(e) {
+            if (e.target && e.target.classList.contains('combination-product-cost')) {
+                const tr = e.target.closest('tr');
+                if (tr) {
+                    const cost = parseFloat(e.target.value);
+                    const salePriceInRow = tr.querySelector('.combination-offer-price');
+                    const oldPriceInRow = tr.querySelector('.combination-regular-price');
+                    const wholesalePriceInRow = tr.querySelector('.combination-wholesale-price');
+                    const resellerPriceInRow = tr.querySelector('.combination-reseller-price');
+
+                    if (!isNaN(cost) && cost > 0) {
+                        if (salePriceInRow) salePriceInRow.value = (cost * (1 + pricingPercentages.sale / 100)).toFixed(2);
+                        if (oldPriceInRow) oldPriceInRow.value = (cost * (1 + pricingPercentages.old / 100)).toFixed(2);
+                        if (wholesalePriceInRow) wholesalePriceInRow.value = (cost * (1 + pricingPercentages.wholesale / 100)).toFixed(2);
+                        if (resellerPriceInRow) resellerPriceInRow.value = (cost * (1 + pricingPercentages.reseller / 100)).toFixed(2);
+                    } else if (e.target.value === '') {
+                        if (salePriceInRow) salePriceInRow.value = '';
+                        if (oldPriceInRow) oldPriceInRow.value = '';
+                        if (wholesalePriceInRow) wholesalePriceInRow.value = '';
+                        if (resellerPriceInRow) resellerPriceInRow.value = '';
+                    }
+                }
+            }
+        });
     });
 </script>
 @endsection

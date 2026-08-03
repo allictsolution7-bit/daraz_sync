@@ -649,6 +649,80 @@
         .search-form button i {
             font-size: 14px;
         }
+
+        /* Mobile Header Responsive Overrides */
+        @media (max-width: 768px) {
+            .search-bar {
+                display: none !important;
+            }
+            .header-container {
+                width: 100% !important;
+                left: 0 !important;
+            }
+            .header {
+                padding: 6px 12px !important;
+                min-height: 56px !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+            .header-left {
+                padding-left: 0 !important;
+                gap: 8px !important;
+            }
+            .admin-logo-wrapper img {
+                max-height: 28px !important;
+            }
+            .sidebarCollapse {
+                margin-left: 5px !important;
+            }
+            .navbar-item {
+                margin-left: auto !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                gap: 12px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-end !important;
+                width: auto !important;
+                flex: none !important;
+            }
+            .navbar-item .nav-item {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: auto !important;
+                flex: none !important;
+            }
+            .navbar-item .nav-link {
+                padding: 6px !important;
+                margin: 0 !important;
+                display: block !important;
+            }
+            .navbar-item .nav-link i {
+                font-size: 18px !important;
+            }
+
+            /* Reduce excessive margins & paddings on mobile view */
+            .content-wrapper {
+                padding: 12px 10px !important;
+                margin-left: 0 !important;
+            }
+            .container-fluid {
+                padding: 5px 4px !important;
+            }
+            .form-section {
+                padding: 16px 14px !important;
+                margin-bottom: 16px !important;
+                border-radius: 14px !important;
+            }
+            .row {
+                --bs-gutter-x: 10px !important;
+                --bs-gutter-y: 10px !important;
+            }
+            .tab-content {
+                margin-top: 1rem !important;
+            }
+        }
     </style>
     @yield('styles')
 </head>

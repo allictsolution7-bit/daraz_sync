@@ -154,6 +154,78 @@
         font-weight: 700;
         font-size: 0.95rem;
     }
+
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 576px) {
+        .page-header-card.d-flex.justify-content-between.align-items-center.mb-3 {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            padding: 12px !important;
+        }
+        .page-header-card.d-flex.justify-content-between.align-items-center.mb-3 h4 {
+            font-size: 1.15rem !important;
+            text-align: center !important;
+        }
+        .page-header-card.d-flex.justify-content-between.align-items-center.mb-3 a.btn {
+            font-size: 0.8rem !important;
+            padding: 6px 12px !important;
+            width: 100% !important;
+            text-align: center !important;
+        }
+        .modern-breadcrumb {
+            display: none !important; /* Hide breadcrumbs on small mobile to save space */
+        }
+
+        /* Sticky Action Bar responsive styles */
+        .sticky-action-bar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            padding: 12px !important;
+        }
+        .sticky-action-bar > .d-flex {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+        .sticky-action-bar > .d-flex > span.product-type-badge {
+            font-size: 0.75rem !important;
+            padding: 6px 12px !important;
+            justify-content: center !important;
+        }
+        .sticky-action-bar > .d-flex > select#status {
+            width: 100% !important;
+            height: 36px !important;
+            font-size: 0.75rem !important;
+            padding: 4px 8px !important;
+        }
+        .sticky-action-bar > button[type="submit"] {
+            width: 100% !important;
+            height: 36px !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            font-size: 0.75rem !important;
+        }
+
+        /* Modern Tabs Font and Size Reduction on Mobile */
+        .modern-tabs {
+            padding: 4px !important;
+            border-radius: 12px !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 4px !important;
+        }
+        .modern-tabs .nav-link {
+            font-size: 0.75rem !important;
+            padding: 6px 12px !important;
+            border-radius: 8px !important;
+            text-align: center !important;
+        }
+    }
 </style>
 @endsection
 
@@ -418,55 +490,46 @@
 
                             <!-- Pricing Fields -->
                             <div id="pricingFields" @if(in_array($product->product_type, ['variable','affiliate'])) style="display:none;" @endif>
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-12 col-sm-6 col-lg">
                                         <label class="form-label">Product Cost</label>
                                         <div class="input-group">
                                             <span class="input-group-text">৳</span>
                                             <input type="number" class="form-control @error('product_cost') is-invalid @enderror" id="productCost" name="product_cost" step="0.01" value="{{ old('product_cost', $product->product_cost) }}">
                                         </div>
-                                        <div class="form-text">What you pay for this product</div>
                                         @error('product_cost')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Sale Price</label>
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <label class="form-label">Sale Price ({{ \App\Services\SettingsService::get('single_product', 'sale_price_percent', 10) }}%)</label>
                                         <div class="input-group">
                                             <span class="input-group-text">৳</span>
                                             <input type="number" class="form-control @error('offer') is-invalid @enderror" id="offer" name="offer" step="0.01" value="{{ old('offer', $product->offer) }}">
                                         </div>
                                         @error('offer')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
-                                </div>
-                                <div id="additionalPricingFields" @if(in_array($product->product_type, ['variable','affiliate'])) style="display:none;" @endif>
-                                    <div class="row g-3 mb-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Old Price</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">৳</span>
-                                                <input type="number" class="form-control @error('old_price') is-invalid @enderror" id="oldPrice" name="old_price" step="0.01" value="{{ old('old_price', $product->old_price) }}" @if(!in_array($product->product_type, ['variable','affiliate'])) required @endif>
-                                            </div>
-                                            @error('old_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <label class="form-label">Old Price ({{ \App\Services\SettingsService::get('single_product', 'old_price_percent', 20) }}%)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">৳</span>
+                                            <input type="number" class="form-control @error('old_price') is-invalid @enderror" id="oldPrice" name="old_price" step="0.01" value="{{ old('old_price', $product->old_price) }}" @if(!in_array($product->product_type, ['variable','affiliate'])) required @endif>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Wholesale Price</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">৳</span>
-                                                <input type="number" class="form-control @error('wholesale_price') is-invalid @enderror" id="wholesalePrice" name="wholesale_price" step="0.01" value="{{ old('wholesale_price', $product->wholesale_price) }}">
-                                            </div>
-                                            <div class="form-text">Price for bulk/wholesale customers</div>
-                                            @error('wholesale_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                        </div>
+                                        @error('old_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
-                                    <div class="row g-3 mb-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Reseller Price</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">৳</span>
-                                                <input type="number" class="form-control @error('reseller_price') is-invalid @enderror" id="resellerPrice" name="reseller_price" step="0.01" value="{{ old('reseller_price', $product->reseller_price) }}">
-                                            </div>
-                                            <div class="form-text">Price for resellers</div>
-                                            @error('reseller_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <label class="form-label">Wholesale Price ({{ \App\Services\SettingsService::get('single_product', 'wholesale_price_percent', 2) }}%)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">৳</span>
+                                            <input type="number" class="form-control @error('wholesale_price') is-invalid @enderror" id="wholesalePrice" name="wholesale_price" step="0.01" value="{{ old('wholesale_price', $product->wholesale_price) }}">
                                         </div>
+                                        @error('wholesale_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <label class="form-label">Reseller Price ({{ \App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5) }}%)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">৳</span>
+                                            <input type="number" class="form-control @error('reseller_price') is-invalid @enderror" id="resellerPrice" name="reseller_price" step="0.01" value="{{ old('reseller_price', $product->reseller_price) }}">
+                                        </div>
+                                        @error('reseller_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
                             </div>
@@ -1388,6 +1451,65 @@
 
         allCheckboxes.forEach(checkbox => checkbox.addEventListener('change', updateSelectedCount));
         updateSelectedCount();
+    });
+
+    // Product pricing auto-calculation logic based on percentages
+    document.addEventListener('DOMContentLoaded', function() {
+        const pricingPercentages = {
+            sale: {{ \App\Services\SettingsService::get('single_product', 'sale_price_percent', 10) }},
+            old: {{ \App\Services\SettingsService::get('single_product', 'old_price_percent', 20) }},
+            wholesale: {{ \App\Services\SettingsService::get('single_product', 'wholesale_price_percent', 2) }},
+            reseller: {{ \App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5) }}
+        };
+
+        const productCostInput = document.getElementById('productCost');
+        const salePriceInput = document.getElementById('offer');
+        const oldPriceInput = document.getElementById('oldPrice');
+        const wholesalePriceInput = document.getElementById('wholesalePrice');
+        const resellerPriceInput = document.getElementById('resellerPrice');
+
+        if (productCostInput) {
+            productCostInput.addEventListener('input', function() {
+                const cost = parseFloat(this.value);
+                if (!isNaN(cost) && cost > 0) {
+                    if (salePriceInput) salePriceInput.value = (cost * (1 + pricingPercentages.sale / 100)).toFixed(2);
+                    if (oldPriceInput) oldPriceInput.value = (cost * (1 + pricingPercentages.old / 100)).toFixed(2);
+                    if (wholesalePriceInput) wholesalePriceInput.value = (cost * (1 + pricingPercentages.wholesale / 100)).toFixed(2);
+                    if (resellerPriceInput) resellerPriceInput.value = (cost * (1 + pricingPercentages.reseller / 100)).toFixed(2);
+                } else if (this.value === '') {
+                    if (salePriceInput) salePriceInput.value = '';
+                    if (oldPriceInput) oldPriceInput.value = '';
+                    if (wholesalePriceInput) wholesalePriceInput.value = '';
+                    if (resellerPriceInput) resellerPriceInput.value = '';
+                }
+            });
+        }
+
+        // Delegate listener for variation combination table cost inputs
+        document.addEventListener('input', function(e) {
+            if (e.target && e.target.classList.contains('combination-product-cost')) {
+                const tr = e.target.closest('tr');
+                if (tr) {
+                    const cost = parseFloat(e.target.value);
+                    const salePriceInRow = tr.querySelector('.combination-offer-price');
+                    const oldPriceInRow = tr.querySelector('.combination-regular-price');
+                    const wholesalePriceInRow = tr.querySelector('.combination-wholesale-price');
+                    const resellerPriceInRow = tr.querySelector('.combination-reseller-price');
+
+                    if (!isNaN(cost) && cost > 0) {
+                        if (salePriceInRow) salePriceInRow.value = (cost * (1 + pricingPercentages.sale / 100)).toFixed(2);
+                        if (oldPriceInRow) oldPriceInRow.value = (cost * (1 + pricingPercentages.old / 100)).toFixed(2);
+                        if (wholesalePriceInRow) wholesalePriceInRow.value = (cost * (1 + pricingPercentages.wholesale / 100)).toFixed(2);
+                        if (resellerPriceInRow) resellerPriceInRow.value = (cost * (1 + pricingPercentages.reseller / 100)).toFixed(2);
+                    } else if (e.target.value === '') {
+                        if (salePriceInRow) salePriceInRow.value = '';
+                        if (oldPriceInRow) oldPriceInRow.value = '';
+                        if (wholesalePriceInRow) wholesalePriceInRow.value = '';
+                        if (resellerPriceInRow) resellerPriceInRow.value = '';
+                    }
+                }
+            }
+        });
     });
 </script>
 @endsection
