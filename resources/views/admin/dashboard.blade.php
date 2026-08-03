@@ -519,6 +519,19 @@
             background: rgba(15, 23, 42, 0.02);
         }
 
+        @media (max-width: 576px) {
+            .range-selector-container {
+                display: flex;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+            .btn-range-modern {
+                flex: 1 1 auto;
+                padding: 8px 10px;
+                font-size: 0.75rem;
+            }
+        }
+
         .btn-action-modern {
             background: #ffffff;
             border: 1px solid #e2e8f0;
