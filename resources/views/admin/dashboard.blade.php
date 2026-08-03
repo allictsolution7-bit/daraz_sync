@@ -465,6 +465,8 @@
             padding: 24px;
             box-shadow: var(--shadow-md);
             margin-bottom: 24px;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .analytics-card-title {
@@ -529,6 +531,13 @@
                 flex: 1 1 auto;
                 padding: 8px 10px;
                 font-size: 0.75rem;
+            }
+            .analytics-card {
+                padding: 16px !important;
+            }
+            .analytics-card .row {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
             }
         }
 
