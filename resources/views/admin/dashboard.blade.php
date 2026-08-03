@@ -524,20 +524,16 @@
         }
 
         @media (max-width: 576px) {
-            .content-wrapper {
-                max-width: 100% !important;
-                overflow-x: hidden !important;
-            }
             .container-fluid {
                 padding-left: 8px !important;
                 padding-right: 8px !important;
-                max-width: 100% !important;
-                overflow-x: hidden !important;
             }
             .kpi-container,
             .status-matrix-grid {
                 grid-template-columns: 1fr !important;
-                max-width: 100% !important;
+                max-width: 94% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
             }
             .matrix-card {
                 padding: 12px !important;
@@ -551,6 +547,7 @@
             .matrix-label {
                 white-space: normal !important;
                 word-break: break-word !important;
+                font-size: 0.65rem !important;
             }
             .range-selector-container {
                 display: flex;
@@ -563,21 +560,50 @@
                 font-size: 0.75rem;
             }
             .analytics-card {
-                padding: 16px !important;
-                max-width: 100% !important;
-                overflow: hidden !important;
+                padding: 12px !important;
+                max-width: 94% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                margin-bottom: 16px !important;
+                border-radius: 12px !important;
             }
             .analytics-card .row {
                 margin-left: 0 !important;
                 margin-right: 0 !important;
             }
+            .analytics-card div[style*="height: 320px"] {
+                height: 180px !important;
+            }
+            .analytics-card div[style*="height: 250px"] {
+                height: 160px !important;
+            }
+            .analytics-card div[style*="height: 180px"] {
+                height: 130px !important;
+            }
+            .analytics-card-title {
+                font-size: 0.85rem !important;
+                margin-bottom: 12px !important;
+            }
+            .analytics-card-title small {
+                font-size: 0.65rem !important;
+            }
             .analytics-card .list-group-item {
                 flex-direction: column !important;
                 align-items: flex-start !important;
-                gap: 8px;
+                gap: 6px !important;
+                padding-top: 8px !important;
+                padding-bottom: 8px !important;
+            }
+            .analytics-card .list-group-item h6 {
+                font-size: 0.75rem !important;
+            }
+            .analytics-card .list-group-item small {
+                font-size: 0.65rem !important;
             }
             .analytics-card .list-group-item .badge {
                 align-self: flex-start !important;
+                font-size: 0.65rem !important;
+                padding: 3px 8px !important;
             }
         }
 
