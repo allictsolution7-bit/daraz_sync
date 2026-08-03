@@ -560,6 +560,14 @@
                 margin-left: 0 !important;
                 margin-right: 0 !important;
             }
+            .analytics-card .list-group-item {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px;
+            }
+            .analytics-card .list-group-item .badge {
+                align-self: flex-start !important;
+            }
         }
 
         .btn-action-modern {
@@ -905,7 +913,7 @@
                             <span>Throughput Dynamics</span>
                             <small class="text-muted" style="font-size: 0.75rem;">Data points processed per epoch</small>
                         </div>
-                        <div style="height: 320px; position: relative;">
+                        <div style="height: 320px; position: relative; width: 100%; max-width: 100%; overflow: hidden;">
                             <canvas id="velocityChart"></canvas>
                         </div>
                     </div>
@@ -917,7 +925,7 @@
                         </div>
                         <div class="row align-items-center">
                             <div class="col-md-7">
-                                <div style="height: 250px; position: relative;">
+                                <div style="height: 250px; position: relative; width: 100%; max-width: 100%; overflow: hidden;">
                                     <canvas id="statusShareChart"></canvas>
                                 </div>
                             </div>
@@ -937,7 +945,7 @@
                         <div class="analytics-card-title">
                             <span>Entity Registry Rate</span>
                         </div>
-                        <div style="height: 180px; position: relative;">
+                        <div style="height: 180px; position: relative; width: 100%; max-width: 100%; overflow: hidden;">
                             <canvas id="acquisitionTrendChart"></canvas>
                         </div>
                     </div>
@@ -947,7 +955,7 @@
                         <div class="analytics-card-title">
                             <span>Sector Utilization Matrix</span>
                         </div>
-                        <div style="height: 180px; position: relative;">
+                        <div style="height: 180px; position: relative; width: 100%; max-width: 100%; overflow: hidden;">
                             <canvas id="deptPerformanceChart"></canvas>
                         </div>
                     </div>
