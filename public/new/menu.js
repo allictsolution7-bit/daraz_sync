@@ -1,27 +1,35 @@
-
+document.addEventListener('DOMContentLoaded', function() {
     // Mobile Menu Toggle
-    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const mobileMenuToggles = document.querySelectorAll('.mobile-menu-toggle');
     const mobileMenu = document.querySelector('.mobile-menu');
     const overlay = document.querySelector('.overlay');
     const mobileMenuClose = document.querySelector('.mobile-menu-close');
 
-    mobileMenuToggle.addEventListener('click', function () {
-        mobileMenu.classList.add('active');
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
+    if (mobileMenu && overlay) {
+        mobileMenuToggles.forEach(toggle => {
+            toggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                mobileMenu.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
 
-    mobileMenuClose.addEventListener('click', function () {
-        mobileMenu.classList.remove('active');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    });
+        if (mobileMenuClose) {
+            mobileMenuClose.addEventListener('click', function (e) {
+                e.preventDefault();
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
 
-    overlay.addEventListener('click', function () {
-        mobileMenu.classList.remove('active');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    });
+        overlay.addEventListener('click', function () {
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
 
     // Submenu functionality
     const hasSubmenuLinks = document.querySelectorAll('.has-submenu');
@@ -31,13 +39,19 @@
         link.addEventListener('click', function (e) {
             e.preventDefault();
             const submenu = this.nextElementSibling;
-            submenu.classList.add('active');
+            if (submenu) {
+                submenu.classList.add('active');
+            }
         });
     });
 
     backBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
             const submenu = this.closest('.submenu');
-            submenu.classList.remove('active');
+            if (submenu) {
+                submenu.classList.remove('active');
+            }
         });
     });
+});
