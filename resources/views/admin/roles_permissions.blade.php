@@ -856,24 +856,60 @@
             modal.querySelectorAll('.collapse').forEach(el => $(el).collapse('hide'));
         }
         if (e.target.classList.contains('copy-perms') || e.target.closest('.copy-perms')) {
+            e.preventDefault();
             const permNames = Array.from(modal.querySelectorAll('.permission-checkbox:checked')).map(cb => cb.value);
             localStorage.setItem('copied_permissions', JSON.stringify(permNames));
+            if (permNames.length === 0) {
+                const msg = 'No permissions selected. Copied empty list.';
+                if (typeof toastr !== 'undefined' && typeof toastr.warning === 'function') {
+                    toastr.warning(msg);
+                } else {
+                    alert(msg);
+                }
+            } else {
+                const msg = `${permNames.length} permissions copied to clipboard.`;
+                if (typeof toastr !== 'undefined' && typeof toastr.success === 'function') {
+                    toastr.success(msg);
+                } else {
+                    alert(msg);
+                }
+            }
         }
         if (e.target.classList.contains('paste-perms') || e.target.closest('.paste-perms')) {
+            e.preventDefault();
             const stored = localStorage.getItem('copied_permissions');
             if (stored) {
                 const permNames = JSON.parse(stored);
                 modal.querySelectorAll('.permission-checkbox').forEach(cb => {
-                    cb.checked = permNames.includes(cb.value);
+                    const newValue = permNames.includes(cb.value);
+                    cb.checked = newValue;
+                    cb.dispatchEvent(new Event('change', { bubbles: true }));
                 });
                 modal.querySelectorAll('.permissions-group').forEach(card => {
                     const groupCheckbox = card.querySelector('.select-all-group');
                     if (groupCheckbox) {
                         const allCBs = card.querySelectorAll('.permission-checkbox');
                         const checkedCBs = card.querySelectorAll('.permission-checkbox:checked');
-                        groupCheckbox.checked = (allCBs.length > 0 && allCBs.length === checkedCBs.length);
+                        const newGroupValue = (allCBs.length > 0 && allCBs.length === checkedCBs.length);
+                        if (groupCheckbox.checked !== newGroupValue) {
+                            groupCheckbox.checked = newGroupValue;
+                            groupCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
                     }
                 });
+                const msg = `Successfully pasted ${permNames.length} permissions.`;
+                if (typeof toastr !== 'undefined' && typeof toastr.success === 'function') {
+                    toastr.success(msg);
+                } else {
+                    alert(msg);
+                }
+            } else {
+                const msg = 'No copied permissions found in clipboard.';
+                if (typeof toastr !== 'undefined' && typeof toastr.warning === 'function') {
+                    toastr.warning(msg);
+                } else {
+                    alert(msg);
+                }
             }
         }
     });
