@@ -535,17 +535,44 @@
             }
             .dataTables_wrapper .dt-buttons {
                 display: grid !important;
-                grid-template-columns: repeat(3, 1fr) !important;
+                grid-template-columns: repeat(4, 1fr) !important;
                 gap: 4px !important;
                 margin-bottom: 0.75rem !important;
                 width: 100% !important;
             }
             .dt-button-modern {
-                padding: 6px 4px !important;
-                font-size: 11px !important;
+                padding: 6px 2px !important;
+                font-size: 10px !important;
                 border-radius: 6px !important;
                 text-align: center !important;
                 width: 100% !important;
+            }
+
+            /* Table mobile optimizations */
+            table.dataTable tbody td {
+                padding: 8px 6px !important;
+                font-size: 0.75rem !important;
+            }
+            table.dataTable thead th {
+                padding: 8px 6px !important;
+                font-size: 0.7rem !important;
+            }
+            .product-thumbnail {
+                width: 32px !important;
+                height: 32px !important;
+                border-radius: 4px !important;
+            }
+            .action-btn {
+                width: 26px !important;
+                height: 26px !important;
+                font-size: 0.75rem !important;
+                border-radius: 6px !important;
+            }
+            .action-buttons-group {
+                gap: 0.2rem !important;
+            }
+            .price-modern {
+                font-size: 0.8rem !important;
             }
         }
     </style>
@@ -654,15 +681,15 @@
                 <thead>
                     <tr>
                         <th width="30"><input type="checkbox" class="custom-control-input" id="select-all-products"></th>
-                        <th>ID</th>
+                        <th class="d-none d-md-table-cell">ID</th>
                         <th>Product Title & Info</th>
                         <th>Preview</th>
-                        <th>Category Group</th>
-                        <th>Stock Type</th>
+                        <th class="d-none d-md-table-cell">Category Group</th>
+                        <th class="d-none d-md-table-cell">Stock Type</th>
                         <th>Price</th>
-                        <th>Product Views</th>
-                        <th>Visibility</th>
-                        <th>Date Added</th>
+                        <th class="d-none d-lg-table-cell">Product Views</th>
+                        <th class="d-none d-sm-table-cell">Visibility</th>
+                        <th class="d-none d-lg-table-cell">Date Added</th>
                         <th width="150">Operations</th>
                     </tr>
                 </thead>
@@ -719,7 +746,7 @@
                     { data: 'checkbox', orderable: false, searchable: false, render: function(data, type, row) {
                         return `<input type="checkbox" class="custom-control-input product-checkbox" value="${row.id}">`;
                     }},
-                    { data: 'id' },
+                    { data: 'id', className: 'd-none d-md-table-cell' },
                     { data: 'title', render: function(data) {
                         if (!data) return '<span class="text-muted">N/A</span>';
                         const maxLength = 40;
@@ -733,10 +760,10 @@
                         const url = path.startsWith('http') ? path : `{{ asset('storage') }}/${path}`;
                         return `<img src="${url}" class="product-thumbnail">`;
                     }},
-                    { data: 'category_display', render: function(data) {
+                    { data: 'category_display', className: 'd-none d-md-table-cell', render: function(data) {
                         return data || '<span class="text-muted">N/A</span>';
                     }},
-                    { data: 'product_type', render: function(data) {
+                    { data: 'product_type', className: 'd-none d-md-table-cell', render: function(data) {
                         const types = {
                             'simple': '<span class="badge-modern badge-simple"><i class="fas fa-cube"></i> Simple</span>',
                             'variable': '<span class="badge-modern badge-variable"><i class="fas fa-boxes"></i> Variable</span>',
@@ -757,16 +784,16 @@
                         
                         return `<span class="price-modern">TK ${price.toFixed(2)}</span>`;
                     }},
-                    { data: 'views', orderable: false, searchable: false, render: function(data) {
+                    { data: 'views', className: 'd-none d-lg-table-cell', orderable: false, searchable: false, render: function(data) {
                         if (!data) return '<span class="text-muted">0 / 0</span>';
                         return `<span class="views-display"><i class="far fa-eye views-icon"></i>${data}</span>`;
                     }},
-                    { data: 'status', render: function(data) {
+                    { data: 'status', className: 'd-none d-sm-table-cell', render: function(data) {
                         return data == 1 ? 
                             '<span class="status-badge-modern status-active-modern"><i class="fas fa-check-circle me-1"></i> Active</span>' : 
                             '<span class="status-badge-modern status-inactive-modern"><i class="fas fa-times-circle me-1"></i> Inactive</span>';
                     }},
-                    { data: 'created_at', render: function(data) {
+                    { data: 'created_at', className: 'd-none d-lg-table-cell', render: function(data) {
                         if (!data) return '<span class="text-muted">N/A</span>';
                         return new Date(data).toLocaleDateString('en-US', {
                             year: 'numeric',

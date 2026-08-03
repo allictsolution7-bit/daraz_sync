@@ -668,13 +668,20 @@
             }
             .header-left {
                 padding-left: 0 !important;
-                gap: 8px !important;
+                gap: 12px !important;
+                justify-content: flex-start !important;
+                width: auto !important;
             }
             .admin-logo-wrapper img {
                 max-height: 28px !important;
             }
             .sidebarCollapse {
-                margin-left: 5px !important;
+                margin-left: 0 !important;
+            }
+            #toggleSidebar {
+                order: -1 !important;
+                margin-left: 0 !important;
+                font-size: 18px !important;
             }
             .navbar-item {
                 margin-left: auto !important;

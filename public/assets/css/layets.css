@@ -239,19 +239,11 @@ img.user-email {
         font-size: 25px;
     }
 
-    #toggleSidebar {
-        display: none;
-    }
-
     .searchBar {
         display: none;
     }
 
     .search-bar {
-        display: none;
-    }
-
-    .ms-2 {
         display: none;
     }
 

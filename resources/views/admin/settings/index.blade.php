@@ -385,33 +385,40 @@
             align-items: center;
             width: auto;
             margin: 0;
-            padding: 5px 10px;
-            font-size: 11px;
+            padding: 4px 8px;
+            font-size: 10px;
             border-radius: 8px;
             flex-shrink: 0;
         }
 
+        .sidebar-tab i {
+            margin-right: 4px !important;
+            width: auto;
+        }
+
         .settings-content {
             width: 100%;
-            padding: 20px;
+            padding: 12px;
         }
     }
 
     @media (max-width: 768px) {
         .container-fluid {
-            padding: 10px;
+            padding: 6px !important;
         }
 
         .card-header {
             flex-direction: column;
             gap: 15px;
             align-items: flex-start !important;
-            padding: 15px !important;
+            padding: 6px 10px !important;
         }
 
         .save-button {
             width: 100%;
             justify-content: center;
+            padding: 4px 10px !important;
+            font-size: 10px !important;
         }
 
         /* Specific overrides to reduce main header height on mobile */
@@ -419,12 +426,12 @@
             flex-direction: row !important;
             justify-content: space-between !important;
             align-items: center !important;
-            padding: 8px 12px !important;
+            padding: 6px 10px !important;
             gap: 10px;
         }
 
         .card.shadow.mb-4 > .card-header h6 {
-            font-size: 13px !important;
+            font-size: 12px !important;
         }
 
         .card.shadow.mb-4 {
@@ -435,10 +442,18 @@
         }
 
         .card.shadow.mb-4 .save-button {
-            padding: 6px 12px;
-            font-size: 11px;
+            padding: 4px 10px !important;
+            font-size: 10px !important;
             width: auto;
             justify-content: center;
+        }
+
+        .tab-header {
+            padding-bottom: 6px !important;
+        }
+
+        .tab-title {
+            font-size: 15px !important;
         }
 
         .form-group.row {
