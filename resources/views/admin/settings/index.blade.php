@@ -350,35 +350,107 @@
     @media (max-width: 992px) {
         .settings-container {
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .settings-sidebar {
             width: 100%;
-            position: static;
+            position: sticky;
+            top: 105px;
             max-height: none;
+            z-index: 100;
+            padding: 6px 8px;
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            white-space: nowrap;
+            gap: 6px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            background: var(--bg-glass);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .settings-sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .settings-sidebar h6 {
+            display: none !important;
+        }
+
+        .sidebar-tab {
+            display: inline-flex;
+            align-items: center;
+            width: auto;
+            margin: 0;
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 8px;
+            flex-shrink: 0;
         }
 
         .settings-content {
             width: 100%;
-            padding: 25px;
+            padding: 20px;
         }
     }
 
     @media (max-width: 768px) {
         .container-fluid {
-            padding: 15px;
+            padding: 10px;
         }
 
         .card-header {
             flex-direction: column;
             gap: 15px;
             align-items: flex-start !important;
+            padding: 15px !important;
         }
 
         .save-button {
             width: 100%;
             justify-content: center;
+        }
+
+        /* Specific overrides to reduce main header height on mobile */
+        .card.shadow.mb-4 > .card-header {
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 8px 12px !important;
+            gap: 10px;
+        }
+
+        .card.shadow.mb-4 > .card-header h6 {
+            font-size: 13px !important;
+        }
+
+        .card.shadow.mb-4 {
+            position: sticky;
+            top: 60px;
+            z-index: 101;
+            margin-bottom: 12px !important;
+        }
+
+        .card.shadow.mb-4 .save-button {
+            padding: 6px 12px;
+            font-size: 11px;
+            width: auto;
+            justify-content: center;
+        }
+
+        .form-group.row {
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            flex-wrap: nowrap;
+        }
+        
+        .input-group .form-control {
+            min-width: 0;
         }
     }
 </style>
@@ -4444,6 +4516,9 @@
             if (targetTab && targetContent) {
                 targetTab.classList.add('active');
                 targetContent.classList.add('active');
+
+                // Scroll the tab into view horizontally on mobile
+                targetTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
                 // Reinitialize mobile nav sortable if mobile nav tab is clicked
                 if (tabId === 'mobile-nav') {
