@@ -593,7 +593,7 @@
 
         <!-- Edit User Roles Modal -->
         <div class="modal fade" id="editUserRolesModal{{ $user->id }}" tabindex="-1">
-            <div class="modal-dialog"><div class="modal-content">
+            <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
                 <form method="POST" action="{{ route('admin.roles_permissions.user_roles.update', $user) }}">
                     @csrf
                     <div class="modal-header modal-header-custom">

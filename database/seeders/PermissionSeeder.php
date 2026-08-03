@@ -91,6 +91,8 @@ class PermissionSeeder extends Seeder
         $super = Role::findOrCreate('super_admin', 'web');
         $super->givePermissionTo(Permission::all());
 
+        Role::findOrCreate('reseller', 'web');
+
         // Attach to existing admin users if present
         foreach ([
             'mdmahedihasan792@gmail.com',

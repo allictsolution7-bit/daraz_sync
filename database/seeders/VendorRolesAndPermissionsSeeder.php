@@ -29,6 +29,7 @@ class VendorRolesAndPermissionsSeeder extends Seeder
             'vendor',
             'vendor_staff',
             'customer',
+            'reseller',
         ];
 
         foreach ($roles as $roleName) {
