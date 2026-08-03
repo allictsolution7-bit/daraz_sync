@@ -518,6 +518,8 @@
                             </div>
                             <button type="button" class="btn btn-perm-tool select-all-perms"><i class="fas fa-check-double mr-1"></i> Select all</button>
                             <button type="button" class="btn btn-perm-tool clear-all-perms"><i class="fas fa-times mr-1"></i> Clear</button>
+                            <button type="button" class="btn btn-perm-tool copy-perms"><i class="fas fa-copy mr-1"></i> Copy (Export)</button>
+                            <button type="button" class="btn btn-perm-tool paste-perms"><i class="fas fa-paste mr-1"></i> Paste (Import)</button>
                             <button type="button" class="btn btn-perm-tool expand-all"><i class="fas fa-chevron-down mr-1"></i> Expand</button>
                             <button type="button" class="btn btn-perm-tool collapse-all"><i class="fas fa-chevron-up mr-1"></i> Collapse</button>
                         </div>
@@ -837,19 +839,40 @@
         const modal = e.target.closest('.modal-content');
         if (!modal) return;
 
-        if (e.target.classList.contains('select-all-perms')) {
+        if (e.target.classList.contains('select-all-perms') || e.target.closest('.select-all-perms')) {
             modal.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = true);
             modal.querySelectorAll('.select-all-group').forEach(cb => cb.checked = true);
         }
-        if (e.target.classList.contains('clear-all-perms')) {
+        if (e.target.classList.contains('clear-all-perms') || e.target.closest('.clear-all-perms')) {
             modal.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = false);
             modal.querySelectorAll('.select-all-group').forEach(cb => cb.checked = false);
         }
-        if (e.target.classList.contains('expand-all')) {
+        if (e.target.classList.contains('expand-all') || e.target.closest('.expand-all')) {
             modal.querySelectorAll('.collapse').forEach(el => $(el).collapse('show'));
         }
-        if (e.target.classList.contains('collapse-all')) {
+        if (e.target.classList.contains('collapse-all') || e.target.closest('.collapse-all')) {
             modal.querySelectorAll('.collapse').forEach(el => $(el).collapse('hide'));
+        }
+        if (e.target.classList.contains('copy-perms') || e.target.closest('.copy-perms')) {
+            const permNames = Array.from(modal.querySelectorAll('.permission-checkbox:checked')).map(cb => cb.value);
+            localStorage.setItem('copied_permissions', JSON.stringify(permNames));
+        }
+        if (e.target.classList.contains('paste-perms') || e.target.closest('.paste-perms')) {
+            const stored = localStorage.getItem('copied_permissions');
+            if (stored) {
+                const permNames = JSON.parse(stored);
+                modal.querySelectorAll('.permission-checkbox').forEach(cb => {
+                    cb.checked = permNames.includes(cb.value);
+                });
+                modal.querySelectorAll('.permissions-group').forEach(card => {
+                    const groupCheckbox = card.querySelector('.select-all-group');
+                    if (groupCheckbox) {
+                        const allCBs = card.querySelectorAll('.permission-checkbox');
+                        const checkedCBs = card.querySelectorAll('.permission-checkbox:checked');
+                        groupCheckbox.checked = (allCBs.length > 0 && allCBs.length === checkedCBs.length);
+                    }
+                });
+            }
         }
     });
 
