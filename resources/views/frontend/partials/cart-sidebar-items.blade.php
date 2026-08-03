@@ -1,5 +1,8 @@
 <div class="cart-sidebar-items">
-    @include('frontend.partials.free-shipping-progress', ['cartTotal' => $carts->sum(function($c) { return $c->calculated_subtotal ?? ($c->price * $c->qunt); })])
+    @include('frontend.partials.free-shipping-progress', [
+        'carts' => $carts,
+        'cartTotal' => $carts->sum(function($c) { return $c->calculated_subtotal ?? ($c->price * $c->qunt); })
+    ])
     @forelse ($carts as $cart)
         @php
             $product = $cart->product;

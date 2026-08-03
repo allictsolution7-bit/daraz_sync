@@ -1610,8 +1610,9 @@ class CartController extends Controller
             ]);
         }
 
-        $count = $query->sum('qunt');
-        $total = $query->selectRaw('SUM(price * qunt) as total')->first()->total ?? 0;
+        $carts = $query->with('product')->get();
+        $count = $carts->sum('qunt');
+        $total = $carts->sum(function($c) { return $c->calculated_subtotal ?? ($c->price * $c->qunt); });
 
         // Get positioning settings for the partial
         $bottomDesktop = \App\Services\SettingsService::get('general', 'free_shipping_progress_bottom_desktop', '0');
@@ -1623,6 +1624,7 @@ class CartController extends Controller
             'count' => $count,
             'total' => $total,
             'html' => view('frontend.partials.free-shipping-progress', [
+                'carts' => $carts,
                 'cartTotal' => $total,
                 'bottomDesktop' => $bottomDesktop,
                 'rightDesktop' => $rightDesktop,
