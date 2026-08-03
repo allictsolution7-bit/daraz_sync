@@ -1204,6 +1204,8 @@
         }
 
         function initializePortalCharts() {
+            const isMobile = window.innerWidth < 576;
+
             // 1. Transaction Velocity Line Chart
             const labels = @json($labels ?? []);
             const data = @json($data ?? []);
@@ -1237,7 +1239,7 @@
                         x: { 
                             grid: { display: false },
                             title: {
-                                display: true,
+                                display: !isMobile,
                                 text: 'Timeline Interval',
                                 font: { weight: 'bold', family: 'Plus Jakarta Sans' }
                             }
@@ -1246,7 +1248,7 @@
                             beginAtZero: true,
                             grid: { color: 'rgba(0, 0, 0, 0.04)' },
                             title: {
-                                display: true,
+                                display: !isMobile,
                                 text: 'Transaction Volume (Orders)',
                                 font: { weight: 'bold', family: 'Plus Jakarta Sans' }
                             }
@@ -1308,7 +1310,7 @@
                             display: true,
                             grid: { display: false },
                             title: {
-                                display: true,
+                                display: !isMobile,
                                 text: 'Time intervals',
                                 font: { weight: '600', family: 'Plus Jakarta Sans', size: 10 }
                             }
@@ -1318,7 +1320,7 @@
                             beginAtZero: true,
                             grid: { color: 'rgba(0, 0, 0, 0.02)' },
                             title: {
-                                display: true,
+                                display: !isMobile,
                                 text: 'Registered Accounts',
                                 font: { weight: '600', family: 'Plus Jakarta Sans', size: 10 }
                             }
@@ -1351,7 +1353,7 @@
                             beginAtZero: true,
                             grid: { color: 'rgba(0, 0, 0, 0.02)' },
                             title: {
-                                display: true,
+                                display: !isMobile,
                                 text: 'Units Sold (Qty)',
                                 font: { weight: '600', family: 'Plus Jakarta Sans', size: 10 }
                             }
@@ -1359,7 +1361,7 @@
                         y: { 
                             grid: { display: false },
                             title: {
-                                display: true,
+                                display: !isMobile,
                                 text: 'Department / Category',
                                 font: { weight: '600', family: 'Plus Jakarta Sans', size: 10 }
                             }
