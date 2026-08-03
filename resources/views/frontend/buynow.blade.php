@@ -817,26 +817,6 @@
 
 <div class="co-page">
 
-    {{-- TOP BAR --}}
-    <div class="co-topbar">
-        <a href="{{ url('/') }}" class="co-topbar-brand">
-            <i class="fa-solid fa-store" style="font-size:18px; color: var(--co-primary);"></i>
-            @php
-                $storeName = 'PurnoBD';
-                if (isset($product) && $product->vendor_id) {
-                    $vendor = \App\Models\User::find($product->vendor_id);
-                    if ($vendor) {
-                        $storeName = $vendor->shop_name ?? $vendor->name ?? ('Store #' . $vendor->id);
-                    }
-                }
-            @endphp
-            <span>{{ $storeName }}</span>
-        </a>
-        <div class="co-topbar-secure">
-            <i class="fa-solid fa-shield-halved"></i> Secured Checkout
-        </div>
-    </div>
-
     {{-- STEPS --}}
     <div class="co-steps-wrap">
         <div class="co-steps">
