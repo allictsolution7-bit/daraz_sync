@@ -3259,6 +3259,16 @@
                         <img src="{{ asset('new/thikana.png') }}" alt="Thikana Logo" style="140px">
                     @endif
                 </a>
+
+                <div class="category-trigger-wrapper">
+                    <a href="#" class="category-trigger-btn" id="categoryTriggerBtn">
+                        <i class="fas fa-list"></i>
+                        <span>Category</span>
+                        <svg class="toggle-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 5px; transition: transform 0.2s ease;">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                </div>
     
                 <div class="search-bar">
                     <input type="text" id="header-search-input"
@@ -4007,7 +4017,67 @@
             margin-top: -3px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             position: relative;
-            z-index: 40;
+            z-index: 1010;
+        }
+
+        @media (min-width: 993px) {
+            .mainnav-section {
+                position: absolute;
+                left: 0;
+                right: 0;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.25s ease, visibility 0.25s ease;
+                border-bottom: 3px solid var(--primary-color, #ff6925);
+            }
+            .mainnav-section.active,
+            .mainnav-section:hover {
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+        }
+
+        .category-trigger-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        .category-trigger-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .category-trigger-btn:hover,
+        .category-trigger-btn.active {
+            border-color: var(--primary-color, #ff6925);
+            background: #fff;
+            color: var(--primary-color, #ff6925);
+        }
+
+        .category-trigger-btn .toggle-arrow {
+            transition: transform 0.2s ease;
+        }
+        
+        .category-trigger-btn.active .toggle-arrow {
+            transform: rotate(180deg);
+        }
+        
+        @media (max-width: 992px) {
+            .category-trigger-wrapper {
+                display: none !important;
+            }
         }
 
         /* Navigation Links */
@@ -4601,14 +4671,32 @@
 	                    ->orderBy('order')
 	                    ->get()
 	                : collect();
-
-	            // Debug: Uncomment the next line to see what's happening
-
 	        @endphp
 
-	        @if ($menuItems->count() > 0)
+	        @if ($menuItems->count() > 0 || (isset($topCategories) && $topCategories->count() > 0))
 	            @foreach ($menuItems as $item)
+	                @if (strtolower($item->title) === 'home' || $item->url === '/' || $item->url === url('/'))
+	                    @continue
+	                @endif
 	                @include('frontend.partials.menu-item', ['item' => $item, 'level' => 1])
+	            @endforeach
+
+	            @php
+	                $topCategories = \App\Models\ProductCategory::where(function($q) {
+	                    $q->where('status', '1')->orWhere('status', 'active');
+	                })
+	                ->withCount('products')
+	                ->orderByDesc('products_count')
+	                ->take(5)
+	                ->get();
+	                $menuItemTitles = $menuItems->map(fn($item) => strtolower($item->title))->toArray();
+	            @endphp
+	            @foreach ($topCategories as $cat)
+	                @if (!in_array(strtolower($cat->name), $menuItemTitles))
+	                    <a href="{{ url('/shop?category=' . $cat->slug) }}" class="menu-item-level-1">
+	                        <span>{{ $cat->name }}</span>
+	                    </a>
+	                @endif
 	            @endforeach
 	        @else
 	            {{-- Debug: Show if no menu items found --}}
@@ -7808,6 +7896,33 @@
 
                 // Run only on scroll
                 window.addEventListener('scroll', checkPosition, { passive: true });
+            }
+        })();
+
+        // Category hover toggle script
+        (function() {
+            const trigger = document.getElementById('categoryTriggerBtn');
+            const mainnav = document.querySelector('.mainnav-section');
+            if (trigger && mainnav) {
+                let hoverTimeout;
+                
+                function showNav() {
+                    clearTimeout(hoverTimeout);
+                    mainnav.classList.add('active');
+                    trigger.classList.add('active');
+                }
+                
+                function hideNav() {
+                    hoverTimeout = setTimeout(function() {
+                        mainnav.classList.remove('active');
+                        trigger.classList.remove('active');
+                    }, 250);
+                }
+
+                trigger.addEventListener('mouseenter', showNav);
+                trigger.addEventListener('mouseleave', hideNav);
+                mainnav.addEventListener('mouseenter', showNav);
+                mainnav.addEventListener('mouseleave', hideNav);
             }
         })();
     </script>
