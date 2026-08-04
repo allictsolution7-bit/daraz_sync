@@ -388,6 +388,7 @@
                 $vRecentOrders = \App\Models\order::whereIn('id', $vOrderIds)->with(['customer'])->latest()->take(5)->get();
             @endphp
 
+            @can('vendor.orders.view')
             <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}" href="{{ route('vendor.orders.index') }}">
                 <span class="d-flex align-items-center gap-2">
                     <i class="fas fa-shopping-cart"></i> Orders
@@ -396,20 +397,30 @@
                     <span class="badge bg-warning text-dark font-weight-bold px-2 py-1 rounded-pill" style="font-size: 0.72rem;">{{ $vTotalOrders }}</span>
                 @endif
             </a>
+            @endcan
 
+            @if(auth()->user()->can('vendor.balance.view') || auth()->user()->can('vendor.withdrawals.create'))
             <div class="vendor-nav-header">Finance & Wallet</div>
+            @endif
+
+            @can('vendor.balance.view')
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.wallet.*') ? 'active' : '' }}" href="{{ route('vendor.wallet.index') }}">
                 <i class="fas fa-wallet text-warning"></i> My Wallet
             </a>
+            @endcan
 
+            @can('vendor.withdrawals.create')
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.withdrawals.*') ? 'active' : '' }}" href="{{ route('vendor.withdrawals.index') }}">
                 <i class="fas fa-hand-holding-dollar"></i> Withdrawals
             </a>
+            @endcan
 
+            @can('vendor.profile.edit')
             <div class="vendor-nav-header">Account & Setup</div>
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.profile') ? 'active' : '' }}" href="{{ route('vendor.profile') }}">
                 <i class="fas fa-cog"></i> Store Settings
             </a>
+            @endcan
 
             @php
                 $user = auth()->user();
@@ -490,6 +501,7 @@
 
             <div class="d-flex align-items-center gap-3">
                 <!-- Topbar Wallet Widget -->
+                @if(!auth()->user()?->hasRole('reseller'))
                 <div class="wallet-pill shadow-sm">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-wallet text-primary fs-5"></i>
@@ -502,8 +514,10 @@
                         <i class="fas fa-plus-circle"></i> Recharge
                     </a>
                 </div>
+                @endif
 
                 <!-- Storefront Link -->
+                @if(!auth()->user()?->hasRole('reseller'))
                 <a href="{{ url('/') }}" target="_blank" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="View Storefront">
                     <i class="fas fa-globe text-secondary"></i>
                 </a>
@@ -559,6 +573,7 @@
                         @endif
                     </div>
                 </div>
+                @endif
 
                 <!-- User Dropdown -->
                 <div class="dropdown">
@@ -584,7 +599,7 @@
 
         <!-- Main Body View -->
         <main class="flex-grow-1 p-3 p-md-4">
-            @if(!auth()->user()->vendorSettings || !auth()->user()->vendorSettings->is_verified)
+            @if(!auth()->user()->hasRole('reseller') && (!auth()->user()->vendorSettings || !auth()->user()->vendorSettings->is_verified))
                 <div class="alert alert-warning border-0 shadow-sm rounded-4 d-flex align-items-center gap-3 p-3 mb-4" role="alert">
                     <div class="bg-warning bg-opacity-20 p-2 rounded-circle text-dark">
                         <i class="fas fa-shield-halved fs-4 text-warning"></i>

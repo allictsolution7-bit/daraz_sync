@@ -56,6 +56,11 @@ class VendorProductController extends Controller
         $canAccessAdminProducts = $this->checkVendorAdminProductAccess($vendor);
 
         $source = $request->get('source', 'my_products');
+        
+        if ($vendor->hasRole('reseller')) {
+            $source = 'admin_products';
+            $canAccessAdminProducts = true;
+        }
 
         $allocationsQuery = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)->get();
         $allocatedProductIds = $allocationsQuery->pluck('product_id')->toArray();

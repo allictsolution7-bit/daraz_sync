@@ -21,20 +21,22 @@ class EnsureUserIsVendor
 
         $user = auth()->user();
 
-        // Check if user has vendor role
-        if (!$user->isVendor()) {
-            abort(403, 'Access denied. Vendor access only.');
+        // Check if user has vendor or reseller role
+        if (!$user->isVendor() && !$user->hasRole('reseller')) {
+            abort(403, 'Access denied. Vendor or Reseller access only.');
         }
 
-        // Check if vendor settings exist and account is active
-        $vendorSettings = $user->vendorSettings;
-        
-        if (!$vendorSettings) {
-            abort(403, 'Vendor account not properly configured.');
-        }
+        // Resellers don't require vendorSettings verification
+        if (!$user->hasRole('reseller')) {
+            $vendorSettings = $user->vendorSettings;
+            
+            if (!$vendorSettings) {
+                abort(403, 'Vendor account not properly configured.');
+            }
 
-        if (!$vendorSettings->is_active) {
-            abort(403, 'Your vendor account is inactive. Please contact support.');
+            if (!$vendorSettings->is_active) {
+                abort(403, 'Your vendor account is inactive. Please contact support.');
+            }
         }
 
         return $next($request);

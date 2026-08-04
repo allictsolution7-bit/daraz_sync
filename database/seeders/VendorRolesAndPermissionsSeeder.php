@@ -174,6 +174,14 @@ class VendorRolesAndPermissionsSeeder extends Seeder
         // Customer - No special vendor permissions needed
         $customer = Role::findByName('customer');
         // Customers don't need special vendor permissions in this model
+        
+        // Reseller - Bare minimum permissions (Dashboard, Catalog View, Access Admin Products)
+        $reseller = Role::findByName('reseller');
+        $reseller->syncPermissions([
+            'vendor.dashboard.view',
+            'vendor.products.view',
+            'vendor.access_admin_products',
+        ]);
 
         $this->command->info('✅ Permissions assigned to roles successfully');
 

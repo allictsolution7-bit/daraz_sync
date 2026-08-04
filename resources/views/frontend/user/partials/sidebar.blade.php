@@ -21,10 +21,20 @@
             @php
                 $u = auth()->user();
                 $isVendorUser = ($u->role === 'vendor' || (method_exists($u, 'isVendor') && $u->isVendor()) || (method_exists($u, 'hasRole') && $u->hasRole('vendor')) || (isset($u->user_type) && $u->user_type === 'vendor') || (isset($u->type) && $u->type === 'vendor'));
-                $isAdminUser = !$isVendorUser && ($u->isAdmin() || $u->hasRole('admin') || $u->hasRole('super_admin') || $u->hasRole('super admin') || $u->hasRole('manager') || $u->can('access admin') || $u->id == 1 || (isset($u->role) && in_array($u->role, ['admin', 'super_admin', 'manager'])));
+                $isResellerUser = ($u->role === 'reseller' || (method_exists($u, 'hasRole') && $u->hasRole('reseller')));
+                $isAdminUser = !$isVendorUser && !$isResellerUser && ($u->isAdmin() || $u->hasRole('admin') || $u->hasRole('super_admin') || $u->hasRole('super admin') || $u->hasRole('manager') || $u->can('access admin') || $u->id == 1 || (isset($u->role) && in_array($u->role, ['admin', 'super_admin', 'manager'])));
             @endphp
 
-            @if($isVendorUser)
+            @if($isResellerUser)
+                <li class="sidebar-menu-item" style="margin-bottom: 12px;">
+                    <a href="{{ Route::has('vendor.dashboard') ? route('vendor.dashboard') : url('/vendor/dashboard') }}" 
+                       class="sidebar-menu-link text-white shadow-sm" 
+                       style="background: linear-gradient(135deg, #10b981, #059669) !important; color: #ffffff !important; font-weight: 700; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                        <i class="fa-solid fa-handshake text-white" style="font-size: 16px; width: 20px; text-align: center;"></i>
+                        <span>Reseller Hub</span>
+                    </a>
+                </li>
+            @elseif($isVendorUser)
                 <li class="sidebar-menu-item" style="margin-bottom: 12px;">
                     <a href="{{ Route::has('vendor.dashboard') ? route('vendor.dashboard') : url('/vendor/dashboard') }}" 
                        class="sidebar-menu-link text-white shadow-sm" 

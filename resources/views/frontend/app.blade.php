@@ -1671,11 +1671,14 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+                gap: 15px;
                 padding: 8px 15px;
+                flex-wrap: nowrap;
             }
 
             .logo {
                 text-align: left;
+                flex-shrink: 0;
             }
 
             .logo img {
@@ -1695,11 +1698,12 @@
                 background: #fff;
                 border-radius: 30px;
                 padding: 0;
-                width: 100%;
+                flex: 1 1 180px;
+                min-width: 120px;
                 max-width: 700px;
                 box-shadow: none;
                 position: relative;
-                margin: 0 30px;
+                margin: 0;
             }
 
             .search-bar input {
@@ -3240,6 +3244,17 @@
 
                 .register-btn {
                     display: none;
+                }
+            }
+
+            @media(max-width:1200px) {
+                .track-text, .call-text {
+                    display: none !important;
+                }
+                .track-box, .call-box {
+                    padding: 8px;
+                    border-radius: 50%;
+                    background: rgba(30, 41, 59, 0.04);
                 }
             }
 

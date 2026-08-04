@@ -149,11 +149,11 @@
     .table-modern thead th {
         background: #f8fafc;
         color: #475569;
-        font-size: 0.725rem;
+        font-size: 0.7rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        padding: 14px 16px;
+        padding: 10px 12px;
         border-bottom: 2px solid #e2e8f0;
     }
 
@@ -166,9 +166,10 @@
     }
 
     .table-modern tbody td {
-        padding: 14px 16px;
+        padding: 10px 12px;
         border-bottom: 1px solid #f1f5f9;
         vertical-align: middle;
+        font-size: 0.8rem;
     }
 
     .copied-badge-pill {
@@ -248,9 +249,11 @@
         @endif
     </div>
 
+    @if(!auth()->user()?->hasRole('reseller'))
     <a href="{{ route('vendor.products.create') }}" class="btn btn-gradient-primary px-3 py-2 text-decoration-none">
         <i class="fas fa-plus-circle me-1.5"></i> Add New Product
     </a>
+    @endif
 </div>
 
 @if(session('warning'))
@@ -444,7 +447,30 @@
                                                                  || in_array($product->id, $allCopiedIds ?? [])
                                                                  || in_array($product->title, $allCopiedTitles ?? []);
                                                     @endphp
-                                                    @if(($source ?? 'my_products') === 'admin_products')
+                                                    @if(auth()->user()->hasRole('reseller'))
+                                                        <div class="d-flex justify-content-end gap-2">
+                                                            <button type="button" class="btn btn-gradient-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
+                                                                    data-product="{{ json_encode([
+                                                                        'title' => $product->title,
+                                                                        'description' => strip_tags($product->description ?? ''),
+                                                                        'short_description' => strip_tags($product->short_description ?? ''),
+                                                                        'old_price' => $product->old_price,
+                                                                        'offer' => $product->offer,
+                                                                        'reseller_price' => $product->reseller_price,
+                                                                        'sku' => $product->sku ?? '',
+                                                                        'variations' => $product->variationCombinations->map(function($comb) {
+                                                                            return $comb->combination_string . ': ৳' . number_format($comb->reseller_price ?? $comb->regular_price ?? 0, 2);
+                                                                        })->toArray()
+                                                                    ]) }}"
+                                                                    onclick="copyProductContentFromBtn(this)">
+                                                                <i class="fas fa-copy"></i> Copy Info
+                                                            </button>
+                                                            <button type="button" class="btn btn-gradient-blue btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
+                                                                    onclick="downloadProductImages('{{ $product->id }}', '{{ addslashes($product->title) }}', '{{ asset('storage/' . $product->thumb_image) }}', {{ json_encode(array_map(fn($img) => asset('storage/' . $img), is_array($product->images) ? $product->images : (json_decode($product->images, true) ?: []))) }})">
+                                                                <i class="fas fa-download"></i> Download Images
+                                                            </button>
+                                                        </div>
+                                                    @elseif(($source ?? 'my_products') === 'admin_products')
                                                         @if($isCopied)
                                                             <div class="d-inline-flex align-items-center gap-1">
                                                                 <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 font-weight-bold d-inline-flex align-items-center gap-1" title="Already Copied to Your Store" style="font-size: 0.78rem; border-radius: 6px;">
@@ -595,7 +621,9 @@
                     @foreach($products as $product)
                     <tr>
                         <td class="ps-4">
-                            @if(($source ?? 'my_products') === 'admin_products')
+                            @if(auth()->user()->hasRole('reseller'))
+                                <small class="text-muted fw-bold">{{ $loop->iteration }}</small>
+                            @elseif(($source ?? 'my_products') === 'admin_products')
                                 @if(in_array($product->id, $allocatedProductIds ?? []) || in_array($product->title, $copiedProductTitles ?? []))
                                     <input type="checkbox" class="form-check-input" disabled>
                                 @else
@@ -682,6 +710,14 @@
                                 <small class="text-decoration-line-through text-muted d-block" style="font-size: 0.75rem;">{{ $displayOldPrice }}</small>
                             @endif
                             <strong class="text-dark fs-6">{{ $displayPrice }}</strong>
+                            @if(auth()->user()->hasRole('reseller'))
+                                <div class="mt-1">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Reseller Price</small>
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-0.5" style="font-size: 0.8rem; font-weight: 700;">
+                                        ৳{{ number_format($product->reseller_price ?? 0, 2) }}
+                                    </span>
+                                </div>
+                            @endif
                         </td>
                         @if(($source ?? 'my_products') === 'my_products')
                         <td>
@@ -761,7 +797,30 @@
                                          || in_array($product->id, $allCopiedIds ?? [])
                                          || in_array($product->title, $allCopiedTitles ?? []);
                             @endphp
-                            @if(($source ?? 'my_products') === 'admin_products')
+                            @if(auth()->user()->hasRole('reseller'))
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="button" class="btn btn-gradient-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
+                                            data-product="{{ json_encode([
+                                                'title' => $product->title,
+                                                'description' => strip_tags($product->description ?? ''),
+                                                'short_description' => strip_tags($product->short_description ?? ''),
+                                                'old_price' => $product->old_price,
+                                                'offer' => $product->offer,
+                                                'reseller_price' => $product->reseller_price,
+                                                'sku' => $product->sku ?? '',
+                                                'variations' => $product->variationCombinations->map(function($comb) {
+                                                    return $comb->combination_string . ': ৳' . number_format($comb->reseller_price ?? $comb->regular_price ?? 0, 2);
+                                                })->toArray()
+                                            ]) }}"
+                                            onclick="copyProductContentFromBtn(this)">
+                                        <i class="fas fa-copy"></i> Copy Info
+                                    </button>
+                                    <button type="button" class="btn btn-gradient-blue btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
+                                            onclick="downloadProductImages('{{ $product->id }}', '{{ addslashes($product->title) }}', '{{ asset('storage/' . $product->thumb_image) }}', {{ json_encode(array_map(fn($img) => asset('storage/' . $img), is_array($product->images) ? $product->images : (json_decode($product->images, true) ?: []))) }})">
+                                        <i class="fas fa-download"></i> Download Images
+                                    </button>
+                                </div>
+                            @elseif(($source ?? 'my_products') === 'admin_products')
                                 @if($isCopied)
                                     <div class="d-inline-flex align-items-center gap-2 justify-content-end">
                                         <span class="copied-badge-pill" title="Already Copied to Your Store">
@@ -1383,6 +1442,94 @@ document.addEventListener('DOMContentLoaded', function() {
     productCheckboxes.forEach(cb => {
         cb.addEventListener('change', updateBulkCopyUI);
     });
+
+    // Copy Product Content Helper
+    window.copyProductContentFromBtn = function(btn) {
+        try {
+            let data = JSON.parse(btn.getAttribute('data-product'));
+            window.copyProductContent(data);
+        } catch (e) {
+            console.error("Failed parsing product data", e);
+        }
+    };
+
+    window.copyProductContent = function(productData) {
+        let textToCopy = `Title: ${productData.title}\n`;
+        if (productData.sku) {
+            textToCopy += `SKU: ${productData.sku}\n`;
+        }
+        if (productData.offer && parseFloat(productData.offer) > 0) {
+            textToCopy += `Offer Price: ৳${parseFloat(productData.offer).toFixed(2)}\n`;
+        }
+        if (productData.old_price && parseFloat(productData.old_price) > 0) {
+            textToCopy += `Regular Price: ৳${parseFloat(productData.old_price).toFixed(2)}\n`;
+        }
+        if (productData.reseller_price && parseFloat(productData.reseller_price) > 0) {
+            textToCopy += `Reseller Price: ৳${parseFloat(productData.reseller_price).toFixed(2)}\n`;
+        }
+        if (productData.variations && productData.variations.length > 0) {
+            textToCopy += `Variations / Options:\n` + productData.variations.map(v => ` - ${v}`).join('\n') + `\n`;
+        }
+        
+        let desc = productData.description || '';
+        if (productData.short_description) {
+            desc = productData.short_description + (desc ? '\n\n' + desc : '');
+        }
+        textToCopy += `\nDescription:\n${desc}\n`;
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('Product details successfully copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            // Fallback for older browsers
+            let textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('Product details successfully copied to clipboard!');
+            } catch (err) {
+                alert('Could not copy product details.');
+            }
+            document.body.removeChild(textArea);
+        });
+    };
+
+    // Download Product Images Helper
+    window.downloadProductImages = function(productId, title, thumbImage, galleryImages) {
+        let urls = [];
+        if (thumbImage && !thumbImage.includes('no-image') && !thumbImage.endsWith('/')) {
+            urls.push(thumbImage);
+        }
+        if (Array.isArray(galleryImages)) {
+            galleryImages.forEach(url => {
+                if (url && !urls.includes(url) && !url.endsWith('/')) {
+                    urls.push(url);
+                }
+            });
+        }
+
+        if (urls.length === 0) {
+            alert('No valid images available for download.');
+            return;
+        }
+
+        let delay = 0;
+        urls.forEach((url, index) => {
+            setTimeout(() => {
+                let a = document.createElement('a');
+                a.href = url;
+                // Extract filename
+                let filename = url.split('/').pop() || `${title.replace(/\s+/g, '_')}_image_${index + 1}`;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }, delay);
+            delay += 400; // Delay to prevent browser blocking multiple downloads
+        });
+    };
 });
 </script>
 @endpush

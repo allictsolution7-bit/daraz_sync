@@ -26,6 +26,22 @@ class VendorDashboardController extends Controller
     public function index()
     {
         $vendor = auth()->user();
+        
+        if ($vendor->hasRole('reseller')) {
+            $adminId = $vendor->created_by;
+            $totalAdminProducts = \App\Models\Product::where(function ($q) use ($adminId) {
+                if ($adminId) {
+                    $q->where('created_by', $adminId)
+                      ->orWhere('vendor_id', $adminId)
+                      ->orWhereNull('vendor_id');
+                } else {
+                    $q->whereNull('vendor_id');
+                }
+            })->count();
+
+            return view('vendor.dashboard.reseller', compact('vendor', 'totalAdminProducts'));
+        }
+
         $vendorSettings = $vendor->vendorSettings;
 
         // Get statistics
@@ -46,7 +62,7 @@ class VendorDashboardController extends Controller
             ->get();
 
         // Get effective settings (commission limits, etc.)
-        $effectiveSettings = $vendorSettings->getEffectiveSettings();
+        $effectiveSettings = $vendorSettings ? $vendorSettings->getEffectiveSettings() : null;
 
         return view('vendor.dashboard.index', compact(
             'vendor',
@@ -65,6 +81,10 @@ class VendorDashboardController extends Controller
     public function profile()
     {
         $vendor = auth()->user();
+        if (!$vendor->can('vendor.profile.edit')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $vendorSettings = $vendor->vendorSettings;
 
         return view('vendor.profile.index', compact('vendor', 'vendorSettings'));
@@ -76,6 +96,10 @@ class VendorDashboardController extends Controller
     public function updateProfile(Request $request)
     {
         $vendor = auth()->user();
+        if (!$vendor->can('vendor.profile.edit')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $vendorSettings = $vendor->vendorSettings;
 
         // Make validation flexible - only validate fields that are present
