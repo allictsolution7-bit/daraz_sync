@@ -2195,7 +2195,7 @@ if ($product->product_type === 'variable') {
 
             {{-- Price Display with Stock Status Badge on exact right --}}
             <div class="py-1 flex items-center justify-between gap-3 my-0.5 border-b border-gray-200">
-                <div class="flex items-baseline gap-2.5" id="top-price-area">
+                <div class="flex items-center gap-2.5" id="top-price-area">
                     @if ($product->product_type === 'variable')
                     @php
                     $regularPrices = [];
@@ -3599,7 +3599,7 @@ if ($product->product_type === 'variable') {
         <!-- Middle Section: Product Description (Left) & Related Products List (Right) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
             <!-- Left Column: Product Description Card (7 Columns) -->
-            @if (setting('general', 'show_product_description_section', '1') == '1' && !empty(trim($product->description)))
+            @if (setting('general', 'show_product_description_section', '1') == '1')
             <div class="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-5 lg:p-6 shadow-sm relative overflow-hidden" id="description">
                 <div class="flex items-center gap-2 pb-3 border-b border-slate-100 mb-3">
                     <div class="w-7 h-7 rounded-lg bg-navy-deep/10 text-navy-deep flex items-center justify-center font-bold text-xs">
@@ -3609,7 +3609,13 @@ if ($product->product_type === 'variable') {
                 </div>
 
                 <div id="description-content" class="description-formatted-wrapper text-slate-700 font-body text-xs leading-relaxed max-h-[600px] overflow-y-auto pr-2 pb-4 custom-scrollbar">
-                    {!! $product->description !!}
+                    @if(!empty(trim($product->description)))
+                        {!! $product->description !!}
+                    @else
+                        <div class="text-center py-4 text-slate-400 text-xs">
+                            No details available for this product.
+                        </div>
+                    @endif
                 </div>
 
                 <style>
@@ -4371,7 +4377,7 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
 <div class="base-container product-sections max-w-container-max mx-auto px-margin-desktop my-4">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <!-- Customer Ratings & Reviews Card (7 Columns) -->
-        @if (setting('general', 'show_ratings_reviews_section', '1') == '1' && $reviewStats['review_count'] > 0)
+        @if (setting('general', 'show_ratings_reviews_section', '1') == '1')
         <div class="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-4 lg:p-5 shadow-sm space-y-4" id="ratings">
             <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
                 <div class="w-7 h-7 rounded-lg bg-amber-400/15 text-amber-500 flex items-center justify-center font-bold text-xs">
@@ -6649,6 +6655,50 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
             // Function to show
             function showRules() {
                 clearTimeout(hoverTimeout);
+                
+                // Calculate position relative to viewport to decide top vs bottom
+                const rect = rulesToggleBtn.getBoundingClientRect();
+                const popoverHeight = 350; // estimate height of the popover card
+                const spaceAbove = rect.top;
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const arrows = rulesPopover.querySelectorAll('.absolute');
+                
+                if (spaceAbove < popoverHeight && spaceBelow > spaceAbove) {
+                    // Show below: remove bottom-full and mb-3, add top-full and mt-3
+                    rulesPopover.classList.remove('bottom-full', 'mb-3');
+                    rulesPopover.classList.add('top-full', 'mt-3');
+                    
+                    // Adjust arrows to top of popover pointing up
+                    arrows.forEach(arrow => {
+                        if (arrow.classList.contains('border-transparent')) {
+                            arrow.classList.remove('top-full', 'border-t-white', 'border-t-slate-100', 'translate-y-[1px]');
+                            arrow.classList.add('bottom-full', '-translate-y-[1px]');
+                            if (arrow.classList.contains('-z-10')) {
+                                arrow.classList.add('border-b-slate-100');
+                            } else {
+                                arrow.classList.add('border-b-white');
+                            }
+                        }
+                    });
+                } else {
+                    // Show above (default): remove top-full and mt-3, add bottom-full and mb-3
+                    rulesPopover.classList.remove('top-full', 'mt-3');
+                    rulesPopover.classList.add('bottom-full', 'mb-3');
+                    
+                    // Adjust arrows to bottom of popover pointing down
+                    arrows.forEach(arrow => {
+                        if (arrow.classList.contains('border-transparent')) {
+                            arrow.classList.remove('bottom-full', 'border-b-white', 'border-b-slate-100', '-translate-y-[1px]');
+                            arrow.classList.add('top-full', 'translate-y-[1px]');
+                            if (arrow.classList.contains('-z-10')) {
+                                arrow.classList.add('border-t-slate-100');
+                            } else {
+                                arrow.classList.add('border-t-white');
+                            }
+                        }
+                    });
+                }
+                
                 rulesPopover.classList.remove('invisible', 'opacity-0', 'translate-y-2');
                 rulesPopover.classList.add('visible-popover', 'opacity-100', 'translate-y-0');
             }

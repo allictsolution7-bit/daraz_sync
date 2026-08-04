@@ -6375,6 +6375,20 @@
     {{-- End Floating Cart --}}
 
     <!-- Cart Drawer -->
+    @php
+        $drawerCarts = collect();
+        if (Auth::check()) {
+            $drawerCarts = \App\Models\Cart::with(['product', 'variationCombination', 'comboOffer'])->where('user_id', Auth::id())->get();
+        } elseif (request()->cookie('guest_id')) {
+            $drawerCarts = \App\Models\Cart::with(['product', 'variationCombination', 'comboOffer'])->where('guest_id', request()->cookie('guest_id'))->get();
+        }
+        foreach ($drawerCarts as $item) {
+            $item->calculated_subtotal = $item->price * $item->qunt;
+        }
+        $drawerCartTotal = $drawerCarts->sum(function ($item) {
+            return $item->calculated_subtotal ?? ($item->price * $item->qunt);
+        });
+    @endphp
     <div id="cartDrawerOverlay" class="cart-drawer-overlay"></div>
     <div id="cartDrawer" class="cart-drawer">
         <div class="cart-drawer-header">
@@ -6389,12 +6403,15 @@
             <div></div>
         </div>
         <div class="cart-drawer-body" id="cartDrawerBody">
-            <div class="cart-sidebar-loading">লোড হচ্ছে...</div>
+            @include('frontend.partials.cart-sidebar-items', [
+                'carts' => $drawerCarts,
+                'subTotal' => $drawerCartTotal
+            ])
         </div>
         <div class="cart-drawer-footer">
             <div class="cart-drawer-total">
                 <span>কার্ট টোটাল</span>
-                <span class="cart-drawer-total-value">৳{{ number_format($cartTotal ?? 0, 0) }}</span>
+                <span class="cart-drawer-total-value">৳{{ number_format($drawerCartTotal ?? 0, 0) }}</span>
             </div>
             <div class="cart-drawer-actions">
                 <a href="{{ route('cart.index') }}" class="drawer-btn secondary" style="display: none;">কার্ট দেখুন</a>
@@ -6428,7 +6445,7 @@
                 if (cartBody) {
                     cartBody.scrollTop = 0;
                 }
-                loadCart();
+                loadCart(false);
             }
 
             function closeDrawer() {
@@ -6463,9 +6480,11 @@
                 }
             }
 
-            function loadCart() {
+            function loadCart(showLoading = false) {
                 if (!cartBody || !sidebarUrl) return;
-                cartBody.innerHTML = '<div class="cart-sidebar-loading">লোড হচ্ছে...</div>';
+                if (showLoading) {
+                    cartBody.innerHTML = '<div class="cart-sidebar-loading">লোড হচ্ছে...</div>';
+                }
                 isLoading = true;
 
                 fetch(sidebarUrl, {
@@ -6477,8 +6496,10 @@
                     .then(res => res.json())
                     .then(data => renderCart(data))
                     .catch(() => {
-                        cartBody.innerHTML =
-                            '<div class="cart-sidebar-empty"><p>কার্টের তথ্য আনতে সমস্যা হয়েছে</p></div>';
+                        if (showLoading || !cartBody.innerHTML.trim() || cartBody.querySelector('.cart-sidebar-loading')) {
+                            cartBody.innerHTML =
+                                '<div class="cart-sidebar-empty"><p>কার্টের তথ্য আনতে সমস্যা হয়েছে</p></div>';
+                        }
                     })
                     .finally(() => {
                         isLoading = false;
