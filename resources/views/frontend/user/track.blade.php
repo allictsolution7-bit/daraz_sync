@@ -90,46 +90,57 @@
         }
 
         .order-info {
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 20px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 16px;
+            padding: 25px 30px;
             margin-top: 30px;
-            background-color: #ffffff;
+            background-color: #f8fafc;
         }
 
         .order-info h5 {
             font-size: 18px;
             font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e2e8f0;
+            color: #0f172a;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
         }
 
         .order-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 24px;
         }
 
         .order-info-item {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #475569;
         }
 
         .order-info-item strong {
-            font-weight: 600;
-            color: #1e293b;
+            font-weight: 700;
+            color: #0f172a;
+            display: inline-block;
+            width: 140px;
         }
 
         .status-timeline {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .status-timeline h5 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 25px;
         }
 
         .timeline-item {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 28px;
             position: relative;
         }
 
@@ -140,11 +151,11 @@
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: 15px;
-            top: 32px;
-            bottom: -20px;
-            width: 2px;
-            background-color: #e2e8f0;
+            left: 20px;
+            top: 42px;
+            bottom: -28px;
+            width: 3px;
+            background-color: rgba(226, 232, 240, 0.8);
         }
 
         .timeline-item:last-child::before {
@@ -152,55 +163,63 @@
         }
 
         .timeline-icon {
-            width: 32px;
-            height: 32px;
-            background-color: #f8fafc;
+            width: 42px;
+            height: 42px;
+            background-color: #ffffff;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
-            border: 2px solid #cbd5e1;
+            margin-right: 20px;
+            border: 3px solid rgba(226, 232, 240, 0.8);
             z-index: 1;
-            color: #64748b;
+            color: #94a3b8;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
         }
 
         .timeline-icon.active {
-            background-color: #ff6a00;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
-            border-color: #ff6a00;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.15);
         }
 
         .timeline-content {
             flex: 1;
+            padding-top: 2px;
         }
 
         .timeline-date {
             font-size: 12px;
-            color: #64748b;
+            color: #94a3b8;
+            font-weight: 600;
         }
 
         .timeline-status {
-            font-weight: 600;
-            color: #1e293b;
+            font-weight: 700;
+            color: #0f172a;
             margin: 4px 0;
+            font-size: 15px;
         }
 
         .timeline-desc {
-            font-size: 13px;
+            font-size: 13.5px;
             color: #64748b;
+            line-height: 1.5;
         }
 
         .alert {
             padding: 15px;
-            border-radius: 6px;
+            border-radius: 10px;
             margin-bottom: 20px;
+            border: none;
         }
 
         .alert-danger {
             background-color: #fee2e2;
             color: #b91c1c;
-            border: 1px solid #fecaca;
         }
 
         @media (max-width: 768px) {
@@ -209,6 +228,11 @@
             }
             .order-info-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .order-info-item strong {
+                display: block;
+                margin-bottom: 4px;
             }
         }
     </style>

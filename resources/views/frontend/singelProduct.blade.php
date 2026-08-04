@@ -3258,7 +3258,10 @@ if ($product->product_type === 'variable') {
                 let exists = wishlist.some(item => item.id == {{ $product->id }});
                 if (exists) {
                     let heartIcon = document.getElementById('wishlist-heart-icon-{{ $product->id }}');
-                    if (heartIcon) heartIcon.classList.add('text-rose-600');
+                    if (heartIcon) {
+                        heartIcon.classList.add('text-rose-600', 'fa-solid');
+                        heartIcon.classList.remove('fa-regular');
+                    }
                 }
             });
 
@@ -3269,11 +3272,17 @@ if ($product->product_type === 'variable') {
 
                 if (index > -1) {
                     wishlist.splice(index, 1);
-                    if (heartIcon) heartIcon.classList.remove('text-rose-600');
+                    if (heartIcon) {
+                        heartIcon.classList.remove('text-rose-600', 'fa-solid');
+                        heartIcon.classList.add('fa-regular');
+                    }
                     alert('Removed from your Wishlist!');
                 } else {
                     wishlist.push({ id: id, title: title, price: price, image: image, url: url });
-                    if (heartIcon) heartIcon.classList.add('text-rose-600');
+                    if (heartIcon) {
+                        heartIcon.classList.add('text-rose-600', 'fa-solid');
+                        heartIcon.classList.remove('fa-regular');
+                    }
                     alert('Added to your Wishlist!');
                 }
                 localStorage.setItem('user_wishlist', JSON.stringify(wishlist));
