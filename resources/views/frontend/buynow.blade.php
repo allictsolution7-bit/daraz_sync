@@ -27,7 +27,7 @@
     .co-page {
         min-height: 100vh;
         background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0f172a 100%);
-        padding: 0 0 24px;
+        padding: 0 0 8px;
         display: flex;
         flex-direction: column;
         position: relative;
@@ -68,7 +68,7 @@
 
     /* ─── Steps ─── */
     .co-steps-wrap {
-        padding: 8px 16px 2px;
+        padding: 4px 16px 2px;
         max-width: 600px;
         margin: 0 auto;
         width: 100%;
@@ -77,7 +77,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 8px;
+        margin-bottom: 2px;
         position: relative;
     }
     .co-step {
@@ -136,7 +136,7 @@
         padding: 0 12px;
         display: grid;
         grid-template-columns: 60% 40%;
-        gap: 16px;
+        gap: 10px;
         align-items: stretch;
         width: 100%;
         padding-bottom: 8px;
@@ -146,7 +146,7 @@
     .co-card {
         background: var(--co-surface);
         border-radius: 12px;
-        padding: 10px 14px;
+        padding: 8px 12px;
         box-shadow: var(--co-shadow);
         border: 1px solid var(--co-border);
         margin-bottom: 0;
@@ -159,7 +159,7 @@
         font-size: 14px;
         font-weight: 700;
         color: var(--co-text);
-        margin-bottom: 12px;
+        margin-bottom: 6px;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -182,7 +182,7 @@
     .co-card-title .icon-blue { background: #eff6ff; color: #3b82f6; }
 
     /* ─── Form Fields ─── */
-    .co-field-group { margin-bottom: 10px; }
+    .co-field-group { margin-bottom: 6px; }
     .co-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .co-label {
         display: block;
@@ -195,7 +195,7 @@
     }
     .co-input {
         width: 100%;
-        padding: 8px 12px;
+        padding: 6px 10px;
         border: 1.5px solid var(--co-border);
         border-radius: 8px;
         font-size: 12px;
@@ -220,7 +220,7 @@
         align-items: center;
         gap: 4px;
     }
-    textarea.co-input { resize: none; min-height: 48px; }
+    textarea.co-input { resize: none; min-height: 36px; }
 
     /* ─── Shipping Options ─── */
     .co-shipping-opts { display: flex; flex-direction: column; gap: 6px; }
@@ -890,9 +890,9 @@
 
                     {{-- Saved Locations Selector --}}
                     @if(isset($locations) && $locations->count() > 0)
-                        <div class="co-field-group" style="margin-bottom: 10px; padding: 6px; background: #f8fafc; border: 1.5px dashed var(--co-primary); border-radius: 8px;">
+                        <div class="co-field-group" style="margin-bottom: 6px; padding: 4px 6px; background: #f8fafc; border: 1.5px dashed var(--co-primary); border-radius: 8px;">
                             <label class="co-label" style="color: var(--co-primary); font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; font-size: 9px;">
-                                <i class="fa-solid fa-map-location-dot"></i> Saved Locations:
+                                <i class="fa-solid fa-map-location-dot"></i> Select a Location:
                             </label>
                             <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                                 @foreach($locations as $loc)
@@ -904,11 +904,11 @@
                                             data-district="{{ $loc->district }}"
                                             data-upazila="{{ $loc->upazila }}"
                                             data-postcode="{{ $loc->post_code }}"
-                                            style="padding: 4px 8px; background: #fff; border: 1.5px solid var(--co-border); border-radius: 6px; font-size: 11px; font-weight: 600; color: var(--co-text); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px;">
-                                        <i class="fa-solid fa-house-chimney" style="color: var(--co-primary); font-size: 10px;"></i>
+                                            style="padding: 10px 20px; background: #fff; border: 1.5px solid var(--co-border); border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--co-text); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; min-height: 44px;">
+                                        <i class="fa-solid fa-house-chimney" style="color: var(--co-primary); font-size: 14px;"></i>
                                         <span>{{ $loc->title }}</span>
                                         @if($loc->is_default)
-                                            <span style="font-size: 8px; background: var(--co-primary); color: #fff; padding: 0px 4px; border-radius: 3px; font-weight: 700;">DEF</span>
+                                            <span style="font-size: 10px; background: var(--co-primary); color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-left: 4px;">DEF</span>
                                         @endif
                                     </button>
                                 @endforeach
@@ -916,22 +916,24 @@
                         </div>
                     @endif
 
-                    <div class="co-field-group">
-                        <label class="co-label">Full Name *</label>
-                        <input class="co-input" type="text" name="name" placeholder="Enter your full name"
-                            value="{{ auth()->check() ? auth()->user()->name : old('name') }}">
-                        @if ($errors->get('name'))
-                            <div class="field-error">@foreach ($errors->get('name') as $e) {{ $e }} @endforeach</div>
-                        @endif
-                    </div>
+                    <div class="co-field-row" style="margin-bottom: 6px;">
+                        <div class="co-field-group" style="margin-bottom: 0;">
+                            <label class="co-label">Full Name *</label>
+                            <input class="co-input" type="text" name="name" placeholder="Enter your full name"
+                                value="{{ auth()->check() ? auth()->user()->name : old('name') }}">
+                            @if ($errors->get('name'))
+                                <div class="field-error">@foreach ($errors->get('name') as $e) {{ $e }} @endforeach</div>
+                            @endif
+                        </div>
 
-                    <div class="co-field-group">
-                        <label class="co-label">Phone Number *</label>
-                        <input class="co-input" type="tel" name="phone" placeholder="01XXXXXXXXX"
-                            value="{{ auth()->check() ? auth()->user()->phone : old('phone') }}">
-                        @if ($errors->get('phone'))
-                            <div class="field-error">@foreach ($errors->get('phone') as $e) {{ $e }} @endforeach</div>
-                        @endif
+                        <div class="co-field-group" style="margin-bottom: 0;">
+                            <label class="co-label">Phone Number *</label>
+                            <input class="co-input" type="tel" name="phone" placeholder="01XXXXXXXXX"
+                                value="{{ auth()->check() ? auth()->user()->phone : old('phone') }}">
+                            @if ($errors->get('phone'))
+                                <div class="field-error">@foreach ($errors->get('phone') as $e) {{ $e }} @endforeach</div>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="co-field-group">
@@ -1112,14 +1114,14 @@
                 </div>
 
                 {{-- Compact Payment Selection (Icons Only) --}}
-                <div style="margin-top: 12px; border-top: 1px solid var(--co-border); padding-top: 12px;">
-                    <span class="co-label" style="margin-bottom: 10px; font-weight: 700; color: var(--co-text); display: block;"><i class="fa-solid fa-credit-card"></i> Payment Method</span>
+                <div style="margin-top: 6px; border-top: 1px solid var(--co-border); padding-top: 6px;">
+                    <span class="co-label" style="margin-bottom: 6px; font-weight: 700; color: var(--co-text); display: block;"><i class="fa-solid fa-credit-card"></i> Payment Method</span>
                     <div class="co-pay-options" style="display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap;">
                         @if ($codEnabled)
-                            <label class="co-pay-opt selected" for="pay_cod" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #f0fdf4; margin: 0; min-height: 72px; transition: all 0.2s;" title="Cash on Delivery">
+                            <label class="co-pay-opt selected" for="pay_cod" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #f0fdf4; margin: 0; min-height: 56px; transition: all 0.2s;" title="Cash on Delivery">
                                 <input type="radio" name="payment_method" id="pay_cod" value="cod" checked style="display:none;">
                                 <div style="position:relative; display:flex; align-items:center; justify-content:center;">
-                                    <i class="fa-solid fa-truck-fast" style="color:#10b981; font-size: 24px;"></i>
+                                    <i class="fa-solid fa-truck-fast" style="color:#10b981; font-size: 20px;"></i>
                                     <i class="fa-solid fa-bangladeshi-taka-sign" style="color:#065f46; font-size: 11px; position:absolute; bottom:-3px; right:-6px; background:#d1fae5; border-radius:50%; padding:2px;"></i>
                                 </div>
                                 <span style="font-size: 10px; font-weight: 700; color: #065f46; white-space: nowrap;">Cash on Delivery</span>
@@ -1127,34 +1129,34 @@
                         @endif
 
                         @if ($bkashEnabled)
-                            <label class="co-pay-opt" for="pay_bkash" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="bKash Wallet">
+                            <label class="co-pay-opt" for="pay_bkash" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 56px; transition: all 0.2s;" title="bKash Wallet">
                                 <input type="radio" name="payment_method" id="pay_bkash" value="bkash" style="display:none;">
-                                <img src="{{ asset('payment-method/bkash.png') }}" alt="bKash" class="co-pay-logo-img" style="height: 28px; object-fit: contain;">
+                                <img src="{{ asset('payment-method/bkash.png') }}" alt="bKash" class="co-pay-logo-img" style="height: 22px; object-fit: contain;">
                                 <span style="font-size: 10px; font-weight: 600; color: #c01263;">bKash</span>
                             </label>
                         @endif
 
                         @if ($nagadEnabled)
-                            <label class="co-pay-opt" for="pay_nagad" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="Nagad Wallet">
+                            <label class="co-pay-opt" for="pay_nagad" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 56px; transition: all 0.2s;" title="Nagad Wallet">
                                 <input type="radio" name="payment_method" id="pay_nagad" value="nagad" style="display:none;">
-                                <img src="{{ asset('payment-method/nagad.png') }}" alt="Nagad" class="co-pay-logo-img" style="height: 28px; object-fit: contain;">
+                                <img src="{{ asset('payment-method/nagad.png') }}" alt="Nagad" class="co-pay-logo-img" style="height: 22px; object-fit: contain;">
                                 <span style="font-size: 10px; font-weight: 600; color: #d84315;">Nagad</span>
                             </label>
                         @endif
 
                         @if ($rocketEnabled)
-                            <label class="co-pay-opt" for="pay_rocket" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="Rocket Wallet">
+                            <label class="co-pay-opt" for="pay_rocket" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 56px; transition: all 0.2s;" title="Rocket Wallet">
                                 <input type="radio" name="payment_method" id="pay_rocket" value="rocket" style="display:none;">
-                                <img src="{{ asset('payment-method/rocket.png') }}" alt="Rocket" class="co-pay-logo-img" style="height: 28px; object-fit: contain;">
+                                <img src="{{ asset('payment-method/rocket.png') }}" alt="Rocket" class="co-pay-logo-img" style="height: 22px; object-fit: contain;">
                                 <span style="font-size: 10px; font-weight: 600; color: #6b21a8;">Rocket</span>
                             </label>
                         @endif
 
                         @if ($autoGateways->count() > 0)
                             @foreach($autoGateways as $gw)
-                                <label class="co-pay-opt" for="pay_{{ $gw->provider }}_bn" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="{{ $gw->name }}">
+                                <label class="co-pay-opt" for="pay_{{ $gw->provider }}_bn" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 56px; transition: all 0.2s;" title="{{ $gw->name }}">
                                     <input type="radio" name="payment_method" id="pay_{{ $gw->provider }}_bn" value="{{ $gw->provider }}" style="display:none;">
-                                    <i class="fa-solid fa-credit-card" style="color: #3b82f6; font-size: 22px;"></i>
+                                    <i class="fa-solid fa-credit-card" style="color: #3b82f6; font-size: 20px;"></i>
                                     <span style="font-size: 10px; font-weight: 600; color: #1e3a8a;">{{ $gw->name }}</span>
                                 </label>
                             @endforeach
@@ -1163,7 +1165,7 @@
                 </div>
 
                 {{-- Confirm Action Button inside Card --}}
-                <div style="margin-top: 10px; border-top: 1.5px solid var(--co-border); padding-top: 10px;">
+                <div style="margin-top: auto; border-top: 1.5px solid var(--co-border); padding-top: 6px;">
                     <button type="submit" form="buynow-order" class="co-place-btn" id="place-order-btn" style="margin-top: 0; width: 100%;">
                         <span><i class="fa-solid fa-lock" style="font-size:12px;"></i></span>
                         <span>Confirm Order Now</span>
