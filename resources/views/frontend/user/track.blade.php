@@ -4,38 +4,40 @@
     <link rel="stylesheet" href="{{ asset('new/user.styles.css') }}">
     <style>
         .track-container {
-            margin: 20px auto;
-            padding: 0 5px;
+            margin: 30px auto;
+            padding: 0 15px;
+            max-width: 1200px;
         }
 
         .track-layout {
             display: grid;
-            grid-template-columns: 250px 1fr;
+            grid-template-columns: 280px 1fr;
             gap: 30px;
         }
 
         .track-card {
-            background-color: #fff;
-            box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
-            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border-radius: 16px;
             overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
         .track-header {
-            padding: 20px 25px;
-            border-bottom: 1px solid #e2e8f0;
-            background-color: #f8fafc;
+            padding: 24px 30px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            background-color: #ffffff;
         }
 
         .track-header h4 {
             margin: 0;
             font-size: 18px;
             font-weight: 700;
-            color: #1e293b;
+            color: #0f172a;
         }
 
         .track-body {
-            padding: 25px;
+            padding: 30px;
         }
 
         .track-form {
@@ -50,39 +52,41 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #1e293b;
+            color: #0f172a;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            padding: 12px 16px;
+            border: 1px solid rgba(226, 232, 240, 1);
+            border-radius: 10px;
             font-size: 15px;
             box-sizing: border-box;
-            transition: border-color 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
-            border-color: #ff6a00;
+            border-color: #6366f1;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
         }
 
         .track-btn {
-            background-color: #ff6a00;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
+            padding: 12px 28px;
+            border-radius: 10px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
 
         .track-btn:hover {
-            background-color: #e05d00;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+            transform: translateY(-1px);
         }
 
         .order-info {

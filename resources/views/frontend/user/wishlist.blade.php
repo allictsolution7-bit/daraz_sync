@@ -5,28 +5,29 @@
     <link rel="stylesheet" href="{{ asset('new/user.styles.css') }}">
     <style>
         .wishlist-container {
-            margin: 20px auto;
-            padding: 0 5px;
+            margin: 30px auto;
+            padding: 0 15px;
+            max-width: 1200px;
         }
 
         .wishlist-layout {
             display: grid;
-            grid-template-columns: 250px 1fr;
+            grid-template-columns: 280px 1fr;
             gap: 30px;
         }
 
         .wishlist-card {
             background-color: #ffffff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border-radius: 16px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
             overflow: hidden;
         }
 
         .wishlist-header {
-            padding: 20px 25px;
-            border-bottom: 1px solid #e2e8f0;
-            background-color: #f8fafc;
+            padding: 24px 30px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            background-color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -47,7 +48,7 @@
         }
 
         .wishlist-body {
-            padding: 25px;
+            padding: 30px;
         }
 
         .wishlist-items-grid {
@@ -58,17 +59,17 @@
 
         .wishlist-item-card {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 12px;
             padding: 15px;
             text-align: center;
             position: relative;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .wishlist-item-card:hover {
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+            transform: translateY(-3px);
         }
 
         .wishlist-item-img {

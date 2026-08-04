@@ -15,13 +15,14 @@
             border-radius: 50%;
             margin-right: 20px;
             object-fit: cover;
-            border: 3px solid #e2e8f0;
+            border: 3px solid rgba(99, 102, 241, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
 
         .profile-name {
             font-size: 24px;
             font-weight: 700;
-            color: #1e293b;
+            color: #0f172a;
             margin-bottom: 5px;
         }
 
@@ -39,44 +40,48 @@
         .edit-profile-btn {
             display: inline-flex;
             align-items: center;
-            background-color: #ff6a00;
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6a00 100%);
             color: white !important;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 12px 24px;
+            border-radius: 10px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 106, 0, 0.15);
         }
 
         .edit-profile-btn:hover {
-            background-color: #e05d00;
+            box-shadow: 0 6px 16px rgba(255, 106, 0, 0.25);
+            transform: translateY(-1px);
             color: white !important;
         }
 
         .portal-btn {
             display: inline-flex;
             align-items: center;
-            background-color: #4f46e5;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white !important;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 12px 24px;
+            border-radius: 10px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
         }
 
         .portal-btn:hover {
-            background-color: #4338ca;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25);
+            transform: translateY(-1px);
             color: white !important;
         }
 
         .settings-title {
             font-size: 20px;
             font-weight: 700;
-            color: #1e293b;
+            color: #0f172a;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
         }
 
         .settings-options {

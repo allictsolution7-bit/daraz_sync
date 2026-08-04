@@ -6,9 +6,9 @@
         .profile-card {
             display: block !important;
             background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(226, 232, 240, 0.8);
             padding: 30px;
         }
 
@@ -16,9 +16,9 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 18px;
+            padding-bottom: 20px;
             margin-bottom: 25px;
-            border-bottom: 2px solid #f1f5f9;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
         }
 
         .edit-header-title {
@@ -32,7 +32,7 @@
         }
 
         .edit-header-title i {
-            color: #ff6a00;
+            color: #6366f1;
         }
 
         .avatar-upload-area {
@@ -40,8 +40,8 @@
             align-items: center;
             gap: 20px;
             background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
         }
@@ -69,26 +69,26 @@
             display: block;
             font-weight: 600;
             font-size: 14px;
-            color: #334155;
+            color: #0f172a;
             margin-bottom: 8px;
         }
 
         .form-control-custom {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            border: 1px solid rgba(226, 232, 240, 1);
+            border-radius: 10px;
             font-size: 15px;
             color: #0f172a;
             background-color: #ffffff;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             box-sizing: border-box;
         }
 
         .form-control-custom:focus {
-            border-color: #ff6a00;
+            border-color: #6366f1;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
         }
 
         .section-separator {
@@ -137,16 +137,16 @@
         }
 
         .btn-save-custom {
-            background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: #ffffff !important;
             border: none;
             padding: 12px 28px;
-            border-radius: 30px;
+            border-radius: 10px;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 106, 0, 0.25);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -154,8 +154,8 @@
         }
 
         .btn-save-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(255, 106, 0, 0.35);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
         }
 
         .btn-cancel-custom {
@@ -164,7 +164,7 @@
             font-weight: 600;
             font-size: 15px;
             padding: 12px 20px;
-            transition: color 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .btn-cancel-custom:hover {

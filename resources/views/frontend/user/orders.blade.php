@@ -3,61 +3,77 @@
     <link rel="stylesheet" href="{{ asset('new/user.styles.css') }}">
     <style>
         .orders-container {
-            margin: 20px auto;
-            padding: 0 5px;
+            margin: 30px auto;
+            padding: 0 15px;
+            max-width: 1200px;
         }
 
         .orders-layout {
             display: grid;
-            grid-template-columns: 250px 1fr;
+            grid-template-columns: 280px 1fr;
             gap: 30px;
         }
 
         .orders-card {
-            background-color: #fff;
-            box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
-            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border-radius: 16px;
             overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s ease;
         }
 
         .orders-header {
-            padding: 20px 25px;
-            border-bottom: 1px solid #e2e8f0;
-            background-color: #f8fafc;
+            padding: 24px 30px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            background-color: #ffffff;
         }
 
         .orders-header h4 {
             margin: 0;
             font-size: 18px;
             font-weight: 700;
-            color: #1e293b;
+            color: #0f172a;
         }
 
         .orders-body {
-            padding: 25px;
+            padding: 30px;
         }
 
         .orders-table {
             width: 100%;
             border-collapse: collapse;
+            vertical-align: middle;
         }
 
         .orders-table th,
         .orders-table td {
-            padding: 12px 15px;
+            padding: 14px 20px;
             text-align: left;
-            border: 1px solid #e2e8f0;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            font-size: 14px;
         }
 
         .orders-table th {
             background-color: #f8fafc;
-            font-weight: 600;
-            color: #1e293b;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .orders-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .orders-table tbody tr:hover {
+            background-color: rgba(99, 102, 241, 0.02);
         }
 
         .badge-status {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
@@ -70,24 +86,27 @@
 
         .view-btn {
             display: inline-block;
-            background-color: #ff6a00;
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6a00 100%);
             color: white !important;
-            padding: 6px 14px;
-            border-radius: 4px;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 106, 0, 0.15);
         }
 
         .view-btn:hover {
-            background-color: #e05d00;
+            box-shadow: 0 6px 16px rgba(255, 106, 0, 0.25);
+            transform: translateY(-1px);
             color: white !important;
         }
 
         @media (max-width: 768px) {
             .orders-layout {
                 grid-template-columns: 1fr;
+                gap: 20px;
             }
 
             .orders-table {
