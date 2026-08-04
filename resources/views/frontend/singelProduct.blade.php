@@ -1786,15 +1786,7 @@
 @endif
 
 {{-- Error Message show --}}
-@if ($errors->any())
-<div class="alert">
-    <ul>
-        @foreach ($errors->all() as $error)
-        <li class="text-red">{{ $error }}</li>
-        @endforeach
-    </ul>
-</div>
-@endif
+
 
 {{-- Breadcrumb Navigation --}}
 <div class="base-container breadcrumb-container">
@@ -3154,7 +3146,27 @@ if ($product->product_type === 'variable') {
                 <div class="border-t border-slate-200/80 pt-1.5 space-y-1">
                     <div class="flex items-center justify-between">
                         <span class="font-semibold text-slate-500 text-[10px]">Return & Warranty</span>
-                        <i class="fa-regular fa-circle-question text-slate-400 text-[10px]"></i>
+                        <div class="relative id-rules-container">
+                            <i id="deliveryRulesToggleBtn" class="fa-regular fa-circle-question text-slate-400 text-sm hover:text-orange-500 transition-colors p-1 -m-1"></i>
+                            <div id="deliveryRulesPopover" class="absolute right-0 bottom-full mb-3 w-96 bg-white border border-slate-100 rounded-2xl shadow-2xl p-5 opacity-0 invisible transition-all duration-200 transform translate-y-2 z-50">
+                                <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-100">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center">
+                                            <i class="fa-solid fa-truck-fast text-sm"></i>
+                                        </div>
+                                        <span class="font-bold text-slate-800 text-sm uppercase tracking-wider font-headline">RULES / শিপিং সংক্রান্ত তথ্য</span>
+                                    </div>
+                                    <button type="button" id="deliveryRulesCloseBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors">
+                                        <i class="fa-solid fa-xmark text-base"></i>
+                                    </button>
+                                </div>
+                                <div class="max-h-72 overflow-y-auto text-xs text-slate-600 leading-relaxed pr-1 custom-scrollbar">
+                                    {!! setting('general', 'delivery_info', '') !!}
+                                </div>
+                                <div class="absolute top-full right-3 border-6 border-transparent border-t-white"></div>
+                                <div class="absolute top-full right-3 border-6 border-transparent border-t-slate-100 -z-10 translate-y-[1px]"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex items-center gap-2">
@@ -3584,83 +3596,104 @@ if ($product->product_type === 'variable') {
                 }
             }
         </style>
-        <!-- Middle Section: Rules + Write Review (Left) & Related Products List (Right) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter items-start">
-            <!-- Left Column: Delivery Rules + Review Form -->
-            <div class="space-y-6 flex flex-col h-full justify-between">
-                <!-- Delivery Rules & Shipping Info Card -->
-                @php
-                $showDelivery = setting('general', 'show_delivery_info', '1');
-                $deliveryInfo = setting('general', 'delivery_info', '');
-                @endphp
-
-                @if ($showDelivery == '1' && $deliveryInfo)
-                <div class="bg-white border-2 border-dashed border-navy-deep/20 p-4 lg:p-5 rounded-3xl space-y-3 shadow-sm">
-                    <div class="flex items-center gap-2.5 pb-2.5 border-b border-slate-100">
-                        <div class="w-8 h-8 rounded-xl bg-navy-deep/10 text-navy-deep flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-truck-fast text-xs"></i>
-                        </div>
-                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-navy-deep font-headline m-0">RULES / শিপিং সংক্রান্ত তথ্য</h4>
+        <!-- Middle Section: Product Description (Left) & Related Products List (Right) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+            <!-- Left Column: Product Description Card (7 Columns) -->
+            @if (setting('general', 'show_product_description_section', '1') == '1' && !empty(trim($product->description)))
+            <div class="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-5 lg:p-6 shadow-sm relative overflow-hidden" id="description">
+                <div class="flex items-center gap-2 pb-3 border-b border-slate-100 mb-3">
+                    <div class="w-7 h-7 rounded-lg bg-navy-deep/10 text-navy-deep flex items-center justify-center font-bold text-xs">
+                        <i class="fa-solid fa-file-lines text-xs"></i>
                     </div>
-                    <div class="space-y-1.5 text-[10px] text-slate-600 leading-snug overflow-y-auto max-h-[220px] pr-2 custom-scrollbar">
-                        {!! $deliveryInfo !!}
-                    </div>
+                    <h3 class="text-sm font-extrabold text-navy-deep font-headline m-0">{{ setting('general', 'description_section_title', 'Product Description') }}</h3>
                 </div>
-                @endif
 
-                <!-- Write a Review Form Card (Underneath Rules) -->
-                @if (setting('general', 'show_review_form_section', '1') == '1')
-                <div class="bg-white border border-slate-200 rounded-3xl p-5 lg:p-6 shadow-sm space-y-3" id="review-form-section">
-                    <div class="flex items-center gap-3 pb-2.5 border-b border-slate-100">
-                        <div class="w-9 h-9 rounded-xl bg-amber-400/15 text-amber-500 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-pen-to-square text-sm"></i>
-                        </div>
-                        <h4 class="text-sm font-extrabold text-navy-deep font-headline m-0">{{ setting('general', 'review_form_header_title', 'এই পণ্য সম্পর্কে আপনার মূল্যবান মতামত লিখুন') }}</h4>
-                    </div>
-
-                    <form id="product-review-form" enctype="multipart/form-data" class="space-y-3">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-
-                        <div class="flex items-center gap-2">
-                            <div class="star-rating-group flex items-center gap-1.5 flex-1">
-                                @for ($r = 1; $r <= 5; $r++)
-                                <div class="individual-star-item cursor-pointer text-blue-900 text-lg hover:scale-110 transition-transform @if($r == 4) selected-active @endif" data-rating="{{ $r }}" title="{{ $r }} Star">
-                                    <i class="@if($r <= 4) fa-solid @else fa-regular @endif fa-star"></i>
-                                </div>
-                                @endfor
-                            </div>
-                        </div>
-                        <input type="hidden" name="rating" id="selected-rating" value="4">
-
-                        <textarea class="comment-input-textarea w-full h-20 p-2.5 border border-slate-200 rounded-xl text-xs font-body focus:ring-2 focus:ring-navy-deep/20 focus:border-navy-deep transition-all resize-none text-slate-700" name="review_text"
-                            placeholder="{{ setting('general', 'review_form_comment_placeholder', 'Write your comment...') }}" required minlength="10"></textarea>
-
-                        <div class="flex items-center justify-between gap-2">
-                            <div class="flex-1">
-                                <label class="block text-[11px] font-bold text-slate-500 mb-1">Upload Image (Optional)</label>
-                                <input type="file" class="image-upload-input text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-slate-100 file:text-navy-deep hover:file:bg-slate-200 cursor-pointer" name="review_images[]" accept="image/*" multiple>
-                            </div>
-                            <button type="submit" class="submit-feedback-button bg-navy-deep hover:bg-navy-deep/90 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md shrink-0 self-end">
-                                {{ setting('general', 'review_form_submit_button_text', 'আপনার মতামত সাবমিট করুন') }}
-                            </button>
-                        </div>
-
-                        @guest
-                        <div class="grid grid-cols-2 gap-2 pt-1">
-                            <input type="text" name="reviewer_name" placeholder="Your Name *" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs" required>
-                            <input type="email" name="reviewer_email" placeholder="Your Email *" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs" required>
-                        </div>
-                        @endguest
-                    </form>
+                <div id="description-content" class="description-formatted-wrapper text-slate-700 font-body text-xs leading-relaxed max-h-[600px] overflow-y-auto pr-2 pb-4 custom-scrollbar">
+                    {!! $product->description !!}
                 </div>
-                @endif
+
+                <style>
+                    .custom-scrollbar::-webkit-scrollbar {
+                        width: 5px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-track {
+                        background: #f1f5f9;
+                        border-radius: 4px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb {
+                        background: #cbd5e1;
+                        border-radius: 4px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: #94a3b8;
+                    }
+
+                    .description-formatted-wrapper {
+                        line-height: 1.6;
+                        color: #334155;
+                    }
+                    .description-formatted-wrapper h1,
+                    .description-formatted-wrapper h2,
+                    .description-formatted-wrapper h3,
+                    .description-formatted-wrapper h4 {
+                        color: #113257;
+                        font-weight: 800;
+                        margin-top: 0.75rem;
+                        margin-bottom: 0.35rem;
+                    }
+                    .description-formatted-wrapper p {
+                        margin-bottom: 0.5rem;
+                        color: #475569;
+                    }
+                    .description-formatted-wrapper strong {
+                        color: #0f172a;
+                        font-weight: 700;
+                    }
+                    .description-formatted-wrapper hr {
+                        border: 0;
+                        height: 1px;
+                        background: #e2e8f0;
+                        margin: 0.75rem 0;
+                    }
+                    .description-formatted-wrapper table {
+                        width: 100% !important;
+                        border-collapse: collapse;
+                        margin: 0.75rem 0;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        border: 1px solid #e2e8f0;
+                    }
+                    .description-formatted-wrapper table th {
+                        background-color: #113257;
+                        color: #ffffff;
+                        font-weight: 700;
+                        text-align: left;
+                        padding: 8px 10px;
+                        font-size: 11px;
+                    }
+                    .description-formatted-wrapper table td {
+                        padding: 8px 10px;
+                        border-bottom: 1px solid #f1f5f9;
+                        font-size: 11px;
+                        color: #334155;
+                    }
+                    .description-formatted-wrapper ul,
+                    .description-formatted-wrapper ol {
+                        padding-left: 1.25rem;
+                        margin: 0.5rem 0;
+                    }
+                    .description-formatted-wrapper li {
+                        margin-bottom: 0.25rem;
+                        font-size: 11px;
+                    }
+                </style>
             </div>
+            @endif
 
-            <!-- Right Column: Related Products List (আরো দেখুন) -->
+            <!-- Right Column: Related Products List (আরো দেখুন) (5 Columns) -->
             @if (setting('single_product', 'enable_related_products', '1') == '1' &&
             setting('general', 'show_related_products_section', '1') == '1')
-            <div class="product-list-sidebar-section flex flex-col h-full !m-0 !p-0">
+            <div class="lg:col-span-5 product-list-sidebar-section flex flex-col h-full !m-0 !p-0">
                 <div class="flex items-center gap-3 product-list-sidebar-header !mb-2 !mt-0">
                     <div class="w-7 h-7 rounded-lg bg-energy-orange/10 text-energy-orange flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-fire-flame-curved text-xs"></i>
@@ -3678,6 +3711,8 @@ if ($product->product_type === 'variable') {
                 @endif
             </div>
             @endif
+        </div>
+
 
                 <style>
                     #related-products-scroll-container {
@@ -4335,101 +4370,9 @@ if ($product->product_type === 'variable') {
 setting('general', 'show_ratings_reviews_section', '1') == '1')
 <div class="base-container product-sections max-w-container-max mx-auto px-margin-desktop my-4">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <!-- Product Description Card (7 Columns) -->
-        @if (setting('general', 'show_product_description_section', '1') == '1' && !empty(trim($product->description)))
-        <div class="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-4 lg:p-5 shadow-sm relative overflow-hidden" id="description">
-            <div class="flex items-center gap-2 pb-3 border-b border-slate-100 mb-3">
-                <div class="w-7 h-7 rounded-lg bg-navy-deep/10 text-navy-deep flex items-center justify-center font-bold text-xs">
-                    <i class="fa-solid fa-file-lines text-xs"></i>
-                </div>
-                <h3 class="text-sm font-extrabold text-navy-deep font-headline m-0">{{ setting('general', 'description_section_title', 'Product Description') }}</h3>
-            </div>
-
-            <div id="description-content" class="description-formatted-wrapper text-slate-700 font-body text-xs leading-relaxed max-h-[360px] overflow-y-auto pr-2 pb-4 custom-scrollbar">
-                {!! $product->description !!}
-            </div>
-
-            <style>
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 5px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: #f1f5f9;
-                    border-radius: 4px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: #cbd5e1;
-                    border-radius: 4px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: #94a3b8;
-                }
-
-                .description-formatted-wrapper {
-                    line-height: 1.6;
-                    color: #334155;
-                }
-                .description-formatted-wrapper h1,
-                .description-formatted-wrapper h2,
-                .description-formatted-wrapper h3,
-                .description-formatted-wrapper h4 {
-                    color: #113257;
-                    font-weight: 800;
-                    margin-top: 0.75rem;
-                    margin-bottom: 0.35rem;
-                }
-                .description-formatted-wrapper p {
-                    margin-bottom: 0.5rem;
-                    color: #475569;
-                }
-                .description-formatted-wrapper strong {
-                    color: #0f172a;
-                    font-weight: 700;
-                }
-                .description-formatted-wrapper hr {
-                    border: 0;
-                    height: 1px;
-                    background: #e2e8f0;
-                    margin: 0.75rem 0;
-                }
-                .description-formatted-wrapper table {
-                    width: 100% !important;
-                    border-collapse: collapse;
-                    margin: 0.75rem 0;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    border: 1px solid #e2e8f0;
-                }
-                .description-formatted-wrapper table th {
-                    background-color: #113257;
-                    color: #ffffff;
-                    font-weight: 700;
-                    text-align: left;
-                    padding: 8px 10px;
-                    font-size: 11px;
-                }
-                .description-formatted-wrapper table td {
-                    padding: 8px 10px;
-                    border-bottom: 1px solid #f1f5f9;
-                    font-size: 11px;
-                    color: #334155;
-                }
-                .description-formatted-wrapper ul,
-                .description-formatted-wrapper ol {
-                    padding-left: 1.25rem;
-                    margin: 0.5rem 0;
-                }
-                .description-formatted-wrapper li {
-                    margin-bottom: 0.25rem;
-                    font-size: 11px;
-                }
-            </style>
-        </div>
-        @endif
-
-        <!-- Customer Ratings & Reviews Card (5 Columns) -->
+        <!-- Customer Ratings & Reviews Card (7 Columns) -->
         @if (setting('general', 'show_ratings_reviews_section', '1') == '1' && $reviewStats['review_count'] > 0)
-        <div class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-4 lg:p-5 shadow-sm space-y-4" id="ratings">
+        <div class="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-4 lg:p-5 shadow-sm space-y-4" id="ratings">
             <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
                 <div class="w-7 h-7 rounded-lg bg-amber-400/15 text-amber-500 flex items-center justify-center font-bold text-xs">
                     <i class="fa-solid fa-star text-xs"></i>
@@ -4476,8 +4419,8 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
                 </div>
             </div>
 
-            <!-- Review Items List -->
-            <div class="space-y-2.5 divide-y divide-slate-100 max-h-[360px] overflow-y-auto pr-2 custom-scrollbar">
+            <!-- Review Items List (Height-Capped Scrollbar showing last 3/most recent reviews immediately) -->
+            <div class="space-y-2.5 divide-y divide-slate-100 max-h-[240px] overflow-y-auto pr-2 custom-scrollbar">
                 @forelse($reviews as $review)
                 <div class="pt-2.5 first:pt-0 space-y-1.5">
                     <div class="flex items-center justify-between">
@@ -4524,6 +4467,54 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
                 </div>
                 @endforelse
             </div>
+        </div>
+        @endif
+
+        <!-- Write a Review Form Card (Beside Customer Ratings) (5 Columns) -->
+        @if (setting('general', 'show_review_form_section', '1') == '1')
+        <div class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-4 lg:p-5 shadow-sm space-y-4" id="review-form-section">
+            <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+                <div class="w-7 h-7 rounded-lg bg-amber-400/15 text-amber-500 flex items-center justify-center font-bold text-xs">
+                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                </div>
+                <h3 class="text-sm font-extrabold text-navy-deep font-headline m-0">{{ setting('general', 'review_form_header_title', 'এই পণ্য সম্পর্কে আপনার মূল্যবান মতামত লিখুন') }}</h3>
+            </div>
+
+            <form id="product-review-form" enctype="multipart/form-data" class="space-y-3">
+                @csrf
+                <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+                <div class="flex items-center gap-2">
+                    <div class="star-rating-group flex items-center gap-1.5 flex-1">
+                        @for ($r = 1; $r <= 5; $r++)
+                        <div class="individual-star-item cursor-pointer text-blue-900 text-lg hover:scale-110 transition-transform @if($r == 4) selected-active @endif" data-rating="{{ $r }}" title="{{ $r }} Star">
+                            <i class="@if($r <= 4) fa-solid @else fa-regular @endif fa-star"></i>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
+                <input type="hidden" name="rating" id="selected-rating" value="4">
+
+                <textarea class="comment-input-textarea w-full h-24 p-2.5 border border-slate-200 rounded-xl text-xs font-body focus:ring-2 focus:ring-navy-deep/20 focus:border-navy-deep transition-all resize-none text-slate-700" name="review_text"
+                    placeholder="{{ setting('general', 'review_form_comment_placeholder', 'Write your comment...') }}" required minlength="10"></textarea>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1">Upload Image (Optional)</label>
+                        <input type="file" class="image-upload-input text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-slate-100 file:text-navy-deep hover:file:bg-slate-200 cursor-pointer" name="review_images[]" accept="image/*" multiple>
+                    </div>
+                    <button type="submit" class="submit-feedback-button bg-navy-deep hover:bg-navy-deep/90 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md shrink-0 self-end">
+                        {{ setting('general', 'review_form_submit_button_text', 'আপনার মতামত সাবমিট করুন') }}
+                    </button>
+                </div>
+
+                @guest
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <input type="text" name="reviewer_name" placeholder="Your Name *" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs" required>
+                    <input type="email" name="reviewer_email" placeholder="Your Email *" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs" required>
+                </div>
+                @endguest
+            </form>
         </div>
         @endif
     </div>
@@ -6645,6 +6636,75 @@ setting('general', 'show_ratings_reviews_section', '1') == '1')
             const re =
                 /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(String(email).toLowerCase());
+        }
+
+        // Delivery Rules Popover Click & Hover Logic
+        const rulesToggleBtn = document.getElementById('deliveryRulesToggleBtn');
+        const rulesPopover = document.getElementById('deliveryRulesPopover');
+        const rulesCloseBtn = document.getElementById('deliveryRulesCloseBtn');
+        let hoverTimeout = null;
+        let isLockedOpen = false;
+
+        if (rulesToggleBtn && rulesPopover) {
+            // Function to show
+            function showRules() {
+                clearTimeout(hoverTimeout);
+                rulesPopover.classList.remove('invisible', 'opacity-0', 'translate-y-2');
+                rulesPopover.classList.add('visible-popover', 'opacity-100', 'translate-y-0');
+            }
+
+            // Function to hide
+            function hideRules() {
+                if (isLockedOpen) return;
+                clearTimeout(hoverTimeout);
+                hoverTimeout = setTimeout(function() {
+                    rulesPopover.classList.add('invisible', 'opacity-0', 'translate-y-2');
+                    rulesPopover.classList.remove('visible-popover', 'opacity-100', 'translate-y-0');
+                }, 200);
+            }
+
+            // Hover on icon
+            rulesToggleBtn.addEventListener('mouseenter', showRules);
+            rulesToggleBtn.addEventListener('mouseleave', hideRules);
+
+            // Hover on popover card
+            rulesPopover.addEventListener('mouseenter', showRules);
+            rulesPopover.addEventListener('mouseleave', hideRules);
+
+            // Click on icon locks it open
+            rulesToggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                isLockedOpen = !isLockedOpen;
+                if (isLockedOpen) {
+                    showRules();
+                    rulesToggleBtn.classList.add('text-orange-500');
+                } else {
+                    rulesToggleBtn.classList.remove('text-orange-500');
+                    hideRules();
+                }
+            });
+
+            // Close button click
+            if (rulesCloseBtn) {
+                rulesCloseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    isLockedOpen = false;
+                    rulesToggleBtn.classList.remove('text-orange-500');
+                    hideRules();
+                });
+            }
+
+            // Prevent closing when clicking inside
+            rulesPopover.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', function() {
+                isLockedOpen = false;
+                rulesToggleBtn.classList.remove('text-orange-500');
+                hideRules();
+            });
         }
     });
 </script>

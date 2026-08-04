@@ -3607,8 +3607,8 @@
 	            .header-v5-right {
 	                display: flex;
 	                align-items: center;
-	                justify-content: flex-end;
-	                gap: 18px;
+	                justify-content: space-between;
+	                gap: 14px;
 	                flex: 1;
 	                min-width: 0;
 	            }
@@ -3845,7 +3845,20 @@
 	                </a>
 
 	                <div class="header-v5-right">
+	                    <div class="category-trigger-wrapper">
+	                        <button id="categoryTriggerBtn" class="category-trigger-btn" type="button">
+	                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+	                                <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+	                            </svg>
+	                            Category
+	                            <svg class="toggle-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+	                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+	                            </svg>
+	                        </button>
+	                    </div>
+
 	                    @if ($showMainNavigationV5 == '1')
+
 	                        <nav class="navigation header-v5-navigation" role="navigation" aria-label="Header navigation">
 	                            @foreach ($menuItemsV5 as $item)
 	                                @include('frontend.partials.menu-item', ['item' => $item, 'level' => 1])
@@ -4022,58 +4035,74 @@
 
         @media (min-width: 993px) {
             .mainnav-section {
-                position: absolute;
-                left: 0;
-                right: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.28s ease, opacity 0.28s ease;
                 opacity: 0;
-                visibility: hidden;
-                transition: opacity 0.25s ease, visibility 0.25s ease;
                 border-bottom: 3px solid var(--primary-color, #ff6925);
             }
-            .mainnav-section.active,
-            .mainnav-section:hover {
-                opacity: 1 !important;
-                visibility: visible !important;
+            .mainnav-section.active {
+                max-height: 200px;
+                opacity: 1;
             }
         }
 
         .category-trigger-wrapper {
             position: relative;
-            display: inline-block;
-            margin-right: 15px;
+            display: inline-flex;
+            align-items: center;
+            flex-shrink: 0;
         }
 
         .category-trigger-btn {
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            padding: 8px 18px;
+            gap: 7px;
+            background: rgba(30, 41, 59, 0.08);
+            border: 1.5px solid rgba(30, 41, 59, 0.15);
+            padding: 7.5px 16px;
             border-radius: 50px;
             font-size: 14px;
             font-weight: 600;
-            color: #1e293b;
-            text-decoration: none;
+            color: #1e293b !important;
+            cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
         }
 
+        /* If header background color is dark, make button contrast in white */
+        .header-v5-section .category-trigger-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            color: #ffffff !important;
+        }
+
         .category-trigger-btn:hover,
         .category-trigger-btn.active {
-            border-color: var(--primary-color, #ff6925);
-            background: #fff;
-            color: var(--primary-color, #ff6925);
+            background: rgba(30, 41, 59, 0.15);
+            border-color: rgba(30, 41, 59, 0.3);
+            color: #1e293b !important;
+        }
+
+        .header-v5-section .category-trigger-btn:hover,
+        .header-v5-section .category-trigger-btn.active {
+            background: rgba(255, 255, 255, 0.28);
+            border-color: rgba(255, 255, 255, 0.9);
+            color: #ffffff !important;
+        }
+
+        .category-trigger-btn svg {
+            flex-shrink: 0;
         }
 
         .category-trigger-btn .toggle-arrow {
             transition: transform 0.2s ease;
         }
-        
+
         .category-trigger-btn.active .toggle-arrow {
             transform: rotate(180deg);
         }
-        
+
         @media (max-width: 992px) {
             .category-trigger-wrapper {
                 display: none !important;
@@ -4098,15 +4127,19 @@
             border-right: 1px solid rgba(255, 255, 255, 0.15);
         }
 
+        .mainnav-section .navigation a {
+            color: #ffffff !important;
+        }
+
         /* Active state */
         .navigation a.active {
-            color: #fff;
+            color: #fff !important;
             background: rgba(0, 0, 0, 0.15);
         }
 
         /* Hover effects */
         .navigation a:hover {
-            color: #fff;
+            color: #fff !important;
             background: rgba(255, 255, 255, 0.12);
             transform: translateY(-1px);
         }

@@ -866,6 +866,8 @@
                     @endif
                 @endif
                 <input type="hidden" name="shipping" value="{{ $shipping }}">
+                {{-- Hidden payment method - synced via JS from the payment cards outside this form --}}
+                <input type="hidden" name="payment_method" id="hidden_payment_method" value="{{ $codEnabled ? 'cod' : ($bkashEnabled ? 'bkash' : ($nagadEnabled ? 'nagad' : 'rocket')) }}">
                 {{-- UTM Tracking --}}
                 <input type="hidden" name="utm_source" class="utm_source" value="">
                 <input type="hidden" name="utm_medium" class="utm_medium" value="">
@@ -1110,42 +1112,50 @@
                 </div>
 
                 {{-- Compact Payment Selection (Icons Only) --}}
-                <div style="margin-top: 10px; border-top: 1px solid var(--co-border); padding-top: 10px;">
-                    <span class="co-label" style="margin-bottom: 6px; font-weight: 700; color: var(--co-text);"><i class="fa-solid fa-credit-card"></i> Payment Method</span>
+                <div style="margin-top: 12px; border-top: 1px solid var(--co-border); padding-top: 12px;">
+                    <span class="co-label" style="margin-bottom: 10px; font-weight: 700; color: var(--co-text); display: block;"><i class="fa-solid fa-credit-card"></i> Payment Method</span>
                     <div class="co-pay-options" style="display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap;">
                         @if ($codEnabled)
-                            <label class="co-pay-opt selected" for="pay_cod" style="flex: 1; padding: 6px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--co-border); border-radius: 6px; cursor: pointer; background: #fff; margin: 0; min-height: 32px;" title="Cash on Delivery">
+                            <label class="co-pay-opt selected" for="pay_cod" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #f0fdf4; margin: 0; min-height: 72px; transition: all 0.2s;" title="Cash on Delivery">
                                 <input type="radio" name="payment_method" id="pay_cod" value="cod" checked style="display:none;">
-                                <i class="fa-solid fa-money-bill-wave" style="color:#10b981; font-size: 14px;"></i>
+                                <div style="position:relative; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fa-solid fa-truck-fast" style="color:#10b981; font-size: 24px;"></i>
+                                    <i class="fa-solid fa-bangladeshi-taka-sign" style="color:#065f46; font-size: 11px; position:absolute; bottom:-3px; right:-6px; background:#d1fae5; border-radius:50%; padding:2px;"></i>
+                                </div>
+                                <span style="font-size: 10px; font-weight: 700; color: #065f46; white-space: nowrap;">Cash on Delivery</span>
                             </label>
                         @endif
 
                         @if ($bkashEnabled)
-                            <label class="co-pay-opt" for="pay_bkash" style="flex: 1; padding: 6px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--co-border); border-radius: 6px; cursor: pointer; background: #fff; margin: 0; min-height: 32px;" title="bKash Wallet">
+                            <label class="co-pay-opt" for="pay_bkash" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="bKash Wallet">
                                 <input type="radio" name="payment_method" id="pay_bkash" value="bkash" style="display:none;">
-                                <img src="{{ asset('payment-method/bkash.png') }}" alt="bKash" class="co-pay-logo-img" style="height: 16px;">
+                                <img src="{{ asset('payment-method/bkash.png') }}" alt="bKash" class="co-pay-logo-img" style="height: 28px; object-fit: contain;">
+                                <span style="font-size: 10px; font-weight: 600; color: #c01263;">bKash</span>
                             </label>
                         @endif
 
                         @if ($nagadEnabled)
-                            <label class="co-pay-opt" for="pay_nagad" style="flex: 1; padding: 6px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--co-border); border-radius: 6px; cursor: pointer; background: #fff; margin: 0; min-height: 32px;" title="Nagad Wallet">
+                            <label class="co-pay-opt" for="pay_nagad" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="Nagad Wallet">
                                 <input type="radio" name="payment_method" id="pay_nagad" value="nagad" style="display:none;">
-                                <img src="{{ asset('payment-method/nagad.png') }}" alt="Nagad" class="co-pay-logo-img" style="height: 16px;">
+                                <img src="{{ asset('payment-method/nagad.png') }}" alt="Nagad" class="co-pay-logo-img" style="height: 28px; object-fit: contain;">
+                                <span style="font-size: 10px; font-weight: 600; color: #d84315;">Nagad</span>
                             </label>
                         @endif
 
                         @if ($rocketEnabled)
-                            <label class="co-pay-opt" for="pay_rocket" style="flex: 1; padding: 6px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--co-border); border-radius: 6px; cursor: pointer; background: #fff; margin: 0; min-height: 32px;" title="Rocket Wallet">
+                            <label class="co-pay-opt" for="pay_rocket" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="Rocket Wallet">
                                 <input type="radio" name="payment_method" id="pay_rocket" value="rocket" style="display:none;">
-                                <img src="{{ asset('payment-method/rocket.png') }}" alt="Rocket" class="co-pay-logo-img" style="height: 16px;">
+                                <img src="{{ asset('payment-method/rocket.png') }}" alt="Rocket" class="co-pay-logo-img" style="height: 28px; object-fit: contain;">
+                                <span style="font-size: 10px; font-weight: 600; color: #6b21a8;">Rocket</span>
                             </label>
                         @endif
 
                         @if ($autoGateways->count() > 0)
                             @foreach($autoGateways as $gw)
-                                <label class="co-pay-opt" for="pay_{{ $gw->provider }}_bn" style="flex: 1; padding: 6px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--co-border); border-radius: 6px; cursor: pointer; background: #fff; margin: 0; min-height: 32px;" title="{{ $gw->name }}">
+                                <label class="co-pay-opt" for="pay_{{ $gw->provider }}_bn" style="flex: 1; min-width: 64px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="{{ $gw->name }}">
                                     <input type="radio" name="payment_method" id="pay_{{ $gw->provider }}_bn" value="{{ $gw->provider }}" style="display:none;">
-                                    <i class="fa-solid fa-credit-card" style="color: #3b82f6; font-size: 14px;"></i>
+                                    <i class="fa-solid fa-credit-card" style="color: #3b82f6; font-size: 22px;"></i>
+                                    <span style="font-size: 10px; font-weight: 600; color: #1e3a8a;">{{ $gw->name }}</span>
                                 </label>
                             @endforeach
                         @endif
@@ -1338,7 +1348,9 @@
             // Reset all payment options styles
             document.querySelectorAll('.co-pay-opt').forEach(o => {
                 o.style.borderColor = 'var(--co-border)';
-                o.style.background = '#fff';
+                // Restore COD's green bg, others get plain white
+                const isCod = o.querySelector('input[value="cod"]');
+                o.style.background = isCod ? '#f0fdf4' : '#fff';
                 const radioDot = o.querySelector('.co-pay-radio');
                 if (radioDot) {
                     radioDot.style.borderColor = '#cbd5e1';
@@ -1358,8 +1370,14 @@
                 if (inner) inner.style.opacity = '1';
             }
             const radio = opt.querySelector('input[type="radio"]');
-            if(radio) radio.checked = true;
+            if(radio) {
+                radio.checked = true;
+                // Sync to hidden input inside the form so it's included when serialized
+                const hiddenPM = document.getElementById('hidden_payment_method');
+                if (hiddenPM) hiddenPM.value = radio.value;
+            }
             updateOrderTotal();
+
         });
     });
 
@@ -1559,8 +1577,25 @@
                                 const msgs = Array.isArray(payloadErrors[field]) ? payloadErrors[field] : [String(payloadErrors[field] || '')];
                                 const el = $(`[name="${field}"]`);
                                 if (el && el.length) {
-                                    el.addClass('form-error');
-                                    if (!el.next('.field-error').length) el.after(`<div class="field-error">${msgs.join('<br>')}</div>`);
+                                    // For radio groups (multiple elements with same name), show error once
+                                    if (el.length > 1 || el.attr('type') === 'radio') {
+                                        // Find or create a dedicated error container for this group
+                                        const groupContainer = el.first().closest('.co-pay-options, .co-shipping-opts');
+                                        if (groupContainer.length) {
+                                            groupContainer.addClass('form-error');
+                                            const errId = `field-error-${field}`;
+                                            $(`#${errId}`).remove();
+                                            groupContainer.after(`<div class="field-error" id="${errId}" style="color:#ef4444; font-size:12px; margin-top:4px;">${msgs.join('<br>')}</div>`);
+                                        } else {
+                                            // fallback: use first element's parent
+                                            const errId = `field-error-${field}`;
+                                            $(`#${errId}`).remove();
+                                            el.first().closest('div').after(`<div class="field-error" id="${errId}" style="color:#ef4444; font-size:12px; margin-top:4px;">${msgs.join('<br>')}</div>`);
+                                        }
+                                    } else {
+                                        el.addClass('form-error');
+                                        if (!el.next('.field-error').length) el.after(`<div class="field-error">${msgs.join('<br>')}</div>`);
+                                    }
                                 }
                             });
                         }
