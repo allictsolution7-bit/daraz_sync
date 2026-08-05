@@ -534,6 +534,35 @@
                                 </div>
                             </div>
 
+                            <!-- Wholesale Pricing Tiers -->
+                            <div class="mb-3 border rounded p-3 bg-light" id="simpleWholesaleTiersSection" style="display: {{ in_array($product->product_type, ['simple', 'digital']) ? 'block' : 'none' }};">
+                                <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-tags-fill"></i> Tiered Wholesale Pricing (Optional)</h6>
+                                <p class="text-muted small mb-3">Add different wholesale prices based on purchase quantity. For example, buying 500+ items can have a lower price than 100+ items.</p>
+                                
+                                <div id="simpleTiersContainer">
+                                    @foreach($product->wholesaleTiers as $tierIndex => $tier)
+                                    <div class="row g-2 align-items-center mb-2 tier-row">
+                                        <div class="col-5">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">Min Qty</span>
+                                                <input type="number" class="form-control" name="wholesale_tiers[{{ $tierIndex }}][min_quantity]" value="{{ $tier->min_quantity }}" required min="1">
+                                            </div>
+                                        </div>
+                                        <div class="col-5">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">Price (৳)</span>
+                                                <input type="number" step="0.01" class="form-control" name="wholesale_tiers[{{ $tierIndex }}][price]" value="{{ $tier->price }}" required min="0">
+                                            </div>
+                                        </div>
+                                        <div class="col-2">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.tier-row').remove()"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addSimpleWholesaleTier()"><i class="bi bi-plus-circle"></i> Add Pricing Tier</button>
+                            </div>
+
                             <!-- Inventory -->
                             <div class="row g-3">
                                 <div class="col-md-6">
@@ -667,7 +696,7 @@
                                 <div id="combinationsTable">
                                     @if($combinations->count() > 0)
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped">
+                                        <table class="table table-bordered table-striped align-middle" style="min-width: 1200px;">
                                             <thead class="table-dark">
                                                 <tr>
                                                     <th>#</th>
@@ -693,7 +722,14 @@
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-regular-price" name="combinations[{{ $index }}][regular_price]" value="{{ $combination->regular_price }}" placeholder="0.00" style="width: 90px;"></td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-offer-price" name="combinations[{{ $index }}][offer_price]" value="{{ $combination->offer_price }}" placeholder="Optional" style="width: 90px;"></td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-product-cost" name="combinations[{{ $index }}][product_cost]" value="{{ $combination->product_cost }}" placeholder="Cost" style="width: 90px;"></td>
-                                                    <td><input type="number" step="0.01" min="0" class="form-control combination-wholesale-price" name="combinations[{{ $index }}][wholesale_price]" value="{{ $combination->wholesale_price }}" placeholder="Wholesale" style="width: 90px;"></td>
+                                                    <td>
+                                                         <input type="number" step="0.01" min="0" class="form-control combination-wholesale-price" name="combinations[{{ $index }}][wholesale_price]" value="{{ $combination->wholesale_price }}" placeholder="Wholesale" style="width: 90px;">
+                                                         <input type="hidden" name="combinations[{{ $index }}][wholesale_tiers]" value="{{ json_encode($combination->wholesaleTiers->map(fn($t) => ['min_quantity' => $t->min_quantity, 'price' => floatval($t->price)])->toArray()) }}">
+                                                         <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1 mt-1 d-block" onclick="openWholesaleTiersModal({{ $index }})" style="font-size: 10px;">Manage Tiers</button>
+                                                         <span id="tier-badge-{{ $index }}" class="badge {{ $combination->wholesaleTiers->count() > 0 ? 'bg-success' : 'bg-secondary' }} mt-1" style="font-size: 9px;">
+                                                             {{ $combination->wholesaleTiers->count() > 0 ? $combination->wholesaleTiers->count() . ' tier(s)' : 'No tiers' }}
+                                                         </span>
+                                                     </td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-reseller-price" name="combinations[{{ $index }}][reseller_price]" value="{{ $combination->reseller_price }}" placeholder="Reseller" style="width: 90px;"></td>
                                                     <td><input type="number" min="0" class="form-control combination-stock" name="combinations[{{ $index }}][stock_quantity]" value="{{ $combination->stock_quantity }}" placeholder="0" style="width: 70px;"></td>
                                                     <td><textarea class="form-control combination-description" name="combinations[{{ $index }}][short_description]" rows="2" placeholder="Brief description..." style="width: 200px; resize: vertical;">{{ $combination->short_description }}</textarea></td>
@@ -1233,7 +1269,12 @@
         rowHTML += `<td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][regular_price]" value="0.00" placeholder="0.00" style="width: 90px;"></td>
             <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][offer_price]" value="" placeholder="Optional" style="width: 90px;"></td>
             <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][product_cost]" value="" placeholder="Cost" style="width: 90px;"></td>
-            <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][wholesale_price]" value="" placeholder="Wholesale" style="width: 90px;"></td>
+            <td>
+                <input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][wholesale_price]" value="" placeholder="Wholesale" style="width: 90px;">
+                <input type="hidden" name="combinations[${currentIndex}][wholesale_tiers]" value="[]">
+                <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1 mt-1 d-block" onclick="openWholesaleTiersModal(${currentIndex})" style="font-size: 10px;">Manage Tiers</button>
+                <span id="tier-badge-${currentIndex}" class="badge bg-secondary mt-1" style="font-size: 9px;">No tiers</span>
+            </td>
             <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][reseller_price]" value="" placeholder="Reseller" style="width: 90px;"></td>
             <td><input type="number" min="0" class="form-control" name="combinations[${currentIndex}][stock_quantity]" value="0" placeholder="0" style="width: 70px;"></td>
             <td><textarea class="form-control" name="combinations[${currentIndex}][short_description]" rows="2" placeholder="Brief description..." style="width: 200px; resize: vertical;"></textarea></td>
@@ -1252,7 +1293,7 @@
         const variations = document.querySelectorAll('.variation');
         const variationNames = [];
         variations.forEach(variation => { const nameInput = variation.querySelector('input[name*="[name]"]'); if (nameInput && nameInput.value.trim()) variationNames.push(nameInput.value.trim()); });
-        let tableHTML = `<div class="table-responsive"><table class="table table-bordered table-striped"><thead class="table-dark"><tr><th>#</th>`;
+        let tableHTML = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle" style="min-width: 1200px;"><thead class="table-dark"><tr><th>#</th>`;
         variationNames.forEach(name => tableHTML += `<th>${name}</th>`);
         tableHTML += `<th>Regular Price (৳)</th><th>Offer Price (৳)</th><th>Product Cost (৳)</th><th>Wholesale Price (৳)</th><th>Reseller Price (৳)</th><th>Stock</th><th>Description</th><th>Images</th><th>Actions</th></tr></thead><tbody></tbody></table></div>`;
         tableDiv.innerHTML = tableHTML;
@@ -1511,5 +1552,154 @@
             }
         });
     });
+
+    let simpleTierCounter = {{ $product->wholesaleTiers->count() }};
+    function addSimpleWholesaleTier() {
+        const container = document.getElementById('simpleTiersContainer');
+        const row = document.createElement('div');
+        row.className = 'row g-2 align-items-center mb-2 tier-row';
+        row.innerHTML = `
+            <div class="col-5">
+                <input type="number" class="form-control" name="wholesale_tiers[${simpleTierCounter}][min_quantity]" placeholder="Min Qty" required min="1">
+            </div>
+            <div class="col-5">
+                <input type="number" step="0.01" class="form-control" name="wholesale_tiers[${simpleTierCounter}][price]" placeholder="Price (৳)" required min="0">
+            </div>
+            <div class="col-2 text-center">
+                <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.tier-row').remove()"><i class="bi bi-trash"></i></button>
+            </div>
+        `;
+        container.appendChild(row);
+        simpleTierCounter++;
+    }
+
+    let currentModalCombinationIndex = null;
+    let currentModalTiers = [];
+
+    window.openWholesaleTiersModal = function(index) {
+        currentModalCombinationIndex = index;
+        const hiddenInput = document.querySelector(`input[name="combinations[${index}][wholesale_tiers]"]`);
+        if (hiddenInput) {
+            try {
+                currentModalTiers = JSON.parse(hiddenInput.value || '[]');
+            } catch (e) {
+                currentModalTiers = [];
+            }
+        } else {
+            currentModalTiers = [];
+        }
+        
+        renderModalTiers();
+        
+        const modalEl = document.getElementById('wholesaleTiersModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+
+    function renderModalTiers() {
+        const container = document.getElementById('modalTiersContainer');
+        container.innerHTML = '';
+        
+        currentModalTiers.forEach((tier, idx) => {
+            const row = document.createElement('div');
+            row.className = 'row g-2 align-items-center mb-2 modal-tier-row';
+            row.innerHTML = `
+                <div class="col-5">
+                    <input type="number" class="form-control modal-tier-qty" value="${tier.min_quantity || ''}" placeholder="Min Qty" required min="1">
+                </div>
+                <div class="col-5">
+                    <input type="number" step="0.01" class="form-control modal-tier-price" value="${tier.price || ''}" placeholder="Price (৳)" required min="0">
+                </div>
+                <div class="col-2 text-center">
+                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.modal-tier-row').remove()"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+        
+        if (currentModalTiers.length === 0) {
+            addModalTierRow();
+        }
+    }
+
+    window.addModalTierRow = function() {
+        const container = document.getElementById('modalTiersContainer');
+        const row = document.createElement('div');
+        row.className = 'row g-2 align-items-center mb-2 modal-tier-row';
+        row.innerHTML = `
+            <div class="col-5">
+                <input type="number" class="form-control modal-tier-qty" placeholder="Min Qty" required min="1">
+            </div>
+            <div class="col-5">
+                <input type="number" step="0.01" class="form-control modal-tier-price" placeholder="Price (৳)" required min="0">
+            </div>
+            <div class="col-2 text-center">
+                <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.modal-tier-row').remove()"><i class="bi bi-trash"></i></button>
+            </div>
+        `;
+        container.appendChild(row);
+    }
+
+    window.saveModalTiers = function() {
+        const rows = document.querySelectorAll('.modal-tier-row');
+        const tiers = [];
+        rows.forEach(row => {
+            const qtyVal = row.querySelector('.modal-tier-qty').value;
+            const priceVal = row.querySelector('.modal-tier-price').value;
+            if (qtyVal && priceVal) {
+                tiers.push({
+                    min_quantity: parseInt(qtyVal),
+                    price: parseFloat(priceVal)
+                });
+            }
+        });
+        
+        tiers.sort((a, b) => a.min_quantity - b.min_quantity);
+        
+        const hiddenInput = document.querySelector(`input[name="combinations[${currentModalCombinationIndex}][wholesale_tiers]"]`);
+        if (hiddenInput) {
+            hiddenInput.value = JSON.stringify(tiers);
+        }
+        
+        const badge = document.getElementById(`tier-badge-${currentModalCombinationIndex}`);
+        if (badge) {
+            if (tiers.length > 0) {
+                badge.className = 'badge bg-success mt-1 d-inline-block';
+                badge.innerText = `${tiers.length} tier(s)`;
+            } else {
+                badge.className = 'badge bg-secondary mt-1 d-inline-block';
+                badge.innerText = 'No tiers';
+            }
+        }
+        
+        const modalEl = document.getElementById('wholesaleTiersModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    }
 </script>
+
+<!-- Wholesale Tiers Modal -->
+<div class="modal fade" id="wholesaleTiersModal" tabindex="-1" aria-labelledby="wholesaleTiersModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="wholesaleTiersModalLabel">Manage Wholesale Price Tiers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Set custom wholesale prices for different minimum purchase quantities.</p>
+                <div id="modalTiersContainer">
+                    <!-- Dynamic Rows Go Here -->
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addModalTierRow()"><i class="bi bi-plus-circle"></i> Add Tier</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveModalTiers()">Save Tiers</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

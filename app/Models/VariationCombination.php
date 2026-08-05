@@ -274,4 +274,9 @@ class VariationCombination extends Model
 
         return VariationOption::whereIn('id', $this->variation_options)->pluck('name')->toArray();
     }
+
+    public function wholesaleTiers()
+    {
+        return $this->hasMany(ProductWholesaleTier::class, 'variation_combination_id')->orderBy('min_quantity');
+    }
 } 

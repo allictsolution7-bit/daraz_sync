@@ -452,12 +452,19 @@
                                                             <button type="button" class="btn btn-gradient-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
                                                                     data-product="{{ json_encode([
                                                                         'title' => $product->title,
-                                                                        'description' => strip_tags($product->description ?? ''),
-                                                                        'short_description' => strip_tags($product->short_description ?? ''),
+                                                                        'product_url' => route('product.single', ['id' => $product->id, 'slug' => $product->slug]),
+                                                                        'category' => $product->category->name ?? 'N/A',
+                                                                        'brand' => $product->brand->name ?? 'N/A',
+                                                                        'stock_status' => $product->stock_status,
+                                                                        'quantity' => $product->quantity,
+                                                                        'description' => preg_replace('/<img[^>]*>/i', '', $product->description ?? ''),
+                                                                        'short_description' => preg_replace('/<img[^>]*>/i', '', $product->short_description ?? ''),
                                                                         'old_price' => $product->old_price,
                                                                         'offer' => $product->offer,
                                                                         'reseller_price' => $product->reseller_price,
                                                                         'sku' => $product->sku ?? '',
+                                                                        'thumb_image' => asset('storage/' . $product->thumb_image),
+                                                                        'gallery_images' => array_map(fn($img) => asset('storage/' . $img), is_array($product->images) ? $product->images : (json_decode($product->images, true) ?: [])),
                                                                         'variations' => $product->variationCombinations->map(function($comb) {
                                                                             return $comb->combination_string . ': ৳' . number_format($comb->reseller_price ?? $comb->regular_price ?? 0, 2);
                                                                         })->toArray()
@@ -802,12 +809,19 @@
                                     <button type="button" class="btn btn-gradient-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
                                             data-product="{{ json_encode([
                                                 'title' => $product->title,
-                                                'description' => strip_tags($product->description ?? ''),
-                                                'short_description' => strip_tags($product->short_description ?? ''),
+                                                'product_url' => route('product.single', ['id' => $product->id, 'slug' => $product->slug]),
+                                                'category' => $product->category->name ?? 'N/A',
+                                                'brand' => $product->brand->name ?? 'N/A',
+                                                'stock_status' => $product->stock_status,
+                                                'quantity' => $product->quantity,
+                                                'description' => preg_replace('/<img[^>]*>/i', '', $product->description ?? ''),
+                                                'short_description' => preg_replace('/<img[^>]*>/i', '', $product->short_description ?? ''),
                                                 'old_price' => $product->old_price,
                                                 'offer' => $product->offer,
                                                 'reseller_price' => $product->reseller_price,
                                                 'sku' => $product->sku ?? '',
+                                                'thumb_image' => asset('storage/' . $product->thumb_image),
+                                                'gallery_images' => array_map(fn($img) => asset('storage/' . $img), is_array($product->images) ? $product->images : (json_decode($product->images, true) ?: [])),
                                                 'variations' => $product->variationCombinations->map(function($comb) {
                                                     return $comb->combination_string . ': ৳' . number_format($comb->reseller_price ?? $comb->regular_price ?? 0, 2);
                                                 })->toArray()
@@ -1454,15 +1468,72 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.copyProductContent = function(productData) {
+        // Helper to convert HTML to clean plaintext with formatting (newlines for blocks, tabs for table cells)
+        function cleanHtml(html) {
+            if (!html) return '';
+            let temp = document.createElement("div");
+            temp.innerHTML = html;
+            
+            // Format table cells so they don't merge together in plaintext
+            temp.querySelectorAll('td, th').forEach(cell => {
+                cell.after(' \t '); // Tab separator for columns
+            });
+            
+            // Replace <br> tags with a newline
+            temp.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+            
+            // Append newlines only for rows, or block tags outside of table cells
+            temp.querySelectorAll('p, div, li, h1, h2, h3, h4, h5, h6, tr, ul, ol').forEach(el => {
+                if (el.tagName === 'TR') {
+                    el.after('\n');
+                    return;
+                }
+                if (!el.closest('td') && !el.closest('th')) {
+                    el.after('\n');
+                }
+            });
+            
+            // Retrieve text content
+            let text = temp.textContent || temp.innerText || "";
+            // Replace multiple consecutive newlines with max 2 newlines for clean output
+            return text.replace(/\n{3,}/g, '\n\n').trim();
+        }
+
+        // Helper to convert relative URLs to absolute URLs
+        function makeAbsoluteUrl(url) {
+            if (!url) return '';
+            if (url.startsWith('/')) {
+                return window.location.origin + url;
+            }
+            return url;
+        }
+
+        let mainImg = makeAbsoluteUrl(productData.thumb_image);
+        let gallery = productData.gallery_images || [];
+
+        // 1. Build Plain Text version
         let textToCopy = `Title: ${productData.title}\n`;
+        if (productData.product_url) {
+            textToCopy += `Product Link: ${productData.product_url}\n`;
+        }
         if (productData.sku) {
             textToCopy += `SKU: ${productData.sku}\n`;
         }
-        if (productData.offer && parseFloat(productData.offer) > 0) {
-            textToCopy += `Offer Price: ৳${parseFloat(productData.offer).toFixed(2)}\n`;
+        if (productData.category && productData.category !== 'N/A') {
+            textToCopy += `Category: ${productData.category}\n`;
+        }
+        if (productData.brand && productData.brand !== 'N/A') {
+            textToCopy += `Brand: ${productData.brand}\n`;
+        }
+        if (productData.stock_status) {
+            let stockQty = productData.quantity !== null && productData.quantity !== undefined ? ` (${productData.quantity} units)` : '';
+            textToCopy += `Stock Status: ${productData.stock_status}${stockQty}\n`;
         }
         if (productData.old_price && parseFloat(productData.old_price) > 0) {
             textToCopy += `Regular Price: ৳${parseFloat(productData.old_price).toFixed(2)}\n`;
+        }
+        if (productData.offer && parseFloat(productData.offer) > 0) {
+            textToCopy += `Offer Price: ৳${parseFloat(productData.offer).toFixed(2)}\n`;
         }
         if (productData.reseller_price && parseFloat(productData.reseller_price) > 0) {
             textToCopy += `Reseller Price: ৳${parseFloat(productData.reseller_price).toFixed(2)}\n`;
@@ -1470,20 +1541,87 @@ document.addEventListener('DOMContentLoaded', function() {
         if (productData.variations && productData.variations.length > 0) {
             textToCopy += `Variations / Options:\n` + productData.variations.map(v => ` - ${v}`).join('\n') + `\n`;
         }
+        if (mainImg) {
+            textToCopy += `\nMain Image: ${mainImg}\n`;
+        }
+        if (gallery.length > 0) {
+            textToCopy += `Gallery Images:\n` + gallery.map(img => ` - ${makeAbsoluteUrl(img)}`).join('\n') + `\n`;
+        }
         
-        let desc = productData.description || '';
-        if (productData.short_description) {
-            desc = productData.short_description + (desc ? '\n\n' + desc : '');
+        let desc = cleanHtml(productData.description || '');
+        let shortDesc = cleanHtml(productData.short_description || '');
+        if (shortDesc) {
+            desc = shortDesc + (desc ? '\n\n' + desc : '');
         }
         textToCopy += `\nDescription:\n${desc}\n`;
 
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            alert('Product details successfully copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-            // Fallback for older browsers
+        // 2. Build Rich HTML version for copy
+        let htmlToCopy = `<h3 style="margin-bottom:5px;">${productData.title}</h3>`;
+        if (productData.product_url) {
+            htmlToCopy += `<p><strong>Product Link:</strong> <a href="${productData.product_url}">${productData.product_url}</a></p>`;
+        }
+        if (productData.sku) {
+            htmlToCopy += `<p><strong>SKU:</strong> ${productData.sku}</p>`;
+        }
+        if (productData.category && productData.category !== 'N/A') {
+            htmlToCopy += `<p><strong>Category:</strong> ${productData.category}</p>`;
+        }
+        if (productData.brand && productData.brand !== 'N/A') {
+            htmlToCopy += `<p><strong>Brand:</strong> ${productData.brand}</p>`;
+        }
+        if (productData.stock_status) {
+            let stockQty = productData.quantity !== null && productData.quantity !== undefined ? ` (${productData.quantity} units)` : '';
+            htmlToCopy += `<p><strong>Stock Status:</strong> ${productData.stock_status}${stockQty}</p>`;
+        }
+        if (productData.old_price && parseFloat(productData.old_price) > 0) {
+            htmlToCopy += `<p><strong>Regular Price:</strong> ৳${parseFloat(productData.old_price).toFixed(2)}</p>`;
+        }
+        if (productData.offer && parseFloat(productData.offer) > 0) {
+            htmlToCopy += `<p><strong>Offer Price:</strong> ৳${parseFloat(productData.offer).toFixed(2)}</p>`;
+        }
+        if (productData.reseller_price && parseFloat(productData.reseller_price) > 0) {
+            htmlToCopy += `<p><strong>Reseller Price:</strong> ৳${parseFloat(productData.reseller_price).toFixed(2)}</p>`;
+        }
+        if (productData.variations && productData.variations.length > 0) {
+            htmlToCopy += `<p><strong>Variations / Options:</strong></p><ul>` + productData.variations.map(v => `<li>${v}</li>`).join('') + `</ul>`;
+        }
+        if (mainImg) {
+            htmlToCopy += `<p><strong>Main Image:</strong> <a href="${mainImg}">${mainImg}</a></p>`;
+        }
+        if (gallery.length > 0) {
+            htmlToCopy += `<p><strong>Gallery Images:</strong></p><ul>` + gallery.map(img => `<li><a href="${makeAbsoluteUrl(img)}">${makeAbsoluteUrl(img)}</a></li>`).join('') + `</ul>`;
+        }
+        
+        let descHtml = productData.description || '';
+        let shortDescHtml = productData.short_description || '';
+        if (shortDescHtml) {
+            descHtml = shortDescHtml + '<br><br>' + descHtml;
+        }
+        htmlToCopy += `<div style="margin-top: 15px;"><strong>Description:</strong><br>${descHtml}</div>`;
+
+        // 3. Write to Clipboard using modern clipboard items if supported
+        if (navigator.clipboard && window.ClipboardItem) {
+            const blobPlain = new Blob([textToCopy], { type: 'text/plain' });
+            const blobHtml = new Blob([htmlToCopy], { type: 'text/html' });
+            
+            const clipboardData = [new ClipboardItem({
+                'text/plain': blobPlain,
+                'text/html': blobHtml
+            })];
+            
+            navigator.clipboard.write(clipboardData).then(() => {
+                alert('Product details successfully copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy rich text: ', err);
+                fallbackCopyToClipboard(textToCopy);
+            });
+        } else {
+            fallbackCopyToClipboard(textToCopy);
+        }
+        
+        function fallbackCopyToClipboard(text) {
             let textArea = document.createElement("textarea");
-            textArea.value = textToCopy;
+            textArea.value = text;
             document.body.appendChild(textArea);
             textArea.select();
             try {
@@ -1493,7 +1631,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Could not copy product details.');
             }
             document.body.removeChild(textArea);
-        });
+        }
     };
 
     // Download Product Images Helper

@@ -227,6 +227,7 @@ Route::prefix('account')->name('account.')->group(function () {
         Route::get('/orders/{id}', [AccountController::class, 'orderDetail'])->name('order.detail');
         Route::get('/download/digital-product/{order_id}/{product_id}', [AccountController::class, 'downloadDigitalProduct'])->name('download.digital.product');
         // Delivery Locations Routes
+        Route::get('/locations/store', fn() => redirect()->route('account.show'));
         Route::post('/locations/store', [AccountController::class, 'storeLocation'])->name('locations.store');
         Route::delete('/locations/{id}', [AccountController::class, 'deleteLocation'])->name('locations.delete');
         Route::post('/locations/{id}/default', [AccountController::class, 'setDefaultLocation'])->name('locations.default');

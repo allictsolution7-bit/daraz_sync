@@ -902,6 +902,17 @@
                                 </div>
                             </div>
 
+                            <!-- Wholesale Pricing Tiers -->
+                            <div class="mb-3 border rounded p-3 bg-light" id="simpleWholesaleTiersSection" style="display: block;">
+                                <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-tags-fill"></i> Tiered Wholesale Pricing (Optional)</h6>
+                                <p class="text-muted small mb-3">Add different wholesale prices based on purchase quantity. For example, buying 500+ items can have a lower price than 100+ items.</p>
+                                
+                                <div id="simpleTiersContainer">
+                                    <!-- Dynamic rows loaded here -->
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addSimpleWholesaleTier()"><i class="bi bi-plus-circle"></i> Add Pricing Tier</button>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
@@ -1445,8 +1456,10 @@
         variationsSection.style.display = 'none';
 
         // Show/hide pricing fields based on product type
+        const simpleWholesaleTiersSection = document.getElementById('simpleWholesaleTiersSection');
         if (type === 'variable') {
             pricingFields.style.display = 'none';
+            if (simpleWholesaleTiersSection) simpleWholesaleTiersSection.style.display = 'none';
             // Clear pricing fields for variable products
             document.getElementById('productOldPrice').value = '';
             document.getElementById('productOfferPrice').value = '';
@@ -1456,6 +1469,11 @@
             document.getElementById('productOldPrice').removeAttribute('required');
         } else {
             pricingFields.style.display = 'block';
+            if (type === 'affiliate') {
+                if (simpleWholesaleTiersSection) simpleWholesaleTiersSection.style.display = 'none';
+            } else {
+                if (simpleWholesaleTiersSection) simpleWholesaleTiersSection.style.display = 'block';
+            }
             // Restore name attributes for non-variable products
             document.getElementById('productOldPrice').setAttribute('name', 'old_price');
             document.getElementById('productOfferPrice').setAttribute('name', 'offer');
@@ -1624,7 +1642,7 @@
         // Build editable preview table
         let tableHTML = `
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
+                    <table class="table table-bordered table-striped align-middle" style="min-width: 1200px;">
                         <thead class="table-dark">
                             <tr>
                                 <th>#</th>`;
@@ -1697,6 +1715,9 @@
                                value=""
                                placeholder="Wholesale"
                                style="width: 90px;">
+                        <input type="hidden" name="combinations[${index}][wholesale_tiers]" value="[]">
+                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1 mt-1 d-block" onclick="openWholesaleTiersModal(${index})" style="font-size: 10px;">Manage Tiers</button>
+                        <span id="tier-badge-${index}" class="badge bg-secondary mt-1" style="font-size: 9px;">No tiers</span>
                     </td>
                     <td>
                         <input type="number" 
@@ -2623,5 +2644,172 @@
             }
         });
     });
+
+    let simpleTierCounter = 0;
+    function addSimpleWholesaleTier() {
+        const container = document.getElementById('simpleTiersContainer');
+        const row = document.createElement('div');
+        row.className = 'row g-2 align-items-center mb-2 tier-row';
+        row.innerHTML = `
+            <div class="col-5">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Min Qty</span>
+                    <input type="number" class="form-control" name="wholesale_tiers[${simpleTierCounter}][min_quantity]" required min="1">
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Price (৳)</span>
+                    <input type="number" step="0.01" class="form-control" name="wholesale_tiers[${simpleTierCounter}][price]" required min="0">
+                </div>
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.tier-row').remove()"><i class="bi bi-trash"></i></button>
+            </div>
+        `;
+        container.appendChild(row);
+        simpleTierCounter++;
+    }
+
+    let currentModalCombinationIndex = null;
+    let currentModalTiers = [];
+
+    window.openWholesaleTiersModal = function(index) {
+        currentModalCombinationIndex = index;
+        const hiddenInput = document.querySelector(`input[name="combinations[${index}][wholesale_tiers]"]`);
+        if (hiddenInput) {
+            try {
+                currentModalTiers = JSON.parse(hiddenInput.value || '[]');
+            } catch (e) {
+                currentModalTiers = [];
+            }
+        } else {
+            currentModalTiers = [];
+        }
+        
+        renderModalTiers();
+        
+        const modalEl = document.getElementById('wholesaleTiersModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+
+    function renderModalTiers() {
+        const container = document.getElementById('modalTiersContainer');
+        container.innerHTML = '';
+        
+        currentModalTiers.forEach((tier, idx) => {
+            const row = document.createElement('div');
+            row.className = 'row g-2 align-items-center mb-2 modal-tier-row';
+            row.innerHTML = `
+                <div class="col-5">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">Min Qty</span>
+                        <input type="number" class="form-control modal-tier-qty" value="${tier.min_quantity || ''}" required min="1">
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">Price (৳)</span>
+                        <input type="number" step="0.01" class="form-control modal-tier-price" value="${tier.price || ''}" required min="0">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.modal-tier-row').remove()"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+        
+        if (currentModalTiers.length === 0) {
+            addModalTierRow();
+        }
+    }
+
+    window.addModalTierRow = function() {
+        const container = document.getElementById('modalTiersContainer');
+        const row = document.createElement('div');
+        row.className = 'row g-2 align-items-center mb-2 modal-tier-row';
+        row.innerHTML = `
+            <div class="col-5">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Min Qty</span>
+                    <input type="number" class="form-control modal-tier-qty" required min="1">
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Price (৳)</span>
+                    <input type="number" step="0.01" class="form-control modal-tier-price" required min="0">
+                </div>
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.modal-tier-row').remove()"><i class="bi bi-trash"></i></button>
+            </div>
+        `;
+        container.appendChild(row);
+    }
+
+    window.saveModalTiers = function() {
+        const rows = document.querySelectorAll('.modal-tier-row');
+        const tiers = [];
+        rows.forEach(row => {
+            const qtyVal = row.querySelector('.modal-tier-qty').value;
+            const priceVal = row.querySelector('.modal-tier-price').value;
+            if (qtyVal && priceVal) {
+                tiers.push({
+                    min_quantity: parseInt(qtyVal),
+                    price: parseFloat(priceVal)
+                });
+            }
+        });
+        
+        tiers.sort((a, b) => a.min_quantity - b.min_quantity);
+        
+        const hiddenInput = document.querySelector(`input[name="combinations[${currentModalCombinationIndex}][wholesale_tiers]"]`);
+        if (hiddenInput) {
+            hiddenInput.value = JSON.stringify(tiers);
+        }
+        
+        const badge = document.getElementById(`tier-badge-${currentModalCombinationIndex}`);
+        if (badge) {
+            if (tiers.length > 0) {
+                badge.className = 'badge bg-success mt-1 d-inline-block';
+                badge.innerText = `${tiers.length} tier(s)`;
+            } else {
+                badge.className = 'badge bg-secondary mt-1 d-inline-block';
+                badge.innerText = 'No tiers';
+            }
+        }
+        
+        const modalEl = document.getElementById('wholesaleTiersModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    }
 </script>
+
+<!-- Wholesale Tiers Modal -->
+<div class="modal fade" id="wholesaleTiersModal" tabindex="-1" aria-labelledby="wholesaleTiersModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="wholesaleTiersModalLabel">Manage Wholesale Price Tiers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Set custom wholesale prices for different minimum purchase quantities.</p>
+                <div id="modalTiersContainer">
+                    <!-- Dynamic Rows Go Here -->
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addModalTierRow()"><i class="bi bi-plus-circle"></i> Add Tier</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveModalTiers()">Save Tiers</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

@@ -641,4 +641,9 @@ class Product extends Model
         // Regular admins see products created by them
         return $query->where('products.created_by', $user->id);
     }
+
+    public function wholesaleTiers()
+    {
+        return $this->hasMany(ProductWholesaleTier::class, 'product_id')->orderBy('min_quantity');
+    }
 }

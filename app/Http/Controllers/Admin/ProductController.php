@@ -425,6 +425,22 @@ class ProductController extends Controller
 
         $product = Product::create($productData);
 
+        // Store wholesale tiers for simple product
+        $tiersInput = $request->input('wholesale_tiers');
+        if (is_string($tiersInput)) {
+            $tiersInput = json_decode($tiersInput, true);
+        }
+        if (is_array($tiersInput)) {
+            foreach ($tiersInput as $tier) {
+                if (isset($tier['min_quantity']) && isset($tier['price'])) {
+                    $product->wholesaleTiers()->create([
+                        'min_quantity' => $tier['min_quantity'],
+                        'price' => $tier['price']
+                    ]);
+                }
+            }
+        }
+
         // Handle SEO data if provided
         if ($request->has('seo') && is_array($request->input('seo'))) {
             $seoData = $request->input('seo');
@@ -656,7 +672,7 @@ class ProductController extends Controller
             }
 
             // Create the combination record with custom or default values
-            VariationCombination::create([
+            $newCombination = VariationCombination::create([
                 'product_id' => $product->id,
                 'variation_options' => $optionIds,
                 'combination_key' => $combinationKey,
@@ -671,6 +687,22 @@ class ProductController extends Controller
                 'gallery_images' => !empty($customGalleryImages) ? $customGalleryImages : null,
                 'is_active' => true,
             ]);
+
+            $combTiers = $customData['wholesale_tiers'] ?? null;
+            if (is_string($combTiers)) {
+                $combTiers = json_decode($combTiers, true);
+            }
+            if (is_array($combTiers)) {
+                foreach ($combTiers as $tier) {
+                    if (isset($tier['min_quantity']) && isset($tier['price'])) {
+                        $newCombination->wholesaleTiers()->create([
+                            'product_id' => $product->id,
+                            'min_quantity' => $tier['min_quantity'],
+                            'price' => $tier['price']
+                        ]);
+                    }
+                }
+            }
         }
     }
 
@@ -1015,11 +1047,45 @@ class ProductController extends Controller
                         }
                     }
                     $existingCombination->save();
+
+                    // Sync wholesale tiers
+                    $existingCombination->wholesaleTiers()->delete();
+                    $combTiers = $combinationData['wholesale_tiers'] ?? null;
+                    if (is_string($combTiers)) {
+                        $combTiers = json_decode($combTiers, true);
+                    }
+                    if (is_array($combTiers)) {
+                        foreach ($combTiers as $tier) {
+                            if (isset($tier['min_quantity']) && isset($tier['price'])) {
+                                $existingCombination->wholesaleTiers()->create([
+                                    'product_id' => $product->id,
+                                    'min_quantity' => $tier['min_quantity'],
+                                    'price' => $tier['price']
+                                ]);
+                            }
+                        }
+                    }
                 }
             } else {
                 // Create new combination
                 // The variation_options field is already in $data as JSON
                 $newCombination = VariationCombination::create($data);
+
+                $combTiers = $combinationData['wholesale_tiers'] ?? null;
+                if (is_string($combTiers)) {
+                    $combTiers = json_decode($combTiers, true);
+                }
+                if (is_array($combTiers)) {
+                    foreach ($combTiers as $tier) {
+                        if (isset($tier['min_quantity']) && isset($tier['price'])) {
+                            $newCombination->wholesaleTiers()->create([
+                                'product_id' => $product->id,
+                                'min_quantity' => $tier['min_quantity'],
+                                'price' => $tier['price']
+                            ]);
+                        }
+                    }
+                }
             }
         }
     }
@@ -1256,6 +1322,23 @@ class ProductController extends Controller
 
         // Update the product
         $update = $product->update($productData);
+
+        // Store/Sync wholesale tiers for simple product
+        $product->wholesaleTiers()->delete();
+        $tiersInput = $request->input('wholesale_tiers');
+        if (is_string($tiersInput)) {
+            $tiersInput = json_decode($tiersInput, true);
+        }
+        if (is_array($tiersInput)) {
+            foreach ($tiersInput as $tier) {
+                if (isset($tier['min_quantity']) && isset($tier['price'])) {
+                    $product->wholesaleTiers()->create([
+                        'min_quantity' => $tier['min_quantity'],
+                        'price' => $tier['price']
+                    ]);
+                }
+            }
+        }
 
         // Handle SEO data if provided
         if ($request->has('seo') && is_array($request->input('seo'))) {
