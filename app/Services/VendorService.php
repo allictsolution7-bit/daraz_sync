@@ -292,8 +292,52 @@ class VendorService
                     $vendorProductData['status'] = 1;
                     $vendorProductData['quantity'] = $allocation->requested_quantity;
                     $vendorProductData['slug'] = $parentProduct->slug . '-v' . $allocation->vendor_id . '-' . time();
+                    
+                    // The admin's wholesale price becomes the vendor's product cost
+                    $vendorProductData['product_cost'] = $parentProduct->wholesale_price > 0 ? $parentProduct->wholesale_price : $parentProduct->product_cost;
 
                     $vendorProduct = Product::create($vendorProductData);
+
+                    // Replicate variation combinations if product is variable
+                    if ($parentProduct->product_type === 'variable') {
+                        $parentProduct->load('variationCombinations');
+                        foreach ($parentProduct->variationCombinations as $parentComb) {
+                            $vendorCombData = $parentComb->toArray();
+                            unset($vendorCombData['id'], $vendorCombData['created_at'], $vendorCombData['updated_at']);
+                            $vendorCombData['product_id'] = $vendorProduct->id;
+                            
+                            // Replicated variation combination's product_cost becomes parent combination's wholesale_price
+                            $vendorCombData['product_cost'] = $parentComb->wholesale_price > 0 ? $parentComb->wholesale_price : $parentComb->product_cost;
+                            
+                            $newComb = \App\Models\VariationCombination::create($vendorCombData);
+
+                            // Replicate combination wholesale pricing tiers
+                            if ($parentComb->wholesaleTiers()->exists()) {
+                                foreach ($parentComb->wholesaleTiers as $tier) {
+                                    \App\Models\ProductWholesaleTier::create([
+                                        'product_id' => $vendorProduct->id,
+                                        'variation_combination_id' => $newComb->id,
+                                        'min_quantity' => $tier->min_quantity,
+                                        'price' => $tier->price,
+                                    ]);
+                                }
+                            }
+                        }
+                    } else {
+                        // Replicate simple product wholesale pricing tiers
+                        if ($parentProduct->wholesaleTiers()->exists()) {
+                            foreach ($parentProduct->wholesaleTiers as $tier) {
+                                if (!$tier->variation_combination_id) {
+                                    \App\Models\ProductWholesaleTier::create([
+                                        'product_id' => $vendorProduct->id,
+                                        'variation_combination_id' => null,
+                                        'min_quantity' => $tier->min_quantity,
+                                        'price' => $tier->price,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
 
                     // Link allocation to newly created vendor product if desired
                     $allocation->update(['product_id' => $vendorProduct->id]);

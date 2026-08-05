@@ -997,12 +997,12 @@ class ProductController extends Controller
                 'product_id' => $product->id,
                 'combination_key' => $combinationKey,
                 'variation_options' => $optionIds, // JSON field
-                'regular_price' => $combinationData['regular_price'] ?? 0,
-                'offer_price' => $combinationData['offer_price'] ?? null,
-                'product_cost' => $combinationData['product_cost'] ?? null,
-                'wholesale_price' => $combinationData['wholesale_price'] ?? null,
-                'reseller_price' => $combinationData['reseller_price'] ?? null,
-                'stock_quantity' => $combinationData['stock_quantity'] ?? 0,
+                'regular_price' => isset($combinationData['regular_price']) && $combinationData['regular_price'] !== '' ? floatval($combinationData['regular_price']) : 0,
+                'offer_price' => isset($combinationData['offer_price']) && $combinationData['offer_price'] !== '' ? floatval($combinationData['offer_price']) : null,
+                'product_cost' => isset($combinationData['product_cost']) && $combinationData['product_cost'] !== '' ? floatval($combinationData['product_cost']) : null,
+                'wholesale_price' => isset($combinationData['wholesale_price']) && $combinationData['wholesale_price'] !== '' ? floatval($combinationData['wholesale_price']) : null,
+                'reseller_price' => isset($combinationData['reseller_price']) && $combinationData['reseller_price'] !== '' ? floatval($combinationData['reseller_price']) : null,
+                'stock_quantity' => isset($combinationData['stock_quantity']) && $combinationData['stock_quantity'] !== '' ? intval($combinationData['stock_quantity']) : 0,
                 'short_description' => $combinationData['short_description'] ?? null,
             ];
 
@@ -1218,6 +1218,7 @@ class ProductController extends Controller
         }
 
         $request->validate($validationRules);
+        \Log::info('Product update combinations: ' . json_encode($request->input('combinations', [])));
 
         // Ensure at least one category is selected (either primary or additional)
         if (empty($request->input('category_id')) && 
@@ -1807,5 +1808,57 @@ class ProductController extends Controller
             return $value->toArray();
         }
         return [];
+    }
+
+    /**
+     * AJAX: Save wholesale tiers for a specific variation combination immediately.
+     * Called when the "Save Tiers" button is clicked in the modal.
+     */
+    public function saveCombinationWholesaleTiers(Request $request, VariationCombination $combination)
+    {
+        // Ensure the combination belongs to a product the user owns
+        $product = Product::forUser()->find($combination->product_id);
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found or access denied.'], 403);
+        }
+
+        $tiersInput = $request->input('tiers', []);
+
+        // Accept JSON string or array
+        if (is_string($tiersInput)) {
+            $tiersInput = json_decode($tiersInput, true) ?? [];
+        }
+
+        // Validate tiers
+        $validTiers = [];
+        foreach ($tiersInput as $tier) {
+            $minQty = isset($tier['min_quantity']) ? intval($tier['min_quantity']) : null;
+            $price  = isset($tier['price'])        ? floatval($tier['price'])        : null;
+            if ($minQty !== null && $minQty > 0 && $price !== null && $price >= 0) {
+                $validTiers[] = ['min_quantity' => $minQty, 'price' => $price];
+            }
+        }
+
+        // Sort by min_quantity ascending
+        usort($validTiers, fn($a, $b) => $a['min_quantity'] <=> $b['min_quantity']);
+
+        // Replace existing tiers for this combination
+        $combination->wholesaleTiers()->delete();
+
+        foreach ($validTiers as $tier) {
+            $combination->wholesaleTiers()->create([
+                'product_id'   => $product->id,
+                'min_quantity' => $tier['min_quantity'],
+                'price'        => $tier['price'],
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => count($validTiers) > 0
+                ? count($validTiers) . ' tier(s) saved successfully.'
+                : 'Wholesale tiers cleared.',
+            'tier_count' => count($validTiers),
+        ]);
     }
 }

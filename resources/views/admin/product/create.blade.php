@@ -2761,11 +2761,13 @@
         const badge = document.getElementById(`tier-badge-${currentModalCombinationIndex}`);
         if (badge) {
             if (tiers.length > 0) {
-                badge.className = 'badge bg-success mt-1 d-inline-block';
+                badge.className = 'badge bg-success mt-1';
                 badge.innerText = `${tiers.length} tier(s)`;
+                badge.style.display = 'inline-block';
             } else {
-                badge.className = 'badge bg-secondary mt-1 d-inline-block';
+                badge.className = 'badge bg-secondary mt-1';
                 badge.innerText = 'No tiers';
+                badge.style.display = 'none';
             }
         }
         

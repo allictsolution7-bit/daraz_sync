@@ -357,6 +357,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::get('/catalog/search', [AdminProductController::class, 'search'])->name('items.search');
     Route::get('/catalog/search-products', [AdminProductController::class, 'search'])->name('products.search');
     Route::get('/item-slug-availability', [AdminProductController::class, 'checkSlugAvailability'])->name('item-slug-availability');
+    Route::post('/catalog/combination/{combination}/save-wholesale-tiers', [AdminProductController::class, 'saveCombinationWholesaleTiers'])->name('items.combination.save-wholesale-tiers');
 
     // Inventory Management
     Route::prefix('stock-control')->name('inventory.')->group(function () {

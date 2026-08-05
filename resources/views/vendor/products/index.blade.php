@@ -672,43 +672,65 @@
                                 $displayPrice = '৳0.00';
                                 $displayOldPrice = null;
 
-                                if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
-                                    $prices = [];
-                                    $regularPrices = [];
-                                    foreach ($product->variationCombinations as $comb) {
-                                        $p = $comb->offer_price ?? $comb->regular_price ?? 0;
-                                        $reg = $comb->regular_price ?? 0;
-                                        if ($p > 0) $prices[] = (float)$p;
-                                        if ($reg > 0) $regularPrices[] = (float)$reg;
-                                    }
-                                    if (!empty($prices)) {
-                                        $minP = min($prices);
-                                        $maxP = max($prices);
-                                        if ($minP === $maxP) {
-                                            $displayPrice = '৳' . number_format($minP, 2);
-                                        } else {
-                                            $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                if (($source ?? 'my_products') === 'admin_products') {
+                                    if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
+                                        $wPrices = [];
+                                        foreach ($product->variationCombinations as $comb) {
+                                            $wp = $comb->wholesale_price > 0 ? $comb->wholesale_price : ($comb->offer_price ?? $comb->regular_price ?? 0);
+                                            if ($wp > 0) $wPrices[] = (float)$wp;
                                         }
-                                    } elseif (!empty($regularPrices)) {
-                                        $minP = min($regularPrices);
-                                        $maxP = max($regularPrices);
-                                        if ($minP === $maxP) {
-                                            $displayPrice = '৳' . number_format($minP, 2);
-                                        } else {
-                                            $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                        if (!empty($wPrices)) {
+                                            $minW = min($wPrices);
+                                            $maxW = max($wPrices);
+                                            if ($minW === $maxW) {
+                                                $displayPrice = '৳' . number_format($minW, 2);
+                                            } else {
+                                                $displayPrice = '৳' . number_format($minW, 2) . ' - ৳' . number_format($maxW, 2);
+                                            }
                                         }
+                                    } else {
+                                        $wp = $product->wholesale_price > 0 ? $product->wholesale_price : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0));
+                                        $displayPrice = '৳' . number_format($wp, 2);
                                     }
                                 } else {
-                                    $offerPrice = (float)($product->offer ?? 0);
-                                    $oldPrice = (float)($product->old_price ?? 0);
-
-                                    if ($offerPrice > 0) {
-                                        $displayPrice = '৳' . number_format($offerPrice, 2);
-                                        if ($oldPrice > $offerPrice) {
-                                            $displayOldPrice = '৳' . number_format($oldPrice, 2);
+                                    if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
+                                        $prices = [];
+                                        $regularPrices = [];
+                                        foreach ($product->variationCombinations as $comb) {
+                                            $p = $comb->offer_price ?? $comb->regular_price ?? 0;
+                                            $reg = $comb->regular_price ?? 0;
+                                            if ($p > 0) $prices[] = (float)$p;
+                                            if ($reg > 0) $regularPrices[] = (float)$reg;
                                         }
-                                    } elseif ($oldPrice > 0) {
-                                        $displayPrice = '৳' . number_format($oldPrice, 2);
+                                        if (!empty($prices)) {
+                                            $minP = min($prices);
+                                            $maxP = max($prices);
+                                            if ($minP === $maxP) {
+                                                $displayPrice = '৳' . number_format($minP, 2);
+                                            } else {
+                                                $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                            }
+                                        } elseif (!empty($regularPrices)) {
+                                            $minP = min($regularPrices);
+                                            $maxP = max($regularPrices);
+                                            if ($minP === $maxP) {
+                                                $displayPrice = '৳' . number_format($minP, 2);
+                                            } else {
+                                                $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                            }
+                                        }
+                                    } else {
+                                        $offerPrice = (float)($product->offer ?? 0);
+                                        $oldPrice = (float)($product->old_price ?? 0);
+
+                                        if ($offerPrice > 0) {
+                                            $displayPrice = '৳' . number_format($offerPrice, 2);
+                                            if ($oldPrice > $offerPrice) {
+                                                $displayOldPrice = '৳' . number_format($oldPrice, 2);
+                                            }
+                                        } elseif ($oldPrice > 0) {
+                                            $displayPrice = '৳' . number_format($oldPrice, 2);
+                                        }
                                     }
                                 }
                             @endphp

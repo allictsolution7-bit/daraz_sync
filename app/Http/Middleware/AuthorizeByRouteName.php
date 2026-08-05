@@ -30,6 +30,7 @@ class AuthorizeByRouteName
         if (
             $name === 'admin.get-product-subcategories' || 
             $name === 'admin.third-categories.by-subcategories' ||
+            $name === 'admin.items.combination.save-wholesale-tiers' ||
             str_starts_with($name, 'admin.subscription-payments') || 
             str_starts_with($name, 'admin.profile') || 
             str_starts_with($name, 'admin.steadfast') ||

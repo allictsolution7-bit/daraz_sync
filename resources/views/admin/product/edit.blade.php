@@ -1580,10 +1580,15 @@
     }
 
     let currentModalCombinationIndex = null;
+    let currentModalCombinationId = null;
     let currentModalTiers = [];
 
     window.openWholesaleTiersModal = function(index) {
         currentModalCombinationIndex = index;
+        // Grab the DB id of this combination from the hidden id input
+        const idInput = document.querySelector(`input[name="combinations[${index}][id]"]`);
+        currentModalCombinationId = idInput ? idInput.value : null;
+
         const hiddenInput = document.querySelector(`input[name="combinations[${index}][wholesale_tiers]"]`);
         if (hiddenInput) {
             try {
@@ -1650,7 +1655,7 @@
         const rows = document.querySelectorAll('.modal-tier-row');
         const tiers = [];
         rows.forEach(row => {
-            const qtyVal = row.querySelector('.modal-tier-qty').value;
+            const qtyVal   = row.querySelector('.modal-tier-qty').value;
             const priceVal = row.querySelector('.modal-tier-price').value;
             if (qtyVal && priceVal) {
                 tiers.push({
@@ -1659,30 +1664,90 @@
                 });
             }
         });
-        
         tiers.sort((a, b) => a.min_quantity - b.min_quantity);
-        
+
+        // Update the hidden field so it stays in sync
         const hiddenInput = document.querySelector(`input[name="combinations[${currentModalCombinationIndex}][wholesale_tiers]"]`);
         if (hiddenInput) {
             hiddenInput.value = JSON.stringify(tiers);
         }
-        
+
+        // Update the badge immediately
         const badge = document.getElementById(`tier-badge-${currentModalCombinationIndex}`);
         if (badge) {
             if (tiers.length > 0) {
-                badge.className = 'badge bg-success mt-1 d-inline-block';
+                badge.className = 'badge bg-success mt-1';
                 badge.innerText = `${tiers.length} tier(s)`;
+                badge.style.display = 'inline-block';
             } else {
-                badge.className = 'badge bg-secondary mt-1 d-inline-block';
+                badge.className = 'badge bg-secondary mt-1';
                 badge.innerText = 'No tiers';
+                badge.style.display = 'none';
             }
         }
-        
-        const modalEl = document.getElementById('wholesaleTiersModal');
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        if (modalInstance) {
-            modalInstance.hide();
+
+        // --- AJAX: save immediately to database if this combination already has a DB id ---
+        if (currentModalCombinationId) {
+            const saveBtn = document.querySelector('#wholesaleTiersModal .btn-primary');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>Saving...';
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+            fetch(`{{ url('/admin/catalog/combination') }}/${currentModalCombinationId}/save-wholesale-tiers`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ tiers: tiers })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = 'Save Tiers';
+                }
+                if (data.success) {
+                    // Show a brief success toast/alert
+                    showTierSaveToast(data.message, 'success');
+                    const modalEl = document.getElementById('wholesaleTiersModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) modalInstance.hide();
+                } else {
+                    showTierSaveToast(data.message || 'Failed to save tiers.', 'danger');
+                }
+            })
+            .catch(() => {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = 'Save Tiers';
+                }
+                showTierSaveToast('Network error. Please try again.', 'danger');
+            });
+        } else {
+            // New combination not yet saved — just close modal, data is in hidden input
+            const modalEl = document.getElementById('wholesaleTiersModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
         }
+    }
+
+    function showTierSaveToast(message, type) {
+        let toast = document.getElementById('tierSaveToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'tierSaveToast';
+            toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;min-width:260px;';
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show shadow" role="alert">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+        setTimeout(() => { toast.innerHTML = ''; }, 4000);
     }
 </script>
 
