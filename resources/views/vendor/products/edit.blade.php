@@ -282,10 +282,28 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        <input type="number" step="0.01" class="form-control" name="product_cost" id="productCost" value="{{ old('product_cost', $product->product_cost) }}">
-                                        <label for="productCost">Product Cost (৳)</label>
-                                    </div>
+                                    @if($product->parent_product_id)
+                                        @php
+                                            $adminWholesalePrice = $product->wholesale_price ?? $product->product_cost ?? 0;
+                                        @endphp
+                                        <div class="form-floating mb-1">
+                                            <input type="number" step="0.01" class="form-control bg-light" id="productCostDisplay"
+                                                value="{{ number_format((float)$adminWholesalePrice, 2, '.', '') }}"
+                                                readonly disabled>
+                                            <label for="productCostDisplay">Your Cost — Admin Wholesale Price (৳)</label>
+                                        </div>
+                                        <small class="text-muted d-block mb-3" style="font-size: 0.75rem;">
+                                            <i class="fas fa-info-circle text-primary me-1"></i>
+                                            This is the wholesale price set by admin. Set your Regular &amp; Sale prices above this amount.
+                                        </small>
+                                        {{-- Keep hidden product_cost unchanged so it saves correctly --}}
+                                        <input type="hidden" name="product_cost" value="{{ old('product_cost', $product->product_cost) }}">
+                                    @else
+                                        <div class="form-floating mb-3">
+                                            <input type="number" step="0.01" class="form-control" name="product_cost" id="productCost" value="{{ old('product_cost', $product->product_cost) }}">
+                                            <label for="productCost">Product Cost (৳)</label>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">

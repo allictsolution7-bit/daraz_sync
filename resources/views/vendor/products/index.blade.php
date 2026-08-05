@@ -72,15 +72,17 @@
         color: #ffffff;
         border: none;
         font-weight: 600;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.22);
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.15);
         transition: all 0.2s ease;
+        padding: 0.45rem 1rem;
+        font-size: 0.8rem;
     }
 
     .btn-gradient-primary:hover {
         background: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
         color: #ffffff;
-        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        box-shadow: 0 6px 15px rgba(79, 70, 229, 0.25);
         transform: translateY(-1px);
     }
 
@@ -89,15 +91,17 @@
         color: #ffffff;
         border: none;
         font-weight: 600;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.22);
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15);
         transition: all 0.2s ease;
+        padding: 0.45rem 1rem;
+        font-size: 0.8rem;
     }
 
     .btn-gradient-success:hover {
         background: linear-gradient(135deg, #059669 0%, #047857 100%);
         color: #ffffff;
-        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+        box-shadow: 0 6px 15px rgba(16, 185, 129, 0.25);
         transform: translateY(-1px);
     }
 
@@ -106,15 +110,17 @@
         color: #ffffff;
         border: none;
         font-weight: 600;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
         transition: all 0.2s ease;
+        padding: 0.45rem 1rem;
+        font-size: 0.8rem;
     }
 
     .btn-gradient-blue:hover {
         background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
         color: #ffffff;
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        box-shadow: 0 6px 15px rgba(37, 99, 235, 0.25);
         transform: translateY(-1px);
     }
 
@@ -123,8 +129,10 @@
         background: #ffffff;
         color: #475569;
         font-weight: 600;
-        border-radius: 10px;
+        border-radius: 8px;
         transition: all 0.2s ease;
+        padding: 0.45rem 1rem;
+        font-size: 0.8rem;
     }
 
     .btn-outline-modern:hover {
@@ -671,9 +679,11 @@
                             @php
                                 $displayPrice = '৳0.00';
                                 $displayOldPrice = null;
+                                $displayWholesalePrice = null;
+                                $displayWholesaleLabel = 'Wholesale Price';
 
                                 if (($source ?? 'my_products') === 'admin_products') {
-                                    if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
+                                    if ($product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
                                         $wPrices = [];
                                         foreach ($product->variationCombinations as $comb) {
                                             $wp = $comb->wholesale_price > 0 ? $comb->wholesale_price : ($comb->offer_price ?? $comb->regular_price ?? 0);
@@ -693,35 +703,34 @@
                                         $displayPrice = '৳' . number_format($wp, 2);
                                     }
                                 } else {
-                                    if ($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty()) {
+                                    // my_products: show selling price + wholesale/cost price
+                                    if ($product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
                                         $prices = [];
                                         $regularPrices = [];
+                                        $wPrices = [];
                                         foreach ($product->variationCombinations as $comb) {
                                             $p = $comb->offer_price ?? $comb->regular_price ?? 0;
                                             $reg = $comb->regular_price ?? 0;
+                                            $wp = ($comb->wholesale_price > 0) ? $comb->wholesale_price : ($comb->product_cost ?? 0);
                                             if ($p > 0) $prices[] = (float)$p;
                                             if ($reg > 0) $regularPrices[] = (float)$reg;
+                                            if ($wp > 0) $wPrices[] = (float)$wp;
                                         }
                                         if (!empty($prices)) {
-                                            $minP = min($prices);
-                                            $maxP = max($prices);
-                                            if ($minP === $maxP) {
-                                                $displayPrice = '৳' . number_format($minP, 2);
-                                            } else {
-                                                $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
-                                            }
+                                            $minP = min($prices); $maxP = max($prices);
+                                            $displayPrice = $minP === $maxP ? '৳' . number_format($minP, 2) : '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
                                         } elseif (!empty($regularPrices)) {
-                                            $minP = min($regularPrices);
-                                            $maxP = max($regularPrices);
-                                            if ($minP === $maxP) {
-                                                $displayPrice = '৳' . number_format($minP, 2);
-                                            } else {
-                                                $displayPrice = '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
-                                            }
+                                            $minP = min($regularPrices); $maxP = max($regularPrices);
+                                            $displayPrice = $minP === $maxP ? '৳' . number_format($minP, 2) : '৳' . number_format($minP, 2) . ' - ৳' . number_format($maxP, 2);
+                                        }
+                                        if (!empty($wPrices)) {
+                                            $minW = min($wPrices); $maxW = max($wPrices);
+                                            $displayWholesalePrice = $minW === $maxW ? '৳' . number_format($minW, 2) : '৳' . number_format($minW, 2) . ' - ৳' . number_format($maxW, 2);
                                         }
                                     } else {
                                         $offerPrice = (float)($product->offer ?? 0);
-                                        $oldPrice = (float)($product->old_price ?? 0);
+                                        $oldPrice   = (float)($product->old_price ?? 0);
+                                        $costPrice  = (float)(($product->wholesale_price > 0) ? $product->wholesale_price : ($product->product_cost ?? 0));
 
                                         if ($offerPrice > 0) {
                                             $displayPrice = '৳' . number_format($offerPrice, 2);
@@ -731,6 +740,9 @@
                                         } elseif ($oldPrice > 0) {
                                             $displayPrice = '৳' . number_format($oldPrice, 2);
                                         }
+                                        if ($costPrice > 0) {
+                                            $displayWholesalePrice = '৳' . number_format($costPrice, 2);
+                                        }
                                     }
                                 }
                             @endphp
@@ -739,6 +751,16 @@
                                 <small class="text-decoration-line-through text-muted d-block" style="font-size: 0.75rem;">{{ $displayOldPrice }}</small>
                             @endif
                             <strong class="text-dark fs-6">{{ $displayPrice }}</strong>
+
+                            @if(($source ?? 'my_products') === 'my_products' && $displayWholesalePrice)
+                                <div class="mt-1">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Wholesale Price</small>
+                                    <span class="badge bg-light text-secondary border px-2 py-1" style="font-size: 0.8rem; font-weight: 700; border-radius: 6px;">
+                                        {{ $displayWholesalePrice }}
+                                    </span>
+                                </div>
+                            @endif
+
                             @if(auth()->user()->hasRole('reseller'))
                                 <div class="mt-1">
                                     <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Reseller Price</small>

@@ -293,8 +293,21 @@ class VendorService
                     $vendorProductData['quantity'] = $allocation->requested_quantity;
                     $vendorProductData['slug'] = $parentProduct->slug . '-v' . $allocation->vendor_id . '-' . time();
                     
-                    // The admin's wholesale price becomes the vendor's product cost
-                    $vendorProductData['product_cost'] = $parentProduct->wholesale_price > 0 ? $parentProduct->wholesale_price : $parentProduct->product_cost;
+                    // Fetch vendor markup settings for auto-calculating prices
+                    $settings = VendorSetting::where('vendor_id', $allocation->vendor_id)->first();
+                    $saleMarkup = floatval($settings->sale_price_markup_pct ?? 10.00) / 100;
+                    $oldMarkup  = floatval($settings->old_price_markup_pct  ?? 25.00) / 100;
+                    $wsMarkup   = floatval($settings->wholesale_price_markup_pct ?? 5.00) / 100;
+
+                    // The admin's wholesale price becomes the vendor's product cost and wholesale reference
+                    $adminWholesale = $parentProduct->wholesale_price > 0 ? $parentProduct->wholesale_price : $parentProduct->product_cost;
+                    $vendorProductData['product_cost']   = $adminWholesale;
+                    $vendorProductData['wholesale_price'] = $adminWholesale;
+
+                    // Auto-calculate simple product prices based on markups
+                    $vendorProductData['offer']     = round($adminWholesale * (1 + $saleMarkup), 2);
+                    $vendorProductData['old_price'] = round($adminWholesale * (1 + $oldMarkup), 2);
+                    $vendorProductData['price']     = round($adminWholesale * (1 + $saleMarkup), 2);
 
                     $vendorProduct = Product::create($vendorProductData);
 
@@ -307,7 +320,13 @@ class VendorService
                             $vendorCombData['product_id'] = $vendorProduct->id;
                             
                             // Replicated variation combination's product_cost becomes parent combination's wholesale_price
-                            $vendorCombData['product_cost'] = $parentComb->wholesale_price > 0 ? $parentComb->wholesale_price : $parentComb->product_cost;
+                            $combWholesale = $parentComb->wholesale_price > 0 ? $parentComb->wholesale_price : $parentComb->product_cost;
+                            $vendorCombData['product_cost'] = $combWholesale;
+
+                            // Auto-calculate combination prices based on markups
+                            $vendorCombData['offer_price']    = round($combWholesale * (1 + $saleMarkup), 2);
+                            $vendorCombData['regular_price']  = round($combWholesale * (1 + $oldMarkup), 2);
+                            $vendorCombData['wholesale_price'] = round($combWholesale * (1 + $wsMarkup), 2);
                             
                             $newComb = \App\Models\VariationCombination::create($vendorCombData);
 

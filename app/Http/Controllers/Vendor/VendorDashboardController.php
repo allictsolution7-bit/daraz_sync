@@ -115,11 +115,14 @@ class VendorDashboardController extends Controller
             'payout_bank_name' => 'nullable|string|max:255',
             'payout_branch_name' => 'nullable|string|max:255',
             'payout_routing_number' => 'nullable|string|max:50',
+            'sale_price_markup_pct' => 'nullable|numeric|min:0',
+            'old_price_markup_pct' => 'nullable|numeric|min:0',
+            'wholesale_price_markup_pct' => 'nullable|numeric|min:0',
         ]);
 
         // Only update fields that were actually submitted
         $dataToUpdate = array_filter($validated, function($value) {
-            return !is_null($value);
+            return !is_null($value) && $value !== '';
         });
 
         if (!empty($dataToUpdate)) {

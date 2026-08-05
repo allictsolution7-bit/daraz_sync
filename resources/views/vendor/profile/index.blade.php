@@ -157,6 +157,11 @@
                 <i class="fas fa-shield-alt text-warning"></i> Verification & Policies
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="markup-tab-btn" data-bs-toggle="tab" data-bs-target="#markup-tab" type="button" role="tab" aria-controls="markup-tab" aria-selected="false">
+                <i class="fas fa-magic text-danger"></i> Price Auto-Calculations
+            </button>
+        </li>
     </ul>
 
     <!-- Tab Contents -->
@@ -524,6 +529,78 @@
                                     <span class="fw-bold text-dark">{{ $effectiveSettings['product_count'] }} / {{ $effectiveSettings['product_limit'] }}</span>
                                 @endif
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Price Auto-Calculations Tab -->
+        <div class="tab-pane fade" id="markup-tab" role="tabpanel" aria-labelledby="markup-tab-btn">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="v-card">
+                        <div class="card-header">
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <i class="fas fa-percentage text-danger"></i> Product Price Auto-Calculation Percentages
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form action="{{ route('vendor.profile.update') }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-info border-0 rounded-3 mb-4">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Configure markup percentages here. When copying products from the admin catalog, your retail, old, and wholesale prices will be auto-calculated by applying these percentages above the admin wholesale cost.
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold fs-7">Sale Price Markup (%)</label>
+                                        <input type="number" 
+                                               step="0.01" 
+                                               name="sale_price_markup_pct" 
+                                               class="form-control fs-7" 
+                                               value="{{ old('sale_price_markup_pct', $vendorSettings->sale_price_markup_pct ?? 10.00) }}"
+                                               min="0"
+                                               required>
+                                        <small class="text-muted fs-8">Markup added to cost for Sale Price.</small>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold fs-7">Old Price Markup (%)</label>
+                                        <input type="number" 
+                                               step="0.01" 
+                                               name="old_price_markup_pct" 
+                                               class="form-control fs-7" 
+                                               value="{{ old('old_price_markup_pct', $vendorSettings->old_price_markup_pct ?? 25.00) }}"
+                                               min="0"
+                                               required>
+                                        <small class="text-muted fs-8">Markup added to cost for Old Price.</small>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold fs-7">Wholesale Price Markup (%)</label>
+                                        <input type="number" 
+                                               step="0.01" 
+                                               name="wholesale_price_markup_pct" 
+                                               class="form-control fs-7" 
+                                               value="{{ old('wholesale_price_markup_pct', $vendorSettings->wholesale_price_markup_pct ?? 5.00) }}"
+                                               min="0"
+                                               required>
+                                        <small class="text-muted fs-8">Markup added to cost for Wholesale Price.</small>
+                                    </div>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-success rounded-3 px-4 fw-bold shadow-sm">
+                                        <i class="fas fa-save me-1"></i> Save Calculation Settings
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

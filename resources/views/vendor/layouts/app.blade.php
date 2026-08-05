@@ -315,30 +315,30 @@
         /* Buttons Redesign */
         .btn {
             font-weight: 700;
-            border-radius: 12px;
-            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            padding: 0.45rem 1rem;
             transition: var(--v-transition);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
         .btn-primary {
             background: linear-gradient(135deg, var(--v-primary) 0%, var(--v-primary-dark) 100%) !important;
             border: none !important;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.15) !important;
             color: #ffffff !important;
         }
         .btn-primary:hover {
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3) !important;
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.25) !important;
             transform: translateY(-1px);
             color: #ffffff !important;
         }
         .btn-warning {
             background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
             border: none !important;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2) !important;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.15) !important;
             color: #0f172a !important;
         }
         .btn-warning:hover {
-            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3) !important;
+            box-shadow: 0 6px 15px rgba(245, 158, 11, 0.25) !important;
             transform: translateY(-1px);
             color: #0f172a !important;
         }
@@ -352,6 +352,50 @@
             }
             .vendor-main-wrapper {
                 margin-left: 0;
+            }
+            
+            /* Sidebar overlay/backdrop when open on mobile */
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                z-index: 1035;
+                display: none;
+                backdrop-filter: blur(4px);
+            }
+            .sidebar-overlay.show {
+                display: block;
+            }
+
+            /* Responsive tweaks for wallet pill and topbar on extra small screens */
+            .vendor-topbar {
+                height: 60px !important;
+                padding: 0 0.75rem !important;
+            }
+            .wallet-pill {
+                padding: 3px 5px 3px 8px !important;
+                gap: 6px !important;
+            }
+            .wallet-pill .btn-primary {
+                padding: 0.25rem 0.5rem !important;
+                font-size: 0.65rem !important;
+            }
+            .wallet-balance-amount {
+                font-size: 0.75rem !important;
+            }
+            
+            /* Hide non-essential buttons in topbar on extra small screens to save space */
+            @media (max-width: 575.98px) {
+                .vendor-topbar .btn-light.border.rounded-circle,
+                .vendor-topbar .dropdown:has(.fa-bell) {
+                    display: none !important;
+                }
+                .wallet-pill {
+                    margin-right: 0.25rem;
+                }
             }
         }
     </style>
@@ -648,13 +692,26 @@
             @yield('content')
         </main>
     </div>
+    
+    <!-- Sidebar mobile overlay backdrop -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('sidebarToggleBtn')?.addEventListener('click', function() {
-            document.getElementById('vendorSidebar').classList.toggle('show');
-        });
+        const sidebar = document.getElementById('vendorSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+
+        function toggleSidebar() {
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            }
+        }
+
+        toggleBtn?.addEventListener('click', toggleSidebar);
+        overlay?.addEventListener('click', toggleSidebar);
     </script>
     @stack('scripts')
 </body>

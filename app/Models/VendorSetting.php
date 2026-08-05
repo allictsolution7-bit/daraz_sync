@@ -47,6 +47,9 @@ class VendorSetting extends Model
         'payout_bank_name',
         'payout_branch_name',
         'payout_routing_number',
+        'sale_price_markup_pct',
+        'old_price_markup_pct',
+        'wholesale_price_markup_pct',
     ];
 
     protected $casts = [
@@ -72,6 +75,9 @@ class VendorSetting extends Model
         'custom_min_commission_rate' => 'decimal:2',
         'custom_max_commission_rate' => 'decimal:2',
         'custom_min_withdrawal_amount' => 'decimal:2',
+        'sale_price_markup_pct' => 'decimal:2',
+        'old_price_markup_pct' => 'decimal:2',
+        'wholesale_price_markup_pct' => 'decimal:2',
     ];
 
     /**
