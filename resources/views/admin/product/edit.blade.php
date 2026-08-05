@@ -536,31 +536,25 @@
 
                             <!-- Wholesale Pricing Tiers -->
                             <div class="mb-3 border rounded p-3 bg-light" id="simpleWholesaleTiersSection" style="display: {{ in_array($product->product_type, ['simple', 'digital']) ? 'block' : 'none' }};">
-                                <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-tags-fill"></i> Tiered Wholesale Pricing (Optional)</h6>
+                                <h6 class="fw-bold mb-2 text-dark"><i class="fas fa-tags text-primary me-2"></i> Tiered Wholesale Pricing (Optional)</h6>
                                 <p class="text-muted small mb-3">Add different wholesale prices based on purchase quantity. For example, buying 500+ items can have a lower price than 100+ items.</p>
                                 
                                 <div id="simpleTiersContainer">
                                     @foreach($product->wholesaleTiers as $tierIndex => $tier)
                                     <div class="row g-2 align-items-center mb-2 tier-row">
                                         <div class="col-5">
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text">Min Qty</span>
-                                                <input type="number" class="form-control" name="wholesale_tiers[{{ $tierIndex }}][min_quantity]" value="{{ $tier->min_quantity }}" required min="1">
-                                            </div>
+                                            <input type="number" class="form-control" name="wholesale_tiers[{{ $tierIndex }}][min_quantity]" value="{{ $tier->min_quantity }}" placeholder="Min Qty" required min="1">
                                         </div>
                                         <div class="col-5">
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text">Price (৳)</span>
-                                                <input type="number" step="0.01" class="form-control" name="wholesale_tiers[{{ $tierIndex }}][price]" value="{{ $tier->price }}" required min="0">
-                                            </div>
+                                            <input type="number" step="0.01" class="form-control" name="wholesale_tiers[{{ $tierIndex }}][price]" value="{{ $tier->price }}" placeholder="Price (৳)" required min="0">
                                         </div>
-                                        <div class="col-2">
-                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.tier-row').remove()"><i class="bi bi-trash"></i></button>
+                                        <div class="col-2 text-center">
+                                            <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.tier-row').remove()"><i class="fas fa-trash-alt"></i></button>
                                         </div>
                                     </div>
                                     @endforeach
                                 </div>
-                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addSimpleWholesaleTier()"><i class="bi bi-plus-circle"></i> Add Pricing Tier</button>
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addSimpleWholesaleTier()"><i class="fas fa-plus-circle me-1"></i> Add Pricing Tier</button>
                             </div>
 
                             <!-- Inventory -->
@@ -723,13 +717,19 @@
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-offer-price" name="combinations[{{ $index }}][offer_price]" value="{{ $combination->offer_price }}" placeholder="Optional" style="width: 90px;"></td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-product-cost" name="combinations[{{ $index }}][product_cost]" value="{{ $combination->product_cost }}" placeholder="Cost" style="width: 90px;"></td>
                                                     <td>
-                                                         <input type="number" step="0.01" min="0" class="form-control combination-wholesale-price" name="combinations[{{ $index }}][wholesale_price]" value="{{ $combination->wholesale_price }}" placeholder="Wholesale" style="width: 90px;">
-                                                         <input type="hidden" name="combinations[{{ $index }}][wholesale_tiers]" value="{{ json_encode($combination->wholesaleTiers->map(fn($t) => ['min_quantity' => $t->min_quantity, 'price' => floatval($t->price)])->toArray()) }}">
-                                                         <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1 mt-1 d-block" onclick="openWholesaleTiersModal({{ $index }})" style="font-size: 10px;">Manage Tiers</button>
-                                                         <span id="tier-badge-{{ $index }}" class="badge {{ $combination->wholesaleTiers->count() > 0 ? 'bg-success' : 'bg-secondary' }} mt-1" style="font-size: 9px;">
-                                                             {{ $combination->wholesaleTiers->count() > 0 ? $combination->wholesaleTiers->count() . ' tier(s)' : 'No tiers' }}
-                                                         </span>
-                                                     </td>
+                                                        <div class="input-group input-group-sm" style="width: 110px;">
+                                                            <input type="number" step="0.01" min="0" class="form-control combination-wholesale-price" name="combinations[{{ $index }}][wholesale_price]" value="{{ $combination->wholesale_price }}" placeholder="Wholesale">
+                                                            <button class="btn btn-outline-secondary px-2" type="button" onclick="openWholesaleTiersModal({{ $index }})" title="Manage Wholesale Tiers">
+                                                                <i class="fas fa-list-ol text-primary"></i>
+                                                            </button>
+                                                        </div>
+                                                        <input type="hidden" name="combinations[{{ $index }}][wholesale_tiers]" value="{{ json_encode($combination->wholesaleTiers->map(fn($t) => ['min_quantity' => $t->min_quantity, 'price' => floatval($t->price)])->toArray()) }}">
+                                                        <div class="text-center">
+                                                            <span id="tier-badge-{{ $index }}" class="badge bg-success mt-1" style="font-size: 8px; {{ $combination->wholesaleTiers->count() > 0 ? '' : 'display: none;' }}">
+                                                                {{ $combination->wholesaleTiers->count() }} tier(s)
+                                                            </span>
+                                                        </div>
+                                                    </td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-reseller-price" name="combinations[{{ $index }}][reseller_price]" value="{{ $combination->reseller_price }}" placeholder="Reseller" style="width: 90px;"></td>
                                                     <td><input type="number" min="0" class="form-control combination-stock" name="combinations[{{ $index }}][stock_quantity]" value="{{ $combination->stock_quantity }}" placeholder="0" style="width: 70px;"></td>
                                                     <td><textarea class="form-control combination-description" name="combinations[{{ $index }}][short_description]" rows="2" placeholder="Brief description..." style="width: 200px; resize: vertical;">{{ $combination->short_description }}</textarea></td>
@@ -758,7 +758,7 @@
                                                     </td>
                                                     <td>
                                                         <button type="button" class="btn btn-sm btn-danger" onclick="deleteExistingCombination(this, {{ $combination->id }})">
-                                                            <i class="bi bi-trash"></i> Delete
+                                                            <i class="fas fa-trash-alt me-1"></i> Delete
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -1270,10 +1270,16 @@
             <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][offer_price]" value="" placeholder="Optional" style="width: 90px;"></td>
             <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][product_cost]" value="" placeholder="Cost" style="width: 90px;"></td>
             <td>
-                <input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][wholesale_price]" value="" placeholder="Wholesale" style="width: 90px;">
+                <div class="input-group input-group-sm" style="width: 110px;">
+                    <input type="number" step="0.01" min="0" class="form-control combination-wholesale-price" name="combinations[${currentIndex}][wholesale_price]" value="" placeholder="Wholesale">
+                    <button class="btn btn-outline-secondary px-2" type="button" onclick="openWholesaleTiersModal(${currentIndex})" title="Manage Wholesale Tiers">
+                        <i class="fas fa-list-ol text-primary"></i>
+                    </button>
+                </div>
                 <input type="hidden" name="combinations[${currentIndex}][wholesale_tiers]" value="[]">
-                <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1 mt-1 d-block" onclick="openWholesaleTiersModal(${currentIndex})" style="font-size: 10px;">Manage Tiers</button>
-                <span id="tier-badge-${currentIndex}" class="badge bg-secondary mt-1" style="font-size: 9px;">No tiers</span>
+                <div class="text-center">
+                    <span id="tier-badge-${currentIndex}" class="badge bg-success mt-1" style="font-size: 8px; display: none;">0 tier(s)</span>
+                </div>
             </td>
             <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][reseller_price]" value="" placeholder="Reseller" style="width: 90px;"></td>
             <td><input type="number" min="0" class="form-control" name="combinations[${currentIndex}][stock_quantity]" value="0" placeholder="0" style="width: 70px;"></td>
@@ -1282,7 +1288,7 @@
                 <div class="mb-2"><input type="file" class="form-control" name="combinations[${currentIndex}][featured_image]" accept="image/*" style="width: 150px; font-size: 11px;"><small class="text-muted d-block">Featured Image</small></div>
                 <div><input type="file" class="form-control" name="combinations[${currentIndex}][gallery_images][]" accept="image/*" multiple style="width: 150px; font-size: 11px;"><small class="text-muted d-block">Gallery Images</small></div>
             </td>
-            <td><button type="button" class="btn btn-sm btn-danger" onclick="deleteNewCombination(this)"><i class="bi bi-trash"></i> Delete</button></td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="deleteNewCombination(this)"><i class="fas fa-trash-alt me-1"></i> Delete</button></td>
             <input type="hidden" name="combinations[${currentIndex}][key]" value="${combinationKey}">
         </tr>`;
         tbody.insertAdjacentHTML('beforeend', rowHTML);
@@ -1565,8 +1571,8 @@
             <div class="col-5">
                 <input type="number" step="0.01" class="form-control" name="wholesale_tiers[${simpleTierCounter}][price]" placeholder="Price (৳)" required min="0">
             </div>
-            <div class="col-2 text-center">
-                <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.tier-row').remove()"><i class="bi bi-trash"></i></button>
+            <div class="col-2 text-end">
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.tier-row').remove()" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fas fa-trash"></i></button>
             </div>
         `;
         container.appendChild(row);
@@ -1610,8 +1616,8 @@
                 <div class="col-5">
                     <input type="number" step="0.01" class="form-control modal-tier-price" value="${tier.price || ''}" placeholder="Price (৳)" required min="0">
                 </div>
-                <div class="col-2 text-center">
-                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.modal-tier-row').remove()"><i class="bi bi-trash"></i></button>
+                <div class="col-2 text-end">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.modal-tier-row').remove()" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fas fa-trash"></i></button>
                 </div>
             `;
             container.appendChild(row);
@@ -1633,8 +1639,8 @@
             <div class="col-5">
                 <input type="number" step="0.01" class="form-control modal-tier-price" placeholder="Price (৳)" required min="0">
             </div>
-            <div class="col-2 text-center">
-                <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.modal-tier-row').remove()"><i class="bi bi-trash"></i></button>
+            <div class="col-2 text-end">
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.modal-tier-row').remove()" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fas fa-trash"></i></button>
             </div>
         `;
         container.appendChild(row);

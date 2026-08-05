@@ -1707,17 +1707,22 @@
                                style="width: 90px;">
                     </td>
                     <td>
-                        <input type="number" 
-                               step="0.01" 
-                               min="0" 
-                               class="form-control combination-wholesale-price" 
-                               name="combinations[${index}][wholesale_price]" 
-                               value=""
-                               placeholder="Wholesale"
-                               style="width: 90px;">
+                        <div class="input-group input-group-sm" style="width: 110px;">
+                            <input type="number" 
+                                   step="0.01" 
+                                   min="0" 
+                                   class="form-control combination-wholesale-price" 
+                                   name="combinations[${index}][wholesale_price]" 
+                                   value=""
+                                   placeholder="Wholesale">
+                            <button class="btn btn-outline-secondary px-2" type="button" onclick="openWholesaleTiersModal(${index})" title="Manage Wholesale Tiers">
+                                <i class="fas fa-list-ol text-primary"></i>
+                            </button>
+                        </div>
                         <input type="hidden" name="combinations[${index}][wholesale_tiers]" value="[]">
-                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-1 mt-1 d-block" onclick="openWholesaleTiersModal(${index})" style="font-size: 10px;">Manage Tiers</button>
-                        <span id="tier-badge-${index}" class="badge bg-secondary mt-1" style="font-size: 9px;">No tiers</span>
+                        <div class="text-center">
+                            <span id="tier-badge-${index}" class="badge bg-success mt-1" style="font-size: 8px; display: none;">0 tier(s)</span>
+                        </div>
                     </td>
                     <td>
                         <input type="number" 
@@ -2652,19 +2657,13 @@
         row.className = 'row g-2 align-items-center mb-2 tier-row';
         row.innerHTML = `
             <div class="col-5">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">Min Qty</span>
-                    <input type="number" class="form-control" name="wholesale_tiers[${simpleTierCounter}][min_quantity]" required min="1">
-                </div>
+                <input type="number" class="form-control" name="wholesale_tiers[${simpleTierCounter}][min_quantity]" placeholder="Min Qty" required min="1">
             </div>
             <div class="col-5">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">Price (৳)</span>
-                    <input type="number" step="0.01" class="form-control" name="wholesale_tiers[${simpleTierCounter}][price]" required min="0">
-                </div>
+                <input type="number" step="0.01" class="form-control" name="wholesale_tiers[${simpleTierCounter}][price]" placeholder="Price (৳)" required min="0">
             </div>
-            <div class="col-2">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.tier-row').remove()"><i class="bi bi-trash"></i></button>
+            <div class="col-2 text-end">
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.tier-row').remove()" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fas fa-trash"></i></button>
             </div>
         `;
         container.appendChild(row);
@@ -2703,19 +2702,13 @@
             row.className = 'row g-2 align-items-center mb-2 modal-tier-row';
             row.innerHTML = `
                 <div class="col-5">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text">Min Qty</span>
-                        <input type="number" class="form-control modal-tier-qty" value="${tier.min_quantity || ''}" required min="1">
-                    </div>
+                    <input type="number" class="form-control modal-tier-qty" value="${tier.min_quantity || ''}" placeholder="Min Qty" required min="1">
                 </div>
                 <div class="col-5">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text">Price (৳)</span>
-                        <input type="number" step="0.01" class="form-control modal-tier-price" value="${tier.price || ''}" required min="0">
-                    </div>
+                    <input type="number" step="0.01" class="form-control modal-tier-price" value="${tier.price || ''}" placeholder="Price (৳)" required min="0">
                 </div>
-                <div class="col-2">
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.modal-tier-row').remove()"><i class="bi bi-trash"></i></button>
+                <div class="col-2 text-end">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.modal-tier-row').remove()" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fas fa-trash"></i></button>
                 </div>
             `;
             container.appendChild(row);
@@ -2732,19 +2725,13 @@
         row.className = 'row g-2 align-items-center mb-2 modal-tier-row';
         row.innerHTML = `
             <div class="col-5">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">Min Qty</span>
-                    <input type="number" class="form-control modal-tier-qty" required min="1">
-                </div>
+                <input type="number" class="form-control modal-tier-qty" placeholder="Min Qty" required min="1">
             </div>
             <div class="col-5">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">Price (৳)</span>
-                    <input type="number" step="0.01" class="form-control modal-tier-price" required min="0">
-                </div>
+                <input type="number" step="0.01" class="form-control modal-tier-price" placeholder="Price (৳)" required min="0">
             </div>
-            <div class="col-2">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.modal-tier-row').remove()"><i class="bi bi-trash"></i></button>
+            <div class="col-2 text-end">
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.modal-tier-row').remove()" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fas fa-trash"></i></button>
             </div>
         `;
         container.appendChild(row);
