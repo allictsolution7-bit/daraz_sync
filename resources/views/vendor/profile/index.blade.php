@@ -157,11 +157,13 @@
                 <i class="fas fa-shield-alt text-warning"></i> Verification & Policies
             </button>
         </li>
+        @if($vendorSettings->is_consignment)
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="markup-tab-btn" data-bs-toggle="tab" data-bs-target="#markup-tab" type="button" role="tab" aria-controls="markup-tab" aria-selected="false">
                 <i class="fas fa-magic text-danger"></i> Price Auto-Calculations
             </button>
         </li>
+        @endif
     </ul>
 
     <!-- Tab Contents -->
@@ -536,6 +538,7 @@
         </div>
 
         <!-- 5. Price Auto-Calculations Tab -->
+        @if($vendorSettings->is_consignment)
         <div class="tab-pane fade" id="markup-tab" role="tabpanel" aria-labelledby="markup-tab-btn">
             <div class="row g-4">
                 <div class="col-lg-8">
@@ -606,6 +609,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </div>
 @endsection

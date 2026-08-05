@@ -190,6 +190,7 @@ class AdminVendorController extends Controller
             'is_active' => 'nullable|boolean',
             'is_verified' => 'nullable|boolean',
             'auto_approve_products' => 'nullable|boolean',
+            'is_consignment' => 'nullable|boolean',
         ]);
 
         DB::transaction(function () use ($validated, $vendor) {
@@ -215,6 +216,7 @@ class AdminVendorController extends Controller
                 'custom_min_withdrawal_amount' => $validated['custom_min_withdrawal_amount'] ?? null,
                 'is_active' => $validated['is_active'] ?? false,
                 'auto_approve_products' => $validated['auto_approve_products'] ?? false,
+                'is_consignment' => $validated['is_consignment'] ?? false,
             ];
 
             // Handle verification

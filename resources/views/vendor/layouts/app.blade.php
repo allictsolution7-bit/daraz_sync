@@ -443,21 +443,23 @@
             </a>
             @endcan
 
-            @if(auth()->user()->can('vendor.balance.view') || auth()->user()->can('vendor.withdrawals.create'))
+            @if(auth()->user()?->vendorSettings?->is_consignment && (auth()->user()->can('vendor.balance.view') || auth()->user()->can('vendor.withdrawals.create')))
             <div class="vendor-nav-header">Finance & Wallet</div>
             @endif
 
-            @can('vendor.balance.view')
-            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.wallet.*') ? 'active' : '' }}" href="{{ route('vendor.wallet.index') }}">
-                <i class="fas fa-wallet text-warning"></i> My Wallet
-            </a>
-            @endcan
+            @if(auth()->user()?->vendorSettings?->is_consignment)
+                @can('vendor.balance.view')
+                <a class="vendor-sidebar-link {{ request()->routeIs('vendor.wallet.*') ? 'active' : '' }}" href="{{ route('vendor.wallet.index') }}">
+                    <i class="fas fa-wallet text-warning"></i> My Wallet
+                </a>
+                @endcan
 
-            @can('vendor.withdrawals.create')
-            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.withdrawals.*') ? 'active' : '' }}" href="{{ route('vendor.withdrawals.index') }}">
-                <i class="fas fa-hand-holding-dollar"></i> Withdrawals
-            </a>
-            @endcan
+                @can('vendor.withdrawals.create')
+                <a class="vendor-sidebar-link {{ request()->routeIs('vendor.withdrawals.*') ? 'active' : '' }}" href="{{ route('vendor.withdrawals.index') }}">
+                    <i class="fas fa-hand-holding-dollar"></i> Withdrawals
+                </a>
+                @endcan
+            @endif
 
             @can('vendor.profile.edit')
             <div class="vendor-nav-header">Account & Setup</div>
@@ -545,7 +547,7 @@
 
             <div class="d-flex align-items-center gap-3">
                 <!-- Topbar Wallet Widget -->
-                @if(!auth()->user()?->hasRole('reseller'))
+                @if(!auth()->user()?->hasRole('reseller') && auth()->user()?->vendorSettings?->is_consignment)
                 <div class="wallet-pill shadow-sm">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-wallet text-primary fs-5"></i>

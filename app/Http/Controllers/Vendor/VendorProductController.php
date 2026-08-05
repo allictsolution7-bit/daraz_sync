@@ -29,7 +29,13 @@ class VendorProductController extends Controller
         if (!$vendor) return false;
 
         $vendorSettings = $vendor->vendorSettings;
-        if ($vendorSettings && $vendorSettings->canAccessAdminProducts()) {
+        
+        // Only consignment vendors can access admin products
+        if (!$vendorSettings || !$vendorSettings->is_consignment) {
+            return false;
+        }
+
+        if ($vendorSettings->canAccessAdminProducts()) {
             return true;
         }
         if (method_exists($vendor, 'can') && $vendor->can('vendor.access_admin_products')) {

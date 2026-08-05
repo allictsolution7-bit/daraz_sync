@@ -50,6 +50,7 @@ class VendorSetting extends Model
         'sale_price_markup_pct',
         'old_price_markup_pct',
         'wholesale_price_markup_pct',
+        'is_consignment',
     ];
 
     protected $casts = [
@@ -63,6 +64,7 @@ class VendorSetting extends Model
         'can_create_coupons' => 'boolean',
         'can_see_customer_info' => 'boolean',
         'can_access_admin_products' => 'boolean',
+        'is_consignment' => 'boolean',
         'is_active' => 'boolean',
         'is_verified' => 'boolean',
         'verified_at' => 'datetime',

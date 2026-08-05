@@ -209,13 +209,21 @@
                             <label class="form-check-label font-weight-bold" for="is_active">Active Account</label>
                         </div>
 
-                        <div class="form-check form-switch mb-2">
+                        <div class="form-check form-switch mb-3">
                             <input class="form-check-input" type="checkbox" id="is_verified" name="is_verified" value="1" {{ old('is_verified', $vendorSettings->is_verified) ? 'checked' : '' }}>
                             <label class="form-check-label font-weight-bold" for="is_verified">Verified Partner Badge</label>
                         </div>
                         @if($vendorSettings->verified_at)
                             <small class="text-muted d-block mb-3">Verified on: {{ $vendorSettings->verified_at->format('d M Y') }}</small>
                         @endif
+
+                        <hr class="my-3 opacity-50">
+
+                        <div class="form-check form-switch mb-1">
+                            <input class="form-check-input" type="checkbox" id="is_consignment" name="is_consignment" value="1" {{ old('is_consignment', $vendorSettings->is_consignment) ? 'checked' : '' }}>
+                            <label class="form-check-label font-weight-bold text-primary" for="is_consignment">Consignment Partner Mode</label>
+                            <small class="text-muted d-block mt-0.5">Enables wallet balance, recharging, parent catalog copying, and purchase options.</small>
+                        </div>
                     </div>
                 </div>
 
