@@ -625,7 +625,7 @@
                     @csrf
                     <div class="modal-header modal-header-custom">
                         <h5 class="modal-title"><i class="fas fa-key" style="color: #f59e0b;"></i> Custom Direct Permissions — <span class="text-info">{{ $user->name }}</span></h5>
-                        <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal">&times;</button>
+                        <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">&times;</button>
                     </div>
                     <div class="modal-body p-4">
                         <div class="alert alert-warning py-2 px-3 small mb-3">
@@ -651,9 +651,12 @@
                                 <i class="fas fa-search"></i>
                                 <input type="text" class="form-control permission-search-custom permission-search" placeholder="Search permissions...">
                             </div>
-                            <button type="button" class="btn btn-perm-tool select-all-perms"><i class="fas fa-check-double mr-1"></i> Select all</button>
-                            <button type="button" class="btn btn-perm-tool clear-all-perms"><i class="fas fa-times mr-1"></i> Clear</button>
-                            <button type="button" class="btn btn-perm-tool expand-all"><i class="fas fa-chevron-down mr-1"></i> Expand</button>
+                            <button type="button" class="btn btn-perm-tool reset-to-default text-danger border-danger-subtle mr-1 me-1"><i class="fas fa-undo mr-1"></i> Reset to Default (Role)</button>
+                            <button type="button" class="btn btn-perm-tool select-all-perms mr-1 me-1"><i class="fas fa-check-double mr-1"></i> Select all</button>
+                            <button type="button" class="btn btn-perm-tool clear-all-perms mr-1 me-1"><i class="fas fa-times mr-1"></i> Clear</button>
+                            <button type="button" class="btn btn-perm-tool copy-perms mr-1 me-1"><i class="fas fa-copy mr-1"></i> Copy (Export)</button>
+                            <button type="button" class="btn btn-perm-tool paste-perms mr-1 me-1"><i class="fas fa-paste mr-1"></i> Paste (Import)</button>
+                            <button type="button" class="btn btn-perm-tool expand-all mr-1 me-1"><i class="fas fa-chevron-down mr-1"></i> Expand</button>
                             <button type="button" class="btn btn-perm-tool collapse-all"><i class="fas fa-chevron-up mr-1"></i> Collapse</button>
                         </div>
                         <div class="role-input-wrapper mb-2"><label><i class="fas fa-shield-halved mr-1"></i> Custom Direct & Role Permissions</label></div>
@@ -704,7 +707,7 @@
                                                                     $isChecked = $isRolePerm || $isDirectPerm;
                                                                 @endphp
                                                                 <div class="perm-item-check" style="{{ $isRolePerm ? 'background: #f0fdf4; border-radius:4px;' : '' }}">
-                                                                    <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="uperm_{{ $user->id }}_{{ $permission->id }}" {{ $isChecked ? 'checked' : '' }}>
+                                                                    <input class="form-check-input permission-checkbox" data-group="{{ $groupSlug }}" data-is-role="{{ $isRolePerm ? '1' : '0' }}" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="uperm_{{ $user->id }}_{{ $permission->id }}" {{ $isChecked ? 'checked' : '' }}>
                                                                     <label for="uperm_{{ $user->id }}_{{ $permission->id }}">
                                                                         {{ $permission->name }}
                                                                         @if($isRolePerm)
@@ -844,6 +847,23 @@
         if (e.target.classList.contains('select-all-perms') || e.target.closest('.select-all-perms')) {
             modal.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = true);
             modal.querySelectorAll('.select-all-group').forEach(cb => cb.checked = true);
+        }
+        if (e.target.classList.contains('reset-to-default') || e.target.closest('.reset-to-default')) {
+            modal.querySelectorAll('.permission-checkbox').forEach(cb => {
+                cb.checked = (cb.getAttribute('data-is-role') === '1');
+            });
+            // Update Select All Group headers to match
+            modal.querySelectorAll('.permissions-group').forEach(card => {
+                const groupCheckbox = card.querySelector('.select-all-group');
+                if (groupCheckbox) {
+                    const allCBs = card.querySelectorAll('.permission-checkbox');
+                    const checkedCBs = card.querySelectorAll('.permission-checkbox:checked');
+                    groupCheckbox.checked = (allCBs.length > 0 && allCBs.length === checkedCBs.length);
+                }
+            });
+            if (typeof toastr !== 'undefined' && typeof toastr.success === 'function') {
+                toastr.success('Permissions reset to role defaults.');
+            }
         }
         if (e.target.classList.contains('clear-all-perms') || e.target.closest('.clear-all-perms')) {
             modal.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = false);

@@ -428,6 +428,12 @@
                 <i class="fas fa-box"></i> Products
             </a>
 
+            @if(auth()->user()?->hasRole('reseller'))
+            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.pos.*') ? 'active' : '' }}" href="{{ route('vendor.pos.index') }}">
+                <i class="fas fa-cash-register text-success"></i> Reseller POS
+            </a>
+            @endif
+
             @php
                 $vUser = auth()->user();
                 $vOrderIds = \App\Models\order_item::forVendor($vUser->id)->pluck('order_id')->unique();

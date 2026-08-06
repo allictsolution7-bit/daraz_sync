@@ -261,7 +261,19 @@ class RolesPermissionsController extends Controller
         }
 
         $permissions = $request->permissions ?? [];
-        $user->syncPermissions($permissions);
+        
+        // Get permissions that are already inherited from the user's role(s)
+        $rolePermissions = $user->roles ? $user->roles->flatMap(function($r) {
+            return $r->permissions ? $r->permissions->pluck('name') : collect();
+        })->unique()->toArray() : [];
+
+        if (empty($rolePermissions) && method_exists($user, 'getPermissionsViaRoles')) {
+            $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+        }
+
+        // Only save direct permissions that are NOT already granted by the role (avoiding redundant duplicate checks)
+        $customDirectPermissions = array_values(array_diff($permissions, $rolePermissions));
+        $user->syncPermissions($customDirectPermissions);
 
         if ($user->vendorSettings) {
             $hasAccess = in_array('vendor.access_admin_products', $permissions) || $request->has('can_access_admin_products');

@@ -769,11 +769,12 @@
                                     @php
                                         $resellerPrice = (float)($product->reseller_price ?? 0);
                                         if ($resellerPrice <= 0) {
-                                            $basePrice = (float)($product->offer > 0 ? $product->offer : ($product->old_price ?? 0));
+                                            // A reseller's base price should be the admin's reseller_price or wholesale_price
+                                            $basePrice = (float)($product->reseller_price > 0 ? $product->reseller_price : ($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)))));
+                                            
                                             if ($basePrice <= 0 && $product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
-                                                // Fallback to first combination price
                                                 $firstComb = $product->variationCombinations->first();
-                                                $basePrice = (float)($firstComb->offer_price ?? $firstComb->regular_price ?? 0);
+                                                $basePrice = (float)($firstComb->reseller_price > 0 ? $firstComb->reseller_price : ($firstComb->wholesale_price > 0 ? $firstComb->wholesale_price : ($firstComb->product_cost > 0 ? $firstComb->product_cost : ($firstComb->offer_price ?? $firstComb->regular_price ?? 0))));
                                             }
                                             $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
                                             $resellerPrice = $basePrice + ($basePrice * ($markupPct / 100));

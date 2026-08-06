@@ -182,6 +182,7 @@ class AuthorizeByRouteName
             'courier-areas' => 'areas',
             'courierStatus' => 'status',
             'balance' => 'balance',
+            'search-products' => 'search_products',
         ];
 
         $suffix = $map[$action] ?? null;

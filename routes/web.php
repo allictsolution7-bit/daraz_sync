@@ -825,6 +825,13 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(
     Route::get('/profile', [VendorDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [VendorDashboardController::class, 'updateProfile'])->name('profile.update');
 
+    // POS Routes (Reseller portal)
+    Route::prefix('pos')->name('pos.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Vendor\VendorPOSController::class, 'index'])->name('index');
+        Route::get('/search-products', [\App\Http\Controllers\Vendor\VendorPOSController::class, 'searchProducts'])->name('search-products');
+        Route::post('/create-order', [\App\Http\Controllers\Vendor\VendorPOSController::class, 'createOrder'])->name('create-order');
+    });
+
     // Products
     Route::get('/products/subcategories/{categoryId}', [VendorProductController::class, 'getSubcategories'])->name('products.subcategories');
     Route::get('/products/thirdcategories/{subCategoryId}', [VendorProductController::class, 'getThirdcategories'])->name('products.thirdcategories');
