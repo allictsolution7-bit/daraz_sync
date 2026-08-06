@@ -157,7 +157,7 @@
                 <i class="fas fa-shield-alt text-warning"></i> Verification & Policies
             </button>
         </li>
-        @if($vendorSettings->is_consignment)
+        @if($vendorSettings->is_consignment || auth()->user()?->hasRole('reseller'))
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="markup-tab-btn" data-bs-toggle="tab" data-bs-target="#markup-tab" type="button" role="tab" aria-controls="markup-tab" aria-selected="false">
                 <i class="fas fa-magic text-danger"></i> Price Auto-Calculations
@@ -538,7 +538,7 @@
         </div>
 
         <!-- 5. Price Auto-Calculations Tab -->
-        @if($vendorSettings->is_consignment)
+        @if($vendorSettings->is_consignment || auth()->user()?->hasRole('reseller'))
         <div class="tab-pane fade" id="markup-tab" role="tabpanel" aria-labelledby="markup-tab-btn">
             <div class="row g-4">
                 <div class="col-lg-8">
@@ -553,50 +553,73 @@
                                 @csrf
                                 @method('PUT')
                                 
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-12">
-                                        <div class="alert alert-info border-0 rounded-3 mb-4">
-                                            <i class="fas fa-info-circle me-1"></i>
-                                            Configure markup percentages here. When copying products from the admin catalog, your retail, old, and wholesale prices will be auto-calculated by applying these percentages above the admin wholesale cost.
+                                @if(auth()->user()?->hasRole('reseller'))
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-12">
+                                            <div class="alert alert-info border-0 rounded-3 mb-4">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Configure your markup percentage here. Your Reseller Price will be auto-calculated by adding this markup percentage on top of the base product price.
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold fs-7">Reseller Price Markup (%)</label>
+                                            <input type="number" 
+                                                   step="0.01" 
+                                                   name="reseller_markup_pct" 
+                                                   class="form-control fs-7" 
+                                                   value="{{ old('reseller_markup_pct', $vendorSettings->reseller_markup_pct ?? 10.00) }}"
+                                                   min="0"
+                                                   required>
+                                            <small class="text-muted fs-8">Markup added to product price for your Reseller selling price.</small>
                                         </div>
                                     </div>
+                                @else
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-12">
+                                            <div class="alert alert-info border-0 rounded-3 mb-4">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Configure markup percentages here. When copying products from the admin catalog, your retail, old, and wholesale prices will be auto-calculated by applying these percentages above the admin wholesale cost.
+                                            </div>
+                                        </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold fs-7">Sale Price Markup (%)</label>
-                                        <input type="number" 
-                                               step="0.01" 
-                                               name="sale_price_markup_pct" 
-                                               class="form-control fs-7" 
-                                               value="{{ old('sale_price_markup_pct', $vendorSettings->sale_price_markup_pct ?? 10.00) }}"
-                                               min="0"
-                                               required>
-                                        <small class="text-muted fs-8">Markup added to cost for Sale Price.</small>
-                                    </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold fs-7">Sale Price Markup (%)</label>
+                                            <input type="number" 
+                                                   step="0.01" 
+                                                   name="sale_price_markup_pct" 
+                                                   class="form-control fs-7" 
+                                                   value="{{ old('sale_price_markup_pct', $vendorSettings->sale_price_markup_pct ?? 10.00) }}"
+                                                   min="0"
+                                                   required>
+                                            <small class="text-muted fs-8">Markup added to cost for Sale Price.</small>
+                                        </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold fs-7">Old Price Markup (%)</label>
-                                        <input type="number" 
-                                               step="0.01" 
-                                               name="old_price_markup_pct" 
-                                               class="form-control fs-7" 
-                                               value="{{ old('old_price_markup_pct', $vendorSettings->old_price_markup_pct ?? 25.00) }}"
-                                               min="0"
-                                               required>
-                                        <small class="text-muted fs-8">Markup added to cost for Old Price.</small>
-                                    </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold fs-7">Old Price Markup (%)</label>
+                                            <input type="number" 
+                                                   step="0.01" 
+                                                   name="old_price_markup_pct" 
+                                                   class="form-control fs-7" 
+                                                   value="{{ old('old_price_markup_pct', $vendorSettings->old_price_markup_pct ?? 25.00) }}"
+                                                   min="0"
+                                                   required>
+                                            <small class="text-muted fs-8">Markup added to cost for Old Price.</small>
+                                        </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold fs-7">Wholesale Price Markup (%)</label>
-                                        <input type="number" 
-                                               step="0.01" 
-                                               name="wholesale_price_markup_pct" 
-                                               class="form-control fs-7" 
-                                               value="{{ old('wholesale_price_markup_pct', $vendorSettings->wholesale_price_markup_pct ?? 5.00) }}"
-                                               min="0"
-                                               required>
-                                        <small class="text-muted fs-8">Markup added to cost for Wholesale Price.</small>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold fs-7">Wholesale Price Markup (%)</label>
+                                            <input type="number" 
+                                                   step="0.01" 
+                                                   name="wholesale_price_markup_pct" 
+                                                   class="form-control fs-7" 
+                                                   value="{{ old('wholesale_price_markup_pct', $vendorSettings->wholesale_price_markup_pct ?? 5.00) }}"
+                                                   min="0"
+                                                   required>
+                                            <small class="text-muted fs-8">Markup added to cost for Wholesale Price.</small>
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
 
                                 <div class="text-end">
                                     <button type="submit" class="btn btn-success rounded-3 px-4 fw-bold shadow-sm">

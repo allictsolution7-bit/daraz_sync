@@ -219,11 +219,11 @@
 
                         <hr class="my-3 opacity-50">
 
-                        <div class="form-check form-switch mb-1">
-                            <input class="form-check-input" type="checkbox" id="is_consignment" name="is_consignment" value="1" {{ old('is_consignment', $vendorSettings->is_consignment) ? 'checked' : '' }}>
-                            <label class="form-check-label font-weight-bold text-primary" for="is_consignment">Consignment Partner Mode</label>
-                            <small class="text-muted d-block mt-0.5">Enables wallet balance, recharging, parent catalog copying, and purchase options.</small>
+                        <div class="form-check form-switch mb-1 d-flex align-items-center gap-2">
+                            <input class="form-check-input me-2" type="checkbox" id="is_consignment" name="is_consignment" value="1" style="width: 3.2em; height: 1.6em; cursor: pointer;" {{ old('is_consignment', $vendorSettings->is_consignment) ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold text-primary fs-6 mb-0" for="is_consignment" style="cursor: pointer; user-select: none;">Consignment Partner Mode</label>
                         </div>
+                        <small class="text-muted d-block mt-1 ps-5">Enables wallet balance, recharging, parent catalog copying, and purchase options.</small>
                     </div>
                 </div>
 

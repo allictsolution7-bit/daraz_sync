@@ -51,6 +51,7 @@ class VendorSetting extends Model
         'old_price_markup_pct',
         'wholesale_price_markup_pct',
         'is_consignment',
+        'reseller_markup_pct',
     ];
 
     protected $casts = [
@@ -80,6 +81,7 @@ class VendorSetting extends Model
         'sale_price_markup_pct' => 'decimal:2',
         'old_price_markup_pct' => 'decimal:2',
         'wholesale_price_markup_pct' => 'decimal:2',
+        'reseller_markup_pct' => 'decimal:2',
     ];
 
     /**

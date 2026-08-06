@@ -411,7 +411,11 @@
                 <i class="fas fa-store text-warning fs-3"></i>
                 <span class="fw-bold text-white fs-5">{{ setting('general', 'site_name', 'Bazarei') }}</span>
             </a>
-            <span class="badge bg-warning text-dark fw-bold px-2 py-1" style="font-size: 0.65rem;">VENDOR</span>
+            @if(auth()->user()?->hasRole('reseller'))
+                <span class="badge bg-success text-white fw-bold px-2 py-1" style="font-size: 0.65rem;">RESELLER</span>
+            @else
+                <span class="badge bg-warning text-dark fw-bold px-2 py-1" style="font-size: 0.65rem;">VENDOR</span>
+            @endif
         </div>
 
         <div class="vendor-sidebar-nav">
@@ -461,12 +465,12 @@
                 @endcan
             @endif
 
-            @can('vendor.profile.edit')
+            @if(auth()->user()->can('vendor.profile.edit') || auth()->user()->hasRole('reseller'))
             <div class="vendor-nav-header">Account & Setup</div>
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.profile') ? 'active' : '' }}" href="{{ route('vendor.profile') }}">
                 <i class="fas fa-cog"></i> Store Settings
             </a>
-            @endcan
+            @endif
 
             @php
                 $user = auth()->user();

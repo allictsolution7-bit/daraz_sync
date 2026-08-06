@@ -524,6 +524,7 @@
             <!-- Bulk Action Bar -->
             <form id="bulkCopyForm" action="{{ route('vendor.products.bulk-copy') }}" method="POST">
                 @csrf
+                @if(!auth()->user()?->hasRole('reseller'))
                 <div class="bulk-action-bar m-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div class="d-flex align-items-center gap-3">
                         <div class="form-check m-0">
@@ -536,6 +537,7 @@
                         <i class="fas fa-shopping-cart"></i> Copy Selected Products
                     </button>
                 </div>
+                @endif
             <!-- Bulk Stock Purchase Cart Modal -->
             <div class="modal fade text-start" id="bulkCopyCartModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -612,7 +614,7 @@
                     <thead>
                         <tr>
                             <th style="width: 45px;" class="ps-4">
-                                @if(($source ?? 'my_products') === 'admin_products')
+                                @if(($source ?? 'my_products') === 'admin_products' && !auth()->user()?->hasRole('reseller'))
                                     <input type="checkbox" class="form-check-input select-all-products" title="Select All">
                                 @else
                                     #
@@ -764,8 +766,21 @@
                             @if(auth()->user()->hasRole('reseller'))
                                 <div class="mt-1">
                                     <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Reseller Price</small>
+                                    @php
+                                        $resellerPrice = (float)($product->reseller_price ?? 0);
+                                        if ($resellerPrice <= 0) {
+                                            $basePrice = (float)($product->offer > 0 ? $product->offer : ($product->old_price ?? 0));
+                                            if ($basePrice <= 0 && $product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
+                                                // Fallback to first combination price
+                                                $firstComb = $product->variationCombinations->first();
+                                                $basePrice = (float)($firstComb->offer_price ?? $firstComb->regular_price ?? 0);
+                                            }
+                                            $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
+                                            $resellerPrice = $basePrice + ($basePrice * ($markupPct / 100));
+                                        }
+                                    @endphp
                                     <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-0.5" style="font-size: 0.8rem; font-weight: 700;">
-                                        ৳{{ number_format($product->reseller_price ?? 0, 2) }}
+                                        ৳{{ number_format($resellerPrice, 2) }}
                                     </span>
                                 </div>
                             @endif

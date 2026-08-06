@@ -81,11 +81,20 @@ class VendorDashboardController extends Controller
     public function profile()
     {
         $vendor = auth()->user();
-        if (!$vendor->can('vendor.profile.edit')) {
+        if (!$vendor->can('vendor.profile.edit') && !$vendor->hasRole('reseller')) {
             abort(403, 'Unauthorized action.');
         }
 
-        $vendorSettings = $vendor->vendorSettings;
+        $vendorSettings = \App\Models\VendorSetting::firstOrCreate(
+            ['vendor_id' => $vendor->id],
+            [
+                'business_name' => $vendor->name ?? 'Store',
+                'store_slug' => \Illuminate\Support\Str::slug($vendor->name ?? 'store'),
+                'business_email' => $vendor->email,
+                'is_active' => true,
+                'is_verified' => true
+            ]
+        );
 
         return view('vendor.profile.index', compact('vendor', 'vendorSettings'));
     }
@@ -96,11 +105,20 @@ class VendorDashboardController extends Controller
     public function updateProfile(Request $request)
     {
         $vendor = auth()->user();
-        if (!$vendor->can('vendor.profile.edit')) {
+        if (!$vendor->can('vendor.profile.edit') && !$vendor->hasRole('reseller')) {
             abort(403, 'Unauthorized action.');
         }
 
-        $vendorSettings = $vendor->vendorSettings;
+        $vendorSettings = \App\Models\VendorSetting::firstOrCreate(
+            ['vendor_id' => $vendor->id],
+            [
+                'business_name' => $vendor->name ?? 'Store',
+                'store_slug' => \Illuminate\Support\Str::slug($vendor->name ?? 'store'),
+                'business_email' => $vendor->email,
+                'is_active' => true,
+                'is_verified' => true
+            ]
+        );
 
         // Make validation flexible - only validate fields that are present
         $validated = $request->validate([
@@ -118,6 +136,7 @@ class VendorDashboardController extends Controller
             'sale_price_markup_pct' => 'nullable|numeric|min:0',
             'old_price_markup_pct' => 'nullable|numeric|min:0',
             'wholesale_price_markup_pct' => 'nullable|numeric|min:0',
+            'reseller_markup_pct' => 'nullable|numeric|min:0',
         ]);
 
         // Only update fields that were actually submitted
