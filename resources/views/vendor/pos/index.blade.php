@@ -104,8 +104,26 @@
 
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 16px;
+    }
+
+    @media (max-width: 1200px) {
+        .product-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .product-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .product-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
     }
 
     .pos-product-card {
@@ -386,7 +404,10 @@
             </div>
 
             <div class="product-grid" id="productsGrid">
-                <!-- Products dynamically rendered here -->
+                <div class="text-center py-5 w-100">
+                    <i class="fas fa-spinner fa-spin fa-2x text-success mb-2"></i>
+                    <p class="text-muted small">Loading catalog products...</p>
+                </div>
             </div>
             
             <div class="d-flex justify-content-between align-items-center mt-3 bg-white p-3 border rounded-3" id="productsPagination" style="display: none;">
@@ -501,6 +522,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
 <script>
 let cart = [];

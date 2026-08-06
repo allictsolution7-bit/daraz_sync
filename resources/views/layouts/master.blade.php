@@ -1351,6 +1351,14 @@
                                                   @endif
                                               </a>
                                           </li>
+                                           <li class="{{ request()->routeIs('admin.reseller-orders.*') ? 'active' : '' }}">
+                                               <a href="{{ route('admin.reseller-orders.index') }}" class="d-flex align-items-center justify-content-between">
+                                                   <span class="menu-content">
+                                                       <i class="fas fa-people-arrows" style="color:#8b5cf6;"></i>
+                                                       Reseller Orders
+                                                   </span>
+                                               </a>
+                                           </li>
                                      </ul>
                                 </li>
                                 @endcan

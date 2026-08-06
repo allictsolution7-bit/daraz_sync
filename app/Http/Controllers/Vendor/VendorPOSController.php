@@ -87,6 +87,10 @@ class VendorPOSController extends Controller
                     $join->on('products.id', '=', 'variation_stock.product_id');
                 })
                 ->where('products.status', 1)
+                ->where(function ($q) {
+                    $q->where('products.approval_status', 'approved')
+                      ->orWhere('products.approval_status', 'draft');
+                })
                 ->where(function ($q) use ($adminId) {
                     if ($adminId) {
                         $q->where('products.created_by', $adminId)

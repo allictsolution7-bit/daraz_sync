@@ -1072,9 +1072,9 @@
 
             <!-- Products Grid -->
             <div class="product-grid" id="productsGrid">
-                <div class="text-center py-5 w-100 bg-white rounded-4 border">
-                    <i class="fas fa-box-open fa-3x text-muted opacity-50 mb-3"></i>
-                    <p class="text-muted fw-semibold">Search or select a category to display products</p>
+                <div class="text-center py-5 w-100">
+                    <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+                    <p class="text-muted small">Loading catalog products...</p>
                 </div>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3 bg-white p-3 border rounded-3" id="productsPagination" style="display: none;">

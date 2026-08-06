@@ -56,6 +56,7 @@ use App\Http\Controllers\Admin\AdminVendorController;
 use App\Http\Controllers\Admin\AdminVendorProductController;
 use App\Http\Controllers\Admin\AdminVendorWithdrawalController;
 use App\Http\Controllers\Admin\AdminVendorOrderController;
+use App\Http\Controllers\Admin\ResellerOrderController;
 use App\Http\Controllers\Admin\VendorGlobalSettingsController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\BackupScheduleController;
@@ -412,6 +413,11 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::get('/my-assignments', [OrderController::class, 'asignedorders'])->name('asigned.orders');
     Route::get('/vendor-orders', [AdminVendorOrderController::class, 'index'])->name('vendor-orders.index');
     Route::get('/vendor-orders/data', [AdminVendorOrderController::class, 'data'])->name('vendor-orders.data');
+
+    // Reseller Orders
+    Route::get('/reseller-orders', [ResellerOrderController::class, 'index'])->name('reseller-orders.index');
+    Route::get('/reseller-orders/data', [ResellerOrderController::class, 'data'])->name('reseller-orders.data');
+    Route::post('/reseller-orders/{id}/status', [ResellerOrderController::class, 'updateStatus'])->name('reseller-orders.update-status');
 
     // Sales Reports
     Route::get('analytics/revenue', [SalesReportController::class, 'index'])->name('orders.reports');
@@ -843,6 +849,7 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(
     // Orders (view only)
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [VendorOrderController::class, 'index'])->name('index');
+        Route::get('/my-pos-orders', [VendorOrderController::class, 'resellerOrders'])->name('reseller');
         Route::get('/{order}', [VendorOrderController::class, 'show'])->name('show');
         Route::get('/earnings/summary', [VendorOrderController::class, 'earnings'])->name('earnings');
     });

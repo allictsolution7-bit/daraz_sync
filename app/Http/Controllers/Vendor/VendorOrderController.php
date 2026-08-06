@@ -106,5 +106,67 @@ class VendorOrderController extends Controller
 
         return view('vendor.orders.earnings', compact('items', 'stats'));
     }
+
+    /**
+     * Show reseller's own POS orders (Reseller POS Orders page)
+     */
+    public function resellerOrders(Request $request)
+    {
+        $reseller = auth()->user();
+
+        // Orders placed via this reseller's POS — identified by vendor_id in order_items
+        $orderIds = order_item::where('vendor_id', $reseller->id)
+            ->whereNotNull('others')
+            ->whereRaw("JSON_EXTRACT(others, '$.is_pos_order') = true")
+            ->distinct()
+            ->pluck('order_id');
+
+        $query = order::whereIn('id', $orderIds)
+            ->where('order_source', 'Reseller POS')
+            ->with(['order_items.product']);
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        if ($request->filled('search')) {
+            $term = $request->search;
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                  ->orWhere('phone', 'like', "%{$term}%");
+            });
+        }
+
+        $allOrders = order::whereIn('id', $orderIds)->where('order_source', 'Reseller POS');
+        $statusCounts = [
+            'all'        => (clone $allOrders)->count(),
+            'pending'    => (clone $allOrders)->where('status', 'pending')->count(),
+            'processing' => (clone $allOrders)->where('status', 'processing')->count(),
+            'delivered'  => (clone $allOrders)->where('status', 'delivered')->count(),
+            'cancelled'  => (clone $allOrders)->where('status', 'cancelled')->count(),
+        ];
+
+        // Earnings summary
+        $totalEarnings = order_item::where('vendor_id', $reseller->id)
+            ->whereIn('order_id', $orderIds)
+            ->sum('vendor_earning');
+        $paidEarnings = order_item::where('vendor_id', $reseller->id)
+            ->whereIn('order_id', $orderIds)
+            ->where('vendor_paid', true)
+            ->sum('vendor_earning');
+
+        $orders = $query->latest()->paginate(20);
+
+        return view('vendor.orders.reseller', compact(
+            'orders', 'statusCounts', 'totalEarnings', 'paidEarnings'
+        ));
+    }
 }
 
