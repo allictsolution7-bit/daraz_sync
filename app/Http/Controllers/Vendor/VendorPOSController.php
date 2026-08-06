@@ -182,6 +182,7 @@ class VendorPOSController extends Controller
                                 'id' => $combo->id,
                                 'display_name' => $combo->display_name ?? 'Variation',
                                 'price' => $finalPrice,
+                                'reseller_price' => $adminResellerPrice > 0 ? $adminResellerPrice : ($combo->wholesale_price > 0 ? $combo->wholesale_price : ($combo->product_cost > 0 ? $combo->product_cost : 0)),
                                 'regular_price' => $combo->regular_price ?? 0,
                                 'offer_price' => $combo->offer_price,
                                 'product_cost' => $combo->product_cost ?? 0,
@@ -194,6 +195,7 @@ class VendorPOSController extends Controller
                         $firstVariation = $data['variations']->first();
                         $data['in_stock'] = $inStock;
                         $data['price'] = $firstVariation ? $firstVariation['price'] : 0;
+                        $data['reseller_price'] = $firstVariation ? $firstVariation['reseller_price'] : 0;
                         $data['stock_quantity'] = (int) ($product->computed_quantity ?? 0);
                     } else {
                         // Calculate simple product calculated reseller price
@@ -207,6 +209,7 @@ class VendorPOSController extends Controller
 
                         $quantity = (int) ($product->computed_quantity ?? $product->quantity ?? 0);
                         $data['price'] = $finalPrice;
+                        $data['reseller_price'] = $adminResellerPrice > 0 ? $adminResellerPrice : ($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : 0));
                         $data['regular_price'] = $product->old_price ?? 0;
                         $data['offer_price'] = $product->offer;
                         $data['product_cost'] = $product->product_cost ?? 0;

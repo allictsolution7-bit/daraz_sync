@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\order;
 use App\Models\order_item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VendorOrderController extends Controller
 {
@@ -246,7 +247,7 @@ class VendorOrderController extends Controller
 
         DB::transaction(function () use ($order) {
             // Restore inventory stock
-            $stockService = app(\App\Services\StockService::class);
+            $stockService = app(\App\Services\StockManagementService::class);
             foreach ($order->order_items as $item) {
                 if ($item->combination_id) {
                     $comb = \App\Models\VariationCombination::find($item->combination_id);

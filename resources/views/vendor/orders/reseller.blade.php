@@ -259,6 +259,18 @@
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <span class="fw-bold text-success fs-6">৳{{ number_format($order->total, 2) }}</span>
+                    @if($order->status === 'pending')
+                        <a href="{{ route('vendor.orders.reseller.edit', $order->id) }}" class="btn btn-sm btn-outline-primary py-1 px-2" title="Edit Order">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ route('vendor.orders.reseller.delete', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel and delete this order? Stock will be restored.');" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" title="Cancel & Delete Order">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    @endif
                     <a href="/admin/pos/print-invoice/{{ $order->id }}" target="_blank" class="btn btn-sm btn-outline-secondary py-1 px-2">
                         <i class="fas fa-print"></i>
                     </a>

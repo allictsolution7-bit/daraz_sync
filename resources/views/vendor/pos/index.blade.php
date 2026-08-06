@@ -106,11 +106,15 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 16px;
+        max-height: calc((230px * 4) + (16px * 3)); /* Height of roughly 4 rows */
+        overflow-y: auto;
+        padding-right: 4px;
     }
 
     @media (max-width: 1200px) {
         .product-grid {
             grid-template-columns: repeat(3, 1fr);
+            max-height: calc((230px * 5) + (16px * 4)); /* Adjusted for 3 columns */
         }
     }
 
@@ -229,7 +233,7 @@
     }
 
     .cart-items {
-        max-height: 320px;
+        max-height: 480px;
         overflow-y: auto;
         padding: 12px;
     }
@@ -384,10 +388,21 @@
         <div class="col-lg-8 col-md-7">
             <div class="product-search-box">
                 <div class="row g-2">
-                    <div class="col-12">
+                    <div class="col-md-9 col-8">
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="fas fa-search text-muted"></i></span>
                             <input type="text" class="form-control" id="productSearch" placeholder="Search admin catalog products...">
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fas fa-list-numeric text-muted" style="font-size: 11px;"></i></span>
+                            <select class="form-select" id="pageSizeSelect" style="font-size: 13px; font-weight: 600;">
+                                <option value="25" selected>25 items</option>
+                                <option value="50">50 items</option>
+                                <option value="100">100 items</option>
+                                <option value="200">200 items</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -450,6 +465,14 @@
                         <span>Total:</span>
                         <span id="total">৳0.00</span>
                     </div>
+                    <div class="summary-row mt-2 pt-2 border-top">
+                        <span>Amount Paid (Optional):</span>
+                        <input type="number" id="amountPaid" class="form-control form-control-sm text-end" style="width: 100px; font-weight: bold; color: var(--pos-primary);" min="0" value="0" oninput="updateTotals()" onkeydown="$(this).data('autofilled', false)">
+                    </div>
+                    <div class="summary-row">
+                        <span class="fw-bold text-danger">Due Amount:</span>
+                        <span id="dueAmount" class="fw-bold text-danger">৳0.00</span>
+                    </div>
                 </div>
             </div>
 
@@ -487,14 +510,6 @@
                                     <option value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label>Amount Paid (Optional)</label>
-                            <input type="number" class="form-control" id="amountPaid" placeholder="Amount Paid" min="0">
-                        </div>
-                        <div class="col-12 mt-2 d-flex align-items-center gap-2">
-                            <input type="checkbox" id="paymentStatusPaid" value="paid" style="width: 16px; height: 16px; cursor: pointer;">
-                            <label for="paymentStatusPaid" class="m-0" style="cursor: pointer; font-weight: 600;">Mark Order Payment as Paid</label>
                         </div>
                         <div class="col-12 mt-2">
                             <label>Remarks</label>
@@ -536,7 +551,7 @@
 let cart = [];
 let currentPage = 1;
 let lastPage = 1;
-let perPage = 24;
+let perPage = 25;
 let currentProduct = null;
 
 $(document).ready(function() {
@@ -549,6 +564,11 @@ $(document).ready(function() {
     searchProducts();
 
     $('#productSearch').on('input', function() {
+        searchProducts(1);
+    });
+
+    $('#pageSizeSelect').on('change', function() {
+        perPage = parseInt($(this).val()) || 25;
         searchProducts(1);
     });
 
@@ -648,7 +668,7 @@ function onProductClick(product) {
         product.variations.forEach(v => {
             const varDisabled = !v.in_stock ? 'disabled opacity-50' : '';
             html += `
-                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" ${varDisabled} onclick="addVariationToCart(${v.id}, '${v.display_name.replace(/'/g, "\\'")}', ${v.price})">
+                <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" ${varDisabled} onclick="addVariationToCart(${v.id}, '${v.display_name.replace(/'/g, "\\'")}', ${v.price}, ${v.reseller_price})">
                     <span class="font-weight-bold text-dark">${v.display_name}</span>
                     <div class="text-end">
                         <span class="text-success font-weight-bold me-2">৳${parseFloat(v.price).toFixed(2)}</span>
@@ -661,16 +681,16 @@ function onProductClick(product) {
         $('#variationModalBody').html(html);
         $('#variationModal').modal('show');
     } else {
-        addToCart(product.id, null, product.title, product.price);
+        addToCart(product.id, null, product.title, product.price, product.reseller_price);
     }
 }
 
-function addVariationToCart(comboId, displayName, price) {
-    addToCart(currentProduct.id, comboId, `${currentProduct.title} (${displayName})`, price);
+function addVariationToCart(comboId, displayName, price, resellerPrice) {
+    addToCart(currentProduct.id, comboId, `${currentProduct.title} (${displayName})`, price, resellerPrice);
     $('#variationModal').modal('hide');
 }
 
-function addToCart(productId, combinationId, name, price) {
+function addToCart(productId, combinationId, name, price, resellerPrice) {
     const existing = cart.find(item => item.product_id === productId && item.combination_id === combinationId);
     if (existing) {
         existing.quantity++;
@@ -680,6 +700,7 @@ function addToCart(productId, combinationId, name, price) {
             combination_id: combinationId,
             name: name,
             price: parseFloat(price),
+            reseller_price: parseFloat(resellerPrice) || 0,
             quantity: 1
         });
     }
@@ -698,18 +719,44 @@ function updateCartDisplay() {
 
     let html = '';
     cart.forEach((item, index) => {
+        console.log("Cart item object:", item);
+        const profit = Math.max(0, item.price - item.reseller_price) * item.quantity;
         html += `
-            <div class="cart-item">
-                <div class="cart-item-info">
-                    <div class="cart-item-name">${item.name}</div>
-                    <div class="text-success small fw-bold">৳${item.price.toFixed(2)}</div>
+            <div class="cart-item-card border p-3 rounded-3 mb-2 bg-light">
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <div class="fw-bold text-dark" style="font-size: 13px; line-height: 1.4; max-width: 80%;">${item.name}</div>
+                    <button class="btn btn-sm btn-link text-danger p-0" onclick="removeItem(${index})" title="Remove item">
+                        <i class="fas fa-trash-can"></i>
+                    </button>
                 </div>
-                <div class="quantity-control">
-                    <button class="quantity-btn" onclick="updateQty(${index}, -1)">-</button>
-                    <input type="text" class="quantity-input" value="${item.quantity}" readonly>
-                    <button class="quantity-btn" onclick="updateQty(${index}, 1)">+</button>
+                
+                <div class="row g-2 align-items-center">
+                    <div class="col-6">
+                        <div class="d-flex flex-column">
+                            <span class="text-muted small" style="font-size: 11px;">Reseller Price</span>
+                            <span class="fw-bold text-secondary" style="font-size: 13px;">৳${item.reseller_price.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex flex-column align-items-end">
+                            <span class="text-muted small" style="font-size: 11px;">Selling Price</span>
+                            <input type="number" class="form-control form-control-sm text-success fw-bold p-1 text-center" style="width: 85px; height: 28px; font-size: 12px; border: 1px solid var(--pos-border); border-radius: 6px;" value="${item.price}" onchange="updateItemPrice(${index}, this.value)" min="0" step="any">
+                        </div>
+                    </div>
+                    
+                    <div class="col-6 mt-2">
+                        <div class="quantity-control d-flex align-items-center border rounded-3 p-0" style="background:#fff; width: fit-content; height: 28px;">
+                            <button class="btn btn-sm px-2 py-0 border-0" onclick="updateQty(${index}, -1)" style="font-size:12px;">-</button>
+                            <span class="px-2 fw-semibold" style="font-size:12px; min-width:20px; text-align:center;">${item.quantity}</span>
+                            <button class="btn btn-sm px-2 py-0 border-0" onclick="updateQty(${index}, 1)" style="font-size:12px;">+</button>
+                        </div>
+                    </div>
+                    <div class="col-6 mt-2 text-end">
+                        <span class="badge bg-warning text-dark font-weight-bold p-2" style="font-size: 11px; border-radius: 6px;">
+                            +৳${profit.toFixed(2)} profit
+                        </span>
+                    </div>
                 </div>
-                <button class="btn btn-sm btn-link text-danger p-0" onclick="removeItem(${index})"><i class="fas fa-trash-can"></i></button>
             </div>
         `;
     });
@@ -724,6 +771,11 @@ function updateQty(index, change) {
     if (cart[index].quantity <= 0) {
         cart.splice(index, 1);
     }
+    updateCartDisplay();
+}
+
+function updateItemPrice(index, price) {
+    cart[index].price = parseFloat(price) || 0;
     updateCartDisplay();
 }
 
@@ -745,8 +797,19 @@ function updateTotals() {
     const discount = parseFloat($('#discountAmount').val()) || 0;
     const grand = Math.max(0, sub + shipping - discount);
 
+    // If the user hasn't typed anything yet or it is 0, auto-fill it with the grand total
+    let amountPaidVal = $('#amountPaid').val();
+    if (amountPaidVal === '' || parseFloat(amountPaidVal) === 0 || $('#amountPaid').data('autofilled') === true) {
+        $('#amountPaid').val(grand.toFixed(2));
+        $('#amountPaid').data('autofilled', true);
+    }
+
+    const amountPaid = parseFloat($('#amountPaid').val()) || 0;
+    const due = Math.max(0, grand - amountPaid);
+
     $('#subtotal').text('৳' + sub.toFixed(2));
     $('#total').text('৳' + grand.toFixed(2));
+    $('#dueAmount').text('৳' + due.toFixed(2));
     $('#cartItemCount').text(cart.reduce((a, b) => a + b.quantity, 0));
 }
 
@@ -764,6 +827,10 @@ function processOrder() {
     const btn = $('#checkoutBtn');
     btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Submitting...');
 
+    const total = parseFloat($('#total').text().replace('৳', ''));
+    const amountPaid = parseFloat($('#amountPaid').val()) || 0;
+    const paymentStatus = amountPaid >= total ? 'paid' : 'pending';
+
     const orderData = {
         customer_name: $('#customerName').val(),
         customer_phone: $('#customerPhone').val(),
@@ -774,9 +841,9 @@ function processOrder() {
         shipping: parseFloat($('#shippingAmount').val()) || 0,
         notes: $('#orderNotes').val(),
         items: cart,
-        total: parseFloat($('#total').text().replace('৳', '')),
-        amount_paid: parseFloat($('#amountPaid').val()) || null,
-        payment_status: $('#paymentStatusPaid').is(':checked') ? 'paid' : 'pending'
+        total: total,
+        amount_paid: amountPaid,
+        payment_status: paymentStatus
     };
 
     $.post('{{ route("vendor.pos.create-order") }}', orderData)
@@ -785,7 +852,6 @@ function processOrder() {
             toastr.success(response.message);
             clearCart();
             $('#customerName, #customerPhone, #customerAddress, #customerCity, #orderNotes, #amountPaid').val('');
-            $('#paymentStatusPaid').prop('checked', false);
             $('#shippingAmount, #discountAmount').val('0');
         } else {
             toastr.error(response.message);
