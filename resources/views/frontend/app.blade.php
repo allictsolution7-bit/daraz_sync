@@ -975,6 +975,15 @@
                     @endif
                 </div>
                 <div class="right">
+                    @if (Route::has('partner.register'))
+                        <span>
+                            <!-- Store SVG -->
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" />
+                            </svg>
+                            <a href="{{ route('partner.register') }}" style="color:{{ $topHeaderTextColor }};">Join as Seller</a>
+                        </span>
+                    @endif
                     @if ($showPhone == '1')
                         <span>
                             <!-- Phone SVG -->
@@ -5532,6 +5541,13 @@
             <div class="footer-column">
                 <h4 class="footer-heading">Information</h4>
                 <div class="footer-links">
+                    @if (Route::has('partner.register'))
+                        <a href="{{ route('partner.register') }}" class="footer-link">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" />
+                            </svg> JOIN AS SELLER
+                        </a>
+                    @endif
                     <a href="{{ url('/p/terms-conditions') }}" class="footer-link">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M9.707 18.707l6-6a.999.999 0 0 0 0-1.414l-6-6a.999.999 0 1 0-1.414 1.414L13.586 12l-5.293 5.293a.999.999 0 1 0 1.414 1.414z" />
@@ -5559,6 +5575,13 @@
             <div class="footer-column">
                 <h4 class="footer-heading">Customer Care</h4>
                 <div class="footer-links">
+                    @if (Route::has('partner.register'))
+                        <a href="{{ route('partner.register') }}" class="footer-link">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" />
+                            </svg> JOIN AS SELLER
+                        </a>
+                    @endif
                     <a href="{{ url('/user/dashboard') }}" class="footer-link">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M9.707 18.707l6-6a.999.999 0 0 0 0-1.414l-6-6a.999.999 0 1 0-1.414 1.414L13.586 12l-5.293 5.293a.999.999 0 1 0 1.414 1.414z" />
@@ -5591,6 +5614,13 @@
             <div class="footer-column">
                 <h4 class="footer-heading">Categories</h4>
                 <div class="footer-links">
+                    @if (Route::has('partner.register'))
+                        <a href="{{ route('partner.register') }}" class="footer-link">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" />
+                            </svg> JOIN AS SELLER
+                        </a>
+                    @endif
                     <a href="{{ url('/shop/watches') }}" class="footer-link">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M9.707 18.707l6-6a.999.999 0 0 0 0-1.414l-6-6a.999.999 0 1 0-1.414 1.414L13.586 12l-5.293 5.293a.999.999 0 1 0 1.414 1.414z" />

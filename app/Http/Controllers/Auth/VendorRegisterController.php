@@ -220,10 +220,24 @@ class VendorRegisterController extends Controller
                 'otp_resend_count' => 0,
             ]);
 
-            // Assign vendor role
-            $user->assignRole('vendor');
+            // Assign roles dynamically
+            $role = $data['role'] ?? 'vendor';
+            if ($role === 'reseller') {
+                $user->assignRole('reseller');
+            } elseif ($role === 'wholeseller') {
+                \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'wholeseller', 'guard_name' => 'web']);
+                $user->assignRole('wholeseller');
+                $user->assignRole('vendor');
+            } else {
+                $user->assignRole('vendor');
+            }
 
             // Create vendor settings
+            $additionalConfig = [];
+            if ($role === 'vendor' && !empty($data['vendor_type'])) {
+                $additionalConfig['vendor_type'] = $data['vendor_type'];
+            }
+
             VendorSetting::create([
                 'vendor_id' => $user->id,
                 'business_name' => $data['business_name'],
@@ -233,6 +247,7 @@ class VendorRegisterController extends Controller
                 'store_slug' => $data['store_slug'],
                 'is_active' => false, // Pending admin approval
                 'is_verified' => false,
+                'additional_config' => $additionalConfig,
             ]);
 
             DB::commit();
@@ -246,16 +261,16 @@ class VendorRegisterController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Vendor registration successful! Your account is pending approval.',
+                    'message' => 'Partner registration successful! Your account is pending approval.',
                     'redirect' => $this->redirectTo,
                 ]);
             }
 
-            return redirect($this->redirectTo)->with('success', 'Your vendor account has been created successfully! Please wait for admin approval.');
+            return redirect($this->redirectTo)->with('success', 'Your partner account has been created successfully! Please wait for admin approval.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error("Vendor registration failed: " . $e->getMessage());
+            \Log::error("Vendor/Partner registration failed: " . $e->getMessage());
             
             if ($request->expectsJson()) {
                 return response()->json([
@@ -335,5 +350,131 @@ class VendorRegisterController extends Controller
             'available' => !$exists,
         ]);
     }
-}
 
+    /**
+     * Show partner registration form
+     */
+    public function showPartnerRegistrationForm()
+    {
+        return view('auth.partner-register');
+    }
+
+    /**
+     * Handle a partner registration request
+     */
+    public function registerPartner(Request $request)
+    {
+        $request->validate([
+            'role' => 'required|in:reseller,vendor,wholeseller',
+            'vendor_type' => 'required_if:role,vendor|nullable|in:retailer,wholeseller',
+        ]);
+
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'min:11', 'max:15', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ];
+
+        if ($request->role !== 'reseller') {
+            $rules['business_name'] = ['required', 'string', 'max:255'];
+            $rules['business_email'] = ['required', 'string', 'email', 'max:255'];
+            $rules['business_phone'] = ['required', 'string', 'max:20'];
+            $rules['business_address'] = ['nullable', 'string', 'max:500'];
+            $rules['store_slug'] = ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', 'unique:vendor_settings,store_slug'];
+        }
+
+        $emailEnabled = setting('registration', 'email_enabled', '1') == '1';
+        $emailRequired = setting('registration', 'email_required', '0') == '1';
+
+        if ($emailEnabled) {
+            if ($emailRequired) {
+                $rules['email'] = ['required', 'string', 'email', 'max:255', 'unique:users'];
+            } else {
+                if (!empty($request->email)) {
+                    $rules['email'] = ['string', 'email', 'max:255', 'unique:users'];
+                }
+            }
+        }
+
+        $validator = Validator::make($request->all(), $rules, [
+            'store_slug.regex' => 'The store slug must only contain lowercase letters, numbers, and hyphens.',
+            'store_slug.unique' => 'This store slug is already taken. Please choose another one.',
+        ]);
+
+        $validator->validate();
+
+        $phoneOtpEnabled = setting('registration', 'phone_otp_enabled', '1') == '1';
+        $otpExpirationMinutes = 10;
+
+        $businessName = $request->business_name ?? $request->name . ' Store';
+        $businessEmail = $request->business_email ?? ($request->email ?? $this->generateUniqueEmail());
+        $businessPhone = $request->business_phone ?? $request->phone;
+        $businessAddress = $request->business_address ?? '';
+        
+        $baseSlug = Str::slug($businessName);
+        $storeSlug = $request->store_slug ?? $baseSlug;
+        if ($request->role === 'reseller' && !$request->store_slug) {
+            $count = 1;
+            while (VendorSetting::where('store_slug', $storeSlug)->exists()) {
+                $storeSlug = $baseSlug . '-' . $count;
+                $count++;
+            }
+        }
+
+        if ($phoneOtpEnabled) {
+            $otpCode = (string) rand(1000, 9999);
+            
+            $registrationData = [
+                'name' => $request->name,
+                'email' => $request->email ?? $this->generateUniqueEmail(),
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+                'business_name' => $businessName,
+                'business_email' => $businessEmail,
+                'business_phone' => $businessPhone,
+                'business_address' => $businessAddress,
+                'store_slug' => $storeSlug,
+                'role' => $request->role,
+                'vendor_type' => $request->vendor_type,
+                'otp_code' => $otpCode,
+                'otp_expires_at' => now()->addMinutes($otpExpirationMinutes),
+                'otp_resend_count' => 0,
+            ];
+            
+            session(['pending_vendor_registration' => $registrationData]);
+
+            try {
+                $smsTemplate = setting('registration', 'otp_sms_template', 'Dear {name}\nYour Mobile OTP Verification Code is : {otp_code}\nThank you from the Shop');
+                $smsMessage = str_replace(['{name}', '{otp_code}'], [$request->name, $otpCode], $smsTemplate);
+                
+                $this->smsService->sendSMS($request->phone, $smsMessage);
+                
+                return response()->json([
+                    'status' => 'otp_sent',
+                    'message' => 'OTP sent to your phone for verification.',
+                ]);
+            } catch (\Exception $e) {
+                \Log::error("SMS sending failed during partner registration: " . $e->getMessage());
+                session()->forget('pending_vendor_registration');
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to send OTP. Please try again.',
+                ], 500);
+            }
+        } else {
+            return $this->createVendor([
+                'name' => $request->name,
+                'email' => $request->email ?? $this->generateUniqueEmail(),
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+                'business_name' => $businessName,
+                'business_email' => $businessEmail,
+                'business_phone' => $businessPhone,
+                'business_address' => $businessAddress,
+                'store_slug' => $storeSlug,
+                'role' => $request->role,
+                'vendor_type' => $request->vendor_type,
+            ], $request);
+        }
+    }
+}

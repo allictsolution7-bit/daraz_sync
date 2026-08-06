@@ -81,6 +81,11 @@ if (!module_enabled('MultiVendor')) {
     Route::post('/vendor/register/check-slug', [App\Http\Controllers\Auth\VendorRegisterController::class, 'checkSlug'])->name('vendor.register.check-slug');
 }
 
+// Partner / Multi-role registration routes
+Route::get('/join-as-seller', [App\Http\Controllers\Auth\VendorRegisterController::class, 'showPartnerRegistrationForm'])->name('partner.register');
+Route::post('/join-as-seller', [App\Http\Controllers\Auth\VendorRegisterController::class, 'registerPartner'])->name('partner.register.submit');
+
+
 // CSRF Token Refresh Route – used by admin auto-refresh to prevent 419 errors
 Route::get('/csrf-token-refresh', function () {
     return response()->json(['token' => csrf_token()]);
