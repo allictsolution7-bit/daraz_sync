@@ -488,6 +488,14 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-md-6">
+                            <label>Amount Paid (Optional)</label>
+                            <input type="number" class="form-control" id="amountPaid" placeholder="Amount Paid" min="0">
+                        </div>
+                        <div class="col-12 mt-2 d-flex align-items-center gap-2">
+                            <input type="checkbox" id="paymentStatusPaid" value="paid" style="width: 16px; height: 16px; cursor: pointer;">
+                            <label for="paymentStatusPaid" class="m-0" style="cursor: pointer; font-weight: 600;">Mark Order Payment as Paid</label>
+                        </div>
                         <div class="col-12 mt-2">
                             <label>Remarks</label>
                             <textarea class="form-control" id="orderNotes" rows="2" placeholder="Optional notes for admin"></textarea>
@@ -766,7 +774,9 @@ function processOrder() {
         shipping: parseFloat($('#shippingAmount').val()) || 0,
         notes: $('#orderNotes').val(),
         items: cart,
-        total: parseFloat($('#total').text().replace('৳', ''))
+        total: parseFloat($('#total').text().replace('৳', '')),
+        amount_paid: parseFloat($('#amountPaid').val()) || null,
+        payment_status: $('#paymentStatusPaid').is(':checked') ? 'paid' : 'pending'
     };
 
     $.post('{{ route("vendor.pos.create-order") }}', orderData)
@@ -774,7 +784,8 @@ function processOrder() {
         if (response.success) {
             toastr.success(response.message);
             clearCart();
-            $('#customerName, #customerPhone, #customerAddress, #customerCity, #orderNotes').val('');
+            $('#customerName, #customerPhone, #customerAddress, #customerCity, #orderNotes, #amountPaid').val('');
+            $('#paymentStatusPaid').prop('checked', false);
             $('#shippingAmount, #discountAmount').val('0');
         } else {
             toastr.error(response.message);

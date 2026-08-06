@@ -42,33 +42,29 @@ class ResellerOrderController extends Controller
 
     public function index(Request $request)
     {
-        $admin = Auth::user();
-
-        $resellers = User::where('created_by', $admin->id)
-            ->whereHas('roles', fn($q) => $q->where('name', 'reseller'))
-            ->get(['id', 'name', 'email']);
-
-        $totalCount     = $this->getResellerOrdersQuery()->count();
-        $pendingCount   = $this->getResellerOrdersQuery()->where('status', 'pending')->count();
-        $processingCount= $this->getResellerOrdersQuery()->where('status', 'processing')->count();
-        $deliveredCount = $this->getResellerOrdersQuery()->where('status', 'delivered')->count();
-        $cancelledCount = $this->getResellerOrdersQuery()->where('status', 'cancelled')->count();
-
         $statusCounts = [
-            'all'        => $totalCount,
-            'pending'    => $pendingCount,
-            'processing' => $processingCount,
-            'delivered'  => $deliveredCount,
-            'cancelled'  => $cancelledCount,
+            'all' => '...', 'pending' => '...', 'phone_not_rcv' => '...', 'follow_up' => '...',
+            'processing' => '...', 'ready_for_delivery' => '...', 'shipped' => '...',
+            'delivered' => '...', 'on_hold' => '...', 'cancelled' => '...'
         ];
 
-        return view('admin.reseller-orders.index', compact('statusCounts', 'resellers', 'totalCount'));
+        $orders = collect([]);
+
+        $assignableStaff = User::whereHas('roles', function ($query) {
+                $query->where('name', '!=', 'user');
+            })
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
+
+        $isResellerOrdersPage = true;
+
+        return view('admin.orders', compact('orders', 'statusCounts', 'assignableStaff', 'isResellerOrdersPage'));
     }
 
     public function data(Request $request)
     {
         $query = $this->getResellerOrdersQuery()
-            ->with(['order_items.product', 'user', 'assignedStaff']);
+            ->with(['order_items.product', 'order_items.vendor', 'assignedStaff', 'fraudCheckResult']);
 
         if (!$request->has('order')) {
             $query->orderBy('created_at', 'desc');
@@ -78,11 +74,32 @@ class ResellerOrderController extends Controller
             $query->where('status', $status);
         }
 
-        if ($resellerId = $request->get('reseller_id')) {
-            $query->whereIn('id', function($q) use ($resellerId) {
-                $q->select('order_id')->from('order_items')
-                  ->where(DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(others, '$.reseller_id')) AS UNSIGNED)"), $resellerId);
-            });
+        if ($courierStatus = $request->get('courier_status')) {
+            if ($courierStatus === 'steadfast_sent') {
+                $query->where('delivery_data->courier_provider', 'steadfast');
+            } elseif ($courierStatus === 'steadfast_not_sent') {
+                $query->where(function ($q) {
+                    $q->whereNull('delivery_data->courier_provider')
+                      ->orWhere('delivery_data->courier_provider', '!=', 'steadfast');
+                });
+            }
+        }
+
+        if ($orderType = $request->get('order_type')) {
+            if ($orderType === 'combo') {
+                $query->where('is_combo_order', true);
+            } elseif ($orderType === 'regular') {
+                $query->where(function ($q) {
+                    $q->whereNull('is_combo_order')->orWhere('is_combo_order', false);
+                });
+            }
+        }
+
+        if ($min = $request->get('amount_min')) {
+            $query->where('total', '>=', (float) $min);
+        }
+        if ($max = $request->get('amount_max')) {
+            $query->where('total', '<=', (float) $max);
         }
 
         if ($from = $request->get('date_from')) {
@@ -93,87 +110,113 @@ class ResellerOrderController extends Controller
         }
 
         return DataTables::eloquent($query)
-            ->addColumn('reseller_info', function ($order) {
-                $firstItem = $order->order_items->first();
-                $others = is_string($firstItem?->others) ? json_decode($firstItem->others, true) : ($firstItem?->others ?? []);
-                $resellerName = $others['reseller_name'] ?? 'Unknown Reseller';
-                $resellerId = $others['reseller_id'] ?? null;
-                $html = '<div class="fw-bold text-primary">' . e($resellerName) . '</div>';
-                if ($resellerId) {
-                    $html .= '<div class="text-muted small">ID: #' . $resellerId . '</div>';
-                }
-                return $html;
+            ->addColumn('select', function ($order) {
+                $courierProvider = $order->delivery_data['courier_provider'] ?? null;
+                $isSteadfast = $courierProvider === 'steadfast';
+                $isPathao = $courierProvider === 'pathao';
+                $hasCourier = !empty($courierProvider);
+                $steadfastSent = $isSteadfast ? 'true' : 'false';
+                $pathaoSent = $isPathao ? 'true' : 'false';
+                $courierSent = $hasCourier ? 'true' : 'false';
+                $ipAddress = $order->ip_address ?? $order->ip ?? ($order->delivery_data['ip'] ?? null);
+                return '<input type="checkbox" class="order-checkbox" value="'.$order->id.'" data-steadfast-sent="'.$steadfastSent.'" data-pathao-sent="'.$pathaoSent.'" data-courier-sent="'.$courierSent.'" data-courier-provider="'.e($courierProvider).'" data-phone="'.e($order->phone).'" data-ip="'.e($ipAddress ?? '').'" />';
             })
             ->addColumn('customer_info', function ($order) {
-                $editUrl = route('admin.orders.edit', $order->id);
-                $html = '<div class="fw-semibold">' . e($order->name) . '</div>';
-                $html .= '<div class="text-muted small">' . e($order->phone) . '</div>';
-                if ($order->city) {
-                    $html .= '<div class="text-muted small">' . e($order->city) . '</div>';
-                }
-                $html .= '<div class="mt-1"><a href="' . $editUrl . '" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:11px;"><i class="fas fa-eye me-1"></i>View</a></div>';
-                return $html;
+                // Return data structure for JS customization in Datatables
+                return '';
             })
-            ->addColumn('items_info', function ($order) {
-                $html = '';
+            ->addColumn('product_price_and_name', function ($order) {
+                $amount = number_format($order->total, 2);
+                $html = '<div class="d-flex flex-column gap-1">';
+                $html .= '<span class="font-title-sm text-primary fw-bold" style="color: #1f108e; font-size: 15px; letter-spacing: -0.01em;">৳ '.$amount.'</span>';
+
+                $titles = [];
                 foreach ($order->order_items as $item) {
-                    $title = $item->product->title ?? 'Product';
-                    $qty   = $item->quantity;
-                    $price = number_format($item->price, 2);
-                    $others = is_string($item->others) ? json_decode($item->others, true) : ($item->others ?? []);
-                    $html .= '<div class="small mb-1"><span class="fw-semibold">' . e($title) . '</span>';
-                    $html .= ' <span class="badge bg-light text-dark border">x' . $qty . '</span>';
-                    $html .= ' <span class="text-success fw-bold">৳' . $price . '</span>';
-                    if (!empty($others['variation_display_name'])) {
-                        $html .= '<br><small class="text-muted">' . e($others['variation_display_name']) . '</small>';
-                    }
-                    $html .= '</div>';
+                    $resellerName = $item->vendor->name ?? 'Reseller';
+                    $titles[] = '<span class="text-on-surface" style="font-size: 13px; color: #191c1e; line-height: 1.3;">- '.e($item->product->title ?? 'Product').' <span class="badge bg-warning-subtle text-warning border px-2 py-0.5" style="font-size: 10px;"><i class="fas fa-store me-1"></i>'.$resellerName.'</span></span>';
                 }
-                return $html ?: '-';
-            })
-            ->addColumn('total_info', function ($order) {
-                $html = '<div class="fw-bold text-success fs-6">৳' . number_format($order->total, 2) . '</div>';
-                $html .= '<div class="small text-muted">' . e(strtoupper($order->payment_method)) . '</div>';
-                if ($order->discount > 0) {
-                    $html .= '<div class="small text-danger">-৳' . number_format($order->discount, 2) . '</div>';
-                }
-                if ($order->shipping > 0) {
-                    $html .= '<div class="small text-info">+৳' . number_format($order->shipping, 2) . ' ship</div>';
-                }
-                return $html;
-            })
-            ->addColumn('status_badge', function ($order) {
-                $map = [
-                    'pending' => 'warning', 'processing' => 'info',
-                    'ready_for_delivery' => 'primary', 'shipped' => 'secondary',
-                    'delivered' => 'success', 'cancelled' => 'danger', 'on_hold' => 'dark',
-                ];
-                $color = $map[$order->status] ?? 'secondary';
-                $label = ucwords(str_replace('_', ' ', $order->status));
-                $statusOptions = '';
-                foreach ($map as $val => $c) {
-                    $sel = $order->status === $val ? 'selected' : '';
-                    $statusOptions .= '<option value="' . $val . '" ' . $sel . '>' . ucwords(str_replace('_', ' ', $val)) . '</option>';
-                }
-                return '<div class="d-flex flex-column gap-1">
-                    <span class="badge bg-' . $color . '">' . $label . '</span>
-                    <select class="form-select form-select-sm reseller-order-status-change" data-order-id="' . $order->id . '" style="font-size:11px;width:120px;">
-                        ' . $statusOptions . '
-                    </select>
-                </div>';
-            })
-            ->addColumn('actions', function ($order) {
-                $editUrl = route('admin.orders.edit', $order->id);
-                $html = '<div class="d-flex gap-1">';
-                $html .= '<a href="' . $editUrl . '" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a>';
-                $html .= '<a href="/admin/pos/print-invoice/' . $order->id . '" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fas fa-print"></i></a>';
+                $html .= implode('<br>', $titles);
                 $html .= '</div>';
                 return $html;
             })
-            ->addColumn('created_date', function ($order) {
-                return '<div class="small">' . $order->created_at->format('d M Y') . '<br><span class="text-muted">' . $order->created_at->format('h:i A') . '</span></div>';
+            ->addColumn('courier_column', function ($order) {
+                $deliveryData = $order->delivery_data;
+                if (!$deliveryData || empty($deliveryData['courier_provider'])) {
+                    return '';
+                }
+
+                $courierProvider = ucfirst($deliveryData['courier_provider']);
+                $cnId = $deliveryData['consignment_id'] ?? $deliveryData['tracking_code'] ?? '';
+                $trackingCode = $deliveryData['tracking_code'] ?? $deliveryData['consignment_id'] ?? '';
+                $trackUrl = $deliveryData['tracking_url'] ?? ($trackingCode ? 'https://steadfast.com.bd/tl/'.$trackingCode : '#');
+                $courierStatus = $order->courier_status ?? null;
+
+                $html = '<div class="d-flex flex-column gap-1">';
+                $html .= '<div class="d-flex align-items-center gap-2">';
+                $html .= '<span class="fw-bold text-dark" style="font-size: 13.5px;">'.e($courierProvider).'</span>';
+                if ($cnId) {
+                    $html .= '<a href="'.e($trackUrl).'" target="_blank" class="fw-bold text-decoration-none" style="color: #1f108e; font-size: 11.5px;">Track</a>';
+                }
+                $html .= '</div>';
+
+                if ($cnId) {
+                    $html .= '<span class="text-muted" style="font-size: 11.5px; font-family: monospace;">ID: '.e($cnId).'</span>';
+                }
+
+                if ($courierStatus) {
+                    $html .= '<div class="courier-status-badge mt-1" data-order-id="'.$order->id.'" data-courier="'.e($deliveryData['courier_provider']).'" style="cursor:pointer; display:inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 500;">';
+                    $html .= '<i class="fas fa-truck me-1"></i><span class="courier-status-text">'.e($courierStatus).'</span></div>';
+                }
+
+                $html .= '</div>';
+                return $html;
             })
-            ->rawColumns(['reseller_info', 'customer_info', 'items_info', 'total_info', 'status_badge', 'actions', 'created_date'])
+            ->addColumn('status_badge', function ($order) {
+                $text = ucfirst(str_replace('_', ' ', $order->status));
+                if ($order->status === 'ready_for_delivery') {
+                    $text = 'Ready Delivery';
+                }
+
+                $statusHtml = '<div class="order-status-container">
+                    <span class="order-status-badge order-status-'.e($order->status).' change-status-btn shadow-sm" data-order-id="'.$order->id.'" data-current-status="'.e($order->status).'" data-payment-method="'.e($order->payment_method).'" data-order-source="'.e($order->order_source ?? '').'" style="cursor:pointer;">'.$text.' <i class="fas fa-chevron-down" style="font-size: 11px; opacity: 0.8;"></i></span>';
+
+                $assignee = $order->assignedStaff;
+                $assigneeName = $assignee?->name ?? 'Unassigned';
+                $assignedLabel = $assignee ? 'Assigned To' : 'Unassigned';
+
+                $statusHtml .= '<div class="assigned-user-profile d-flex align-items-center gap-2 mt-2">
+                    <div class="assigned-user-details">
+                        <div class="assigned-user-name" style="margin-bottom:-4px; font-size: 11.5px; font-weight: 600; color: #191c1e;">'.e($assigneeName).'</div>
+                        <small class="text-muted" style="font-size: 10px;">'.$assignedLabel.'</small>
+                    </div>
+                </div>';
+
+                $statusHtml .= '</div>';
+                return $statusHtml;
+            })
+            ->addColumn('fraud_check', function ($order) {
+                $fraudCheckResult = $order->fraudCheckResult;
+                $canCheckFraud = !in_array($order->status, ['delivered', 'shipped', 'ready_for_delivery']);
+                if ($order->hasFraudCheck() && $fraudCheckResult) {
+                    $badge = $fraudCheckResult->risk_level_badge_class;
+                    $display = $fraudCheckResult->risk_level_display;
+                    $rate = $fraudCheckResult->success_rate_display;
+                    return '<div class="fraud-check-info fraud-check-column"><span class="'.$badge.' fraud-risk-badge">'.$display.'</span><div class="fraud-success-rate" style="font-size: 12px; font-weight: 600; color: #191c1e;">'.$rate.'</div></div>';
+                } elseif ($canCheckFraud) {
+                    return '<div class="fraud-check-loading fraud-check-column" data-order-id="'.$order->id.'" data-phone="'.e($order->phone).'"><i class="fas fa-spinner fa-spin text-muted"></i> <small class="text-muted">Checking...</small></div>';
+                }
+                return '<div class="fraud-check-missing fraud-check-column"><small class="text-muted">No data</small></div>';
+            })
+            ->addColumn('order_at', function ($order) {
+                $ts = $order->created_at->timestamp;
+                $date = $order->created_at->format('m-d-y');
+                $time = $order->created_at->format('h:i:s A');
+                return '<span data-order="'.$ts.'"><div style="line-height: 1.3;"><div style="font-weight: 500; color: #191c1e; font-size: 13.5px;">'.$date.'</div><div style="font-weight: 400; font-size: 12px; color: #464553;">'.$time.'</div></div></span>';
+            })
+            ->setRowClass(function ($order) {
+                return 'order-status-' . $order->status;
+            })
+            ->rawColumns(['select', 'customer_info', 'product_price_and_name', 'courier_column', 'status_badge', 'fraud_check', 'order_at'])
             ->toJson();
     }
 

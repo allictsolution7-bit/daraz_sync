@@ -56,6 +56,23 @@ class AuthorizeByRouteName
             abort(403, 'Permission required: (vendor_orders.view). Please ask an administrator to grant this permission.');
         }
 
+        // Direct mapping for reseller orders route — accessible to all admins with orders.view or admin role
+        if (str_starts_with($name, 'admin.reseller-orders')) {
+            if (
+                $user->can('reseller_orders.view') ||
+                $user->can('orders.view') ||
+                $user->can('vendor_orders.view') ||
+                (method_exists($user, 'hasRole') && (
+                    $user->hasRole('super_admin') ||
+                    $user->hasRole('super admin') ||
+                    $user->hasRole('admin')
+                ))
+            ) {
+                return $next($request);
+            }
+            abort(403, 'Permission required: (reseller_orders.view). Please ask an administrator to grant this permission.');
+        }
+
         // Direct mapping for basic shipping settings route
         if (str_starts_with($name, 'admin.basic.shipping.settings') || str_starts_with($name, 'basic.shipping.settings')) {
             if ($user->can('shipping.basic.view') || $user->can('shipping.basic.update') || $user->can('basic_shipping.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {

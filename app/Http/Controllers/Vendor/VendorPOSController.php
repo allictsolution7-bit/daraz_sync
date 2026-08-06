@@ -254,6 +254,8 @@ class VendorPOSController extends Controller
             'shipping' => 'nullable|numeric|min:0',
             'total' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
+            'amount_paid' => 'nullable|numeric|min:0',
+            'payment_status' => 'nullable|string|in:paid,pending',
         ]);
 
         try {
@@ -293,24 +295,27 @@ class VendorPOSController extends Controller
                     }
                 }
 
-                // Create Order
-                $order = order::create([
-                    'name' => $customer->name,
-                    'phone' => $customer->phone,
-                    'address' => $customer->address ?? '',
-                    'city' => $customer->city ?? '',
-                    'upazila' => '',
-                    'user_id' => $customer->id,
-                    'status' => 'pending', // Reseller orders start as pending for admin verification
-                    'order_source' => 'Reseller POS',
-                    'payment_method' => $request->payment_method,
-                    'total' => $request->total,
-                    'discount' => $request->discount ?? 0,
-                    'shipping' => $request->shipping ?? 0,
-                    'message' => $request->notes,
-                    'assigned_to' => $reseller->created_by, // Automatically assign to the reseller's admin
-                    'payment_status' => 'pending',
-                ]);
+                 // Create Order
+                 $order = order::create([
+                     'name' => $customer->name,
+                     'phone' => $customer->phone,
+                     'address' => $customer->address ?? '',
+                     'city' => $customer->city ?? '',
+                     'upazila' => '',
+                     'user_id' => $customer->id,
+                     'status' => 'pending', // Reseller orders start as pending for admin verification
+                     'order_source' => 'Reseller POS',
+                     'payment_method' => $request->payment_method,
+                     'total' => $request->total,
+                     'discount' => $request->discount ?? 0,
+                     'shipping' => $request->shipping ?? 0,
+                     'message' => $request->notes,
+                     'assigned_to' => $reseller->created_by, // Automatically assign to the reseller's admin
+                     'payment_status' => $request->payment_status === 'paid' ? 'paid' : 'pending',
+                     'delivery_data' => [
+                         'amount_paid' => $request->amount_paid ?? 0,
+                     ]
+                 ]);
 
                 // Create items & deduct stock
                 foreach ($request->items as $item) {
@@ -332,10 +337,16 @@ class VendorPOSController extends Controller
                         }
                     }
 
-                    // Base Cost of product is what admin set
+                    // Base Cost of product is what admin set as reseller_price (defaulting to wholesale_price or product_cost if 0)
                     $unitCost = ($item['combination_id'] && isset($combination))
-                        ? ($combination->wholesale_price ?? $combination->product_cost ?? 0)
-                        : ($product->wholesale_price ?? $product->product_cost ?? 0);
+                        ? ($combination->reseller_price ?? $combination->wholesale_price ?? $combination->product_cost ?? 0)
+                        : ($product->reseller_price ?? $product->wholesale_price ?? $product->product_cost ?? 0);
+
+                    if ($unitCost <= 0) {
+                        $unitCost = ($item['combination_id'] && isset($combination))
+                            ? ($combination->wholesale_price ?? $combination->product_cost ?? 0)
+                            : ($product->wholesale_price ?? $product->product_cost ?? 0);
+                    }
 
                     // reseller_commission = selling_price - admin_cost
                     $resellerEarning = ($item['price'] - $unitCost) * $item['quantity'];

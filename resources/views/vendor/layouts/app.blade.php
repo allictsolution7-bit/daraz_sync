@@ -432,6 +432,20 @@
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.pos.*') ? 'active' : '' }}" href="{{ route('vendor.pos.index') }}">
                 <i class="fas fa-cash-register text-success"></i> Reseller POS
             </a>
+            <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('vendor.orders.reseller') ? 'active' : '' }}" href="{{ route('vendor.orders.reseller') }}">
+                <span class="d-flex align-items-center gap-2">
+                    <i class="fas fa-receipt" style="color:#a78bfa;"></i> My POS Orders
+                </span>
+                @php
+                    $resellerPosOrderCount = \App\Models\order_item::where('vendor_id', auth()->id())
+                        ->whereNotNull('others')
+                        ->distinct('order_id')
+                        ->count('order_id');
+                @endphp
+                @if($resellerPosOrderCount > 0)
+                    <span class="badge bg-warning text-dark rounded-pill" style="font-size:0.65rem;">{{ $resellerPosOrderCount }}</span>
+                @endif
+            </a>
             @endif
 
             @php

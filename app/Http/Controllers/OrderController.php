@@ -21,19 +21,20 @@ class OrderController extends Controller
      */
     protected function withoutVendorOrders($query)
     {
-        return $query->whereNotIn('id', function($q) {
-            $q->select('order_id')
-              ->from('order_items')
-              ->where(function($sub) {
-                  $sub->whereNotNull('vendor_id')
-                      ->orWhereIn('product_id', function($pq) {
-                          $pq->select('id')
-                             ->from('products')
-                             ->whereNotNull('vendor_id')
-                             ->orWhereNotNull('parent_product_id');
-                      });
-              });
-        });
+        return $query->where('order_source', '!=', 'Reseller POS')
+            ->whereNotIn('id', function($q) {
+                $q->select('order_id')
+                  ->from('order_items')
+                  ->where(function($sub) {
+                      $sub->whereNotNull('vendor_id')
+                          ->orWhereIn('product_id', function($pq) {
+                              $pq->select('id')
+                                 ->from('products')
+                                 ->whereNotNull('vendor_id')
+                                 ->orWhereNotNull('parent_product_id');
+                          });
+                  });
+            });
     }
 
     /**
@@ -128,6 +129,8 @@ class OrderController extends Controller
 
         if ($request->get('vendor_orders')) {
             $baseQuery = app(\App\Http\Controllers\Admin\AdminVendorOrderController::class)->getVendorOrdersQuery();
+        } elseif ($request->get('reseller_orders')) {
+            $baseQuery = app(\App\Http\Controllers\Admin\ResellerOrderController::class)->getResellerOrdersQuery();
         } else {
             $baseQuery = $this->withoutVendorOrders($this->scopeForAdminUser($query));
         }

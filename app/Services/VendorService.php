@@ -130,6 +130,12 @@ class VendorService
         }
 
         DB::transaction(function () use ($orderItem) {
+            // Get vendor/user
+            $vendor = User::find($orderItem->vendor_id);
+            if (!$vendor) {
+                return;
+            }
+
             // Get current balance
             $currentBalance = $this->calculateBalance($orderItem->vendor_id);
             $newBalance = $currentBalance + $orderItem->vendor_earning;
@@ -145,7 +151,18 @@ class VendorService
                 'description' => "Earning from Order #{$orderItem->order_id} - {$orderItem->product->title}",
             ]);
 
-            // Note: We don't mark as paid yet - that happens when withdrawal is completed
+            // Update user wallet balance directly
+            $vendor->increment('wallet_balance', $orderItem->vendor_earning);
+
+            // Log approved transaction
+            VendorWalletTransaction::create([
+                'vendor_id' => $vendor->id,
+                'type' => 'sale_commission',
+                'amount' => $orderItem->vendor_earning,
+                'status' => 'approved',
+                'admin_note' => "POS Order profit credited. Order #{$orderItem->order_id}",
+                'is_seen' => true
+            ]);
         });
     }
 

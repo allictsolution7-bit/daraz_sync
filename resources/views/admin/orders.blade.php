@@ -1679,6 +1679,8 @@
                 params.assigned_to_me = 1;
             @elseif(isset($isVendorOrdersPage) && $isVendorOrdersPage)
                 params.vendor_orders = 1;
+            @elseif(isset($isResellerOrdersPage) && $isResellerOrdersPage)
+                params.reseller_orders = 1;
             @endif
 
             $.ajax({
@@ -1715,7 +1717,7 @@
                 serverSide: true,
                 dom: '<"top"Bf>rt<"bottom"lip>',
                 ajax: {
-                    url: '{{ isset($isVendorOrdersPage) && $isVendorOrdersPage ? route('admin.vendor-orders.data') : route('admin.orders.data') }}',
+                    url: '{{ isset($isVendorOrdersPage) && $isVendorOrdersPage ? route('admin.vendor-orders.data') : (isset($isResellerOrdersPage) && $isResellerOrdersPage ? route('admin.reseller-orders.data') : route('admin.orders.data')) }}',
                     data: function(d) {
                         d.status = $('#status-filter').val();
                         d.courier_status = $('#courier-filter').val();
@@ -1773,6 +1775,13 @@
                             }
                             if (ipAddress) {
                                 html += `<div class="mt-1"><span class="text-muted" style="font-size: 10.5px; font-family: monospace;">IP: ${escapeHtml(ipAddress)}</span></div>`;
+                            }
+                            if (row.order_source === 'Reseller POS') {
+                                const resellerName = (row.order_items && row.order_items[0] && row.order_items[0].others && JSON.parse(row.order_items[0].others).reseller_name) || 'Reseller';
+                                html += `<div class="mt-1"><span class="badge bg-purple text-white" style="font-size: 10px; background-color: #8b5cf6;"><i class="fas fa-user-tie me-1"></i>POS: ${escapeHtml(resellerName)}</span></div>`;
+                                if (row.delivery_data && row.delivery_data.amount_paid > 0) {
+                                    html += `<div class="mt-1"><span class="badge bg-success-subtle text-success border" style="font-size: 10.5px;"><i class="fas fa-check-circle me-1"></i>Paid: ৳${parseFloat(row.delivery_data.amount_paid).toFixed(2)}</span></div>`;
+                                }
                             }
                             html += `</div>`;
                             return html;
