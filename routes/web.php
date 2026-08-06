@@ -850,6 +850,9 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [VendorOrderController::class, 'index'])->name('index');
         Route::get('/my-pos-orders', [VendorOrderController::class, 'resellerOrders'])->name('reseller');
+        Route::get('/my-pos-orders/{id}/edit', [VendorOrderController::class, 'editResellerOrder'])->name('reseller.edit');
+        Route::post('/my-pos-orders/{id}/update', [VendorOrderController::class, 'updateResellerOrder'])->name('reseller.update');
+        Route::delete('/my-pos-orders/{id}/delete', [VendorOrderController::class, 'deleteResellerOrder'])->name('reseller.delete');
         Route::get('/{order}', [VendorOrderController::class, 'show'])->name('show');
         Route::get('/earnings/summary', [VendorOrderController::class, 'earnings'])->name('earnings');
     });

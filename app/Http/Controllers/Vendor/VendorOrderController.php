@@ -168,5 +168,104 @@ class VendorOrderController extends Controller
             'orders', 'statusCounts', 'totalEarnings', 'paidEarnings'
         ));
     }
+
+    /**
+     * Show edit form for reseller POS orders (Pending status only)
+     */
+    public function editResellerOrder($id)
+    {
+        $reseller = auth()->user();
+        $order = order::where('order_source', 'Reseller POS')
+            ->whereIn('id', function($q) use ($reseller) {
+                $q->select('order_id')->from('order_items')->where('vendor_id', $reseller->id);
+            })
+            ->findOrFail($id);
+
+        if ($order->status !== 'pending') {
+            return redirect()->back()->with('error', 'Only pending POS orders can be edited.');
+        }
+
+        return view('vendor.orders.reseller_edit', compact('order'));
+    }
+
+    /**
+     * Update reseller POS order info (Customer details & remarks)
+     */
+    public function updateResellerOrder(Request $request, $id)
+    {
+        $reseller = auth()->user();
+        $order = order::where('order_source', 'Reseller POS')
+            ->whereIn('id', function($q) use ($reseller) {
+                $q->select('order_id')->from('order_items')->where('vendor_id', $reseller->id);
+            })
+            ->findOrFail($id);
+
+        if ($order->status !== 'pending') {
+            return response()->json(['success' => false, 'message' => 'Only pending orders can be updated.'], 403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+            'city' => 'nullable|string|max:100',
+            'notes' => 'nullable|string',
+            'amount_paid' => 'nullable|numeric|min:0',
+        ]);
+
+        $deliveryData = $order->delivery_data ?? [];
+        $deliveryData['amount_paid'] = $request->amount_paid ?? 0;
+
+        $order->update([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'city' => $request->city ?? '',
+            'message' => $request->notes,
+            'delivery_data' => $deliveryData,
+        ]);
+
+        return redirect()->route('vendor.orders.reseller')->with('success', 'Order updated successfully.');
+    }
+
+    /**
+     * Delete/Cancel reseller POS order (Pending status only)
+     */
+    public function deleteResellerOrder($id)
+    {
+        $reseller = auth()->user();
+        $order = order::where('order_source', 'Reseller POS')
+            ->whereIn('id', function($q) use ($reseller) {
+                $q->select('order_id')->from('order_items')->where('vendor_id', $reseller->id);
+            })
+            ->findOrFail($id);
+
+        if ($order->status !== 'pending') {
+            return redirect()->back()->with('error', 'Only pending POS orders can be deleted.');
+        }
+
+        DB::transaction(function () use ($order) {
+            // Restore inventory stock
+            $stockService = app(\App\Services\StockService::class);
+            foreach ($order->order_items as $item) {
+                if ($item->combination_id) {
+                    $comb = \App\Models\VariationCombination::find($item->combination_id);
+                    if ($comb) {
+                        $stockService->updateVariationCombinationStock($comb, $item->quantity, 'restock', $order->id, "Reseller POS Cancelled - Restock");
+                    }
+                } else {
+                    if ($item->product) {
+                        $stockService->updateSimpleProductStock($item->product, $item->quantity, 'restock', $order->id, "Reseller POS Cancelled - Restock");
+                    }
+                }
+            }
+
+            // Delete order items and order
+            $order->order_items()->delete();
+            $order->delete();
+        });
+
+        return redirect()->route('vendor.orders.reseller')->with('success', 'Order deleted successfully and stock restored.');
+    }
 }
 
