@@ -1777,7 +1777,15 @@
                                 html += `<div class="mt-1"><span class="text-muted" style="font-size: 10.5px; font-family: monospace;">IP: ${escapeHtml(ipAddress)}</span></div>`;
                             }
                             if (row.order_source === 'Reseller POS') {
-                                const resellerName = (row.order_items && row.order_items[0] && row.order_items[0].others && JSON.parse(row.order_items[0].others).reseller_name) || 'Reseller';
+                                let resellerName = 'Reseller';
+                                if (row.order_items && row.order_items[0] && row.order_items[0].others) {
+                                    try {
+                                        const othersObj = typeof row.order_items[0].others === 'string' ? JSON.parse(row.order_items[0].others) : row.order_items[0].others;
+                                        if (othersObj && othersObj.reseller_name) {
+                                            resellerName = othersObj.reseller_name;
+                                        }
+                                    } catch (e) {}
+                                }
                                 html += `<div class="mt-1"><span class="badge bg-purple text-white" style="font-size: 10px; background-color: #8b5cf6;"><i class="fas fa-user-tie me-1"></i>POS: ${escapeHtml(resellerName)}</span></div>`;
                                 if (row.delivery_data && row.delivery_data.amount_paid > 0) {
                                     html += `<div class="mt-1"><span class="badge bg-success-subtle text-success border" style="font-size: 10.5px;"><i class="fas fa-check-circle me-1"></i>Paid: ৳${parseFloat(row.delivery_data.amount_paid).toFixed(2)}</span></div>`;
@@ -1803,7 +1811,7 @@
                         className: 'text-end',
                         render: function(data, type, row) {
                             const editUrl = `/admin/transactions/${row.id}/edit`;
-                            const hasNote = row.admin_note && row.admin_note.trim().length > 0;
+                            const hasNote = row.admin_note && typeof row.admin_note === 'string' && row.admin_note.trim().length > 0;
                             const noteTitle = hasNote ? escapeHtml(row.admin_note) : 'Add Note';
                             const noteIconColor = hasNote ? '#4f46e5' : '#9e9e9e';
                             let html = `

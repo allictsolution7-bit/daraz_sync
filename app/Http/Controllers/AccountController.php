@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\order;
+use App\Models\Product;
+use App\Models\VariationCombination;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -268,5 +270,50 @@ class AccountController extends Controller
         }
 
         return view('frontend.user.track', compact('order'));
+    }
+
+    /**
+     * Cancel order by user
+     */
+    public function cancelOrder(Request $request, $id)
+    {
+        $user = Auth::user();
+        $order = $user->orders()->findOrFail($id);
+
+        // Check if the order is in a cancellable status
+        $cancellableStatuses = ['pending', 'phone_not_rcv'];
+        if (!in_array(strtolower($order->status), $cancellableStatuses)) {
+            return redirect()->back()->with('error', 'This order cannot be cancelled as it is already being processed.');
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($order) {
+            // Update order status
+            $order->status = 'cancelled';
+            
+            // Add cancellation status log
+            $statusUpdates = $order->status_updates ? json_decode($order->status_updates, true) : [];
+            $statusUpdates[] = [
+                'status' => 'cancelled',
+                'updated_at' => now()->toDateTimeString(),
+                'updated_by' => auth()->id(),
+                'note' => 'Cancelled by Customer'
+            ];
+            $order->status_updates = json_encode($statusUpdates);
+            $order->save();
+
+            // Restore Stock
+            $order->loadMissing('order_items');
+            foreach ($order->order_items as $orderItem) {
+                if ($orderItem->combination_id) {
+                    \App\Models\VariationCombination::where('id', $orderItem->combination_id)
+                        ->increment('stock_quantity', $orderItem->quantity);
+                } else {
+                    \App\Models\Product::where('id', $orderItem->product_id)
+                        ->increment('quantity', $orderItem->quantity);
+                }
+            }
+        });
+
+        return redirect()->back()->with('success', 'Order cancelled successfully.');
     }
 }

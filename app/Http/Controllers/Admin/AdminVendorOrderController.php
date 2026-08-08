@@ -54,38 +54,30 @@ class AdminVendorOrderController extends Controller
             return order::whereRaw('1 = 0');
         }
 
-        return order::whereIn('id', function ($q) use ($vendorIds, $adminProductIds) {
-            $q->select('order_id')
-              ->from('order_items')
-              ->where(function ($subQ) use ($vendorIds, $adminProductIds) {
-                  $hasCondition = false;
+        return order::whereHas('orderItems', function ($q) use ($vendorIds, $adminProductIds) {
+            $q->where(function ($subQ) use ($vendorIds, $adminProductIds) {
+                $hasCondition = false;
 
-                  if (!empty($vendorIds)) {
-                      $subQ->whereIn('vendor_id', $vendorIds)
-                           ->orWhereIn('product_id', function ($pq) use ($vendorIds) {
-                               $pq->select('id')
-                                  ->from('products')
-                                  ->whereIn('vendor_id', $vendorIds);
-                           });
-                      $hasCondition = true;
-                  }
+                if (!empty($vendorIds)) {
+                    $subQ->whereIn('vendor_id', $vendorIds)
+                         ->orWhereHas('product', function ($pq) use ($vendorIds) {
+                             $pq->whereIn('vendor_id', $vendorIds);
+                         });
+                    $hasCondition = true;
+                }
 
-                  if (!empty($adminProductIds)) {
-                      if ($hasCondition) {
-                          $subQ->orWhereIn('product_id', function ($pq) use ($adminProductIds) {
-                              $pq->select('id')
-                                 ->from('products')
-                                 ->whereIn('parent_product_id', $adminProductIds);
-                          });
-                      } else {
-                          $subQ->whereIn('product_id', function ($pq) use ($adminProductIds) {
-                              $pq->select('id')
-                                 ->from('products')
-                                 ->whereIn('parent_product_id', $adminProductIds);
-                          });
-                      }
-                  }
-              });
+                if (!empty($adminProductIds)) {
+                    if ($hasCondition) {
+                        $subQ->orWhereHas('product', function ($pq) use ($adminProductIds) {
+                            $pq->whereIn('parent_product_id', $adminProductIds);
+                        });
+                    } else {
+                        $subQ->whereHas('product', function ($pq) use ($adminProductIds) {
+                            $pq->whereIn('parent_product_id', $adminProductIds);
+                        });
+                    }
+                }
+            });
         });
     }
 

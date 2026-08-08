@@ -1118,46 +1118,46 @@
                     <span class="co-label" style="margin-bottom: 6px; font-weight: 700; color: var(--co-text); display: block;"><i class="fa-solid fa-credit-card"></i> Payment Method</span>
                     <div class="co-pay-options" style="display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap;">
                         @if ($codEnabled)
-                            <label class="co-pay-opt selected" for="pay_cod" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #f0fdf4; margin: 0; min-height: 56px; transition: all 0.2s;" title="Cash on Delivery">
+                            <label class="co-pay-opt selected" for="pay_cod" style="flex: 1; min-width: 100px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 2px solid var(--co-border); border-radius: 12px; cursor: pointer; background: #f0fdf4; margin: 0; min-height: 72px; transition: all 0.2s;" title="Cash on Delivery">
                                 <input type="radio" name="payment_method" id="pay_cod" value="cod" checked style="display:none;">
                                 <div style="position:relative; display:flex; align-items:center; justify-content:center;">
-                                    <i class="fa-solid fa-truck-fast" style="color:#10b981; font-size: 20px;"></i>
-                                    <i class="fa-solid fa-bangladeshi-taka-sign" style="color:#065f46; font-size: 11px; position:absolute; bottom:-3px; right:-6px; background:#d1fae5; border-radius:50%; padding:2px;"></i>
+                                    <i class="fa-solid fa-truck-fast" style="color:#10b981; font-size: 26px;"></i>
+                                    <i class="fa-solid fa-bangladeshi-taka-sign" style="color:#065f46; font-size: 13px; position:absolute; bottom:-4px; right:-8px; background:#d1fae5; border-radius:50%; padding:2.5px 3.5px;"></i>
                                 </div>
-                                <span style="font-size: 10px; font-weight: 700; color: #065f46; white-space: nowrap;">Cash on Delivery</span>
+                                <span style="font-size: 12px; font-weight: 800; color: #065f46; white-space: nowrap;">Cash on Delivery</span>
                             </label>
                         @endif
 
                         @if ($bkashEnabled)
-                            <label class="co-pay-opt" for="pay_bkash" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 56px; transition: all 0.2s;" title="bKash Wallet">
+                            <label class="co-pay-opt" for="pay_bkash" style="flex: 1; min-width: 100px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 2px solid var(--co-border); border-radius: 12px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="bKash Wallet">
                                 <input type="radio" name="payment_method" id="pay_bkash" value="bkash" style="display:none;">
-                                <img src="{{ asset('payment-method/bkash.png') }}" alt="bKash" class="co-pay-logo-img" style="height: 22px; object-fit: contain;">
-                                <span style="font-size: 10px; font-weight: 600; color: #c01263;">bKash</span>
+                                <img src="{{ asset('payment-method/bkash.png') }}" alt="bKash" class="co-pay-logo-img" style="height: 28px; object-fit: contain;">
+                                <span style="font-size: 12px; font-weight: 700; color: #c01263;">bKash</span>
                             </label>
                         @endif
 
                         @if ($nagadEnabled)
-                            <label class="co-pay-opt" for="pay_nagad" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 56px; transition: all 0.2s;" title="Nagad Wallet">
+                            <label class="co-pay-opt" for="pay_nagad" style="flex: 1; min-width: 100px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 2px solid var(--co-border); border-radius: 12px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="Nagad Wallet">
                                 <input type="radio" name="payment_method" id="pay_nagad" value="nagad" style="display:none;">
-                                <img src="{{ asset('payment-method/nagad.png') }}" alt="Nagad" class="co-pay-logo-img" style="height: 22px; object-fit: contain;">
-                                <span style="font-size: 10px; font-weight: 600; color: #d84315;">Nagad</span>
+                                <img src="{{ asset('payment-method/nagad.png') }}" alt="Nagad" class="co-pay-logo-img" style="height: 28px; object-fit: contain;">
+                                <span style="font-size: 12px; font-weight: 700; color: #d84315;">Nagad</span>
                             </label>
                         @endif
 
                         @if ($rocketEnabled)
-                            <label class="co-pay-opt" for="pay_rocket" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 56px; transition: all 0.2s;" title="Rocket Wallet">
+                            <label class="co-pay-opt" for="pay_rocket" style="flex: 1; min-width: 100px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 2px solid var(--co-border); border-radius: 12px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="Rocket Wallet">
                                 <input type="radio" name="payment_method" id="pay_rocket" value="rocket" style="display:none;">
-                                <img src="{{ asset('payment-method/rocket.png') }}" alt="Rocket" class="co-pay-logo-img" style="height: 22px; object-fit: contain;">
-                                <span style="font-size: 10px; font-weight: 600; color: #6b21a8;">Rocket</span>
+                                <img src="{{ asset('payment-method/rocket.png') }}" alt="Rocket" class="co-pay-logo-img" style="height: 28px; object-fit: contain;">
+                                <span style="font-size: 12px; font-weight: 700; color: #6b21a8;">Rocket</span>
                             </label>
                         @endif
 
                         @if ($autoGateways->count() > 0)
                             @foreach($autoGateways as $gw)
-                                <label class="co-pay-opt" for="pay_{{ $gw->provider }}_bn" style="flex: 1; min-width: 64px; padding: 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 2px solid var(--co-border); border-radius: 10px; cursor: pointer; background: #fff; margin: 0; min-height: 56px; transition: all 0.2s;" title="{{ $gw->name }}">
+                                <label class="co-pay-opt" for="pay_{{ $gw->provider }}_bn" style="flex: 1; min-width: 100px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 2px solid var(--co-border); border-radius: 12px; cursor: pointer; background: #fff; margin: 0; min-height: 72px; transition: all 0.2s;" title="{{ $gw->name }}">
                                     <input type="radio" name="payment_method" id="pay_{{ $gw->provider }}_bn" value="{{ $gw->provider }}" style="display:none;">
-                                    <i class="fa-solid fa-credit-card" style="color: #3b82f6; font-size: 20px;"></i>
-                                    <span style="font-size: 10px; font-weight: 600; color: #1e3a8a;">{{ $gw->name }}</span>
+                                    <i class="fa-solid fa-credit-card" style="color: #3b82f6; font-size: 26px;"></i>
+                                    <span style="font-size: 12px; font-weight: 700; color: #1e3a8a;">{{ $gw->name }}</span>
                                 </label>
                             @endforeach
                         @endif

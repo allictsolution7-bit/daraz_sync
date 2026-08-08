@@ -103,6 +103,26 @@
             color: white !important;
         }
 
+        .cancel-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.15);
+        }
+
+        .cancel-btn:hover {
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+            transform: translateY(-1px);
+            color: white !important;
+        }
+
         @media (max-width: 768px) {
             .orders-layout {
                 grid-template-columns: 1fr;
@@ -153,7 +173,15 @@
                                     </td>
                                     <td><strong>৳{{ number_format($order->total ?? 0, 2) }}</strong></td>
                                     <td>
-                                        <a href="{{ route('account.order.detail', $order->id) }}" class="view-btn">View Details</a>
+                                        <div style="display: flex; gap: 8px; align-items: center;">
+                                            <a href="{{ route('account.order.detail', $order->id) }}" class="view-btn">View Details</a>
+                                            @if(in_array(strtolower($order->status), ['pending', 'phone_not_rcv']))
+                                                <form action="{{ route('account.order.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');" style="margin: 0;">
+                                                    @csrf
+                                                    <button type="submit" class="cancel-btn">Cancel</button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach

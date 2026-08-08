@@ -765,31 +765,92 @@
                 <ul class="navbar-item flex-row  align-items-center py-2 ml-auto ">
                     <li class="nav-item dropdown user-profile-dropdown">
                         @php
-                            $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
-                                ->where('status', 'pending')
-                                ->where('type', 'recharge_request')
-                                ->latest()
-                                ->limit(5)
-                                ->get();
-                            $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')
-                                ->where('type', 'recharge_request')
-                                ->count();
+                            $user = auth()->user();
+                            $isSuperAdmin = false;
+                            if ($user) {
+                                if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin'))) {
+                                    $isSuperAdmin = true;
+                                } elseif ($user->is_super_admin ?? false) {
+                                    $isSuperAdmin = true;
+                                }
+                            }
 
-                            $headerPendingProducts = \App\Models\Product::with('vendor')
-                                ->whereNotNull('vendor_id')
-                                ->where('approval_status', 'pending')
-                                ->latest()
-                                ->limit(5)
-                                ->get();
-                            $headerPendingProdCount = \App\Models\Product::whereNotNull('vendor_id')
-                                ->where('approval_status', 'pending')
-                                ->count();
+                            // 1. Scoped recharge requests
+                            if ($isSuperAdmin) {
+                                $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')
+                                    ->where('type', 'recharge_request')
+                                    ->count();
+                                $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
+                                    ->where('status', 'pending')
+                                    ->where('type', 'recharge_request')
+                                    ->latest()->limit(5)->get();
+                            } else {
+                                $adminVendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
+                                $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')
+                                    ->where('type', 'recharge_request')
+                                    ->whereIn('vendor_id', $adminVendorIds)
+                                    ->count();
+                                $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
+                                    ->where('status', 'pending')
+                                    ->where('type', 'recharge_request')
+                                    ->whereIn('vendor_id', $adminVendorIds)
+                                    ->latest()->limit(5)->get();
+                            }
 
-                            $headerVendorOrdersQuery = \App\Models\order::whereIn('id', function ($q) {
-                                $q->select('order_id')
-                                  ->from('order_items')
-                                  ->whereNotNull('vendor_id');
-                            })->where('status', 'pending');
+                            // 2. Scoped product approvals
+                            if ($isSuperAdmin) {
+                                $headerPendingProducts = \App\Models\Product::with('vendor')
+                                    ->whereNotNull('vendor_id')
+                                    ->where('approval_status', 'pending')
+                                    ->latest()->limit(5)->get();
+                                $headerPendingProdCount = \App\Models\Product::whereNotNull('vendor_id')
+                                    ->where('approval_status', 'pending')
+                                    ->count();
+                            } else {
+                                $adminVendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
+                                $headerPendingProducts = \App\Models\Product::with('vendor')
+                                    ->whereIn('vendor_id', $adminVendorIds)
+                                    ->where('approval_status', 'pending')
+                                    ->latest()->limit(5)->get();
+                                $headerPendingProdCount = \App\Models\Product::whereIn('vendor_id', $adminVendorIds)
+                                    ->where('approval_status', 'pending')
+                                    ->count();
+                            }
+
+                            // 3. Scoped vendor orders
+                            if ($isSuperAdmin) {
+                                $headerVendorOrdersQuery = \App\Models\order::whereHas('orderItems', function ($q) {
+                                    $q->whereNotNull('vendor_id');
+                                })->where('status', 'pending');
+                            } else {
+                                $adminVendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
+                                $adminProductIds = \App\Models\Product::where('created_by', $user->id)->pluck('id')->toArray();
+                                
+                                $headerVendorOrdersQuery = \App\Models\order::where('status', 'pending')
+                                    ->whereHas('orderItems', function ($q) use ($adminVendorIds, $adminProductIds) {
+                                        $q->where(function ($subQ) use ($adminVendorIds, $adminProductIds) {
+                                            $hasCondition = false;
+                                            if (!empty($adminVendorIds)) {
+                                                $subQ->whereIn('vendor_id', $adminVendorIds)
+                                                     ->orWhereHas('product', function ($pq) use ($adminVendorIds) {
+                                                         $pq->whereIn('vendor_id', $adminVendorIds);
+                                                     });
+                                                $hasCondition = true;
+                                            }
+                                            if (!empty($adminProductIds)) {
+                                                if ($hasCondition) {
+                                                    $subQ->orWhereHas('product', function ($pq) use ($adminProductIds) {
+                                                        $pq->whereIn('parent_product_id', $adminProductIds);
+                                                     });
+                                                } else {
+                                                    $subQ->whereHas('product', function ($pq) use ($adminProductIds) {
+                                                        $pq->whereIn('parent_product_id', $adminProductIds);
+                                                     });
+                                                }
+                                            }
+                                        });
+                                    });
+                            }
                             
                             $headerVendorOrders = $headerVendorOrdersQuery->latest()->limit(5)->get();
                             $headerVendorOrderCount = $headerVendorOrdersQuery->count();
