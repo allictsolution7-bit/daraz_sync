@@ -323,7 +323,7 @@
                                     @foreach($orderItems as $item)
                                         <tr>
                                             <td class="ps-4 font-weight-bold text-dark">{{ $item->order->order_number ?? '#' . $item->order_id }}</td>
-                                            <td>{{ $item->product->name ?? 'N/A' }}</td>
+                                            <td>{{ $item->product->title ?? 'N/A' }}</td>
                                             <td>{{ $item->quantity }}</td>
                                             <td>৳{{ number_format($item->price, 2) }}</td>
                                             <td>{{ $item->vendor_commission_rate }}%</td>

@@ -110,7 +110,7 @@
                                 <select name="products[]" class="form-control select2" multiple>
                                     @foreach($products as $product)
                                         <option value="{{ $product->id }}" {{ $rule->products->contains($product->id) ? 'selected' : '' }}>
-                                            {{ $product->name }}
+                                            {{ $product->title }}
                                         </option>
                                     @endforeach
                                 </select>

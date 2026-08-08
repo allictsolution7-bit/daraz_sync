@@ -1791,6 +1791,28 @@
                                     html += `<div class="mt-1"><span class="badge bg-success-subtle text-success border" style="font-size: 10.5px;"><i class="fas fa-check-circle me-1"></i>Paid: ৳${parseFloat(row.delivery_data.amount_paid).toFixed(2)}</span></div>`;
                                 }
                             }
+
+                            // Payment method and status display
+                            const pm = row.payment_method ? row.payment_method.toUpperCase() : 'COD';
+                            const ps = row.payment_status || 'pending';
+                            let psBadgeClass = 'bg-warning-subtle text-warning border-warning-subtle';
+                            if (ps === 'paid') {
+                                psBadgeClass = 'bg-success-subtle text-success border-success-subtle';
+                            } else if (ps === 'failed' || ps === 'refunded') {
+                                psBadgeClass = 'bg-danger-subtle text-danger border-danger-subtle';
+                            }
+                            
+                            html += `
+                                <div class="mt-1.5 d-flex align-items-center gap-1 flex-wrap">
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle" style="font-size: 10px; font-weight: 600;">
+                                        <i class="fas fa-credit-card me-1"></i>${pm}
+                                    </span>
+                                    <span class="badge ${psBadgeClass} border change-payment-status-btn" style="font-size: 10px; font-weight: 600; text-transform: uppercase; cursor: pointer;" data-order-id="${row.id}" data-current-payment-status="${ps}">
+                                        ${ps}
+                                    </span>
+                                </div>
+                            `;
+                            
                             html += `</div>`;
                             return html;
                         }
@@ -2128,6 +2150,82 @@
                 }
 
                 $('#statusChangeModal').modal('show');
+            });
+
+            // Quick update payment status (delegated)
+            $(document).on('click', '.change-payment-status-btn', function(event) {
+                event.stopPropagation();
+                var orderId = $(this).data('order-id');
+                var currentPaymentStatus = $(this).data('current-payment-status') || 'pending';
+
+                Swal.fire({
+                    title: 'Update Payment Status',
+                    text: 'Select new payment status:',
+                    icon: 'question',
+                    input: 'select',
+                    inputOptions: {
+                        'pending': 'Pending',
+                        'paid': 'Full Paid'
+                    },
+                    inputValue: currentPaymentStatus,
+                    showCancelButton: true,
+                    confirmButtonText: 'Update',
+                    confirmButtonColor: '#4f46e5',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        popup: 'premium-swal-popup'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route('admin.orders.updatePaymentStatus') }}',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                order_id: orderId,
+                                payment_status: result.value
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Success!',
+                                        text: response.message,
+                                        icon: 'success',
+                                        timer: 1500,
+                                        showConfirmButton: false,
+                                        customClass: {
+                                            popup: 'premium-swal-popup'
+                                        }
+                                    });
+                                    if (typeof table !== 'undefined') {
+                                        table.ajax.reload(null, false);
+                                    } else {
+                                        location.reload();
+                                    }
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: response.message || 'Something went wrong',
+                                        icon: 'error',
+                                        customClass: {
+                                            popup: 'premium-swal-popup'
+                                        }
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: xhr.responseJSON?.message || 'Failed to update payment status',
+                                    icon: 'error',
+                                    customClass: {
+                                        popup: 'premium-swal-popup'
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             });
 
             // Check pending purchase event status

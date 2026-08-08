@@ -412,6 +412,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
         Route::put('/{order}', [BackOrderController::class, 'update'])->name('update');
         Route::delete('/{order}', [BackOrderController::class, 'destroy'])->name('destroy');
         Route::post('/update-status', [BackOrderController::class, 'updateStatus'])->name('updateStatus');
+        Route::post('/update-payment-status', [BackOrderController::class, 'updatePaymentStatus'])->name('updatePaymentStatus');
         Route::post('/bulk-update-status', [BackOrderController::class, 'bulkUpdateStatus'])->name('bulkUpdateStatus');
         Route::post('/bulk-refresh-courier-status', [BackOrderController::class, 'bulkRefreshCourierStatus'])->name('bulkRefreshCourierStatus');
         Route::post('/update-note', [BackOrderController::class, 'updateNote'])->name('updateNote');

@@ -870,6 +870,26 @@ class OrderController extends Controller
     }
 
     /**
+     * Update payment status (paid/pending) via AJAX
+     */
+    public function updatePaymentStatus(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'payment_status' => 'required|string|in:paid,pending'
+        ]);
+
+        $order = order::findOrFail($request->order_id);
+        $order->payment_status = $request->payment_status;
+        $order->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment status updated to ' . ($request->payment_status === 'paid' ? 'Full Paid' : 'Pending')
+        ]);
+    }
+
+    /**
      * Fire pending purchase event for a COD or offline order.
      * This sends the purchase event to PixelFly after order confirmation.
      */

@@ -288,7 +288,7 @@
                                         <tr>
                                             <td class="ps-4 font-weight-bold">
                                                 <a href="{{ route('admin.vendor-products.show', $product) }}" class="text-dark text-decoration-none">
-                                                    {{ $product->name }}
+                                                    {{ $product->title }}
                                                 </a>
                                             </td>
                                             <td>

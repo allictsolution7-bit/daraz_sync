@@ -246,10 +246,10 @@
                                             <div class="product-item">
                                                 @if ($item->product && $item->product->image)
                                                     <img src="{{ asset('storage/' . $item->product->image) }}"
-                                                        alt="{{ $item->product->name }}" class="product-image">
+                                                        alt="{{ $item->product->title }}" class="product-image">
                                                 @endif
                                                 <div>
-                                                    {{ $item->product ? $item->product->name : 'Product not available' }}
+                                                    {{ $item->product ? $item->product->title : 'Product not available' }}
                                                     
                                                     @if($order->status == 'ready_for_delivery' && $item->product && $item->product->product_type == 'digital' && $item->product->digital_file)
                                                         <div>
