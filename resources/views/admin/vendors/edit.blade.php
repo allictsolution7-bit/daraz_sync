@@ -246,6 +246,12 @@
                             <label class="form-check-label fw-bold text-primary fs-6 mb-0" for="is_consignment" style="cursor: pointer; user-select: none;">Consignment Partner Mode</label>
                         </div>
                         <small class="text-muted d-block mt-1 ps-5">Enables wallet balance, recharging, parent catalog copying, and purchase options.</small>
+
+                        <div class="form-check form-switch mb-1 pt-2 d-flex align-items-center gap-2" id="allow-negative-balance-group" style="display: none;">
+                            <input class="form-check-input me-2" type="checkbox" id="allow_negative_balance" name="allow_negative_balance" value="1" style="width: 3.2em; height: 1.6em; cursor: pointer;" {{ old('allow_negative_balance', $vendorSettings->additional_config['allow_negative_balance'] ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label fw-bold text-danger fs-6 mb-0" for="allow_negative_balance" style="cursor: pointer; user-select: none;">Allow Negative Wallet Balance</label>
+                        </div>
+                        <small class="text-muted d-block mt-1 ps-5 mb-3" id="allow-negative-balance-desc" style="display: none;">Enables wholeseller to purchase stock even when wallet balance is negative or insufficient.</small>
                     </div>
                 </div>
 
@@ -322,8 +328,19 @@
             } else {
                 $('#vendor-type-group').addClass('d-none');
             }
+
+            // Show/hide negative balance option based on whether the partner is a Wholeseller
+            const isWholeseller = (role === 'wholeseller') || (role === 'vendor' && $('input[name="vendor_type"]:checked').val() === 'wholeseller');
+            if (isWholeseller) {
+                $('#allow-negative-balance-group').show();
+                $('#allow-negative-balance-desc').show();
+            } else {
+                $('#allow-negative-balance-group').hide();
+                $('#allow-negative-balance-desc').hide();
+            }
         }
         $('select[name="role"]').on('change', toggleVendorType);
+        $('input[name="vendor_type"]').on('change', toggleVendorType);
         toggleVendorType(); // trigger initially
     });
 </script>

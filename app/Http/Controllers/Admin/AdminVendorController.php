@@ -203,6 +203,7 @@ class AdminVendorController extends Controller
             'is_verified' => 'nullable|boolean',
             'auto_approve_products' => 'nullable|boolean',
             'is_consignment' => 'nullable|boolean',
+            'allow_negative_balance' => 'nullable|boolean',
         ]);
 
         DB::transaction(function () use ($validated, $vendor, $request) {
@@ -238,6 +239,14 @@ class AdminVendorController extends Controller
                 $additionalConfig['vendor_type'] = $request->vendor_type;
             } else {
                 unset($additionalConfig['vendor_type']);
+            }
+
+            // Save allow negative balance toggle for wholeseller partners
+            $isWholeseller = ($validated['role'] === 'wholeseller') || ($validated['role'] === 'vendor' && ($request->vendor_type ?? '') === 'wholeseller');
+            if ($isWholeseller) {
+                $additionalConfig['allow_negative_balance'] = $request->has('allow_negative_balance');
+            } else {
+                unset($additionalConfig['allow_negative_balance']);
             }
             
             $settingsData = [

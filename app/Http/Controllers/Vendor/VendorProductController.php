@@ -324,7 +324,10 @@ class VendorProductController extends Controller
 
         // Wallet Balance Check
         $walletBalance = (float)($vendor->wallet_balance ?? 0);
-        if ($walletBalance < $totalCost) {
+        $vendorSettings = $vendor->vendorSettings;
+        $allowNegative = $vendorSettings && !empty($vendorSettings->additional_config['allow_negative_balance']);
+
+        if (!$allowNegative && $walletBalance < $totalCost) {
             return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
                 ->with('error', 'Insufficient wallet balance. Total stock cost is ৳' . number_format($totalCost, 2) . ', but your wallet balance is ৳' . number_format($walletBalance, 2) . '. Please recharge your wallet first.');
         }
@@ -333,10 +336,8 @@ class VendorProductController extends Controller
         try {
             $vendorSettings = $vendor->vendorSettings;
 
-            // Respect vendor auto-approve settings or default to true for instant allocation
-            $autoApprove = $vendorSettings && method_exists($vendorSettings, 'shouldAutoApproveProducts') 
-                ? $vendorSettings->shouldAutoApproveProducts() 
-                : true;
+            // Copying/purchasing parent admin catalog products is always auto-approved
+            $autoApprove = true;
 
             if ($autoApprove) {
                 $trxStatus = 'approved';
@@ -576,7 +577,10 @@ class VendorProductController extends Controller
 
         // Wallet Balance Check
         $walletBalance = (float)($vendor->wallet_balance ?? 0);
-        if ($walletBalance < $totalCost) {
+        $vendorSettings = $vendor->vendorSettings;
+        $allowNegative = $vendorSettings && !empty($vendorSettings->additional_config['allow_negative_balance']);
+
+        if (!$allowNegative && $walletBalance < $totalCost) {
             return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
                 ->with('error', 'Insufficient wallet balance for bulk copy. Total required cost for ' . $totalItemsCount . ' products is ৳' . number_format($totalCost, 2) . ', but your wallet balance is ৳' . number_format($walletBalance, 2) . '. Please recharge your wallet first.');
         }
@@ -584,9 +588,8 @@ class VendorProductController extends Controller
         DB::beginTransaction();
         try {
             $vendorSettings = $vendor->vendorSettings;
-            $autoApprove = $vendorSettings && method_exists($vendorSettings, 'shouldAutoApproveProducts') 
-                ? $vendorSettings->shouldAutoApproveProducts() 
-                : false;
+            // Bulk copying/purchasing parent admin catalog products is always auto-approved
+            $autoApprove = true;
 
             $statusTarget = $autoApprove ? 'approved' : 'pending';
             $trxStatus = $autoApprove ? 'approved' : 'pending';
@@ -597,7 +600,7 @@ class VendorProductController extends Controller
                 $prodCost = $item['total_cost'];
                 $combMap = $item['comb_map'];
 
-                \App\Models\VendorProductAllocation::create([
+                $allocation = \App\Models\VendorProductAllocation::create([
                     'vendor_id' => $vendor->id,
                     'product_id' => $product->id,
                     'requested_quantity' => $prodQty,
@@ -619,6 +622,27 @@ class VendorProductController extends Controller
                     'admin_note' => 'Bulk Stock Purchase: Requested product "' . $product->title . '" (' . $prodQty . ' units)',
                     'is_seen' => true,
                 ]);
+
+                // Adjust stocks & copy product copy if auto-approved
+                if ($autoApprove) {
+                    // Deduct stock from Admin product (-)
+                    if ($product->manage_stock && $product->quantity !== null) {
+                        $product->decrement('quantity', $prodQty);
+                    }
+
+                    // Deduct stock from Admin variation combinations if variable (-)
+                    if ($product->product_type === 'variable' && !empty($combMap)) {
+                        foreach ($combMap as $cId => $cData) {
+                            $combModel = \App\Models\VariationCombination::find($cId);
+                            if ($combModel && $combModel->stock_quantity !== null) {
+                                $combModel->decrement('stock_quantity', $cData['quantity']);
+                            }
+                        }
+                    }
+
+                    // Create separate vendor product copy
+                    $this->vendorService->approveAllocation($allocation->id, $adminId ?? 1);
+                }
             }
 
             // Deduct total cost from vendor's wallet balance

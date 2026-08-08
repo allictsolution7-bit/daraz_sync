@@ -1240,8 +1240,24 @@
 
 @push('scripts')
 <script>
+const isConsignmentEnabled = {{ auth()->user()->vendorSettings?->is_consignment ? 'true' : 'false' }};
+
+function showConsignmentError() {
+    const msg = "You do not have permission. Consignment Partner Mode is disabled for your store.";
+    if (typeof toastr !== 'undefined' && typeof toastr.error === 'function') {
+        toastr.error(msg);
+    } else {
+        alert(msg);
+    }
+}
+
 function openBulkCopyCartModal() {
+    if (!isConsignmentEnabled) {
+        showConsignmentError();
+        return;
+    }
     let checkboxes = document.querySelectorAll('.product-select-checkbox:checked');
+
     if (checkboxes.length === 0) return;
 
     let container = document.getElementById('bulkCartItemsContainer');
@@ -1421,6 +1437,24 @@ function calculateProductStockCopy(productId, currentBalance) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Intercept modal show events to prevent opening copy modals if consignment is disabled
+    if (!isConsignmentEnabled) {
+        document.addEventListener('show.bs.modal', function(e) {
+            if (e.target && e.target.id && e.target.id.startsWith('copyStockModal_')) {
+                e.preventDefault();
+                showConsignmentError();
+            }
+        }, true);
+
+        if (window.jQuery) {
+            jQuery(document).on('show.bs.modal', '[id^="copyStockModal_"]', function(e) {
+                e.preventDefault();
+                showConsignmentError();
+                return false;
+            });
+        }
+    }
+
     let modals = document.querySelectorAll('[id^="copyStockModal_"]');
     modals.forEach(function(modal) {
         // Trigger both Bootstrap 4 and Bootstrap 5 event listeners

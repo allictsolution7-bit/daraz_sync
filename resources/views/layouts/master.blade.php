@@ -765,13 +765,36 @@
                 <ul class="navbar-item flex-row  align-items-center py-2 ml-auto ">
                     <li class="nav-item dropdown user-profile-dropdown">
                         @php
-                            $headerPendingPayments = collect();
-                            $headerPendingCount = 0;
-                            $headerPendingProducts = collect();
-                            $headerPendingProdCount = 0;
-                            $headerVendorOrders = collect();
-                            $headerVendorOrderCount = 0;
-                            $headerTotalCount = 0;
+                            $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
+                                ->where('status', 'pending')
+                                ->where('type', 'recharge_request')
+                                ->latest()
+                                ->limit(5)
+                                ->get();
+                            $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')
+                                ->where('type', 'recharge_request')
+                                ->count();
+
+                            $headerPendingProducts = \App\Models\Product::with('vendor')
+                                ->whereNotNull('vendor_id')
+                                ->where('approval_status', 'pending')
+                                ->latest()
+                                ->limit(5)
+                                ->get();
+                            $headerPendingProdCount = \App\Models\Product::whereNotNull('vendor_id')
+                                ->where('approval_status', 'pending')
+                                ->count();
+
+                            $headerVendorOrdersQuery = \App\Models\order::whereIn('id', function ($q) {
+                                $q->select('order_id')
+                                  ->from('order_items')
+                                  ->whereNotNull('vendor_id');
+                            })->where('status', 'pending');
+                            
+                            $headerVendorOrders = $headerVendorOrdersQuery->latest()->limit(5)->get();
+                            $headerVendorOrderCount = $headerVendorOrdersQuery->count();
+
+                            $headerTotalCount = $headerPendingCount + $headerPendingProdCount + $headerVendorOrderCount;
                         @endphp
                         <a href="#" class="nav-link user position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
                             <i class="fa-regular fa-bell" style="font-size: 20px; color: #ffaa00;"></i>

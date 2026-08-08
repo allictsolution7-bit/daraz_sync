@@ -300,7 +300,20 @@ class VendorService
                 if (!$existingVendorProduct) {
                     // Create replicated product for vendor
                     $vendorProductData = $parentProduct->toArray();
+                    
+                    // Filter array to keep only valid database columns to prevent virtual column errors
+                    $columns = \Illuminate\Support\Facades\Schema::getColumnListing('products');
+                    $vendorProductData = array_intersect_key($vendorProductData, array_flip($columns));
+                    
                     unset($vendorProductData['id'], $vendorProductData['created_at'], $vendorProductData['updated_at']);
+
+                    // Strip heavy base64 images from description to prevent MySQL gone away errors
+                    if (!empty($vendorProductData['description'])) {
+                        $vendorProductData['description'] = preg_replace('/data:image\/[^;]+;base64,[^"\'\s>]+/i', '', $vendorProductData['description']);
+                    }
+                    if (!empty($vendorProductData['short_description'])) {
+                        $vendorProductData['short_description'] = preg_replace('/data:image\/[^;]+;base64,[^"\'\s>]+/i', '', $vendorProductData['short_description']);
+                    }
                     
                     $vendorProductData['vendor_id'] = $allocation->vendor_id;
                     $vendorProductData['parent_product_id'] = $parentProduct->id;
