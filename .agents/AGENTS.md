@@ -6,4 +6,4 @@
 - **Methodical Execution**: Process the changes page-by-page. Review the layout, sub-pages, and components associated with one page before moving to the next.
 
 ## Command & Task Execution Preferences
-- **Command Selection Inquiry**: Before starting any task, proposing or executing any terminal command, or when submitting completed work/responses, always ask the user if they would prefer to use the `jcode` CLI agent on their side, or if they want you to handle/process it directly using your built-in tools and skills.
+- **Command Selection Inquiry**: Before starting any task, proposing or executing any terminal command, or when submitting completed work/responses, always ask the user using the `ask_question` tool (interactive pop-up modal) if they would prefer to use the `jcode` CLI agent on their side, or if they want you to handle/process it directly using your built-in tools and skills.

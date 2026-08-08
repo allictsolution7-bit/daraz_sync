@@ -76,10 +76,14 @@ Route::post('/resend-registration-otp', [App\Http\Controllers\Auth\RegisterContr
 if (!module_enabled('MultiVendor')) {
     Route::get('/vendor/register', [App\Http\Controllers\Auth\VendorRegisterController::class, 'showRegistrationForm'])->name('vendor.register');
     Route::post('/vendor/register', [App\Http\Controllers\Auth\VendorRegisterController::class, 'register'])->name('vendor.register.submit');
-    Route::post('/vendor/register/verify-otp', [App\Http\Controllers\Auth\VendorRegisterController::class, 'verifyOtp'])->name('vendor.register.verify-otp');
-    Route::post('/vendor/register/resend-otp', [App\Http\Controllers\Auth\VendorRegisterController::class, 'resendOtp'])->name('vendor.register.resend-otp');
-    Route::post('/vendor/register/check-slug', [App\Http\Controllers\Auth\VendorRegisterController::class, 'checkSlug'])->name('vendor.register.check-slug');
 }
+
+// Always allow checking slug availability, verifying OTP, and resending OTP (used by partner registration)
+Route::post('/vendor/register/verify-otp', [App\Http\Controllers\Auth\VendorRegisterController::class, 'verifyOtp'])->name('vendor.register.verify-otp');
+Route::post('/vendor/register/resend-otp', [App\Http\Controllers\Auth\VendorRegisterController::class, 'resendOtp'])->name('vendor.register.resend-otp');
+Route::post('/vendor/register/check-slug', [App\Http\Controllers\Auth\VendorRegisterController::class, 'checkSlug'])->name('vendor.register.check-slug');
+
+
 
 // Partner / Multi-role registration routes
 Route::get('/join-as-seller', [App\Http\Controllers\Auth\VendorRegisterController::class, 'showPartnerRegistrationForm'])->name('partner.register');
