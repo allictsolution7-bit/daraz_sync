@@ -28,30 +28,30 @@ class VendorProductController extends Controller
     {
         if (!$vendor) return false;
 
+        // Check Spatie roles (if wholeseller/reseller role exists in DB)
         if ($vendor->hasRole('wholeseller') || $vendor->hasRole('reseller')) {
             return true;
         }
 
         $vendorSettings = $vendor->vendorSettings;
-        
-        // Only consignment vendors can access admin products
-        if (!$vendorSettings || !$vendorSettings->is_consignment) {
-            return false;
-        }
 
-        if ($vendorSettings->canAccessAdminProducts()) {
-            return true;
-        }
-        if (method_exists($vendor, 'can') && $vendor->can('vendor.access_admin_products')) {
+        if (!$vendorSettings) return false;
+
+        // Check vendor_type stored in additional_config JSON
+        $additionalConfig = $vendorSettings->additional_config ?? [];
+        $vendorType = $additionalConfig['vendor_type'] ?? null;
+        if (in_array($vendorType, ['wholeseller', 'reseller'])) {
             return true;
         }
 
-        if (method_exists($vendor, 'roles') && $vendor->roles) {
-            foreach ($vendor->roles as $role) {
-                if ($role->permissions && $role->permissions->contains('name', 'vendor.access_admin_products')) {
-                    return true;
-                }
-            }
+        // Check explicit can_access_admin_products flag
+        if ($vendorSettings->can_access_admin_products) {
+            return true;
+        }
+
+        // Check consignment access
+        if ($vendorSettings->is_consignment && $vendorSettings->canAccessAdminProducts()) {
+            return true;
         }
 
         return false;
@@ -67,7 +67,14 @@ class VendorProductController extends Controller
 
         $source = $request->get('source');
         
-        if ($vendor->hasRole('reseller') || $vendor->hasRole('wholeseller')) {
+        // Detect wholeseller/reseller via role OR vendor_type in additional_config
+        $vendorSettings = $vendor->vendorSettings;
+        $additionalConfig = $vendorSettings?->additional_config ?? [];
+        $vendorType = $additionalConfig['vendor_type'] ?? null;
+        $isWholeseller = $vendor->hasRole('wholeseller') || $vendor->hasRole('reseller')
+            || in_array($vendorType, ['wholeseller', 'reseller']);
+
+        if ($isWholeseller) {
             $canAccessAdminProducts = true;
             if (!$source) {
                 $source = 'admin_products';

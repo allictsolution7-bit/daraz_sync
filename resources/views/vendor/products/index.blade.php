@@ -223,6 +223,12 @@
         border-radius: 6px;
         display: inline-block;
     }
+    .table-responsive {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
 </style>
 @endpush
 
@@ -544,7 +550,7 @@
 @endif
 
 <!-- Products Table -->
-<div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4" style="border: 1px solid #e2e8f0 !important;">
+<div class="card shadow-sm border-0 rounded-4 mb-4" style="border: 1px solid #e2e8f0 !important; overflow: clip;">
     <div class="card-body p-0">
         @if(($source ?? 'my_products') === 'admin_products')
             <!-- Bulk Action Bar -->
@@ -636,7 +642,7 @@
             </div>
         @else
             <div class="table-responsive">
-                <table class="table table-modern align-middle mb-0">
+                <table class="table table-modern align-middle mb-0" style="min-width: 900px;">
                     <thead>
                         <tr>
                             <th style="width: 45px;" class="ps-4">

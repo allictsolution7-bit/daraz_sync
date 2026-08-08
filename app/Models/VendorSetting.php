@@ -375,6 +375,13 @@ class VendorSetting extends Model
             return true;
         }
 
+        // Check vendor_type stored in additional_config JSON
+        $additionalConfig = $this->additional_config ?? [];
+        $vendorType = $additionalConfig['vendor_type'] ?? null;
+        if (in_array($vendorType, ['wholeseller', 'reseller'])) {
+            return true;
+        }
+
         $user = $this->vendor ?? auth()->user();
         if (!$user) {
             return false;
@@ -408,5 +415,6 @@ class VendorSetting extends Model
 
         return false;
     }
+
 }
 
