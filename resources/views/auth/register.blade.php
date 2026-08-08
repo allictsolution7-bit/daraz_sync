@@ -132,6 +132,13 @@
         .registration-form.wide {
             max-width: 850px !important;
         }
+        #generate-password {
+            cursor: pointer;
+            text-decoration: none;
+        }
+        #generate-password:hover {
+            text-decoration: underline;
+        }
     </style>
 @endsection
 
@@ -246,7 +253,10 @@
                     @enderror
                 </div>
                 <div class="form-group">
-                    <label for="password">{{ __('Password') }}</label>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label for="password" class="mb-0">{{ __('Password') }}</label>
+                        <a id="generate-password" class="text-primary font-weight-bold small"><i class="fas fa-key"></i> Generate Password</a>
+                    </div>
                     <div class="input-group mt-2">
                         <input id="password" type="password" class="form-control" name="password" required
                             autocomplete="new-password">
@@ -271,7 +281,6 @@
                     <span id="password-error" class="invalid-feedback" role="alert" style="display: none;">
                         <strong>Password error message</strong>
                     </span>
-                    <a id="generate-password" class="btn btn-primary mt-1">Generate Password</a>
                     @error('password')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>

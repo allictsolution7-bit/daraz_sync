@@ -24,9 +24,18 @@ class AdminVendorController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::role('vendor')
-            ->with('vendorSettings')
-            ->where('created_by', auth()->id()); // Scope to current admin's vendors only
+        $user = auth()->user();
+        $isSuperAdmin = $user && (!empty($user->is_super_admin) || $user->id == 1 || in_array($user->type ?? '', ['super_admin', 'super admin']) || in_array($user->role ?? '', ['super_admin', 'super admin']) || (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['super_admin', 'super admin', 'Super Admin', 'super-admin'])));
+
+        $query = User::role('vendor')->with('vendorSettings');
+
+        if (!$isSuperAdmin) {
+            $query->where(function ($q) {
+                $q->where('created_by', auth()->id())
+                  ->orWhereNull('created_by')
+                  ->orWhere('created_by', 0);
+            });
+        }
 
         // Search
         if ($request->has('search') && $request->search) {
@@ -178,6 +187,9 @@ class AdminVendorController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $vendor->id,
             'phone' => 'nullable|string|max:20',
+            'password' => 'nullable|string|min:8',
+            'role' => 'required|string|in:reseller,vendor,wholeseller',
+            'vendor_type' => 'required_if:role,vendor|nullable|in:retailer,wholeseller',
             'business_name' => 'required|string|max:255',
             'business_email' => 'required|email',
             'business_phone' => 'required|string|max:20',
@@ -193,16 +205,40 @@ class AdminVendorController extends Controller
             'is_consignment' => 'nullable|boolean',
         ]);
 
-        DB::transaction(function () use ($validated, $vendor) {
+        DB::transaction(function () use ($validated, $vendor, $request) {
             // Update user
-            $vendor->update([
+            $userData = [
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'] ?? null,
-            ]);
+            ];
+
+            if ($request->filled('password')) {
+                $userData['password'] = Hash::make($request->password);
+            }
+
+            $vendor->update($userData);
+
+            // Sync roles dynamically
+            $role = $validated['role'];
+            if ($role === 'reseller') {
+                $vendor->syncRoles(['reseller']);
+            } elseif ($role === 'wholeseller') {
+                \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'wholeseller', 'guard_name' => 'web']);
+                $vendor->syncRoles(['wholeseller', 'vendor']);
+            } else {
+                $vendor->syncRoles(['vendor']);
+            }
 
             // Update vendor settings
             $vendorSettings = $vendor->vendorSettings;
+            
+            $additionalConfig = $vendorSettings->additional_config ?? [];
+            if ($validated['role'] === 'vendor' && !empty($request->vendor_type)) {
+                $additionalConfig['vendor_type'] = $request->vendor_type;
+            } else {
+                unset($additionalConfig['vendor_type']);
+            }
             
             $settingsData = [
                 'business_name' => $validated['business_name'],
@@ -217,6 +253,7 @@ class AdminVendorController extends Controller
                 'is_active' => $validated['is_active'] ?? false,
                 'auto_approve_products' => $validated['auto_approve_products'] ?? false,
                 'is_consignment' => $validated['is_consignment'] ?? false,
+                'additional_config' => $additionalConfig,
             ];
 
             // Handle verification

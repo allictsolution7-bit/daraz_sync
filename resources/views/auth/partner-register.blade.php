@@ -80,6 +80,36 @@
         .gap-4 {
             gap: 1.5rem;
         }
+        .registration-form {
+            transition: max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            max-width: 480px;
+            width: 100%;
+        }
+        .registration-form.wide-form {
+            max-width: 950px !important;
+        }
+        .role-radio:checked + .role-label {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+        }
+        .role-label {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border-width: 2px;
+            border-radius: 8px;
+        }
+        .role-label:hover {
+            border-color: #007bff;
+        }
+        #generate-password {
+            cursor: pointer;
+            text-decoration: none;
+        }
+        #generate-password:hover {
+            text-decoration: underline;
+        }
     </style>
 @endsection
 
@@ -107,186 +137,212 @@
             <form method="POST" action="{{ route('partner.register.submit') }}">
                 @csrf
 
-                <!-- Role Selection -->
-                <div class="form-section">
-                    <h6><i class="fas fa-user-tag"></i> Select Partnership Role</h6>
-                    <div class="form-group">
-                        <label for="role">Join As <span class="text-danger">*</span></label>
-                        <select name="role" id="role" class="form-control" required>
-                            <option value="reseller" {{ old('role') == 'reseller' ? 'selected' : '' }}>Reseller</option>
-                            <option value="vendor" {{ old('role', 'vendor') == 'vendor' ? 'selected' : '' }}>Vendor</option>
-                            <option value="wholeseller" {{ old('role') == 'wholeseller' ? 'selected' : '' }}>Wholeseller</option>
-                        </select>
-                    </div>
-
-                    <!-- Vendor Type selection (only shown if role is Vendor) -->
-                    <div class="form-group d-none" id="vendor-type-group">
-                        <label>Vendor Type <span class="text-danger">*</span></label>
-                        <div class="d-flex gap-4 align-items-center mt-2">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="vendor_type" id="retailer" value="retailer" checked>
-                                <label class="form-check-label" for="retailer">Retailer</label>
+                <div class="row">
+                    <div id="form-left-col" class="col-md-6">
+                        <!-- Role Selection -->
+                        <div class="form-section">
+                            <h6><i class="fas fa-user-tag"></i> Select Partnership Role</h6>
+                            <div class="form-group">
+                                <label class="d-block">Join As <span class="text-danger">*</span></label>
+                                <div class="d-flex gap-2 justify-content-between role-selector">
+                                    <div class="flex-fill mr-2">
+                                        <input type="radio" name="role" id="role_vendor" value="vendor" class="d-none role-radio" {{ old('role', 'vendor') == 'vendor' ? 'checked' : '' }}>
+                                        <label for="role_vendor" class="btn btn-outline-primary btn-block p-3 text-center role-label">
+                                            <i class="fas fa-store d-block mb-1 fa-2x"></i>
+                                            Vendor
+                                        </label>
+                                    </div>
+                                    <div class="flex-fill mr-2">
+                                        <input type="radio" name="role" id="role_reseller" value="reseller" class="d-none role-radio" {{ old('role') == 'reseller' ? 'checked' : '' }}>
+                                        <label for="role_reseller" class="btn btn-outline-primary btn-block p-3 text-center role-label">
+                                            <i class="fas fa-people-arrows d-block mb-1 fa-2x"></i>
+                                            Reseller
+                                        </label>
+                                    </div>
+                                    <div class="flex-fill">
+                                        <input type="radio" name="role" id="role_wholeseller" value="wholeseller" class="d-none role-radio" {{ old('role') == 'wholeseller' ? 'checked' : '' }}>
+                                        <label for="role_wholeseller" class="btn btn-outline-primary btn-block p-3 text-center role-label">
+                                            <i class="fas fa-warehouse d-block mb-1 fa-2x"></i>
+                                            Wholeseller
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="vendor_type" id="wholesale_vendor" value="wholeseller">
-                                <label class="form-check-label" for="wholesale_vendor">Wholeseller</label>
+
+                            <!-- Vendor Type selection (only shown if role is Vendor) -->
+                            <div class="form-group d-none" id="vendor-type-group">
+                                <label>Vendor Type <span class="text-danger">*</span></label>
+                                <div class="d-flex gap-4 align-items-center mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="vendor_type" id="retailer" value="retailer" checked>
+                                        <label class="form-check-label" for="retailer">Retailer</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="vendor_type" id="wholesale_vendor" value="wholeseller">
+                                        <label class="form-check-label" for="wholesale_vendor">Wholeseller</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Personal Information -->
-                <div class="form-section">
-                    <h6><i class="fas fa-user"></i> Personal Information</h6>
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h6><i class="fas fa-user"></i> Personal Information</h6>
 
-                    <div class="form-group">
-                        <label for="name">{{ __('Full Name') }} <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" 
-                               placeholder="Enter your full name" name="name" value="{{ old('name') }}" 
-                               autocomplete="name" autofocus required>
-                        @error('name')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
+                            <div class="form-group">
+                                <label for="name">{{ __('Full Name') }} <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" 
+                                       placeholder="Enter your full name" name="name" value="{{ old('name') }}" 
+                                       autocomplete="name" autofocus required>
+                                @error('name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
 
-                    @if(setting('registration', 'email_enabled', '1') == '1')
-                    <div class="form-group">
-                        <label for="email">{{ __('Email Address') }}
-                            @if(setting('registration', 'email_required', '0') == '0')
-                                <small class="text-muted">(Optional)</small>
-                            @else
-                                <span class="text-danger">*</span>
+                            @if(setting('registration', 'email_enabled', '1') == '1')
+                            <div class="form-group">
+                                <label for="email">{{ __('Email Address') }}
+                                    @if(setting('registration', 'email_required', '0') == '0')
+                                        <small class="text-muted">(Optional)</small>
+                                    @else
+                                        <span class="text-danger">*</span>
+                                    @endif
+                                </label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
+                                       value="{{ old('email') }}" id="email" placeholder="your@email.com" autocomplete="email"
+                                       @if(setting('registration', 'email_required', '0') == '1') required @endif>
+                                <div class="email-existing"></div>
+                                @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                             @endif
-                        </label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
-                               value="{{ old('email') }}" id="email" placeholder="your@email.com" autocomplete="email"
-                               @if(setting('registration', 'email_required', '0') == '1') required @endif>
-                        <div class="email-existing"></div>
-                        @error('email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    @endif
 
-                    <div class="form-group">
-                        <label for="phone">{{ __('Phone Number') }} <span class="text-danger">*</span></label>
-                        <input type="tel" class="form-control @error('phone') is-invalid @enderror" name="phone"
-                               value="{{ old('phone') }}" id="phone" placeholder="01XXXXXXXXX" autocomplete="tel" required>
-                        @error('phone')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
+                            <div class="form-group">
+                                <label for="phone">{{ __('Phone Number') }} <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control @error('phone') is-invalid @enderror" name="phone"
+                                       value="{{ old('phone') }}" id="phone" placeholder="01XXXXXXXXX" autocomplete="tel" required>
+                                @error('phone')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
 
-                    <div class="form-group">
-                        <label for="password">{{ __('Password') }} <span class="text-danger">*</span></label>
-                        <div class="input-group mt-2">
-                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" 
-                                   name="password" required autocomplete="new-password">
-                            <div class="input-group-append">
-                                <button id="toggle-password" class="btn btn-outline-primary" type="button">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                            <div class="form-group">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label for="password" class="mb-0">{{ __('Password') }} <span class="text-danger">*</span></label>
+                                    <a id="generate-password" class="text-primary font-weight-bold small"><i class="fas fa-key"></i> Generate Password</a>
+                                </div>
+                                <div class="input-group mt-2">
+                                    <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" 
+                                           name="password" required autocomplete="new-password">
+                                    <div class="input-group-append">
+                                        <button id="toggle-password" class="btn btn-outline-primary" type="button">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0;"></div>
+                                </div>
+                                <div id="strength-text" class="strength-text"></div>
+                                <ul id="password-requirements" class="requirements">
+                                    <li id="length" class="invalid">Minimum 8 characters</li>
+                                    <li id="lowercase" class="invalid">At least one lowercase letter</li>
+                                    <li id="uppercase" class="invalid">At least one uppercase letter</li>
+                                    <li id="number" class="invalid">At least one number</li>
+                                    <li id="special" class="invalid">At least one special character</li>
+                                </ul>
+                                @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password-confirm">Confirm Password <span class="text-danger">*</span></label>
+                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" 
+                                       required autocomplete="new-password">
                             </div>
                         </div>
-                        <div class="progress mt-2">
-                            <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0;"></div>
+                    </div>
+
+                    <div id="form-right-col" class="col-md-6">
+                        <!-- Business Information -->
+                        <div class="form-section" id="business-info-section">
+                            <h6><i class="fas fa-store"></i> Business Information</h6>
+
+                            <div class="form-group">
+                                <label for="business_name">{{ __('Business/Shop Name') }} <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control @error('business_name') is-invalid @enderror required-field" 
+                                       id="business_name" name="business_name" value="{{ old('business_name') }}" 
+                                       placeholder="Your Shop Name">
+                                @error('business_name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="store_slug">{{ __('Store URL (Slug)') }} <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control @error('store_slug') is-invalid @enderror required-field" 
+                                       id="store_slug" name="store_slug" value="{{ old('store_slug') }}" 
+                                       placeholder="my-awesome-shop" pattern="[a-z0-9-]+">
+                                <div class="slug-preview">
+                                    Your store will be accessible at: <strong id="slug-url">{{ url('/store/') }}/your-slug</strong>
+                                </div>
+                                <div class="slug-feedback"></div>
+                                <small class="text-muted">Only lowercase letters, numbers, and hyphens. No spaces.</small>
+                                @error('store_slug')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="business_email">{{ __('Business Email') }} <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control @error('business_email') is-invalid @enderror required-field" 
+                                       id="business_email" name="business_email" value="{{ old('business_email') }}" 
+                                       placeholder="shop@example.com">
+                                @error('business_email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="business_phone">{{ __('Business Phone') }} <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control @error('business_phone') is-invalid @enderror required-field" 
+                                       id="business_phone" name="business_phone" value="{{ old('business_phone') }}" 
+                                       placeholder="01XXXXXXXXX">
+                                @error('business_phone')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="business_address">{{ __('Business Address') }}</label>
+                                <textarea class="form-control @error('business_address') is-invalid @enderror" 
+                                          id="business_address" name="business_address" rows="3" 
+                                          placeholder="Enter your business address">{{ old('business_address') }}</textarea>
+                                @error('business_address')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                         </div>
-                        <div id="strength-text" class="strength-text"></div>
-                        <ul id="password-requirements" class="requirements">
-                            <li id="length" class="invalid">Minimum 8 characters</li>
-                            <li id="lowercase" class="invalid">At least one lowercase letter</li>
-                            <li id="uppercase" class="invalid">At least one uppercase letter</li>
-                            <li id="number" class="invalid">At least one number</li>
-                            <li id="special" class="invalid">At least one special character</li>
-                        </ul>
-                        <a id="generate-password" class="btn btn-primary btn-sm mt-1 text-white">Generate Password</a>
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password-confirm">Confirm Password <span class="text-danger">*</span></label>
-                        <input id="password-confirm" type="password" class="form-control" name="password_confirmation" 
-                               required autocomplete="new-password">
-                    </div>
-                </div>
-
-                <!-- Business Information -->
-                <div class="form-section" id="business-info-section">
-                    <h6><i class="fas fa-store"></i> Business Information</h6>
-
-                    <div class="form-group">
-                        <label for="business_name">{{ __('Business/Shop Name') }} <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('business_name') is-invalid @enderror required-field" 
-                               id="business_name" name="business_name" value="{{ old('business_name') }}" 
-                               placeholder="Your Shop Name">
-                        @error('business_name')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="store_slug">{{ __('Store URL (Slug)') }} <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('store_slug') is-invalid @enderror required-field" 
-                               id="store_slug" name="store_slug" value="{{ old('store_slug') }}" 
-                               placeholder="my-awesome-shop" pattern="[a-z0-9-]+">
-                        <div class="slug-preview">
-                            Your store will be accessible at: <strong id="slug-url">{{ url('/store/') }}/your-slug</strong>
-                        </div>
-                        <div class="slug-feedback"></div>
-                        <small class="text-muted">Only lowercase letters, numbers, and hyphens. No spaces.</small>
-                        @error('store_slug')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="business_email">{{ __('Business Email') }} <span class="text-danger">*</span></label>
-                        <input type="email" class="form-control @error('business_email') is-invalid @enderror required-field" 
-                               id="business_email" name="business_email" value="{{ old('business_email') }}" 
-                               placeholder="shop@example.com">
-                        @error('business_email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="business_phone">{{ __('Business Phone') }} <span class="text-danger">*</span></label>
-                        <input type="tel" class="form-control @error('business_phone') is-invalid @enderror required-field" 
-                               id="business_phone" name="business_phone" value="{{ old('business_phone') }}" 
-                               placeholder="01XXXXXXXXX">
-                        @error('business_phone')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="business_address">{{ __('Business Address') }}</label>
-                        <textarea class="form-control @error('business_address') is-invalid @enderror" 
-                                  id="business_address" name="business_address" rows="3" 
-                                  placeholder="Enter your business address">{{ old('business_address') }}</textarea>
-                        @error('business_address')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
                 </div>
 
@@ -362,13 +418,23 @@
     <script>
         // Toggle business information sections based on chosen role
         function toggleBusinessSection() {
-            const role = $('#role').val();
+            const role = $('input[name="role"]:checked').val();
             if (role === 'reseller') {
                 $('#business-info-section').addClass('d-none');
                 $('#business-info-section').find('.required-field').prop('required', false);
+                
+                // Adjust layout for narrow centered view
+                $('#form-left-col').removeClass('col-md-6').addClass('col-md-12');
+                $('#form-right-col').addClass('d-none');
+                $('.registration-form').removeClass('wide-form');
             } else {
                 $('#business-info-section').removeClass('d-none');
                 $('#business-info-section').find('.required-field').prop('required', true);
+                
+                // Adjust layout for side-by-side view
+                $('#form-left-col').removeClass('col-md-12').addClass('col-md-6');
+                $('#form-right-col').removeClass('d-none');
+                $('.registration-form').addClass('wide-form');
             }
 
             if (role === 'vendor') {
@@ -377,7 +443,7 @@
                 $('#vendor-type-group').addClass('d-none');
             }
         }
-        $('#role').on('change', toggleBusinessSection);
+        $('input[name="role"]').on('change', toggleBusinessSection);
         toggleBusinessSection(); // Initial trigger
 
         // Password generation and strength functions (same as customer registration)

@@ -147,6 +147,28 @@
                                 <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Leave blank to keep current">
                                 @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
+                            <div class="col-md-6">
+                                <label>Partnership Role <span class="text-danger">*</span></label>
+                                <select name="role" class="form-select @error('role') is-invalid @enderror" required>
+                                    <option value="vendor" {{ old('role', ($vendor->hasRole('wholeseller') ? 'wholeseller' : ($vendor->hasRole('reseller') ? 'reseller' : 'vendor'))) == 'vendor' ? 'selected' : '' }}>Vendor</option>
+                                    <option value="reseller" {{ old('role', ($vendor->hasRole('wholeseller') ? 'wholeseller' : ($vendor->hasRole('reseller') ? 'reseller' : 'vendor'))) == 'reseller' ? 'selected' : '' }}>Reseller</option>
+                                    <option value="wholeseller" {{ old('role', ($vendor->hasRole('wholeseller') ? 'wholeseller' : ($vendor->hasRole('reseller') ? 'reseller' : 'vendor'))) == 'wholeseller' ? 'selected' : '' }}>Wholeseller</option>
+                                </select>
+                                @error('role')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col-md-6 d-none" id="vendor-type-group">
+                                <label>Vendor Type <span class="text-danger">*</span></label>
+                                <div class="d-flex gap-4 align-items-center mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="vendor_type" id="retailer" value="retailer" {{ old('vendor_type', ($vendorSettings->additional_config['vendor_type'] ?? 'retailer')) == 'retailer' ? 'checked' : '' }}>
+                                        <label class="form-check-label text-dark fw-bold" for="retailer" style="text-transform: none; font-size: 13px; cursor: pointer;">Retailer</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="vendor_type" id="wholesale_vendor" value="wholeseller" {{ old('vendor_type', ($vendorSettings->additional_config['vendor_type'] ?? 'retailer')) == 'wholeseller' ? 'checked' : '' }}>
+                                        <label class="form-check-label text-dark fw-bold" for="wholesale_vendor" style="text-transform: none; font-size: 13px; cursor: pointer;">Wholeseller</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -288,5 +310,22 @@
         </div>
     </form>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        function toggleVendorType() {
+            const role = $('select[name="role"]').val();
+            if (role === 'vendor') {
+                $('#vendor-type-group').removeClass('d-none');
+            } else {
+                $('#vendor-type-group').addClass('d-none');
+            }
+        }
+        $('select[name="role"]').on('change', toggleVendorType);
+        toggleVendorType(); // trigger initially
+    });
+</script>
 @endsection
 

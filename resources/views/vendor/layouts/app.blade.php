@@ -406,16 +406,31 @@
 
     <!-- Sidebar Navigation -->
     <aside class="vendor-sidebar" id="vendorSidebar">
-        <div class="vendor-sidebar-brand">
-            <a href="{{ route('vendor.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2">
+        <div class="vendor-sidebar-brand flex-column align-items-start gap-2">
+            <a href="{{ route('vendor.dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2 w-100">
                 <i class="fas fa-store text-warning fs-3"></i>
-                <span class="fw-bold text-white fs-5">{{ setting('general', 'site_name', 'Bazarei') }}</span>
+                <span class="fw-bold text-white fs-5" style="line-height: 1.2; word-break: break-word;">{{ setting('general', 'site_name', 'Bazarei') }}</span>
             </a>
-            @if(auth()->user()?->hasRole('reseller'))
-                <span class="badge bg-success text-white fw-bold px-2 py-1" style="font-size: 0.65rem;">RESELLER</span>
-            @else
-                <span class="badge bg-warning text-dark fw-bold px-2 py-1" style="font-size: 0.65rem;">VENDOR</span>
-            @endif
+            @php
+                $user = auth()->user();
+                $vendorSettings = $user?->vendorSettings;
+                $vendorType = $vendorSettings?->additional_config['vendor_type'] ?? null;
+                
+                $roleLabel = 'VENDOR';
+                $badgeClass = 'bg-warning text-dark';
+                
+                if ($user?->hasRole('reseller')) {
+                    $roleLabel = 'RESELLER';
+                    $badgeClass = 'bg-success text-white';
+                } elseif ($user?->hasRole('wholeseller') || $vendorType === 'wholeseller') {
+                    $roleLabel = 'WHOLESELLER';
+                    $badgeClass = 'bg-info text-white';
+                } elseif ($vendorType === 'retailer') {
+                    $roleLabel = 'RETAILER';
+                    $badgeClass = 'bg-primary text-white';
+                }
+            @endphp
+            <span class="badge {{ $badgeClass }} fw-bold px-2 py-1" style="font-size: 0.65rem; margin-top: 4px;">{{ $roleLabel }}</span>
         </div>
 
         <div class="vendor-sidebar-nav">
