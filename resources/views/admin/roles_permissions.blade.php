@@ -386,8 +386,14 @@
                                 </div>
                             </td>
                             <td class="align-middle text-end role-actions">
+                                @php
+                                    $protectedRoles = ['super admin', 'Shop Manager', 'admin', 'vendor', 'reseller'];
+                                    $isProtected = in_array(strtolower(trim($role->name)), array_map('strtolower', $protectedRoles));
+                                @endphp
                                 <button class="btn btn-warning btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#editRoleModal{{ $role->id }}" data-bs-target="#editRoleModal{{ $role->id }}">Edit</button>
-                                <button class="btn btn-danger btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#deleteRoleModal{{ $role->id }}" data-bs-target="#deleteRoleModal{{ $role->id }}">Delete</button>
+                                @if(!$isProtected)
+                                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-bs-toggle="modal" data-target="#deleteRoleModal{{ $role->id }}" data-bs-target="#deleteRoleModal{{ $role->id }}">Delete</button>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -507,9 +513,13 @@
                         <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body p-4">
+                        @php
+                            $protectedRoles = ['super admin', 'Shop Manager', 'admin', 'vendor', 'reseller'];
+                            $isProtected = in_array(strtolower(trim($role->name)), array_map('strtolower', $protectedRoles));
+                        @endphp
                         <div class="role-input-wrapper mb-3">
                             <label><i class="fas fa-id-card mr-1"></i> Role Name</label>
-                            <input type="text" name="name" class="form-control role-input-custom" value="{{ $role->name }}" required>
+                            <input type="text" name="name" class="form-control role-input-custom" value="{{ $role->name }}" required {{ $isProtected ? 'readonly' : '' }}>
                         </div>
                         <div class="perm-toolbar d-flex flex-wrap align-items-center mb-3">
                             <div class="search-input-wrapper mr-auto">

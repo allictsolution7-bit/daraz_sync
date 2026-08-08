@@ -367,23 +367,23 @@
                     <label for="vendor_search" class="form-label small fw-bold mb-1">Search Product</label>
                     <input type="text" name="search" id="vendor_search" class="form-control form-control-sm" placeholder="Search by product name or ID..." value="{{ request('search') }}">
                 </div>
-                <div class="col-md-3 col-12 text-end">
-                    <div class="d-flex justify-content-end gap-2">
-                        <div class="btn-group btn-group-sm" role="group">
+                <div class="col-md-3 col-12 text-end d-flex align-items-end justify-content-end">
+                    <div class="d-flex justify-content-end gap-2 w-100 align-items-center">
+                        <div class="btn-group btn-group-sm" role="group" style="height: 38px;">
                             <a href="{{ route('vendor.products.index', array_merge(request()->except(['view_mode']), ['view_mode' => 'table', 'source' => $source ?? 'my_products'])) }}" 
-                               class="btn {{ request('view_mode', 'table') === 'table' ? 'btn-primary' : 'btn-outline-secondary' }}" title="Table View">
+                               class="btn {{ request('view_mode', 'table') === 'table' ? 'btn-primary' : 'btn-outline-secondary' }} d-inline-flex align-items-center justify-content-center" title="Table View" style="width: 38px;">
                                 <i class="fas fa-list"></i>
                             </a>
                             <a href="{{ route('vendor.products.index', array_merge(request()->except(['view_mode']), ['view_mode' => 'grouped', 'source' => $source ?? 'my_products'])) }}" 
-                               class="btn {{ request('view_mode') === 'grouped' ? 'btn-primary' : 'btn-outline-secondary' }}" title="Grouped Category View">
+                               class="btn {{ request('view_mode') === 'grouped' ? 'btn-primary' : 'btn-outline-secondary' }} d-inline-flex align-items-center justify-content-center" title="Grouped Category View" style="width: 38px;">
                                 <i class="fas fa-layer-group"></i>
                             </a>
                         </div>
-                        <a href="{{ route('vendor.products.index', ['source' => $source ?? 'my_products']) }}" class="btn btn-sm btn-outline-secondary">
-                            <i class="fas fa-undo me-1"></i> Reset
+                        <a href="{{ route('vendor.products.index', ['source' => $source ?? 'my_products']) }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center gap-1" style="height: 38px; padding: 0 12px;">
+                            <i class="fas fa-undo"></i> Reset
                         </a>
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            <i class="fas fa-filter me-1"></i> Filter
+                        <button type="submit" class="btn btn-sm btn-primary d-inline-flex align-items-center justify-content-center gap-1" style="height: 38px; padding: 0 12px;">
+                            <i class="fas fa-filter"></i> Filter
                         </button>
                     </div>
                 </div>
@@ -446,7 +446,33 @@
                                                     @endif
                                                 </td>
                                                 <td><strong>{{ $product->title }}</strong></td>
-                                                <td>৳{{ number_format($product->price ?? $product->old_price, 2) }}</td>
+                                                <td>
+                                                     @if(auth()->user()->hasRole('wholeseller'))
+                                                         @php
+                                                             $wholesalePrice = (float)($product->wholesale_price ?? 0);
+                                                             if ($wholesalePrice <= 0 && $product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
+                                                                 $wPrices = [];
+                                                                 foreach ($product->variationCombinations as $comb) {
+                                                                     $wp = $comb->wholesale_price > 0 ? $comb->wholesale_price : ($comb->offer_price ?? $comb->regular_price ?? 0);
+                                                                     if ($wp > 0) $wPrices[] = (float)$wp;
+                                                                 }
+                                                                 if (!empty($wPrices)) {
+                                                                     $wholesalePrice = min($wPrices);
+                                                                 }
+                                                             }
+                                                         @endphp
+                                                         <strong>৳{{ number_format($wholesalePrice, 2) }}</strong>
+                                                         @if($product->wholesaleTiers && $product->wholesaleTiers->isNotEmpty())
+                                                             <div class="mt-1" style="font-size: 0.7rem; line-height: 1.2;">
+                                                                 @foreach($product->wholesaleTiers as $tier)
+                                                                     <div class="text-secondary">Buy <strong>{{ $tier->min_quantity }}+</strong>: ৳{{ number_format($tier->price, 2) }}</div>
+                                                                 @endforeach
+                                                             </div>
+                                                         @endif
+                                                     @else
+                                                         ৳{{ number_format($product->price ?? $product->old_price, 2) }}
+                                                     @endif
+                                                 </td>
                                                 <td>{{ $product->quantity ?? 0 }}</td>
                                                 <td>
                                                     @php
@@ -764,27 +790,62 @@
                             @endif
 
                             @if(auth()->user()->hasRole('reseller'))
-                                <div class="mt-1">
-                                    <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Reseller Price</small>
-                                    @php
-                                        $resellerPrice = (float)($product->reseller_price ?? 0);
-                                        if ($resellerPrice <= 0) {
-                                            // A reseller's base price should be the admin's reseller_price or wholesale_price
-                                            $basePrice = (float)($product->reseller_price > 0 ? $product->reseller_price : ($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)))));
-                                            
-                                            if ($basePrice <= 0 && $product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
-                                                $firstComb = $product->variationCombinations->first();
-                                                $basePrice = (float)($firstComb->reseller_price > 0 ? $firstComb->reseller_price : ($firstComb->wholesale_price > 0 ? $firstComb->wholesale_price : ($firstComb->product_cost > 0 ? $firstComb->product_cost : ($firstComb->offer_price ?? $firstComb->regular_price ?? 0))));
-                                            }
-                                            $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
-                                            $resellerPrice = $basePrice + ($basePrice * ($markupPct / 100));
-                                        }
-                                    @endphp
-                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-0.5" style="font-size: 0.8rem; font-weight: 700;">
-                                        ৳{{ number_format($resellerPrice, 2) }}
-                                    </span>
-                                </div>
-                            @endif
+                                 <div class="mt-1">
+                                     <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Reseller Price</small>
+                                     @php
+                                         $resellerPrice = (float)($product->reseller_price ?? 0);
+                                         if ($resellerPrice <= 0) {
+                                             // A reseller's base price should be the admin's reseller_price or wholesale_price
+                                             $basePrice = (float)($product->reseller_price > 0 ? $product->reseller_price : ($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)))));
+                                             
+                                             if ($basePrice <= 0 && $product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
+                                                 $firstComb = $product->variationCombinations->first();
+                                                 $basePrice = (float)($firstComb->reseller_price > 0 ? $firstComb->reseller_price : ($firstComb->wholesale_price > 0 ? $firstComb->wholesale_price : ($firstComb->product_cost > 0 ? $firstComb->product_cost : ($firstComb->offer_price ?? $firstComb->regular_price ?? 0))));
+                                             }
+                                             $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
+                                             $resellerPrice = $basePrice + ($basePrice * ($markupPct / 100));
+                                         }
+                                     @endphp
+                                     <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-0.5" style="font-size: 0.8rem; font-weight: 700;">
+                                         ৳{{ number_format($resellerPrice, 2) }}
+                                     </span>
+                                 </div>
+                             @endif
+
+                             @if(auth()->user()->hasRole('wholeseller'))
+                                 <div class="mt-1">
+                                     <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Wholesale Price</small>
+                                     @php
+                                         $wholesalePrice = (float)($product->wholesale_price ?? 0);
+                                         if ($wholesalePrice <= 0 && $product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
+                                             $wPrices = [];
+                                             foreach ($product->variationCombinations as $comb) {
+                                                 $wp = $comb->wholesale_price > 0 ? $comb->wholesale_price : ($comb->offer_price ?? $comb->regular_price ?? 0);
+                                                 if ($wp > 0) $wPrices[] = (float)$wp;
+                                             }
+                                             if (!empty($wPrices)) {
+                                                 $wholesalePrice = min($wPrices);
+                                             }
+                                         }
+                                     @endphp
+                                     <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-0.5" style="font-size: 0.8rem; font-weight: 700; border-radius: 6px;">
+                                         ৳{{ number_format($wholesalePrice, 2) }}
+                                     </span>
+                                 </div>
+
+                                 @if($product->wholesaleTiers && $product->wholesaleTiers->isNotEmpty())
+                                     <div class="mt-2">
+                                         <small class="text-muted d-block mb-1" style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Wholesale Tiers</small>
+                                         <div class="d-flex flex-column gap-1">
+                                             @foreach($product->wholesaleTiers as $tier)
+                                                 <span class="text-secondary" style="font-size: 0.75rem;">
+                                                     Buy <strong class="text-dark">{{ $tier->min_quantity }}+</strong> for <strong class="text-primary">৳{{ number_format($tier->price, 2) }}</strong>
+                                                 </span>
+                                             @endforeach
+                                         </div>
+                                     </div>
+                                 @endif
+                             @endif
                         </td>
                         @if(($source ?? 'my_products') === 'my_products')
                         <td>

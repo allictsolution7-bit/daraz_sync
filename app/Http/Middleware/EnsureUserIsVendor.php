@@ -26,8 +26,8 @@ class EnsureUserIsVendor
             abort(403, 'Access denied. Vendor or Reseller access only.');
         }
 
-        // Resellers don't require vendorSettings verification
-        if (!$user->hasRole('reseller')) {
+        // Resellers and wholesellers don't require vendorSettings verification
+        if (!$user->hasRole('reseller') && !$user->hasRole('wholeseller')) {
             $vendorSettings = $user->vendorSettings;
             
             if (!$vendorSettings) {

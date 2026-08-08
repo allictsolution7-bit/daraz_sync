@@ -28,6 +28,10 @@ class VendorProductController extends Controller
     {
         if (!$vendor) return false;
 
+        if ($vendor->hasRole('wholeseller') || $vendor->hasRole('reseller')) {
+            return true;
+        }
+
         $vendorSettings = $vendor->vendorSettings;
         
         // Only consignment vendors can access admin products
@@ -61,11 +65,15 @@ class VendorProductController extends Controller
         $vendor = auth()->user();
         $canAccessAdminProducts = $this->checkVendorAdminProductAccess($vendor);
 
-        $source = $request->get('source', 'my_products');
+        $source = $request->get('source');
         
-        if ($vendor->hasRole('reseller')) {
-            $source = 'admin_products';
+        if ($vendor->hasRole('reseller') || $vendor->hasRole('wholeseller')) {
             $canAccessAdminProducts = true;
+            if (!$source) {
+                $source = 'admin_products';
+            }
+        } else {
+            $source = $source ?: 'my_products';
         }
 
         $allocationsQuery = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)->get();
@@ -80,13 +88,18 @@ class VendorProductController extends Controller
                       ->orWhere('vendor_id', $adminId)
                       ->orWhereNull('vendor_id');
                 } else {
-                    $q->whereNull('vendor_id');
+                    // Fallback: If no parent admin configured, show products from super-admin (ID 1) or global platform products
+                    $q->where('created_by', 1)
+                      ->orWhere('vendor_id', 1)
+                      ->orWhereNull('vendor_id');
                 }
-            })->with(['category', 'subCategory', 'brand', 'variationCombinations']);
+            });
+
+            $query->with(['category', 'subCategory', 'brand', 'variationCombinations.wholesaleTiers', 'wholesaleTiers']);
         } else {
             $source = 'my_products';
             $query = Product::where('vendor_id', $vendor->id)
-                ->with(['category', 'subCategory', 'brand', 'variationCombinations']);
+                ->with(['category', 'subCategory', 'brand', 'variationCombinations.wholesaleTiers', 'wholesaleTiers']);
 
             if ($request->filled('status')) {
                 $query->where('approval_status', $request->status);

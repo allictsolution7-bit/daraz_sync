@@ -149,19 +149,14 @@ class RolesPermissionsController extends Controller
     {
         $this->checkPageAccess();
 
-        $request->validate(['name' => 'required|unique:permissions,name,' . $permission->id]);
-        $permission->update(['name' => $request->name]);
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-        return back()->with('success', 'Permission updated successfully.');
+        return back()->with('error', 'Permissions cannot be modified.');
     }
 
     public function deletePermission(Permission $permission)
     {
         $this->checkPageAccess();
 
-        $permission->delete();
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-        return back()->with('success', 'Permission deleted successfully.');
+        return back()->with('error', 'Permissions are protected and cannot be deleted.');
     }
 
     // Role CRUD
@@ -191,10 +186,13 @@ class RolesPermissionsController extends Controller
     {
         $this->checkPageAccess();
 
-        if (!$this->isSuperAdmin()) {
-            $restrictedRoles = ['super admin', 'super_admin', 'Super Admin', 'super-admin', 'admin', 'Admin'];
-            if (in_array(strtolower(trim($role->name)), array_map('strtolower', $restrictedRoles))) {
-                return back()->with('error', 'You do not have permission to modify the "' . $role->name . '" role.');
+        $protectedRoles = ['super admin', 'Shop Manager', 'admin', 'vendor', 'reseller'];
+        $roleNameLower = strtolower(trim($role->name));
+        $requestNameLower = strtolower(trim($request->name));
+
+        if (in_array($roleNameLower, array_map('strtolower', $protectedRoles))) {
+            if ($roleNameLower !== $requestNameLower) {
+                return back()->with('error', 'The name of the role "' . $role->name . '" is protected and cannot be changed.');
             }
         }
 
@@ -212,11 +210,9 @@ class RolesPermissionsController extends Controller
     {
         $this->checkPageAccess();
 
-        if (!$this->isSuperAdmin()) {
-            $restrictedRoles = ['super admin', 'super_admin', 'Super Admin', 'super-admin', 'admin', 'Admin'];
-            if (in_array(strtolower(trim($role->name)), array_map('strtolower', $restrictedRoles))) {
-                return back()->with('error', 'You do not have permission to delete the "' . $role->name . '" role.');
-            }
+        $protectedRoles = ['super admin', 'Shop Manager', 'admin', 'vendor', 'reseller'];
+        if (in_array(strtolower(trim($role->name)), array_map('strtolower', $protectedRoles))) {
+            return back()->with('error', 'The role "' . $role->name . '" is protected and cannot be deleted.');
         }
 
         $role->delete();
@@ -237,6 +233,50 @@ class RolesPermissionsController extends Controller
                 if (in_array(strtolower(trim($roleName)), array_map('strtolower', $restrictedRoles))) {
                     return back()->with('error', 'You cannot assign restricted role "' . $roleName . '".');
                 }
+            }
+        }
+
+        // Limit maximum count of super admin and admin roles to 1
+        $superAdminRoles = ['super admin', 'super_admin', 'Super Admin', 'super-admin'];
+        $adminRoles = ['admin', 'Admin'];
+
+        $hasSuperAdminTarget = false;
+        foreach ($targetRoles as $roleName) {
+            if (in_array(strtolower(trim($roleName)), array_map('strtolower', $superAdminRoles))) {
+                $hasSuperAdminTarget = true;
+                break;
+            }
+        }
+
+        $hasAdminTarget = false;
+        foreach ($targetRoles as $roleName) {
+            if (in_array(strtolower(trim($roleName)), array_map('strtolower', $adminRoles))) {
+                $hasAdminTarget = true;
+                break;
+            }
+        }
+
+        if ($hasSuperAdminTarget) {
+            // Count other users with super admin roles
+            $existingSuperAdminCount = User::where('id', '!=', $user->id)
+                ->whereHas('roles', function ($q) use ($superAdminRoles) {
+                    $q->whereIn('name', $superAdminRoles);
+                })->count();
+
+            if ($existingSuperAdminCount >= 1) {
+                return back()->with('error', 'You cannot have more than 1 Super Admin in the system.');
+            }
+        }
+
+        if ($hasAdminTarget) {
+            // Count other users with admin roles
+            $existingAdminCount = User::where('id', '!=', $user->id)
+                ->whereHas('roles', function ($q) use ($adminRoles) {
+                    $q->whereIn('name', $adminRoles);
+                })->count();
+
+            if ($existingAdminCount >= 1) {
+                return back()->with('error', 'You cannot have more than 1 Admin in the system.');
             }
         }
 
