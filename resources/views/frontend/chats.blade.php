@@ -6,13 +6,13 @@
     .chat-wrapper {
         display: grid;
         grid-template-columns: 320px 1fr;
-        height: calc(100vh - 120px);
-        min-height: 500px;
+        height: 500px;
+        min-height: 400px;
         background: #fff;
         border: 1px solid #e2e8f0;
         border-radius: 16px;
         overflow: hidden;
-        margin: 30px auto;
+        margin: 30px auto 90px auto;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
     
@@ -89,6 +89,14 @@
         text-overflow: ellipsis;
     }
     
+    .chat-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+    }
+
     .chat-room-container {
         display: flex;
         flex-direction: column;
@@ -243,14 +251,21 @@
             <div class="chat-list">
                 @forelse($chatRooms as $room)
                     <a href="{{ route('chats.index', ['room' => $room->id]) }}" 
-                       class="chat-item {{ $activeRoom && $activeRoom->id === $room->id ? 'active' : '' }}">
-                        <img src="{{ $room->display_logo }}" alt="{{ $room->display_name }}" class="chat-avatar">
-                        <div class="chat-info">
-                            <div class="chat-name">{{ $room->display_name }}</div>
-                            <div class="chat-last-message">
-                                {{ $room->lastMessage ? $room->lastMessage->message : 'No messages yet' }}
+                       class="chat-item {{ $activeRoom && $activeRoom->id === $room->id ? 'active' : '' }} d-flex align-items-center justify-content-between" style="gap: 10px;">
+                        <div class="d-flex align-items-center gap-3" style="min-width: 0; flex: 1;">
+                            <img src="{{ $room->display_logo }}" alt="{{ $room->display_name }}" class="chat-avatar" style="flex-shrink: 0;">
+                            <div class="chat-info" style="min-width: 0; flex: 1;">
+                                <div class="chat-name">{{ $room->display_name }}</div>
+                                <div class="chat-last-message">
+                                    {{ $room->lastMessage ? $room->lastMessage->message : 'No messages yet' }}
+                                </div>
                             </div>
                         </div>
+                        @if(($room->unread_count ?? 0) > 0)
+                            <span class="badge bg-danger rounded-circle text-white font-weight-bold d-flex align-items-center justify-content-center" style="font-size: 0.65rem; min-width: 18px; height: 18px; padding: 2px; flex-shrink: 0;">
+                                {{ $room->unread_count }}
+                            </span>
+                        @endif
                     </a>
                 @empty
                     <div class="p-5 text-center text-slate-400 text-sm">

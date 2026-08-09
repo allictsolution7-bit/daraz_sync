@@ -47,6 +47,12 @@ class ChatController extends Controller
             } else {
                 $room->display_logo = asset('clientside/images/profile.png');
             }
+
+            // Calculate unread count for this room
+            $room->unread_count = \App\Models\ChatMessage::where('chat_room_id', $room->id)
+                ->where('is_read', false)
+                ->where('sender_id', '!=', $user->id)
+                ->count();
         }
 
         $activeRoom = null;

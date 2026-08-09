@@ -1377,124 +1377,124 @@
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <form id="statusChangeForm">
-                <div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
+                <div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius: 16px;">
                     <!-- Modal Header -->
-                    <div class="modal-header border-0 px-4 py-3 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;">
-                                <i class="fas fa-sliders-h fs-5"></i>
+                    <div class="modal-header border-0 px-4 py-2.5 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-primary text-white rounded-3 p-1.5 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;">
+                                <i class="fas fa-sliders-h fs-6"></i>
                             </div>
                             <div>
-                                <h5 class="modal-title fw-bold mb-0 text-white" id="statusChangeModalLabel">Update Order Status & Analytics</h5>
-                                <p class="mb-0 text-white-50 small">Select a new fulfillment status and trigger automated sync events</p>
+                                <h6 class="modal-title fw-bold mb-0 text-white" id="statusChangeModalLabel" style="font-size: 15px;">Update Order Status & Analytics</h6>
+                                <p class="mb-0 text-white-50" style="font-size: 11px;">Select status and trigger sync events</p>
                             </div>
                         </div>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <!-- Modal Body -->
-                    <div class="modal-body p-4 bg-slate-50" style="background-color: #f8fafc;">
+                    <div class="modal-body p-3 bg-slate-50" style="background-color: #f8fafc;">
                         <input type="hidden" name="order_id" id="modalOrderId">
                         <input type="hidden" name="payment_method" id="modalPaymentMethod">
                         <input type="hidden" name="status" id="modalStatusSelect" value="pending">
 
                         <!-- Status Grid Selection Section -->
-                        <div class="mb-4">
-                            <label class="text-uppercase text-secondary fw-bold small mb-3 d-flex align-items-center gap-2" style="font-size: 11px; letter-spacing: 0.08em;">
+                        <div class="mb-2">
+                            <label class="text-uppercase text-secondary fw-bold small mb-2 d-flex align-items-center gap-2" style="font-size: 10px; letter-spacing: 0.08em;">
                                 <i class="fas fa-list-check text-primary"></i> Choose Fulfillment Status
                             </label>
 
                             <div class="row row-cols-lg-5 row-cols-md-3 row-cols-2 g-2" id="statusGridOptions">
                                 <div class="col">
-                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="pending">
-                                        <div class="fs-5 mb-1">⏳</div>
-                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Pending</div>
+                                    <div class="status-card-option py-1.5 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="pending">
+                                        <div class="fs-6 mb-0.5">⏳</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11px;">Pending</div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="phone_not_rcv">
-                                        <div class="fs-5 mb-1">📞</div>
-                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Call Not Received</div>
+                                    <div class="status-card-option py-1.5 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="phone_not_rcv">
+                                        <div class="fs-6 mb-0.5">📞</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11px;">Call Not Rcv</div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="follow_up">
-                                        <div class="fs-5 mb-1">🔄</div>
-                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Follow up</div>
+                                    <div class="status-card-option py-1.5 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="follow_up">
+                                        <div class="fs-6 mb-0.5">🔄</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11px;">Follow up</div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="processing">
-                                        <div class="fs-5 mb-1">⚙️</div>
-                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Processing</div>
+                                    <div class="status-card-option py-1.5 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="processing">
+                                        <div class="fs-6 mb-0.5">⚙️</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11px;">Processing</div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="ready_for_delivery">
-                                        <div class="fs-5 mb-1">📦</div>
-                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Ready Delivery</div>
+                                    <div class="status-card-option py-1.5 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="ready_for_delivery">
+                                        <div class="fs-6 mb-0.5">📦</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11px;">Ready Del</div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="shipped">
-                                        <div class="fs-5 mb-1">🚚</div>
-                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Shipped</div>
+                                    <div class="status-card-option py-1.5 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="shipped">
+                                        <div class="fs-6 mb-0.5">🚚</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11px;">Shipped</div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="delivered">
-                                        <div class="fs-5 mb-1">✅</div>
-                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Delivered</div>
+                                    <div class="status-card-option py-1.5 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="delivered">
+                                        <div class="fs-6 mb-0.5">✅</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11px;">Delivered</div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="on_hold">
-                                        <div class="fs-5 mb-1">⏸️</div>
-                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">On Hold</div>
+                                    <div class="status-card-option py-1.5 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="on_hold">
+                                        <div class="fs-6 mb-0.5">⏸️</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11px;">On Hold</div>
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="status-card-option p-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="cancelled">
-                                        <div class="fs-5 mb-1">❌</div>
-                                        <div class="fw-bold text-dark" style="font-size: 11.5px;">Cancelled</div>
+                                    <div class="status-card-option py-1.5 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="cancelled">
+                                        <div class="fs-6 mb-0.5">❌</div>
+                                        <div class="fw-bold text-dark" style="font-size: 11px;">Cancelled</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Purchase Event Section (COD & Offline Orders) -->
-                        <div id="codPurchaseEventSection" class="p-3 border rounded-3 bg-white shadow-sm mt-3" style="display: none;">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div id="codPurchaseEventSection" class="p-2.5 border rounded-3 bg-white shadow-sm mt-2" style="display: none;">
+                            <div class="d-flex align-items-center justify-content-between mb-1.5">
                                 <div class="d-flex align-items-center gap-2">
-                                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
-                                        <i class="fas fa-chart-line"></i>
+                                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                        <i class="fas fa-chart-line" style="font-size: 12px;"></i>
                                     </div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold text-dark fs-6">Pixel & Analytics Conversion Sync</h6>
-                                        <span class="text-muted" style="font-size: 11px;">Meta Pixel & Google Analytics Events</span>
+                                        <h6 class="mb-0 fw-bold text-dark" style="font-size: 13.5px;">Pixel & Analytics Conversion Sync</h6>
+                                        <span class="text-muted" style="font-size: 10px;">Meta Pixel & Google Analytics Events</span>
                                     </div>
                                 </div>
-                                <span class="badge bg-info-subtle text-info border px-2 py-1" style="font-size: 10px;">Automated</span>
+                                <span class="badge bg-info-subtle text-info border px-2 py-0.5" style="font-size: 9px;">Automated</span>
                             </div>
                             
-                            <p class="text-muted small mb-3" id="purchaseEventDescription" style="font-size: 12px; line-height: 1.4;">
+                            <p class="text-muted small mb-2" id="purchaseEventDescription" style="font-size: 11.5px; line-height: 1.35;">
                                 Fire server-side Purchase event conversions to validate marketing attribution and ROAS metrics.
                             </p>
                             
-                            <div id="purchaseEventStatus" class="mb-3"></div>
+                            <div id="purchaseEventStatus" class="mb-2"></div>
                             
-                            <button type="button" id="firePurchaseEventBtn" class="btn btn-emerald w-100 fw-bold py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="background-color: #10b981; color: #ffffff; border: none; border-radius: 10px; font-size: 13px;">
+                            <button type="button" id="firePurchaseEventBtn" class="btn btn-emerald w-100 fw-bold py-1.5 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="background-color: #10b981; color: #ffffff; border: none; border-radius: 8px; font-size: 12.5px;">
                                 <i class="fas fa-paper-plane"></i> Sync Purchase Event Now
                             </button>
                         </div>
                     </div>
 
                     <!-- Modal Footer -->
-                    <div class="modal-footer bg-white border-top px-4 py-3 d-flex justify-content-between">
-                        <button type="button" class="btn btn-light border px-4 fw-semibold" data-bs-dismiss="modal">
+                    <div class="modal-footer bg-white border-top px-4 py-2.5 d-flex justify-content-between">
+                        <button type="button" class="btn btn-light border px-3 fw-semibold py-1.5" data-bs-dismiss="modal" style="font-size: 13px; border-radius: 8px;">
                             <i class="fas fa-xmark me-1"></i> Cancel
                         </button>
-                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; border-radius: 10px;">
+                        <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm py-1.5" style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; border-radius: 8px; font-size: 13px;">
                             <i class="fas fa-check-double me-1"></i> Update Order Status
                         </button>
                     </div>
