@@ -106,6 +106,18 @@ use App\Models\User;
 class order extends Model
 {
     use HasFactory;
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($order) {
+            if ($order->isDirty('status') && $order->status === 'delivered') {
+                $order->delivered_at = now();
+            }
+        });
+    }
+
     protected $guarded = [];
 
     // Automatically cast delivery_data JSON column to array

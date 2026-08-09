@@ -137,12 +137,18 @@ class VendorDashboardController extends Controller
             'old_price_markup_pct' => 'nullable|numeric|min:0',
             'wholesale_price_markup_pct' => 'nullable|numeric|min:0',
             'reseller_markup_pct' => 'nullable|numeric|min:0',
+            'return_policy_text' => 'nullable|string',
         ]);
 
+        if ($request->has('return_policy_text')) {
+            $vendorSettings->return_policy = ['policy_text' => $request->return_policy_text];
+            $vendorSettings->save();
+        }
+
         // Only update fields that were actually submitted
-        $dataToUpdate = array_filter($validated, function($value) {
-            return !is_null($value) && $value !== '';
-        });
+        $dataToUpdate = array_filter($validated, function($value, $key) {
+            return !is_null($value) && $value !== '' && $key !== 'return_policy_text';
+        }, ARRAY_FILTER_USE_BOTH);
 
         if (!empty($dataToUpdate)) {
             $vendorSettings->update($dataToUpdate);

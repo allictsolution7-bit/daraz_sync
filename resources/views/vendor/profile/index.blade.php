@@ -533,6 +533,33 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Store Custom Return Policy Card -->
+                    <div class="v-card mt-4">
+                        <div class="card-header">
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <i class="fas fa-undo-alt text-primary"></i> Custom Store Return Policy
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form action="{{ route('vendor.profile.update') }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark fs-8 uppercase">Custom Return Policy Text</label>
+                                    <textarea name="return_policy_text" class="form-control" rows="5" placeholder="Enter your store's custom return acceptance and money refund terms...">{{ old('return_policy_text', $vendorSettings->return_policy['policy_text'] ?? '') }}</textarea>
+                                    <small class="text-muted fs-8">Specify custom terms. If empty, the website's default return policy will apply to your products.</small>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none;">
+                                        <i class="fas fa-save me-1"></i> Save Return Policy
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

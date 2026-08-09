@@ -661,6 +661,14 @@
                         </div>
                     </div>
 
+                    <div class="form-group row mt-2">
+                        <label class="col-md-3 col-form-label">Default Return Policy</label>
+                        <div class="col-md-9">
+                            <textarea name="settings[default_return_policy]" class="form-control" rows="6" placeholder="Enter default return policy instructions and money refund conditions...">{{ setting('general', 'default_return_policy', "If you are not satisfied with your purchase, you can return it within the specified return period. The product must be unused and in its original packaging. Once received, refund will be processed to your payment method.") }}</textarea>
+                            <small class="form-text text-muted">This policy will be shown to customers when requesting a return on a product that does not belong to a vendor, or if the vendor has not specified their custom policy.</small>
+                        </div>
+                    </div>
+
                     <hr>
                     <h6 class="text-primary">Global Settings</h6>
 

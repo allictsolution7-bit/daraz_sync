@@ -952,10 +952,10 @@
                                     <div class="col-md-6">
                                         <label class="form-label font-weight-bold">Easy Return Period</label>
                                         <div class="input-group">
-                                            <input type="text" name="settings[return_days_option]" class="form-control" placeholder="14" value="{{ setting('general', 'return_days_option', '14') }}">
+                                            <input type="number" name="return_period" class="form-control" placeholder="0" min="0" value="{{ old('return_period', 0) }}">
                                             <span class="input-group-text">Days</span>
                                         </div>
-                                        <small class="form-text text-muted">Enter 0 to mark return as Not Available</small>
+                                        <small class="form-text text-muted">Enter the number of days allowed for easy return (e.g. 7 or 14). Enter 0 if return is not allowed.</small>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label font-weight-bold">Warranty Status</label>

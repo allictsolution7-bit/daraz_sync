@@ -846,6 +846,7 @@ class VendorProductController extends Controller
             'thumb_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'vendor_proposed_commission' => 'nullable|numeric|min:0|max:100',
+            'return_period' => 'nullable|integer|min:0',
         ];
 
         // Add product type specific validation
@@ -965,6 +966,7 @@ class VendorProductController extends Controller
             'approved_at' => $validated['approved_at'] ?? null,
             'vendor_proposed_commission' => $validated['vendor_proposed_commission'] ?? null,
             'vendor_commission_rate' => $validated['vendor_commission_rate'],
+            'return_period' => $validated['return_period'] ?? 0,
         ];
 
         // Create product
@@ -1192,6 +1194,7 @@ class VendorProductController extends Controller
             'thumb_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'vendor_proposed_commission' => 'nullable|numeric|min:0|max:100',
+            'return_period' => 'nullable|integer|min:0',
             'seo.meta_title' => 'nullable|string|max:60',
             'seo.meta_description' => 'nullable|string|max:160',
             'seo.meta_keywords' => 'nullable|string|max:255',

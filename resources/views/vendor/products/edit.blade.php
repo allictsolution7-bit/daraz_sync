@@ -342,6 +342,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="number" class="form-control" name="return_period" id="returnPeriod" value="{{ old('return_period', $product->return_period ?? 0) }}" min="0">
+                                        <label for="returnPeriod">Easy Return Period (Days)</label>
+                                    </div>
+                                    <small class="text-muted d-block ms-2 mb-3" style="margin-top: -10px;">Enter 0 if return is not allowed.</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

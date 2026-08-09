@@ -147,6 +147,7 @@ class Product extends Model
         'vendor_proposed_commission',
         'vendor_commission_rate',
         'commission_note',
+        'return_period',
     ];
 
     protected $casts = [

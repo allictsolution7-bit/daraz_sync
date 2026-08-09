@@ -254,8 +254,83 @@
                                                     @if($order->status == 'ready_for_delivery' && $item->product && $item->product->product_type == 'digital' && $item->product->digital_file)
                                                         <div>
                                                             <a href="{{ route('account.download.digital.product', ['order_id' => $order->id, 'product_id' => $item->product->id]) }}" class="download-btn">
-                                                                <i class="fas fa-download"></i> Download File
+                                                                 <i class="fas fa-download"></i> Download File
                                                             </a>
+                                                        </div>
+                                                    @endif
+
+                                                    @php
+                                                        $canReturn = false;
+                                                        $returnDaysLeft = 0;
+                                                        $policyText = '';
+                                                        
+                                                        if (strtolower($order->status) === 'delivered' && $item->product && ($item->product->return_period ?? 0) > 0) {
+                                                            $deliveredDate = \Carbon\Carbon::parse($order->delivered_at ?? $order->updated_at);
+                                                            $expiryDate = $deliveredDate->copy()->addDays($item->product->return_period);
+                                                            
+                                                            if (now()->lessThanOrEqualTo($expiryDate)) {
+                                                                $canReturn = true;
+                                                                $returnDaysLeft = ceil(now()->diffInDays($expiryDate, false));
+                                                                if ($returnDaysLeft < 0) {
+                                                                    $canReturn = false;
+                                                                }
+                                                            }
+                                                            
+                                                            if ($item->product->vendor_id) {
+                                                                $vendorUser = \App\Models\User::find($item->product->vendor_id);
+                                                                if ($vendorUser && $vendorUser->vendorSettings && !empty($vendorUser->vendorSettings->return_policy['policy_text'])) {
+                                                                    $policyText = $vendorUser->vendorSettings->return_policy['policy_text'];
+                                                                }
+                                                            }
+                                                            
+                                                            if (empty($policyText)) {
+                                                                $policyText = setting('general', 'default_return_policy', "If you are not satisfied with your purchase, you can return it within the specified return period. The product must be unused and in its original packaging. Once received, refund will be processed to your payment method.");
+                                                            }
+                                                        }
+                                                    @endphp
+                                                    
+                                                    @if($canReturn)
+                                                        <div class="mt-2">
+                                                            <button type="button" class="btn btn-sm btn-warning fw-bold text-white px-3 py-1.5 rounded" style="font-size: 12px; background-color: #f59e0b; border: none; border-radius: 6px;" data-bs-toggle="modal" data-bs-target="#returnPolicyModal_{{ $item->id }}">
+                                                                <i class="fas fa-undo me-1"></i> Easy Return ({{ $returnDaysLeft }} days left)
+                                                            </button>
+                                                        </div>
+                                                        
+                                                        <!-- Return Policy Modal -->
+                                                        <div class="modal fade" id="returnPolicyModal_{{ $item->id }}" tabindex="-1" aria-hidden="true" style="text-transform: none;">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                                                                    <div class="modal-header border-0 px-4 py-3 text-white" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+                                                                        <div class="d-flex align-items-center gap-2">
+                                                                            <i class="fas fa-undo-alt fs-5"></i>
+                                                                            <h5 class="modal-title fw-bold mb-0 text-white" style="font-size: 16px;">Product Return Policy</h5>
+                                                                        </div>
+                                                                        <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body p-4 bg-light">
+                                                                        <div class="p-3 bg-white border rounded-3 mb-3 text-start">
+                                                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                                                <span class="text-secondary fw-semibold fs-7" style="font-size: 13px;">Easy Return Period:</span>
+                                                                                <span class="badge bg-warning text-white fw-bold px-2.5 py-1 rounded-pill" style="font-size: 12px;">{{ $item->product->return_period }} Days</span>
+                                                                            </div>
+                                                                            <div class="d-flex align-items-center justify-content-between">
+                                                                                <span class="text-secondary fw-semibold fs-7" style="font-size: 13px;">Return Window Expiry:</span>
+                                                                                <span class="text-dark fw-bold fs-7" style="font-size: 13px;">{{ \Carbon\Carbon::parse($order->delivered_at ?? $order->updated_at)->addDays($item->product->return_period)->format('M d, Y') }}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <div class="text-start">
+                                                                            <h6 class="fw-bold text-dark mb-2"><i class="fas fa-circle-info text-primary me-1"></i> Return Instructions & Terms:</h6>
+                                                                            <div class="p-3 bg-white border rounded-3 text-muted fs-7" style="line-height: 1.6; white-space: pre-line; font-size: 13px;">
+                                                                                {{ $policyText }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer border-0 px-4 pb-4 pt-0 justify-content-end">
+                                                                        <button type="button" class="btn btn-secondary px-4 py-2" data-bs-dismiss="modal" style="border-radius: 8px; font-size: 14px;">Got It</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     @endif
                                                 </div>

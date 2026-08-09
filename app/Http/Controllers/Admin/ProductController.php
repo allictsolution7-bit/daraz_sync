@@ -283,6 +283,7 @@ class ProductController extends Controller
             'weight' => 'nullable|numeric|min:0.001',
             'status' => 'required|in:0,1',
             'product_type' => 'required|in:simple,variable,digital,affiliate',
+            'return_period' => 'nullable|integer|min:0',
             // Primary category/subcategory (optional for backward compatibility)
             'category_id' => 'nullable|exists:product_categories,id',
             'sub_category_id' => 'nullable|exists:sub_categories,id',
@@ -408,6 +409,7 @@ class ProductController extends Controller
             'tags' => $request->input('tags'),
             'is_featured' => $request->has('is_featured') ? 1 : 0,
             'created_by' => auth()->id(),
+            'return_period' => $request->input('return_period', 0),
         ];
 
         // Add product type specific fields
@@ -1149,6 +1151,7 @@ class ProductController extends Controller
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,avif|max:2048', // 2MB limit for each image
             'quantity' => 'nullable|integer|min:0',
             'status' => 'required|in:0,1',
+            'return_period' => 'nullable|integer|min:0',
             // Primary category/subcategory (optional for backward compatibility)
             'category_id' => 'nullable|exists:product_categories,id',
             'sub_category_id' => 'nullable|exists:sub_categories,id',
@@ -1299,6 +1302,7 @@ class ProductController extends Controller
             'video_url' => $request->input('video_url'),
             'tags' => $request->input('tags'),
             'is_featured' => $request->has('is_featured') ? 1 : 0,
+            'return_period' => $request->input('return_period', 0),
         ];
 
         // Handle product type specific fields
