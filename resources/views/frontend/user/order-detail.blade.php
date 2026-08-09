@@ -261,7 +261,7 @@
 
                                                     @php
                                                         $canReturn = false;
-                                                        $returnDaysLeft = 0;
+                                                        $timeString = "";
                                                         $policyText = '';
                                                         
                                                         if (strtolower($order->status) === 'delivered' && $item->product && ($item->product->return_period ?? 0) > 0) {
@@ -270,10 +270,11 @@
                                                             
                                                             if (now()->lessThanOrEqualTo($expiryDate)) {
                                                                 $canReturn = true;
-                                                                $returnDaysLeft = ceil(now()->diffInDays($expiryDate, false));
-                                                                if ($returnDaysLeft < 0) {
-                                                                    $canReturn = false;
+                                                                $diff = now()->diff($expiryDate);
+                                                                if ($diff->days > 0) {
+                                                                    $timeString .= $diff->days . 'd ';
                                                                 }
+                                                                $timeString .= $diff->h . 'h';
                                                             }
                                                             
                                                             if ($item->product->vendor_id) {
@@ -284,55 +285,90 @@
                                                             }
                                                             
                                                             if (empty($policyText)) {
-                                                                $policyText = setting('general', 'default_return_policy', "If you are not satisfied with your purchase, you can return it within the specified return period. The product must be unused and in its original packaging. Once received, refund will be processed to your payment method.");
+                                                                $policyText = "If you are not satisfied with your purchase, you can return it within the specified return period under the following conditions:\n\n" .
+                                                                    "1. Return Acceptance Rules:\n" .
+                                                                    "- The product must be unused, unwashed, and in its original condition.\n" .
+                                                                    "- All original tags, user manuals, warranty cards, and accessories must be intact.\n" .
+                                                                    "- The product must be returned in its original manufacturer packaging/box.\n" .
+                                                                    "- Returns are accepted for damaged, defective, or incorrect products delivered.\n\n" .
+                                                                    "2. Refund & Payback Process:\n" .
+                                                                    "- Once we receive the returned item, it will undergo a quality inspection.\n" .
+                                                                    "- Upon approval, the refund will be processed to your original payment method within 3 to 7 business days.\n" .
+                                                                    "- If the order was paid via Cash on Delivery, the refund will be sent via bKash/Nagad/Rocket.";
                                                             }
                                                         }
                                                     @endphp
                                                     
-                                                    @if($canReturn)
-                                                        <div class="mt-2">
-                                                            <button type="button" class="btn btn-sm btn-warning fw-bold text-white px-3 py-1.5 rounded" style="font-size: 12px; background-color: #f59e0b; border: none; border-radius: 6px;" data-bs-toggle="modal" data-bs-target="#returnPolicyModal_{{ $item->id }}">
-                                                                <i class="fas fa-undo me-1"></i> Easy Return ({{ $returnDaysLeft }} days left)
-                                                            </button>
-                                                        </div>
-                                                        
-                                                        <!-- Return Policy Modal -->
-                                                        <div class="modal fade" id="returnPolicyModal_{{ $item->id }}" tabindex="-1" aria-hidden="true" style="text-transform: none;">
-                                                            <div class="modal-dialog modal-dialog-centered">
-                                                                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
-                                                                    <div class="modal-header border-0 px-4 py-3 text-white" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
-                                                                        <div class="d-flex align-items-center gap-2">
-                                                                            <i class="fas fa-undo-alt fs-5"></i>
-                                                                            <h5 class="modal-title fw-bold mb-0 text-white" style="font-size: 16px;">Product Return Policy</h5>
-                                                                        </div>
-                                                                        <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body p-4 bg-light">
-                                                                        <div class="p-3 bg-white border rounded-3 mb-3 text-start">
-                                                                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                                                                <span class="text-secondary fw-semibold fs-7" style="font-size: 13px;">Easy Return Period:</span>
-                                                                                <span class="badge bg-warning text-white fw-bold px-2.5 py-1 rounded-pill" style="font-size: 12px;">{{ $item->product->return_period }} Days</span>
-                                                                            </div>
-                                                                            <div class="d-flex align-items-center justify-content-between">
-                                                                                <span class="text-secondary fw-semibold fs-7" style="font-size: 13px;">Return Window Expiry:</span>
-                                                                                <span class="text-dark fw-bold fs-7" style="font-size: 13px;">{{ \Carbon\Carbon::parse($order->delivered_at ?? $order->updated_at)->addDays($item->product->return_period)->format('M d, Y') }}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                        
-                                                                        <div class="text-start">
-                                                                            <h6 class="fw-bold text-dark mb-2"><i class="fas fa-circle-info text-primary me-1"></i> Return Instructions & Terms:</h6>
-                                                                            <div class="p-3 bg-white border rounded-3 text-muted fs-7" style="line-height: 1.6; white-space: pre-line; font-size: 13px;">
-                                                                                {{ $policyText }}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer border-0 px-4 pb-4 pt-0 justify-content-end">
-                                                                        <button type="button" class="btn btn-secondary px-4 py-2" data-bs-dismiss="modal" style="border-radius: 8px; font-size: 14px;">Got It</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @endif
+                                                     @if($canReturn)
+                                                         <div class="mt-2">
+                                                             <button type="button" class="btn btn-sm btn-warning fw-bold text-white px-3 py-1.5 rounded shadow-sm" style="font-size: 12px; background-color: #f59e0b; border: none; border-radius: 6px; cursor: pointer;" onclick="document.getElementById('returnPolicyModal_{{ $item->id }}').style.display='flex';">
+                                                                 <i class="fas fa-undo me-1"></i> Return ({{ $timeString }})
+                                                             </button>
+                                                         </div>
+                                                         
+                                                         <!-- Return Policy Modal -->
+                                                         <div id="returnPolicyModal_{{ $item->id }}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 99999; align-items: center; justify-content: center; padding: 15px; text-transform: none; text-align: left; color: #334155;">
+                                                             <div style="background: #fff; width: 100%; max-width: 500px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh;">
+                                                                 <!-- Header -->
+                                                                 <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 16px 24px; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+                                                                     <div style="display: flex; align-items: center; gap: 8px;">
+                                                                         <i class="fas fa-undo-alt" style="font-size: 18px;"></i>
+                                                                         <h5 style="margin: 0; font-weight: bold; font-size: 16px; color: #fff;">Product Return Policy</h5>
+                                                                     </div>
+                                                                     <button type="button" onclick="document.getElementById('returnPolicyModal_{{ $item->id }}').style.display='none';" style="background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+                                                                 </div>
+
+                                                                 <!-- Step 1: Policy Instructions -->
+                                                                 <div id="returnDetailStep1_{{ $item->id }}" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+                                                                     <div style="padding: 24px; overflow-y: auto; flex: 1;">
+                                                                         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                                                                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                                                                 <span style="color: #64748b; font-size: 13px;">Delivered On:</span>
+                                                                                 <span style="color: #1e293b; font-weight: bold; font-size: 13px;">{{ \Carbon\Carbon::parse($order->delivered_at ?? $order->updated_at)->format('M d, Y') }}</span>
+                                                                             </div>
+                                                                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                                                                 <span style="color: #64748b; font-size: 13px;">Easy Return Period:</span>
+                                                                                 <span style="background: #f59e0b; color: #fff; font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 99px; background-color: #f59e0b;">{{ $item->product->return_period }} Days</span>
+                                                                             </div>
+                                                                             <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                                                 <span style="color: #64748b; font-size: 13px;">Return Window Expiry:</span>
+                                                                                 <span style="color: #1e293b; font-weight: bold; font-size: 13px;">{{ \Carbon\Carbon::parse($order->delivered_at ?? $order->updated_at)->addDays($item->product->return_period)->format('M d, Y') }}</span>
+                                                                             </div>
+                                                                         </div>
+                                                                         
+                                                                         <div>
+                                                                             <h6 style="margin: 0 0 8px 0; font-weight: bold; color: #1e293b; font-size: 14px;"><i class="fas fa-circle-info text-primary" style="margin-right: 4px;"></i> Return Instructions & Terms:</h6>
+                                                                             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; color: #475569; font-size: 13px; line-height: 1.6; white-space: pre-line; max-height: 120px; overflow-y: auto; background: #fff; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                                                                                 {{ $policyText }}
+                                                                             </div>
+                                                                         </div>
+                                                                     </div>
+                                                                     <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between;">
+                                                                         <button type="button" onclick="document.getElementById('returnPolicyModal_{{ $item->id }}').style.display='none';" style="background: #e2e8f0; border: none; color: #475569; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">Cancel</button>
+                                                                         <button type="button" onclick="document.getElementById('returnDetailStep1_{{ $item->id }}').style.display='none'; document.getElementById('returnDetailStep2_{{ $item->id }}').style.display='flex';" style="background: #f59e0b; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">Proceed to Return</button>
+                                                                     </div>
+                                                                 </div>
+
+                                                                 <!-- Step 2: Reason Submission Form -->
+                                                                 <div id="returnDetailStep2_{{ $item->id }}" style="display: none; flex-direction: column; flex: 1; overflow: hidden;">
+                                                                     <form action="{{ route('account.order.return', $order->id) }}" method="POST" style="margin: 0; display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+                                                                         @csrf
+                                                                         <div style="padding: 24px; flex: 1; overflow-y: auto;">
+                                                                             <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                                                 <label style="font-weight: bold; color: #1e293b; font-size: 14px;">Reason for Return</label>
+                                                                                 <textarea name="reason" rows="5" placeholder="Please describe the reason for returning this item..." required style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 13.5px; width: 100%; box-sizing: border-box; resize: vertical;"></textarea>
+                                                                             </div>
+                                                                         </div>
+                                                                         <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between;">
+                                                                             <button type="button" onclick="document.getElementById('returnDetailStep2_{{ $item->id }}').style.display='none'; document.getElementById('returnDetailStep1_{{ $item->id }}').style.display='flex';" style="background: #e2e8f0; border: none; color: #475569; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">Back</button>
+                                                                             <button type="submit" style="background: #ef4444; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">Submit Return</button>
+                                                                         </div>
+                                                                     </form>
+                                                                 </div>
+
+                                                             </div>
+                                                         </div>
+                                                     @endif
                                                 </div>
                                             </div>
                                         </td>

@@ -234,6 +234,7 @@ Route::prefix('account')->name('account.')->group(function () {
         Route::get('/orders', [AccountController::class, 'orders'])->name('orders');
         Route::get('/orders/{id}', [AccountController::class, 'orderDetail'])->name('order.detail');
         Route::post('/orders/{id}/cancel', [AccountController::class, 'cancelOrder'])->name('order.cancel');
+        Route::post('/orders/{id}/return', [AccountController::class, 'returnOrder'])->name('order.return');
         Route::get('/download/digital-product/{order_id}/{product_id}', [AccountController::class, 'downloadDigitalProduct'])->name('download.digital.product');
         // Delivery Locations Routes
         Route::get('/locations/store', fn() => redirect()->route('account.show'));

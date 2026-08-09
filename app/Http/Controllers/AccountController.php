@@ -171,7 +171,7 @@ class AccountController extends Controller
     public function orders()
     {
         $user = Auth::user();
-        $orders = $user->orders()->latest()->paginate(10);
+        $orders = $user->orders()->with('order_items.product')->latest()->paginate(10);
 
         return view('frontend.user.orders', compact(['orders', 'user']));
     }
@@ -315,5 +315,59 @@ class AccountController extends Controller
         });
 
         return redirect()->back()->with('success', 'Order cancelled successfully.');
+    }
+
+    /**
+     * Return order by user
+     */
+    public function returnOrder(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:1000'
+        ]);
+
+        $user = Auth::user();
+        $order = $user->orders()->findOrFail($id);
+
+        // Check if the order is delivered
+        if (strtolower($order->status) !== 'delivered') {
+            return redirect()->back()->with('error', 'This order is not eligible for return.');
+        }
+
+        // Check return window eligibility for at least one item
+        $hasReturnableItems = false;
+        foreach ($order->order_items as $item) {
+            if ($item->product && ($item->product->return_period ?? 0) > 0) {
+                $deliveredDate = \Carbon\Carbon::parse($order->delivered_at ?? $order->updated_at);
+                $expiryDate = $deliveredDate->copy()->addDays($item->product->return_period);
+                if (now()->lessThanOrEqualTo($expiryDate)) {
+                    $hasReturnableItems = true;
+                    break;
+                }
+            }
+        }
+
+        if (!$hasReturnableItems) {
+            return redirect()->back()->with('error', 'The return window for this order has expired.');
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($order, $request) {
+            // Update order status to 'return'
+            $order->status = 'return';
+            
+            // Save return reason & note in order or status logs
+            $statusUpdates = $order->status_updates ? json_decode($order->status_updates, true) : [];
+            $statusUpdates[] = [
+                'status' => 'return',
+                'updated_at' => now()->toDateTimeString(),
+                'updated_by' => auth()->id(),
+                'note' => 'Returned by Customer. Reason: ' . $request->reason
+            ];
+            $order->status_updates = json_encode($statusUpdates);
+            
+            $order->save();
+        });
+
+        return redirect()->back()->with('success', 'Return request submitted successfully. The order status has been updated to return.');
     }
 }
