@@ -730,6 +730,57 @@
                 margin-top: 1rem !important;
             }
         }
+
+        /* Navbar Search Autocomplete styling */
+        .admin-search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-radius: 12px;
+            margin-top: 8px;
+            max-height: 350px;
+            overflow-y: auto;
+            z-index: 9999;
+            border: 1px solid #e2e8f0;
+            padding: 8px 0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .admin-search-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #334155;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .admin-search-dropdown-item:hover, 
+        .admin-search-dropdown-item.active {
+            background-color: #f1f5f9;
+            color: #197A94 !important;
+        }
+        
+        .admin-search-dropdown-item i {
+            font-size: 13px;
+            width: 16px;
+            text-align: center;
+            opacity: 0.7;
+            color: #197A94;
+        }
+        
+        .admin-search-no-results {
+            padding: 15px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            text-align: center;
+        }
     </style>
     @yield('styles')
 </head>
@@ -755,14 +806,38 @@
                     <input type="search" name="search" placeholder="Search..." id="">
                 </div> -->
                 <!-- ... existing code ... -->
-                <div class="search-bar">
-                    <form class="search-form d-flex align-items-center" method="POST" action="#">
-                        <input type="text" name="query" placeholder="Search..." title="Enter search keyword">
-                        <button type="submit" title="Search"><i class="fas fa-search"></i></button>
-                    </form>
+                <div class="search-bar position-relative" id="adminNavbarSearchContainer" style="width: 280px; margin-left: 20px;">
+                    <div class="search-form d-flex align-items-center">
+                        <input type="text" id="adminNavbarSearchInput" placeholder="Search pages..." title="Enter page name to search" autocomplete="off" style="width: 100%;">
+                        <button type="button" title="Search"><i class="fas fa-search"></i></button>
+                    </div>
+                    <!-- Autocomplete dropdown list -->
+                    <div id="adminNavbarSearchDropdown" class="admin-search-dropdown shadow" style="display: none;"></div>
                 </div><!-- End Search Bar -->
 
                 <ul class="navbar-item flex-row  align-items-center py-2 ml-auto ">
+                    <li class="nav-item dropdown user-profile-dropdown">
+                        @php
+                            $unreadChatCount = 0;
+                            if (auth()->check()) {
+                                $user = auth()->user();
+                                $unreadChatCount = \App\Models\ChatMessage::where('is_read', false)
+                                    ->where('sender_id', '!=', $user->id)
+                                    ->whereHas('chatRoom', function($q) use ($user) {
+                                        $q->where('customer_id', $user->id)
+                                          ->orWhere('vendor_id', $user->id);
+                                    })
+                                    ->count();
+                            }
+                        @endphp
+                        <a href="{{ route('chats.index') }}" class="nav-link user position-relative" id="chatNavbarLink" title="Chat Messages">
+                            <i class="fa-regular fa-comments" style="font-size: 20px; color: #10b981;"></i>
+                            @if($unreadChatCount > 0)
+                                <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" style="font-size: 0.65rem;">{{ $unreadChatCount }}</span>
+                            @endif
+                        </a>
+                    </li>
+
                     <li class="nav-item dropdown user-profile-dropdown">
                         @php
                             $user = auth()->user();
@@ -1168,11 +1243,27 @@
                         @endcan
 
                         <li class="{{ request()->routeIs('chats.index') ? 'active' : '' }}">
-                            <a href="{{ route('chats.index') }}">
+                            <a href="{{ route('chats.index') }}" class="d-flex align-items-center justify-content-between">
                                 <span class="menu-content">
                                     <i class="fas fa-comments" style="color:#10b981;"></i>
                                     Chats
                                 </span>
+                                @php
+                                    $sidebarUnreadCount = 0;
+                                    if (auth()->check()) {
+                                        $user = auth()->user();
+                                        $sidebarUnreadCount = \App\Models\ChatMessage::where('is_read', false)
+                                            ->where('sender_id', '!=', $user->id)
+                                            ->whereHas('chatRoom', function($q) use ($user) {
+                                                $q->where('customer_id', $user->id)
+                                                  ->orWhere('vendor_id', $user->id);
+                                            })
+                                            ->count();
+                                    }
+                                @endphp
+                                @if($sidebarUnreadCount > 0)
+                                    <span class="badge bg-danger rounded-circle text-white font-weight-bold px-2 py-0.5 ms-2" style="font-size: 0.65rem;">{{ $sidebarUnreadCount }}</span>
+                                @endif
                             </a>
                         </li>
 
@@ -2758,6 +2849,143 @@
             });
         };
     })();
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('adminNavbarSearchInput');
+        const searchDropdown = document.getElementById('adminNavbarSearchDropdown');
+        const searchContainer = document.getElementById('adminNavbarSearchContainer');
+        
+        if (!searchInput || !searchDropdown) return;
+        
+        // Index sidebar pages
+        let sidebarPages = [];
+        
+        function buildSearchIndex() {
+            sidebarPages = [];
+            const links = document.querySelectorAll('ul#sidebar a');
+            
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                // Ignore dummy links
+                if (!href || href === '#' || href.startsWith('javascript:')) return;
+                
+                // Get page name
+                let text = '';
+                const menuContent = link.querySelector('.menu-content');
+                if (menuContent) {
+                    // clone to remove any child elements that might contain numbers or extra icons
+                    const temp = menuContent.cloneNode(true);
+                    // remove icons
+                    const icons = temp.querySelectorAll('i, svg, span.right, span.badge');
+                    icons.forEach(el => el.remove());
+                    text = temp.textContent.trim();
+                } else {
+                    const temp = link.cloneNode(true);
+                    const icons = temp.querySelectorAll('i, svg, span.right, span.badge');
+                    icons.forEach(el => el.remove());
+                    text = temp.textContent.trim();
+                }
+                
+                // Try to find font-awesome icon
+                let iconClass = 'fa-solid fa-file';
+                const icon = link.querySelector('i');
+                if (icon) {
+                    iconClass = icon.className;
+                }
+                
+                if (text) {
+                    // Avoid duplicates
+                    const exists = sidebarPages.some(page => page.url === href);
+                    if (!exists) {
+                        sidebarPages.push({
+                            title: text,
+                            url: href,
+                            icon: iconClass
+                        });
+                    }
+                }
+            });
+        }
+        
+        // Build index initially
+        buildSearchIndex();
+        
+        // Re-build index if menu changes
+        const sidebarObserver = new MutationObserver(buildSearchIndex);
+        const sidebarEl = document.getElementById('sidebar');
+        if (sidebarEl) {
+            sidebarObserver.observe(sidebarEl, { childList: true, subtree: true });
+        }
+        
+        let activeIndex = -1;
+        
+        searchInput.addEventListener('input', function() {
+            const query = searchInput.value.trim().toLowerCase();
+            searchDropdown.innerHTML = '';
+            activeIndex = -1;
+            
+            if (!query) {
+                searchDropdown.style.display = 'none';
+                return;
+            }
+            
+            const matches = sidebarPages.filter(page => page.title.toLowerCase().includes(query));
+            
+            if (matches.length === 0) {
+                searchDropdown.innerHTML = '<div class="admin-search-no-results">No pages found</div>';
+            } else {
+                matches.forEach((page, idx) => {
+                    const item = document.createElement('a');
+                    item.href = page.url;
+                    item.className = 'admin-search-dropdown-item';
+                    item.innerHTML = `<i class="${page.icon}"></i> <span>${page.title}</span>`;
+                    searchDropdown.appendChild(item);
+                });
+            }
+            
+            searchDropdown.style.display = 'block';
+        });
+        
+        // Keyboard navigation
+        searchInput.addEventListener('keydown', function(e) {
+            const items = searchDropdown.querySelectorAll('.admin-search-dropdown-item');
+            if (items.length === 0) return;
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (activeIndex < items.length - 1) {
+                    if (activeIndex >= 0) items[activeIndex].classList.remove('active');
+                    activeIndex++;
+                    items[activeIndex].classList.add('active');
+                    items[activeIndex].scrollIntoView({ block: 'nearest' });
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (activeIndex > 0) {
+                    items[activeIndex].classList.remove('active');
+                    activeIndex--;
+                    items[activeIndex].classList.add('active');
+                    items[activeIndex].scrollIntoView({ block: 'nearest' });
+                }
+            } else if (e.key === 'Enter') {
+                if (activeIndex >= 0 && items[activeIndex]) {
+                    e.preventDefault();
+                    items[activeIndex].click();
+                }
+            } else if (e.key === 'Escape') {
+                searchDropdown.style.display = 'none';
+                searchInput.blur();
+            }
+        });
+        
+        // Hide when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchContainer.contains(e.target)) {
+                searchDropdown.style.display = 'none';
+            }
+        });
+    });
     </script>
 </body>
 

@@ -68,9 +68,27 @@
             </a>
         </li>
         <li class="sidebar-menu-item">
-            <a href="{{ route('chats.index') }}" class="sidebar-menu-link {{ request()->is('chats*') ? 'active' : '' }}">
-                <i class="fa-solid fa-comments sidebar-menu-icon"></i>
-                <span>Chats</span>
+            <a href="{{ route('chats.index') }}" class="sidebar-menu-link d-flex align-items-center justify-content-between {{ request()->is('chats*') ? 'active' : '' }}">
+                <span>
+                    <i class="fa-solid fa-comments sidebar-menu-icon"></i>
+                    <span>Chats</span>
+                </span>
+                @php
+                    $sidebarUnreadCount = 0;
+                    if (auth()->check()) {
+                        $user = auth()->user();
+                        $sidebarUnreadCount = \App\Models\ChatMessage::where('is_read', false)
+                            ->where('sender_id', '!=', $user->id)
+                            ->whereHas('chatRoom', function($q) use ($user) {
+                                $q->where('customer_id', $user->id)
+                                  ->orWhere('vendor_id', $user->id);
+                            })
+                            ->count();
+                    }
+                @endphp
+                @if($sidebarUnreadCount > 0)
+                    <span class="badge bg-danger rounded-circle text-white font-weight-bold px-2 py-0.5" style="font-size: 0.65rem;">{{ $sidebarUnreadCount }}</span>
+                @endif
             </a>
         </li>
         <li class="sidebar-menu-item">

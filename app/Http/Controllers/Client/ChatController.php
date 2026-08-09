@@ -39,9 +39,14 @@ class ChatController extends Controller
             $room->display_name = ($otherUser->vendorSettings && $otherUser->vendorSettings->business_name)
                 ? $otherUser->vendorSettings->business_name
                 : $otherUser->name;
-            $room->display_logo = ($otherUser->vendorSettings && $otherUser->vendorSettings->business_logo)
-                ? asset('storage/' . $otherUser->vendorSettings->business_logo)
-                : 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=100&h=100&fit=crop';
+            
+            if ($otherUser->vendorSettings && $otherUser->vendorSettings->business_logo) {
+                $room->display_logo = asset('storage/' . $otherUser->vendorSettings->business_logo);
+            } elseif ($otherUser->profile_photo_path) {
+                $room->display_logo = asset('storage/' . $otherUser->profile_photo_path);
+            } else {
+                $room->display_logo = asset('clientside/images/profile.png');
+            }
         }
 
         $activeRoom = null;
@@ -66,6 +71,14 @@ class ChatController extends Controller
             $activeRoom->display_name = ($otherUser->vendorSettings && $otherUser->vendorSettings->business_name)
                 ? $otherUser->vendorSettings->business_name
                 : $otherUser->name;
+
+            if ($otherUser->vendorSettings && $otherUser->vendorSettings->business_logo) {
+                $activeRoom->display_logo = asset('storage/' . $otherUser->vendorSettings->business_logo);
+            } elseif ($otherUser->profile_photo_path) {
+                $activeRoom->display_logo = asset('storage/' . $otherUser->profile_photo_path);
+            } else {
+                $activeRoom->display_logo = asset('clientside/images/profile.png');
+            }
         }
 
         return view('frontend.chats', compact('chatRooms', 'activeRoom'));
@@ -122,7 +135,7 @@ class ChatController extends Controller
                 'id' => $message->id,
                 'sender_id' => $message->sender_id,
                 'message' => $message->message,
-                'created_at' => $message->created_at->diffForHumans(),
+                'created_at' => str_contains(strtolower($message->created_at->diffForHumans()), 'second') ? 'Just now' : $message->created_at->diffForHumans(),
                 'sender_name' => $user->name,
             ]
         ]);
@@ -158,7 +171,7 @@ class ChatController extends Controller
                 'id' => $msg->id,
                 'sender_id' => $msg->sender_id,
                 'message' => $msg->message,
-                'created_at' => $msg->created_at->diffForHumans(),
+                'created_at' => str_contains(strtolower($msg->created_at->diffForHumans()), 'second') ? 'Just now' : $msg->created_at->diffForHumans(),
                 'sender_name' => $msg->sender->name,
             ];
         });

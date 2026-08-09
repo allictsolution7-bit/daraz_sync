@@ -268,7 +268,7 @@
                         <a href="{{ route('chats.index') }}" class="d-md-none text-slate-600 me-2">
                             <i class="fa-solid fa-arrow-left"></i>
                         </a>
-                        <img src="{{ $activeRoom->display_logo ?? 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=100&h=100&fit=crop' }}" 
+                        <img src="{{ $activeRoom->display_logo ?? asset('clientside/images/profile.png') }}" 
                              alt="{{ $activeRoom->display_name }}" 
                              class="chat-avatar" style="width: 40px; height: 40px;">
                         <div>
@@ -282,7 +282,7 @@
                             <div class="message-bubble {{ $msg->sender_id === auth()->id() ? 'sent' : 'received' }}" data-id="{{ $msg->id }}">
                                 <div>{{ $msg->message }}</div>
                                 <div class="message-time">
-                                    {{ $msg->created_at->diffForHumans() }}
+                                    {{ str_contains(strtolower($msg->created_at->diffForHumans()), 'second') ? 'Just now' : $msg->created_at->diffForHumans() }}
                                 </div>
                             </div>
                         @empty
@@ -335,8 +335,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const url = chatForm.action;
         const formData = new FormData(chatForm);
         
-        // Disable input during send
-        messageInput.disabled = true;
+        // Optimistic UI update: append immediately
+        const tempId = 'temp-' + Date.now();
+        const tempMsg = {
+            id: tempId,
+            message: messageText,
+            created_at: 'Sending...'
+        };
+        
+        // Clear placeholder
+        const placeholder = document.getElementById('noMessagesPlaceholder');
+        if (placeholder) placeholder.remove();
+        
+        appendMessage(tempMsg, true);
+        messageInput.value = '';
+        messageInput.focus();
         
         fetch(url, {
             method: 'POST',
@@ -347,23 +360,38 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            messageInput.disabled = false;
             if (data.success) {
-                // Clear placeholder
-                const placeholder = document.getElementById('noMessagesPlaceholder');
-                if (placeholder) placeholder.remove();
-                
-                // Add sent message bubble
-                appendMessage(data.message, true);
-                messageInput.value = '';
-                messageInput.focus();
+                // Find optimistic bubble and update with real data
+                const bubble = chatBody.querySelector(`[data-id="${tempId}"]`);
+                if (bubble) {
+                    bubble.setAttribute('data-id', data.message.id);
+                    const timeEl = bubble.querySelector('.message-time');
+                    if (timeEl) timeEl.textContent = data.message.created_at;
+                    // Update polling lastMessageId if needed
+                    if (parseInt(data.message.id) > lastMessageId) {
+                        lastMessageId = parseInt(data.message.id);
+                    }
+                }
             } else {
-                alert('Failed to send message: ' + (data.message || 'Unknown error'));
+                // Mark optimistic bubble as failed
+                const bubble = chatBody.querySelector(`[data-id="${tempId}"]`);
+                if (bubble) {
+                    bubble.style.opacity = '0.7';
+                    const timeEl = bubble.querySelector('.message-time');
+                    if (timeEl) timeEl.textContent = 'Failed to send';
+                    timeEl.style.color = '#ef4444';
+                }
             }
         })
         .catch(err => {
-            messageInput.disabled = false;
             console.error(err);
+            const bubble = chatBody.querySelector(`[data-id="${tempId}"]`);
+            if (bubble) {
+                bubble.style.opacity = '0.7';
+                const timeEl = bubble.querySelector('.message-time');
+                if (timeEl) timeEl.textContent = 'Failed to send';
+                timeEl.style.color = '#ef4444';
+            }
         });
     });
     

@@ -439,8 +439,26 @@
                 <i class="fas fa-chart-pie"></i> Dashboard
             </a>
 
-            <a class="vendor-sidebar-link {{ request()->routeIs('chats.index') ? 'active' : '' }}" href="{{ route('chats.index') }}">
-                <i class="fas fa-comments text-info"></i> Chats
+            <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('chats.index') ? 'active' : '' }}" href="{{ route('chats.index') }}">
+                <span class="d-flex align-items-center gap-2">
+                    <i class="fas fa-comments text-info"></i> Chats
+                </span>
+                @php
+                    $sidebarUnreadCount = 0;
+                    if (auth()->check()) {
+                        $user = auth()->user();
+                        $sidebarUnreadCount = \App\Models\ChatMessage::where('is_read', false)
+                            ->where('sender_id', '!=', $user->id)
+                            ->whereHas('chatRoom', function($q) use ($user) {
+                                $q->where('customer_id', $user->id)
+                                  ->orWhere('vendor_id', $user->id);
+                            })
+                            ->count();
+                    }
+                @endphp
+                @if($sidebarUnreadCount > 0)
+                    <span class="badge bg-danger text-white font-weight-bold px-2 py-1 rounded-pill" style="font-size: 0.72rem;">{{ $sidebarUnreadCount }}</span>
+                @endif
             </a>
 
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}" href="{{ route('vendor.products.index') }}">
@@ -609,6 +627,29 @@
                 @if(!auth()->user()?->hasRole('reseller'))
                 <a href="{{ url('/') }}" target="_blank" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="View Storefront">
                     <i class="fas fa-globe text-secondary"></i>
+                </a>
+
+                <!-- Chat Messages Icon -->
+                @php
+                    $unreadChatCount = 0;
+                    if (auth()->check()) {
+                        $user = auth()->user();
+                        $unreadChatCount = \App\Models\ChatMessage::where('is_read', false)
+                            ->where('sender_id', '!=', $user->id)
+                            ->whereHas('chatRoom', function($q) use ($user) {
+                                $q->where('customer_id', $user->id)
+                                  ->orWhere('vendor_id', $user->id);
+                            })
+                            ->count();
+                    }
+                @endphp
+                <a href="{{ route('chats.index') }}" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center position-relative" style="width: 40px; height: 40px;" title="Chat Messages">
+                    <i class="fas fa-comments text-secondary"></i>
+                    @if($unreadChatCount > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem; transform: translate(-30%, 10%) !important;">
+                            {{ $unreadChatCount }}
+                        </span>
+                    @endif
                 </a>
 
                 <!-- Order Notifications Bell Dropdown -->

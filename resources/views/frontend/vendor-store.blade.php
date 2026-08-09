@@ -647,7 +647,7 @@
                              alt="{{ $vendor->name }}"
                              class="vendor-logo">
                     @else
-                        <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=140&h=140&fit=crop&crop=face&auto=format"
+                        <img src="{{ asset('clientside/images/profile.png') }}"
                              alt="{{ $vendor->name }}"
                              class="vendor-logo">
                     @endif

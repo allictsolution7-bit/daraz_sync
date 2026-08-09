@@ -777,6 +777,14 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
 });
 
 
+// Chat/Messaging System Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/chats', [App\Http\Controllers\Client\ChatController::class, 'index'])->name('chats.index');
+    Route::get('/chats/start/{seller}', [App\Http\Controllers\Client\ChatController::class, 'startChat'])->name('chats.start');
+    Route::get('/chats/{chatRoom}/messages', [App\Http\Controllers\Client\ChatController::class, 'getMessages'])->name('chats.messages');
+    Route::post('/chats/{chatRoom}/send', [App\Http\Controllers\Client\ChatController::class, 'sendMessage'])->name('chats.send');
+});
+
 // Catch-all route for pages - must be at the end
 Route::get('/{slug}', [OthersController::class, 'page'])->name("page");
 
@@ -973,10 +981,4 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:adm
     });
 });
 
-// Chat/Messaging System Routes
-Route::middleware('auth')->group(function () {
-    Route::get('/chats', [App\Http\Controllers\Client\ChatController::class, 'index'])->name('chats.index');
-    Route::get('/chats/start/{seller}', [App\Http\Controllers\Client\ChatController::class, 'startChat'])->name('chats.start');
-    Route::get('/chats/{chatRoom}/messages', [App\Http\Controllers\Client\ChatController::class, 'getMessages'])->name('chats.messages');
-    Route::post('/chats/{chatRoom}/send', [App\Http\Controllers\Client\ChatController::class, 'sendMessage'])->name('chats.send');
-});
+
