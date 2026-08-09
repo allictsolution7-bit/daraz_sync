@@ -6,8 +6,8 @@
     .vendor-hero-section {
         position: relative;
         background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        padding: 80px 0 60px;
-        margin-bottom: 50px;
+        padding: 15px 0;
+        margin-bottom: 25px;
         color: white;
         overflow: hidden;
     }
@@ -26,21 +26,32 @@
     .vendor-hero-content {
         position: relative;
         z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .vendor-info-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
 
     .vendor-logo-container {
         position: relative;
         display: inline-block;
-        margin-bottom: 30px;
+        margin-bottom: 0;
     }
 
     .vendor-logo {
-        width: 140px;
-        height: 140px;
+        width: 65px;
+        height: 65px;
         border-radius: 50%;
-        border: 6px solid rgba(255, 255, 255, 0.9);
+        border: 3px solid rgba(255, 255, 255, 0.9);
         object-fit: cover;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         transition: transform 0.3s ease;
     }
 
@@ -50,64 +61,67 @@
 
     .vendor-verified-badge {
         position: absolute;
-        bottom: 10px;
-        right: 10px;
+        bottom: 0;
+        right: 0;
         background: #28a745;
         color: white;
         border-radius: 50%;
-        width: 40px;
-        height: 40px;
+        width: 20px;
+        height: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
-        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+        border: 2px solid white;
+        font-size: 0.65rem;
     }
 
-    .vendor-info {
-        text-align: center;
-        max-width: 700px;
-        margin: 0 auto;
+    .vendor-details-text {
+        text-align: left;
     }
 
     .vendor-name {
-        font-size: 3rem;
+        font-size: 1.5rem;
         font-weight: 800;
-        margin-bottom: 15px;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        margin: 0;
+        text-shadow: none;
         letter-spacing: -0.5px;
     }
 
     .vendor-business-name {
-        font-size: 1.3rem;
+        font-size: 0.9rem;
         font-weight: 600;
-        margin-bottom: 20px;
-        opacity: 0.95;
+        margin: 2px 0 0 0;
+        opacity: 0.9;
         color: rgba(255, 255, 255, 0.9);
     }
 
     .vendor-description {
-        font-size: 1.1rem;
-        line-height: 1.6;
-        opacity: 0.9;
-        margin-bottom: 35px;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        opacity: 0.85;
+        margin: 4px 0 0 0;
         color: rgba(255, 255, 255, 0.85);
+        max-width: 500px;
     }
 
     .vendor-stats {
         display: flex;
-        justify-content: center;
-        gap: 60px;
-        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
     }
 
     .stat-item {
         text-align: center;
-        padding: 15px 25px;
+        padding: 6px 14px;
         background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
+        border-radius: 8px;
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 80px;
         transition: all 0.3s ease;
     }
 
@@ -117,21 +131,19 @@
     }
 
     .stat-number {
-        font-size: 2.5rem;
+        font-size: 1.1rem;
         font-weight: 800;
         display: block;
-        margin-bottom: 5px;
-        background: linear-gradient(45deg, #fff, #f0f0f0);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        line-height: 1.2;
     }
 
     .stat-label {
-        font-size: 0.95rem;
-        opacity: 0.9;
+        font-size: 0.65rem;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
+        opacity: 0.8;
+        display: block;
+        margin-top: 2px;
         font-weight: 600;
     }
 
@@ -200,7 +212,7 @@
 
     .filter-form {
         display: grid;
-        grid-template-columns: 2fr 1fr 1fr auto;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
         gap: 15px;
         align-items: end;
     }
@@ -208,6 +220,7 @@
     .form-group {
         display: flex;
         flex-direction: column;
+        width: 100%;
     }
 
     .form-label {
@@ -219,18 +232,55 @@
         letter-spacing: 0.5px;
     }
 
-    .form-control, .form-select {
+    .filter-form .input-group {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .filter-form .input-group:focus-within {
+        border-color: var(--primary-color);
+        background: white;
+    }
+
+    .filter-form .input-group-text {
+        background: transparent !important;
+        border: none !important;
+        padding-left: 15px;
+        padding-right: 5px;
+        display: flex;
+        align-items: center;
+    }
+
+    .filter-form .form-control {
+        border: none !important;
+        background: transparent !important;
+        padding: 12px 10px !important;
+        font-size: 1rem;
+        width: 100%;
+        outline: none;
+        box-shadow: none !important;
+    }
+
+    .filter-form .form-select {
         border: 2px solid #e9ecef;
         border-radius: 10px;
         padding: 12px 16px;
         font-size: 1rem;
         transition: all 0.3s ease;
         background: #f8f9fa;
+        width: 100%;
+        outline: none;
+        cursor: pointer;
     }
 
-    .form-control:focus, .form-select:focus {
+    .filter-form .form-select:focus {
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 240, 38, 39), 0.1);
         background: white;
     }
 
@@ -244,10 +294,14 @@
         font-size: 1rem;
         cursor: pointer;
         transition: all 0.3s ease;
-        display: flex;
+        display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
         box-shadow: 0 4px 15px rgba(var(--primary-color-rgb, 240, 38, 39), 0.3);
+        height: 48px;
+        width: 100%;
+        white-space: nowrap;
     }
 
     .filter-btn:hover {
@@ -529,13 +583,64 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #555;
     }
+
+    /* Style Pagination explicitly to avoid bullets and design conflicts */
+    .pagination-container ul.pagination {
+        display: flex;
+        padding-left: 0;
+        list-style: none;
+        border-radius: 8px;
+        gap: 5px;
+        margin: 0;
+    }
+
+    .pagination-container ul.pagination li.page-item,
+    .pagination-container ul.pagination li {
+        list-style-type: none !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    .pagination-container ul.pagination li a,
+    .pagination-container ul.pagination li span {
+        position: relative;
+        display: block;
+        padding: 8px 16px;
+        color: #4b5563;
+        text-decoration: none;
+        background-color: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .pagination-container ul.pagination li a:hover {
+        background-color: #f3f4f6;
+        color: var(--primary-color);
+        border-color: #d1d5db;
+    }
+
+    .pagination-container ul.pagination li.active span {
+        z-index: 3;
+        color: #fff;
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .pagination-container ul.pagination li.disabled span {
+        color: #9ca3af;
+        pointer-events: none;
+        background-color: #f9fafb;
+        border-color: #e5e7eb;
+    }
 </style>
 
 <!-- Enhanced Vendor Hero Section -->
 <div class="vendor-hero-section">
     <div class="base-container">
         <div class="vendor-hero-content">
-            <div class="vendor-info">
+            <div class="vendor-info-left">
                 <div class="vendor-logo-container">
                     @if($vendor->vendorSettings && $vendor->vendorSettings->business_logo)
                         <img src="{{ asset('storage/' . $vendor->vendorSettings->business_logo) }}"
@@ -554,44 +659,44 @@
                     @endif
                 </div>
 
-                <h1 class="vendor-name">{{ $vendor->name }}</h1>
-
-                @if($vendor->vendorSettings && $vendor->vendorSettings->business_name)
-                    <p class="vendor-business-name">{{ $vendor->vendorSettings->business_name }}</p>
-                @endif
-
-                @if($vendor->vendorSettings && $vendor->vendorSettings->business_description)
-                    <p class="vendor-description">{{ $vendor->vendorSettings->business_description }}</p>
-                @endif
-
-                <div class="vendor-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">{{ $stats['total_products'] }}</span>
-                        <span class="stat-label">Products</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">
-                            @if($vendor->vendorSettings && $vendor->vendorSettings->is_verified)
-                                <i class="fas fa-shield-alt"></i>
-                            @else
-                                <i class="fas fa-store"></i>
-                            @endif
-                        </span>
-                        <span class="stat-label">
-                            @if($vendor->vendorSettings && $vendor->vendorSettings->is_verified)
-                                Verified
-                            @else
-                                Seller
-                            @endif
-                        </span>
-                    </div>
-                    @if(isset($stats['total_sales']) && $stats['total_sales'] > 0)
-                        <div class="stat-item">
-                            <span class="stat-number">{{ $stats['total_sales'] }}</span>
-                            <span class="stat-label">Sales</span>
-                        </div>
+                <div class="vendor-details-text">
+                    <h1 class="vendor-name">{{ $vendor->name }}</h1>
+                    @if($vendor->vendorSettings && $vendor->vendorSettings->business_name)
+                        <p class="vendor-business-name">{{ $vendor->vendorSettings->business_name }}</p>
+                    @endif
+                    @if($vendor->vendorSettings && $vendor->vendorSettings->business_description)
+                        <p class="vendor-description">{{ $vendor->vendorSettings->business_description }}</p>
                     @endif
                 </div>
+            </div>
+
+            <div class="vendor-stats">
+                <div class="stat-item">
+                    <span class="stat-number">{{ $stats['total_products'] }}</span>
+                    <span class="stat-label">Products</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">
+                        @if($vendor->vendorSettings && $vendor->vendorSettings->is_verified)
+                            <i class="fas fa-shield-alt"></i>
+                        @else
+                            <i class="fas fa-store"></i>
+                        @endif
+                    </span>
+                    <span class="stat-label">
+                        @if($vendor->vendorSettings && $vendor->vendorSettings->is_verified)
+                            Verified
+                        @else
+                            Seller
+                        @endif
+                    </span>
+                </div>
+                @if(isset($stats['total_sales']) && $stats['total_sales'] > 0)
+                    <div class="stat-item">
+                        <span class="stat-number">{{ $stats['total_sales'] }}</span>
+                        <span class="stat-label">Sales</span>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

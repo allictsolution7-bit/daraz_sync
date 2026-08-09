@@ -439,6 +439,10 @@
                 <i class="fas fa-chart-pie"></i> Dashboard
             </a>
 
+            <a class="vendor-sidebar-link {{ request()->routeIs('chats.index') ? 'active' : '' }}" href="{{ route('chats.index') }}">
+                <i class="fas fa-comments text-info"></i> Chats
+            </a>
+
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}" href="{{ route('vendor.products.index') }}">
                 <i class="fas fa-box"></i> Products
             </a>

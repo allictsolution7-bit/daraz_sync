@@ -3222,19 +3222,16 @@ if ($product->product_type === 'variable') {
                             </a>
                         @endif
                     </div>
-                    @php
-                        $whatsappNumber = null;
-                        if ($seller) {
-                            $whatsappNumber = ($seller->vendorSettings && $seller->vendorSettings->business_phone) ? $seller->vendorSettings->business_phone : $seller->phone;
-                        }
-                        if (!$whatsappNumber) {
-                            $whatsappNumber = setting('general', 'whatsapp_number');
-                        }
-                    @endphp
-                    @if (setting('general', 'show_whatsapp_button', '1') == '1' && $whatsappNumber)
-                    <a href="https://api.whatsapp.com/send?phone={{ $whatsappNumber }}" target="_blank" class="flex items-center gap-1 text-blue-600 font-bold text-xs hover:underline">
-                        <i class="fa-solid fa-comments"></i> Chat Now
-                    </a>
+                    @if ($seller)
+                        @auth
+                            <a href="{{ route('chats.start', $seller->id) }}" class="flex items-center gap-1 text-blue-600 font-bold text-xs hover:underline">
+                                <i class="fa-solid fa-comments"></i> Chat Now
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}?redirect={{ urlencode(url()->current()) }}" class="flex items-center gap-1 text-blue-600 font-bold text-xs hover:underline">
+                                <i class="fa-solid fa-comments"></i> Chat Now
+                            </a>
+                        @endauth
                     @endif
                 </div>
 

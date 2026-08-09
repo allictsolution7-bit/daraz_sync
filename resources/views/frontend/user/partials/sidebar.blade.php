@@ -68,6 +68,12 @@
             </a>
         </li>
         <li class="sidebar-menu-item">
+            <a href="{{ route('chats.index') }}" class="sidebar-menu-link {{ request()->is('chats*') ? 'active' : '' }}">
+                <i class="fa-solid fa-comments sidebar-menu-icon"></i>
+                <span>Chats</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
             <a href="{{ Route::has('cart.index') ? route('cart.index') : url('/cart') }}" class="sidebar-menu-link {{ request()->is('cart*') ? 'active' : '' }}">
                 <i class="fa-solid fa-cart-shopping sidebar-menu-icon"></i>
                 <span>Cart</span>

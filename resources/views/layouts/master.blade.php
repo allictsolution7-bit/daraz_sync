@@ -1167,6 +1167,15 @@
                         </li>
                         @endcan
 
+                        <li class="{{ request()->routeIs('chats.index') ? 'active' : '' }}">
+                            <a href="{{ route('chats.index') }}">
+                                <span class="menu-content">
+                                    <i class="fas fa-comments" style="color:#10b981;"></i>
+                                    Chats
+                                </span>
+                            </a>
+                        </li>
+
 
 
                         <!-- CORE SHOP SECTION -->

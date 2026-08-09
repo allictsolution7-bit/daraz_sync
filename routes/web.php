@@ -138,10 +138,8 @@ Route::get('/clear-cache', function () {
 Route::get('/', [OthersController::class, 'index'])->name("index");
 Route::get('/shop/{category?}/{sub_category?}/{third_category?}', [OthersController::class, 'shop'])->name("shop");
 
-// Vendor Store (Public) - only if MultiVendor module not enabled
-if (!module_enabled('MultiVendor')) {
-    Route::get('/store/{slug}', [VendorStoreController::class, 'show'])->name('vendor.store.show');
-}
+// Vendor Store (Public)
+Route::get('/store/{slug}', [VendorStoreController::class, 'show'])->name('vendor.store.show');
 
 // Public PDF Routes (accessible without admin login)
 // Uses POS module if enabled, otherwise falls back to default PDF service
@@ -973,4 +971,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:adm
         Route::post('/history/{id}/restore', [BackupHistoryController::class, 'restore'])->name('history.restore');
         Route::delete('/history/{id}', [BackupHistoryController::class, 'destroy'])->name('history.destroy');
     });
+});
+
+// Chat/Messaging System Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/chats', [App\Http\Controllers\Client\ChatController::class, 'index'])->name('chats.index');
+    Route::get('/chats/start/{seller}', [App\Http\Controllers\Client\ChatController::class, 'startChat'])->name('chats.start');
+    Route::get('/chats/{chatRoom}/messages', [App\Http\Controllers\Client\ChatController::class, 'getMessages'])->name('chats.messages');
+    Route::post('/chats/{chatRoom}/send', [App\Http\Controllers\Client\ChatController::class, 'sendMessage'])->name('chats.send');
 });
