@@ -39,7 +39,17 @@
         border: 1px solid #e2e8f0;
         border-radius: 16px;
         box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
-        overflow: hidden;
+        overflow: visible;
+    }
+
+    .v-card .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 0 0 16px 16px;
+    }
+
+    .v-card .table-responsive table {
+        min-width: 900px;
     }
 
     .v-card .card-header {

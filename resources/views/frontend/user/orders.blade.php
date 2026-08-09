@@ -83,6 +83,9 @@
         .badge-success { background-color: #dcfce7; color: #15803d; }
         .badge-warning { background-color: #fef3c7; color: #b45309; }
         .badge-info { background-color: #e0f2fe; color: #0369a1; }
+        .badge-paid { background-color: #dcfce7; color: #15803d; }
+        .badge-payment-pending { background-color: #fef3c7; color: #b45309; }
+        .badge-failed { background-color: #fee2e2; color: #dc2626; }
 
         .view-btn {
             display: inline-block;
@@ -156,7 +159,7 @@
                                 <tr>
                                     <th>Order ID</th>
                                     <th>Date</th>
-                                    <th>Status</th>
+                                    <th>Status / Payment</th>
                                     <th>Total</th>
                                     <th>Actions</th>
                                 </tr>
@@ -168,7 +171,15 @@
                                     <td>{{ $order->created_at->format('M d, Y') }}</td>
                                     <td>
                                         <span class="badge-status badge-{{ strtolower($order->status) == 'completed' || strtolower($order->status) == 'delivered' ? 'success' : (strtolower($order->status) == 'pending' ? 'warning' : 'info') }}">
-                                            {{ ucfirst($order->status ?? 'Pending') }}
+                                            {{ ucfirst(str_replace('_', ' ', $order->status ?? 'Pending')) }}
+                                        </span>
+                                        @php
+                                            $ps = strtolower($order->payment_status ?? 'pending');
+                                            $psBadge = $ps === 'paid' ? 'paid' : ($ps === 'failed' || $ps === 'refunded' ? 'failed' : 'payment-pending');
+                                            $psLabel = $ps === 'paid' ? 'Paid' : ($ps === 'failed' ? 'Failed' : ($ps === 'refunded' ? 'Refunded' : 'Pending'));
+                                        @endphp
+                                        <span class="badge-status badge-{{ $psBadge }}" style="margin-top: 4px; display: inline-block;">
+                                            {{ $psLabel }}
                                         </span>
                                     </td>
                                     <td><strong>৳{{ number_format($order->total ?? 0, 2) }}</strong></td>

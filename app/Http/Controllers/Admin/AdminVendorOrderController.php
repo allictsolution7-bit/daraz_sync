@@ -18,66 +18,13 @@ class AdminVendorOrderController extends Controller
      */
     public function getVendorOrdersQuery($user = null)
     {
-        $user = $user ?: Auth::user();
+        $vendorUserIds = User::role('vendor')->pluck('id')->toArray();
 
-        $isSuperAdmin = false;
-        if ($user) {
-            if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin'))) {
-                $isSuperAdmin = true;
-            } elseif ($user->is_super_admin ?? false) {
-                $isSuperAdmin = true;
-            }
-        }
-
-        if ($isSuperAdmin) {
-            // Super Admin sees all vendor items
-            return order::whereIn('id', function ($q) {
-                $q->select('order_id')
-                  ->from('order_items')
-                  ->where(function($sub) {
-                      $sub->whereNotNull('vendor_id')
-                          ->orWhereIn('product_id', function($pq) {
-                              $pq->select('id')
-                                 ->from('products')
-                                 ->whereNotNull('vendor_id')
-                                 ->orWhereNotNull('parent_product_id');
-                          });
-                  });
-            });
-        }
-
-        // Regular Admin: Vendors created by this admin OR products copied from this admin
-        $vendorIds = User::where('created_by', $user->id)->pluck('id')->toArray();
-        $adminProductIds = Product::where('created_by', $user->id)->pluck('id')->toArray();
-
-        if (empty($vendorIds) && empty($adminProductIds)) {
-            return order::whereRaw('1 = 0');
-        }
-
-        return order::whereHas('orderItems', function ($q) use ($vendorIds, $adminProductIds) {
-            $q->where(function ($subQ) use ($vendorIds, $adminProductIds) {
-                $hasCondition = false;
-
-                if (!empty($vendorIds)) {
-                    $subQ->whereIn('vendor_id', $vendorIds)
-                         ->orWhereHas('product', function ($pq) use ($vendorIds) {
-                             $pq->whereIn('vendor_id', $vendorIds);
-                         });
-                    $hasCondition = true;
-                }
-
-                if (!empty($adminProductIds)) {
-                    if ($hasCondition) {
-                        $subQ->orWhereHas('product', function ($pq) use ($adminProductIds) {
-                            $pq->whereIn('parent_product_id', $adminProductIds);
-                        });
-                    } else {
-                        $subQ->whereHas('product', function ($pq) use ($adminProductIds) {
-                            $pq->whereIn('parent_product_id', $adminProductIds);
-                        });
-                    }
-                }
-            });
+        // Return all orders containing items belonging to vendors
+        return order::whereIn('id', function ($q) use ($vendorUserIds) {
+            $q->select('order_id')
+              ->from('order_items')
+              ->whereIn('vendor_id', $vendorUserIds);
         });
     }
 

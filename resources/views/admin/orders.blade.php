@@ -2159,36 +2159,44 @@
                 var currentPaymentStatus = $(this).data('current-payment-status') || 'pending';
 
                 Swal.fire({
-                    title: 'Update Payment Status',
-                    text: 'Select new payment status:',
+                    title: '<span style="font-weight: 700; color: #1e293b;">Update Payment Status</span>',
+                    html: '<div style="font-size: 14px; color: #64748b; margin-bottom: 10px;">Choose the payment status for this order:</div>',
                     icon: 'question',
-                    input: 'select',
-                    inputOptions: {
-                        'pending': 'Pending',
-                        'paid': 'Full Paid'
-                    },
-                    inputValue: currentPaymentStatus,
                     showCancelButton: true,
-                    confirmButtonText: 'Update',
-                    confirmButtonColor: '#4f46e5',
+                    showDenyButton: true,
+                    confirmButtonText: '<i class="fas fa-check-circle me-1"></i> Full Paid',
+                    denyButtonText: '<i class="fas fa-clock me-1"></i> Pending',
                     cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#10b981', // Emerald green
+                    denyButtonColor: '#f59e0b', // Amber/Orange
+                    cancelButtonColor: '#94a3b8', // Slate grey
                     customClass: {
-                        popup: 'premium-swal-popup'
+                        popup: 'premium-swal-popup border-radius-12',
+                        confirmButton: 'btn fw-bold px-4 py-2 border-0 shadow-sm',
+                        denyButton: 'btn fw-bold px-4 py-2 border-0 shadow-sm',
+                        cancelButton: 'btn fw-semibold px-4 py-2 border-0 shadow-sm'
                     }
                 }).then((result) => {
+                    let newPaymentStatus = null;
                     if (result.isConfirmed) {
+                        newPaymentStatus = 'paid';
+                    } else if (result.isDenied) {
+                        newPaymentStatus = 'pending';
+                    }
+
+                    if (newPaymentStatus) {
                         $.ajax({
                             url: '{{ route('admin.orders.updatePaymentStatus') }}',
                             method: 'POST',
                             data: {
                                 _token: '{{ csrf_token() }}',
                                 order_id: orderId,
-                                payment_status: result.value
+                                payment_status: newPaymentStatus
                             },
                             success: function(response) {
                                 if (response.success) {
                                     Swal.fire({
-                                        title: 'Success!',
+                                        title: 'Updated!',
                                         text: response.message,
                                         icon: 'success',
                                         timer: 1500,

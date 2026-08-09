@@ -17,14 +17,36 @@ class VendorOrderController extends Controller
     {
         $vendor = auth()->user();
 
-        // Get order IDs that contain vendor's products
-        $orderIds = order_item::forVendor($vendor->id)
-            ->distinct('order_id')
-            ->pluck('order_id');
+        // Get order IDs that contain vendor's products (including copied reseller products)
+        $orderIds = order_item::where(function($q) use ($vendor) {
+            $q->where('vendor_id', $vendor->id)
+              ->orWhereIn('product_id', function($pq) use ($vendor) {
+                  $pq->select('id')
+                     ->from('products')
+                     ->whereIn('parent_product_id', function($ppq) use ($vendor) {
+                         $ppq->select('id')
+                             ->from('products')
+                             ->where('vendor_id', $vendor->id);
+                     });
+              });
+        })
+        ->distinct()
+        ->pluck('order_id');
 
         $query = order::whereIn('id', $orderIds)
             ->with(['customer', 'orderItems' => function ($query) use ($vendor) {
-                $query->forVendor($vendor->id);
+                $query->where(function($q) use ($vendor) {
+                    $q->where('vendor_id', $vendor->id)
+                      ->orWhereIn('product_id', function($pq) use ($vendor) {
+                          $pq->select('id')
+                             ->from('products')
+                             ->whereIn('parent_product_id', function($ppq) use ($vendor) {
+                                 $ppq->select('id')
+                                     ->from('products')
+                                     ->where('vendor_id', $vendor->id);
+                             });
+                      });
+                });
             }]);
 
         // Filter by status
@@ -56,7 +78,18 @@ class VendorOrderController extends Controller
 
         // Check if vendor has items in this order
         $vendorItems = $order->orderItems()
-            ->forVendor($vendor->id)
+            ->where(function($q) use ($vendor) {
+                $q->where('vendor_id', $vendor->id)
+                  ->orWhereIn('product_id', function($pq) use ($vendor) {
+                      $pq->select('id')
+                         ->from('products')
+                         ->whereIn('parent_product_id', function($ppq) use ($vendor) {
+                             $ppq->select('id')
+                                 ->from('products')
+                                 ->where('vendor_id', $vendor->id);
+                         });
+                  });
+            })
             ->get();
 
         if ($vendorItems->isEmpty()) {
@@ -94,7 +127,12 @@ class VendorOrderController extends Controller
         $totalCommission = $query->sum('vendor_commission_amount');
         $totalSales = $query->sum('sub_total');
         $paidEarnings = order_item::forVendor($vendor->id)
-            ->where('vendor_paid', true)
+            ->where(function($q) {
+                $q->where('vendor_paid', true)
+                  ->orWhereHas('order', function($q2) {
+                      $q2->where('payment_status', 'paid');
+                  });
+            })
             ->sum('vendor_earning');
 
         $stats = [
@@ -160,7 +198,12 @@ class VendorOrderController extends Controller
             ->sum('vendor_earning');
         $paidEarnings = order_item::where('vendor_id', $reseller->id)
             ->whereIn('order_id', $orderIds)
-            ->where('vendor_paid', true)
+            ->where(function($q) {
+                $q->where('vendor_paid', true)
+                  ->orWhereHas('order', function($q2) {
+                      $q2->where('payment_status', 'paid');
+                  });
+            })
             ->sum('vendor_earning');
 
         $orders = $query->latest()->paginate(20);
