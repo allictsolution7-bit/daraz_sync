@@ -22,13 +22,30 @@ class VendorStoreController extends Controller
                       ->where('is_active', true)
                       ->where('is_verified', true);
             })
-            ->firstOrFail();
+            ->first();
+
+        if (!$vendor) {
+            $vendor = User::with('vendorSettings')
+                ->where('id', $slug)
+                ->orWhere('name', 'like', str_replace('-', ' ', $slug))
+                ->firstOrFail();
+        }
+
+        // Base query for seller's products (approved vendor products OR admin products created by this user)
+        $vendorProductBaseQuery = function() use ($vendor) {
+            return Product::where(function($q) use ($vendor) {
+                $q->where(function($sub) use ($vendor) {
+                    $sub->where('vendor_id', $vendor->id)
+                        ->where('approval_status', 'approved');
+                })->orWhere(function($sub) use ($vendor) {
+                    $sub->whereNull('vendor_id')
+                        ->where('created_by', $vendor->id);
+                });
+            })->where('status', 1);
+        };
 
         // Get vendor's approved products
-        $query = Product::forVendor($vendor->id)
-            ->where('approval_status', 'approved')
-            ->where('status', 1)
-            ->with(['category', 'brand']);
+        $query = $vendorProductBaseQuery()->with(['category', 'brand']);
 
         // Category filter (checks both primary and additional categories)
         if ($request->has('category') && $request->category) {
@@ -64,9 +81,7 @@ class VendorStoreController extends Controller
         $products = $query->paginate(20);
 
         // Get vendor's categories (distinct from their products - includes additional categories)
-        $vendorCategoryIds = Product::forVendor($vendor->id)
-            ->where('approval_status', 'approved')
-            ->where('status', 1)
+        $vendorCategoryIds = $vendorProductBaseQuery()
             ->with(['category', 'additionalCategories'])
             ->get()
             ->flatMap(function($product) {
@@ -87,19 +102,16 @@ class VendorStoreController extends Controller
 
         // Get vendor stats
         $stats = [
-            'total_products' => Product::forVendor($vendor->id)
-                ->where('approval_status', 'approved')
-                ->where('status', 1)
-                ->count(),
+            'total_products' => $vendorProductBaseQuery()->count(),
             'total_reviews' => 0, // Can be enhanced later
             'rating' => 0, // Can be enhanced later
         ];
 
         // SEO Data
         $seoTitle = $vendor->name . ' - Vendor Store | ' . SettingsService::get('general', 'site_name', 'Thikana Shop');
-        $seoDescription = $vendor->vendorSettings->business_description ?? 'Shop products from ' . $vendor->name;
+        $seoDescription = ($vendor->vendorSettings && $vendor->vendorSettings->business_description) ? $vendor->vendorSettings->business_description : 'Shop products from ' . $vendor->name;
         $seoKeywords = $vendor->name . ', vendor, shop, products';
-        $seoImage = $vendor->vendorSettings->business_logo 
+        $seoImage = ($vendor->vendorSettings && $vendor->vendorSettings->business_logo) 
             ? asset('storage/' . $vendor->vendorSettings->business_logo) 
             : SettingsService::getDefaultOgImage();
 

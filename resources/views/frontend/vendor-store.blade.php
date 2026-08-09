@@ -537,7 +537,7 @@
         <div class="vendor-hero-content">
             <div class="vendor-info">
                 <div class="vendor-logo-container">
-                    @if($vendor->vendorSettings->business_logo)
+                    @if($vendor->vendorSettings && $vendor->vendorSettings->business_logo)
                         <img src="{{ asset('storage/' . $vendor->vendorSettings->business_logo) }}"
                              alt="{{ $vendor->name }}"
                              class="vendor-logo">
@@ -547,7 +547,7 @@
                              class="vendor-logo">
                     @endif
 
-                    @if($vendor->vendorSettings->is_verified)
+                    @if($vendor->vendorSettings && $vendor->vendorSettings->is_verified)
                         <div class="vendor-verified-badge">
                             <i class="fas fa-check"></i>
                         </div>
@@ -556,11 +556,11 @@
 
                 <h1 class="vendor-name">{{ $vendor->name }}</h1>
 
-                @if($vendor->vendorSettings->business_name)
+                @if($vendor->vendorSettings && $vendor->vendorSettings->business_name)
                     <p class="vendor-business-name">{{ $vendor->vendorSettings->business_name }}</p>
                 @endif
 
-                @if($vendor->vendorSettings->business_description)
+                @if($vendor->vendorSettings && $vendor->vendorSettings->business_description)
                     <p class="vendor-description">{{ $vendor->vendorSettings->business_description }}</p>
                 @endif
 
@@ -571,14 +571,14 @@
                     </div>
                     <div class="stat-item">
                         <span class="stat-number">
-                            @if($vendor->vendorSettings->is_verified)
+                            @if($vendor->vendorSettings && $vendor->vendorSettings->is_verified)
                                 <i class="fas fa-shield-alt"></i>
                             @else
                                 <i class="fas fa-store"></i>
                             @endif
                         </span>
                         <span class="stat-label">
-                            @if($vendor->vendorSettings->is_verified)
+                            @if($vendor->vendorSettings && $vendor->vendorSettings->is_verified)
                                 Verified
                             @else
                                 Seller
@@ -636,7 +636,7 @@
                             </a>
                         </span>
                     @endif
-                    <a href="{{ route('vendor.store.show', $vendor->id) }}" class="clear-filters-btn">
+                    <a href="{{ route('vendor.store.show', $vendor->vendorSettings ? $vendor->vendorSettings->store_slug : $vendor->id) }}" class="clear-filters-btn">
                         Clear All
                     </a>
                 @endif
@@ -743,7 +743,7 @@
                     @endif
                 </p>
                 @if(request()->hasAny(['search', 'category', 'sort']))
-                    <a href="{{ route('vendor.store.show', $vendor->id) }}" class="clear-filters-link">
+                    <a href="{{ route('vendor.store.show', $vendor->vendorSettings ? $vendor->vendorSettings->store_slug : $vendor->id) }}" class="clear-filters-link">
                         <i class="fas fa-times-circle"></i>
                         Clear All Filters
                     </a>

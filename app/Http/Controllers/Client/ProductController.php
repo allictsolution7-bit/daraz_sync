@@ -44,7 +44,9 @@ class ProductController extends Controller
                 'variationCombinations',
                 'additionalCategories',
                 'additionalSubCategories.category',
-                'thirdCategories.subCategory.category'
+                'thirdCategories.subCategory.category',
+                'vendor.vendorSettings',
+                'creator'
             ])
             ->firstOrFail();
         // Get all category IDs (primary + additional) for related products
@@ -104,6 +106,28 @@ class ProductController extends Controller
             'rating_distribution' => $product->rating_distribution,
         ];
 
+        // Get seller dynamic rating and review counts
+        $sellerReviewsCount = 0;
+        $sellerPositiveRating = 95; // Default fallback
+        $seller = $product->vendor ?: $product->creator;
+        
+        if ($seller) {
+            $sellerProductIds = Product::where('vendor_id', $seller->id)
+                ->orWhere('created_by', $seller->id)
+                ->pluck('id');
+            
+            // Get all active reviews for seller's products
+            $allSellerReviews = \App\Models\CustomerReview::whereIn('product_id', $sellerProductIds)
+                ->where('is_active', true)
+                ->get();
+                
+            $sellerReviewsCount = $allSellerReviews->count();
+            if ($sellerReviewsCount > 0) {
+                $positiveReviews = $allSellerReviews->where('rating', '>=', 4)->count();
+                $sellerPositiveRating = round(($positiveReviews / $sellerReviewsCount) * 100);
+            }
+        }
+
         // Check if product has combo offers
         $hasComboOffers = \App\Models\ComboOffer::where('product_id', $product->id)
             ->where('is_active', true)
@@ -158,7 +182,9 @@ class ProductController extends Controller
             'sliderCategories1',
             'SingleProductSliderCategories',
             'variationCombinationsData',
-            'hasComboOffers'
+            'hasComboOffers',
+            'sellerReviewsCount',
+            'sellerPositiveRating'
         ), $seoData));
     }
 

@@ -13,7 +13,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class ResellerOrderController extends Controller
 {
-    protected function getResellerOrdersQuery()
+    public function getResellerOrdersQuery()
     {
         $admin = Auth::user();
         $isSuperAdmin = $admin && method_exists($admin, 'hasRole') &&

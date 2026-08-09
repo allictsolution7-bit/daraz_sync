@@ -3199,16 +3199,40 @@ if ($product->product_type === 'variable') {
             </div>
 
             {{-- Right Column: Seller Details (Compact) --}}
+            @php
+                $seller = $product->vendor ?: $product->creator;
+            @endphp
             <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between space-y-1.5 text-xs text-slate-700">
                 <div class="flex items-center justify-between">
                     <div>
                         <div class="text-[10px] text-slate-400 font-medium leading-none">Sold by</div>
-                        <div class="text-slate-900 font-bold text-xs mt-0.5 hover:text-blue-600 cursor-pointer">
-                            {{ $product->shop_name ?? setting('general', 'site_title', 'Hollyland Bangladesh') }}
-                        </div>
+                        @if($seller)
+                            @if($seller->vendorSettings && $seller->vendorSettings->store_slug)
+                                <a href="{{ route('vendor.store.show', $seller->vendorSettings->store_slug) }}" class="text-slate-900 font-bold text-xs mt-0.5 hover:text-blue-600 cursor-pointer block">
+                                    {{ $seller->vendorSettings->business_name ?? $seller->name }}
+                                </a>
+                            @else
+                                <a href="{{ route('vendor.store.show', $seller->id) }}" class="text-slate-900 font-bold text-xs mt-0.5 hover:text-blue-600 cursor-pointer block">
+                                    {{ $seller->name }}
+                                </a>
+                            @endif
+                        @else
+                            <a href="{{ route('shop') }}" class="text-slate-900 font-bold text-xs mt-0.5 hover:text-blue-600 cursor-pointer block">
+                                {{ setting('general', 'site_title', 'Hollyland Bangladesh') }}
+                            </a>
+                        @endif
                     </div>
-                    @if (setting('general', 'show_whatsapp_button', '1') == '1')
-                    <a href="https://api.whatsapp.com/send?phone={{ setting('general', 'whatsapp_number') }}" target="_blank" class="flex items-center gap-1 text-blue-600 font-bold text-xs hover:underline">
+                    @php
+                        $whatsappNumber = null;
+                        if ($seller) {
+                            $whatsappNumber = ($seller->vendorSettings && $seller->vendorSettings->business_phone) ? $seller->vendorSettings->business_phone : $seller->phone;
+                        }
+                        if (!$whatsappNumber) {
+                            $whatsappNumber = setting('general', 'whatsapp_number');
+                        }
+                    @endphp
+                    @if (setting('general', 'show_whatsapp_button', '1') == '1' && $whatsappNumber)
+                    <a href="https://api.whatsapp.com/send?phone={{ $whatsappNumber }}" target="_blank" class="flex items-center gap-1 text-blue-600 font-bold text-xs hover:underline">
                         <i class="fa-solid fa-comments"></i> Chat Now
                     </a>
                     @endif
@@ -3217,7 +3241,9 @@ if ($product->product_type === 'variable') {
                 <div class="grid grid-cols-3 gap-1 border-t border-slate-200 pt-1.5 text-center">
                     <div>
                         <div class="text-[9px] text-slate-400 leading-tight">Positive Seller Ratings</div>
-                        <div class="text-sm font-bold text-slate-800 mt-0.5">93%</div>
+                        <div class="text-sm font-bold text-slate-800 mt-0.5">
+                            {{ $seller ? $sellerPositiveRating . '%' : '98%' }}
+                        </div>
                     </div>
                     <div class="border-x border-slate-200 px-0.5">
                         <div class="text-[9px] text-slate-400 leading-tight">Ship on Time</div>
@@ -3225,14 +3251,28 @@ if ($product->product_type === 'variable') {
                     </div>
                     <div>
                         <div class="text-[9px] text-slate-400 leading-tight">Chat Response Rate</div>
-                        <div class="text-[10px] text-slate-400 mt-1">Not enough data</div>
+                        <div class="text-[10px] text-slate-400 mt-1">
+                            {{ $seller ? ($seller->vendorSettings ? 'Not enough data' : '99%') : '99%' }}
+                        </div>
                     </div>
                 </div>
 
                 <div class="text-center border-t border-slate-200 pt-1.5">
-                    <a href="{{ url('/') }}" class="text-blue-600 font-bold text-xs hover:underline uppercase tracking-wide">
-                        GO TO STORE
-                    </a>
+                    @if($seller)
+                        @if($seller->vendorSettings && $seller->vendorSettings->store_slug)
+                            <a href="{{ route('vendor.store.show', $seller->vendorSettings->store_slug) }}" class="text-blue-600 font-bold text-xs hover:underline uppercase tracking-wide">
+                                GO TO STORE
+                            </a>
+                        @else
+                            <a href="{{ route('vendor.store.show', $seller->id) }}" class="text-blue-600 font-bold text-xs hover:underline uppercase tracking-wide">
+                                GO TO STORE
+                            </a>
+                        @endif
+                    @else
+                        <a href="{{ route('shop') }}" class="text-blue-600 font-bold text-xs hover:underline uppercase tracking-wide">
+                            GO TO STORE
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
