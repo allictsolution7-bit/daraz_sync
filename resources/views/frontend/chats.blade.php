@@ -1,5 +1,9 @@
 @extends('frontend.app')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('new/user.styles.css') }}">
+@endsection
+
 @section('content')
 <style>
     /* Chat System Layout styling */
@@ -240,8 +244,12 @@
     }
 </style>
 
-<div class="base-container">
-    <div class="chat-wrapper">
+<div class="base-container profile-container">
+    <div class="profile-layout">
+        <!-- Sidebar Menu -->
+        @include('frontend.user.partials.sidebar')
+
+        <div class="chat-wrapper" style="margin: 0; width: 100%;">
         <!-- Sidebar: Conversations List -->
         <div class="chat-sidebar">
             <div class="chat-sidebar-header d-flex justify-content-between align-items-center">
@@ -327,6 +335,7 @@
                 </div>
             @endif
         </div>
+    </div>
     </div>
 </div>
 
