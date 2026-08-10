@@ -48,6 +48,10 @@ class VendorGlobalSetting extends Model
     {
         $setting = self::where('key', $key)->first();
 
+        if (is_array($value) || is_object($value)) {
+            $value = json_encode($value);
+        }
+
         if ($setting) {
             $setting->update(['value' => $value]);
         } else {

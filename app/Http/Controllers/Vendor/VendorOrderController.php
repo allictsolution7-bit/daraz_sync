@@ -54,6 +54,45 @@ class VendorOrderController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Filter by Courier Status
+        if ($courierStatus = $request->get('courier_status')) {
+            if ($courierStatus === 'steadfast_sent') {
+                $query->where('delivery_data->courier_provider', 'steadfast');
+            } elseif ($courierStatus === 'steadfast_not_sent') {
+                $query->where(function ($q) {
+                    $q->whereNull('delivery_data->courier_provider')
+                      ->orWhere('delivery_data->courier_provider', '!=', 'steadfast');
+                });
+            }
+        }
+
+        // Filter by Order Type
+        if ($orderType = $request->get('order_type')) {
+            if ($orderType === 'combo') {
+                $query->where('is_combo_order', true);
+            } elseif ($orderType === 'regular') {
+                $query->where(function ($q) {
+                    $q->whereNull('is_combo_order')->orWhere('is_combo_order', false);
+                });
+            }
+        }
+
+        // Filter by Amount range
+        if ($minAmount = $request->get('min_amount')) {
+            $query->where('total', '>=', (float) $minAmount);
+        }
+        if ($maxAmount = $request->get('max_amount')) {
+            $query->where('total', '<=', (float) $maxAmount);
+        }
+
+        // Filter by Date range
+        if ($dateFrom = $request->get('date_from')) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+        if ($dateTo = $request->get('date_to')) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
         // Search by order ID or customer
         if ($request->has('search') && $request->search) {
             $query->where(function ($q) use ($request) {

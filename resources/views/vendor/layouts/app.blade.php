@@ -493,8 +493,8 @@
                 $vRecentOrders = \App\Models\order::whereIn('id', $vOrderIds)->with(['customer'])->latest()->take(5)->get();
             @endphp
 
-            @can('vendor.orders.view')
-            <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('vendor.orders.*') ? 'active' : '' }}" href="{{ route('vendor.orders.index') }}">
+            @if(auth()->user()->can('vendor.orders.view') || auth()->user()->hasRole('vendor') || auth()->user()->hasRole('wholeseller') || auth()->user()->hasRole('reseller'))
+            <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('vendor.orders.index') || request()->routeIs('vendor.orders.show') ? 'active' : '' }}" href="{{ route('vendor.orders.index') }}">
                 <span class="d-flex align-items-center gap-2">
                     <i class="fas fa-shopping-cart"></i> Orders
                 </span>
@@ -502,7 +502,10 @@
                     <span class="badge bg-warning text-dark font-weight-bold px-2 py-1 rounded-pill" style="font-size: 0.72rem;">{{ $vTotalOrders }}</span>
                 @endif
             </a>
-            @endcan
+            <a class="vendor-sidebar-link d-flex align-items-center gap-2 {{ request()->routeIs('vendor.orders.earnings') ? 'active' : '' }}" href="{{ route('vendor.orders.earnings') }}">
+                <i class="fas fa-chart-line text-success"></i> Earnings
+            </a>
+            @endif
 
             @if(auth()->user()?->vendorSettings?->is_consignment && (auth()->user()->can('vendor.balance.view') || auth()->user()->can('vendor.withdrawals.create')))
             <div class="vendor-nav-header">Finance & Wallet</div>

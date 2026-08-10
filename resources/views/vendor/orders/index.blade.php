@@ -169,7 +169,7 @@
     <div class="v-card mb-4">
         <div class="card-body p-4">
             <form action="{{ route('vendor.orders.index') }}" method="GET" class="row g-3">
-                <div class="col-lg-5 col-md-6">
+                <div class="col-lg-4 col-md-6">
                     <label class="form-label font-weight-bold text-dark fs-8 text-uppercase mb-1">Search Orders</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light text-muted border-end-0" style="border-radius: 10px 0 0 10px; border: 1.5px solid #e2e8f0;">
@@ -184,10 +184,10 @@
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-3">
-                    <label class="form-label font-weight-bold text-dark fs-8 text-uppercase mb-1">Filter Status</label>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label font-weight-bold text-dark fs-8 text-uppercase mb-1">Order Status</label>
                     <select name="status" class="form-select">
-                        <option value="all">All Order Statuses</option>
+                        <option value="all">All Status</option>
                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="processing" {{ request('status') === 'processing' ? 'selected' : '' }}>Processing</option>
                         <option value="shipped" {{ request('status') === 'shipped' ? 'selected' : '' }}>Shipped</option>
@@ -196,13 +196,57 @@
                     </select>
                 </div>
 
-                <div class="col-lg-4 col-md-3 d-flex align-items-end gap-2">
+                <div class="col-lg-5 col-md-12 d-flex align-items-end gap-2">
                     <button type="submit" class="btn btn-primary flex-grow-1 rounded-3 font-weight-bold" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); border: none; height: 42px;">
-                        <i class="fas fa-filter me-1"></i> Filter
+                        <i class="fas fa-filter me-1"></i> Apply Filters
                     </button>
-                    <a href="{{ route('vendor.orders.index') }}" class="btn btn-outline-secondary rounded-3 font-weight-bold d-inline-flex align-items-center justify-content-center" style="height: 42px; width: 42px;">
+                    <button type="button" id="btn-toggle-advanced" class="btn btn-outline-secondary rounded-3 font-weight-bold d-inline-flex align-items-center gap-1.5" style="height: 42px; white-space: nowrap;">
+                        <i class="fas fa-sliders-h"></i> Advanced Filters
+                    </button>
+                    <a href="{{ route('vendor.orders.index') }}" class="btn btn-outline-danger rounded-3 font-weight-bold d-inline-flex align-items-center justify-content-center" style="height: 42px; width: 42px;" title="Reset Filters">
                         <i class="fas fa-undo"></i>
                     </a>
+                </div>
+
+                <!-- Advanced Filters Collapsible Section -->
+                @php
+                    $hasAdvancedFilters = request('courier_status') || request('order_type') || request('min_amount') || request('max_amount') || request('date_from') || request('date_to');
+                @endphp
+                <div class="col-12 {{ $hasAdvancedFilters ? '' : 'd-none' }}" id="advanced-filters-section">
+                    <div class="p-3 bg-light rounded-3 border mt-2 row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label font-weight-bold text-dark fs-8 text-uppercase mb-1">Courier Status</label>
+                            <select name="courier_status" class="form-select bg-white">
+                                <option value="">All Orders</option>
+                                <option value="steadfast_sent" {{ request('courier_status') === 'steadfast_sent' ? 'selected' : '' }}>Steadfast Sent</option>
+                                <option value="steadfast_not_sent" {{ request('courier_status') === 'steadfast_not_sent' ? 'selected' : '' }}>Steadfast Not Sent</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label font-weight-bold text-dark fs-8 text-uppercase mb-1">Order Type</label>
+                            <select name="order_type" class="form-select bg-white">
+                                <option value="">All Types</option>
+                                <option value="combo" {{ request('order_type') === 'combo' ? 'selected' : '' }}>Combo Orders</option>
+                                <option value="regular" {{ request('order_type') === 'regular' ? 'selected' : '' }}>Regular Orders</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-sm-6">
+                            <label class="form-label font-weight-bold text-dark fs-8 text-uppercase mb-1">Min Amount</label>
+                            <input type="number" name="min_amount" class="form-control bg-white" placeholder="Min Amount" value="{{ request('min_amount') }}" min="0">
+                        </div>
+                        <div class="col-md-2 col-sm-6">
+                            <label class="form-label font-weight-bold text-dark fs-8 text-uppercase mb-1">Max Amount</label>
+                            <input type="number" name="max_amount" class="form-control bg-white" placeholder="Max Amount" value="{{ request('max_amount') }}" min="0">
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <label class="form-label font-weight-bold text-dark fs-8 text-uppercase mb-1">Date From</label>
+                            <input type="date" name="date_from" class="form-control bg-white" value="{{ request('date_from') }}">
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <label class="form-label font-weight-bold text-dark fs-8 text-uppercase mb-1">Date To</label>
+                            <input type="date" name="date_to" class="form-control bg-white" value="{{ request('date_to') }}">
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -336,3 +380,18 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('btn-toggle-advanced');
+        const advancedSection = document.getElementById('advanced-filters-section');
+        
+        if (toggleBtn && advancedSection) {
+            toggleBtn.addEventListener('click', function() {
+                advancedSection.classList.toggle('d-none');
+            });
+        }
+    });
+</script>
+@endpush

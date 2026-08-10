@@ -189,6 +189,24 @@ class Product extends Model
         return $seo;
     }
 
+    public function getProductTypeAttribute($value)
+    {
+        if ($value === 'variable') {
+            if ($this->relationLoaded('variationCombinations')) {
+                if ($this->variationCombinations->count() === 0) {
+                    return 'simple';
+                }
+            } else {
+                if ($this->variationCombinations()->count() === 0) {
+                    return 'simple';
+                }
+            }
+        }
+        return $value;
+    }
+
+
+
     public function variations()
     {
         return $this->hasMany(Variation::class);

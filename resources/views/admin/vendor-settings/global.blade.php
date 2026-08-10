@@ -119,34 +119,7 @@
         </div>
     @endif
 
-    <!-- System Status Toggle Banner -->
-    <div class="vp-card">
-        <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h5 class="font-weight-bold text-dark mb-1">
-                    <i class="fas fa-power-off text-primary me-2"></i> Multi-Vendor Module Engine Status
-                </h5>
-                <p class="text-muted small mb-0">Enable or disable multi-partner vendor store functionality across the website platform</p>
-            </div>
-            <form action="{{ route('admin.vendor-settings.toggle-system') }}" method="POST">
-                @csrf
-                <div class="form-check form-switch d-flex align-items-center gap-2">
-                    <input 
-                        class="form-check-input" 
-                        type="checkbox" 
-                        name="enabled" 
-                        value="1"
-                        {{ $vendorSettings['system']['vendor_system_enabled']['value'] ? 'checked' : '' }}
-                        onchange="if(confirm('Are you sure you want to toggle the multi-seller engine?')) this.form.submit(); else this.checked = !this.checked;"
-                        style="width: 3.2rem; height: 1.7rem;"
-                    >
-                    <span class="badge bg-{{ $vendorSettings['system']['vendor_system_enabled']['value'] ? 'success' : 'danger' }} rounded-pill px-3 py-2 font-weight-bold">
-                        {{ $vendorSettings['system']['vendor_system_enabled']['value'] ? 'MODULE ACTIVE' : 'MODULE DISABLED' }}
-                    </span>
-                </div>
-            </form>
-        </div>
-    </div>
+
 
     <!-- Configuration Form -->
     <form action="{{ route('admin.vendor-settings.global.update') }}" method="POST">
@@ -164,6 +137,9 @@
                     <div class="card-body p-4">
                         <div class="row g-3">
                             @foreach($vendorSettings['commission'] ?? [] as $setting)
+                                @if($setting['key'] === 'commission_by_category' || $setting['key'] === 'commission_by_role' || $setting['key'] === 'commission_calculation_method')
+                                    @continue
+                                @endif
                                 <div class="col-md-6">
                                     <label>{{ $setting['label'] }}</label>
                                     <input 
@@ -176,6 +152,139 @@
                                     <small class="text-muted d-block mt-1">{{ $setting['description'] }}</small>
                                 </div>
                             @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commission Mode Selector -->
+                <div class="vp-card">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <i class="fas fa-toggle-on text-primary"></i>
+                        <h5>Active Commission Strategy</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted small mb-3">Select the active calculation strategy. The system will use the enabled method automatically. (Note: Product-specific approved commission rates still override these defaults).</p>
+                        @php
+                            $activeMethod = $vendorSettings['commission']['commission_calculation_method']['value'] ?? 'category';
+                        @endphp
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="settings[commission_calculation_method]" id="calc_category" value="category" {{ $activeMethod === 'category' ? 'checked' : '' }}>
+                                <label class="form-check-label fw-bold text-dark" for="calc_category" style="text-transform: none; font-size:13px; cursor:pointer;">
+                                    Product Category Based
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="settings[commission_calculation_method]" id="calc_role" value="role" {{ $activeMethod === 'role' ? 'checked' : '' }}>
+                                <label class="form-check-label fw-bold text-dark" for="calc_role" style="text-transform: none; font-size:13px; cursor:pointer;">
+                                    Partner Role Based
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commission by Product Category -->
+                <div class="vp-card">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <i class="fas fa-tags text-primary"></i>
+                        <h5>Commission by Product Category</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted small mb-3">Set custom commission rate percentages for specific product categories. If left blank or empty, category calculation falls back to role or global commission defaults.</p>
+                        @php
+                            $catCommissions = $vendorSettings['commission']['commission_by_category']['value'] ?? [];
+                            if (is_string($catCommissions)) {
+                                $catCommissions = json_decode($catCommissions, true) ?? [];
+                            }
+                        @endphp
+                        <div class="row g-3" style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+                            @foreach($categories as $category)
+                                <div class="col-md-6">
+                                    <label class="text-secondary" style="font-size:11px; text-transform:none;">{{ $category->name }} (%)</label>
+                                    <input 
+                                        type="number" 
+                                        step="0.01" 
+                                        min="0" 
+                                        max="100" 
+                                        name="settings[commission_by_category][{{ $category->id }}]" 
+                                        class="form-control" 
+                                        value="{{ $catCommissions[$category->id] ?? '' }}"
+                                        placeholder="Use default"
+                                    >
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commission by Partner Role -->
+                <div class="vp-card">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <i class="fas fa-users-cog text-primary"></i>
+                        <h5>Commission by Partner Role</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted small mb-3">Set default commission rate percentages for partners based on their account role or business type.</p>
+                        @php
+                            $roleCommissions = $vendorSettings['commission']['commission_by_role']['value'] ?? [];
+                            if (is_string($roleCommissions)) {
+                                $roleCommissions = json_decode($roleCommissions, true) ?? [];
+                            }
+                        @endphp
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="text-secondary" style="font-size:11px; text-transform:none;">Retailer Commission (%)</label>
+                                <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    min="0" 
+                                    max="100" 
+                                    name="settings[commission_by_role][retailer]" 
+                                    class="form-control" 
+                                    value="{{ $roleCommissions['retailer'] ?? '15.00' }}"
+                                    required
+                                >
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary" style="font-size:11px; text-transform:none;">Wholeseller Commission (%)</label>
+                                <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    min="0" 
+                                    max="100" 
+                                    name="settings[commission_by_role][wholeseller]" 
+                                    class="form-control" 
+                                    value="{{ $roleCommissions['wholeseller'] ?? '10.00' }}"
+                                    required
+                                >
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary" style="font-size:11px; text-transform:none;">Reseller Commission (%)</label>
+                                <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    min="0" 
+                                    max="100" 
+                                    name="settings[commission_by_role][reseller]" 
+                                    class="form-control" 
+                                    value="{{ $roleCommissions['reseller'] ?? '5.00' }}"
+                                    required
+                                >
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-secondary" style="font-size:11px; text-transform:none;">General Vendor Commission (%)</label>
+                                <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    min="0" 
+                                    max="100" 
+                                    name="settings[commission_by_role][vendor]" 
+                                    class="form-control" 
+                                    value="{{ $roleCommissions['vendor'] ?? '15.00' }}"
+                                    required
+                                >
+                            </div>
                         </div>
                     </div>
                 </div>

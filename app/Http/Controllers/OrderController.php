@@ -191,7 +191,8 @@ class OrderController extends Controller
     public function data(Request $request)
     {
         $query = order::with([
-            'order_items.product',
+            'order_items.product.vendor.vendorSettings',
+            'order_items.vendor.vendorSettings',
             'order_items.variationCombination',
             'comboOffer', // needed for combo order title (no extra query per row)
             'fraudCheckResult',
@@ -340,6 +341,20 @@ class OrderController extends Controller
                         if ($pills) {
                             $html .= '<div class="prod-pills">'.implode('', $pills).'</div>';
                         }
+                        
+                        // Vendor/Seller Name and Store Name
+                        $vendor = $item->vendor ?? ($item->product ? $item->product->vendor : null);
+                        if ($vendor) {
+                            $storeName = $vendor->vendorSettings ? $vendor->vendorSettings->business_name : null;
+                            $sellerText = $vendor->name;
+                            if ($storeName) {
+                                $sellerText .= ' (' . $storeName . ')';
+                            }
+                            $html .= '<div style="font-size: 11px; color: #d97706; margin-top: 4px; font-weight: 500;"><i class="fas fa-store me-1"></i>Seller: ' . e($sellerText) . '</div>';
+                        } else {
+                            $html .= '<div style="font-size: 11px; color: #64748b; margin-top: 4px; font-weight: 500;"><i class="fas fa-user-shield me-1"></i>Seller: Admin</div>';
+                        }
+
                         $html .= '</div>';
                     }
                     $extra = $items->count() - 2;

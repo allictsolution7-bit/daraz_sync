@@ -8,14 +8,12 @@ use Illuminate\Http\Request;
 
 class VendorGlobalSettingsController extends Controller
 {
-    /**
-     * Display vendor global settings page
-     */
     public function index()
     {
         $vendorSettings = VendorGlobalSetting::getAll();
+        $categories = \App\Models\ProductCategory::where('status', 1)->orderBy('name', 'asc')->get();
         
-        return view('admin.vendor-settings.global', compact('vendorSettings'));
+        return view('admin.vendor-settings.global', compact('vendorSettings', 'categories'));
     }
 
     /**
