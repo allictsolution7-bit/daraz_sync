@@ -282,7 +282,8 @@ class VendorPOSController extends Controller
                         'city' => $request->customer_city ?? '',
                         'upazila' => '',
                         'password' => bcrypt($generatedPassword),
-                        'otp_verified' => true
+                        'otp_verified' => true,
+                        'created_by' => $reseller->id
                     ]);
                     
                     // Assign customer role if Spatie role package is used or role column exists

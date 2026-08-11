@@ -872,6 +872,9 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(
         Route::post('/create-order', [\App\Http\Controllers\Vendor\VendorPOSController::class, 'createOrder'])->name('create-order');
     });
 
+    // Customers Route for reseller
+    Route::get('/customers', [\App\Http\Controllers\Vendor\VendorCustomerController::class, 'index'])->name('customers.index');
+
     // Products
     Route::get('/products/subcategories/{categoryId}', [VendorProductController::class, 'getSubcategories'])->name('products.subcategories');
     Route::get('/products/thirdcategories/{subCategoryId}', [VendorProductController::class, 'getThirdcategories'])->name('products.thirdcategories');

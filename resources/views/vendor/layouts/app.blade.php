@@ -483,6 +483,9 @@
                     <span class="badge bg-warning text-dark rounded-pill" style="font-size:0.65rem;">{{ $resellerPosOrderCount }}</span>
                 @endif
             </a>
+            <a class="vendor-sidebar-link {{ request()->routeIs('vendor.customers.*') ? 'active' : '' }}" href="{{ route('vendor.customers.index') }}">
+                <i class="fas fa-users text-info"></i> Customers
+            </a>
             @endif
 
             @php

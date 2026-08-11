@@ -80,23 +80,23 @@
         }
 
         .status-open {
-            background-color: #dbeafe;
-            color: #1e40af;
+            background-color: #dbeafe !important;
+            color: #1e40af !important;
         }
 
         .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
+            background-color: #fef3c7 !important;
+            color: #92400e !important;
         }
 
         .status-resolved {
-            background-color: #d1fae5;
-            color: #065f46;
+            background-color: #d1fae5 !important;
+            color: #065f46 !important;
         }
 
         .status-closed {
-            background-color: #f1f5f9;
-            color: #475569;
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
         }
 
         .badge-priority {
@@ -108,18 +108,18 @@
         }
 
         .priority-low {
-            background-color: #f1f5f9;
-            color: #475569;
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
         }
 
         .priority-medium {
-            background-color: #e0f2fe;
-            color: #0369a1;
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
         }
 
         .priority-high {
-            background-color: #fee2e2;
-            color: #b91c1c;
+            background-color: #fee2e2 !important;
+            color: #b91c1c !important;
         }
 
         .ticket-table {

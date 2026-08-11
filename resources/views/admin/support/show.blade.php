@@ -22,21 +22,21 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(226, 232, 240, 0.8);
-            border-radius: 20px;
+            border-radius: 12px;
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
-            margin-bottom: 2.5rem;
-            padding: 2.5rem;
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
         }
 
         .btn-back {
             background-color: #f1f5f9;
             color: #475569;
             border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -61,23 +61,23 @@
         }
 
         .status-open {
-            background-color: #dbeafe;
-            color: #1e40af;
+            background-color: #dbeafe !important;
+            color: #1e40af !important;
         }
 
         .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
+            background-color: #fef3c7 !important;
+            color: #92400e !important;
         }
 
         .status-resolved {
-            background-color: #d1fae5;
-            color: #065f46;
+            background-color: #d1fae5 !important;
+            color: #065f46 !important;
         }
 
         .status-closed {
-            background-color: #f1f5f9;
-            color: #475569;
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
         }
 
         .badge-priority {
@@ -89,18 +89,18 @@
         }
 
         .priority-low {
-            background-color: #f1f5f9;
-            color: #475569;
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
         }
 
         .priority-medium {
-            background-color: #e0f2fe;
-            color: #0369a1;
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
         }
 
         .priority-high {
-            background-color: #fee2e2;
-            color: #b91c1c;
+            background-color: #fee2e2 !important;
+            color: #b91c1c !important;
         }
 
         /* Message Thread Styles */
@@ -114,8 +114,8 @@
 
         .message-bubble {
             display: flex;
-            gap: 15px;
-            padding: 20px;
+            gap: 12px;
+            padding: 12px 16px;
             border-radius: 12px;
             max-width: 85%;
         }
@@ -162,7 +162,7 @@
         }
 
         .message-content {
-            font-size: 14.5px;
+            font-size: 13.5px;
             color: #334155;
             line-height: 1.6;
             white-space: pre-wrap;
@@ -171,15 +171,15 @@
         /* Reply Box Styles */
         .reply-box {
             border-top: 1px solid #e2e8f0;
-            padding-top: 25px;
+            padding-top: 15px;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 16px;
+            padding: 8px 12px;
             border: 1px solid rgba(226, 232, 240, 1);
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 13px;
             box-sizing: border-box;
             transition: all 0.3s ease;
         }
@@ -194,9 +194,9 @@
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -243,8 +243,8 @@
         <!-- Main Ticket Details and Conversation Thread -->
         <div class="col-lg-8 col-md-12">
             <div class="premium-card">
-                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 10px;">
-                    <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;">{{ $ticket->subject }}</h2>
+                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 10px;">
+                    <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">{{ $ticket->subject }}</h2>
                     <span style="font-size: 13px; color: #64748b; font-weight: 500;">
                         Category: <strong style="color: #475569;">{{ $ticket->category }}</strong> &bull; 
                         Customer: <strong style="color: #475569;">{{ $ticket->user->name }} ({{ $ticket->user->email }})</strong> &bull;
@@ -286,7 +286,7 @@
 
                 <!-- Reply Form -->
                 <div class="reply-box">
-                    <h4 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 15px;">Send a Reply</h4>
+                    <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 12px;">Send a Reply</h4>
                     <form action="{{ route('admin.support-tickets.reply', $ticket->id) }}" method="POST">
                         @csrf
                         <div class="form-group mb-3">
@@ -319,7 +319,7 @@
         <!-- Quick Info and Settings Side Pane -->
         <div class="col-lg-4 col-md-12">
             <div class="premium-card">
-                <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 20px;">Ticket Settings</h3>
+                <h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 15px;">Ticket Settings</h3>
                 
                 <div class="mb-4">
                     <div style="font-size: 13px; color: #64748b; margin-bottom: 6px; font-weight: 600;">Current Status</div>
@@ -354,14 +354,14 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn w-100 btn-primary shadow-sm py-2 fw-bold" style="background-color: #4f46e5; border: none; border-radius: 10px;">
+                    <button type="submit" class="btn w-100 btn-primary shadow-sm py-2 fw-bold" style="background-color: #4f46e5; border: none; border-radius: 8px; font-size: 13px;">
                         Update Settings
                     </button>
                 </form>
             </div>
 
             <div class="premium-card">
-                <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 15px;">Customer Profile</h3>
+                <h3 style="font-size: 14px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 12px;">Customer Profile</h3>
                 <div style="font-size: 14px;">
                     <div class="mb-2"><strong>Name:</strong> {{ $ticket->user->name }}</div>
                     <div class="mb-2"><strong>Email:</strong> {{ $ticket->user->email }}</div>
