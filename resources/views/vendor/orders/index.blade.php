@@ -325,13 +325,22 @@
                                 </td>
                                 <td>
                                     @if($vendorEarning > 0)
+                                        @php
+                                            $allPaid = $vendorItems->where('vendor_paid', false)->count() === 0;
+                                            $badgeClass = $allPaid ? 'paid' : 'unpaid';
+                                            $badgeText = $allPaid ? 'Paid' : 'Unpaid';
+                                        @endphp
                                         <div class="d-flex align-items-center gap-1.5">
                                             <span class="fs-6 font-weight-extrabold text-success px-2 py-0.5 rounded" style="background: #f0fdf4;">৳{{ number_format($vendorEarning, 2) }}</span>
-                                            @if($vendorItems->where('vendor_paid', true)->count() > 0)
-                                                <span class="badge-earning paid">Paid</span>
-                                            @else
-                                                <span class="badge-earning unpaid">Unpaid</span>
-                                            @endif
+                                            <button type="button" 
+                                                    class="btn-badge-payment badge-earning {{ $badgeClass }} border-0" 
+                                                    style="cursor: pointer; transition: transform 0.15s ease;"
+                                                    data-order-id="{{ $order->id }}"
+                                                    data-current-status="{{ $allPaid ? 'paid' : 'unpaid' }}"
+                                                    data-order-number="#{{ $order->invoice_no ?? $order->order_number ?? $order->id }}"
+                                                    title="Click to change payment status">
+                                                {{ $badgeText }}
+                                            </button>
                                         </div>
                                     @else
                                         <span class="text-muted">-</span>
@@ -379,6 +388,43 @@
         </div>
     </div>
 </div>
+
+<!-- Payment Status Update Modal -->
+<div class="modal fade" id="paymentStatusModal" tabindex="-1" aria-labelledby="paymentStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title font-weight-bold text-dark" id="paymentStatusModalLabel">Update Payment Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-4 py-3">
+                <p class="text-muted">You are updating the payment status for order <strong id="modal-order-number" class="text-dark"></strong>.</p>
+                <div class="p-3 bg-light rounded-3 mb-3 border">
+                    <span class="small text-muted d-block mb-2 text-uppercase font-weight-bold" style="letter-spacing: 0.5px;">Select Payment Status</span>
+                    <div class="d-flex gap-3">
+                        <div class="form-check flex-grow-1 p-0">
+                            <input class="btn-check" type="radio" name="modal_payment_status" id="status_paid" value="paid">
+                            <label class="btn btn-outline-success w-100 py-2.5 font-weight-bold rounded-3" for="status_paid">
+                                <i class="fas fa-check-circle me-1.5"></i> Mark Paid
+                            </label>
+                        </div>
+                        <div class="form-check flex-grow-1 p-0">
+                            <input class="btn-check" type="radio" name="modal_payment_status" id="status_unpaid" value="unpaid">
+                            <label class="btn btn-outline-warning w-100 py-2.5 font-weight-bold rounded-3" for="status_unpaid">
+                                <i class="fas fa-clock me-1.5"></i> Mark Unpaid
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-warning mb-0"><i class="fas fa-triangle-exclamation me-1.5"></i> Note: This action will automatically credit or reverse earnings in your wallet balance.</p>
+            </div>
+            <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                <button type="button" class="btn btn-light rounded-3 px-3 py-2 font-weight-bold" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="btn-save-payment-status" class="btn btn-primary rounded-3 px-4 py-2 font-weight-bold" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); border: none;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -390,6 +436,85 @@
         if (toggleBtn && advancedSection) {
             toggleBtn.addEventListener('click', function() {
                 advancedSection.classList.toggle('d-none');
+            });
+        }
+
+        // Payment Status Update functionality
+        const paymentButtons = document.querySelectorAll('.btn-badge-payment');
+        const paymentModalElement = document.getElementById('paymentStatusModal');
+        let paymentModalInstance = null;
+        if (paymentModalElement) {
+            paymentModalInstance = new bootstrap.Modal(paymentModalElement);
+        }
+
+        let selectedOrderId = null;
+
+        paymentButtons.forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+            });
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+
+            btn.addEventListener('click', function() {
+                selectedOrderId = this.getAttribute('data-order-id');
+                const currentStatus = this.getAttribute('data-current-status');
+                const orderNumber = this.getAttribute('data-order-number');
+
+                document.getElementById('modal-order-number').textContent = orderNumber;
+
+                if (currentStatus === 'paid') {
+                    document.getElementById('status_paid').checked = true;
+                } else {
+                    document.getElementById('status_unpaid').checked = true;
+                }
+
+                if (paymentModalInstance) {
+                    paymentModalInstance.show();
+                }
+            });
+        });
+
+        const saveBtn = document.getElementById('btn-save-payment-status');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function() {
+                const statusInput = document.querySelector('input[name="modal_payment_status"]:checked');
+                if (!statusInput || !selectedOrderId) return;
+
+                const selectedStatus = statusInput.value;
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
+                fetch(`/vendor/orders/${selectedOrderId}/toggle-payment-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        payment_status: selectedStatus
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (paymentModalInstance) paymentModalInstance.hide();
+                        // Show native alert or reload
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Something went wrong.');
+                        this.disabled = false;
+                        this.innerHTML = 'Save Changes';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('An error occurred. Please try again.');
+                    this.disabled = false;
+                    this.innerHTML = 'Save Changes';
+                });
             });
         }
     });

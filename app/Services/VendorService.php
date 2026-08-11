@@ -449,58 +449,53 @@ class VendorService
 
     public function calculateProductCommission(Product $product): float
     {
-        // 1. If vendor proposed commission and it's set, use that
+        // 1. If product-specific custom commission is set, use that first
         if ($product->vendor_commission_rate !== null) {
             return $product->vendor_commission_rate;
         }
 
-        // Get configured calculation method (default: category)
-        $method = \App\Models\VendorGlobalSetting::get('commission_calculation_method', 'category');
-
-        if ($method === 'category') {
-            // 2. Check category-wise commission rate
-            if ($product->category_id) {
-                $categoryCommissions = \App\Models\VendorGlobalSetting::get('commission_by_category', []);
-                if (is_array($categoryCommissions) && isset($categoryCommissions[$product->category_id])) {
-                    $rate = $categoryCommissions[$product->category_id];
-                    if ($rate !== null && $rate !== '') {
-                        return floatval($rate);
-                    }
-                }
-            }
-        } else {
-            // 3. Check role/type-wise commission rate
-            if ($product->vendor_id) {
-                $vendor = \App\Models\User::find($product->vendor_id);
-                if ($vendor) {
-                    $vendorSettings = VendorSetting::where('vendor_id', $vendor->id)->first();
-                    $vendorType = $vendorSettings?->additional_config['vendor_type'] ?? null;
-                    
-                    $commissionByRole = \App\Models\VendorGlobalSetting::get('commission_by_role', []);
-                    if (is_array($commissionByRole)) {
-                        if ($vendor->hasRole('reseller') && isset($commissionByRole['reseller'])) {
-                            return floatval($commissionByRole['reseller']);
-                        }
-                        if (($vendor->hasRole('wholeseller') || $vendorType === 'wholeseller') && isset($commissionByRole['wholeseller'])) {
-                            return floatval($commissionByRole['wholeseller']);
-                        }
-                        if ($vendorType === 'retailer' && isset($commissionByRole['retailer'])) {
-                            return floatval($commissionByRole['retailer']);
-                        }
-                        if ($vendor->hasRole('vendor') && isset($commissionByRole['vendor'])) {
-                            return floatval($commissionByRole['vendor']);
-                        }
-                    }
-
-                    // 4. Otherwise, use vendor's default commission
-                    if ($vendorSettings && $vendorSettings->default_commission_rate !== null) {
-                        return $vendorSettings->getDefaultCommissionRate();
-                    }
+        // 2. Check category-wise commission rate
+        if ($product->category_id) {
+            $categoryCommissions = \App\Models\VendorGlobalSetting::get('commission_by_category', []);
+            if (is_array($categoryCommissions) && isset($categoryCommissions[$product->category_id])) {
+                $rate = $categoryCommissions[$product->category_id];
+                if ($rate !== null && $rate !== '') {
+                    return floatval($rate);
                 }
             }
         }
 
-        // 5. Global default commission
+        // 3. Check role/type-wise commission rate (if no category rate was found)
+        if ($product->vendor_id) {
+            $vendor = \App\Models\User::find($product->vendor_id);
+            if ($vendor) {
+                $vendorSettings = VendorSetting::where('vendor_id', $vendor->id)->first();
+                $vendorType = $vendorSettings?->additional_config['vendor_type'] ?? null;
+                
+                $commissionByRole = \App\Models\VendorGlobalSetting::get('commission_by_role', []);
+                if (is_array($commissionByRole)) {
+                    if ($vendor->hasRole('reseller') && isset($commissionByRole['reseller'])) {
+                        return floatval($commissionByRole['reseller']);
+                    }
+                    if (($vendor->hasRole('wholeseller') || $vendorType === 'wholeseller') && isset($commissionByRole['wholeseller'])) {
+                        return floatval($commissionByRole['wholeseller']);
+                    }
+                    if ($vendorType === 'retailer' && isset($commissionByRole['retailer'])) {
+                        return floatval($commissionByRole['retailer']);
+                    }
+                    if ($vendor->hasRole('vendor') && isset($commissionByRole['vendor'])) {
+                        return floatval($commissionByRole['vendor']);
+                    }
+                }
+
+                // 4. Fallback to vendor's individual default commission
+                if ($vendorSettings && $vendorSettings->default_commission_rate !== null) {
+                    return $vendorSettings->getDefaultCommissionRate();
+                }
+            }
+        }
+
+        // 5. Global default commission fallback
         return \App\Models\VendorGlobalSetting::getGlobalCommissionRate();
     }
 

@@ -13,6 +13,7 @@ use App\Services\StockManagementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class VendorPOSController extends Controller
 {
@@ -269,8 +270,10 @@ class VendorPOSController extends Controller
 
             return DB::transaction(function () use ($request, $reseller) {
                 // Find or create customer
+                $generatedPassword = null;
                 $customer = User::where('phone', $request->customer_phone)->first();
                 if (!$customer) {
+                    $generatedPassword = Str::random(8);
                     $customer = User::create([
                         'name' => $request->customer_name,
                         'phone' => $request->customer_phone,
@@ -278,9 +281,19 @@ class VendorPOSController extends Controller
                         'address' => $request->customer_address ?? '',
                         'city' => $request->customer_city ?? '',
                         'upazila' => '',
-                        'password' => bcrypt('password'),
+                        'password' => bcrypt($generatedPassword),
                         'otp_verified' => true
                     ]);
+                    
+                    // Assign customer role if Spatie role package is used or role column exists
+                    try {
+                        $customer->assignRole('user');
+                    } catch (\Exception $e) {
+                        // ignore if role configuration differs
+                    }
+
+                    // Log details to php system error log (console) for future SMS integration
+                    error_log("NEW USER CREATED VIA POS - Name: {$customer->name}, Phone: {$customer->phone}, Password: {$generatedPassword}");
                 }
 
                 // Verify stock availability

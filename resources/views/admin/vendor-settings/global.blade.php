@@ -156,33 +156,7 @@
                     </div>
                 </div>
 
-                <!-- Commission Mode Selector -->
-                <div class="vp-card">
-                    <div class="card-header d-flex align-items-center gap-2">
-                        <i class="fas fa-toggle-on text-primary"></i>
-                        <h5>Active Commission Strategy</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <p class="text-muted small mb-3">Select the active calculation strategy. The system will use the enabled method automatically. (Note: Product-specific approved commission rates still override these defaults).</p>
-                        @php
-                            $activeMethod = $vendorSettings['commission']['commission_calculation_method']['value'] ?? 'category';
-                        @endphp
-                        <div class="d-flex align-items-center gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="settings[commission_calculation_method]" id="calc_category" value="category" {{ $activeMethod === 'category' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-bold text-dark" for="calc_category" style="text-transform: none; font-size:13px; cursor:pointer;">
-                                    Product Category Based
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="settings[commission_calculation_method]" id="calc_role" value="role" {{ $activeMethod === 'role' ? 'checked' : '' }}>
-                                <label class="form-check-label fw-bold text-dark" for="calc_role" style="text-transform: none; font-size:13px; cursor:pointer;">
-                                    Partner Role Based
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- Commission by Product Category -->
                 <div class="vp-card">

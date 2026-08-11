@@ -872,6 +872,7 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(
         Route::post('/my-pos-orders/{id}/update', [VendorOrderController::class, 'updateResellerOrder'])->name('reseller.update');
         Route::delete('/my-pos-orders/{id}/delete', [VendorOrderController::class, 'deleteResellerOrder'])->name('reseller.delete');
         Route::get('/{order}', [VendorOrderController::class, 'show'])->name('show');
+        Route::post('/{order}/toggle-payment-status', [VendorOrderController::class, 'togglePaymentStatus'])->name('toggle-payment-status');
         Route::get('/earnings/summary', [VendorOrderController::class, 'earnings'])->name('earnings');
     });
 

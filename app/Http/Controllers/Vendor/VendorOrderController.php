@@ -350,5 +350,110 @@ class VendorOrderController extends Controller
 
         return redirect()->route('vendor.orders.reseller')->with('success', 'Order deleted successfully and stock restored.');
     }
+
+    /**
+     * Toggle payment status for the items belonging to the vendor in this order
+     */
+    public function togglePaymentStatus(Request $request, order $order)
+    {
+        $vendor = auth()->user();
+        $targetStatus = $request->input('payment_status'); // 'paid' or 'unpaid'
+
+        if (!in_array($targetStatus, ['paid', 'unpaid'])) {
+            return response()->json(['success' => false, 'message' => 'Invalid payment status option.'], 400);
+        }
+
+        // Get the order items belonging to this vendor
+        $vendorItems = $order->orderItems()
+            ->where(function($q) use ($vendor) {
+                $q->where('vendor_id', $vendor->id)
+                  ->orWhereIn('product_id', function($pq) use ($vendor) {
+                      $pq->select('id')
+                         ->from('products')
+                         ->whereIn('parent_product_id', function($ppq) use ($vendor) {
+                             $ppq->select('id')
+                                 ->from('products')
+                                 ->where('vendor_id', $vendor->id);
+                         });
+                  });
+            })
+            ->get();
+
+        if ($vendorItems->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'No matching items found for this vendor in the order.'], 403);
+        }
+
+        try {
+            DB::transaction(function () use ($vendorItems, $targetStatus, $order, $vendor) {
+                $vendorService = app(\App\Services\VendorService::class);
+
+                foreach ($vendorItems as $item) {
+                    if ($targetStatus === 'paid') {
+                        if (!$item->vendor_paid) {
+                            $item->update([
+                                'vendor_paid' => true,
+                                'vendor_paid_at' => now(),
+                            ]);
+
+                            // Credit vendor wallet/ledger if earning is positive
+                            if ($item->vendor_earning > 0) {
+                                $vendorService->creditVendorEarning($item);
+                            }
+                        }
+                    } else { // unpaid
+                        if ($item->vendor_paid) {
+                            $item->update([
+                                'vendor_paid' => false,
+                                'vendor_paid_at' => null,
+                            ]);
+
+                            // Deduct from vendor wallet/ledger
+                            if ($item->vendor_earning > 0) {
+                                // Decrement user wallet balance
+                                $vendorUser = \App\Models\User::find($item->vendor_id);
+                                if ($vendorUser) {
+                                    $vendorUser->decrement('wallet_balance', $item->vendor_earning);
+                                }
+
+                                // Create a ledger entry for adjustment/reversal
+                                $currentBalance = $vendorService->calculateBalance($item->vendor_id);
+                                $newBalance = $currentBalance - $item->vendor_earning;
+
+                                \App\Models\VendorBalanceLedger::create([
+                                    'vendor_id' => $item->vendor_id,
+                                    'transaction_type' => 'withdrawal', // acts as a debit
+                                    'amount' => $item->vendor_earning,
+                                    'balance_after' => $newBalance,
+                                    'order_id' => $item->order_id,
+                                    'order_item_id' => $item->id,
+                                    'description' => "Earning reversal from Order #{$item->order_id} - {$item->product->title}",
+                                ]);
+
+                                // Log reversal transaction
+                                \App\Models\VendorWalletTransaction::create([
+                                    'vendor_id' => $item->vendor_id,
+                                    'type' => 'stock_purchase', // serves as debit
+                                    'amount' => $item->vendor_earning,
+                                    'status' => 'approved',
+                                    'admin_note' => "POS Order profit reversed (unpaid). Order #{$item->order_id}",
+                                    'is_seen' => true
+                                ]);
+                            }
+                        }
+                    }
+                }
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment status updated successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
 

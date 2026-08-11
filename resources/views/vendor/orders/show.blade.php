@@ -173,17 +173,17 @@
                     </span>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-modern align-middle">
+                    <div class="table-responsive w-100" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                        <table class="table table-modern align-middle" style="min-width: 700px; margin-bottom: 0;">
                             <thead>
                                 <tr>
-                                    <th style="min-width: 260px;">Product Info</th>
-                                    <th>Unit Price</th>
-                                    <th class="text-center">Qty</th>
-                                    <th>Subtotal</th>
-                                    <th>Commission</th>
-                                    <th>Your Earning</th>
-                                    <th class="text-center">Payout</th>
+                                    <th style="min-width: 180px; width: 30%;">Product Info</th>
+                                    <th style="width: 12%;">Unit Price</th>
+                                    <th class="text-center" style="width: 8%;">Qty</th>
+                                    <th style="width: 12%;">Subtotal</th>
+                                    <th style="width: 16%;">Commission</th>
+                                    <th style="width: 14%;">Your Earning</th>
+                                    <th class="text-center" style="width: 8%;">Payout</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -201,10 +201,10 @@
                                                     <i class="fas fa-image text-muted fs-5"></i>
                                                 </div>
                                             @endif
-                                            <div style="max-width: 260px;">
-                                                <span class="font-weight-bold text-dark d-block lh-sm mb-1" style="word-break: break-word;">{{ $prd->title ?? $item->product_name ?? 'Product Item' }}</span>
+                                            <div style="max-width: 220px;">
+                                                <span class="font-weight-bold text-dark d-block lh-sm mb-1" style="word-break: break-word; white-space: normal;">{{ $prd->title ?? $item->product_name ?? 'Product Item' }}</span>
                                                 @if($item->variationCombination)
-                                                    <span class="badge" style="color: #4f46e5; background: #eef2ff; font-weight: 700; font-size: 0.72rem;"><i class="fas fa-tag me-1"></i>{{ $item->variationCombination->name }}</span>
+                                                    <span class="badge" style="color: #4f46e5; background: #eef2ff; font-weight: 700; font-size: 0.72rem; white-space: normal; text-align: left; display: inline-block; word-break: break-word;"><i class="fas fa-tag me-1"></i>{{ $item->variationCombination->name }}</span>
                                                 @endif
                                             </div>
                                         </div>
