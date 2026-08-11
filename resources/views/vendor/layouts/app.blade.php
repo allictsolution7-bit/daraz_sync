@@ -439,7 +439,7 @@
                 <i class="fas fa-chart-pie"></i> Dashboard
             </a>
 
-            <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('chats.index') ? 'active' : '' }}" href="{{ route('chats.index') }}">
+            <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('vendor.chats.index') ? 'active' : '' }}" href="{{ route('vendor.chats.index') }}">
                 <span class="d-flex align-items-center gap-2">
                     <i class="fas fa-comments text-info"></i> Chats
                 </span>
@@ -652,7 +652,7 @@
                             ->count();
                     }
                 @endphp
-                <a href="{{ route('chats.index') }}" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center position-relative" style="width: 40px; height: 40px;" title="Chat Messages">
+                <a href="{{ route('vendor.chats.index') }}" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center position-relative" style="width: 40px; height: 40px;" title="Chat Messages">
                     <i class="fas fa-comments text-secondary"></i>
                     @if($unreadChatCount > 0)
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem; transform: translate(-30%, 10%) !important;">

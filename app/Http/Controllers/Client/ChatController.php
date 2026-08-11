@@ -87,6 +87,13 @@ class ChatController extends Controller
             }
         }
 
+        $routeName = $request->route() ? $request->route()->getName() : '';
+        if ($routeName === 'admin.chats.index') {
+            return view('admin.chats', compact('chatRooms', 'activeRoom'));
+        } elseif ($routeName === 'vendor.chats.index') {
+            return view('vendor.chats', compact('chatRooms', 'activeRoom'));
+        }
+
         return view('frontend.chats', compact('chatRooms', 'activeRoom'));
     }
 

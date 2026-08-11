@@ -535,7 +535,7 @@
                             </div>
 
                             @php
-                                $isCreator = ($product->created_by === auth()->id()) || ($product->vendor_id === auth()->id());
+                                $isCreator = ($product->created_by === auth()->id()) || ($product->vendor_id === auth()->id()) || (auth()->check() && (auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('super admin') || auth()->user()->hasRole('admin')));
                             @endphp
                             <div class="mb-4 form-check form-switch p-3 bg-light rounded border">
                                 <input class="form-check-input ms-0 me-2" type="checkbox" id="payAdvanceDelivery" name="pay_advance_delivery" value="1" {{ old('pay_advance_delivery', $product->pay_advance_delivery) ? 'checked' : '' }} {{ !$isCreator ? 'disabled' : '' }}>

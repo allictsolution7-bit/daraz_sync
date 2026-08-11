@@ -1305,7 +1305,7 @@ class ProductController extends Controller
             'return_period' => $request->input('return_period', 0),
         ];
 
-        $isCreator = ($product->created_by === auth()->id()) || ($product->vendor_id === auth()->id());
+        $isCreator = ($product->created_by === auth()->id()) || ($product->vendor_id === auth()->id()) || (auth()->check() && (auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('super admin') || auth()->user()->hasRole('admin')));
         if ($isCreator) {
             $productData['pay_advance_delivery'] = $request->has('pay_advance_delivery') ? 1 : 0;
         }

@@ -311,6 +311,9 @@ Route::get("/admin", function () {
 Route::post('/incomplete-order', [IncompleteOrderController::class, 'store'])->name('incomplete-order.store');
 
 Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'TrackInstallation'])->name('admin.')->group(function () {
+    // Chat System Route
+    Route::get('/chats', [App\Http\Controllers\Client\ChatController::class, 'index'])->name('chats.index');
+
     // Dashboard Routes
     Route::get('/dashboard', [AdminController::class, 'admin'])->name('dashboard');
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
@@ -857,6 +860,8 @@ Route::get('/api/mobile-subcategories/{categoryId}', [CategoryController::class,
 // VENDOR PANEL ROUTES
 // ==========================================
 Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(function () {
+    // Chat System Route
+    Route::get('/chats', [App\Http\Controllers\Client\ChatController::class, 'index'])->name('chats.index');
 
     // Dashboard
     Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');

@@ -831,7 +831,7 @@
                                     ->count();
                             }
                         @endphp
-                        <a href="{{ route('chats.index') }}" class="nav-link user position-relative" id="chatNavbarLink" title="Chat Messages">
+                        <a href="{{ route('admin.chats.index') }}" class="nav-link user position-relative" id="chatNavbarLink" title="Chat Messages">
                             <i class="fa-regular fa-comments" style="font-size: 20px; color: #10b981;"></i>
                             @if($unreadChatCount > 0)
                                 <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" style="font-size: 0.65rem;">{{ $unreadChatCount }}</span>
@@ -1252,8 +1252,8 @@
                         </li>
                         @endcan
 
-                        <li class="{{ request()->routeIs('chats.index') ? 'active' : '' }}">
-                            <a href="{{ route('chats.index') }}" class="d-flex align-items-center justify-content-between">
+                        <li class="{{ request()->routeIs('admin.chats.index') ? 'active' : '' }}">
+                            <a href="{{ route('admin.chats.index') }}" class="d-flex align-items-center justify-content-between">
                                 <span class="menu-content">
                                     <i class="fas fa-comments" style="color:#10b981;"></i>
                                     Chats
