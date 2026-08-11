@@ -256,7 +256,12 @@
                     <div class="d-flex align-items-center gap-3" style="min-width: 0; flex: 1;">
                         <img src="{{ $room->display_logo }}" alt="{{ $room->display_name }}" class="chat-avatar" style="flex-shrink: 0;">
                         <div class="chat-info" style="min-width: 0; flex: 1;">
-                            <div class="chat-name">{{ $room->display_name }}</div>
+                            <div class="chat-name">
+                                {{ $room->display_name }}
+                                @if($room->wholeseller_id)
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size: 0.6rem; vertical-align: middle;">WS</span>
+                                @endif
+                            </div>
                             <div class="chat-last-message">
                                 {{ $room->lastMessage ? $room->lastMessage->message : 'No messages yet' }}
                             </div>
@@ -292,6 +297,15 @@
                         <span class="text-xs text-success font-medium">Online Support</span>
                     </div>
                 </div>
+                @if($activeRoom->wholeseller_id && $activeRoom->wholeseller)
+                    <div class="p-2 px-4 border-bottom d-flex align-items-center justify-content-between" style="background-color: #fff3cd; color: #856404; font-size: 0.82rem; font-weight: 500;">
+                        <span>
+                            <i class="fa-solid fa-circle-info me-1"></i>
+                            Redirected from wholeseller: <strong>{{ $activeRoom->wholeseller->name }}</strong>
+                        </span>
+                        <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">Wholeseller Product Chat</span>
+                    </div>
+                @endif
 
                 <div class="chat-body" id="chatBody">
                     @forelse($activeRoom->messages as $msg)

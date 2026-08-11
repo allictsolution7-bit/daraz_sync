@@ -25,12 +25,36 @@ class ChatController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $routeName = $request->route() ? $request->route()->getName() : '';
 
-        // Get all chat rooms where the user is either the customer or the vendor
-        $chatRooms = ChatRoom::where('customer_id', $user->id)
-            ->orWhere('vendor_id', $user->id)
-            ->with(['customer.vendorSettings', 'vendor.vendorSettings', 'lastMessage'])
+        // Find the admin user
+        $admin = User::whereHas('roles', function($q) {
+            $q->whereIn('name', ['admin', 'super_admin', 'super admin']);
+        })->first() ?? User::where('id', 1)->first();
+
+        // If user is a vendor/wholeseller/reseller and we are in vendor panel
+        if ($routeName === 'vendor.chats.index' && $admin && $user->id !== $admin->id) {
+            // Find or create chat room with admin
+            ChatRoom::firstOrCreate([
+                'customer_id' => $user->id,
+                'vendor_id' => $admin->id
+            ]);
+
+            // Only get the chat room with the admin
+            $chatRooms = ChatRoom::where(function($q) use ($user, $admin) {
+                $q->where('customer_id', $user->id)->where('vendor_id', $admin->id);
+            })->orWhere(function($q) use ($user, $admin) {
+                $q->where('customer_id', $admin->id)->where('vendor_id', $user->id);
+            })
+            ->with(['customer.vendorSettings', 'vendor.vendorSettings', 'lastMessage', 'wholeseller'])
             ->get();
+        } else {
+            // Get all chat rooms where the user is either the customer or the vendor
+            $chatRooms = ChatRoom::where('customer_id', $user->id)
+                ->orWhere('vendor_id', $user->id)
+                ->with(['customer.vendorSettings', 'vendor.vendorSettings', 'lastMessage', 'wholeseller'])
+                ->get();
+        }
 
         // Format names/logos based on participant
         foreach ($chatRooms as $room) {
@@ -109,12 +133,34 @@ class ChatController extends Controller
             return redirect()->route('chats.index')->with('error', 'You cannot chat with yourself.');
         }
 
-        // Find or create chatroom
-        // Customer is the active user initiating, Vendor is the seller
-        $chatRoom = ChatRoom::firstOrCreate([
-            'customer_id' => $user->id,
-            'vendor_id' => $seller->id,
-        ]);
+        // Find the admin user
+        $admin = User::whereHas('roles', function($q) {
+            $q->whereIn('name', ['admin', 'super_admin', 'super admin']);
+        })->first() ?? User::where('id', 1)->first();
+
+        // Check if the seller is a wholeseller
+        if ($seller->hasRole('wholeseller')) {
+            if (!$admin) {
+                return redirect()->route('chats.index')->with('error', 'Support administrator not found.');
+            }
+            if ($user->id === $admin->id) {
+                return redirect()->route('chats.index')->with('error', 'You cannot chat with yourself.');
+            }
+
+            // Find or create chatroom with admin, with wholeseller_id reference
+            $chatRoom = ChatRoom::firstOrCreate([
+                'customer_id' => $user->id,
+                'vendor_id' => $admin->id,
+                'wholeseller_id' => $seller->id,
+            ]);
+        } else {
+            // Find or create regular chatroom
+            $chatRoom = ChatRoom::firstOrCreate([
+                'customer_id' => $user->id,
+                'vendor_id' => $seller->id,
+                'wholeseller_id' => null,
+            ]);
+        }
 
         return redirect()->route('chats.index', ['room' => $chatRoom->id]);
     }

@@ -68,7 +68,10 @@
             </a>
         </li>
         <li class="sidebar-menu-item">
-            <a href="{{ route('chats.index') }}" class="sidebar-menu-link d-flex align-items-center justify-content-between {{ request()->is('chats*') ? 'active' : '' }}">
+            @php
+                $chatsRoute = (auth()->check() && (auth()->user()->hasRole('vendor') || auth()->user()->hasRole('reseller') || auth()->user()->hasRole('wholeseller'))) ? route('vendor.chats.index') : route('chats.index');
+            @endphp
+            <a href="{{ $chatsRoute }}" class="sidebar-menu-link d-flex align-items-center justify-content-between {{ request()->is('chats*') || request()->is('vendor/chats*') ? 'active' : '' }}">
                 <span>
                     <i class="fa-solid fa-comments sidebar-menu-icon"></i>
                     <span>Chats</span>

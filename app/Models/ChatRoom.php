@@ -10,8 +10,17 @@ class ChatRoom extends Model
 {
     protected $fillable = [
         'customer_id',
-        'vendor_id'
+        'vendor_id',
+        'wholeseller_id'
     ];
+
+    /**
+     * Get the wholeseller associated with the redirected chat.
+     */
+    public function wholeseller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'wholeseller_id');
+    }
 
     /**
      * Get the customer participant of the chatroom.
