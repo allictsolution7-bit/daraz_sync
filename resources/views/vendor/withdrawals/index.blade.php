@@ -220,117 +220,127 @@
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    @php
-                        $currentBalance = $vendorService->getCurrentBalance(auth()->id());
-                        $minWithdrawal = $vendorSettings->getMinWithdrawalAmount();
-                        $canWithdraw = $currentBalance >= $minWithdrawal;
-                    @endphp
+                    @can('vendor.withdrawals.create')
+                        @php
+                            $currentBalance = $vendorService->getCurrentBalance(auth()->id());
+                            $minWithdrawal = $vendorSettings->getMinWithdrawalAmount();
+                            $canWithdraw = $currentBalance >= $minWithdrawal;
+                        @endphp
 
-                    @if($canWithdraw)
-                        <form action="{{ route('vendor.withdrawals.store') }}" method="POST">
-                            @csrf
-                            
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-dark fs-8 uppercase">Amount (৳) *</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light fw-bold">৳</span>
-                                    <input type="number" 
-                                           name="amount" 
-                                           class="form-control @error('amount') is-invalid @enderror" 
-                                           value="{{ old('amount') }}"
-                                           min="{{ $minWithdrawal }}"
-                                           max="{{ $currentBalance }}"
-                                           step="0.01"
-                                           placeholder="0.00"
-                                           required>
+                        @if($canWithdraw)
+                            <form action="{{ route('vendor.withdrawals.store') }}" method="POST">
+                                @csrf
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark fs-8 uppercase">Amount (৳) *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light fw-bold">৳</span>
+                                        <input type="number" 
+                                               name="amount" 
+                                               class="form-control @error('amount') is-invalid @enderror" 
+                                               value="{{ old('amount') }}"
+                                               min="{{ $minWithdrawal }}"
+                                               max="{{ $currentBalance }}"
+                                               step="0.01"
+                                               placeholder="0.00"
+                                               required>
+                                    </div>
+                                    @error('amount')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted d-block mt-1">
+                                        Min: ৳{{ number_format($minWithdrawal, 2) }} | Max: ৳{{ number_format($currentBalance, 2) }}
+                                    </small>
                                 </div>
-                                @error('amount')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted d-block mt-1">
-                                    Min: ৳{{ number_format($minWithdrawal, 2) }} | Max: ৳{{ number_format($currentBalance, 2) }}
-                                </small>
-                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-dark fs-8 uppercase">Payout Method *</label>
-                                <select name="payout_method" 
-                                        class="form-select @error('payout_method') is-invalid @enderror" required>
-                                    <option value="">Select Method</option>
-                                    <option value="bank" {{ old('payout_method', $vendorSettings->payout_method) == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
-                                    <option value="bkash" {{ old('payout_method', $vendorSettings->payout_method) == 'bkash' ? 'selected' : '' }}>bKash</option>
-                                    <option value="nagad" {{ old('payout_method', $vendorSettings->payout_method) == 'nagad' ? 'selected' : '' }}>Nagad</option>
-                                    <option value="rocket" {{ old('payout_method', $vendorSettings->payout_method) == 'rocket' ? 'selected' : '' }}>Rocket</option>
-                                </select>
-                                @error('payout_method')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark fs-8 uppercase">Payout Method *</label>
+                                    <select name="payout_method" 
+                                            class="form-select @error('payout_method') is-invalid @enderror" required>
+                                        <option value="">Select Method</option>
+                                        <option value="bank" {{ old('payout_method', $vendorSettings->payout_method) == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
+                                        <option value="bkash" {{ old('payout_method', $vendorSettings->payout_method) == 'bkash' ? 'selected' : '' }}>bKash</option>
+                                        <option value="nagad" {{ old('payout_method', $vendorSettings->payout_method) == 'nagad' ? 'selected' : '' }}>Nagad</option>
+                                        <option value="rocket" {{ old('payout_method', $vendorSettings->payout_method) == 'rocket' ? 'selected' : '' }}>Rocket</option>
+                                    </select>
+                                    @error('payout_method')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-dark fs-8 uppercase">Account / Mobile Number *</label>
-                                <input type="text" 
-                                       name="account_number" 
-                                       class="form-control @error('account_number') is-invalid @enderror" 
-                                       value="{{ old('account_number', $vendorSettings->payout_account_number) }}"
-                                       placeholder="Account number or wallet number" required>
-                                @error('account_number')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark fs-8 uppercase">Account / Mobile Number *</label>
+                                    <input type="text" 
+                                           name="account_number" 
+                                           class="form-control @error('account_number') is-invalid @enderror" 
+                                           value="{{ old('account_number', $vendorSettings->payout_account_number) }}"
+                                           placeholder="Account number or wallet number" required>
+                                    @error('account_number')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-dark fs-8 uppercase">Account Holder Name *</label>
-                                <input type="text" 
-                                       name="account_name" 
-                                       class="form-control @error('account_name') is-invalid @enderror" 
-                                       value="{{ old('account_name', $vendorSettings->payout_account_name) }}"
-                                       placeholder="Name on account" required>
-                                @error('account_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark fs-8 uppercase">Account Holder Name *</label>
+                                    <input type="text" 
+                                           name="account_name" 
+                                           class="form-control @error('account_name') is-invalid @enderror" 
+                                           value="{{ old('account_name', $vendorSettings->payout_account_name) }}"
+                                           placeholder="Name on account" required>
+                                    @error('account_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-dark fs-8 uppercase">Notes (Optional)</label>
-                                <textarea name="notes" 
-                                          class="form-control @error('notes') is-invalid @enderror" 
-                                          rows="2"
-                                          placeholder="Additional payout instructions">{{ old('notes') }}</textarea>
-                                @error('notes')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark fs-8 uppercase">Notes (Optional)</label>
+                                    <textarea name="notes" 
+                                              class="form-control @error('notes') is-invalid @enderror" 
+                                              rows="2"
+                                              placeholder="Additional payout instructions">{{ old('notes') }}</textarea>
+                                    @error('notes')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-                            <div class="alert alert-info border-0 shadow-sm rounded-3 p-3 mb-3" style="background: rgba(6, 182, 212, 0.1); color: #0891b2;">
-                                <div class="d-flex gap-2">
-                                    <i class="fas fa-info-circle fs-5 mt-1"></i>
-                                    <div class="fs-8">
-                                        <strong>Processing Time:</strong> 2-5 business days.<br>
-                                        <strong>Processing Fee:</strong> ৳0 (No charge)
+                                <div class="alert alert-info border-0 shadow-sm rounded-3 p-3 mb-3" style="background: rgba(6, 182, 212, 0.1); color: #0891b2;">
+                                    <div class="d-flex gap-2">
+                                        <i class="fas fa-info-circle fs-5 mt-1"></i>
+                                        <div class="fs-8">
+                                            <strong>Processing Time:</strong> 2-5 business days.<br>
+                                            <strong>Processing Fee:</strong> ৳0 (No charge)
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <button type="submit" class="btn btn-primary w-100 rounded-3 py-2.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none;">
-                                <i class="fas fa-paper-plane me-1"></i> Submit Request
-                            </button>
-                        </form>
+                                <button type="submit" class="btn btn-primary w-100 rounded-3 py-2.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none;">
+                                    <i class="fas fa-paper-plane me-1"></i> Submit Request
+                                </button>
+                            </form>
+                        @else
+                            <div class="text-center py-4">
+                                <div class="metric-icon-box pending mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.75rem;">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-2">Insufficient Balance</h5>
+                                <p class="text-muted small mb-3">
+                                    Minimum withdrawal threshold is <strong>৳{{ number_format($minWithdrawal, 2) }}</strong>.<br>
+                                    Your current balance: <strong>৳{{ number_format($currentBalance, 2) }}</strong>
+                                </p>
+                                <a href="{{ route('vendor.orders.index') }}" class="btn btn-outline-primary rounded-3 btn-sm fw-bold">
+                                    <i class="fas fa-box me-1"></i> View Orders
+                                </a>
+                            </div>
+                        @endif
                     @else
                         <div class="text-center py-4">
-                            <div class="metric-icon-box pending mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.75rem;">
-                                <i class="fas fa-exclamation-triangle"></i>
+                            <div class="mx-auto mb-3 text-muted" style="font-size: 2.5rem; text-align: center;">
+                                <i class="fas fa-lock"></i>
                             </div>
-                            <h5 class="fw-bold text-dark mb-2">Insufficient Balance</h5>
-                            <p class="text-muted small mb-3">
-                                Minimum withdrawal threshold is <strong>৳{{ number_format($minWithdrawal, 2) }}</strong>.<br>
-                                Your current balance: <strong>৳{{ number_format($currentBalance, 2) }}</strong>
-                            </p>
-                            <a href="{{ route('vendor.orders.index') }}" class="btn btn-outline-primary rounded-3 btn-sm fw-bold">
-                                <i class="fas fa-box me-1"></i> View Orders
-                            </a>
+                            <h6 class="fw-bold text-dark">Access Disabled</h6>
+                            <p class="text-muted small mb-0">You do not have permission to submit new withdrawal requests.</p>
                         </div>
-                    @endif
+                    @endcan
                 </div>
             </div>
 
@@ -449,6 +459,7 @@
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                     @if($withdrawal->status == 'pending')
+                                                        @can('vendor.withdrawals.cancel')
                                                         <form action="{{ route('vendor.withdrawals.cancel', $withdrawal) }}" 
                                                               method="POST" 
                                                               class="d-inline"
@@ -459,6 +470,7 @@
                                                                 <i class="fas fa-times"></i>
                                                             </button>
                                                         </form>
+                                                        @endcan
                                                     @endif
                                                 </div>
                                             </td>

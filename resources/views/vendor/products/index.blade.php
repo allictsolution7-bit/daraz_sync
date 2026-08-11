@@ -263,11 +263,11 @@
         @endif
     </div>
 
-    @if(!auth()->user()?->hasRole('reseller'))
+    @can('vendor.products.create')
     <a href="{{ route('vendor.products.create') }}" class="btn btn-gradient-primary px-3 py-2 text-decoration-none">
         <i class="fas fa-plus-circle me-1.5"></i> Add New Product
     </a>
-    @endif
+    @endcan
 </div>
 
 @if(session('warning'))
@@ -962,20 +962,24 @@
                                     </button>
                                 </div>
                             @elseif(($source ?? 'my_products') === 'admin_products')
-                                @if($isCopied)
-                                    <div class="d-inline-flex align-items-center gap-2 justify-content-end">
-                                        <span class="copied-badge-pill" title="Already Copied to Your Store">
-                                            <i class="fas fa-check-circle"></i> Already Copied
-                                        </span>
-                                        <button type="button" class="btn btn-gradient-blue btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}" onclick="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})" title="Get More Stock for this product">
-                                            <i class="fas fa-plus-circle"></i> Get More Stock
+                                @can('vendor.products.create')
+                                    @if($isCopied)
+                                        <div class="d-inline-flex align-items-center gap-2 justify-content-end">
+                                            <span class="copied-badge-pill" title="Already Copied to Your Store">
+                                                <i class="fas fa-check-circle"></i> Already Copied
+                                            </span>
+                                            <button type="button" class="btn btn-gradient-blue btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}" onclick="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})" title="Get More Stock for this product">
+                                                <i class="fas fa-plus-circle"></i> Get More Stock
+                                            </button>
+                                        </div>
+                                    @else
+                                        <button type="button" class="btn btn-gradient-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}" onclick="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
+                                            <i class="fas fa-copy me-1"></i> Copy to My Products
                                         </button>
-                                    </div>
+                                    @endif
                                 @else
-                                    <button type="button" class="btn btn-gradient-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#copyStockModal_{{ $product->id }}" onclick="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
-                                        <i class="fas fa-copy me-1"></i> Copy to My Products
-                                    </button>
-                                @endif
+                                    <span class="text-muted small">View Only</span>
+                                @endcan
 
                                     <!-- Modal for Stock Allocation & Purchase -->
                                     <div class="modal fade text-start" id="copyStockModal_{{ $product->id }}" tabindex="-1" aria-hidden="true">
@@ -1184,6 +1188,7 @@
                                             </div>
                                         @endif
 
+                                        @can('vendor.products.edit')
                                         <a href="{{ route('vendor.products.edit', $product) }}"
                                            title="Edit product"
                                            style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:0.8rem; font-weight:700; color:#1d4ed8; background:linear-gradient(135deg,#eff6ff,#dbeafe); border:1.5px solid #93c5fd; border-radius:10px; text-decoration:none; transition:all .2s;"
@@ -1191,7 +1196,9 @@
                                            onmouseout="this.style.background='linear-gradient(135deg,#eff6ff,#dbeafe)'">
                                             <i class="fas fa-pen-to-square"></i> Edit
                                         </a>
+                                        @endcan
 
+                                        @can('vendor.products.delete')
                                         <form action="{{ route('vendor.products.destroy', $product) }}" 
                                               method="POST" 
                                               class="d-inline"
@@ -1206,6 +1213,7 @@
                                                 <i class="fas fa-trash-can"></i>
                                             </button>
                                         </form>
+                                        @endcan
                                     </div>
                                 @endif
                             </td>
