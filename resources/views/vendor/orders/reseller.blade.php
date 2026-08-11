@@ -271,7 +271,7 @@
                             </button>
                         </form>
                     @endif
-                    <a href="/admin/pos/print-invoice/{{ $order->id }}" target="_blank" class="btn btn-sm btn-outline-secondary py-1 px-2">
+                    <a href="{{ route('order.print-invoice', $order->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-1 px-2">
                         <i class="fas fa-print"></i>
                     </a>
                 </div>

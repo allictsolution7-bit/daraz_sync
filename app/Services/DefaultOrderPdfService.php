@@ -176,15 +176,30 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
     /**
      * Get site settings for PDF
      */
-    protected function getSiteSettings(): array
+    protected function getSiteSettings(?order $order = null): array
     {
-        return [
+        $siteSettings = [
             'site_name' => SettingsService::getSiteName(),
             'contact_email' => SettingsService::getContactEmail(),
             'phone_number' => SettingsService::get('general', 'phone_number', '+8801779542054'),
             'address' => SettingsService::get('general', 'address', 'Dhaka, Bangladesh'),
             'website' => config('app.url', 'www.thikana.shop'),
         ];
+
+        if ($order && ($order->order_source === 'Reseller POS' || $order->order_items->contains(fn($item) => $item->vendor_id !== null))) {
+            $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? null;
+            if ($vendorId) {
+                $vendorSetting = \App\Models\VendorSetting::where('vendor_id', $vendorId)->first();
+                if ($vendorSetting) {
+                    $siteSettings['site_name'] = $vendorSetting->business_name ?: ($vendorSetting->vendor->name ?? $siteSettings['site_name']);
+                    $siteSettings['contact_email'] = $vendorSetting->business_email ?: ($vendorSetting->vendor->email ?? $siteSettings['contact_email']);
+                    $siteSettings['phone_number'] = $vendorSetting->business_phone ?: $siteSettings['phone_number'];
+                    $siteSettings['address'] = $vendorSetting->business_address ?: $siteSettings['address'];
+                }
+            }
+        }
+
+        return $siteSettings;
     }
 
     /**
@@ -192,7 +207,7 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
      */
     protected function generateReceiptHtml(order $order): string
     {
-        $settings = $this->getSiteSettings();
+        $settings = $this->getSiteSettings($order);
 
         $itemsHtml = '';
         foreach ($order->order_items as $item) {
@@ -259,7 +274,7 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
      */
     protected function generateInvoiceHtml(order $order): string
     {
-        $settings = $this->getSiteSettings();
+        $settings = $this->getSiteSettings($order);
 
         $itemsHtml = '';
         foreach ($order->order_items as $item) {
@@ -358,7 +373,7 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
      */
     protected function generatePackageSlipHtml(order $order): string
     {
-        $settings = $this->getSiteSettings();
+        $settings = $this->getSiteSettings($order);
 
         $itemsHtml = '';
         foreach ($order->order_items as $item) {
@@ -433,7 +448,7 @@ class DefaultOrderPdfService implements OrderPdfServiceInterface
      */
     protected function generateSteadfastInvoiceHtml(order $order): string
     {
-        $settings = $this->getSiteSettings();
+        $settings = $this->getSiteSettings($order);
         
         $deliveryData = $order->delivery_data ?? [];
         $consignmentId = $deliveryData['consignment_id'] 

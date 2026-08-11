@@ -240,10 +240,7 @@
                                             @endif
 
                                             @if(in_array(strtolower($order->status), ['pending', 'phone_not_rcv']))
-                                                <form action="{{ route('account.order.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');" style="margin: 0;">
-                                                    @csrf
-                                                    <button type="submit" class="cancel-btn">Cancel</button>
-                                                </form>
+                                                <button type="button" class="cancel-btn" onclick="document.getElementById('cancelOrderModal_{{ $order->id }}').style.display='flex';">Cancel</button>
                                             @endif
                                         </div>
                                     </td>
@@ -379,6 +376,34 @@
                     </form>
                 </div>
 
+            </div>
+        </div>
+    @endif
+
+    @if(in_array(strtolower($order->status), ['pending', 'phone_not_rcv']))
+        <!-- Cancel Order Modal -->
+        <div id="cancelOrderModal_{{ $order->id }}" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 99999; align-items: center; justify-content: center; padding: 15px; text-transform: none; text-align: left; color: #334155;">
+            <div style="background: #fff; width: 100%; max-width: 450px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); padding: 16px 24px; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 18px;"></i>
+                        <h5 style="margin: 0; font-weight: bold; font-size: 16px; color: #fff;">Cancel Order - #{{ $order->id }}</h5>
+                    </div>
+                    <button type="button" onclick="document.getElementById('cancelOrderModal_{{ $order->id }}').style.display='none';" style="background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+                </div>
+                <!-- Body -->
+                <div style="padding: 24px;">
+                    <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.5;">Are you sure you want to cancel this order? This action cannot be undone.</p>
+                </div>
+                <!-- Footer / Actions -->
+                <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" onclick="document.getElementById('cancelOrderModal_{{ $order->id }}').style.display='none';" style="background: #e2e8f0; border: none; color: #475569; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">No, Keep Order</button>
+                    <form action="{{ route('account.order.cancel', $order->id) }}" method="POST" style="margin: 0;">
+                        @csrf
+                        <button type="submit" style="background: #ef4444; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">Yes, Cancel Order</button>
+                    </form>
+                </div>
             </div>
         </div>
     @endif

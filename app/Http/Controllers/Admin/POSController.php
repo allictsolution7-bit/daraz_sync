@@ -545,13 +545,43 @@ class POSController extends Controller
     }
 
     /**
+     * Get site settings for POS PDFs, overriding with reseller store if applicable
+     */
+    protected function getSiteSettings($order): array
+    {
+        $siteSettings = [
+            'site_name' => SettingsService::getSiteName(),
+            'contact_email' => SettingsService::getContactEmail(),
+            'phone_number' => SettingsService::get('general', 'phone_number', '+8801779542054'),
+            'address' => SettingsService::get('general', 'address', 'Dhaka, Bangladesh'),
+            'website' => config('app.url', 'www.thikana.shop'),
+        ];
+
+        if ($order && ($order->order_source === 'Reseller POS' || $order->order_items->contains(fn($item) => $item->vendor_id !== null))) {
+            $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? null;
+            if ($vendorId) {
+                $vendorSetting = \App\Models\VendorSetting::where('vendor_id', $vendorId)->first();
+                if ($vendorSetting) {
+                    $siteSettings['site_name'] = $vendorSetting->business_name ?: ($vendorSetting->vendor->name ?? $siteSettings['site_name']);
+                    $siteSettings['contact_email'] = $vendorSetting->business_email ?: ($vendorSetting->vendor->email ?? $siteSettings['contact_email']);
+                    $siteSettings['phone_number'] = $vendorSetting->business_phone ?: $siteSettings['phone_number'];
+                    $siteSettings['address'] = $vendorSetting->business_address ?: $siteSettings['address'];
+                }
+            }
+        }
+
+        return $siteSettings;
+    }
+
+    /**
      * Print receipt PDF for an order
      */
     public function printReceipt($orderId)
     {
         try {
-            $order = Order::with(['order_items.product', 'order_items.variationCombination', 'user'])
-                          ->findOrFail($orderId);
+            $order = $orderId instanceof Order 
+                ? $orderId->load(['order_items.product', 'order_items.variationCombination', 'user'])
+                : Order::with(['order_items.product', 'order_items.variationCombination', 'user'])->findOrFail($orderId);
 
             // Create mPDF instance with Bangla font support
             $mpdf = new \Mpdf\Mpdf([
@@ -567,13 +597,7 @@ class POSController extends Controller
             ]);
 
             // Get site settings
-            $siteSettings = [
-                'site_name' => SettingsService::getSiteName(),
-                'contact_email' => SettingsService::getContactEmail(),
-                'phone_number' => SettingsService::get('general', 'phone_number', '+8801779542054'),
-                'address' => SettingsService::get('general', 'address', 'Dhaka, Bangladesh'),
-                'website' => config('app.url', 'www.thikana.shop'),
-            ];
+            $siteSettings = $this->getSiteSettings($order);
 
             // Get HTML content
             $html = view('admin.pos.pdf-receipt', compact('order', 'siteSettings'))->render();
@@ -597,8 +621,9 @@ class POSController extends Controller
     public function printInvoice($orderId)
     {
         try {
-            $order = Order::with(['order_items.product', 'order_items.variationCombination', 'user'])
-                          ->findOrFail($orderId);
+            $order = $orderId instanceof Order 
+                ? $orderId->load(['order_items.product', 'order_items.variationCombination', 'user'])
+                : Order::with(['order_items.product', 'order_items.variationCombination', 'user'])->findOrFail($orderId);
 
             // Create mPDF instance with Bangla font support
             $mpdf = new \Mpdf\Mpdf([
@@ -614,13 +639,7 @@ class POSController extends Controller
             ]);
 
             // Get site settings
-            $siteSettings = [
-                'site_name' => SettingsService::getSiteName(),
-                'contact_email' => SettingsService::getContactEmail(),
-                'phone_number' => SettingsService::get('general', 'phone_number', '+8801779542054'),
-                'address' => SettingsService::get('general', 'address', 'Dhaka, Bangladesh'),
-                'website' => config('app.url', 'www.thikana.shop'),
-            ];
+            $siteSettings = $this->getSiteSettings($order);
 
             // Get HTML content
             $html = view('admin.pos.pdf-invoices.pdf-invoice-v3', compact('order', 'siteSettings'))->render();
@@ -644,8 +663,9 @@ class POSController extends Controller
     public function downloadReceipt($orderId)
     {
         try {
-            $order = Order::with(['order_items.product', 'order_items.variationCombination', 'user'])
-                          ->findOrFail($orderId);
+            $order = $orderId instanceof Order 
+                ? $orderId->load(['order_items.product', 'order_items.variationCombination', 'user'])
+                : Order::with(['order_items.product', 'order_items.variationCombination', 'user'])->findOrFail($orderId);
 
             // Create mPDF instance with Bangla font support
             $mpdf = new \Mpdf\Mpdf([
@@ -661,13 +681,7 @@ class POSController extends Controller
             ]);
 
             // Get site settings
-            $siteSettings = [
-                'site_name' => SettingsService::getSiteName(),
-                'contact_email' => SettingsService::getContactEmail(),
-                'phone_number' => SettingsService::get('general', 'phone_number', '+8801779542054'),
-                'address' => SettingsService::get('general', 'address', 'Dhaka, Bangladesh'),
-                'website' => config('app.url', 'www.thikana.shop'),
-            ];
+            $siteSettings = $this->getSiteSettings($order);
 
             // Get HTML content
             $html = view('admin.pos.pdf-receipt', compact('order', 'siteSettings'))->render();
@@ -691,8 +705,9 @@ class POSController extends Controller
     public function downloadInvoice($orderId)
     {
         try {
-            $order = Order::with(['order_items.product', 'order_items.variationCombination', 'user'])
-                          ->findOrFail($orderId);
+            $order = $orderId instanceof Order 
+                ? $orderId->load(['order_items.product', 'order_items.variationCombination', 'user'])
+                : Order::with(['order_items.product', 'order_items.variationCombination', 'user'])->findOrFail($orderId);
 
             // Create mPDF instance with Bangla font support
             $mpdf = new \Mpdf\Mpdf([
@@ -708,13 +723,7 @@ class POSController extends Controller
             ]);
 
             // Get site settings
-            $siteSettings = [
-                'site_name' => SettingsService::getSiteName(),
-                'contact_email' => SettingsService::getContactEmail(),
-                'phone_number' => SettingsService::get('general', 'phone_number', '+8801779542054'),
-                'address' => SettingsService::get('general', 'address', 'Dhaka, Bangladesh'),
-                'website' => config('app.url', 'www.thikana.shop'),
-            ];
+            $siteSettings = $this->getSiteSettings($order);
 
             // Get HTML content
             $html = view('admin.pos.pdf-invoices.pdf-invoice-v3', compact('order', 'siteSettings'))->render();
@@ -738,8 +747,9 @@ class POSController extends Controller
     public function printPackageSlip($orderId)
     {
         try {
-            $order = Order::with(['order_items.product', 'order_items.variationCombination', 'user'])
-                          ->findOrFail($orderId);
+            $order = $orderId instanceof Order 
+                ? $orderId->load(['order_items.product', 'order_items.variationCombination', 'user'])
+                : Order::with(['order_items.product', 'order_items.variationCombination', 'user'])->findOrFail($orderId);
 
             // Create mPDF instance with Bangla font support
             $mpdf = new \Mpdf\Mpdf([
@@ -755,13 +765,7 @@ class POSController extends Controller
             ]);
 
             // Get site settings
-            $siteSettings = [
-                'site_name' => SettingsService::getSiteName(),
-                'contact_email' => SettingsService::getContactEmail(),
-                'phone_number' => SettingsService::get('general', 'phone_number', '+8801779542054'),
-                'address' => SettingsService::get('general', 'address', 'Dhaka, Bangladesh'),
-                'website' => config('app.url', 'www.thikana.shop'),
-            ];
+            $siteSettings = $this->getSiteSettings($order);
 
             // Get HTML content
             $html = view('admin.pos.pdf-package-slip', compact('order', 'siteSettings'))->render();
@@ -785,8 +789,9 @@ class POSController extends Controller
     public function downloadPackageSlip($orderId)
     {
         try {
-            $order = Order::with(['order_items.product', 'order_items.variationCombination', 'user'])
-                          ->findOrFail($orderId);
+            $order = $orderId instanceof Order 
+                ? $orderId->load(['order_items.product', 'order_items.variationCombination', 'user'])
+                : Order::with(['order_items.product', 'order_items.variationCombination', 'user'])->findOrFail($orderId);
 
             // Create mPDF instance with Bangla font support
             $mpdf = new \Mpdf\Mpdf([
@@ -802,13 +807,7 @@ class POSController extends Controller
             ]);
 
             // Get site settings
-            $siteSettings = [
-                'site_name' => SettingsService::getSiteName(),
-                'contact_email' => SettingsService::getContactEmail(),
-                'phone_number' => SettingsService::get('general', 'phone_number', '+8801779542054'),
-                'address' => SettingsService::get('general', 'address', 'Dhaka, Bangladesh'),
-                'website' => config('app.url', 'www.thikana.shop'),
-            ];
+            $siteSettings = $this->getSiteSettings($order);
 
             // Get HTML content
             $html = view('admin.pos.pdf-package-slip', compact('order', 'siteSettings'))->render();

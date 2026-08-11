@@ -1098,6 +1098,28 @@
                     </div>
                 </div>
 
+                <!-- Role Management Tabs and Select Filter -->
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-7">
+                        <div class="portal-tabs-container mb-0" style="max-width: 500px;">
+                            <button type="button" class="portal-tab-btn active" id="tab-management" onclick="switchRoleTab('management')">
+                                <i class="fas fa-user-shield"></i> Admin & Store Managers
+                            </button>
+                            <button type="button" class="portal-tab-btn" id="tab-others" onclick="switchRoleTab('others')">
+                                <i class="fas fa-users"></i> Other Roles
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-5 d-flex justify-content-md-end justify-content-start align-items-center gap-2 mt-2 mt-md-0">
+                        <label for="roleSelectFilter" class="mb-0 text-muted fw-bold" style="font-size: 13px; white-space: nowrap;">
+                            <i class="fas fa-filter"></i> Filter Role:
+                        </label>
+                        <select id="roleSelectFilter" onchange="filterTableBySelect()" class="form-select" style="width: 200px; border-radius: 10px; border: 1px solid var(--border-glass); padding: 8px 12px; font-size: 13px; box-shadow: var(--shadow-premium); background: var(--bg-glass);">
+                            <option value="all">All Roles</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table premium-table" id="users">
                         <thead>
@@ -2610,8 +2632,120 @@
                         }
                     ]
                 });
+
+                // Initialize custom tab filter and draw
+                window.updateRoleOptions();
+                $('#users').DataTable().draw();
             }
         });
+
+        // Tab & Select filter variables and functions
+        window.activeTab = 'management';
+        
+        window.switchRoleTab = function(tab) {
+            window.activeTab = tab;
+            
+            // Toggle active classes on tab buttons
+            if (tab === 'management') {
+                $('#tab-management').addClass('active');
+                $('#tab-others').removeClass('active');
+            } else {
+                $('#tab-others').addClass('active');
+                $('#tab-management').removeClass('active');
+            }
+            
+            // Update role options dropdown list based on current tab
+            window.updateRoleOptions();
+            
+            // Trigger table draw (which calls the custom search function)
+            if (window.jQuery && $.fn.DataTable && $.fn.DataTable.isDataTable('#users')) {
+                $('#users').DataTable().draw();
+            }
+        };
+        
+        window.updateRoleOptions = function() {
+            const roleSelect = $('#roleSelectFilter');
+            if (!roleSelect.length) return;
+            roleSelect.empty();
+            roleSelect.append('<option value="all">All Roles</option>');
+            
+            if (window.activeTab === 'management') {
+                roleSelect.append('<option value="admin">Admin</option>');
+                roleSelect.append('<option value="super-admin">Super Admin</option>');
+                roleSelect.append('<option value="shop-manager">Shop Manager</option>');
+                roleSelect.append('<option value="store-manager">Store Manager</option>');
+            } else {
+                roleSelect.append('<option value="reseller">Reseller</option>');
+                roleSelect.append('<option value="customer">Customer</option>');
+                
+                // Try to find any other roles present in the table dynamically
+                if (window.jQuery && $.fn.DataTable && $.fn.DataTable.isDataTable('#users')) {
+                    const table = $('#users').DataTable();
+                    const roles = [];
+                    table.rows().every(function() {
+                        const rowNode = this.node();
+                        $(rowNode).find('td:eq(5) .badge-premium').each(function() {
+                            const roleText = $(this).text().trim().toLowerCase();
+                            if (roleText && !roleText.includes('admin') && !roleText.includes('manager')) {
+                                if (!roles.includes(roleText) && roleText !== 'reseller' && roleText !== 'customer') {
+                                    roles.push(roleText);
+                                }
+                            }
+                        });
+                    });
+                    
+                    roles.forEach(role => {
+                        const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+                        roleSelect.append(`<option value="${role}">${displayRole}</option>`);
+                    });
+                }
+            }
+        };
+        
+        window.filterTableBySelect = function() {
+            if (window.jQuery && $.fn.DataTable && $.fn.DataTable.isDataTable('#users')) {
+                $('#users').DataTable().draw();
+            }
+        };
+
+        // Custom search filtering function for DataTables
+        if (window.jQuery) {
+            $.fn.dataTable.ext.search.push(
+                function(settings, data, dataIndex) {
+                    if (settings.nTable.id !== 'users') {
+                        return true;
+                    }
+                    
+                    const table = $('#users').DataTable();
+                    const rowNode = table.row(dataIndex).node();
+                    const roleCell = $(rowNode).find('td:eq(5)');
+                    const roleText = roleCell.text().toLowerCase();
+                    
+                    const isManagementRole = roleText.includes('admin') || roleText.includes('manager') || roleText.includes('shop') || roleText.includes('store');
+                    
+                    // Tab filter
+                    if (window.activeTab === 'management') {
+                        if (!isManagementRole) {
+                            return false;
+                        }
+                    } else { // others
+                        if (isManagementRole) {
+                            return false;
+                        }
+                    }
+                    
+                    // Select Option filter
+                    const selectedRole = $('#roleSelectFilter').val();
+                    if (selectedRole && selectedRole !== 'all') {
+                        if (!roleText.includes(selectedRole)) {
+                            return false;
+                        }
+                    }
+                    
+                    return true;
+                }
+            );
+        }
 
         window.toggleSelectAll = function() {
             const selectAll = document.getElementById('selectAll');

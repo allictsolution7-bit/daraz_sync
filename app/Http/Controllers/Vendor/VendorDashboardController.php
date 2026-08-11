@@ -122,12 +122,14 @@ class VendorDashboardController extends Controller
 
         // Make validation flexible - only validate fields that are present
         $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
             'business_name' => 'nullable|string|max:255',
             'business_email' => 'nullable|email|max:255',
             'business_phone' => 'nullable|string|max:20',
             'business_address' => 'nullable|string',
             'tax_id' => 'nullable|string|max:50',
-            'payout_method' => 'nullable|in:bank,bkash,nagad,rocket',
+            'payout_method' => 'nullable|string|in:bank,bkash,nagad,rocket,',
             'payout_account_number' => 'nullable|string|max:50',
             'payout_account_name' => 'nullable|string|max:255',
             'payout_bank_name' => 'nullable|string|max:255',
@@ -140,15 +142,29 @@ class VendorDashboardController extends Controller
             'return_policy_text' => 'nullable|string',
         ]);
 
+        // Update User (Personal details) if submitted
+        if ($request->has('name')) {
+            $vendor->name = $request->name;
+        }
+        if ($request->has('phone')) {
+            $vendor->phone = $request->phone;
+        }
+        if ($vendor->isDirty()) {
+            $vendor->save();
+        }
+
         if ($request->has('return_policy_text')) {
             $vendorSettings->return_policy = ['policy_text' => $request->return_policy_text];
             $vendorSettings->save();
         }
 
-        // Only update fields that were actually submitted
-        $dataToUpdate = array_filter($validated, function($value, $key) {
-            return !is_null($value) && $value !== '' && $key !== 'return_policy_text';
-        }, ARRAY_FILTER_USE_BOTH);
+        // Only update fields that were actually submitted (present in request)
+        $dataToUpdate = [];
+        foreach ($validated as $key => $value) {
+            if ($request->has($key) && !in_array($key, ['name', 'phone', 'return_policy_text'])) {
+                $dataToUpdate[$key] = $value;
+            }
+        }
 
         if (!empty($dataToUpdate)) {
             $vendorSettings->update($dataToUpdate);
