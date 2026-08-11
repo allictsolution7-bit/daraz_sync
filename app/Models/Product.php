@@ -148,6 +148,7 @@ class Product extends Model
         'vendor_commission_rate',
         'commission_note',
         'return_period',
+        'pay_advance_delivery',
     ];
 
     protected $casts = [
@@ -163,6 +164,7 @@ class Product extends Model
         'reseller_price' => 'decimal:2',
         'views_total' => 'integer',
         'views_unique' => 'integer',
+        'pay_advance_delivery' => 'boolean',
         // Vendor casts
         'approved_at' => 'datetime',
         'vendor_proposed_commission' => 'decimal:2',

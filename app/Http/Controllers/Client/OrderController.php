@@ -211,6 +211,23 @@ class OrderController extends Controller
                 ], 422);
             }
 
+            // Check if COD is selected and any product requires advance delivery payment
+            if ($request->payment_method === 'cod') {
+                $hasAdvanceDelivery = false;
+                foreach ($carts as $cart) {
+                    if ($cart->product && $cart->product->pay_advance_delivery) {
+                        $hasAdvanceDelivery = true;
+                        break;
+                    }
+                }
+                if ($hasAdvanceDelivery) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'এই অর্ডারে থাকা কিছু পণ্যের জন্য অগ্রিম ডেলিভারি চার্জ পরিশোধ করা বাধ্যতামূলক। অনুগ্রহ করে পেমেন্ট মেথড হিসেবে বিকাশ, নগদ বা রকেট নির্বাচন করে অর্ডার করুন।'
+                    ], 422);
+                }
+            }
+
             foreach ($carts as $cart) {
                 $total += $cart->price * $cart->qunt;
             }

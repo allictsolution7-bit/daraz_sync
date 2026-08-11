@@ -1876,6 +1876,17 @@
 
             <!-- Payment Options -->
             <div class="payment-method-section">
+                @php
+                    $hasAdvanceDeliveryProduct = $carts->contains(function($item) {
+                        return $item->product && $item->product->pay_advance_delivery;
+                    });
+                @endphp
+                @if($hasAdvanceDeliveryProduct)
+                    <div class="alert alert-warning border-0 rounded-3 mb-3" style="background-color: #fff3cd; color: #856404; padding: 12px 15px; font-size: 14px; border-radius: 8px;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>অগ্রিম ডেলিভারি চার্জ প্রযোজ্য:</strong> আপনার কার্টে থাকা কিছু পণ্যের জন্য ডেলিভারি চার্জ অগ্রিম পরিশোধ করা বাধ্যতামূলক। ক্যাশ অন ডেলিভারি (COD) অর্ডারের ক্ষেত্রে পেমেন্ট সম্পন্ন করার জন্য ডেলিভারি চার্জ অগ্রিম পরিশোধ করতে হবে।
+                    </div>
+                @endif
                 <h5 class="payment-method-title" style="font-weight: 600;border-bottom: 1px solid #b1b1b1ff;margin-bottom: 10px;">পে করুন</h5>
                 <div>
                     @php

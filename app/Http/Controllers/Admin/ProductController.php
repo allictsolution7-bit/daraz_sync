@@ -1305,6 +1305,11 @@ class ProductController extends Controller
             'return_period' => $request->input('return_period', 0),
         ];
 
+        $isCreator = ($product->created_by === auth()->id()) || ($product->vendor_id === auth()->id());
+        if ($isCreator) {
+            $productData['pay_advance_delivery'] = $request->has('pay_advance_delivery') ? 1 : 0;
+        }
+
         // Handle product type specific fields
         if ($product->product_type === 'digital') {
             // Handle digital file update

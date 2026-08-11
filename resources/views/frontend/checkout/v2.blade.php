@@ -1783,6 +1783,17 @@
 
         <!-- Payment Options -->
         <div class="payment-method-section">
+            @php
+                $hasAdvanceDeliveryProduct = $carts->contains(function($item) {
+                    return $item->product && $item->product->pay_advance_delivery;
+                });
+            @endphp
+            @if($hasAdvanceDeliveryProduct)
+                <div class="alert alert-warning border-0 rounded-3 mb-3" style="background-color: #fff3cd; color: #856404; padding: 12px 15px; font-size: 14px; border-radius: 8px;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Advance Delivery Charge Required:</strong> Some products in your cart require the delivery charge to be paid in advance. For Cash on Delivery orders, please pay the delivery charge first.
+                </div>
+            @endif
             <h5 class="payment-method-title">Payment Method</h5>
             <div>
                 @php

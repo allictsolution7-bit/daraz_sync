@@ -1115,6 +1115,26 @@
 
                 {{-- Compact Payment Selection (Icons Only) --}}
                 <div style="margin-top: 6px; border-top: 1px solid var(--co-border); padding-top: 6px;">
+                    @php
+                        $hasAdvanceDeliveryProduct = false;
+                        if ($isComboPurchase && isset($comboData['selections'])) {
+                            foreach ($comboData['selections'] as $sel) {
+                                $prod = \App\Models\Product::find($sel['product_id']);
+                                if ($prod && $prod->pay_advance_delivery) {
+                                    $hasAdvanceDeliveryProduct = true;
+                                    break;
+                                }
+                            }
+                        } elseif (!$isComboPurchase && isset($product) && $product->pay_advance_delivery) {
+                            $hasAdvanceDeliveryProduct = true;
+                        }
+                    @endphp
+                    @if($hasAdvanceDeliveryProduct)
+                        <div class="alert alert-warning border-0 rounded-3 mb-3" style="background-color: #fff3cd; color: #856404; padding: 10px 12px; font-size: 12px; border-radius: 8px;">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                            <strong>অগ্রিম ডেলিভারি চার্জ প্রযোজ্য:</strong> এই পণ্যটির জন্য ডেলিভারি চার্জ অগ্রিম পরিশোধ করতে হবে। অনুগ্রহ করে পেমেন্ট মেথড হিসেবে বিকাশ, নগদ বা রকেট নির্বাচন করুন।
+                        </div>
+                    @endif
                     <span class="co-label" style="margin-bottom: 6px; font-weight: 700; color: var(--co-text); display: block;"><i class="fa-solid fa-credit-card"></i> Payment Method</span>
                     <div class="co-pay-options" style="display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap;">
                         @if ($codEnabled)

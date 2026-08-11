@@ -1292,6 +1292,11 @@ class VendorProductController extends Controller
             $validated['status'] = 0; // Deactivate until re-approved if auto-approve is disabled
         }
 
+        $isCreator = ($product->created_by === $vendor->id) || ($product->vendor_id === $vendor->id);
+        if ($isCreator) {
+            $validated['pay_advance_delivery'] = $request->has('pay_advance_delivery') ? 1 : 0;
+        }
+
         $product->update($validated);
 
         return redirect()->route('vendor.products.index')

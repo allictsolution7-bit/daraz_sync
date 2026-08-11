@@ -351,6 +351,18 @@
                                     <small class="text-muted d-block ms-2 mb-3" style="margin-top: -10px;">Enter 0 if return is not allowed.</small>
                                 </div>
                             </div>
+
+                            @php
+                                $isCreator = ($product->created_by === auth()->id()) || ($product->vendor_id === auth()->id());
+                            @endphp
+                            <div class="form-check form-switch mb-3 p-3 bg-light rounded border">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="pay_advance_delivery" id="pay_advance_delivery" value="1" {{ old('pay_advance_delivery', $product->pay_advance_delivery) ? 'checked' : '' }} {{ !$isCreator ? 'disabled' : '' }}>
+                                <label class="form-check-label fw-bold text-dark" for="pay_advance_delivery">Pay Delivery Charge in Advance (for COD)</label>
+                                <small class="text-muted d-block ms-4 mt-1">If enabled, customers placing COD orders with this product must pay the delivery charge first.</small>
+                                @if(!$isCreator)
+                                    <small class="text-danger fw-bold d-block ms-4 mt-1"><i class="fas fa-lock"></i> Only the product creator can modify this option.</small>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -645,19 +645,26 @@ class CartController extends Controller
         ]);
 
         // ========================================
-        // FRAUD PROTECTION CHECK
-        // ========================================
-        $fraudProtection = new FraudProtectionService();
-        $fraudValidation = $fraudProtection->validateOrder($request->all());
-        
-        if (!$fraudValidation['valid']) {
-            return response()->json([
-                'success' => false,
-                'errors' => $fraudValidation['errors'],
-                'message' => $fraudValidation['errors'][0] ?? 'Order validation failed'
-            ], 422);
+
+        // Check if COD is selected and any product in combo selections requires advance delivery payment
+        if ($request->payment_method === 'cod') {
+            $hasAdvanceDelivery = false;
+            if ($request->has('selections') && is_array($request->selections)) {
+                foreach ($request->selections as $sel) {
+                    $prod = Product::find($sel['product_id']);
+                    if ($prod && $prod->pay_advance_delivery) {
+                        $hasAdvanceDelivery = true;
+                        break;
+                    }
+                }
+            }
+            if ($hasAdvanceDelivery) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'এই অর্ডারে থাকা কিছু পণ্যের জন্য অগ্রিম ডেলিভারি চার্জ পরিশোধ করা বাধ্যতামূলক। অনুগ্রহ করে পেমেন্ট মেথড হিসেবে বিকাশ, নগদ বা রকেট নির্বাচন করে অর্ডার করুন।'
+                ], 422);
+            }
         }
-        // ========================================
 
         // Get the combo offer
         $comboOffer = \App\Models\ComboOffer::findOrFail($request->combo_offer_id);
@@ -834,18 +841,14 @@ class CartController extends Controller
 
         $validated = $request->validate($validationRules);
 
-        // ========================================
-        // FRAUD PROTECTION CHECK
-        // ========================================
-        $fraudProtection = new FraudProtectionService();
-        $fraudValidation = $fraudProtection->validateOrder($request->all());
-        
-        if (!$fraudValidation['valid']) {
-            return response()->json([
-                'success' => false,
-                'errors' => $fraudValidation['errors'],
-                'message' => $fraudValidation['errors'][0] ?? 'Order validation failed'
-            ], 422);
+        // Check if COD is selected and the product requires advance delivery payment
+        if ($request->payment_method === 'cod') {
+            if ($product && $product->pay_advance_delivery) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'এই অর্ডারে থাকা কিছু পণ্যের জন্য অগ্রিম ডেলিভারি চার্জ পরিশোধ করা বাধ্যতামূলক। অনুগ্রহ করে পেমেন্ট মেথড হিসেবে বিকাশ, নগদ বা রকেট নির্বাচন করে অর্ডার করুন।'
+                ], 422);
+            }
         }
         // ========================================
 

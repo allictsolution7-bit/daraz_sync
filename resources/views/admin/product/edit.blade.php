@@ -534,6 +534,22 @@
                                 </div>
                             </div>
 
+                            @php
+                                $isCreator = ($product->created_by === auth()->id()) || ($product->vendor_id === auth()->id());
+                            @endphp
+                            <div class="mb-4 form-check form-switch p-3 bg-light rounded border">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" id="payAdvanceDelivery" name="pay_advance_delivery" value="1" {{ old('pay_advance_delivery', $product->pay_advance_delivery) ? 'checked' : '' }} {{ !$isCreator ? 'disabled' : '' }}>
+                                <label class="form-check-label fw-bold text-dark" for="payAdvanceDelivery">
+                                    <i class="fas fa-truck-loading me-1 text-primary"></i> Pay Delivery Charge in Advance (for COD)
+                                </label>
+                                <div class="form-text text-muted ms-4">
+                                    If enabled, customers placing Cash on Delivery orders containing this product must pay the delivery charge first.
+                                    @if(!$isCreator)
+                                        <span class="text-danger fw-bold d-block mt-1"><i class="fas fa-lock"></i> Only the product creator can modify this option.</span>
+                                    @endif
+                                </div>
+                            </div>
+
                             <!-- Wholesale Pricing Tiers -->
                             <div class="mb-3 border rounded p-3 bg-light" id="simpleWholesaleTiersSection" style="display: {{ in_array($product->product_type, ['simple', 'digital']) ? 'block' : 'none' }};">
                                 <h6 class="fw-bold mb-2 text-dark"><i class="fas fa-tags text-primary me-2"></i> Tiered Wholesale Pricing (Optional)</h6>
