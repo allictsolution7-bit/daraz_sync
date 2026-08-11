@@ -188,8 +188,8 @@ class AdminVendorController extends Controller
             'email' => 'required|email|unique:users,email,' . $vendor->id,
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:8',
-            'role' => 'required|string|in:reseller,vendor,wholeseller',
-            'vendor_type' => 'required_if:role,vendor|nullable|in:retailer,wholeseller',
+            'role' => 'required|string|in:reseller,vendor,wholeseller,paid_vendor,retailer',
+            'vendor_type' => 'nullable|string|in:retailer,wholeseller',
             'business_name' => 'required|string|max:255',
             'business_email' => 'required|email',
             'business_phone' => 'required|string|max:20',
@@ -222,11 +222,12 @@ class AdminVendorController extends Controller
 
             // Sync roles dynamically
             $role = $validated['role'];
-            if ($role === 'reseller') {
-                $vendor->syncRoles(['reseller']);
-            } elseif ($role === 'wholeseller') {
-                \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'wholeseller', 'guard_name' => 'web']);
-                $vendor->syncRoles(['wholeseller', 'vendor']);
+            if (in_array($role, ['reseller', 'wholeseller', 'paid_vendor', 'retailer', 'vendor'])) {
+                \Spatie\Permission\Models\Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
+                $vendor->syncRoles([$role]);
+                if (in_array($role, ['wholeseller', 'retailer', 'paid_vendor'])) {
+                    $vendor->assignRole('vendor');
+                }
             } else {
                 $vendor->syncRoles(['vendor']);
             }

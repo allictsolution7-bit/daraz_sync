@@ -222,12 +222,12 @@ class VendorRegisterController extends Controller
 
             // Assign roles dynamically
             $role = $data['role'] ?? 'vendor';
-            if ($role === 'reseller') {
-                $user->assignRole('reseller');
-            } elseif ($role === 'wholeseller') {
-                \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'wholeseller', 'guard_name' => 'web']);
-                $user->assignRole('wholeseller');
-                $user->assignRole('vendor');
+            if (in_array($role, ['reseller', 'wholeseller', 'paid_vendor', 'retailer', 'vendor'])) {
+                \Spatie\Permission\Models\Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
+                $user->assignRole($role);
+                if (in_array($role, ['wholeseller', 'retailer', 'paid_vendor'])) {
+                    $user->assignRole('vendor');
+                }
             } else {
                 $user->assignRole('vendor');
             }
@@ -365,8 +365,8 @@ class VendorRegisterController extends Controller
     public function registerPartner(Request $request)
     {
         $request->validate([
-            'role' => 'required|in:reseller,vendor,wholeseller',
-            'vendor_type' => 'required_if:role,vendor|nullable|in:retailer,wholeseller',
+            'role' => 'required|in:reseller,vendor,wholeseller,paid_vendor,retailer',
+            'vendor_type' => 'nullable|in:retailer,wholeseller',
         ]);
 
         $rules = [

@@ -147,12 +147,26 @@
                                 <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Leave blank to keep current">
                                 @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
-                            <div class="col-md-6">
+                             <div class="col-md-6">
                                 <label>Partnership Role <span class="text-danger">*</span></label>
+                                @php
+                                    $currentRole = 'vendor';
+                                    if ($vendor->hasRole('reseller')) {
+                                        $currentRole = 'reseller';
+                                    } elseif ($vendor->hasRole('wholeseller')) {
+                                        $currentRole = 'wholeseller';
+                                    } elseif ($vendor->hasRole('retailer')) {
+                                        $currentRole = 'retailer';
+                                    } elseif ($vendor->hasRole('paid_vendor')) {
+                                        $currentRole = 'paid_vendor';
+                                    }
+                                @endphp
                                 <select name="role" class="form-select @error('role') is-invalid @enderror" required>
-                                    <option value="vendor" {{ old('role', ($vendor->hasRole('wholeseller') ? 'wholeseller' : ($vendor->hasRole('reseller') ? 'reseller' : 'vendor'))) == 'vendor' ? 'selected' : '' }}>Vendor</option>
-                                    <option value="reseller" {{ old('role', ($vendor->hasRole('wholeseller') ? 'wholeseller' : ($vendor->hasRole('reseller') ? 'reseller' : 'vendor'))) == 'reseller' ? 'selected' : '' }}>Reseller</option>
-                                    <option value="wholeseller" {{ old('role', ($vendor->hasRole('wholeseller') ? 'wholeseller' : ($vendor->hasRole('reseller') ? 'reseller' : 'vendor'))) == 'wholeseller' ? 'selected' : '' }}>Wholeseller</option>
+                                    <option value="vendor" {{ old('role', $currentRole) == 'vendor' ? 'selected' : '' }}>Vendor</option>
+                                    <option value="reseller" {{ old('role', $currentRole) == 'reseller' ? 'selected' : '' }}>Reseller</option>
+                                    <option value="wholeseller" {{ old('role', $currentRole) == 'wholeseller' ? 'selected' : '' }}>Wholeseller</option>
+                                    <option value="retailer" {{ old('role', $currentRole) == 'retailer' ? 'selected' : '' }}>Retailer</option>
+                                    <option value="paid_vendor" {{ old('role', $currentRole) == 'paid_vendor' ? 'selected' : '' }}>Paid Vendor</option>
                                 </select>
                                 @error('role')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>

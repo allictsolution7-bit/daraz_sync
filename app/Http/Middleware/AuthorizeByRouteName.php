@@ -91,7 +91,7 @@ class AuthorizeByRouteName
         }
 
         $parts = explode('.', $name);
-        if (count($parts) < 2 || $parts[0] !== 'admin') {
+        if (count($parts) < 2 || ($parts[0] !== 'admin' && $parts[0] !== 'vendor')) {
             return $next($request);
         }
 

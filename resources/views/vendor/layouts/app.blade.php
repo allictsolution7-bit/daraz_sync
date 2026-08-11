@@ -422,12 +422,15 @@
                 if ($user?->hasRole('reseller')) {
                     $roleLabel = 'RESELLER';
                     $badgeClass = 'bg-success text-white';
+                } elseif ($user?->hasRole('paid_vendor')) {
+                    $roleLabel = 'PAID VENDOR';
+                    $badgeClass = 'bg-danger text-white';
+                } elseif ($user?->hasRole('retailer') || $vendorType === 'retailer') {
+                    $roleLabel = 'RETAILER';
+                    $badgeClass = 'bg-primary text-white';
                 } elseif ($user?->hasRole('wholeseller') || $vendorType === 'wholeseller') {
                     $roleLabel = 'WHOLESELLER';
                     $badgeClass = 'bg-info text-white';
-                } elseif ($vendorType === 'retailer') {
-                    $roleLabel = 'RETAILER';
-                    $badgeClass = 'bg-primary text-white';
                 }
             @endphp
             <span class="badge {{ $badgeClass }} fw-bold px-2 py-1" style="font-size: 0.65rem; margin-top: 4px;">{{ $roleLabel }}</span>
@@ -435,10 +438,13 @@
 
         <div class="vendor-sidebar-nav">
             <div class="vendor-nav-header">Main Menu</div>
+            @can('vendor.dashboard.view')
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}" href="{{ route('vendor.dashboard') }}">
                 <i class="fas fa-chart-pie"></i> Dashboard
             </a>
+            @endcan
 
+            @can('vendor.chats.view')
             <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('vendor.chats.index') ? 'active' : '' }}" href="{{ route('vendor.chats.index') }}">
                 <span class="d-flex align-items-center gap-2">
                     <i class="fas fa-comments text-info"></i> Chats
@@ -460,15 +466,21 @@
                     <span class="badge bg-danger text-white font-weight-bold px-2 py-1 rounded-pill" style="font-size: 0.72rem;">{{ $sidebarUnreadCount }}</span>
                 @endif
             </a>
+            @endcan
 
+            @can('vendor.products.view')
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.products.*') ? 'active' : '' }}" href="{{ route('vendor.products.index') }}">
                 <i class="fas fa-box"></i> Products
             </a>
+            @endcan
 
-            @if(auth()->user()?->hasRole('reseller'))
+            @can('vendor.pos.view')
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.pos.*') ? 'active' : '' }}" href="{{ route('vendor.pos.index') }}">
                 <i class="fas fa-cash-register text-success"></i> Reseller POS
             </a>
+            @endcan
+
+            @can('vendor.orders.reseller.view')
             <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('vendor.orders.reseller') ? 'active' : '' }}" href="{{ route('vendor.orders.reseller') }}">
                 <span class="d-flex align-items-center gap-2">
                     <i class="fas fa-receipt" style="color:#a78bfa;"></i> My POS Orders
@@ -483,10 +495,13 @@
                     <span class="badge bg-warning text-dark rounded-pill" style="font-size:0.65rem;">{{ $resellerPosOrderCount }}</span>
                 @endif
             </a>
+            @endcan
+
+            @can('vendor.customers.view')
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.customers.*') ? 'active' : '' }}" href="{{ route('vendor.customers.index') }}">
                 <i class="fas fa-users text-info"></i> Customers
             </a>
-            @endif
+            @endcan
 
             @php
                 $vUser = auth()->user();
@@ -496,7 +511,7 @@
                 $vRecentOrders = \App\Models\order::whereIn('id', $vOrderIds)->with(['customer'])->latest()->take(5)->get();
             @endphp
 
-            @if(auth()->user()->can('vendor.orders.view') || auth()->user()->hasRole('vendor') || auth()->user()->hasRole('wholeseller') || auth()->user()->hasRole('reseller'))
+            @can('vendor.orders.view')
             <a class="vendor-sidebar-link d-flex align-items-center justify-content-between {{ request()->routeIs('vendor.orders.index') || request()->routeIs('vendor.orders.show') ? 'active' : '' }}" href="{{ route('vendor.orders.index') }}">
                 <span class="d-flex align-items-center gap-2">
                     <i class="fas fa-shopping-cart"></i> Orders
@@ -505,38 +520,44 @@
                     <span class="badge bg-warning text-dark font-weight-bold px-2 py-1 rounded-pill" style="font-size: 0.72rem;">{{ $vTotalOrders }}</span>
                 @endif
             </a>
+            @endcan
+
+            @can('vendor.orders.earnings')
             <a class="vendor-sidebar-link d-flex align-items-center gap-2 {{ request()->routeIs('vendor.orders.earnings') ? 'active' : '' }}" href="{{ route('vendor.orders.earnings') }}">
                 <i class="fas fa-chart-line text-success"></i> Earnings
             </a>
-            @endif
+            @endcan
 
-            @if(auth()->user()?->vendorSettings?->is_consignment && (auth()->user()->can('vendor.balance.view') || auth()->user()->can('vendor.withdrawals.create')))
+            @if(auth()->user()?->vendorSettings?->is_consignment && (auth()->user()->can('vendor.wallet.view') || auth()->user()->can('vendor.withdrawals.view')))
             <div class="vendor-nav-header">Finance & Wallet</div>
             @endif
 
             @if(auth()->user()?->vendorSettings?->is_consignment)
-                @can('vendor.balance.view')
+                @can('vendor.wallet.view')
                 <a class="vendor-sidebar-link {{ request()->routeIs('vendor.wallet.*') ? 'active' : '' }}" href="{{ route('vendor.wallet.index') }}">
                     <i class="fas fa-wallet text-warning"></i> My Wallet
                 </a>
                 @endcan
 
-                @can('vendor.withdrawals.create')
+                @can('vendor.withdrawals.view')
                 <a class="vendor-sidebar-link {{ request()->routeIs('vendor.withdrawals.*') ? 'active' : '' }}" href="{{ route('vendor.withdrawals.index') }}">
                     <i class="fas fa-hand-holding-dollar"></i> Withdrawals
                 </a>
                 @endcan
             @endif
 
-            @if(auth()->user()->can('vendor.profile.edit') || auth()->user()->hasRole('reseller'))
+            @if(auth()->user()->can('vendor.profile.view') || auth()->user()->can('vendor.profile.edit'))
             <div class="vendor-nav-header">Account & Setup</div>
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.profile') ? 'active' : '' }}" href="{{ route('vendor.profile') }}">
                 <i class="fas fa-cog"></i> Store Settings
             </a>
             @endif
+            
+            @can('vendor.support.view')
             <a class="vendor-sidebar-link {{ request()->is('support*') ? 'active' : '' }}" href="{{ route('support.index') }}">
                 <i class="fas fa-headset"></i> Support / Complain
             </a>
+            @endcan
 
             @php
                 $user = auth()->user();

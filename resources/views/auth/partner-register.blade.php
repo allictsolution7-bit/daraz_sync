@@ -144,26 +144,40 @@
                             <h6><i class="fas fa-user-tag"></i> Select Partnership Role</h6>
                             <div class="form-group">
                                 <label class="d-block">Join As <span class="text-danger">*</span></label>
-                                <div class="d-flex gap-2 justify-content-between role-selector">
-                                    <div class="flex-fill mr-2">
+                                <div class="d-flex flex-wrap gap-2 justify-content-between role-selector">
+                                    <div class="flex-fill mr-2" style="min-width: 120px; margin-bottom: 8px;">
                                         <input type="radio" name="role" id="role_vendor" value="vendor" class="d-none role-radio" {{ old('role', 'vendor') == 'vendor' ? 'checked' : '' }}>
                                         <label for="role_vendor" class="btn btn-outline-primary btn-block p-3 text-center role-label">
                                             <i class="fas fa-store d-block mb-1 fa-2x"></i>
                                             Vendor
                                         </label>
                                     </div>
-                                    <div class="flex-fill mr-2">
+                                    <div class="flex-fill mr-2" style="min-width: 120px; margin-bottom: 8px;">
                                         <input type="radio" name="role" id="role_reseller" value="reseller" class="d-none role-radio" {{ old('role') == 'reseller' ? 'checked' : '' }}>
                                         <label for="role_reseller" class="btn btn-outline-primary btn-block p-3 text-center role-label">
                                             <i class="fas fa-people-arrows d-block mb-1 fa-2x"></i>
                                             Reseller
                                         </label>
                                     </div>
-                                    <div class="flex-fill">
+                                    <div class="flex-fill mr-2" style="min-width: 120px; margin-bottom: 8px;">
                                         <input type="radio" name="role" id="role_wholeseller" value="wholeseller" class="d-none role-radio" {{ old('role') == 'wholeseller' ? 'checked' : '' }}>
                                         <label for="role_wholeseller" class="btn btn-outline-primary btn-block p-3 text-center role-label">
                                             <i class="fas fa-warehouse d-block mb-1 fa-2x"></i>
                                             Wholeseller
+                                        </label>
+                                    </div>
+                                    <div class="flex-fill mr-2" style="min-width: 120px; margin-bottom: 8px;">
+                                        <input type="radio" name="role" id="role_retailer" value="retailer" class="d-none role-radio" {{ old('role') == 'retailer' ? 'checked' : '' }}>
+                                        <label for="role_retailer" class="btn btn-outline-primary btn-block p-3 text-center role-label">
+                                            <i class="fas fa-shopping-basket d-block mb-1 fa-2x"></i>
+                                            Retailer
+                                        </label>
+                                    </div>
+                                    <div class="flex-fill" style="min-width: 120px; margin-bottom: 8px;">
+                                        <input type="radio" name="role" id="role_paid_vendor" value="paid_vendor" class="d-none role-radio" {{ old('role') == 'paid_vendor' ? 'checked' : '' }}>
+                                        <label for="role_paid_vendor" class="btn btn-outline-primary btn-block p-3 text-center role-label">
+                                            <i class="fas fa-money-bill-wave d-block mb-1 fa-2x"></i>
+                                            Paid Vendor
                                         </label>
                                     </div>
                                 </div>

@@ -128,7 +128,7 @@ class User extends Authenticatable
      */
     public function isVendor(): bool
     {
-        return $this->hasRole('vendor') || $this->hasRole('wholeseller');
+        return $this->hasRole('vendor') || $this->hasRole('wholeseller') || $this->hasRole('retailer') || $this->hasRole('paid_vendor');
     }
 
     /**

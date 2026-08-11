@@ -859,7 +859,7 @@ Route::get('/api/mobile-subcategories/{categoryId}', [CategoryController::class,
 // ==========================================
 // VENDOR PANEL ROUTES
 // ==========================================
-Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor'])->group(function () {
+Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor', 'authorize.by_route'])->group(function () {
     // Chat System Route
     Route::get('/chats', [App\Http\Controllers\Client\ChatController::class, 'index'])->name('chats.index');
 
