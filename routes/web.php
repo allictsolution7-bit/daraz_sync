@@ -179,7 +179,7 @@ Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
 Route::post('/cart/add-quick', [App\Http\Controllers\Client\OrderController::class, 'addQuick'])->name('cart.add.quick');
 Route::get('/cart/count', [CartController::class, 'cartCount'])->name('cart.count');
 Route::get('/cart/sidebar', [CartController::class, 'sidebar'])->name('cart.sidebar');
-Route::get('/wishlist', function() { return view('frontend.user.wishlist'); })->name('wishlist.index');
+Route::get('/wishlist', function() { return view('frontend.user.wishlist'); })->name('wishlist.index')->middleware('auth');
 
 // Buy Now Routes
 Route::match(['get', 'post'], '/buy/store', [CartController::class, 'buystore'])->name('buy.store.post');
@@ -244,8 +244,16 @@ Route::prefix('account')->name('account.')->group(function () {
     });
 });
 
-Route::get('/track-order', [AccountController::class, 'trackOrder'])->name('order.track');
-Route::post('/track-order', [AccountController::class, 'trackOrderSubmit'])->name('order.track.submit');
+// User Support Routes
+Route::middleware('auth')->prefix('support')->name('support.')->group(function () {
+    Route::get('/', [App\Http\Controllers\Client\SupportController::class, 'index'])->name('index');
+    Route::post('/store', [App\Http\Controllers\Client\SupportController::class, 'store'])->name('store');
+    Route::get('/{id}', [App\Http\Controllers\Client\SupportController::class, 'show'])->name('show');
+    Route::post('/{id}/reply', [App\Http\Controllers\Client\SupportController::class, 'reply'])->name('reply');
+});
+
+Route::get('/track-order', [AccountController::class, 'trackOrder'])->name('order.track')->middleware('auth');
+Route::post('/track-order', [AccountController::class, 'trackOrderSubmit'])->name('order.track.submit')->middleware('auth');
 
 // Email Check Route
 Route::post('/check-email', [AdminController::class, 'checkemail'])->name('check.email');
@@ -318,6 +326,14 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::delete('/team-members/bulk-delete', [AdminController::class, 'bulkDelete'])->name('users.bulk-delete');
 
     Route::post('/transactions/bulk-assign', [BackOrderController::class, 'bulkAssign'])->name('orders.bulk-assign');
+
+    // Support Tickets Management
+    Route::prefix('support-tickets')->name('support-tickets.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\SupportTicketController::class, 'index'])->name('index');
+        Route::get('/{id}', [App\Http\Controllers\Admin\SupportTicketController::class, 'show'])->name('show');
+        Route::post('/{id}/reply', [App\Http\Controllers\Admin\SupportTicketController::class, 'reply'])->name('reply');
+        Route::post('/{id}/update-status', [App\Http\Controllers\Admin\SupportTicketController::class, 'updateStatus'])->name('update-status');
+    });
 
     // Product Categories
     Route::prefix('catalog-groups')->name('product_categories.')->group(function () {

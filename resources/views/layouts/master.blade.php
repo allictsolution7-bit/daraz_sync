@@ -291,6 +291,7 @@
 
         .icon-profile { background: rgba(79, 70, 229, 0.06) !important; color: #4f46e5 !important; }
         .icon-settings { background: rgba(13, 148, 136, 0.06) !important; color: #0d9488 !important; }
+        .icon-user-acc { background: rgba(23, 162, 184, 0.06) !important; color: #17a2b8 !important; }
         .icon-logout { background: rgba(225, 29, 72, 0.06) !important; color: #e11d48 !important; }
 
         .premium-link-title {
@@ -1090,6 +1091,15 @@
                                         <div class="premium-link-desc">Configure store properties</div>
                                     </div>
                                 </a>
+                                <a href="{{ route('account.show') }}" class="premium-user-link">
+                                    <div class="premium-link-icon-container icon-user-acc">
+                                        <i class="fa-solid fa-user-gear"></i>
+                                    </div>
+                                    <div>
+                                        <div class="premium-link-title">User Account</div>
+                                        <div class="premium-link-desc">View customer dashboard & profile</div>
+                                    </div>
+                                </a>
                                 <div class="dropdown-divider my-2"></div>
                                 <a href="{{ route('logout') }}" class="premium-user-link premium-user-link-logout"
                                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -1266,6 +1276,22 @@
                                 @endif
                             </a>
                         </li>
+
+                        <li class="{{ request()->is('admin/support-tickets*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.support-tickets.index') }}" class="d-flex align-items-center justify-content-between">
+                                <span class="menu-content">
+                                    <i class="fas fa-headset" style="color:#ef4444;"></i>
+                                    Support Tickets
+                                </span>
+                                @php
+                                    $pendingTicketCount = \App\Models\SupportTicket::where('status', 'open')->count();
+                                @endphp
+                                @if($pendingTicketCount > 0)
+                                    <span class="badge bg-danger rounded-circle text-white font-weight-bold px-2 py-0.5 ms-2" style="font-size: 0.65rem;">{{ $pendingTicketCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+
 
 
 

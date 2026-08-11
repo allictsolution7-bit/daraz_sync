@@ -115,6 +115,12 @@
                 <span>Settings</span>
             </a>
         </li>
+        <li class="sidebar-menu-item">
+            <a href="{{ route('support.index') }}" class="sidebar-menu-link {{ request()->is('support*') ? 'active' : '' }}">
+                <i class="fa-solid fa-headset sidebar-menu-icon"></i>
+                <span>Support / Complain</span>
+            </a>
+        </li>
     </ul>
 
     @auth

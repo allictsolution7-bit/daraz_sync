@@ -35,7 +35,8 @@ class AuthorizeByRouteName
             str_starts_with($name, 'admin.profile') || 
             str_starts_with($name, 'admin.steadfast') ||
             str_starts_with($name, 'admin.pathao') ||
-            str_starts_with($name, 'admin.delivery')
+            str_starts_with($name, 'admin.delivery') ||
+            str_starts_with($name, 'admin.support-tickets')
         ) {
             return $next($request);
         }

@@ -531,6 +531,9 @@
                 <i class="fas fa-cog"></i> Store Settings
             </a>
             @endif
+            <a class="vendor-sidebar-link {{ request()->is('support*') ? 'active' : '' }}" href="{{ route('support.index') }}">
+                <i class="fas fa-headset"></i> Support / Complain
+            </a>
 
             @php
                 $user = auth()->user();
@@ -718,6 +721,7 @@
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2 p-2" style="min-width: 200px;">
                         <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="{{ route('vendor.profile') }}"><i class="fas fa-store text-primary me-2"></i> Store Settings</a></li>
                         <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="{{ route('vendor.wallet.index') }}"><i class="fas fa-wallet text-warning me-2"></i> Wallet & Payments</a></li>
+                        <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="{{ route('account.show') }}"><i class="fas fa-user-circle text-info me-2"></i> User Account</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
