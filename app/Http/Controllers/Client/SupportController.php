@@ -36,8 +36,10 @@ class SupportController extends Controller
         $request->validate([
             'subject' => 'required|string|max:255',
             'category' => 'required|string|max:100',
-            'message' => 'required|string',
             'priority' => 'required|in:low,medium,high',
+            'message' => 'required_without:attachments|nullable|string',
+            'attachments' => 'required_without:message|nullable|array',
+            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,zip|max:5120',
         ]);
 
         $ticket = SupportTicket::create([
@@ -48,10 +50,20 @@ class SupportController extends Controller
             'status' => 'open',
         ]);
 
+        $attachments = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('support_attachments'), $fileName);
+                $attachments[] = 'support_attachments/' . $fileName;
+            }
+        }
+
         SupportTicketReply::create([
             'ticket_id' => $ticket->id,
             'user_id' => Auth::id(),
-            'message' => $request->message,
+            'message' => $request->message ?? '',
+            'attachments' => $attachments,
         ]);
 
         return redirect()->route('support.show', $ticket->id)->with('success', 'Your complaint/ticket has been submitted successfully.');
@@ -78,7 +90,9 @@ class SupportController extends Controller
         $ticket = SupportTicket::where('user_id', Auth::id())->findOrFail($id);
 
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'required_without:attachments|nullable|string',
+            'attachments' => 'required_without:message|nullable|array',
+            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,zip|max:5120',
         ]);
 
         // If ticket is closed, don't allow replies, or reopen it
@@ -86,10 +100,20 @@ class SupportController extends Controller
             $ticket->update(['status' => 'open']);
         }
 
+        $attachments = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('support_attachments'), $fileName);
+                $attachments[] = 'support_attachments/' . $fileName;
+            }
+        }
+
         SupportTicketReply::create([
             'ticket_id' => $ticket->id,
             'user_id' => Auth::id(),
-            'message' => $request->message,
+            'message' => $request->message ?? '',
+            'attachments' => $attachments,
         ]);
 
         // Touch updated_at timestamp on parent ticket

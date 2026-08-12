@@ -5229,8 +5229,14 @@
         .footer-container {
             padding: 0 15px;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
             gap: 20px;
+        }
+
+        .footer-container .footer-column:nth-child(2) .footer-link,
+        .footer-container .footer-column:nth-child(3) .footer-link,
+        .footer-container .footer-column:nth-child(4) .footer-link {
+            font-size: 12.5px;
         }
 
         .footer-column {

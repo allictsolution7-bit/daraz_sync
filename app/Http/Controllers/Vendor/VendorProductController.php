@@ -92,13 +92,9 @@ class VendorProductController extends Controller
             $query = Product::where(function ($q) use ($adminId) {
                 if ($adminId) {
                     $q->where('created_by', $adminId)
-                      ->orWhere('vendor_id', $adminId)
-                      ->orWhereNull('vendor_id');
+                      ->whereNull('vendor_id');
                 } else {
-                    // Fallback: If no parent admin configured, show products from super-admin (ID 1) or global platform products
-                    $q->where('created_by', 1)
-                      ->orWhere('vendor_id', 1)
-                      ->orWhereNull('vendor_id');
+                    $q->whereNull('vendor_id');
                 }
             });
 

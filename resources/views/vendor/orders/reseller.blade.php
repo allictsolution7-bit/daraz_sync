@@ -223,6 +223,44 @@
         </form>
     </div>
 
+    @php
+        $hasSelfDeliveryOrders = $orders->contains(function ($ord) {
+            $dd = is_string($ord->delivery_data) ? json_decode($ord->delivery_data, true) : ($ord->delivery_data ?? []);
+            return isset($dd['delivery_by']) && $dd['delivery_by'] === 'reseller';
+        });
+    @endphp
+
+    @if($hasSelfDeliveryOrders)
+    <!-- Bulk Operations Panel -->
+    <div class="card mb-4 border-0 shadow-sm" style="border-radius: 16px;">
+        <div class="card-header bg-light border-bottom-0 py-3 d-flex justify-content-between align-items-center" style="border-radius: 16px 16px 0 0;">
+            <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-tools text-primary me-2"></i> Logistics & Dispatch Dashboard</h6>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="select-all-orders">
+                <label class="form-check-label small fw-semibold text-muted" for="select-all-orders">Select All</label>
+            </div>
+        </div>
+        <div class="card-body p-3">
+            <div class="row g-3">
+                <div class="col-md-6 border-end">
+                    <div class="small fw-bold text-muted mb-2"><i class="fas fa-truck text-success me-1"></i> Dispatch Options</div>
+                    <div class="d-flex gap-2">
+                        <button id="bulk-send-steadfast" class="btn btn-sm btn-success fw-bold"><i class="fas fa-paper-plane me-1"></i> Send via Steadfast</button>
+                        <button id="bulk-send-pathao" class="btn btn-sm btn-primary fw-bold"><i class="fas fa-shipping-fast me-1"></i> Send via Pathao</button>
+                    </div>
+                </div>
+                <div class="col-md-6 ps-md-4">
+                    <div class="small fw-bold text-muted mb-2"><i class="fas fa-file-alt text-info me-1"></i> Invoice & Slips</div>
+                    <div class="d-flex gap-2">
+                        <button id="bulk-print-invoices" class="btn btn-sm btn-outline-info fw-bold"><i class="fas fa-file-invoice me-1"></i> Invoices</button>
+                        <button id="bulk-print-package-slips" class="btn btn-sm btn-outline-warning fw-bold"><i class="fas fa-box me-1"></i> Package Slips</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Orders List --}}
     @if($orders->isEmpty())
         <div class="empty-state">
@@ -245,12 +283,31 @@
                 'ready_for_delivery' => 'fa-box-open',
             ];
             $statusIcon = $statusIconMap[$order->status] ?? 'fa-circle';
+
+            $deliveryData = is_string($order->delivery_data) ? json_decode($order->delivery_data, true) : ($order->delivery_data ?? []);
+            $isSelfDelivery = isset($deliveryData['delivery_by']) && $deliveryData['delivery_by'] === 'reseller';
+            $courierProvider = $deliveryData['courier_provider'] ?? null;
+            $hasCourier = !empty($courierProvider);
+            $courierSent = $hasCourier ? 'true' : 'false';
         @endphp
         <div class="order-card">
             <div class="order-card-header">
                 <div class="d-flex align-items-center gap-3">
+                    @if($isSelfDelivery)
+                        <input type="checkbox" class="order-checkbox me-1" value="{{ $order->id }}" data-courier-sent="{{ $courierSent }}" data-courier-provider="{{ $courierProvider }}" data-phone="{{ $order->phone }}" data-ip="">
+                    @endif
                     <div>
-                        <div class="order-id">#{{ $order->id }}</div>
+                        <div class="order-id">
+                            #{{ $order->id }}
+                            @if($isSelfDelivery)
+                                <span class="badge bg-primary ms-1" style="font-size: 0.65rem;"><i class="fas fa-truck-ramp-box me-1"></i> Self-Delivery</span>
+                            @endif
+                            @if($hasCourier)
+                                <span class="badge bg-info text-white courier-status-badge ms-1" data-order-id="{{ $order->id }}" data-courier="{{ $courierProvider }}" style="cursor: pointer; font-size: 0.65rem;" title="Click to refresh courier status">
+                                    <i class="fas fa-truck"></i> <span class="courier-status-text">{{ $deliveryData['courier_status'] ?? 'Sent' }}</span>
+                                </span>
+                            @endif
+                        </div>
                         <div class="order-date">{{ $order->created_at->format('d M Y, h:i A') }}</div>
                     </div>
                     <span class="order-status-badge {{ $statusClass }}">
@@ -350,4 +407,178 @@
     @endif
 
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Select all functionality
+    const selectAll = document.getElementById('select-all-orders');
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            const isChecked = this.checked;
+            document.querySelectorAll('.order-checkbox').forEach(cb => {
+                cb.checked = isChecked;
+            });
+        });
+    }
+
+    // Bulk Send Steadfast
+    const steadfastBtn = document.getElementById('bulk-send-steadfast');
+    if (steadfastBtn) {
+        steadfastBtn.addEventListener('click', function() {
+            const selected = Array.from(document.querySelectorAll('.order-checkbox:checked'))
+                .filter(cb => cb.dataset.courierSent !== 'true')
+                .map(cb => cb.value);
+
+            if (selected.length === 0) {
+                alert('Please select at least one order that has not been sent to any courier.');
+                return;
+            }
+
+            steadfastBtn.disabled = true;
+            steadfastBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Sending...';
+
+            fetch("{{ route('vendor.steadfast.sendBulk') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ order_ids: selected })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message || 'Orders sent to Steadfast successfully!');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Failed to send orders.');
+                    steadfastBtn.disabled = false;
+                    steadfastBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Send via Steadfast';
+                }
+            })
+            .catch(() => {
+                alert('Error sending orders.');
+                steadfastBtn.disabled = false;
+                steadfastBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Send via Steadfast';
+            });
+        });
+    }
+
+    // Bulk Send Pathao
+    const pathaoBtn = document.getElementById('bulk-send-pathao');
+    if (pathaoBtn) {
+        pathaoBtn.addEventListener('click', function() {
+            const selected = Array.from(document.querySelectorAll('.order-checkbox:checked'))
+                .filter(cb => cb.dataset.courierSent !== 'true')
+                .map(cb => cb.value);
+
+            if (selected.length === 0) {
+                alert('Please select at least one order that has not been sent to any courier.');
+                return;
+            }
+
+            pathaoBtn.disabled = true;
+            pathaoBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Sending...';
+
+            fetch("{{ route('vendor.pathao.sendBulk') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ order_ids: selected })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message || 'Orders sent to Pathao successfully!');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Failed to send orders.');
+                    pathaoBtn.disabled = false;
+                    pathaoBtn.innerHTML = '<i class="fas fa-shipping-fast me-1"></i> Send via Pathao';
+                }
+            })
+            .catch(() => {
+                alert('Error sending orders.');
+                pathaoBtn.disabled = false;
+                pathaoBtn.innerHTML = '<i class="fas fa-shipping-fast me-1"></i> Send via Pathao';
+            });
+        });
+    }
+
+    // Bulk print invoices
+    const printInvoicesBtn = document.getElementById('bulk-print-invoices');
+    if (printInvoicesBtn) {
+        printInvoicesBtn.addEventListener('click', function() {
+            const selected = Array.from(document.querySelectorAll('.order-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) {
+                alert('Please select at least one order.');
+                return;
+            }
+            selected.forEach((orderId, idx) => {
+                setTimeout(() => {
+                    window.open(`/order/${orderId}/print-invoice`, '_blank');
+                }, idx * 500);
+            });
+        });
+    }
+
+    // Bulk print package slips
+    const printSlipsBtn = document.getElementById('bulk-print-package-slips');
+    if (printSlipsBtn) {
+        printSlipsBtn.addEventListener('click', function() {
+            const selected = Array.from(document.querySelectorAll('.order-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) {
+                alert('Please select at least one order.');
+                return;
+            }
+            selected.forEach((orderId, idx) => {
+                setTimeout(() => {
+                    window.open(`/order/${orderId}/print-package-slip`, '_blank');
+                }, idx * 500);
+            });
+        });
+    }
+
+    // Courier status click handler (refresh status)
+    document.addEventListener('click', function(e) {
+        const badge = e.target.closest('.courier-status-badge');
+        if (badge) {
+            const orderId = badge.dataset.orderId;
+            const courier = badge.dataset.courier;
+            const statusText = badge.querySelector('.courier-status-text');
+            statusText.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            let url = '';
+            if (courier === 'steadfast') {
+                url = `/vendor/steadfast/order-status/${orderId}`;
+            } else if (courier === 'pathao') {
+                url = `/vendor/pathao/order-status/${orderId}`;
+            }
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    statusText.textContent = data.status || 'Checked';
+                } else {
+                    statusText.textContent = 'Failed';
+                }
+            })
+            .catch(() => {
+                statusText.textContent = 'Error';
+            });
+        }
+    });
+});
+</script>
+@endpush
 @endsection

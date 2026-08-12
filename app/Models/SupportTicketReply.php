@@ -11,6 +11,11 @@ class SupportTicketReply extends Model
         'ticket_id',
         'user_id',
         'message',
+        'attachments',
+    ];
+
+    protected $casts = [
+        'attachments' => 'array',
     ];
 
     /**

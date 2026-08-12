@@ -780,42 +780,76 @@
                                     }
                                 }
                             @endphp
+                             @if(!auth()->user()->hasRole('reseller'))
+                                 @if($displayOldPrice)
+                                     <small class="text-decoration-line-through text-muted d-block" style="font-size: 0.75rem;">{{ $displayOldPrice }}</small>
+                                 @endif
+                                 <strong class="text-dark fs-6">{{ $displayPrice }}</strong>
 
-                            @if($displayOldPrice)
-                                <small class="text-decoration-line-through text-muted d-block" style="font-size: 0.75rem;">{{ $displayOldPrice }}</small>
-                            @endif
-                            <strong class="text-dark fs-6">{{ $displayPrice }}</strong>
+                                 @if(($source ?? 'my_products') === 'my_products' && $displayWholesalePrice)
+                                     <div class="mt-1">
+                                         <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Wholesale Price</small>
+                                         <span class="badge bg-light text-secondary border px-2 py-1" style="font-size: 0.8rem; font-weight: 700; border-radius: 6px;">
+                                             {{ $displayWholesalePrice }}
+                                         </span>
+                                     </div>
+                                 @endif
+                             @endif
 
-                            @if(($source ?? 'my_products') === 'my_products' && $displayWholesalePrice)
-                                <div class="mt-1">
-                                    <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Wholesale Price</small>
-                                    <span class="badge bg-light text-secondary border px-2 py-1" style="font-size: 0.8rem; font-weight: 700; border-radius: 6px;">
-                                        {{ $displayWholesalePrice }}
-                                    </span>
-                                </div>
-                            @endif
-
-                            @if(auth()->user()->hasRole('reseller'))
-                                 <div class="mt-1">
-                                     <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Reseller Price</small>
-                                     @php
-                                         $resellerPrice = (float)($product->reseller_price ?? 0);
-                                         if ($resellerPrice <= 0) {
-                                             // A reseller's base price should be the admin's reseller_price or wholesale_price
-                                             $basePrice = (float)($product->reseller_price > 0 ? $product->reseller_price : ($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)))));
-                                             
-                                             if ($basePrice <= 0 && $product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
-                                                 $firstComb = $product->variationCombinations->first();
-                                                 $basePrice = (float)($firstComb->reseller_price > 0 ? $firstComb->reseller_price : ($firstComb->wholesale_price > 0 ? $firstComb->wholesale_price : ($firstComb->product_cost > 0 ? $firstComb->product_cost : ($firstComb->offer_price ?? $firstComb->regular_price ?? 0))));
-                                             }
-                                             $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
-                                             $resellerPrice = $basePrice + ($basePrice * ($markupPct / 100));
-                                         }
-                                     @endphp
-                                     <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-0.5" style="font-size: 0.8rem; font-weight: 700;">
-                                         ৳{{ number_format($resellerPrice, 2) }}
-                                     </span>
-                                 </div>
+                             @if(auth()->user()->hasRole('reseller'))
+                                  <div class="mt-1">
+                                      @php
+                                           if ($product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
+                                               $firstComb = $product->variationCombinations->first();
+                                               $adminResellerPrice = (float)($firstComb->reseller_price ?? 0);
+                                               if ($adminResellerPrice <= 0) {
+                                                   $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                                                   $prodCost = (float)($firstComb->product_cost > 0 ? $firstComb->product_cost : ($product->product_cost ?? 0));
+                                                   if ($prodCost > 0) {
+                                                       $basePrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                                                   } else {
+                                                       $basePrice = (float)($firstComb->wholesale_price > 0 ? $firstComb->wholesale_price : ($firstComb->offer_price ?? $firstComb->regular_price ?? 0));
+                                                   }
+                                               } else {
+                                                   $basePrice = $adminResellerPrice;
+                                               }
+                                           } else {
+                                               $adminResellerPrice = (float)($product->reseller_price ?? 0);
+                                               if ($adminResellerPrice <= 0) {
+                                                   $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                                                   $prodCost = (float)($product->product_cost ?? 0);
+                                                   if ($prodCost > 0) {
+                                                       $basePrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                                                   } else {
+                                                       $basePrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)));
+                                                   }
+                                               } else {
+                                                   $basePrice = $adminResellerPrice;
+                                               }
+                                           }
+                                           
+                                           $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
+                                           $sellingPrice = $basePrice + ceil($basePrice * ($markupPct / 100));
+                                           $profit = $sellingPrice - $basePrice;
+                                       @endphp
+                                       
+                                       <!-- Large price is the Reseller Cost -->
+                                       <strong class="text-dark fs-6" title="Reseller Cost">৳{{ number_format($basePrice, 2) }}</strong>
+                                       
+                                       <div class="mt-2 pt-2 border-top">
+                                           <div class="d-flex flex-column gap-1">
+                                               <div>
+                                                   <small class="text-muted d-block" style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase;">Selling Price</small>
+                                                   <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-0.5" style="font-size: 0.8rem; font-weight: 700;">
+                                                       ৳{{ number_format($sellingPrice, 2) }}
+                                                   </span>
+                                               </div>
+                                               <div style="font-size: 0.72rem; line-height: 1.2;">
+                                                   <span class="text-warning fw-bold d-block">+৳{{ number_format($profit, 2) }} profit</span>
+                                               </div>
+                                           </div>
+                                       </div>
+                                  </div>
                              @endif
 
                              @if(auth()->user()->hasRole('wholeseller'))

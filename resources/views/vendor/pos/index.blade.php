@@ -511,6 +511,31 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <!-- Self-Delivery Wallet System -->
+                        <div class="col-12 mt-3 p-3 bg-light rounded-3 border" id="selfDeliveryWrapper">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold text-dark fs-7"><i class="fas fa-truck-ramp-box me-1.5 text-primary"></i> Self-Delivery Option</span>
+                                <div class="form-check form-switch p-0 m-0">
+                                    <input class="form-check-input ms-0" type="checkbox" id="selfDeliveryToggle" onchange="toggleSelfDelivery()">
+                                </div>
+                            </div>
+                            <p class="text-muted small mb-2" style="font-size: 0.72rem; line-height: 1.4;">
+                                Enable this option to dispatch the order yourself using Steadfast/Pathao. This will deduct the reseller product cost from your wallet and directly approve the order.
+                            </p>
+                            <div class="d-flex justify-content-between text-muted small mt-1">
+                                <span>Reseller Cost of Items:</span>
+                                <span class="fw-bold text-dark" id="resellerCostTotal">৳0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>Your Wallet Balance:</span>
+                                <span class="fw-bold text-primary" id="walletBalanceVal">৳{{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</span>
+                            </div>
+                            <div class="alert alert-danger p-2 mt-2 mb-0 d-none" id="insufficientBalanceAlert" style="font-size: 0.7rem; border-radius: 6px;">
+                                <i class="fas fa-triangle-exclamation me-1"></i> Insufficient wallet balance for Self-Delivery.
+                            </div>
+                        </div>
+
                         <div class="col-12 mt-2">
                             <label>Remarks</label>
                             <textarea class="form-control" id="orderNotes" rows="2" placeholder="Optional notes for admin"></textarea>
@@ -629,11 +654,17 @@ function renderProducts(products) {
                 <div class="pos-card-img-wrap">${imgHtml}</div>
                 <div class="pos-card-body">
                     <div class="pos-card-title">${p.title}</div>
-                    <div class="pos-card-footer">
-                        <span class="pos-card-price">৳${parseFloat(p.price).toFixed(2)}</span>
-                        <span class="badge ${isOutOfStock ? 'bg-danger' : 'bg-success bg-opacity-10 text-success'} font-weight-bold" style="font-size:0.7rem;">
-                            ${isOutOfStock ? 'Out of Stock' : 'In Stock'}
-                        </span>
+                    <div class="pos-card-footer d-flex flex-column gap-2 mt-auto">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <span class="pos-card-price text-success fw-bold" style="font-size: 1.05rem;" title="Selling Price">৳${parseFloat(p.price).toFixed(2)}</span>
+                            <span class="badge ${isOutOfStock ? 'bg-danger' : 'bg-success bg-opacity-10 text-success'} font-weight-bold" style="font-size:0.65rem; padding: 4px 8px; border-radius: 6px;">
+                                ${isOutOfStock ? 'Out of Stock' : 'In Stock'}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center w-100 border-top pt-2" style="font-size: 0.75rem;">
+                            <span class="text-muted">Cost: ৳${parseFloat(p.reseller_price).toFixed(2)}</span>
+                            <span class="badge bg-warning bg-opacity-10 text-dark fw-bold border-0 px-2 py-1" style="font-size: 0.68rem; border-radius: 4px;" title="Profit margin">+৳${parseFloat(p.price - p.reseller_price).toFixed(2)} profit</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -667,12 +698,13 @@ function onProductClick(product) {
         let html = '<div class="list-group">';
         product.variations.forEach(v => {
             const varDisabled = !v.in_stock ? 'disabled opacity-50' : '';
+            const profit = parseFloat(v.price - v.reseller_price);
             html += `
                 <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" ${varDisabled} onclick="addVariationToCart(${v.id}, '${v.display_name.replace(/'/g, "\\'")}', ${v.price}, ${v.reseller_price})">
                     <span class="font-weight-bold text-dark">${v.display_name}</span>
                     <div class="text-end">
-                        <span class="text-success font-weight-bold me-2">৳${parseFloat(v.price).toFixed(2)}</span>
-                        <small class="text-muted">(${v.stock_quantity} units)</small>
+                        <span class="text-success font-weight-bold d-block">৳${parseFloat(v.price).toFixed(2)}</span>
+                        <small class="text-muted" style="font-size: 0.68rem;">Cost: ৳${parseFloat(v.reseller_price).toFixed(2)} | +৳${profit.toFixed(2)} profit</small>
                     </div>
                 </button>
             `;
@@ -791,7 +823,11 @@ function clearCart() {
 
 function updateTotals() {
     let sub = 0;
-    cart.forEach(i => sub += (i.price * i.quantity));
+    let resellerCostSum = 0;
+    cart.forEach(i => {
+        sub += (i.price * i.quantity);
+        resellerCostSum += (i.reseller_price * i.quantity);
+    });
     
     const shipping = parseFloat($('#shippingAmount').val()) || 0;
     const discount = parseFloat($('#discountAmount').val()) || 0;
@@ -811,6 +847,28 @@ function updateTotals() {
     $('#total').text('৳' + grand.toFixed(2));
     $('#dueAmount').text('৳' + due.toFixed(2));
     $('#cartItemCount').text(cart.reduce((a, b) => a + b.quantity, 0));
+
+    // Update reseller cost total UI
+    $('#resellerCostTotal').text('৳' + resellerCostSum.toFixed(2));
+
+    // Check if wallet balance supports self delivery
+    const walletBalance = parseFloat('{{ auth()->user()->wallet_balance ?? 0 }}');
+    if (resellerCostSum > walletBalance) {
+        $('#selfDeliveryToggle').prop('checked', false).prop('disabled', true);
+        $('#insufficientBalanceAlert').removeClass('d-none');
+    } else {
+        $('#selfDeliveryToggle').prop('disabled', false);
+        $('#insufficientBalanceAlert').addClass('d-none');
+    }
+}
+
+function toggleSelfDelivery() {
+    if ($('#selfDeliveryToggle').is(':checked')) {
+        $('#shippingAmount').val('0').prop('disabled', true);
+    } else {
+        $('#shippingAmount').prop('disabled', false);
+    }
+    updateTotals();
 }
 
 function validateCheckout() {
@@ -843,16 +901,29 @@ function processOrder() {
         items: cart,
         total: total,
         amount_paid: amountPaid,
-        payment_status: paymentStatus
+        payment_status: paymentStatus,
+        delivery_type: $('#selfDeliveryToggle').is(':checked') ? 'self' : 'admin'
     };
 
     $.post('{{ route("vendor.pos.create-order") }}', orderData)
     .done(function(response) {
         if (response.success) {
             toastr.success(response.message);
+            
+            // Deduct wallet balance from UI dynamically if self delivery was checked
+            if ($('#selfDeliveryToggle').is(':checked')) {
+                let cost = 0;
+                cart.forEach(i => cost += (i.reseller_price * i.quantity));
+                let oldBal = parseFloat('{{ auth()->user()->wallet_balance ?? 0 }}');
+                let newBal = Math.max(0, oldBal - cost);
+                $('#walletBalanceVal, .wallet-balance-amount').text('৳ ' + newBal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            }
+
             clearCart();
             $('#customerName, #customerPhone, #customerAddress, #customerCity, #orderNotes, #amountPaid').val('');
             $('#shippingAmount, #discountAmount').val('0');
+            $('#selfDeliveryToggle').prop('checked', false);
+            $('#shippingAmount').prop('disabled', false);
         } else {
             toastr.error(response.message);
         }

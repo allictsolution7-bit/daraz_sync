@@ -51,15 +51,27 @@ class SupportTicketController extends Controller
         $ticket = SupportTicket::findOrFail($id);
 
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'required_without:attachments|nullable|string',
+            'attachments' => 'required_without:message|nullable|array',
             'status' => 'required|string|in:open,pending,resolved,closed',
+            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,zip|max:5120',
         ]);
+
+        $attachments = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('support_attachments'), $fileName);
+                $attachments[] = 'support_attachments/' . $fileName;
+            }
+        }
 
         // Create the reply message
         SupportTicketReply::create([
             'ticket_id' => $ticket->id,
             'user_id' => Auth::id(),
-            'message' => $request->message,
+            'message' => $request->message ?? '',
+            'attachments' => $attachments,
         ]);
 
         // Update ticket status

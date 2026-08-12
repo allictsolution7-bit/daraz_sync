@@ -172,17 +172,21 @@ class VendorPOSController extends Controller
                             // Calculate reseller calculated price
                             $adminResellerPrice = (float)($combo->reseller_price ?? 0);
                             if ($adminResellerPrice <= 0) {
-                                $basePrice = (float)($combo->wholesale_price > 0 ? $combo->wholesale_price : ($combo->product_cost > 0 ? $combo->product_cost : ($combo->offer_price ?? $combo->regular_price ?? 0)));
-                                $finalPrice = $basePrice + ($basePrice * ($markupPct / 100));
-                            } else {
-                                $finalPrice = $adminResellerPrice;
+                                $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                                $prodCost = (float)($combo->product_cost > 0 ? $combo->product_cost : ($product->product_cost ?? 0));
+                                if ($prodCost > 0) {
+                                    $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                                } else {
+                                    $adminResellerPrice = (float)($combo->wholesale_price > 0 ? $combo->wholesale_price : ($combo->offer_price ?? $combo->regular_price ?? 0));
+                                }
                             }
+                            $finalPrice = $adminResellerPrice + ceil($adminResellerPrice * ($markupPct / 100));
 
                             return [
                                 'id' => $combo->id,
                                 'display_name' => $combo->display_name ?? 'Variation',
                                 'price' => $finalPrice,
-                                'reseller_price' => $adminResellerPrice > 0 ? $adminResellerPrice : ($combo->wholesale_price > 0 ? $combo->wholesale_price : ($combo->product_cost > 0 ? $combo->product_cost : 0)),
+                                'reseller_price' => $adminResellerPrice,
                                 'regular_price' => $combo->regular_price ?? 0,
                                 'offer_price' => $combo->offer_price,
                                 'product_cost' => $combo->product_cost ?? 0,
@@ -201,15 +205,19 @@ class VendorPOSController extends Controller
                         // Calculate simple product calculated reseller price
                         $adminResellerPrice = (float)($product->reseller_price ?? 0);
                         if ($adminResellerPrice <= 0) {
-                            $basePrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0))));
-                            $finalPrice = $basePrice + ($basePrice * ($markupPct / 100));
-                        } else {
-                            $finalPrice = $adminResellerPrice;
+                            $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                            $prodCost = (float)($product->product_cost ?? 0);
+                            if ($prodCost > 0) {
+                                $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                            } else {
+                                $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)));
+                            }
                         }
+                        $finalPrice = $adminResellerPrice + ceil($adminResellerPrice * ($markupPct / 100));
 
                         $quantity = (int) ($product->computed_quantity ?? $product->quantity ?? 0);
                         $data['price'] = $finalPrice;
-                        $data['reseller_price'] = $adminResellerPrice > 0 ? $adminResellerPrice : ($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : 0));
+                        $data['reseller_price'] = $adminResellerPrice;
                         $data['regular_price'] = $product->old_price ?? 0;
                         $data['offer_price'] = $product->offer;
                         $data['product_cost'] = $product->product_cost ?? 0;
@@ -260,6 +268,7 @@ class VendorPOSController extends Controller
             'notes' => 'nullable|string',
             'amount_paid' => 'nullable|numeric|min:0',
             'payment_status' => 'nullable|string|in:paid,pending',
+            'delivery_type' => 'nullable|string|in:self,admin',
         ]);
 
         try {
@@ -312,6 +321,60 @@ class VendorPOSController extends Controller
                     }
                 }
 
+                // Calculate total reseller cost to deduct from wallet if self-delivery
+                $resellerOrderCost = 0;
+                foreach ($request->items as $item) {
+                    $product = Product::find($item['product_id']);
+                    
+                    if ($item['combination_id']) {
+                        $combination = VariationCombination::find($item['combination_id']);
+                        $adminResellerPrice = $combination ? (float)($combination->reseller_price ?? 0) : 0;
+                        if ($adminResellerPrice <= 0 && $combination) {
+                            $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                            $prodCost = (float)($combination->product_cost > 0 ? $combination->product_cost : ($product->product_cost ?? 0));
+                            if ($prodCost > 0) {
+                                $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                            } else {
+                                $adminResellerPrice = (float)($combination->wholesale_price > 0 ? $combination->wholesale_price : ($combination->product_cost > 0 ? $combination->product_cost : 0));
+                            }
+                        }
+                        $unitCost = $adminResellerPrice;
+                    } else {
+                        $adminResellerPrice = (float)($product->reseller_price ?? 0);
+                        if ($adminResellerPrice <= 0) {
+                            $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                            $prodCost = (float)($product->product_cost ?? 0);
+                            if ($prodCost > 0) {
+                                $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                            } else {
+                                $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : 0));
+                            }
+                        }
+                        $unitCost = $adminResellerPrice;
+                    }
+
+                    $resellerOrderCost += $unitCost * $item['quantity'];
+                }
+
+                $isSelfDelivery = $request->delivery_type === 'self';
+                if ($isSelfDelivery) {
+                    if ($reseller->wallet_balance < $resellerOrderCost) {
+                        throw new \Exception("Insufficient wallet balance. You need at least ৳" . number_format($resellerOrderCost, 2) . " but you only have ৳" . number_format($reseller->wallet_balance, 2) . ".");
+                    }
+                    
+                    // Deduct from reseller's wallet balance
+                    $reseller->decrement('wallet_balance', $resellerOrderCost);
+                    
+                    // Log transaction
+                    \App\Models\VendorWalletTransaction::create([
+                        'vendor_id' => $reseller->id,
+                        'type' => 'reseller_pos_payment',
+                        'amount' => $resellerOrderCost,
+                        'status' => 'approved',
+                        'admin_note' => "Paid for Reseller POS Order (Self-Delivery). Products cost: ৳" . number_format($resellerOrderCost, 2),
+                    ]);
+                }
+
                  // Create Order
                  $order = order::create([
                      'name' => $customer->name,
@@ -320,7 +383,7 @@ class VendorPOSController extends Controller
                      'city' => $customer->city ?? '',
                      'upazila' => '',
                      'user_id' => $customer->id,
-                     'status' => 'pending', // Reseller orders start as pending for admin verification
+                     'status' => $isSelfDelivery ? 'processing' : 'pending', // Self-delivered orders start as processing (approved), admin delivered orders start as pending
                      'order_source' => 'Reseller POS',
                      'payment_method' => $request->payment_method,
                      'total' => $request->total,
@@ -328,9 +391,11 @@ class VendorPOSController extends Controller
                      'shipping' => $request->shipping ?? 0,
                      'message' => $request->notes,
                      'assigned_to' => $reseller->created_by, // Automatically assign to the reseller's admin
-                     'payment_status' => $request->payment_status === 'paid' ? 'paid' : 'pending',
+                     'payment_status' => $isSelfDelivery ? 'paid' : ($request->payment_status === 'paid' ? 'paid' : 'pending'),
                      'delivery_data' => [
                          'amount_paid' => $request->amount_paid ?? 0,
+                         'delivery_by' => $isSelfDelivery ? 'reseller' : 'admin',
+                         'reseller_cost_deducted' => $isSelfDelivery ? $resellerOrderCost : 0,
                      ]
                  ]);
 
@@ -354,15 +419,32 @@ class VendorPOSController extends Controller
                         }
                     }
 
-                    // Base Cost of product is what admin set as reseller_price (defaulting to wholesale_price or product_cost if 0)
-                    $unitCost = ($item['combination_id'] && isset($combination))
-                        ? ($combination->reseller_price ?? $combination->wholesale_price ?? $combination->product_cost ?? 0)
-                        : ($product->reseller_price ?? $product->wholesale_price ?? $product->product_cost ?? 0);
-
-                    if ($unitCost <= 0) {
-                        $unitCost = ($item['combination_id'] && isset($combination))
-                            ? ($combination->wholesale_price ?? $combination->product_cost ?? 0)
-                            : ($product->wholesale_price ?? $product->product_cost ?? 0);
+                    // Base Cost of product is what admin set as reseller_price (defaulting to product cost + reseller_price_percent)
+                    if ($item['combination_id']) {
+                        $combination = VariationCombination::find($item['combination_id']);
+                        $adminResellerPrice = $combination ? (float)($combination->reseller_price ?? 0) : 0;
+                        if ($adminResellerPrice <= 0 && $combination) {
+                            $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                            $prodCost = (float)($combination->product_cost > 0 ? $combination->product_cost : ($product->product_cost ?? 0));
+                            if ($prodCost > 0) {
+                                $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                            } else {
+                                $adminResellerPrice = (float)($combination->wholesale_price > 0 ? $combination->wholesale_price : ($combination->product_cost > 0 ? $combination->product_cost : 0));
+                            }
+                        }
+                        $unitCost = $adminResellerPrice;
+                    } else {
+                        $adminResellerPrice = (float)($product->reseller_price ?? 0);
+                        if ($adminResellerPrice <= 0) {
+                            $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                            $prodCost = (float)($product->product_cost ?? 0);
+                            if ($prodCost > 0) {
+                                $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                            } else {
+                                $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : 0));
+                            }
+                        }
+                        $unitCost = $adminResellerPrice;
                     }
 
                     // reseller_commission = selling_price - admin_cost

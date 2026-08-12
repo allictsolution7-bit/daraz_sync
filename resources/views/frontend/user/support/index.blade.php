@@ -352,7 +352,7 @@
             <span class="close-modal" onclick="closeTicketModal()">&times;</span>
             <h3 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 20px;">Submit a Complaint / Request</h3>
             
-            <form action="{{ route('support.store') }}" method="POST">
+            <form action="{{ route('support.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">
                     <label for="subject">Subject / Title</label>
@@ -385,6 +385,12 @@
                 <div class="form-group">
                     <label for="message">Detailed Explanation</label>
                     <textarea id="message" name="message" class="form-control" rows="5" placeholder="Describe your issue in detail. If relating to an order, please include order ID." required style="resize: vertical; font-family: inherit;"></textarea>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="attachments">Attach Images / Files (Optional)</label>
+                    <input type="file" id="attachments" name="attachments[]" class="form-control" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" style="height: auto; padding: 6px;">
+                    <span style="font-size: 11px; color: #64748b; margin-top: 4px; display: block;">You can select multiple files. Allowed formats: images, PDF, Word, Excel, ZIP (Max 5MB each).</span>
                 </div>
 
                 <div style="text-align: right; margin-top: 25px;">

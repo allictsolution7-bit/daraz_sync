@@ -22,6 +22,118 @@
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: border-top 0.3s ease;
+        }
+
+        .support-card.card-status-open {
+            border-top: 4px solid #3b82f6;
+        }
+
+        .support-card.card-status-pending {
+            border-top: 4px solid #f59e0b;
+        }
+
+        .support-card.card-status-resolved {
+            border-top: 4px solid #10b981;
+        }
+
+        .support-card.card-status-closed {
+            border-top: 4px solid #64748b;
+        }
+
+        /* Attachment Styles */
+        .attachment-container {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-top: 1px dashed #f1f5f9;
+            padding-top: 8px;
+        }
+
+        .attachment-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #475569;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .attachment-item:hover {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+
+        .attachment-image-preview {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .attachment-image-preview:hover {
+            transform: scale(1.05);
+        }
+
+        /* Custom Chat Upload Styles */
+        .chat-input-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 24px;
+            background: #fff;
+            padding: 2px 16px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .file-list-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .file-preview-item {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #334155;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .file-preview-item:hover {
+            background-color: #e2e8f0;
+            border-color: #94a3b8;
+        }
+
+        .file-preview-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .support-header {
@@ -230,7 +342,7 @@
             @include('frontend.user.partials.sidebar')
 
             <!-- Main Content Card -->
-            <div class="support-card">
+            <div class="support-card card-status-{{ $ticket->status }}">
                 <div class="support-header">
                     <h4>
                         <a href="{{ route('support.index') }}" class="btn-back">
@@ -248,6 +360,16 @@
                     @if (session('success'))
                         <div class="alert alert-success" style="padding: 15px; border-radius: 10px; background-color: #d1fae5; color: #065f46; margin-bottom: 20px; border: none; font-weight: 500;">
                             {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger" style="padding: 15px; border-radius: 10px; background-color: #fee2e2; color: #b91c1c; margin-bottom: 20px; border: none; font-weight: 500;">
+                            <ul style="margin: 0; padding-left: 20px; font-size: 13.5px;">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
                     @endif
 
@@ -285,36 +407,108 @@
                                         </span>
                                         <span>{{ $reply->created_at->diffForHumans() }}</span>
                                     </div>
-                                    <div class="message-content">{{ $reply->message }}</div>
+                                    @if(!empty(trim($reply->message)))
+                                        <div class="message-content">{{ $reply->message }}</div>
+                                    @endif
+                                    @if(!empty($reply->attachments))
+                                        <div class="attachment-container">
+                                            @foreach($reply->attachments as $path)
+                                                @php
+                                                    $cleanPath = str_replace('storage/support_attachments/', 'support_attachments/', $path);
+                                                    $isImage = in_array(strtolower(pathinfo($cleanPath, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
+                                                    $fileName = basename($cleanPath);
+                                                @endphp
+                                                @if($isImage)
+                                                    <a href="{{ asset($cleanPath) }}" target="_blank" title="View full image">
+                                                        <img src="{{ asset($cleanPath) }}" class="attachment-image-preview" alt="Attachment">
+                                                    </a>
+                                                @else
+                                                    <a href="{{ asset($cleanPath) }}" target="_blank" class="attachment-item" title="Download File">
+                                                        <i class="fa-solid fa-file-arrow-down"></i>
+                                                        <span>{{ $fileName }}</span>
+                                                    </a>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
                     </div>
 
                     <!-- Reply Box -->
-                    <div class="reply-box">
-                        <h4 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 15px;">Post a Reply</h4>
-                        <form action="{{ route('support.reply', $ticket->id) }}" method="POST">
-                            @csrf
-                            <div class="form-group" style="margin-bottom: 15px;">
-                                <textarea name="message" class="form-control" rows="4" placeholder="Type your message here..." required style="resize: vertical; font-family: inherit; font-size: 14px;"></textarea>
+                    <div class="reply-box" style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
+                        <h4 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 15px;">Post a Reply</h4>
+                        
+                        @if ($ticket->status === 'resolved' || $ticket->status === 'closed')
+                            <div style="font-size: 13px; color: #92400e; background-color: #fffbeb; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border: 1px solid #fef3c7;">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span>This ticket is currently closed/resolved. Sending a reply will automatically reopen it.</span>
                             </div>
-                            
-                            @if ($ticket->status === 'resolved' || $ticket->status === 'closed')
-                                <div style="font-size: 13px; color: #92400e; background-color: #fffbeb; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border: 1px solid #fef3c7;">
-                                    <i class="fa-solid fa-circle-exclamation"></i>
-                                    <span>This ticket is currently closed/resolved. Sending a reply will automatically reopen the ticket.</span>
-                                </div>
-                            @endif
+                        @endif
 
-                            <button type="submit" class="btn-reply">
-                                <i class="fa-solid fa-paper-plane"></i> Send Message
+                        <form action="{{ route('support.reply', $ticket->id) }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 12px; align-items: center; width: 100%;">
+                            @csrf
+                            <div class="chat-input-wrapper">
+                                <textarea name="message" placeholder="Type your message here..." style="flex: 1; border: none; outline: none; background: transparent; padding: 10px 0; resize: none; font-size: 14px; height: 38px; line-height: 20px; font-family: inherit;"></textarea>
+                                
+                                <button type="button" onclick="document.getElementById('reply_attachments').click()" style="background: none; border: none; color: #64748b; cursor: pointer; padding: 6px; margin-left: 10px; transition: color 0.2s; display: flex; align-items: center; justify-content: center;" title="Attach Files (Max 5MB each)">
+                                    <i class="fa-solid fa-paperclip" style="font-size: 18px;"></i>
+                                </button>
+                                <input type="file" id="reply_attachments" name="attachments[]" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.zip" style="display: none;">
+                            </div>
+                            <button type="submit" style="height: 42px; width: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; cursor: pointer; color: white; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2); flex-shrink: 0; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                <i class="fa-solid fa-paper-plane" style="font-size: 15px; margin: 0;"></i>
                             </button>
                         </form>
+                        <div id="file-list" class="file-list-preview" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; width: 100%;"></div>
                     </div>
 
                 </div>
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('reply_attachments');
+    const fileList = document.getElementById('file-list');
+
+    if (fileInput && fileList) {
+        // Handle file selection
+        fileInput.addEventListener('change', updateFileList);
+
+        function updateFileList() {
+            fileList.innerHTML = '';
+            const files = fileInput.files;
+            
+            if (files.length > 3) {
+                alert("You can only upload a maximum of 3 files at a time.");
+                fileInput.value = ''; // Reset input
+                return;
+            }
+            
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const item = document.createElement('div');
+                    item.className = 'file-preview-item';
+                    
+                    const nameContainer = document.createElement('div');
+                    nameContainer.className = 'file-preview-name';
+                    
+                    const isImage = file.type.startsWith('image/');
+                    const iconClass = isImage ? 'fa-regular fa-image' : 'fa-regular fa-file-lines';
+                    nameContainer.innerHTML = `<i class="${iconClass}" style="color: #6366f1;"></i> <span>${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>`;
+                    
+                    item.appendChild(nameContainer);
+                    fileList.appendChild(item);
+                }
+            }
+        }
+    }
+});
+</script>
 @endsection

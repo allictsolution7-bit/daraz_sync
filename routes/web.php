@@ -915,6 +915,22 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor', 'authori
         Route::post('/recharge', [\App\Http\Controllers\Vendor\VendorWalletController::class, 'recharge'])->name('recharge');
         Route::post('/transfer', [\App\Http\Controllers\Vendor\VendorWalletController::class, 'transfer'])->name('transfer');
     });
+
+    // Courier Integration for Resellers/Vendors
+    Route::prefix('steadfast')->group(function () {
+        Route::post('send', [\App\Http\Controllers\Admin\Courier\SteadFastController::class, 'sendToCourier'])->name('steadfast.send');
+        Route::post('send-bulk', [\App\Http\Controllers\Admin\Courier\SteadFastController::class, 'sendBulkToCourier'])->name('steadfast.sendBulk');
+        Route::get('order-status/{orderId}', [\App\Http\Controllers\Admin\Courier\SteadFastController::class, 'getCourierOrderStatus'])->name('steadfast.orderStatus');
+        Route::get('balance', [\App\Http\Controllers\Admin\Courier\SteadFastController::class, 'getBalance'])->name('steadfast.balance');
+    });
+
+    Route::prefix('pathao')->group(function () {
+        Route::post('send', [\App\Http\Controllers\Admin\Courier\PathaoController::class, 'sendToCourier'])->name('pathao.send');
+        Route::post('send-bulk', [\App\Http\Controllers\Admin\Courier\PathaoController::class, 'sendBulkToCourier'])->name('pathao.sendBulk');
+        Route::get('order-status/{orderId}', [\App\Http\Controllers\Admin\Courier\PathaoController::class, 'getCourierOrderStatus'])->name('pathao.orderStatus');
+        Route::get('balance', [\App\Http\Controllers\Admin\Courier\PathaoController::class, 'getBalance'])->name('pathao.balance');
+        Route::get('stores', [\App\Http\Controllers\Admin\Courier\PathaoController::class, 'getPathaoStores'])->name('pathao.stores');
+    });
 });
 
 // ==========================================

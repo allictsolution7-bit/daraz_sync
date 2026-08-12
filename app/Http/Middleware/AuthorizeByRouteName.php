@@ -35,6 +35,8 @@ class AuthorizeByRouteName
             str_starts_with($name, 'admin.profile') || 
             str_starts_with($name, 'admin.steadfast') ||
             str_starts_with($name, 'admin.pathao') ||
+            str_starts_with($name, 'vendor.steadfast') ||
+            str_starts_with($name, 'vendor.pathao') ||
             str_starts_with($name, 'admin.delivery') ||
             str_starts_with($name, 'admin.support-tickets')
         ) {
@@ -240,6 +242,9 @@ class AuthorizeByRouteName
         $routePermission = str_replace(['.update', '.destroy'], ['.edit', '.delete'], $name);
         $routePermissionSnake = str_replace(['.update', '.destroy'], ['.edit', '.delete'], $permission);
 
+        $isResellerFinanceRoute = (str_starts_with($name, 'vendor.wallet.') || str_starts_with($name, 'vendor.withdrawals.')) &&
+            method_exists($user, 'hasRole') && $user->hasRole('reseller');
+
         if (
             $user->can($permission) || 
             $user->can($vendorPerm) || 
@@ -249,6 +254,7 @@ class AuthorizeByRouteName
             $user->can($routePermissionSnake) ||
             $hasOrderAssignedPermission || 
             ($isPackagesView && $isAdminUser) || 
+            $isResellerFinanceRoute ||
             (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin')))
         ) {
             return $next($request);

@@ -14,6 +14,11 @@ class SupportTicket extends Model
         'category',
         'status',
         'priority',
+        'attachments',
+    ];
+
+    protected $casts = [
+        'attachments' => 'array',
     ];
 
     /**
