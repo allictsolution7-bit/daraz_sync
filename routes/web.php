@@ -250,6 +250,7 @@ Route::middleware('auth')->prefix('support')->name('support.')->group(function (
     Route::post('/store', [App\Http\Controllers\Client\SupportController::class, 'store'])->name('store');
     Route::get('/{id}', [App\Http\Controllers\Client\SupportController::class, 'show'])->name('show');
     Route::post('/{id}/reply', [App\Http\Controllers\Client\SupportController::class, 'reply'])->name('reply');
+    Route::post('/reply/{id}/update', [App\Http\Controllers\Client\SupportController::class, 'updateReply'])->name('reply.update');
 });
 
 Route::get('/track-order', [AccountController::class, 'trackOrder'])->name('order.track')->middleware('auth');

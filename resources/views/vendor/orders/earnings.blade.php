@@ -110,8 +110,14 @@
     }
 
     /* Custom Table Styling */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .table-custom {
         margin-bottom: 0;
+        width: 100%;
     }
 
     .table-custom thead th {
@@ -119,21 +125,29 @@
         color: #475569;
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
+        font-size: 11px;
+        letter-spacing: 0.04em;
         border-bottom: 2px solid #e2e8f0;
-        padding: 1rem 1.25rem;
+        padding: 8px 10px;
+        white-space: nowrap;
     }
 
     .table-custom tbody td {
-        padding: 1rem 1.25rem;
+        padding: 8px 10px;
         vertical-align: middle;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 0.9rem;
+        font-size: 12px;
+        white-space: nowrap;
     }
 
     .table-custom tbody tr:hover {
         background-color: rgba(248, 250, 252, 0.8);
+    }
+
+    .table-custom tfoot td {
+        padding: 8px 10px;
+        font-size: 12px;
+        white-space: nowrap;
     }
 
     .badge-paid {

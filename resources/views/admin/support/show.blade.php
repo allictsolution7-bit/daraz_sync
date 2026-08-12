@@ -26,8 +26,14 @@
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
-            margin-bottom: 1.5rem;
-            padding: 1.25rem;
+            margin-bottom: 1rem;
+            padding: 10px 15px;
+        }
+
+        .col-lg-8 .premium-card {
+            height: calc(114vh - 70px);
+            display: flex;
+            flex-direction: column;
         }
 
         .premium-card.card-status-open {
@@ -218,15 +224,18 @@
         .message-thread {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            margin-top: 25px;
-            margin-bottom: 30px;
+            gap: 12px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
         }
 
         .message-bubble {
             display: flex;
-            gap: 12px;
-            padding: 12px 16px;
+            gap: 10px;
+            padding: 10px 14px;
             border-radius: 12px;
             max-width: 85%;
         }
@@ -245,8 +254,8 @@
         }
 
         .avatar {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             object-fit: cover;
             flex-shrink: 0;
@@ -367,7 +376,7 @@
         <!-- Main Ticket Details and Conversation Thread -->
         <div class="col-lg-8 col-md-12">
             <div class="premium-card card-status-{{ $ticket->status }}">
-                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 10px;">
+                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 6px;">
                     <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">{{ $ticket->subject }}</h2>
                     <span style="font-size: 13px; color: #64748b; font-weight: 500;">
                         Category: <strong style="color: #475569;">{{ $ticket->category }}</strong> &bull; 
@@ -432,7 +441,7 @@
                 </div>
 
                 <!-- Reply Form -->
-                <div class="reply-box" style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
+                <div class="reply-box" style="border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 10px;">
                     <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 12px;">Send a Reply</h4>
                     <form action="{{ route('admin.support-tickets.reply', $ticket->id) }}" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
                         @csrf
@@ -526,6 +535,11 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const thread = document.querySelector('.message-thread');
+    if (thread) {
+        thread.scrollTop = thread.scrollHeight;
+    }
+
     const fileInput = document.getElementById('attachments');
     const fileList = document.getElementById('file-list');
 
