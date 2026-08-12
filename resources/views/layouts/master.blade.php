@@ -1140,7 +1140,7 @@
         $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/import-woo*') || request()->routeIs('admin.telegram-settings.*') || request()->is('admin/event-queue*');
         $securityTrustActive = request()->is('admin/trust-scanner*') || request()->is('admin/trust-shield*') || request()->is('admin/snapshots*');
         $contentPagesActive = request()->is('admin/hero-banners*') || request()->is('admin/site-pages*') || request()->is('admin/nav-builder*') || request()->is('admin/articles*') || request()->is('admin/article-topics*') || request()->is('admin/article-subtopics*') || request()->is('admin/comments*');
-        $vendorsActive = request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-payments*') || request()->is('admin/vendor-settings*') || request()->is('admin/partners*') || request()->is('admin/partner-items*') || request()->is('admin/partner-payouts*') || request()->is('admin/partner-config*');
+        $vendorsActive = request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-payments*') || request()->is('admin/vendor-settings*') || request()->is('admin/partners*') || request()->is('admin/partner-items*') || request()->is('admin/partner-payouts*') || request()->is('admin/partner-config*') || request()->is('admin/partner-earnings*');
         $controlSystemActive = request()->is('admin/team-members*') || request()->routeIs('admin.roles_permissions.*') || request()->is('admin/extensions*') || request()->is('admin/config*') || request()->is('admin/social-links*') || request()->is('admin/inquiries*') || request()->routeIs('admin.subscriptions.index');
         @endphp
 
@@ -2189,6 +2189,13 @@
                                              @if($pendingPaymentCount > 0)
                                                  <span class="badge bg-danger rounded-pill ms-2" style="font-size: 0.65rem; padding: 2px 6px;">{{ $pendingPaymentCount }}</span>
                                              @endif
+                                         </span>
+                                     </a>
+                                 </li>
+                                 <li class="{{ request()->routeIs('admin.vendor-earnings.index') ? 'active' : '' }}">
+                                     <a href="{{ route('admin.vendor-earnings.index') }}">
+                                         <span class="menu-content">
+                                             <i class="fas fa-hand-holding-dollar text-success"></i> Partner Earnings
                                          </span>
                                      </a>
                                  </li>

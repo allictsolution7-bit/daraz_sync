@@ -391,7 +391,7 @@ class VendorPOSController extends Controller
                      'shipping' => $request->shipping ?? 0,
                      'message' => $request->notes,
                      'assigned_to' => $reseller->created_by, // Automatically assign to the reseller's admin
-                     'payment_status' => $isSelfDelivery ? 'paid' : ($request->payment_status === 'paid' ? 'paid' : 'pending'),
+                     'payment_status' => ($request->payment_method === 'cod' && !$isSelfDelivery) ? 'pending' : ($isSelfDelivery ? 'paid' : ($request->payment_status === 'paid' ? 'paid' : 'pending')),
                      'delivery_data' => [
                          'amount_paid' => $request->amount_paid ?? 0,
                          'delivery_by' => $isSelfDelivery ? 'reseller' : 'admin',

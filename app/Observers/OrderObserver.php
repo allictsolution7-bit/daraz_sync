@@ -43,19 +43,30 @@ class OrderObserver
 
     /**
      * Handle the order "updated" event.
-     * Process vendor earnings when order is completed/delivered
+     * Process vendor earnings when order is completed/delivered and paid
      */
     public function updated(order $order): void
     {
-        // Check if order status changed to delivered/completed
-        if ($order->isDirty('status')) {
-            $newStatus = $order->status;
-            $oldStatus = $order->getOriginal('status');
+        $statusChanged = $order->isDirty('status');
+        $paymentChanged = $order->isDirty('payment_status');
 
-            // When order is marked as delivered, process vendor earnings
-            if ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
-                $this->processVendorEarnings($order);
-            }
+        $isDelivered = $order->status === 'delivered';
+        $isPaid = $order->payment_status === 'paid';
+
+        // Check if the order is now BOTH delivered AND paid
+        $isCurrentlyEligible = $isDelivered && $isPaid;
+
+        // Check if the order WAS both delivered AND paid before this update
+        $wasDelivered = $order->getOriginal('status') === 'delivered';
+        $wasPaid = $order->getOriginal('payment_status') === 'paid';
+        $wasEligible = $wasDelivered && $wasPaid;
+
+        if ($isCurrentlyEligible && !$wasEligible) {
+            // Transitioned to eligible -> Credit earnings
+            $this->processVendorEarnings($order);
+        } elseif (!$isCurrentlyEligible && $wasEligible) {
+            // Transitioned away from eligible -> Reverse earnings
+            $this->reverseVendorEarnings($order);
         }
     }
 
@@ -122,6 +133,65 @@ class OrderObserver
             ]);
         } catch (\Exception $e) {
             Log::error("Failed to process vendor earnings for order", [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Reverse vendor earnings when order becomes unpaid or undelivered
+     */
+    protected function reverseVendorEarnings(order $order): void
+    {
+        try {
+            // Find vendor items in this order that were already credited/paid
+            $vendorItems = $order->orderItems()
+                ->whereNotNull('vendor_id')
+                ->where('vendor_paid', true)
+                ->get();
+
+            if ($vendorItems->isEmpty()) {
+                return;
+            }
+
+            foreach ($vendorItems as $item) {
+                \Illuminate\Support\Facades\DB::transaction(function () use ($item) {
+                    $item->update([
+                        'vendor_paid' => false,
+                        'vendor_paid_at' => null,
+                    ]);
+
+                    if ($item->vendor_earning > 0) {
+                        // Decrement vendor wallet balance
+                        $vendorUser = \App\Models\User::find($item->vendor_id);
+                        if ($vendorUser) {
+                            $vendorUser->decrement('wallet_balance', $item->vendor_earning);
+                        }
+
+                        // Create a ledger entry for adjustment/reversal
+                        $currentBalance = $this->vendorService->calculateBalance($item->vendor_id);
+                        $newBalance = $currentBalance - $item->vendor_earning;
+
+                        \App\Models\VendorBalanceLedger::create([
+                            'vendor_id' => $item->vendor_id,
+                            'transaction_type' => 'withdrawal', // acts as a debit
+                            'amount' => $item->vendor_earning,
+                            'balance_after' => $newBalance,
+                            'order_id' => $item->order_id,
+                            'order_item_id' => $item->id,
+                            'description' => "Earning reversal from Order #{$item->order_id} - {$item->product->title}",
+                        ]);
+                    }
+                });
+            }
+
+            Log::info("Vendor earnings reversed for order", [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Failed to reverse vendor earnings for order", [
                 'order_id' => $order->id,
                 'error' => $e->getMessage(),
             ]);

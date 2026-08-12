@@ -47,6 +47,7 @@ class ProcessVendorEarnings extends Command
             $this->info('Finding delivered orders with unpaid vendor items...');
             
             $orders = order::where('status', 'delivered')
+                ->where('payment_status', 'paid')
                 ->whereHas('order_items', function ($query) {
                     $query->whereNotNull('vendor_id')
                           ->where('vendor_paid', false);

@@ -588,6 +588,17 @@ $(document).ready(function() {
 
     searchProducts();
 
+    $('#paymentMethod').on('change', function() {
+        if ($(this).val() === 'cod') {
+            $('#amountPaid').val(0);
+            $('#amountPaid').data('autofilled', false);
+        } else {
+            $('#amountPaid').val('');
+            $('#amountPaid').data('autofilled', true);
+        }
+        updateTotals();
+    });
+
     $('#productSearch').on('input', function() {
         searchProducts(1);
     });
@@ -833,11 +844,17 @@ function updateTotals() {
     const discount = parseFloat($('#discountAmount').val()) || 0;
     const grand = Math.max(0, sub + shipping - discount);
 
-    // If the user hasn't typed anything yet or it is 0, auto-fill it with the grand total
+    // If the user hasn't typed anything yet or it is 0, auto-fill it with the grand total (unless it is COD)
+    const paymentMethod = $('#paymentMethod').val();
     let amountPaidVal = $('#amountPaid').val();
-    if (amountPaidVal === '' || parseFloat(amountPaidVal) === 0 || $('#amountPaid').data('autofilled') === true) {
-        $('#amountPaid').val(grand.toFixed(2));
-        $('#amountPaid').data('autofilled', true);
+    if (paymentMethod === 'cod') {
+        $('#amountPaid').val(0);
+        $('#amountPaid').data('autofilled', false);
+    } else {
+        if (amountPaidVal === '' || parseFloat(amountPaidVal) === 0 || $('#amountPaid').data('autofilled') === true) {
+            $('#amountPaid').val(grand.toFixed(2));
+            $('#amountPaid').data('autofilled', true);
+        }
     }
 
     const amountPaid = parseFloat($('#amountPaid').val()) || 0;
@@ -887,7 +904,9 @@ function processOrder() {
 
     const total = parseFloat($('#total').text().replace('৳', ''));
     const amountPaid = parseFloat($('#amountPaid').val()) || 0;
-    const paymentStatus = amountPaid >= total ? 'paid' : 'pending';
+    const paymentMethod = $('#paymentMethod').val();
+    const isSelfDelivery = $('#selfDeliveryToggle').is(':checked');
+    const paymentStatus = (paymentMethod === 'cod' && !isSelfDelivery) ? 'pending' : (amountPaid >= total ? 'paid' : 'pending');
 
     const orderData = {
         customer_name: $('#customerName').val(),

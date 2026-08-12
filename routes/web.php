@@ -950,6 +950,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:adm
         Route::get('/{id}/pdf', [\App\Http\Controllers\Admin\AdminVendorPaymentController::class, 'downloadPdf'])->name('download-pdf');
     });
 
+    // Partner Earnings Overview Route
+    Route::get('partner-earnings', [\App\Http\Controllers\Admin\AdminPartnerEarningsController::class, 'index'])->name('vendor-earnings.index');
+
     // Vendor Management
     Route::resource('partners', AdminVendorController::class)->parameters(['partners' => 'vendor'])->names(['index' => 'vendors.index', 'create' => 'vendors.create', 'store' => 'vendors.store', 'show' => 'vendors.show', 'edit' => 'vendors.edit', 'update' => 'vendors.update', 'destroy' => 'vendors.destroy']);
     Route::post('/partners/{vendor}/verify', [AdminVendorController::class, 'verify'])->name('vendors.verify');
