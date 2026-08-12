@@ -163,6 +163,7 @@ class AuthorizeByRouteName
             'results' => 'results',
             'result-details' => 'result_details',
             'payment-gateway' => 'view',
+            'reseller' => 'reseller.view',
             // create
             'create' => 'create',
             'store' => 'create',
@@ -200,7 +201,8 @@ class AuthorizeByRouteName
             'courier-areas' => 'areas',
             'courierStatus' => 'status',
             'balance' => 'balance',
-            'search-products' => 'search_products',
+            'search-products' => 'view',
+            'create-order' => 'create',
         ];
 
         $suffix = $map[$action] ?? null;

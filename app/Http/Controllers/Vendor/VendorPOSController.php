@@ -95,8 +95,7 @@ class VendorPOSController extends Controller
                 ->where(function ($q) use ($adminId) {
                     if ($adminId) {
                         $q->where('products.created_by', $adminId)
-                          ->orWhere('products.vendor_id', $adminId)
-                          ->orWhereNull('products.vendor_id');
+                          ->whereNull('products.vendor_id');
                     } else {
                         $q->whereNull('products.vendor_id');
                     }
@@ -229,6 +228,7 @@ class VendorPOSController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('POS SEARCH ERROR: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
             return response()->json([
                 'error' => true,
                 'message' => 'Failed to search products: ' . $e->getMessage(),
