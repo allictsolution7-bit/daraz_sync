@@ -139,12 +139,7 @@
     <ul class="nav nav-tabs profile-nav-tabs" id="profileTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="personal-tab-btn" data-bs-toggle="tab" data-bs-target="#personal-tab" type="button" role="tab" aria-controls="personal-tab" aria-selected="true">
-                <i class="fas fa-user-circle text-primary"></i> Personal Details
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="business-tab-btn" data-bs-toggle="tab" data-bs-target="#business-tab" type="button" role="tab" aria-controls="business-tab" aria-selected="false">
-                <i class="fas fa-building text-indigo"></i> Business & Store Details
+                <i class="fas fa-store text-primary"></i> Personal & Store Details
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -173,14 +168,14 @@
 
     <!-- Tab Contents -->
     <div class="tab-content" id="profileTabsContent">
-        <!-- 1. Personal Information Tab -->
+        <!-- 1. Personal & Store Information Tab -->
         <div class="tab-pane fade show active" id="personal-tab" role="tabpanel" aria-labelledby="personal-tab-btn">
             <div class="row">
                 <div class="col-lg-8">
                     <div class="v-card">
                         <div class="card-header">
                             <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
-                                <i class="fas fa-user-circle text-primary"></i> Personal Information
+                                <i class="fas fa-store text-primary"></i> Personal & Store Details
                             </h5>
                         </div>
                         <div class="card-body p-4">
@@ -188,6 +183,7 @@
                                 @csrf
                                 @method('PUT')
                                 
+                                <h6 class="fw-bold text-muted mb-3 uppercase small"><i class="fas fa-user me-1"></i> Owner Details</h6>
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold text-dark fs-8 uppercase">Full Name <span class="text-danger">*</span></label>
@@ -223,33 +219,9 @@
                                     <small class="text-muted fs-8">Primary login email address cannot be modified directly.</small>
                                 </div>
 
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none;">
-                                        <i class="fas fa-save me-1"></i> Save Personal Details
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                <hr class="my-4">
 
-        <!-- 2. Business Information Tab -->
-        <div class="tab-pane fade" id="business-tab" role="tabpanel" aria-labelledby="business-tab-btn">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="v-card">
-                        <div class="card-header">
-                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
-                                <i class="fas fa-building text-primary"></i> Business & Store Details
-                            </h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <form action="{{ route('vendor.profile.update') }}" method="POST">
-                                @csrf
-                                @method('PUT')
-                                
+                                <h6 class="fw-bold text-muted mb-3 uppercase small"><i class="fas fa-store-alt me-1"></i> Store Details</h6>
                                 <div class="mb-3">
                                     <label class="form-label fw-bold text-dark fs-8 uppercase">Store / Business Name <span class="text-danger">*</span></label>
                                     <input type="text" 
@@ -312,7 +284,7 @@
 
                                 <div class="text-end">
                                     <button type="submit" class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none;">
-                                        <i class="fas fa-save me-1"></i> Save Business Details
+                                        <i class="fas fa-save me-1"></i> Save Profile Details
                                     </button>
                                 </div>
                             </form>

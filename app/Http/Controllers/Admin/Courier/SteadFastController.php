@@ -338,13 +338,24 @@ class SteadFastController extends Controller
                     : strtolower(str_replace(' ', '_', $statusText));
                 $order->courier_status_updated_at = now();
                 $order->courier_status_details = $response;
+
+                $rawStatus = strtolower($order->courier_status_slug);
+                $isCleared = false;
+                if (in_array($rawStatus, ['unknown', 'not_found', 'invalid', '404', 'cancelled'])) {
+                    $order->courier_status = null;
+                    $order->courier_status_slug = null;
+                    $order->courier_status_details = null;
+                    $order->delivery_data = null;
+                    $isCleared = true;
+                }
+                
                 $order->save();
                 
                 return response()->json([
                     'success' => true,
-                    'status' => $statusText,
-                    'status_slug' => $order->courier_status_slug,
-                    'updated_at' => $order->courier_status_updated_at->diffForHumans(),
+                    'status' => $isCleared ? 'Cleared' : $statusText,
+                    'status_slug' => $isCleared ? null : $order->courier_status_slug,
+                    'updated_at' => $order->courier_status_updated_at ? $order->courier_status_updated_at->diffForHumans() : now()->diffForHumans(),
                     'raw' => $response
                 ]);
             }

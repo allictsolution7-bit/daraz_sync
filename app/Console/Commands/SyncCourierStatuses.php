@@ -69,9 +69,18 @@ class SyncCourierStatuses extends Command
                     $order->courier_status_updated_at = now();
                     $order->courier_status_details = $response;
 
-                    // If delivered, update order status to delivered
-                    if (in_array(strtolower($statusText), ['delivered', 'partial_delivered', 'completed'])) {
-                        $order->order_status = 'delivered';
+                    // If status is unknown/invalid/not found/cancelled, we should clear delivery data to allow re-delivery!
+                    $rawStatus = strtolower($order->courier_status_slug);
+                    if (in_array($rawStatus, ['unknown', 'not_found', 'invalid', '404', 'cancelled'])) {
+                        $order->courier_status = null;
+                        $order->courier_status_slug = null;
+                        $order->courier_status_details = null;
+                        $order->delivery_data = null;
+                    } else {
+                        // If delivered, update order status to delivered
+                        if (in_array(strtolower($statusText), ['delivered', 'partial_delivered', 'completed'])) {
+                            $order->order_status = 'delivered';
+                        }
                     }
 
                     $order->save();
@@ -83,8 +92,17 @@ class SyncCourierStatuses extends Command
                     $order->courier_status_updated_at = now();
                     $order->courier_status_details = $response;
 
-                    if (strtolower($statusText) === 'delivered') {
-                        $order->order_status = 'delivered';
+                    // If status is unknown/invalid/not found/cancelled, we should clear delivery data to allow re-delivery!
+                    $rawStatus = strtolower($order->courier_status_slug);
+                    if (in_array($rawStatus, ['unknown', 'not_found', 'invalid', '404', 'cancelled'])) {
+                        $order->courier_status = null;
+                        $order->courier_status_slug = null;
+                        $order->courier_status_details = null;
+                        $order->delivery_data = null;
+                    } else {
+                        if (strtolower($statusText) === 'delivered') {
+                            $order->order_status = 'delivered';
+                        }
                     }
 
                     $order->save();

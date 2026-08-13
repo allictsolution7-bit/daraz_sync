@@ -63,6 +63,13 @@ class PathaoController extends Controller
         $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id();
         $delivery = DeliveryServiceManager::forProvider('pathao', $vendorId, $isSelfDelivery);
 
+        if (!$delivery) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pathao integration not configured for your account. Please set up API credentials in Store Settings.'
+            ]);
+        }
+
         // Get default store_id from credentials
         $integration = DeliveryServiceManager::getIntegration('pathao', $vendorId, $isSelfDelivery);
         $storeId = $integration?->credentials['store_id'] ?? null;
@@ -166,6 +173,13 @@ class PathaoController extends Controller
         $vendorId = $firstOrder ? ($firstOrder->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id()) : Auth::id();
 
         $delivery = DeliveryServiceManager::forProvider('pathao', $vendorId, $isSelfDelivery);
+
+        if (!$delivery) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pathao integration not configured for your account. Please set up API credentials in Store Settings.'
+            ]);
+        }
 
         $integration = DeliveryServiceManager::getIntegration('pathao', $vendorId, $isSelfDelivery);
         $storeId = $integration?->credentials['store_id'] ?? null;
@@ -410,13 +424,24 @@ class PathaoController extends Controller
                 $order->courier_status_slug = $statusSlug;
                 $order->courier_status_updated_at = now();
                 $order->courier_status_details = $response;
+
+                $rawStatus = strtolower($statusSlug);
+                $isCleared = false;
+                if (in_array($rawStatus, ['unknown', 'not_found', 'invalid', '404', 'cancelled'])) {
+                    $order->courier_status = null;
+                    $order->courier_status_slug = null;
+                    $order->courier_status_details = null;
+                    $order->delivery_data = null;
+                    $isCleared = true;
+                }
+                
                 $order->save();
                 
                 return response()->json([
                     'success' => true,
-                    'status' => $statusText,
-                    'status_slug' => $statusSlug,
-                    'updated_at' => $order->courier_status_updated_at->diffForHumans(),
+                    'status' => $isCleared ? 'Cleared' : $statusText,
+                    'status_slug' => $isCleared ? null : $statusSlug,
+                    'updated_at' => $order->courier_status_updated_at ? $order->courier_status_updated_at->diffForHumans() : now()->diffForHumans(),
                     'raw' => $response
                 ]);
             } else {
