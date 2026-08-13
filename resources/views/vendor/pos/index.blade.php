@@ -467,7 +467,7 @@
                     </div>
                     <div class="summary-row mt-2 pt-2 border-top">
                         <span>Amount Paid (Optional):</span>
-                        <input type="number" id="amountPaid" class="form-control form-control-sm text-end" style="width: 100px; font-weight: bold; color: var(--pos-primary);" min="0" value="0" oninput="updateTotals()" onkeydown="$(this).data('autofilled', false)">
+                        <input type="number" id="amountPaid" class="form-control form-control-sm text-end" style="width: 100px; font-weight: bold; color: var(--pos-primary);" min="0" value="0" oninput="$(this).data('autofilled', false); updateTotals();" onchange="$(this).data('autofilled', false); updateTotals();">
                     </div>
                     <div class="summary-row">
                         <span class="fw-bold text-danger">Due Amount:</span>
@@ -483,6 +483,24 @@
                 </div>
                 <div class="customer-form pb-0">
                     <div class="row g-2">
+                        <div class="col-12 mb-1">
+                            <label class="fw-semibold small text-muted">Select Customer (Optional)</label>
+                            <select class="form-select form-select-sm" id="posCustomerSelect">
+                                <option value="">-- New / Walk-in Customer --</option>
+                                @foreach($customers as $cust)
+                                    @php
+                                        $masked = strlen($cust->phone) > 8 ? substr($cust->phone, 0, 4) . str_repeat('*', strlen($cust->phone) - 6) . substr($cust->phone, -2) : (strlen($cust->phone) > 4 ? substr($cust->phone, 0, 2) . str_repeat('*', strlen($cust->phone) - 4) . substr($cust->phone, -2) : str_repeat('*', strlen($cust->phone)));
+                                    @endphp
+                                    <option value="{{ $cust->id }}" 
+                                            data-name="{{ $cust->name }}" 
+                                            data-phone="{{ $masked }}" 
+                                            data-address="{{ $cust->address }}" 
+                                            data-city="{{ $cust->city }}">
+                                        {{ $cust->name }} ({{ $masked }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="col-md-6">
                             <label>Customer Name *</label>
                             <input type="text" class="form-control" id="customerName" placeholder="Name" required>
@@ -589,13 +607,8 @@ $(document).ready(function() {
     searchProducts();
 
     $('#paymentMethod').on('change', function() {
-        if ($(this).val() === 'cod') {
-            $('#amountPaid').val(0);
-            $('#amountPaid').data('autofilled', false);
-        } else {
-            $('#amountPaid').val('');
-            $('#amountPaid').data('autofilled', true);
-        }
+        $('#amountPaid').val('');
+        $('#amountPaid').data('autofilled', true);
         updateTotals();
     });
 
@@ -622,6 +635,22 @@ $(document).ready(function() {
     });
 
     $('#customerName, #customerPhone, #customerAddress').on('input', validateCheckout);
+
+    $('#posCustomerSelect').on('change', function() {
+        const option = $(this).find('option:selected');
+        if (option.val() === '') {
+            $('#customerName').val('');
+            $('#customerPhone').val('').prop('readonly', false);
+            $('#customerAddress').val('');
+            $('#customerCity').val('');
+        } else {
+            $('#customerName').val(option.data('name'));
+            $('#customerPhone').val(option.data('phone')).prop('readonly', true);
+            $('#customerAddress').val(option.data('address'));
+            $('#customerCity').val(option.data('city'));
+        }
+        validateCheckout();
+    });
 });
 
 function searchProducts(page = 1) {
@@ -667,14 +696,14 @@ function renderProducts(products) {
                     <div class="pos-card-title">${p.title}</div>
                     <div class="pos-card-footer d-flex flex-column gap-2 mt-auto">
                         <div class="d-flex justify-content-between align-items-center w-100">
-                            <span class="pos-card-price text-success fw-bold" style="font-size: 1.05rem;" title="Selling Price">৳${parseFloat(p.price).toFixed(2)}</span>
+                            <span class="pos-card-price text-success fw-bold" style="font-size: 1.05rem;" title="Selling Price">৳${parseFloat(p.price).toFixed(0)}</span>
                             <span class="badge ${isOutOfStock ? 'bg-danger' : 'bg-success bg-opacity-10 text-success'} font-weight-bold" style="font-size:0.65rem; padding: 4px 8px; border-radius: 6px;">
                                 ${isOutOfStock ? 'Out of Stock' : 'In Stock'}
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center w-100 border-top pt-2" style="font-size: 0.75rem;">
-                            <span class="text-muted">Cost: ৳${parseFloat(p.reseller_price).toFixed(2)}</span>
-                            <span class="badge bg-warning bg-opacity-10 text-dark fw-bold border-0 px-2 py-1" style="font-size: 0.68rem; border-radius: 4px;" title="Profit margin">+৳${parseFloat(p.price - p.reseller_price).toFixed(2)} profit</span>
+                            <span class="text-muted">Cost: ৳${parseFloat(p.reseller_price).toFixed(0)}</span>
+                            <span class="badge bg-warning bg-opacity-10 text-dark fw-bold border-0 px-2 py-1" style="font-size: 0.68rem; border-radius: 4px;" title="Profit margin">+৳${parseFloat(p.price - p.reseller_price).toFixed(0)} profit</span>
                         </div>
                     </div>
                 </div>
@@ -714,8 +743,8 @@ function onProductClick(product) {
                 <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3" ${varDisabled} onclick="addVariationToCart(${v.id}, '${v.display_name.replace(/'/g, "\\'")}', ${v.price}, ${v.reseller_price})">
                     <span class="font-weight-bold text-dark">${v.display_name}</span>
                     <div class="text-end">
-                        <span class="text-success font-weight-bold d-block">৳${parseFloat(v.price).toFixed(2)}</span>
-                        <small class="text-muted" style="font-size: 0.68rem;">Cost: ৳${parseFloat(v.reseller_price).toFixed(2)} | +৳${profit.toFixed(2)} profit</small>
+                        <span class="text-success font-weight-bold d-block">৳${parseFloat(v.price).toFixed(0)}</span>
+                        <small class="text-muted" style="font-size: 0.68rem;">Cost: ৳${parseFloat(v.reseller_price).toFixed(0)} | +৳${profit.toFixed(0)} profit</small>
                     </div>
                 </button>
             `;
@@ -777,13 +806,13 @@ function updateCartDisplay() {
                     <div class="col-6">
                         <div class="d-flex flex-column">
                             <span class="text-muted small" style="font-size: 11px;">Reseller Price</span>
-                            <span class="fw-bold text-secondary" style="font-size: 13px;">৳${item.reseller_price.toFixed(2)}</span>
+                            <span class="fw-bold text-secondary" style="font-size: 13px;">৳${item.reseller_price.toFixed(0)}</span>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="d-flex flex-column align-items-end">
                             <span class="text-muted small" style="font-size: 11px;">Selling Price</span>
-                            <input type="number" class="form-control form-control-sm text-success fw-bold p-1 text-center" style="width: 85px; height: 28px; font-size: 12px; border: 1px solid var(--pos-border); border-radius: 6px;" value="${item.price}" onchange="updateItemPrice(${index}, this.value)" min="0" step="any">
+                            <input type="number" class="form-control form-control-sm text-success fw-bold p-1 text-center" style="width: 85px; height: 28px; font-size: 12px; border: 1px solid var(--pos-border); border-radius: 6px;" value="${Math.ceil(item.price)}" onchange="updateItemPrice(${index}, this.value)" min="0" step="any">
                         </div>
                     </div>
                     
@@ -796,7 +825,7 @@ function updateCartDisplay() {
                     </div>
                     <div class="col-6 mt-2 text-end">
                         <span class="badge bg-warning text-dark font-weight-bold p-2" style="font-size: 11px; border-radius: 6px;">
-                            +৳${profit.toFixed(2)} profit
+                            +৳${profit.toFixed(0)} profit
                         </span>
                     </div>
                 </div>
@@ -844,29 +873,23 @@ function updateTotals() {
     const discount = parseFloat($('#discountAmount').val()) || 0;
     const grand = Math.max(0, sub + shipping - discount);
 
-    // If the user hasn't typed anything yet or it is 0, auto-fill it with the grand total (unless it is COD)
-    const paymentMethod = $('#paymentMethod').val();
+    // If the user hasn't typed anything yet or if it is marked as autofilled (including initial page load), auto-fill it with the grand total
     let amountPaidVal = $('#amountPaid').val();
-    if (paymentMethod === 'cod') {
-        $('#amountPaid').val(0);
-        $('#amountPaid').data('autofilled', false);
-    } else {
-        if (amountPaidVal === '' || parseFloat(amountPaidVal) === 0 || $('#amountPaid').data('autofilled') === true) {
-            $('#amountPaid').val(grand.toFixed(2));
-            $('#amountPaid').data('autofilled', true);
-        }
+    if (amountPaidVal === '' || $('#amountPaid').data('autofilled') === true || $('#amountPaid').data('autofilled') === undefined) {
+        $('#amountPaid').val(grand.toFixed(0));
+        $('#amountPaid').data('autofilled', true);
     }
 
     const amountPaid = parseFloat($('#amountPaid').val()) || 0;
     const due = Math.max(0, grand - amountPaid);
 
-    $('#subtotal').text('৳' + sub.toFixed(2));
-    $('#total').text('৳' + grand.toFixed(2));
-    $('#dueAmount').text('৳' + due.toFixed(2));
+    $('#subtotal').text('৳' + sub.toFixed(0));
+    $('#total').text('৳' + grand.toFixed(0));
+    $('#dueAmount').text('৳' + due.toFixed(0));
     $('#cartItemCount').text(cart.reduce((a, b) => a + b.quantity, 0));
 
     // Update reseller cost total UI
-    $('#resellerCostTotal').text('৳' + resellerCostSum.toFixed(2));
+    $('#resellerCostTotal').text('৳' + resellerCostSum.toFixed(0));
 
     // Check if wallet balance supports self delivery
     const walletBalance = parseFloat('{{ auth()->user()->wallet_balance ?? 0 }}');
@@ -909,6 +932,7 @@ function processOrder() {
     const paymentStatus = (paymentMethod === 'cod' && !isSelfDelivery) ? 'pending' : (amountPaid >= total ? 'paid' : 'pending');
 
     const orderData = {
+        customer_id: $('#posCustomerSelect').val() || null,
         customer_name: $('#customerName').val(),
         customer_phone: $('#customerPhone').val(),
         customer_address: $('#customerAddress').val(),
@@ -939,7 +963,9 @@ function processOrder() {
             }
 
             clearCart();
+            $('#posCustomerSelect').val('');
             $('#customerName, #customerPhone, #customerAddress, #customerCity, #orderNotes, #amountPaid').val('');
+            $('#customerPhone').prop('readonly', false);
             $('#shippingAmount, #discountAmount').val('0');
             $('#selfDeliveryToggle').prop('checked', false);
             $('#shippingAmount').prop('disabled', false);

@@ -37,6 +37,11 @@ class VendorProductController extends Controller
 
         if (!$vendorSettings) return false;
 
+        // If they are vendor retailer: they only get access if consignment is enabled.
+        if ($vendor->isVendorRetailer()) {
+            return $vendor->isConsignmentEnabled();
+        }
+
         // Check vendor_type stored in additional_config JSON
         $additionalConfig = $vendorSettings->additional_config ?? [];
         $vendorType = $additionalConfig['vendor_type'] ?? null;

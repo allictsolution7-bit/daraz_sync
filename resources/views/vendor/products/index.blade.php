@@ -585,9 +585,11 @@
                                     <small class="text-muted font-weight-bold d-block">YOUR WALLET BALANCE</small>
                                     <span class="fs-5 font-weight-bold text-primary">৳{{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</span>
                                 </div>
+                                @if(auth()->user()->canSeeRecharge())
                                 <a href="{{ route('vendor.wallet.index') }}" class="btn btn-sm btn-outline-primary font-weight-bold" target="_blank">
                                     <i class="fas fa-plus-circle me-1"></i> Recharge Wallet
                                 </a>
+                                @endif
                             </div>
 
                             <h6 class="font-weight-bold text-dark mb-3">Selected Products Stock Configuration:</h6>
@@ -1027,15 +1029,17 @@
                                                     </div>
                                                     <div class="modal-body p-4">
                                                         <!-- Wallet Balance Header -->
-                                                        <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center mb-4">
-                                                            <div>
-                                                                <small class="text-muted font-weight-bold d-block">YOUR WALLET BALANCE</small>
-                                                                <span class="fs-5 font-weight-bold text-primary">৳{{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</span>
-                                                            </div>
-                                                            <a href="{{ route('vendor.wallet.index') }}" class="btn btn-sm btn-outline-primary font-weight-bold" target="_blank">
-                                                                <i class="fas fa-plus-circle me-1"></i> Recharge Wallet
-                                                            </a>
-                                                        </div>
+                                                         <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center mb-4">
+                                                             <div>
+                                                                 <small class="text-muted font-weight-bold d-block">YOUR WALLET BALANCE</small>
+                                                                 <span class="fs-5 font-weight-bold text-primary">৳{{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</span>
+                                                             </div>
+                                                             @if(auth()->user()->canSeeRecharge())
+                                                             <a href="{{ route('vendor.wallet.index') }}" class="btn btn-sm btn-outline-primary font-weight-bold" target="_blank">
+                                                                 <i class="fas fa-plus-circle me-1"></i> Recharge Wallet
+                                                             </a>
+                                                             @endif
+                                                         </div>
                                                         <!-- Product Summary Header -->
                                                          <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 border mb-4">
                                                              @if($product->thumb_image)
@@ -1142,7 +1146,7 @@
                                             $hasAllocation = isset($productAllocations[$product->id]) || ($product->parent_product_id && isset($productAllocations[$product->parent_product_id]));
                                             $targetProductId = isset($productAllocations[$product->id]) ? $product->id : ($product->parent_product_id ?? $product->id);
                                         @endphp
-                                        @if($hasAllocation || $product->parent_product_id)
+                                        @if(($hasAllocation || $product->parent_product_id) && (!auth()->user()->isVendorRetailer() || auth()->user()->isConsignmentEnabled()))
                                             <button type="button"
                                                     title="Return stock & get wallet refund"
                                                     data-bs-toggle="modal"

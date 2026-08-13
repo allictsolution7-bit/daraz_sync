@@ -340,13 +340,15 @@
                         <a href="{{ route('vendor.orders.reseller.edit', $order->id) }}" class="btn btn-sm btn-outline-primary py-1 px-2" title="Edit Order">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <form action="{{ route('vendor.orders.reseller.delete', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel and delete this order? Stock will be restored.');" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" title="Cancel & Delete Order">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
+                        @can('vendor.orders.reseller.delete')
+                            <form action="{{ route('vendor.orders.reseller.delete', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel and delete this order? Stock will be restored.');" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" title="Cancel & Delete Order">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        @endcan
                     @endif
                     <a href="{{ route('order.print-invoice', $order->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-1 px-2">
                         <i class="fas fa-print"></i>

@@ -46,7 +46,21 @@ class VendorPOSController extends Controller
             'rocket' => 'Rocket'
         ];
 
-        return view('vendor.pos.index', compact('categories', 'paymentMethods'));
+        // Fetch reseller's customers
+        $customers = User::where(function ($q) use ($vendor) {
+            $q->where('created_by', $vendor->id)
+              ->orWhereIn('id', function ($sub) use ($vendor) {
+                  $sub->select('orders.user_id')
+                      ->from('orders')
+                      ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                      ->where('order_items.vendor_id', $vendor->id)
+                      ->whereNotNull('orders.user_id');
+              });
+        })
+        ->orderBy('name')
+        ->get();
+
+        return view('vendor.pos.index', compact('categories', 'paymentMethods', 'customers'));
     }
 
     /**
@@ -180,7 +194,8 @@ class VendorPOSController extends Controller
                                     $adminResellerPrice = (float)($combo->wholesale_price > 0 ? $combo->wholesale_price : ($combo->offer_price ?? $combo->regular_price ?? 0));
                                 }
                             }
-                            $finalPrice = $adminResellerPrice + ceil($adminResellerPrice * ($markupPct / 100));
+                            $adminResellerPrice = ceil($adminResellerPrice);
+                            $finalPrice = ceil($adminResellerPrice + ($adminResellerPrice * ($markupPct / 100)));
 
                             return [
                                 'id' => $combo->id,
@@ -213,7 +228,8 @@ class VendorPOSController extends Controller
                                 $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)));
                             }
                         }
-                        $finalPrice = $adminResellerPrice + ceil($adminResellerPrice * ($markupPct / 100));
+                        $adminResellerPrice = ceil($adminResellerPrice);
+                        $finalPrice = ceil($adminResellerPrice + ($adminResellerPrice * ($markupPct / 100)));
 
                         $quantity = (int) ($product->computed_quantity ?? $product->quantity ?? 0);
                         $data['price'] = $finalPrice;
@@ -251,6 +267,7 @@ class VendorPOSController extends Controller
     public function createOrder(Request $request)
     {
         $request->validate([
+            'customer_id' => 'nullable|exists:users,id',
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:20',
             'customer_email' => 'nullable|email',
@@ -279,31 +296,57 @@ class VendorPOSController extends Controller
 
             return DB::transaction(function () use ($request, $reseller) {
                 // Find or create customer
-                $generatedPassword = null;
-                $customer = User::where('phone', $request->customer_phone)->first();
-                if (!$customer) {
-                    $generatedPassword = Str::random(8);
-                    $customer = User::create([
-                        'name' => $request->customer_name,
-                        'phone' => $request->customer_phone,
-                        'email' => $request->customer_email ?: $this->generateUniqueEmail(),
-                        'address' => $request->customer_address ?? '',
-                        'city' => $request->customer_city ?? '',
-                        'upazila' => '',
-                        'password' => bcrypt($generatedPassword),
-                        'otp_verified' => true,
-                        'created_by' => $reseller->id
-                    ]);
-                    
-                    // Assign customer role if Spatie role package is used or role column exists
-                    try {
-                        $customer->assignRole('user');
-                    } catch (\Exception $e) {
-                        // ignore if role configuration differs
-                    }
+                $customer = null;
+                if ($request->filled('customer_id')) {
+                    $customer = User::where('id', $request->customer_id)
+                        ->where(function ($q) use ($reseller) {
+                            $q->where('created_by', $reseller->id)
+                              ->orWhereIn('id', function ($sub) use ($reseller) {
+                                  $sub->select('orders.user_id')
+                                      ->from('orders')
+                                      ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                                      ->where('order_items.vendor_id', $reseller->id)
+                                      ->whereNotNull('orders.user_id');
+                              });
+                        })->first();
 
-                    // Log details to php system error log (console) for future SMS integration
-                    error_log("NEW USER CREATED VIA POS - Name: {$customer->name}, Phone: {$customer->phone}, Password: {$generatedPassword}");
+                    if ($customer) {
+                        // Update customer details if they changed in the form
+                        $customer->update([
+                            'name' => $request->customer_name,
+                            'address' => $request->customer_address ?? '',
+                            'city' => $request->customer_city ?? '',
+                        ]);
+                    }
+                }
+
+                if (!$customer) {
+                    $generatedPassword = null;
+                    $customer = User::where('phone', $request->customer_phone)->first();
+                    if (!$customer) {
+                        $generatedPassword = Str::random(8);
+                        $customer = User::create([
+                            'name' => $request->customer_name,
+                            'phone' => $request->customer_phone,
+                            'email' => $request->customer_email ?: $this->generateUniqueEmail(),
+                            'address' => $request->customer_address ?? '',
+                            'city' => $request->customer_city ?? '',
+                            'upazila' => '',
+                            'password' => bcrypt($generatedPassword),
+                            'otp_verified' => true,
+                            'created_by' => $reseller->id
+                        ]);
+                        
+                        // Assign customer role if Spatie role package is used or role column exists
+                        try {
+                            $customer->assignRole('user');
+                        } catch (\Exception $e) {
+                            // ignore if role configuration differs
+                        }
+
+                        // Log details to php system error log (console) for future SMS integration
+                        error_log("NEW USER CREATED VIA POS - Name: {$customer->name}, Phone: {$customer->phone}, Password: {$generatedPassword}");
+                    }
                 }
 
                 // Verify stock availability
@@ -338,7 +381,7 @@ class VendorPOSController extends Controller
                                 $adminResellerPrice = (float)($combination->wholesale_price > 0 ? $combination->wholesale_price : ($combination->product_cost > 0 ? $combination->product_cost : 0));
                             }
                         }
-                        $unitCost = $adminResellerPrice;
+                        $unitCost = ceil($adminResellerPrice);
                     } else {
                         $adminResellerPrice = (float)($product->reseller_price ?? 0);
                         if ($adminResellerPrice <= 0) {
@@ -350,7 +393,7 @@ class VendorPOSController extends Controller
                                 $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : 0));
                             }
                         }
-                        $unitCost = $adminResellerPrice;
+                        $unitCost = ceil($adminResellerPrice);
                     }
 
                     $resellerOrderCost += $unitCost * $item['quantity'];
@@ -432,7 +475,7 @@ class VendorPOSController extends Controller
                                 $adminResellerPrice = (float)($combination->wholesale_price > 0 ? $combination->wholesale_price : ($combination->product_cost > 0 ? $combination->product_cost : 0));
                             }
                         }
-                        $unitCost = $adminResellerPrice;
+                        $unitCost = ceil($adminResellerPrice);
                     } else {
                         $adminResellerPrice = (float)($product->reseller_price ?? 0);
                         if ($adminResellerPrice <= 0) {
@@ -444,7 +487,7 @@ class VendorPOSController extends Controller
                                 $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : 0));
                             }
                         }
-                        $unitCost = $adminResellerPrice;
+                        $unitCost = ceil($adminResellerPrice);
                     }
 
                     // reseller_commission = selling_price - admin_cost

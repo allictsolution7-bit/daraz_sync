@@ -200,7 +200,25 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="cphone"><i class="fas fa-phone-alt me-1 text-cyan fs-9" style="color:#0891b2;"></i> {{ $customer->phone }}</div>
+                                    <div class="cphone">
+                                        <i class="fas fa-phone-alt me-1 text-cyan fs-9" style="color:#0891b2;"></i>
+                                        @if($customer->phone)
+                                            @php
+                                                $phone = $customer->phone;
+                                                $len = strlen($phone);
+                                                if ($len > 8) {
+                                                    $maskedPhone = substr($phone, 0, 4) . str_repeat('*', $len - 6) . substr($phone, -2);
+                                                } elseif ($len > 4) {
+                                                    $maskedPhone = substr($phone, 0, 2) . str_repeat('*', $len - 4) . substr($phone, -2);
+                                                } else {
+                                                    $maskedPhone = str_repeat('*', $len);
+                                                }
+                                            @endphp
+                                            {{ $maskedPhone }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </div>
                                 </td>
                                 <td>
                                     @if($customer->address || $customer->city)

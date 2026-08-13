@@ -131,6 +131,36 @@ class User extends Authenticatable
         return $this->hasRole('vendor') || $this->hasRole('wholeseller') || $this->hasRole('retailer') || $this->hasRole('paid_vendor');
     }
 
+    public function isVendorRetailer(): bool
+    {
+        if (!$this->hasRole('vendor')) {
+            return false;
+        }
+        $settings = $this->vendorSettings;
+        if (!$settings) {
+            return false;
+        }
+        $config = $settings->additional_config ?? [];
+        return ($config['vendor_type'] ?? null) === 'retailer';
+    }
+
+    public function isConsignmentEnabled(): bool
+    {
+        $settings = $this->vendorSettings;
+        return $settings ? (bool)$settings->is_consignment : false;
+    }
+
+    public function canSeeRecharge(): bool
+    {
+        if ($this->hasRole('reseller')) {
+            return true;
+        }
+        if ($this->isVendorRetailer()) {
+            return $this->isConsignmentEnabled();
+        }
+        return $this->isConsignmentEnabled();
+    }
+
     /**
      * Check if user is admin
      */

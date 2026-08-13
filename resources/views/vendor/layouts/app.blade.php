@@ -638,7 +638,7 @@
 
             <div class="d-flex align-items-center gap-3">
                 <!-- Topbar Wallet Widget -->
-                @if(auth()->user()?->hasRole('reseller') || auth()->user()?->vendorSettings?->is_consignment)
+                @if(auth()->user()?->canSeeRecharge())
                 <div class="wallet-pill shadow-sm">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-wallet text-primary fs-5"></i>
