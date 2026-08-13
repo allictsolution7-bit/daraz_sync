@@ -132,35 +132,25 @@
     .empty-state i { font-size: 3rem; color: #c7d2fe; margin-bottom: 16px; }
     .empty-state h5 { color: #4b5563; font-weight: 700; }
     .empty-state p { color: #9ca3af; max-width: 320px; margin: 0 auto; }
+    .status-card-option {
+        transition: all 0.2s ease;
+        border-color: #cbd5e1 !important;
+    }
+    .status-card-option:hover {
+        border-color: #6366f1 !important;
+        background-color: #e0e7ff !important;
+    }
+    .active-status-card {
+        border-color: #6366f1 !important;
+        background-color: #e0e7ff !important;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
 </style>
 @endsection
 
 @section('content')
 <div class="container-fluid px-3 px-md-4 py-4">
 
-    {{-- Hero Header --}}
-    <div class="reseller-orders-hero">
-        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
-            <div>
-                <h2><i class="fas fa-receipt me-2"></i>My POS Orders</h2>
-                <p>Orders you've placed through the Reseller POS terminal</p>
-            </div>
-            <div class="d-flex gap-3 flex-wrap">
-                <div class="stat-pill">
-                    <div class="val">{{ $statusCounts['all'] }}</div>
-                    <div class="lbl">Total</div>
-                </div>
-                <div class="stat-pill">
-                    <div class="val">{{ $statusCounts['pending'] }}</div>
-                    <div class="lbl">Pending</div>
-                </div>
-                <div class="stat-pill">
-                    <div class="val">{{ $statusCounts['delivered'] }}</div>
-                    <div class="lbl">Delivered</div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     {{-- Earnings Row --}}
     @if($totalEarnings > 0)
@@ -180,32 +170,35 @@
     @endif
 
     {{-- Delivery Options Tabs --}}
-    <div class="d-flex mb-3 gap-2 border-bottom pb-2 flex-wrap">
-        <a href="{{ request()->fullUrlWithQuery(['delivery_by' => 'reseller']) }}" class="btn {{ $deliveryBy === 'reseller' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm fw-bold px-3 rounded-pill">
-            <i class="fas fa-truck-ramp-box me-1"></i> Self-Delivery Orders ({{ $selfDeliveryCount }})
-        </a>
-        <a href="{{ request()->fullUrlWithQuery(['delivery_by' => 'admin']) }}" class="btn {{ $deliveryBy === 'admin' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm fw-bold px-3 rounded-pill">
-            <i class="fas fa-user-shield me-1"></i> Admin-Delivery Orders ({{ $adminDeliveryCount }})
-        </a>
-    </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 gap-3 flex-wrap border-bottom pb-2">
+        {{-- Delivery Mode Tabs --}}
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ request()->fullUrlWithQuery(['delivery_by' => 'reseller']) }}" class="btn {{ $deliveryBy === 'reseller' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm fw-bold px-3 rounded-pill">
+                <i class="fas fa-truck-ramp-box me-1"></i> Self-Delivery Orders ({{ $selfDeliveryCount }})
+            </a>
+            <a href="{{ request()->fullUrlWithQuery(['delivery_by' => 'admin']) }}" class="btn {{ $deliveryBy === 'admin' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm fw-bold px-3 rounded-pill">
+                <i class="fas fa-user-shield me-1"></i> Admin-Delivery Orders ({{ $adminDeliveryCount }})
+            </a>
+        </div>
 
-    {{-- Status Tabs --}}
-    <div class="status-tab-row">
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="status-tab {{ !request('status') || request('status') === 'all' ? 'active' : '' }}">
-            <i class="fas fa-list-ul"></i> All <span class="cnt">{{ $statusCounts['all'] }}</span>
-        </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'pending']) }}" class="status-tab {{ request('status') === 'pending' ? 'active' : '' }}" style="{{ request('status') === 'pending' ? '' : 'border-color:#fcd34d;color:#92400e;' }}">
-            <i class="fas fa-clock"></i> Pending <span class="cnt">{{ $statusCounts['pending'] }}</span>
-        </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'processing']) }}" class="status-tab {{ request('status') === 'processing' ? 'active' : '' }}" style="{{ request('status') === 'processing' ? '' : 'border-color:#93c5fd;color:#1e40af;' }}">
-            <i class="fas fa-spinner"></i> Processing <span class="cnt">{{ $statusCounts['processing'] }}</span>
-        </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'delivered']) }}" class="status-tab {{ request('status') === 'delivered' ? 'active' : '' }}" style="{{ request('status') === 'delivered' ? '' : 'border-color:#86efac;color:#15803d;' }}">
-            <i class="fas fa-check-circle"></i> Delivered <span class="cnt">{{ $statusCounts['delivered'] }}</span>
-        </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'cancelled']) }}" class="status-tab {{ request('status') === 'cancelled' ? 'active' : '' }}" style="{{ request('status') === 'cancelled' ? '' : 'border-color:#fca5a5;color:#991b1b;' }}">
-            <i class="fas fa-times-circle"></i> Cancelled <span class="cnt">{{ $statusCounts['cancelled'] }}</span>
-        </a>
+        {{-- Status Tabs --}}
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="status-tab {{ !request('status') || request('status') === 'all' ? 'active' : '' }}">
+                <i class="fas fa-list-ul"></i> All <span class="cnt">{{ $statusCounts['all'] }}</span>
+            </a>
+            <a href="{{ request()->fullUrlWithQuery(['status' => 'pending']) }}" class="status-tab {{ request('status') === 'pending' ? 'active' : '' }}" style="{{ request('status') === 'pending' ? '' : 'border-color:#fcd34d;color:#92400e;' }}">
+                <i class="fas fa-clock"></i> Pending <span class="cnt">{{ $statusCounts['pending'] }}</span>
+            </a>
+            <a href="{{ request()->fullUrlWithQuery(['status' => 'processing']) }}" class="status-tab {{ request('status') === 'processing' ? 'active' : '' }}" style="{{ request('status') === 'processing' ? '' : 'border-color:#93c5fd;color:#1e40af;' }}">
+                <i class="fas fa-spinner"></i> Processing <span class="cnt">{{ $statusCounts['processing'] }}</span>
+            </a>
+            <a href="{{ request()->fullUrlWithQuery(['status' => 'delivered']) }}" class="status-tab {{ request('status') === 'delivered' ? 'active' : '' }}" style="{{ request('status') === 'delivered' ? '' : 'border-color:#86efac;color:#15803d;' }}">
+                <i class="fas fa-check-circle"></i> Delivered <span class="cnt">{{ $statusCounts['delivered'] }}</span>
+            </a>
+            <a href="{{ request()->fullUrlWithQuery(['status' => 'cancelled']) }}" class="status-tab {{ request('status') === 'cancelled' ? 'active' : '' }}" style="{{ request('status') === 'cancelled' ? '' : 'border-color:#fca5a5;color:#991b1b;' }}">
+                <i class="fas fa-times-circle"></i> Cancelled <span class="cnt">{{ $statusCounts['cancelled'] }}</span>
+            </a>
+        </div>
     </div>
 
     {{-- Filters --}}
@@ -234,7 +227,7 @@
         </form>
     </div>
 
-    @if(!$orders->isEmpty() && ($deliveryBy === 'reseller' || $hasCourierIntegration))
+    @if(!$orders->isEmpty() && $deliveryBy === 'reseller')
     <!-- Bulk Operations Panel -->
     <div class="card mb-4 border-0 shadow-sm" style="border-radius: 16px;">
         <div class="card-header bg-light border-bottom-0 py-3 d-flex justify-content-between align-items-center" style="border-radius: 16px 16px 0 0;">
@@ -307,7 +300,7 @@
         <div class="order-card">
             <div class="order-card-header">
                 <div class="d-flex align-items-center gap-3">
-                    @if($deliveryBy === 'reseller' || $hasCourierIntegration)
+                    @if($deliveryBy === 'reseller')
                         <input type="checkbox" class="order-checkbox me-1" value="{{ $order->id }}" data-courier-sent="{{ $courierSent }}" data-courier-provider="{{ $courierProvider }}" data-phone="{{ $order->phone }}" data-ip="">
                     @endif
                     <div>
@@ -333,8 +326,12 @@
                             </div>
                         @endif
                     </div>
-                    <span class="order-status-badge {{ $statusClass }}">
+                    <span class="order-status-badge {{ $statusClass }} change-status-btn shadow-sm" 
+                          data-order-id="{{ $order->id }}" 
+                          data-current-status="{{ $order->status }}" 
+                          style="cursor: pointer;">
                         <i class="fas {{ $statusIcon }}"></i> {{ $statusLabel }}
+                        <i class="fas fa-chevron-down ms-1" style="font-size: 8px; opacity: 0.8;"></i>
                     </span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
@@ -429,6 +426,102 @@
         </div>
     @endif
 
+</div>
+
+<!-- Status Change Modal -->
+<div class="modal fade" id="statusChangeModal" tabindex="-1" aria-labelledby="statusChangeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius: 16px;">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 px-4 py-3 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary text-white rounded-3 p-1.5 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;">
+                        <i class="fas fa-sliders-h fs-6"></i>
+                    </div>
+                    <div>
+                        <h6 class="modal-title fw-bold mb-0 text-white" id="statusChangeModalLabel" style="font-size: 15px;">Update Order Status</h6>
+                        <p class="mb-0 text-white-50" style="font-size: 11px;">Select status for this order</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-3 bg-slate-50" style="background-color: #f8fafc;">
+                <input type="hidden" id="modalOrderId">
+                <input type="hidden" id="modalStatusSelect" value="pending">
+
+                <div class="mb-2">
+                    <label class="text-uppercase text-secondary fw-bold small mb-2 d-flex align-items-center gap-2" style="font-size: 10px; letter-spacing: 0.08em;">
+                        <i class="fas fa-list-check text-primary"></i> Choose Fulfillment Status
+                    </label>
+
+                    <div class="row row-cols-3 g-2" id="statusGridOptions">
+                        <div class="col">
+                            <div class="status-card-option py-2 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="pending" style="cursor: pointer;">
+                                <div class="fs-6 mb-1">⏳</div>
+                                <div class="fw-bold text-dark" style="font-size: 11px;">Pending</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="status-card-option py-2 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="phone_not_rcv" style="cursor: pointer;">
+                                <div class="fs-6 mb-1">📞</div>
+                                <div class="fw-bold text-dark" style="font-size: 11px;">Call Not Rcv</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="status-card-option py-2 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="follow_up" style="cursor: pointer;">
+                                <div class="fs-6 mb-1">🔄</div>
+                                <div class="fw-bold text-dark" style="font-size: 11px;">Follow up</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="status-card-option py-2 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="processing" style="cursor: pointer;">
+                                <div class="fs-6 mb-1">⚙️</div>
+                                <div class="fw-bold text-dark" style="font-size: 11px;">Processing</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="status-card-option py-2 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="ready_for_delivery" style="cursor: pointer;">
+                                <div class="fs-6 mb-1">📦</div>
+                                <div class="fw-bold text-dark" style="font-size: 11px;">Ready Del</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="status-card-option py-2 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="shipped" style="cursor: pointer;">
+                                <div class="fs-6 mb-1">🚚</div>
+                                <div class="fw-bold text-dark" style="font-size: 11px;">Shipped</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="status-card-option py-2 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="delivered" style="cursor: pointer;">
+                                <div class="fs-6 mb-1">✅</div>
+                                <div class="fw-bold text-dark" style="font-size: 11px;">Delivered</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="status-card-option py-2 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="on_hold" style="cursor: pointer;">
+                                <div class="fs-6 mb-1">⏸️</div>
+                                <div class="fw-bold text-dark" style="font-size: 11px;">On Hold</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="status-card-option py-2 px-2 border rounded-3 bg-white text-center cursor-pointer h-100" data-status="cancelled" style="cursor: pointer;">
+                                <div class="fs-6 mb-1">❌</div>
+                                <div class="fw-bold text-dark" style="font-size: 11px;">Cancelled</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 bg-light px-4 py-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary btn-sm fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm fw-semibold" id="btnUpdateStatus">Update Order Status</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -661,6 +754,75 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // Highlight active status card on click
+    document.querySelectorAll('.status-card-option').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.status-card-option').forEach(c => c.classList.remove('active-status-card'));
+            this.classList.add('active-status-card');
+            document.getElementById('modalStatusSelect').value = this.dataset.status;
+        });
+    });
+
+    // When status badge is clicked
+    document.addEventListener('click', function(e) {
+        const badge = e.target.closest('.change-status-btn');
+        if (badge) {
+            e.preventDefault();
+            const orderId = badge.dataset.orderId;
+            const currentStatus = badge.dataset.currentStatus;
+
+            document.getElementById('modalOrderId').value = orderId;
+            document.getElementById('modalStatusSelect').value = currentStatus;
+
+            document.querySelectorAll('.status-card-option').forEach(card => {
+                if (card.dataset.status === currentStatus) {
+                    card.classList.add('active-status-card');
+                } else {
+                    card.classList.remove('active-status-card');
+                }
+            });
+
+            const modal = new bootstrap.Modal(document.getElementById('statusChangeModal'));
+            modal.show();
+        }
+    });
+
+    // Update status submit click handler
+    const btnUpdateStatus = document.getElementById('btnUpdateStatus');
+    if (btnUpdateStatus) {
+        btnUpdateStatus.addEventListener('click', function() {
+            const orderId = document.getElementById('modalOrderId').value;
+            const status = document.getElementById('modalStatusSelect').value;
+
+            btnUpdateStatus.disabled = true;
+            btnUpdateStatus.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+
+            fetch(`/vendor/orders/my-pos-orders/${orderId}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Failed to update status.');
+                    btnUpdateStatus.disabled = false;
+                    btnUpdateStatus.innerHTML = 'Update Order Status';
+                }
+            })
+            .catch(() => {
+                alert('An error occurred while updating status.');
+                btnUpdateStatus.disabled = false;
+                btnUpdateStatus.innerHTML = 'Update Order Status';
+            });
+        });
+    }
 });
 </script>
 @endpush

@@ -225,11 +225,17 @@ class VendorOrderController extends Controller
         // Apply Delivery Filter
         $deliveryBy = $request->get('delivery_by', 'reseller');
         if ($deliveryBy === 'reseller') {
-            $query->where('delivery_data->delivery_by', 'reseller');
+            $query->where(function($q) {
+                $q->where('delivery_data->delivery_by', 'reseller')
+                  ->orWhereNotNull('delivery_data->courier_provider');
+            });
         } else {
             $query->where(function($q) {
                 $q->where('delivery_data->delivery_by', 'admin')
-                  ->orWhereNull('delivery_data->delivery_by');
+                  ->orWhere(function($sub) {
+                      $sub->whereNull('delivery_data->delivery_by')
+                          ->whereNull('delivery_data->courier_provider');
+                  });
             });
         }
 
@@ -238,10 +244,14 @@ class VendorOrderController extends Controller
         // Filter status counts by delivery type
         $statusOrders = (clone $allOrders)->where(function($q) use ($deliveryBy) {
             if ($deliveryBy === 'reseller') {
-                $q->where('delivery_data->delivery_by', 'reseller');
+                $q->where('delivery_data->delivery_by', 'reseller')
+                  ->orWhereNotNull('delivery_data->courier_provider');
             } else {
                 $q->where('delivery_data->delivery_by', 'admin')
-                  ->orWhereNull('delivery_data->delivery_by');
+                  ->orWhere(function($sub) {
+                      $sub->whereNull('delivery_data->delivery_by')
+                          ->whereNull('delivery_data->courier_provider');
+                  });
             }
         });
 
@@ -254,10 +264,16 @@ class VendorOrderController extends Controller
         ];
 
         // Overall tab counts for navigation
-        $selfDeliveryCount = (clone $allOrders)->where('delivery_data->delivery_by', 'reseller')->count();
+        $selfDeliveryCount = (clone $allOrders)->where(function($q) {
+            $q->where('delivery_data->delivery_by', 'reseller')
+              ->orWhereNotNull('delivery_data->courier_provider');
+        })->count();
         $adminDeliveryCount = (clone $allOrders)->where(function($q) {
             $q->where('delivery_data->delivery_by', 'admin')
-              ->orWhereNull('delivery_data->delivery_by');
+              ->orWhere(function($sub) {
+                  $sub->whereNull('delivery_data->delivery_by')
+                      ->whereNull('delivery_data->courier_provider');
+              });
         })->count();
 
         // Earnings summary
@@ -341,6 +357,30 @@ class VendorOrderController extends Controller
         ]);
 
         return redirect()->route('vendor.orders.reseller')->with('success', 'Order updated successfully.');
+    }
+
+    /**
+     * Update order status for reseller POS order
+     */
+    public function updateOrderStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string|in:pending,processing,ready_for_delivery,shipped,delivered,cancelled,on_hold,phone_not_rcv,follow_up'
+        ]);
+
+        $reseller = auth()->user();
+        $order = order::where('order_source', 'Reseller POS')
+            ->whereIn('id', function($q) use ($reseller) {
+                $q->select('order_id')->from('order_items')->where('vendor_id', $reseller->id);
+            })
+            ->findOrFail($id);
+
+        $order->update(['status' => $request->status]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order status updated successfully.'
+        ]);
     }
 
     /**

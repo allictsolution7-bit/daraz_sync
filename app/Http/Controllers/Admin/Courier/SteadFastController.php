@@ -352,6 +352,7 @@ class SteadFastController extends Controller
                 'success' => false,
                 'message' => $e->getMessage()
             ]);
+        }
     }
 
     private function processResellerWalletDeduction($order, $user)
