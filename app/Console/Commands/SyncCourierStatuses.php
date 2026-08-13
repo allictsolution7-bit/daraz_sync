@@ -31,7 +31,7 @@ class SyncCourierStatuses extends Command
         $this->info("Starting Courier Status Sync...");
 
         // Fetch orders that are sent to a courier but not in a final status (Delivered/Cancelled)
-        $orders = Order::whereNotNull('delivery_data')
+        $orders = Order::with('order_items')->whereNotNull('delivery_data')
             ->whereNotIn('order_status', ['delivered', 'cancelled', 'returned'])
             ->get();
 
@@ -51,8 +51,12 @@ class SyncCourierStatuses extends Command
             }
 
             try {
-                $userId = $order->user_id ?? 1;
-                $delivery = DeliveryServiceManager::forProvider($provider, $userId);
+                $isSelfDelivery = ($deliveryData['delivery_by'] ?? null) === 'reseller';
+                $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? ($order->user_id ?? 1);
+                $delivery = DeliveryServiceManager::forProvider($provider, $vendorId, $isSelfDelivery);
+                if (!$delivery) {
+                    continue;
+                }
                 $response = $delivery->trackOrder((string)$consignmentId);
 
                 if ($provider === 'steadfast' && isset($response['delivery_status'])) {

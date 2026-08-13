@@ -290,8 +290,8 @@ class VendorOrderController extends Controller
             })
             ->sum('vendor_earning');
 
-        $hasCourierIntegration = \App\Services\Delivery\DeliveryServiceManager::forProvider('steadfast', $reseller->id) !== null 
-            || \App\Services\Delivery\DeliveryServiceManager::forProvider('pathao', $reseller->id) !== null;
+        $hasCourierIntegration = \App\Services\Delivery\DeliveryServiceManager::forProvider('steadfast', $reseller->id, true) !== null 
+            || \App\Services\Delivery\DeliveryServiceManager::forProvider('pathao', $reseller->id, true) !== null;
 
         $orders = $query->latest()->paginate(20);
 

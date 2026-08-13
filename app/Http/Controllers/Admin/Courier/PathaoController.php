@@ -14,7 +14,10 @@ class PathaoController extends Controller
     {
         $courier = $request->courier;
 
-        $service = DeliveryServiceManager::forProvider($courier);
+        $userId = Auth::id();
+        $user = Auth::user();
+        $disableFallback = $user && $user->hasRole('reseller');
+        $service = DeliveryServiceManager::forProvider($courier, $userId, $disableFallback);
         $cities = $service?->getCities();
         return response()->json($cities['data']['data'] ?? []);
     }
@@ -23,7 +26,10 @@ class PathaoController extends Controller
     {
         $courier = $request->courier;
         $cityId = $request->city_id;
-        $service = DeliveryServiceManager::forProvider($courier);
+        $userId = Auth::id();
+        $user = Auth::user();
+        $disableFallback = $user && $user->hasRole('reseller');
+        $service = DeliveryServiceManager::forProvider($courier, $userId, $disableFallback);
         $zones = $service->getZones($cityId);
         return response()->json($zones['data']['data'] ?? []);
     }
@@ -32,7 +38,10 @@ class PathaoController extends Controller
     {
         $courier = $request->courier;
         $zoneId = $request->zone_id;
-        $service = DeliveryServiceManager::forProvider($courier);
+        $userId = Auth::id();
+        $user = Auth::user();
+        $disableFallback = $user && $user->hasRole('reseller');
+        $service = DeliveryServiceManager::forProvider($courier, $userId, $disableFallback);
         $areas = $service->getAreas($zoneId);
         return response()->json($areas['data']['data'] ?? []);
     }
@@ -50,11 +59,12 @@ class PathaoController extends Controller
             ]);
         }
 
-        $userId = Auth::id();
-        $delivery = DeliveryServiceManager::forProvider('pathao', $userId);
+        $isSelfDelivery = ($order->delivery_data['delivery_by'] ?? null) === 'reseller';
+        $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id();
+        $delivery = DeliveryServiceManager::forProvider('pathao', $vendorId, $isSelfDelivery);
 
         // Get default store_id from credentials
-        $integration = DeliveryServiceManager::getIntegration('pathao', $userId);
+        $integration = DeliveryServiceManager::getIntegration('pathao', $vendorId, $isSelfDelivery);
         $storeId = $integration?->credentials['store_id'] ?? null;
 
         if (!$storeId) {
@@ -151,10 +161,13 @@ class PathaoController extends Controller
             ]);
         }
 
-        $delivery = DeliveryServiceManager::forProvider('pathao');
+        $firstOrder = $orders->first();
+        $isSelfDelivery = $firstOrder ? (($firstOrder->delivery_data['delivery_by'] ?? null) === 'reseller') : false;
+        $vendorId = $firstOrder ? ($firstOrder->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id()) : Auth::id();
 
-        $userId = Auth::id();
-        $integration = DeliveryServiceManager::getIntegration('pathao', $userId);
+        $delivery = DeliveryServiceManager::forProvider('pathao', $vendorId, $isSelfDelivery);
+
+        $integration = DeliveryServiceManager::getIntegration('pathao', $vendorId, $isSelfDelivery);
         $storeId = $integration?->credentials['store_id'] ?? null;
 
         if (!$storeId) {
@@ -290,7 +303,9 @@ class PathaoController extends Controller
 
         // Send to courier using your service
         try {
-            $service = \App\Services\Delivery\DeliveryServiceManager::forProvider($request->courier_provider);
+            $isSelfDelivery = ($order->delivery_data['delivery_by'] ?? null) === 'reseller';
+            $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id();
+            $service = \App\Services\Delivery\DeliveryServiceManager::forProvider($request->courier_provider, $vendorId, $isSelfDelivery);
 
             $response = $service->createOrder([
                 'store_id'           => $request->pathao_store_id,
@@ -339,7 +354,10 @@ class PathaoController extends Controller
 
     public function getPathaoStores()
     {
-        $service = \App\Services\Delivery\DeliveryServiceManager::forProvider('pathao');
+        $userId = Auth::id();
+        $user = Auth::user();
+        $disableFallback = $user && $user->hasRole('reseller');
+        $service = \App\Services\Delivery\DeliveryServiceManager::forProvider('pathao', $userId, $disableFallback);
         $stores = $service->getStores();
         // Return only the array of stores
         return response()->json($stores['data']['data'] ?? []);
@@ -347,7 +365,10 @@ class PathaoController extends Controller
 
     public function getBalance()
     {
-        $delivery = \App\Services\Delivery\DeliveryServiceManager::forProvider('pathao');
+        $userId = Auth::id();
+        $user = Auth::user();
+        $disableFallback = $user && $user->hasRole('reseller');
+        $delivery = \App\Services\Delivery\DeliveryServiceManager::forProvider('pathao', $userId, $disableFallback);
         try {
             $response = $delivery->getBalance();
             return response()->json([
@@ -375,7 +396,9 @@ class PathaoController extends Controller
                 ]);
             }
 
-            $delivery = \App\Services\Delivery\DeliveryServiceManager::forProvider('pathao');
+            $isSelfDelivery = ($order->delivery_data['delivery_by'] ?? null) === 'reseller';
+            $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id();
+            $delivery = \App\Services\Delivery\DeliveryServiceManager::forProvider('pathao', $vendorId, $isSelfDelivery);
             $response = $delivery->trackOrder($order->delivery_data['consignment_id']);
             
             if (isset($response['data']['order_status'])) {

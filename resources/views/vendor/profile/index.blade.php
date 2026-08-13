@@ -164,6 +164,11 @@
             </button>
         </li>
         @endif
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="courier-tab-btn" data-bs-toggle="tab" data-bs-target="#courier-tab" type="button" role="tab" aria-controls="courier-tab" aria-selected="false">
+                <i class="fas fa-truck text-success"></i> Courier Integrations
+            </button>
+        </li>
     </ul>
 
     <!-- Tab Contents -->
@@ -660,6 +665,153 @@
             </div>
         </div>
         @endif
+
+        <!-- 6. Courier Integrations Tab -->
+        <div class="tab-pane fade" id="courier-tab" role="tabpanel" aria-labelledby="courier-tab-btn">
+            <div class="row g-4">
+                <!-- Steadfast Settings -->
+                <div class="col-lg-6">
+                    <div class="v-card h-100">
+                        <div class="card-header bg-light">
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <i class="fas fa-shipping-fast text-success"></i> Steadfast Credentials
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form action="{{ route('vendor.profile.delivery-integration') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="provider" value="steadfast">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark fs-8 uppercase">API Key <span class="text-danger">*</span></label>
+                                    <input type="text" 
+                                           name="api_key" 
+                                           class="form-control" 
+                                           value="{{ old('api_key', $steadfastIntegration->credentials['api_key'] ?? '') }}"
+                                           required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark fs-8 uppercase">Secret Key <span class="text-danger">*</span></label>
+                                    <input type="text" 
+                                           name="secret_key" 
+                                           class="form-control" 
+                                           value="{{ old('secret_key', $steadfastIntegration->credentials['secret_key'] ?? '') }}"
+                                           required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark fs-8 uppercase">Base URL <span class="text-danger">*</span></label>
+                                    <input type="url" 
+                                           name="base_url" 
+                                           class="form-control" 
+                                           value="{{ old('base_url', $steadfastIntegration->credentials['base_url'] ?? 'https://portal.packsend.com.bd/api/v1') }}"
+                                           required>
+                                </div>
+
+                                <div class="form-check form-switch mb-4">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="steadfast_active" value="1" {{ ($steadfastIntegration->is_active ?? false) ? 'checked' : '' }}>
+                                    <label class="form-check-label fw-bold text-dark fs-7" for="steadfast_active">Enable Steadfast Integration</label>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+                                        <i class="fas fa-save me-1"></i> Save Steadfast Details
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pathao Settings -->
+                <div class="col-lg-6">
+                    <div class="v-card h-100">
+                        <div class="card-header bg-light">
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <i class="fas fa-truck-ramp-box text-primary"></i> Pathao Credentials
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form action="{{ route('vendor.profile.delivery-integration') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="provider" value="pathao">
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark fs-8 uppercase">Client ID <span class="text-danger">*</span></label>
+                                        <input type="text" 
+                                               name="client_id" 
+                                               class="form-control" 
+                                               value="{{ old('client_id', $pathaoIntegration->credentials['client_id'] ?? '') }}"
+                                               required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark fs-8 uppercase">Client Secret <span class="text-danger">*</span></label>
+                                        <input type="text" 
+                                               name="client_secret" 
+                                               class="form-control" 
+                                               value="{{ old('client_secret', $pathaoIntegration->credentials['client_secret'] ?? '') }}"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark fs-8 uppercase">Username <span class="text-danger">*</span></label>
+                                        <input type="text" 
+                                               name="username" 
+                                               class="form-control" 
+                                               value="{{ old('username', $pathaoIntegration->credentials['username'] ?? '') }}"
+                                               required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark fs-8 uppercase">Password <span class="text-danger">*</span></label>
+                                        <input type="password" 
+                                               name="password" 
+                                               class="form-control" 
+                                               value="{{ old('password', $pathaoIntegration->credentials['password'] ?? '') }}"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark fs-8 uppercase">Base URL <span class="text-danger">*</span></label>
+                                        <input type="url" 
+                                               name="base_url" 
+                                               class="form-control" 
+                                               value="{{ old('base_url', $pathaoIntegration->credentials['base_url'] ?? 'https://api.pathao.com') }}"
+                                               required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark fs-8 uppercase">Store ID</label>
+                                        <input type="text" 
+                                               name="store_id" 
+                                               class="form-control" 
+                                               value="{{ old('store_id', $pathaoIntegration->credentials['store_id'] ?? '') }}">
+                                    </div>
+                                </div>
+
+                                <div class="form-check form-switch mb-4">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="pathao_active" value="1" {{ ($pathaoIntegration->is_active ?? false) ? 'checked' : '' }}>
+                                    <label class="form-check-label fw-bold text-dark fs-7" for="pathao_active">Enable Pathao Integration</label>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none;">
+                                        <i class="fas fa-save me-1"></i> Save Pathao Details
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

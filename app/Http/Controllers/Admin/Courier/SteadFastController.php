@@ -36,8 +36,9 @@ class SteadFastController extends Controller
             ]);
         }
 
-        $userId = Auth::id();
-        $delivery = DeliveryServiceManager::forProvider('steadfast', $userId);
+        $isSelfDelivery = ($order->delivery_data['delivery_by'] ?? null) === 'reseller';
+        $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id();
+        $delivery = DeliveryServiceManager::forProvider('steadfast', $vendorId, $isSelfDelivery);
 
         if (!$delivery) {
             return response()->json([
@@ -167,8 +168,10 @@ class SteadFastController extends Controller
             ]);
         }
 
-        $userId = Auth::id();
-        $delivery = DeliveryServiceManager::forProvider('steadfast', $userId);
+        $firstOrder = $orders->first();
+        $isSelfDelivery = $firstOrder ? (($firstOrder->delivery_data['delivery_by'] ?? null) === 'reseller') : false;
+        $vendorId = $firstOrder ? ($firstOrder->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id()) : Auth::id();
+        $delivery = DeliveryServiceManager::forProvider('steadfast', $vendorId, $isSelfDelivery);
 
         if (!$delivery) {
             return response()->json([
@@ -269,7 +272,9 @@ class SteadFastController extends Controller
     public function getBalance()
     {
         $userId = Auth::id();
-        $delivery = DeliveryServiceManager::forProvider('steadfast', $userId);
+        $user = Auth::user();
+        $disableFallback = $user && $user->hasRole('reseller');
+        $delivery = DeliveryServiceManager::forProvider('steadfast', $userId, $disableFallback);
 
         if (!$delivery) {
             return response()->json([
@@ -309,8 +314,9 @@ class SteadFastController extends Controller
                 ]);
             }
 
-            $userId = Auth::id();
-            $delivery = DeliveryServiceManager::forProvider('steadfast', $userId);
+            $isSelfDelivery = ($order->delivery_data['delivery_by'] ?? null) === 'reseller';
+            $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id();
+            $delivery = DeliveryServiceManager::forProvider('steadfast', $vendorId, $isSelfDelivery);
 
             if (!$delivery) {
                 return response()->json([

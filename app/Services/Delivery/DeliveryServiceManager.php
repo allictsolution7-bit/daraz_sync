@@ -21,7 +21,7 @@ class DeliveryServiceManager
     /**
      * Resolve a delivery service for a given provider scoped to a specific user/vendor ID
      */
-    public static function forProvider($provider, $userId = null): ?DeliveryServiceInterface
+    public static function forProvider($provider, $userId = null, $disableFallback = false): ?DeliveryServiceInterface
     {
         $userId = $userId ?: Auth::id();
 
@@ -34,7 +34,7 @@ class DeliveryServiceManager
             ->first();
 
         // 2. Fallback to any active integration if specific user has no configuration
-        if (!$integration) {
+        if (!$integration && !$disableFallback) {
             $integration = DeliveryIntegration::where('provider', $provider)
                 ->where('is_active', true)
                 ->first();
@@ -47,7 +47,7 @@ class DeliveryServiceManager
     /**
      * Get integration record for user or fallback
      */
-    public static function getIntegration($provider, $userId = null): ?DeliveryIntegration
+    public static function getIntegration($provider, $userId = null, $disableFallback = false): ?DeliveryIntegration
     {
         $userId = $userId ?: Auth::id();
 
@@ -58,7 +58,7 @@ class DeliveryServiceManager
             })
             ->first();
 
-        if (!$integration) {
+        if (!$integration && !$disableFallback) {
             $integration = DeliveryIntegration::where('provider', $provider)
                 ->where('is_active', true)
                 ->first();

@@ -1093,7 +1093,13 @@ class OrderController extends Controller
                     continue;
                 }
 
-                $delivery = \App\Services\Delivery\DeliveryServiceManager::forProvider($courierProvider);
+                $isSelfDelivery = ($order->delivery_data['delivery_by'] ?? null) === 'reseller';
+                $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id();
+                $delivery = \App\Services\Delivery\DeliveryServiceManager::forProvider($courierProvider, $vendorId, $isSelfDelivery);
+                if (!$delivery) {
+                    $failed++;
+                    continue;
+                }
                 $response = $delivery->trackOrder($trackingId);
 
                 // Handle Steadfast response

@@ -873,6 +873,7 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor', 'authori
     // Profile
     Route::get('/profile', [VendorDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [VendorDashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/delivery-integration', [VendorDashboardController::class, 'saveDeliveryIntegration'])->name('profile.delivery-integration');
 
     // POS Routes (Reseller portal)
     Route::prefix('pos')->name('pos.')->group(function () {

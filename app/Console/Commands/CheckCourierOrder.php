@@ -28,7 +28,7 @@ class CheckCourierOrder extends Command
     public function handle()
     {
         $orderId = $this->argument('order_id');
-        $order = Order::find($orderId);
+        $order = Order::with('order_items')->find($orderId);
 
         if (!$order) {
             $this->error("Order {$orderId} not found!");
@@ -70,7 +70,13 @@ class CheckCourierOrder extends Command
             if ($this->confirm('Do you want to fetch the current courier status?', true)) {
                 $this->info("Fetching status from {$courierProvider}...");
                 try {
-                    $delivery = DeliveryServiceManager::forProvider($courierProvider);
+                    $isSelfDelivery = ($deliveryData['delivery_by'] ?? null) === 'reseller';
+                    $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id();
+                    $delivery = DeliveryServiceManager::forProvider($courierProvider, $vendorId, $isSelfDelivery);
+                    if (!$delivery) {
+                        $this->error("Delivery gateway not configured for this reseller.");
+                        return 0;
+                    }
                     $response = $delivery->trackOrder($consignmentId);
                     
                     $this->info("Tracking Response:");

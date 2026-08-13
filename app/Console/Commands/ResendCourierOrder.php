@@ -58,7 +58,13 @@ class ResendCourierOrder extends Command
         }
 
         try {
-            $delivery = DeliveryServiceManager::forProvider($provider);
+            $isSelfDelivery = ($order->delivery_data['delivery_by'] ?? null) === 'reseller';
+            $vendorId = $order->order_items->firstWhere('vendor_id', '!=', null)->vendor_id ?? Auth::id();
+            $delivery = DeliveryServiceManager::forProvider($provider, $vendorId, $isSelfDelivery);
+            if (!$delivery) {
+                $this->error("Delivery gateway not configured for this reseller.");
+                return 1;
+            }
 
             // Calculate weight from order items
             $weight = 0;
@@ -72,7 +78,7 @@ class ResendCourierOrder extends Command
 
             // Build order data based on provider
             if ($provider === 'pathao') {
-                $integration = \App\Models\DeliveryIntegration::where('provider', 'pathao')->where('is_active', true)->first();
+                $integration = DeliveryServiceManager::getIntegration('pathao', $vendorId, $isSelfDelivery);
                 $storeId = $integration?->credentials['store_id'] ?? null;
 
                 if (!$storeId) {

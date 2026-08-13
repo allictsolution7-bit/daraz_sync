@@ -96,7 +96,74 @@ class VendorDashboardController extends Controller
             ]
         );
 
-        return view('vendor.profile.index', compact('vendor', 'vendorSettings'));
+        $steadfastIntegration = \App\Models\DeliveryIntegration::where('user_id', $vendor->id)
+            ->where('provider', 'steadfast')
+            ->first();
+
+        $pathaoIntegration = \App\Models\DeliveryIntegration::where('user_id', $vendor->id)
+            ->where('provider', 'pathao')
+            ->first();
+
+        return view('vendor.profile.index', compact('vendor', 'vendorSettings', 'steadfastIntegration', 'pathaoIntegration'));
+    }
+
+    /**
+     * Save reseller delivery integration credentials
+     */
+    public function saveDeliveryIntegration(Request $request)
+    {
+        $vendor = auth()->user();
+        if (!$vendor->can('vendor.profile.edit') && !$vendor->hasRole('reseller')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $provider = $request->input('provider');
+        if (!in_array($provider, ['steadfast', 'pathao'])) {
+            return redirect()->back()->with('error', 'Invalid courier provider.');
+        }
+
+        if ($provider === 'steadfast') {
+            $request->validate([
+                'api_key' => 'required|string',
+                'secret_key' => 'required|string',
+                'base_url' => 'required|url',
+            ]);
+            $credentials = [
+                'api_key' => $request->api_key,
+                'secret_key' => $request->secret_key,
+                'base_url' => $request->base_url,
+            ];
+        } else {
+            $request->validate([
+                'client_id' => 'required|string',
+                'client_secret' => 'required|string',
+                'username' => 'required|string',
+                'password' => 'required|string',
+                'base_url' => 'required|url',
+                'store_id' => 'nullable|string',
+            ]);
+            $credentials = [
+                'client_id' => $request->client_id,
+                'client_secret' => $request->client_secret,
+                'username' => $request->username,
+                'password' => $request->password,
+                'base_url' => $request->base_url,
+                'store_id' => $request->store_id,
+            ];
+        }
+
+        \App\Models\DeliveryIntegration::updateOrCreate(
+            [
+                'user_id' => $vendor->id,
+                'provider' => $provider,
+            ],
+            [
+                'credentials' => $credentials,
+                'is_active' => $request->has('is_active'),
+            ]
+        );
+
+        return redirect()->back()->with('success', ucfirst($provider) . ' integration credentials saved successfully!');
     }
 
     /**
