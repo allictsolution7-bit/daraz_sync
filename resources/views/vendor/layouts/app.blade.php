@@ -476,7 +476,7 @@
 
             @can('vendor.pos.view')
             <a class="vendor-sidebar-link {{ request()->routeIs('vendor.pos.*') ? 'active' : '' }}" href="{{ route('vendor.pos.index') }}">
-                <i class="fas fa-cash-register text-success"></i> Reseller POS
+                <i class="fas fa-cash-register text-success"></i> POS
             </a>
             @endcan
 

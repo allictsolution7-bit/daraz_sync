@@ -30,8 +30,8 @@ class VendorPOSController extends Controller
     public function index()
     {
         $vendor = Auth::user();
-        if (!$vendor || !$vendor->hasRole('reseller')) {
-            abort(403, 'POS access is only available for Reseller accounts.');
+        if (!$vendor || !$vendor->can('vendor.pos.view')) {
+            abort(403, 'POS access is restricted.');
         }
 
         $categories = ProductCategory::where('status', 'active')
@@ -70,7 +70,7 @@ class VendorPOSController extends Controller
     {
         try {
             $vendor = Auth::user();
-            if (!$vendor || !$vendor->hasRole('reseller')) {
+            if (!$vendor || !$vendor->can('vendor.pos.view')) {
                 return response()->json(['error' => true, 'message' => 'Unauthorized'], 403);
             }
 
@@ -290,7 +290,7 @@ class VendorPOSController extends Controller
 
         try {
             $reseller = Auth::user();
-            if (!$reseller || !$reseller->hasRole('reseller')) {
+            if (!$reseller || !$reseller->can('vendor.pos.view')) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
             }
 

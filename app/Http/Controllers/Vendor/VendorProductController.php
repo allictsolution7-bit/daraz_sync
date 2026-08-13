@@ -81,12 +81,9 @@ class VendorProductController extends Controller
 
         if ($isWholeseller) {
             $canAccessAdminProducts = true;
-            if (!$source) {
-                $source = 'admin_products';
-            }
-        } else {
-            $source = $source ?: 'my_products';
         }
+
+        $source = $source ?: 'my_products';
 
         $allocationsQuery = \App\Models\VendorProductAllocation::where('vendor_id', $vendor->id)->get();
         $allocatedProductIds = $allocationsQuery->pluck('product_id')->toArray();

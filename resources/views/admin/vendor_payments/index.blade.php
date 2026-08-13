@@ -163,7 +163,7 @@
                                 </td>
                                 <td class="py-2">
                                     @php
-                                        $isCredit = in_array(strtolower($trx->type), ['recharge_request', 'admin_grant', 'transfer_received', 'stock_purchase_refund', 'refund', 'admin_refund']);
+                                        $isCredit = in_array(strtolower($trx->type), ['recharge_request', 'admin_grant', 'transfer_received', 'stock_purchase_refund', 'refund', 'admin_refund', 'sale_commission']);
                                     @endphp
                                     <span class="fw-bold {{ $isCredit ? 'text-success' : 'text-danger' }}" style="font-size: 0.85rem;">
                                         {{ $isCredit ? '+' : '-' }} ৳{{ number_format($trx->amount, 2) }}

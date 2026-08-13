@@ -125,7 +125,7 @@ class VendorService
      */
     public function creditVendorEarning(order_item $orderItem): void
     {
-        if (!$orderItem->vendor_id || !$orderItem->vendor_earning) {
+        if (!$orderItem->vendor_id || !$orderItem->vendor_earning || $orderItem->vendor_paid) {
             return;
         }
 
@@ -153,6 +153,12 @@ class VendorService
 
             // Update user wallet balance directly
             $vendor->increment('wallet_balance', $orderItem->vendor_earning);
+
+            // Mark order item as paid to prevent duplicate processing
+            $orderItem->update([
+                'vendor_paid' => true,
+                'vendor_paid_at' => now(),
+            ]);
 
             // Log approved transaction
             VendorWalletTransaction::create([

@@ -1,6 +1,6 @@
 @extends('vendor.layouts.app')
 
-@section('title', 'Reseller POS System')
+@section('title', 'POS System')
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -372,7 +372,7 @@
                 <i class="fas fa-cash-register"></i>
             </div>
             <div>
-                <h3 class="pos-title-badge mb-0">Reseller POS</h3>
+                <h3 class="pos-title-badge mb-0">POS</h3>
                 <p class="mb-0 text-white-50 small">Quickly place catalog orders directly to your admin</p>
             </div>
         </div>
