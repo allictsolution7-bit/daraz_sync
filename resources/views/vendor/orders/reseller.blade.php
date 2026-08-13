@@ -179,6 +179,16 @@
     </div>
     @endif
 
+    {{-- Delivery Options Tabs --}}
+    <div class="d-flex mb-3 gap-2 border-bottom pb-2 flex-wrap">
+        <a href="{{ request()->fullUrlWithQuery(['delivery_by' => 'reseller']) }}" class="btn {{ $deliveryBy === 'reseller' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm fw-bold px-3 rounded-pill">
+            <i class="fas fa-truck-ramp-box me-1"></i> Self-Delivery Orders ({{ $selfDeliveryCount }})
+        </a>
+        <a href="{{ request()->fullUrlWithQuery(['delivery_by' => 'admin']) }}" class="btn {{ $deliveryBy === 'admin' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm fw-bold px-3 rounded-pill">
+            <i class="fas fa-user-shield me-1"></i> Admin-Delivery Orders ({{ $adminDeliveryCount }})
+        </a>
+    </div>
+
     {{-- Status Tabs --}}
     <div class="status-tab-row">
         <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="status-tab {{ !request('status') || request('status') === 'all' ? 'active' : '' }}">
@@ -202,6 +212,7 @@
     <div class="filter-bar mb-4">
         <form method="GET" action="" class="row g-2 align-items-end">
             <input type="hidden" name="status" value="{{ request('status') }}">
+            <input type="hidden" name="delivery_by" value="{{ $deliveryBy }}">
             <div class="col-md-4">
                 <label class="form-label fw-semibold small text-muted mb-1">Search Customer</label>
                 <input type="text" name="search" value="{{ request('search') }}" class="form-control form-control-sm" placeholder="Name or phone...">
@@ -223,14 +234,7 @@
         </form>
     </div>
 
-    @php
-        $hasSelfDeliveryOrders = $orders->contains(function ($ord) {
-            $dd = is_string($ord->delivery_data) ? json_decode($ord->delivery_data, true) : ($ord->delivery_data ?? []);
-            return isset($dd['delivery_by']) && $dd['delivery_by'] === 'reseller';
-        });
-    @endphp
-
-    @if($hasSelfDeliveryOrders)
+    @if(!$orders->isEmpty() && ($deliveryBy === 'reseller' || $hasCourierIntegration))
     <!-- Bulk Operations Panel -->
     <div class="card mb-4 border-0 shadow-sm" style="border-radius: 16px;">
         <div class="card-header bg-light border-bottom-0 py-3 d-flex justify-content-between align-items-center" style="border-radius: 16px 16px 0 0;">
@@ -244,9 +248,10 @@
             <div class="row g-3">
                 <div class="col-md-6 border-end">
                     <div class="small fw-bold text-muted mb-2"><i class="fas fa-truck text-success me-1"></i> Dispatch Options</div>
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
                         <button id="bulk-send-steadfast" class="btn btn-sm btn-success fw-bold"><i class="fas fa-paper-plane me-1"></i> Send via Steadfast</button>
                         <button id="bulk-send-pathao" class="btn btn-sm btn-primary fw-bold"><i class="fas fa-shipping-fast me-1"></i> Send via Pathao</button>
+                        <button id="bulk-sync-courier" class="btn btn-sm btn-outline-secondary fw-bold"><i class="fas fa-sync me-1"></i> Sync All Statuses</button>
                     </div>
                 </div>
                 <div class="col-md-6 ps-md-4">
@@ -289,11 +294,20 @@
             $courierProvider = $deliveryData['courier_provider'] ?? null;
             $hasCourier = !empty($courierProvider);
             $courierSent = $hasCourier ? 'true' : 'false';
+
+            // Tracking info
+            $cnId = $deliveryData['consignment_id'] ?? $deliveryData['tracking_code'] ?? null;
+            $trackingCode = $deliveryData['tracking_code'] ?? $deliveryData['consignment_id'] ?? null;
+            $providerKey = strtolower($courierProvider ?? '');
+            $trackUrl = $deliveryData['tracking_url'] ?? match($providerKey) {
+                'pathao' => $cnId ? "https://merchant.pathao.com/tracking?consignment_id={$cnId}" : '#',
+                default => $trackingCode ? "https://steadfast.com.bd/tl/{$trackingCode}" : '#',
+            };
         @endphp
         <div class="order-card">
             <div class="order-card-header">
                 <div class="d-flex align-items-center gap-3">
-                    @if($isSelfDelivery)
+                    @if($deliveryBy === 'reseller' || $hasCourierIntegration)
                         <input type="checkbox" class="order-checkbox me-1" value="{{ $order->id }}" data-courier-sent="{{ $courierSent }}" data-courier-provider="{{ $courierProvider }}" data-phone="{{ $order->phone }}" data-ip="">
                     @endif
                     <div>
@@ -304,11 +318,20 @@
                             @endif
                             @if($hasCourier)
                                 <span class="badge bg-info text-white courier-status-badge ms-1" data-order-id="{{ $order->id }}" data-courier="{{ $courierProvider }}" style="cursor: pointer; font-size: 0.65rem;" title="Click to refresh courier status">
-                                    <i class="fas fa-truck"></i> <span class="courier-status-text">{{ $deliveryData['courier_status'] ?? 'Sent' }}</span>
+                                    <i class="fas fa-truck"></i> <span class="courier-status-text">{{ $deliveryData['courier_status'] ?? 'Sent' }}</span> <i class="fas fa-sync-alt ms-1" style="font-size: 8px;"></i>
                                 </span>
                             @endif
                         </div>
                         <div class="order-date">{{ $order->created_at->format('d M Y, h:i A') }}</div>
+                        @if($hasCourier)
+                            <div class="mt-1 small">
+                                <span class="fw-bold text-dark">{{ ucfirst($courierProvider) }}</span>
+                                @if($cnId)
+                                    <span class="text-muted ms-1" style="font-family: monospace;">(ID: {{ $cnId }})</span>
+                                    <a href="{{ $trackUrl }}" target="_blank" class="ms-1 fw-bold text-decoration-none text-primary" style="font-size: 0.75rem;">Track <i class="fas fa-external-link-alt" style="font-size: 8px;"></i></a>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                     <span class="order-status-badge {{ $statusClass }}">
                         <i class="fas {{ $statusIcon }}"></i> {{ $statusLabel }}
@@ -538,6 +561,66 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     window.open(`/order/${orderId}/print-package-slip`, '_blank');
                 }, idx * 500);
+            });
+        });
+    }
+
+    // Bulk Sync Courier Statuses
+    const syncAllBtn = document.getElementById('bulk-sync-courier');
+    if (syncAllBtn) {
+        syncAllBtn.addEventListener('click', function() {
+            const badges = document.querySelectorAll('.courier-status-badge');
+            if (badges.length === 0) {
+                alert('No orders with active courier tracking found on this page.');
+                return;
+            }
+            
+            syncAllBtn.disabled = true;
+            syncAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Syncing...';
+            
+            let completed = 0;
+            let successCount = 0;
+            
+            badges.forEach(badge => {
+                const orderId = badge.dataset.orderId;
+                const courier = badge.dataset.courier;
+                const statusText = badge.querySelector('.courier-status-text');
+                statusText.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                let url = '';
+                if (courier === 'steadfast') {
+                    url = `/vendor/steadfast/order-status/${orderId}`;
+                } else if (courier === 'pathao') {
+                    url = `/vendor/pathao/order-status/${orderId}`;
+                }
+
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        statusText.textContent = data.status || 'Checked';
+                        successCount++;
+                    } else {
+                        statusText.textContent = 'Failed';
+                    }
+                })
+                .catch(() => {
+                    statusText.textContent = 'Error';
+                })
+                .finally(() => {
+                    completed++;
+                    if (completed === badges.length) {
+                        syncAllBtn.disabled = false;
+                        syncAllBtn.innerHTML = '<i class="fas fa-sync me-1"></i> Sync All Statuses';
+                        alert(`Courier synchronization complete! Successfully synced ${successCount} of ${badges.length} orders.`);
+                    }
+                });
             });
         });
     }

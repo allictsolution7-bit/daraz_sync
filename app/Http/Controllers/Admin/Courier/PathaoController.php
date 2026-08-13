@@ -40,6 +40,16 @@ class PathaoController extends Controller
     public function sendToCourier(Request $request)
     {
         $order = order::findOrFail($request->order_id);
+        $user = Auth::user();
+        try {
+            $this->processResellerWalletDeduction($order, $user);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+
         $userId = Auth::id();
         $delivery = DeliveryServiceManager::forProvider('pathao', $userId);
 
@@ -129,6 +139,18 @@ class PathaoController extends Controller
     public function sendBulkToCourier(Request $request)
     {
         $orders = order::whereIn('id', $request->order_ids)->get();
+        $user = Auth::user();
+        try {
+            foreach ($orders as $order) {
+                $this->processResellerWalletDeduction($order, $user);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+
         $delivery = DeliveryServiceManager::forProvider('pathao');
 
         $userId = Auth::id();
@@ -385,6 +407,45 @@ class PathaoController extends Controller
                 'success' => false,
                 'message' => $e->getMessage()
             ]);
+        }
+    }
+
+    private function processResellerWalletDeduction($order, $user)
+    {
+        if ($user && $user->hasRole('reseller')) {
+            $deliveryData = is_string($order->delivery_data) 
+                ? json_decode($order->delivery_data, true) 
+                : ($order->delivery_data ?? []);
+
+            $deducted = $deliveryData['reseller_cost_deducted'] ?? 0;
+            if ($deducted <= 0) {
+                $cost = (float) $order->order_items()->sum('total_cost');
+                if ($cost > 0) {
+                    if ($user->wallet_balance < $cost) {
+                        throw new \Exception("Insufficient wallet balance for Order #{$order->id}. You need at least ৳" . number_format($cost, 2) . " but you only have ৳" . number_format($user->wallet_balance, 2) . ".");
+                    }
+
+                    // Decrement wallet balance
+                    $user->decrement('wallet_balance', $cost);
+
+                    // Log transaction
+                    \App\Models\VendorWalletTransaction::create([
+                        'vendor_id' => $user->id,
+                        'type' => 'reseller_pos_payment',
+                        'amount' => $cost,
+                        'status' => 'approved',
+                        'admin_note' => "Paid for Reseller POS Order #{$order->id} (Self-Dispatch). Products cost: ৳" . number_format($cost, 2),
+                    ]);
+
+                    $deliveryData['reseller_cost_deducted'] = $cost;
+                }
+            }
+
+            // Always ensure delivery_by is set to reseller
+            $deliveryData['delivery_by'] = 'reseller';
+            $order->delivery_data = $deliveryData;
+            $order->status = 'processing'; // Mark order as approved/processing
+            $order->save();
         }
     }
 }

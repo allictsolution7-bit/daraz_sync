@@ -339,8 +339,9 @@
                         @endphp
                         <tr>
                             <td>
-                                <div class="fw-bold text-primary">#{{ $item->order->order_number ?? $item->order_id }}</div>
-                                <div class="small text-muted">{{ $item->order ? $item->order->created_at->format('d M, Y h:i A') : '' }}</div>
+                                <div class="fw-bold text-primary">#{{ $item->order->order_number ?? $item->order->id ?? $item->order_id }}</div>
+                                <div class="small text-dark fw-bold">{{ $item->order->name ?? 'N/A' }}</div>
+                                <div class="small text-muted" style="font-size: 0.75rem;">{{ $item->order ? $item->order->created_at->format('d M, Y h:i A') : '' }}</div>
                             </td>
                             <td>
                                 <div class="fw-bold">{{ $item->vendor->name ?? 'Deleted Partner' }}</div>

@@ -38,7 +38,8 @@ class AuthorizeByRouteName
             str_starts_with($name, 'vendor.steadfast') ||
             str_starts_with($name, 'vendor.pathao') ||
             str_starts_with($name, 'admin.delivery') ||
-            str_starts_with($name, 'admin.support-tickets')
+            str_starts_with($name, 'admin.support-tickets') ||
+            $name === 'vendor.orders.toggle-payment-status'
         ) {
             return $next($request);
         }

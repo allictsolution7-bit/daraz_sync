@@ -222,14 +222,43 @@ class VendorOrderController extends Controller
             });
         }
 
+        // Apply Delivery Filter
+        $deliveryBy = $request->get('delivery_by', 'reseller');
+        if ($deliveryBy === 'reseller') {
+            $query->where('delivery_data->delivery_by', 'reseller');
+        } else {
+            $query->where(function($q) {
+                $q->where('delivery_data->delivery_by', 'admin')
+                  ->orWhereNull('delivery_data->delivery_by');
+            });
+        }
+
         $allOrders = order::whereIn('id', $orderIds)->where('order_source', 'Reseller POS');
+        
+        // Filter status counts by delivery type
+        $statusOrders = (clone $allOrders)->where(function($q) use ($deliveryBy) {
+            if ($deliveryBy === 'reseller') {
+                $q->where('delivery_data->delivery_by', 'reseller');
+            } else {
+                $q->where('delivery_data->delivery_by', 'admin')
+                  ->orWhereNull('delivery_data->delivery_by');
+            }
+        });
+
         $statusCounts = [
-            'all'        => (clone $allOrders)->count(),
-            'pending'    => (clone $allOrders)->where('status', 'pending')->count(),
-            'processing' => (clone $allOrders)->where('status', 'processing')->count(),
-            'delivered'  => (clone $allOrders)->where('status', 'delivered')->count(),
-            'cancelled'  => (clone $allOrders)->where('status', 'cancelled')->count(),
+            'all'        => (clone $statusOrders)->count(),
+            'pending'    => (clone $statusOrders)->where('status', 'pending')->count(),
+            'processing' => (clone $statusOrders)->where('status', 'processing')->count(),
+            'delivered'  => (clone $statusOrders)->where('status', 'delivered')->count(),
+            'cancelled'  => (clone $statusOrders)->where('status', 'cancelled')->count(),
         ];
+
+        // Overall tab counts for navigation
+        $selfDeliveryCount = (clone $allOrders)->where('delivery_data->delivery_by', 'reseller')->count();
+        $adminDeliveryCount = (clone $allOrders)->where(function($q) {
+            $q->where('delivery_data->delivery_by', 'admin')
+              ->orWhereNull('delivery_data->delivery_by');
+        })->count();
 
         // Earnings summary
         $totalEarnings = order_item::where('vendor_id', $reseller->id)
@@ -245,10 +274,13 @@ class VendorOrderController extends Controller
             })
             ->sum('vendor_earning');
 
+        $hasCourierIntegration = \App\Services\Delivery\DeliveryServiceManager::forProvider('steadfast', $reseller->id) !== null 
+            || \App\Services\Delivery\DeliveryServiceManager::forProvider('pathao', $reseller->id) !== null;
+
         $orders = $query->latest()->paginate(20);
 
         return view('vendor.orders.reseller', compact(
-            'orders', 'statusCounts', 'totalEarnings', 'paidEarnings'
+            'orders', 'statusCounts', 'totalEarnings', 'paidEarnings', 'deliveryBy', 'selfDeliveryCount', 'adminDeliveryCount', 'hasCourierIntegration'
         ));
     }
 
@@ -389,15 +421,17 @@ class VendorOrderController extends Controller
 
                 foreach ($vendorItems as $item) {
                     if ($targetStatus === 'paid') {
-                        if (!$item->vendor_paid) {
-                            $item->update([
-                                'vendor_paid' => true,
-                                'vendor_paid_at' => now(),
-                            ]);
+                        // Only credit and mark as vendor_paid if the order is delivered
+                        if ($order->status === 'delivered') {
+                            if (!$item->vendor_paid) {
+                                $item->update([
+                                    'vendor_paid' => true,
+                                    'vendor_paid_at' => now(),
+                                ]);
 
-                            // Credit vendor wallet/ledger if earning is positive
-                            if ($item->vendor_earning > 0) {
-                                $vendorService->creditVendorEarning($item);
+                                if ($item->vendor_earning > 0) {
+                                    $vendorService->creditVendorEarning($item);
+                                }
                             }
                         }
                     } else { // unpaid
@@ -407,7 +441,7 @@ class VendorOrderController extends Controller
                                 'vendor_paid_at' => null,
                             ]);
 
-                            // Deduct from vendor wallet/ledger
+                            // Deduct from vendor wallet/ledger if it was previously credited
                             if ($item->vendor_earning > 0) {
                                 // Decrement user wallet balance
                                 $vendorUser = \App\Models\User::find($item->vendor_id);
@@ -428,20 +462,15 @@ class VendorOrderController extends Controller
                                     'order_item_id' => $item->id,
                                     'description' => "Earning reversal from Order #{$item->order_id} - {$item->product->title}",
                                 ]);
-
-                                // Log reversal transaction
-                                \App\Models\VendorWalletTransaction::create([
-                                    'vendor_id' => $item->vendor_id,
-                                    'type' => 'stock_purchase', // serves as debit
-                                    'amount' => $item->vendor_earning,
-                                    'status' => 'approved',
-                                    'admin_note' => "POS Order profit reversed (unpaid). Order #{$item->order_id}",
-                                    'is_seen' => true
-                                ]);
                             }
                         }
                     }
                 }
+
+                // Update the order's payment status
+                $order->update([
+                    'payment_status' => $targetStatus === 'paid' ? 'paid' : 'pending'
+                ]);
             });
 
             return response()->json([
