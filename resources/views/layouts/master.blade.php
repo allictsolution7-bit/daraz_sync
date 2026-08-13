@@ -1134,7 +1134,7 @@
 
         @php
         $coreShopActive = request()->is('admin/product*') || request()->is('admin/catalog-groups*') || request()->is('admin/catalog-tiers*') || request()->is('admin/catalog-levels*') || request()->is('admin/publishers-mark*') || request()->is('admin/stock-control*') || request()->is('admin/promo-pages*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/bundle-deals*') || request()->is('admin/catalog*');
-        $ordersSalesActive = request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/vendor-orders*') || request()->is('admin/reseller-orders*') || request()->is('admin/pending-queue*') || request()->is('admin/pos*');
+        $ordersSalesActive = request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/vendor-orders*') || request()->is('admin/reseller-orders*') || request()->is('admin/pending-queue*') || request()->is('admin/pos*') || request()->is('admin/customers*');
         $shippingDeliveryActive = request()->is('admin/shipping-basics*') || request()->is('admin/delivery-zones/rules*') || request()->is('admin/courier-connect*');
         $reportsAnalyticsActive = request()->routeIs('admin.orders.reports*') || request()->routeIs('admin.customers.reports*');
         $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/import-woo*') || request()->routeIs('admin.telegram-settings.*') || request()->is('admin/event-queue*');
@@ -1598,6 +1598,18 @@
                                     </li>
                                 </x-license-feature>
                                 @endif
+                                @endif
+
+                                {{-- Customers --}}
+                                @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || auth()->user()?->hasRole('admin') || auth()->user()?->can('customers.view'))
+                                <li class="{{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.customers.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-users" style="color:#1abc9c;"></i>
+                                            Customers
+                                        </span>
+                                    </a>
+                                </li>
                                 @endif
                             </ul>
                         </li>

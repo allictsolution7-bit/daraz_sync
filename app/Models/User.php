@@ -231,4 +231,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(VendorBalanceLedger::class, 'vendor_id');
     }
+
+    /**
+     * Get the user who created this customer/user
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

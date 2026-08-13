@@ -77,6 +77,14 @@ class AuthorizeByRouteName
             abort(403, 'Permission required: (reseller_orders.view). Please ask an administrator to grant this permission.');
         }
 
+        // Direct mapping for customers route
+        if ($name === 'admin.customers.index') {
+            if ($user->can('customers.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {
+                return $next($request);
+            }
+            abort(403, 'Permission required: (customers.view). Please ask an administrator to grant this permission.');
+        }
+
         // Direct mapping for basic shipping settings route
         if (str_starts_with($name, 'admin.basic.shipping.settings') || str_starts_with($name, 'basic.shipping.settings')) {
             if ($user->can('shipping.basic.view') || $user->can('shipping.basic.update') || $user->can('basic_shipping.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {

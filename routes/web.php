@@ -331,6 +331,9 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
 
     Route::post('/transactions/bulk-assign', [BackOrderController::class, 'bulkAssign'])->name('orders.bulk-assign');
 
+    // Customer Management
+    Route::get('/customers', [\App\Http\Controllers\Admin\AdminCustomerController::class, 'index'])->name('customers.index');
+
     // Support Tickets Management
     Route::prefix('support-tickets')->name('support-tickets.')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\SupportTicketController::class, 'index'])->name('index');

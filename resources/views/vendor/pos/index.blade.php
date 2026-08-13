@@ -485,21 +485,36 @@
                     <div class="row g-2">
                         <div class="col-12 mb-1">
                             <label class="fw-semibold small text-muted">Select Customer (Optional)</label>
-                            <select class="form-select form-select-sm" id="posCustomerSelect">
-                                <option value="">-- New / Walk-in Customer --</option>
-                                @foreach($customers as $cust)
-                                    @php
-                                        $masked = strlen($cust->phone) > 8 ? substr($cust->phone, 0, 4) . str_repeat('*', strlen($cust->phone) - 6) . substr($cust->phone, -2) : (strlen($cust->phone) > 4 ? substr($cust->phone, 0, 2) . str_repeat('*', strlen($cust->phone) - 4) . substr($cust->phone, -2) : str_repeat('*', strlen($cust->phone)));
-                                    @endphp
-                                    <option value="{{ $cust->id }}" 
-                                            data-name="{{ $cust->name }}" 
-                                            data-phone="{{ $masked }}" 
-                                            data-address="{{ $cust->address }}" 
-                                            data-city="{{ $cust->city }}">
-                                        {{ $cust->name }} ({{ $masked }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div class="dropdown w-100" id="posCustomerDropdown">
+                                <button class="btn btn-sm btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center dropdown-toggle" type="button" id="customerDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false" style="border: 1px solid #ced4da; background-color: #fff; color: #212529; font-size: 0.875rem; height: 38px;">
+                                    <span id="selectedCustomerLabel">-- New / Walk-in Customer --</span>
+                                </button>
+                                <div class="dropdown-menu w-100 p-2 shadow-lg" aria-labelledby="customerDropdownBtn" style="max-height: 300px; overflow-y: auto;">
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control border-start-0" id="customerSearchInput" placeholder="Search customer..." autocomplete="off">
+                                    </div>
+                                    <div id="customerOptionsContainer">
+                                        <button class="dropdown-item small py-2 active customer-opt border-bottom" type="button" data-value="" data-name="" data-phone="" data-address="" data-city="">
+                                            -- New / Walk-in Customer --
+                                        </button>
+                                        @foreach($customers as $cust)
+                                            @php
+                                                $masked = strlen($cust->phone) > 8 ? substr($cust->phone, 0, 4) . str_repeat('*', strlen($cust->phone) - 6) . substr($cust->phone, -2) : (strlen($cust->phone) > 4 ? substr($cust->phone, 0, 2) . str_repeat('*', strlen($cust->phone) - 4) . substr($cust->phone, -2) : str_repeat('*', strlen($cust->phone)));
+                                            @endphp
+                                            <button class="dropdown-item small py-2 customer-opt text-wrap" type="button" 
+                                                    data-value="{{ $cust->id }}" 
+                                                    data-name="{{ $cust->name }}" 
+                                                    data-phone="{{ $masked }}" 
+                                                    data-address="{{ $cust->address }}" 
+                                                    data-city="{{ $cust->city }}">
+                                                {{ $cust->name }} ({{ $masked }})
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <input type="hidden" id="posCustomerSelect" value="">
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label>Customer Name *</label>
@@ -636,20 +651,53 @@ $(document).ready(function() {
 
     $('#customerName, #customerPhone, #customerAddress').on('input', validateCheckout);
 
-    $('#posCustomerSelect').on('change', function() {
-        const option = $(this).find('option:selected');
-        if (option.val() === '') {
+    // Filter customer options in dropdown
+    $('#customerSearchInput').on('keyup', function() {
+        const search = $(this).val().toLowerCase();
+        $('#customerOptionsContainer .customer-opt').each(function() {
+            const text = $(this).text().toLowerCase();
+            if (text.includes(search)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+
+    // Handle customer option selection
+    $(document).on('click', '#customerOptionsContainer .customer-opt', function() {
+        const value = $(this).attr('data-value');
+        const name = $(this).attr('data-name');
+        const phone = $(this).attr('data-phone');
+        const address = $(this).attr('data-address');
+        const city = $(this).attr('data-city');
+        const labelText = $(this).text().trim();
+
+        // Update active class
+        $('#customerOptionsContainer .customer-opt').removeClass('active');
+        $(this).addClass('active');
+
+        // Set hidden value
+        $('#posCustomerSelect').val(value).trigger('change');
+        $('#selectedCustomerLabel').text(labelText);
+
+        // Fill form fields
+        if (value === '') {
             $('#customerName').val('');
             $('#customerPhone').val('').prop('readonly', false);
             $('#customerAddress').val('');
             $('#customerCity').val('');
         } else {
-            $('#customerName').val(option.data('name'));
-            $('#customerPhone').val(option.data('phone')).prop('readonly', true);
-            $('#customerAddress').val(option.data('address'));
-            $('#customerCity').val(option.data('city'));
+            $('#customerName').val(name);
+            $('#customerPhone').val(phone).prop('readonly', true);
+            $('#customerAddress').val(address);
+            $('#customerCity').val(city);
         }
         validateCheckout();
+
+        // Clear search and restore lists visibility
+        $('#customerSearchInput').val('');
+        $('#customerOptionsContainer .customer-opt').show();
     });
 });
 

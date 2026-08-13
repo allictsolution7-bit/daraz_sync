@@ -1229,10 +1229,10 @@
                     <span><i class="fas fa-user me-2"></i> Customer Information</span>
                 </div>
                 <div class="customer-form">
-                    <div class="mb-3">
+                    <div class="mb-3 position-relative">
                         <input type="text" class="form-control" id="customerSearch" 
-                               placeholder="Search existing customer...">
-                        <div id="customerSuggestions" class="mt-2"></div>
+                               placeholder="Search existing customer..." autocomplete="off">
+                        <div id="customerSuggestions" class="position-absolute w-100 mt-1 shadow-lg bg-white rounded-3" style="z-index: 1050; max-height: 250px; overflow-y: auto; display: none; border: 1px solid rgba(0,0,0,0.1);"></div>
                     </div>
                     <div class="row g-2">
                         <div class="col-md-6">
@@ -1428,6 +1428,16 @@ function setupEventListeners() {
     
     // Customer search
     $('#customerSearch').on('input', debounce(searchCustomers, 300));
+    $('#customerSearch').on('focus', function() {
+        if ($('#customerSuggestions').children().length > 0) {
+            $('#customerSuggestions').show();
+        }
+    });
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#customerSearch, #customerSuggestions').length) {
+            $('#customerSuggestions').hide();
+        }
+    });
     
     // Customer form validation
     $('#customerName, #customerPhone').on('input', validateForm);
@@ -2023,7 +2033,7 @@ function clearCart() {
 function searchCustomers() {
     const search = $('#customerSearch').val();
     if (search.length < 2) {
-        $('#customerSuggestions').empty();
+        $('#customerSuggestions').empty().hide();
         return;
     }
     
@@ -2037,28 +2047,28 @@ function displayCustomerSuggestions(customers) {
     const suggestions = $('#customerSuggestions');
     
     if (customers.length === 0) {
-        suggestions.empty();
+        suggestions.empty().hide();
         return;
     }
     
-    let html = '<div class="list-group">';
+    let html = '<div class="list-group list-group-flush m-0">';
     customers.forEach(customer => {
         html += `
-            <button type="button" class="list-group-item list-group-item-action" 
+            <button type="button" class="list-group-item list-group-item-action border-0 py-2 px-3" 
                     onclick="selectCustomer(${customer.id}, '${customer.name}', '${customer.phone}', '${customer.email || ''}', '${customer.address || ''}', '${customer.city || ''}')">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <strong>${customer.name}</strong>
-                        <br><small class="text-muted">${customer.phone}</small>
+                        <div class="fw-bold text-dark">${customer.name}</div>
+                        <small class="text-muted"><i class="fas fa-phone-alt me-1 text-secondary" style="font-size:10px;"></i>${customer.phone}</small>
                     </div>
-                    <small class="text-muted">${customer.email || ''}</small>
+                    <span class="badge bg-light text-secondary border px-2 py-1">${customer.city || 'No City'}</span>
                 </div>
             </button>
         `;
     });
     html += '</div>';
     
-    suggestions.html(html);
+    suggestions.html(html).show();
 }
 
 function selectCustomer(id, name, phone, email, address, city) {
@@ -2070,7 +2080,7 @@ function selectCustomer(id, name, phone, email, address, city) {
     $('#customerAddress').val(address);
     $('#customerCity').val(city);
     
-    $('#customerSuggestions').empty();
+    $('#customerSuggestions').empty().hide();
     $('#customerSearch').val('');
     
     validateForm();
