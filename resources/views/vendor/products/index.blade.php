@@ -263,12 +263,6 @@
         @endif
     </div>
 
-    @if(auth()->user()->isVendorRetailer() || auth()->user()->hasRole('retailer'))
-    <a href="{{ route('vendor.products.index', ['source' => 'admin_products']) }}" class="btn btn-outline-primary px-3 py-2 text-decoration-none me-2">
-        <i class="fas fa-store me-1.5"></i> Add Wholesell Products
-    </a>
-    @endif
-
     @can('vendor.products.create')
     <a href="{{ route('vendor.products.create') }}" class="btn btn-gradient-primary px-3 py-2 text-decoration-none">
         <i class="fas fa-plus-circle me-1.5"></i> Add New Product
