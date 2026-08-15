@@ -46,19 +46,10 @@ class VendorPOSController extends Controller
             'rocket' => 'Rocket'
         ];
 
-        // Fetch reseller's customers
-        $customers = User::where(function ($q) use ($vendor) {
-            $q->where('created_by', $vendor->id)
-              ->orWhereIn('id', function ($sub) use ($vendor) {
-                  $sub->select('orders.user_id')
-                      ->from('orders')
-                      ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-                      ->where('order_items.vendor_id', $vendor->id)
-                      ->whereNotNull('orders.user_id');
-              });
-        })
-        ->orderBy('name')
-        ->get();
+        // Fetch reseller's customers created only by this vendor
+        $customers = User::where('created_by', $vendor->id)
+            ->orderBy('name')
+            ->get();
 
         return view('vendor.pos.index', compact('categories', 'paymentMethods', 'customers'));
     }
@@ -299,16 +290,8 @@ class VendorPOSController extends Controller
                 $customer = null;
                 if ($request->filled('customer_id')) {
                     $customer = User::where('id', $request->customer_id)
-                        ->where(function ($q) use ($reseller) {
-                            $q->where('created_by', $reseller->id)
-                              ->orWhereIn('id', function ($sub) use ($reseller) {
-                                  $sub->select('orders.user_id')
-                                      ->from('orders')
-                                      ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-                                      ->where('order_items.vendor_id', $reseller->id)
-                                      ->whereNotNull('orders.user_id');
-                              });
-                        })->first();
+                        ->where('created_by', $reseller->id)
+                        ->first();
 
                     if ($customer) {
                         // Update customer details if they changed in the form
