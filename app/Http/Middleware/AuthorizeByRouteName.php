@@ -39,6 +39,9 @@ class AuthorizeByRouteName
             str_starts_with($name, 'vendor.pathao') ||
             str_starts_with($name, 'admin.delivery') ||
             str_starts_with($name, 'admin.support-tickets') ||
+            str_starts_with($name, 'vendor.profile.verify-phone') ||
+            $name === 'vendor.profile.verify-submit' ||
+            $name === 'vendor.profile.verify-reset' ||
             $name === 'vendor.orders.toggle-payment-status'
         ) {
             return $next($request);

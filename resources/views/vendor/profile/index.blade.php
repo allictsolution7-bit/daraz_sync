@@ -408,16 +408,23 @@
                             </h5>
                         </div>
                         <div class="card-body p-4 fs-8">
+                            @php
+                                $phoneVerified = $vendorSettings->additional_config['phone_verified'] ?? false;
+                                $verificationSubmitted = $vendorSettings->additional_config['verification_submitted'] ?? false;
+                            @endphp
+
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="text-muted">Verification Status:</span>
                                 @if($vendorSettings->is_verified)
                                     <span class="badge-approved fs-8">
                                         <i class="fas fa-check-circle me-1"></i> Verified
                                     </span>
-                                @else
+                                @elseif($verificationSubmitted)
                                     <span class="badge-pending fs-8">
-                                        <i class="fas fa-clock me-1"></i> Pending Review
+                                        <i class="fas fa-clock me-1"></i> Under Review
                                     </span>
+                                @else
+                                    <span class="badge bg-danger bg-opacity-10 text-danger fw-bold px-2.5 py-1 rounded-pill fs-8">Unverified</span>
                                 @endif
                             </div>
 
@@ -436,6 +443,104 @@
                             </div>
                         </div>
                     </div>
+
+                    @if(!$vendorSettings->is_verified)
+                        @if($verificationSubmitted)
+                            <div class="alert alert-info mt-3 p-3 rounded-3 border fs-8" role="alert">
+                                <h6 class="fw-bold mb-1 text-dark"><i class="fas fa-info-circle me-1 text-info"></i> Under Review</h6>
+                                <p class="mb-2 text-muted">Your phone number, trade license, and NID/Tax details are currently under review. Our team will verify them soon.</p>
+                                <div class="mt-2 border-top pt-2">
+                                    <div class="mb-1 text-muted"><strong>Verified Phone:</strong> <span class="text-dark fw-bold">{{ $vendorSettings->additional_config['verified_phone_number'] ?? $vendorSettings->business_phone }}</span></div>
+                                    <div class="mb-1 text-muted"><strong>Trade License:</strong> <span class="text-dark fw-bold">{{ $vendorSettings->business_license }}</span></div>
+                                    <div class="text-muted"><strong>NID / Tax ID:</strong> <span class="text-dark fw-bold">{{ $vendorSettings->tax_id }}</span></div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="v-card mb-4 mt-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-user-check text-warning me-1"></i> Complete Verification Steps</h6>
+                                </div>
+                                <div class="card-body p-4 fs-8">
+                                    <!-- STEP 1: Phone Verification -->
+                                    <div class="mb-4 pb-3 border-bottom">
+                                        <h6 class="fw-bold text-dark mb-2 d-flex justify-content-between align-items-center">
+                                            <span>1. Phone Number Verification</span>
+                                            <span id="phone-status-badge" class="badge {{ $phoneVerified ? 'bg-success' : 'bg-danger' }}">
+                                                {{ $phoneVerified ? 'Verified' : 'Unverified' }}
+                                            </span>
+                                        </h6>
+                                        <div class="input-group input-group-sm mb-2 {{ $phoneVerified ? 'd-none' : '' }}" id="phone-input-group">
+                                            <input type="text" id="verification_phone" class="form-control" placeholder="Phone Number" value="{{ old('phone', $vendor->phone) }}">
+                                            <button type="button" class="btn btn-primary btn-sm fw-bold" id="send-otp-btn">Send OTP</button>
+                                        </div>
+                                        <div class="input-group input-group-sm d-none" id="otp-input-group">
+                                            <input type="text" id="verification_otp" class="form-control" placeholder="Enter OTP (1234)">
+                                            <button type="button" class="btn btn-success btn-sm fw-bold" id="verify-otp-btn">Verify OTP</button>
+                                        </div>
+                                        @if($phoneVerified)
+                                            <div class="text-success small fw-semibold" id="phone-verified-msg">
+                                                <i class="fas fa-check-circle me-1"></i> Phone number <span class="fw-bold text-dark">{{ $vendorSettings->additional_config['verified_phone_number'] ?? '' }}</span> verified successfully!
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- STEP 2: Trade License & NID Details -->
+                                    <form action="{{ route('vendor.profile.verify-submit') }}" method="POST" enctype="multipart/form-data" id="verification-form">
+                                        @csrf
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-dark fs-8 uppercase">Trade License Number <span class="text-danger">*</span></label>
+                                            <input type="text" name="business_license" class="form-control form-control-sm" required placeholder="Enter Trade License Number" {{ $phoneVerified ? '' : 'disabled' }} id="verify-trade-license" value="{{ old('business_license', $vendorSettings->business_license) }}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-dark fs-8 uppercase">Trade License Document (PDF/Image) <span class="text-danger">*</span></label>
+                                            <input type="file" name="business_license_document" class="form-control form-control-sm" required {{ $phoneVerified ? '' : 'disabled' }} id="verify-license-doc">
+                                            <small class="text-muted">Upload a copy of your trade license (Max 5MB).</small>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold text-dark fs-8 uppercase">Owner NID / Tax ID <span class="text-danger">*</span></label>
+                                            <input type="text" name="tax_id" class="form-control form-control-sm" required placeholder="Enter NID or Tax Identification Number" {{ $phoneVerified ? '' : 'disabled' }} id="verify-tax-id" value="{{ old('tax_id', $vendorSettings->tax_id) }}">
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success w-100 fw-bold btn-sm shadow-sm" {{ $phoneVerified ? '' : 'disabled' }} id="submit-verification-btn">
+                                            <i class="fas fa-paper-plane me-1"></i> Submit for Verification
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endif
+                    @endif
+
+                    @if($vendorSettings->is_verified)
+                        <div class="v-card mb-4 mt-3">
+                            <div class="card-header bg-light">
+                                <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-check-double text-success me-1"></i> Verified Information</h6>
+                            </div>
+                            <div class="card-body p-4 fs-8">
+                                <div class="mb-2 text-muted"><strong>Verified Phone:</strong> <span class="text-dark fw-bold">{{ $vendorSettings->additional_config['verified_phone_number'] ?? $vendorSettings->business_phone ?? 'N/A' }}</span></div>
+                                <div class="mb-2 text-muted"><strong>Trade License:</strong> <span class="text-dark fw-bold">{{ $vendorSettings->business_license ?? 'N/A' }}</span></div>
+                                <div class="mb-3 text-muted"><strong>NID / Tax ID:</strong> <span class="text-dark fw-bold">{{ $vendorSettings->tax_id ?? 'N/A' }}</span></div>
+                                
+                                @if($vendorSettings->business_license_document)
+                                    <div class="mb-3">
+                                        <strong class="text-muted">License Document:</strong>
+                                        <a href="{{ asset('storage/' . $vendorSettings->business_license_document) }}" target="_blank" class="btn btn-xs btn-outline-primary px-2 py-0.5 rounded text-decoration-none" style="font-size: 0.7rem;">
+                                            <i class="fas fa-file-pdf me-1"></i> View Document
+                                        </a>
+                                    </div>
+                                @endif
+
+                                <hr class="my-3">
+                                <form action="{{ route('vendor.profile.verify-reset') }}" method="POST" onsubmit="return confirm('Are you sure you want to request re-verification? This will temporarily mark your account as unverified.');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-warning w-100 fw-bold btn-sm" style="font-size: 0.75rem;">
+                                        <i class="fas fa-arrows-rotate me-1"></i> Re-submit Verification / Edit Info
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Merchant Support Card -->
                     <div class="v-card">
@@ -801,6 +906,116 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 bankDetails.style.display = 'none';
             }
+        });
+    }
+
+    // Phone Verification JS
+    const sendOtpBtn = document.getElementById('send-otp-btn');
+    const verifyOtpBtn = document.getElementById('verify-otp-btn');
+    const verificationPhone = document.getElementById('verification_phone');
+    const verificationOtp = document.getElementById('verification_otp');
+    const phoneInputGroup = document.getElementById('phone-input-group');
+    const otpInputGroup = document.getElementById('otp-input-group');
+    const phoneStatusBadge = document.getElementById('phone-status-badge');
+    
+    const verifyTradeLicense = document.getElementById('verify-trade-license');
+    const verifyLicenseDoc = document.getElementById('verify-license-doc');
+    const verifyTaxId = document.getElementById('verify-tax-id');
+    const submitVerificationBtn = document.getElementById('submit-verification-btn');
+
+    if (sendOtpBtn) {
+        sendOtpBtn.addEventListener('click', function() {
+            const phone = verificationPhone.value;
+            if (!phone) {
+                alert('Please enter a phone number.');
+                return;
+            }
+            sendOtpBtn.disabled = true;
+            sendOtpBtn.innerText = 'Sending...';
+
+            fetch('{{ route("vendor.profile.verify-phone.send") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ phone: phone })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    otpInputGroup.classList.remove('d-none');
+                    alert(data.message);
+                } else {
+                    alert(data.message || 'Failed to send OTP.');
+                    sendOtpBtn.disabled = false;
+                    sendOtpBtn.innerText = 'Send OTP';
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert('An error occurred. Please try again.');
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.innerText = 'Send OTP';
+            });
+        });
+    }
+
+    if (verifyOtpBtn) {
+        verifyOtpBtn.addEventListener('click', function() {
+            const phone = verificationPhone.value;
+            const code = verificationOtp.value;
+            if (!code) {
+                alert('Please enter the OTP code.');
+                return;
+            }
+            verifyOtpBtn.disabled = true;
+            verifyOtpBtn.innerText = 'Verifying...';
+
+            fetch('{{ route("vendor.profile.verify-phone.confirm") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ phone: phone, code: code })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    phoneStatusBadge.className = 'badge bg-success';
+                    phoneStatusBadge.innerText = 'Verified';
+                    phoneInputGroup.classList.add('d-none');
+                    otpInputGroup.classList.add('d-none');
+                    
+                    // Show message
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'text-success small fw-semibold';
+                    msgDiv.innerHTML = '<i class="fas fa-check-circle me-1"></i> Phone number <span class="fw-bold text-dark">' + phone + '</span> verified successfully!';
+                    phoneInputGroup.parentNode.appendChild(msgDiv);
+
+                    // Enable verification form fields
+                    verifyTradeLicense.removeAttribute('disabled');
+                    verifyLicenseDoc.removeAttribute('disabled');
+                    verifyTaxId.removeAttribute('disabled');
+                    submitVerificationBtn.removeAttribute('disabled');
+                } else {
+                    alert(data.message || 'OTP verification failed.');
+                    verifyOtpBtn.disabled = false;
+                    verifyOtpBtn.innerText = 'Verify OTP';
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert(error.message || 'An error occurred during verification.');
+                verifyOtpBtn.disabled = false;
+                verifyOtpBtn.innerText = 'Verify OTP';
+            });
         });
     }
 });

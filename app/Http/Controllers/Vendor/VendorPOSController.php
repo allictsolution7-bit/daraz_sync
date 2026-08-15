@@ -46,10 +46,20 @@ class VendorPOSController extends Controller
             'rocket' => 'Rocket'
         ];
 
-        // Fetch reseller's customers created only by this vendor
-        $customers = User::where('created_by', $vendor->id)
-            ->orderBy('name')
-            ->get();
+        // Fetch reseller's customers (created by this vendor or placed a POS order)
+        $customers = User::where(function ($q) use ($vendor) {
+            $q->where('created_by', $vendor->id)
+              ->orWhereIn('id', function ($sub) use ($vendor) {
+                  $sub->select('orders.user_id')
+                      ->from('orders')
+                      ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                      ->where('orders.order_source', 'Reseller POS')
+                      ->where('order_items.vendor_id', $vendor->id)
+                      ->whereNotNull('orders.user_id');
+              });
+        })
+        ->orderBy('name')
+        ->get();
 
         return view('vendor.pos.index', compact('categories', 'paymentMethods', 'customers'));
     }
@@ -290,7 +300,17 @@ class VendorPOSController extends Controller
                 $customer = null;
                 if ($request->filled('customer_id')) {
                     $customer = User::where('id', $request->customer_id)
-                        ->where('created_by', $reseller->id)
+                        ->where(function ($q) use ($reseller) {
+                            $q->where('created_by', $reseller->id)
+                              ->orWhereIn('id', function ($sub) use ($reseller) {
+                                  $sub->select('orders.user_id')
+                                      ->from('orders')
+                                      ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                                      ->where('orders.order_source', 'Reseller POS')
+                                      ->where('order_items.vendor_id', $reseller->id)
+                                      ->whereNotNull('orders.user_id');
+                              });
+                        })
                         ->first();
 
                     if ($customer) {
@@ -306,12 +326,15 @@ class VendorPOSController extends Controller
                 if (!$customer) {
                     $generatedPassword = null;
                     $customer = User::where('phone', $request->customer_phone)->first();
+                    if ($customer && !$customer->created_by) {
+                        $customer->update(['created_by' => $reseller->id]);
+                    }
                     if (!$customer) {
                         $generatedPassword = Str::random(8);
                         $customer = User::create([
                             'name' => $request->customer_name,
                             'phone' => $request->customer_phone,
-                            'email' => $request->customer_email ?: $this->generateUniqueEmail(),
+                            'email' => $request->customer_email ?: $this->generateUniqueEmail($request->customer_name),
                             'address' => $request->customer_address ?? '',
                             'city' => $request->customer_city ?? '',
                             'upazila' => '',
@@ -540,8 +563,17 @@ class VendorPOSController extends Controller
         }
     }
 
-    private function generateUniqueEmail()
+    private function generateUniqueEmail($name = null)
     {
-        return 'customer_' . time() . '_' . rand(1000, 9999) . '@pos.com';
+        if ($name) {
+            $cleanName = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $name));
+            if (!empty($cleanName)) {
+                $email = $cleanName . rand(10, 9999) . '@gmail.com';
+                if (!User::where('email', $email)->exists()) {
+                    return $email;
+                }
+            }
+        }
+        return 'customer_' . time() . '_' . rand(1000, 9999) . '@gmail.com';
     }
 }

@@ -113,6 +113,12 @@
 @endpush
 
 @section('content')
+@php
+    $firstItem = $vendorItems->first();
+    $categoryName = $firstItem && $firstItem->product && $firstItem->product->category ? $firstItem->product->category->name : '';
+    $cleanCategory = $categoryName ? preg_replace('/[^a-zA-Z0-9]/', '', $categoryName) : 'General';
+    $tracingId = $cleanCategory . '_' . ($order->invoice_no ?? $order->order_number ?? $order->id);
+@endphp
 <div class="container-fluid py-4">
     <!-- Header Card -->
     <div class="d-flex justify-content-between align-items-center mb-4 order-header-card">
@@ -122,7 +128,7 @@
             </div>
             <div>
                 <div class="d-flex align-items-center gap-2">
-                    <h4 class="fw-bold mb-0 text-dark">Order #{{ $order->invoice_no ?? $order->order_number ?? $order->id }}</h4>
+                    <h4 class="fw-bold mb-0 text-dark">Order #{{ $tracingId }}</h4>
                     @switch($order->status)
                         @case('pending')
                             <span class="badge-status pending"><i class="fas fa-clock"></i> Pending</span>

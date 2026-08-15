@@ -874,6 +874,10 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'vendor', 'authori
     Route::get('/profile', [VendorDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [VendorDashboardController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/delivery-integration', [VendorDashboardController::class, 'saveDeliveryIntegration'])->name('profile.delivery-integration');
+    Route::post('/profile/verify-phone/send', [VendorDashboardController::class, 'sendPhoneOtp'])->name('profile.verify-phone.send');
+    Route::post('/profile/verify-phone/confirm', [VendorDashboardController::class, 'confirmPhoneOtp'])->name('profile.verify-phone.confirm');
+    Route::post('/profile/verify-submit', [VendorDashboardController::class, 'submitVerification'])->name('profile.verify-submit');
+    Route::post('/profile/verify-reset', [VendorDashboardController::class, 'resetVerification'])->name('profile.verify-reset');
 
     // POS Routes (Reseller portal)
     Route::prefix('pos')->name('pos.')->group(function () {

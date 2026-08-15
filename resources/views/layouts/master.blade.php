@@ -2157,9 +2157,19 @@
                                 <li
                                     class="{{ request()->routeIs('admin.vendors.index') || request()->routeIs('admin.vendors.show') || request()->routeIs('admin.vendors.edit') ? 'active' : '' }}">
                                     <a href="{{ route('admin.vendors.index') }}">
-                                        <span class="menu-content">
-                                            <i class="fas fa-shop"></i>
-                                            All Vendors
+                                        <span class="menu-content d-flex align-items-center justify-content-between">
+                                            <span>
+                                                <i class="fas fa-shop"></i>
+                                                All Vendors
+                                            </span>
+                                            @php
+                                                $pendingVendorCount = \App\Models\VendorSetting::where('is_verified', false)
+                                                    ->where('additional_config->verification_submitted', true)
+                                                    ->count();
+                                            @endphp
+                                            @if($pendingVendorCount > 0)
+                                                <span class="badge bg-warning text-dark rounded-pill ms-2 fw-bold" style="font-size: 0.65rem; padding: 2px 6px;">{{ $pendingVendorCount }}</span>
+                                            @endif
                                         </span>
                                     </a>
                                 </li>

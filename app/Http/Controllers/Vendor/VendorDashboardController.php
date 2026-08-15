@@ -239,5 +239,107 @@ class VendorDashboardController extends Controller
 
         return redirect()->back()->with('success', 'Profile updated successfully!');
     }
+
+    /**
+     * Send mock phone verification OTP
+     */
+    public function sendPhoneOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|max:20'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Verification code sent to ' . $request->phone . '. Please enter 1234 to verify.'
+        ]);
+    }
+
+    /**
+     * Confirm mock phone verification OTP
+     */
+    public function confirmPhoneOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|max:20',
+            'code' => 'required|string|max:6'
+        ]);
+
+        if ($request->code !== '1234') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid verification code. Please try again.'
+            ], 422);
+        }
+
+        $vendor = auth()->user();
+        $vendorSettings = \App\Models\VendorSetting::firstOrCreate(['vendor_id' => $vendor->id]);
+        
+        $config = $vendorSettings->additional_config ?? [];
+        $config['phone_verified'] = true;
+        $config['verified_phone_number'] = $request->phone;
+        
+        $vendorSettings->additional_config = $config;
+        $vendorSettings->business_phone = $request->phone;
+        $vendorSettings->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Phone number verified successfully!'
+        ]);
+    }
+
+    /**
+     * Submit verification details (Trade License and Other Info)
+     */
+    public function submitVerification(Request $request)
+    {
+        $request->validate([
+            'tax_id' => 'required|string|max:50',
+            'business_license' => 'required|string|max:50',
+            'business_license_document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $vendor = auth()->user();
+        $vendorSettings = \App\Models\VendorSetting::firstOrCreate(['vendor_id' => $vendor->id]);
+
+        $documentPath = null;
+        if ($request->hasFile('business_license_document')) {
+            $documentPath = $request->file('business_license_document')->store('verification_documents', 'public');
+        }
+
+        $vendorSettings->update([
+            'tax_id' => $request->tax_id,
+            'business_license' => $request->business_license,
+            'business_license_document' => $documentPath,
+        ]);
+
+        $config = $vendorSettings->additional_config ?? [];
+        $config['verification_submitted'] = true;
+        $vendorSettings->additional_config = $config;
+        $vendorSettings->save();
+
+        return redirect()->back()->with('success', 'Verification details submitted successfully! Your account is now pending review.');
+    }
+
+    /**
+     * Reset verification to allow editing and re-submitting
+     */
+    public function resetVerification()
+    {
+        $vendor = auth()->user();
+        $vendorSettings = \App\Models\VendorSetting::where('vendor_id', $vendor->id)->first();
+        if ($vendorSettings) {
+            $vendorSettings->is_verified = false;
+            
+            $config = $vendorSettings->additional_config ?? [];
+            $config['verification_submitted'] = false;
+            
+            $vendorSettings->additional_config = $config;
+            $vendorSettings->save();
+        }
+
+        return redirect()->back()->with('success', 'Verification status reset. You can now edit and re-submit your details.');
+    }
 }
 

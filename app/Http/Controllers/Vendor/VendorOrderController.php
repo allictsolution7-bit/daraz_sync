@@ -46,7 +46,7 @@ class VendorOrderController extends Controller
                                      ->where('vendor_id', $vendor->id);
                              });
                       });
-                });
+                })->with('product.category');
             }]);
 
         // Filter by status
@@ -135,7 +135,7 @@ class VendorOrderController extends Controller
             abort(403, 'You do not have access to this order.');
         }
 
-        $order->load(['customer', 'orderItems.product', 'orderItems.vendor']);
+        $order->load(['customer', 'orderItems.product.category', 'orderItems.vendor']);
 
         return view('vendor.orders.show', compact('order', 'vendorItems'));
     }
@@ -201,7 +201,7 @@ class VendorOrderController extends Controller
 
         $query = order::whereIn('id', $orderIds)
             ->where('order_source', 'Reseller POS')
-            ->with(['order_items.product']);
+            ->with(['order_items.product.category']);
 
         if ($request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
