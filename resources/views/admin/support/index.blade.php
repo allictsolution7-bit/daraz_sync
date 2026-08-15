@@ -184,7 +184,7 @@
                 <p class="mb-0 text-white-50 opacity-75 small">View, reply, and take action on client complaints & queries</p>
             </div>
             <div>
-                <span class="badge bg-white text-indigo-700 fw-bold px-2.5 py-1.5 rounded-pill shadow-sm" style="font-size: 11px;">
+                <span class="badge bg-white fw-bold px-2.5 py-1.5 rounded-pill shadow-sm" style="font-size: 11px; color: #4f46e5 !important;">
                     {{ \App\Models\SupportTicket::where('status', 'open')->count() }} Open Tickets
                 </span>
             </div>

@@ -299,12 +299,7 @@
                             @php
                                 $vendorItems = $order->orderItems->where('vendor_id', auth()->id());
                                 $vendorEarning = $vendorItems->sum('vendor_earning');
-                                
-                                // Get first item's product's category name for the tracking ID
-                                $firstItem = $vendorItems->first();
-                                $categoryName = $firstItem && $firstItem->product && $firstItem->product->category ? $firstItem->product->category->name : '';
-                                $cleanCategory = $categoryName ? preg_replace('/[^a-zA-Z0-9]/', '', $categoryName) : 'General';
-                                $tracingId = $cleanCategory . '_' . ($order->invoice_no ?? $order->order_number ?? $order->id);
+                                $tracingId = $order->order_number;
                             @endphp
                             <tr>
                                 <td>

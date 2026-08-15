@@ -114,10 +114,7 @@
 
 @section('content')
 @php
-    $firstItem = $vendorItems->first();
-    $categoryName = $firstItem && $firstItem->product && $firstItem->product->category ? $firstItem->product->category->name : '';
-    $cleanCategory = $categoryName ? preg_replace('/[^a-zA-Z0-9]/', '', $categoryName) : 'General';
-    $tracingId = $cleanCategory . '_' . ($order->invoice_no ?? $order->order_number ?? $order->id);
+    $tracingId = $order->order_number;
 @endphp
 <div class="container-fluid py-4">
     <!-- Header Card -->
