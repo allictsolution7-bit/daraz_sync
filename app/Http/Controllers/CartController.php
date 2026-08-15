@@ -907,7 +907,7 @@ class CartController extends Controller
                 $password = bcrypt('password');
                 $user = User::create([
                     'name'     => $request->name,
-                    'email'    => $this->generateUniqueEmail(),
+                    'email'    => User::generateUniqueEmail($request->name, 'guest'),
                     'password' => $password,
                     'phone'    => $request->phone,
                     'upazila'    => $request->upazila,
@@ -1263,17 +1263,6 @@ class CartController extends Controller
                 'message' => 'An error occurred while processing your order. Please try again.',
             ], 500);
         }
-    }
-
-    // Helper method to generate unique email for guest users
-    private function generateUniqueEmail()
-    {
-        $host = parse_url(config('app.url'), PHP_URL_HOST) ?? 'uddoktaecommerce.com';
-        do {
-            $email = 'guest_' . uniqid() . '@' . $host;
-        } while (User::where('email', $email)->exists());
-
-        return $email;
     }
 
     public function verifyBuynowOtp(Request $request)

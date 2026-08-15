@@ -186,7 +186,7 @@ class OrderController extends Controller
                 $password = bcrypt('password');
                 $user = User::create([
                     'name'     => $request->name,
-                    'email'    => $this->generateUniqueEmail(),
+                    'email'    => User::generateUniqueEmail($request->name, 'guest'),
                     'password' => $password,
                     'phone'    => $request->phone,
                     'upazila'    => $request->upazila,
@@ -754,17 +754,6 @@ class OrderController extends Controller
 
 
         return response()->json(['status' => 'success', 'message' => 'OTP resent successfully.']);
-    }
-
-    // Helper method to generate unique email for guest users
-    private function generateUniqueEmail()
-    {
-        $host = parse_url(config('app.url'), PHP_URL_HOST) ?? 'uddoktaecommerce.com';
-        do {
-            $email = 'guest_' . uniqid() . '@' . $host;
-        } while (User::where('email', $email)->exists());
-
-        return $email;
     }
 
     public function thankYou($orderId)

@@ -239,4 +239,25 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /**
+     * Generate unique email for guest or new users based on their name
+     */
+    public static function generateUniqueEmail($name = null, $prefix = 'customer')
+    {
+        if ($name) {
+            $cleanName = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $name));
+            if (!empty($cleanName)) {
+                $email = $cleanName . rand(10, 9999) . '@gmail.com';
+                if (!self::where('email', $email)->exists()) {
+                    return $email;
+                }
+            }
+        }
+        do {
+            $email = $prefix . '_' . time() . '_' . rand(1000, 9999) . '@gmail.com';
+        } while (self::where('email', $email)->exists());
+
+        return $email;
+    }
 }

@@ -68,17 +68,10 @@ class VendorRegisterController extends Controller
         ]);
     }
 
-    /**
-     * Generate unique email for vendors who don't provide one
-     */
-    private function generateUniqueEmail()
+    private function generateUniqueEmail($name = null)
     {
-        $host = parse_url(config('app.url'), PHP_URL_HOST) ?? 'thikana.com';
-        do {
-            $email = 'vendor_' . uniqid() . '@' . $host;
-        } while (User::where('email', $email)->exists());
-
-        return $email;
+        $name = $name ?: request('name') ?: request('business_name');
+        return User::generateUniqueEmail($name, 'vendor');
     }
 
     /**

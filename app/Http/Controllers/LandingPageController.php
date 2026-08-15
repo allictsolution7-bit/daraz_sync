@@ -212,7 +212,7 @@ class LandingPageController extends Controller
                 $password = bcrypt('password');
                 $user = User::create([
                     'name'     => $request->name,
-                    'email'    => $this->generateUniqueEmail(),
+                    'email'    => User::generateUniqueEmail($request->name, 'guest'),
                     'password' => $password,
                     'phone'    => $request->phone,
                     'address' => $request->address,
@@ -358,19 +358,6 @@ class LandingPageController extends Controller
         }
 
         return response()->noContent();
-    }
-
-    /**
-     * Helper method to generate unique email for guest users.
-     */
-    private function generateUniqueEmail()
-    {
-        $host = parse_url(config('app.url'), PHP_URL_HOST) ?? 'uddoktaecommerce.com';
-        do {
-            $email = 'guest_' . uniqid() . '@' . $host;
-        } while (User::where('email', $email)->exists());
-
-        return $email;
     }
 
     /**

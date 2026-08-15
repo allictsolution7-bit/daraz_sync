@@ -120,6 +120,8 @@ class order extends Model
 
     protected $guarded = [];
 
+    protected $appends = ['order_number'];
+
     // Automatically cast delivery_data JSON column to array
     protected $casts = [
         'delivery_data' => 'array',
@@ -295,5 +297,27 @@ class order extends Model
         $deliveryData['tracking_code'] = $trackingCode ?? $consignmentId;
         $this->delivery_data = $deliveryData;
         $this->save();
+    }
+
+    /**
+     * Get dynamic category-prefixed order number (used as tracing/order ID)
+     */
+    public function getOrderNumberAttribute()
+    {
+        $firstItem = $this->order_items()->first() ?: $this->orderItems()->first();
+        if ($firstItem && $firstItem->product) {
+            $product = $firstItem->product;
+            $category = $product->category;
+            if (!$category && $product->parent_product_id) {
+                $parent = \App\Models\Product::find($product->parent_product_id);
+                $category = $parent ? $parent->category : null;
+            }
+            $categoryName = $category ? $category->name : '';
+        } else {
+            $categoryName = '';
+        }
+        
+        $cleanCategory = $categoryName ? preg_replace('/[^a-zA-Z0-9]/', '', $categoryName) : 'General';
+        return $cleanCategory . '_' . $this->id;
     }
 }

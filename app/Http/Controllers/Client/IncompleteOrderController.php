@@ -722,7 +722,7 @@ class IncompleteOrderController extends Controller
                     if ($email) {
                         $userData['email'] = $email;
                     } else {
-                        $userData['email'] = $this->generateUniqueEmail();
+                        $userData['email'] = \App\Models\User::generateUniqueEmail($request->customer_name, 'guest');
                     }
                     
                     $user = \App\Models\User::create($userData);
@@ -837,16 +837,5 @@ class IncompleteOrderController extends Controller
                 'message' => 'Failed to create order: ' . $e->getMessage()
             ]);
         }
-    }
-    
-    // Helper method to generate unique email for new users
-    private function generateUniqueEmail()
-    {
-        $host = parse_url(config('app.url'), PHP_URL_HOST) ?? 'thikana.com';
-        do {
-            $email = 'customer_' . uniqid() . '@' . $host;
-        } while (\App\Models\User::where('email', $email)->exists());
-
-        return $email;
     }
 }

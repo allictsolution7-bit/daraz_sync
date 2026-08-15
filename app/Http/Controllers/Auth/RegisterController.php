@@ -83,19 +83,6 @@ class RegisterController extends Controller
 
         return Validator::make($data, $rules);
     }
-
-
-    /**
-     * Generate unique email for users who don't provide one
-     */
-    private function generateUniqueEmail()
-    {
-        $host = parse_url(config('app.url'), PHP_URL_HOST) ?? 'thikana.com';
-        do {
-            $email = 'user_' . uniqid() . '@' . $host;
-        } while (User::where('email', $email)->exists());
-
-        return $email;
     }
 
     /**
@@ -122,7 +109,7 @@ class RegisterController extends Controller
             // Store registration data in session (don't create user yet)
             $registrationData = [
                 'name' => $request->name,
-                'email' => $request->email ?? $this->generateUniqueEmail(),
+                'email' => $request->email ?? User::generateUniqueEmail($request->name, 'user'),
                 'phone' => $request->phone,
                 'password' => Hash::make($request->password),
                 'role' => $userRole,
@@ -178,7 +165,7 @@ class RegisterController extends Controller
 
             $user = User::create([
                 'name' => $request->name,
-                'email' => $request->email ?? $this->generateUniqueEmail(),
+                'email' => $request->email ?? User::generateUniqueEmail($request->name, 'user'),
                 'phone' => $request->phone,
                 'password' => Hash::make($request->password),
                 'otp_verified' => 1, // Mark as verified since no OTP required

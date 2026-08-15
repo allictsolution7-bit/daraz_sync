@@ -334,7 +334,7 @@ class VendorPOSController extends Controller
                         $customer = User::create([
                             'name' => $request->customer_name,
                             'phone' => $request->customer_phone,
-                            'email' => $request->customer_email ?: $this->generateUniqueEmail($request->customer_name),
+                            'email' => $request->customer_email ?: User::generateUniqueEmail($request->customer_name),
                             'address' => $request->customer_address ?? '',
                             'city' => $request->customer_city ?? '',
                             'upazila' => '',
@@ -561,19 +561,5 @@ class VendorPOSController extends Controller
                 'message' => $e->getMessage()
             ], 422);
         }
-    }
-
-    private function generateUniqueEmail($name = null)
-    {
-        if ($name) {
-            $cleanName = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $name));
-            if (!empty($cleanName)) {
-                $email = $cleanName . rand(10, 9999) . '@gmail.com';
-                if (!User::where('email', $email)->exists()) {
-                    return $email;
-                }
-            }
-        }
-        return 'customer_' . time() . '_' . rand(1000, 9999) . '@gmail.com';
     }
 }
