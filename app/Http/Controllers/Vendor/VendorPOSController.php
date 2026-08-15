@@ -384,7 +384,8 @@ class VendorPOSController extends Controller
                             if ($prodCost > 0) {
                                 $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
                             } else {
-                                $adminResellerPrice = (float)($combination->wholesale_price > 0 ? $combination->wholesale_price : ($combination->product_cost > 0 ? $combination->product_cost : 0));
+                                // Match searchProducts fallback: wholesale_price > offer_price > regular_price
+                                $adminResellerPrice = (float)($combination->wholesale_price > 0 ? $combination->wholesale_price : ($combination->offer_price > 0 ? $combination->offer_price : ($combination->regular_price ?? 0)));
                             }
                         }
                         $unitCost = ceil($adminResellerPrice);
@@ -396,7 +397,8 @@ class VendorPOSController extends Controller
                             if ($prodCost > 0) {
                                 $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
                             } else {
-                                $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : 0));
+                                // Match searchProducts fallback: wholesale_price > offer > old_price
+                                $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)));
                             }
                         }
                         $unitCost = ceil($adminResellerPrice);
@@ -468,7 +470,7 @@ class VendorPOSController extends Controller
                         }
                     }
 
-                    // Base Cost of product is what admin set as reseller_price (defaulting to product cost + reseller_price_percent)
+                    // Base Cost = admin's reseller_price (or fallback chain matching searchProducts display logic)
                     if ($item['combination_id']) {
                         $combination = VariationCombination::find($item['combination_id']);
                         $adminResellerPrice = $combination ? (float)($combination->reseller_price ?? 0) : 0;
@@ -478,7 +480,8 @@ class VendorPOSController extends Controller
                             if ($prodCost > 0) {
                                 $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
                             } else {
-                                $adminResellerPrice = (float)($combination->wholesale_price > 0 ? $combination->wholesale_price : ($combination->product_cost > 0 ? $combination->product_cost : 0));
+                                // Match searchProducts fallback: wholesale_price > offer_price > regular_price
+                                $adminResellerPrice = (float)($combination->wholesale_price > 0 ? $combination->wholesale_price : ($combination->offer_price > 0 ? $combination->offer_price : ($combination->regular_price ?? 0)));
                             }
                         }
                         $unitCost = ceil($adminResellerPrice);
@@ -490,7 +493,8 @@ class VendorPOSController extends Controller
                             if ($prodCost > 0) {
                                 $adminResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
                             } else {
-                                $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->product_cost > 0 ? $product->product_cost : 0));
+                                // Match searchProducts fallback: wholesale_price > offer > old_price
+                                $adminResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)));
                             }
                         }
                         $unitCost = ceil($adminResellerPrice);

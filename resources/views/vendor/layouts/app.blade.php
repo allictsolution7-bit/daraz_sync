@@ -813,6 +813,46 @@
     <!-- Sidebar mobile overlay backdrop -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+    @if(auth()->check() && !auth()->user()->hasRole('reseller') && (!auth()->user()->vendorSettings || !auth()->user()->vendorSettings->is_verified) && !request()->routeIs('vendor.profile'))
+    <!-- Verification Warning Modal -->
+    <div class="modal fade" id="vendorVerificationModal" tabindex="-1" aria-labelledby="vendorVerificationModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-md" style="margin-top: 3.5rem;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background: #ffffff;">
+                <div class="modal-header border-0 py-3 px-4 d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2 m-0" id="vendorVerificationModalLabel" style="font-size: 1.1rem;">
+                        <i class="fas fa-triangle-exclamation"></i> Store Verification Required
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <div class="mb-3" style="color: #ef4444;">
+                        <i class="fas fa-shield-halved fa-3x" style="animation: pulse-soft 2s infinite ease-in-out;"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-2" style="font-size: 1.25rem;">Account Verification Pending</h4>
+                    <p class="text-muted mb-4" style="font-size: 0.85rem; line-height: 1.5;">
+                        Your vendor store is currently unverified. Please submit your verification details (like Trade License and other required documents) to get complete access to all store operations.
+                    </p>
+                    <div class="d-flex flex-column gap-2">
+                        <a href="{{ route('vendor.profile') }}" class="btn btn-primary btn-lg w-100 py-2.5 rounded-3 fw-bold fs-7 shadow-sm text-decoration-none">
+                            <i class="fas fa-file-signature me-1"></i> Go to Verification Page
+                        </a>
+                        <button type="button" class="btn btn-light w-100 py-2.5 rounded-3 fw-semibold text-muted fs-7" data-bs-dismiss="modal">
+                            Dismiss for Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        @keyframes pulse-soft {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.08); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+    @endif
+
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -830,6 +870,17 @@
         toggleBtn?.addEventListener('click', toggleSidebar);
         overlay?.addEventListener('click', toggleSidebar);
     </script>
+    @if(auth()->check() && !auth()->user()->hasRole('reseller') && (!auth()->user()->vendorSettings || !auth()->user()->vendorSettings->is_verified) && !request()->routeIs('vendor.profile'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var verificationModalEl = document.getElementById('vendorVerificationModal');
+            if (verificationModalEl) {
+                var verificationModal = new bootstrap.Modal(verificationModalEl);
+                verificationModal.show();
+            }
+        });
+    </script>
+    @endif
     @stack('scripts')
 </body>
 </html>

@@ -340,7 +340,7 @@
                                 <th>Item Title</th>
                                 <th class="text-center">Qty</th>
                                 <th>Subtotal</th>
-                                <th>Commission Rate / Fee</th>
+                                <th>Wholesale Cost</th>
                                 <th>Your Earning</th>
                                 <th class="text-center">Payout Status</th>
                             </tr>
@@ -365,8 +365,8 @@
                                 <td class="text-center fw-bold">{{ $item->quantity }}</td>
                                 <td class="fw-bold">৳{{ number_format($item->sub_total, 2) }}</td>
                                 <td>
-                                    <span class="text-danger fw-bold">-৳{{ number_format($item->vendor_commission_amount, 2) }}</span>
-                                    <small class="text-muted ms-1">({{ number_format($item->vendor_commission_rate, 1) }}%)</small>
+                                    <span class="text-secondary fw-bold">৳{{ number_format($item->total_cost ?? ($item->unit_cost * $item->quantity), 2) }}</span>
+                                    <small class="text-muted ms-1">(৳{{ number_format($item->unit_cost, 0) }}/unit)</small>
                                 </td>
                                 <td>
                                     <span class="fw-800 text-success fs-6">৳{{ number_format($item->vendor_earning, 2) }}</span>
@@ -389,7 +389,7 @@
                             <tr class="fw-bold">
                                 <td colspan="4" class="text-end text-dark">Page Summary Totals:</td>
                                 <td class="text-dark">৳{{ number_format($items->sum('sub_total'), 2) }}</td>
-                                <td class="text-danger">-৳{{ number_format($items->sum('vendor_commission_amount'), 2) }}</td>
+                                <td class="text-secondary">৳{{ number_format($items->sum('total_cost'), 2) }}</td>
                                 <td class="text-success fs-6 fw-800">৳{{ number_format($items->sum('vendor_earning'), 2) }}</td>
                                 <td></td>
                             </tr>

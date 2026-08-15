@@ -37,9 +37,9 @@ class VendorProductController extends Controller
 
         if (!$vendorSettings) return false;
 
-        // If they are vendor retailer: they only get access if consignment is enabled.
-        if ($vendor->isVendorRetailer()) {
-            return $vendor->isConsignmentEnabled();
+        // If they are vendor retailer or retailer role: allow access to add wholesell products by default
+        if ($vendor->isVendorRetailer() || $vendor->hasRole('retailer')) {
+            return true;
         }
 
         // Check vendor_type stored in additional_config JSON
@@ -90,15 +90,29 @@ class VendorProductController extends Controller
         $productAllocations = $allocationsQuery->keyBy('product_id');
 
         if ($source === 'admin_products' && $canAccessAdminProducts) {
-            $adminId = $vendor->created_by;
-            $query = Product::where(function ($q) use ($adminId) {
-                if ($adminId) {
-                    $q->where('created_by', $adminId)
-                      ->whereNull('vendor_id');
-                } else {
-                    $q->whereNull('vendor_id');
-                }
-            });
+            if ($vendor->isVendorRetailer() || $vendor->hasRole('retailer')) {
+                // Retailer viewing wholesale products: show approved products from other wholesellers
+                $wholesellerIds = \App\Models\User::role('wholeseller')->pluck('id')->toArray();
+                $configWholesellerIds = \App\Models\VendorSetting::all()->filter(function($setting) {
+                    return ($setting->additional_config['vendor_type'] ?? null) === 'wholeseller';
+                })->pluck('vendor_id')->toArray();
+                $allWholesellerIds = array_unique(array_merge($wholesellerIds, $configWholesellerIds));
+
+                $query = Product::whereIn('vendor_id', $allWholesellerIds)
+                    ->where('vendor_id', '!=', $vendor->id)
+                    ->where('approval_status', 'approved')
+                    ->where('status', 1);
+            } else {
+                $adminId = $vendor->created_by;
+                $query = Product::where(function ($q) use ($adminId) {
+                    if ($adminId) {
+                        $q->where('created_by', $adminId)
+                          ->whereNull('vendor_id');
+                    } else {
+                        $q->whereNull('vendor_id');
+                    }
+                });
+            }
 
             $query->with(['category', 'subCategory', 'brand', 'variationCombinations.wholesaleTiers', 'wholesaleTiers']);
         } else {
@@ -236,9 +250,22 @@ class VendorProductController extends Controller
         }
 
         $adminId = $vendor->created_by;
+        $isRetailer = $vendor->isVendorRetailer() || $vendor->hasRole('retailer');
+        $isWholesellerProduct = false;
+        if ($product->vendor_id) {
+            $productOwner = \App\Models\User::find($product->vendor_id);
+            if ($productOwner) {
+                $ownerSettings = $productOwner->vendorSettings;
+                $isWholesellerProduct = $productOwner->hasRole('wholeseller') || 
+                    ($ownerSettings && ($ownerSettings->additional_config['vendor_type'] ?? null) === 'wholeseller');
+            }
+        }
+
         if ($product->vendor_id && $product->vendor_id != $adminId) {
-            return redirect()->route('vendor.products.index')
-                ->with('error', 'Unauthorized product copy request.');
+            if (!($isRetailer && $isWholesellerProduct)) {
+                return redirect()->route('vendor.products.index')
+                    ->with('error', 'Unauthorized product copy request.');
+            }
         }
 
         // Check if vendor has already copied this product
@@ -390,7 +417,7 @@ class VendorProductController extends Controller
             \App\Models\VendorWalletTransaction::create([
                 'vendor_id' => $vendor->id,
                 'product_id' => $product->id,
-                'admin_id' => $adminId,
+                'admin_id' => $product->vendor_id ?? $adminId,
                 'type' => 'stock_purchase',
                 'amount' => $totalCost,
                 'payment_method' => 'Wallet',
@@ -486,17 +513,38 @@ class VendorProductController extends Controller
             ->pluck('product_id')
             ->toArray();
 
-        $products = Product::whereIn('id', $productIds)
-            ->where(function($q) use ($adminId) {
-                if ($adminId) {
-                    $q->where('vendor_id', $adminId)->orWhereNull('vendor_id');
-                } else {
-                    $q->whereNull('vendor_id');
-                }
-            })
-            ->whereNotIn('id', $allocatedProductIds)
-            ->with('variationCombinations')
-            ->get();
+        $isRetailer = $vendor->isVendorRetailer() || $vendor->hasRole('retailer');
+        if ($isRetailer) {
+            $wholesellerIds = \App\Models\User::role('wholeseller')->pluck('id')->toArray();
+            $configWholesellerIds = \App\Models\VendorSetting::all()->filter(function($setting) {
+                return ($setting->additional_config['vendor_type'] ?? null) === 'wholeseller';
+            })->pluck('vendor_id')->toArray();
+            $allWholesellerIds = array_unique(array_merge($wholesellerIds, $configWholesellerIds));
+
+            $products = Product::whereIn('id', $productIds)
+                ->where(function($q) use ($allWholesellerIds, $adminId) {
+                    $q->whereIn('vendor_id', $allWholesellerIds)
+                      ->orWhereNull('vendor_id');
+                    if ($adminId) {
+                        $q->orWhere('vendor_id', $adminId);
+                    }
+                })
+                ->whereNotIn('id', $allocatedProductIds)
+                ->with('variationCombinations')
+                ->get();
+        } else {
+            $products = Product::whereIn('id', $productIds)
+                ->where(function($q) use ($adminId) {
+                    if ($adminId) {
+                        $q->where('vendor_id', $adminId)->orWhereNull('vendor_id');
+                    } else {
+                        $q->whereNull('vendor_id');
+                    }
+                })
+                ->whereNotIn('id', $allocatedProductIds)
+                ->with('variationCombinations')
+                ->get();
+        }
 
         if ($products->isEmpty()) {
             return redirect()->route('vendor.products.index', ['source' => 'admin_products'])
@@ -611,7 +659,7 @@ class VendorProductController extends Controller
                 \App\Models\VendorWalletTransaction::create([
                     'vendor_id' => $vendor->id,
                     'product_id' => $product->id,
-                    'admin_id' => $adminId,
+                    'admin_id' => $product->vendor_id ?? $adminId,
                     'type' => 'stock_purchase',
                     'amount' => $prodCost,
                     'payment_method' => 'Wallet',
@@ -1124,11 +1172,11 @@ class VendorProductController extends Controller
 
         $vendorSettings = $vendor->vendorSettings;
 
-        // Check if product can be edited (if already approved, allow if auto_approve_products or can_edit_after_approval is enabled)
-        $canEditApproved = $vendorSettings && ($vendorSettings->can_edit_after_approval || $vendorSettings->auto_approve_products);
+        // Check if product can be edited (defaulted to true now, but will require re-approval upon update)
+        $canEditApproved = true;
         if ($product->isApproved() && !$canEditApproved) {
             return redirect()->route('vendor.products.index')
-                ->with('error', 'You cannot edit approved products. Setting [can_edit_after_approval] or [auto_approve_products] is required in Vendor Store Settings.');
+                ->with('error', 'You cannot edit approved products.');
         }
 
         // Get commission settings
@@ -1167,11 +1215,11 @@ class VendorProductController extends Controller
             abort(403, 'Permission required: (vendor.products.edit). You do not own this product.');
         }
 
-        // Check if product can be edited (if already approved, allow if auto_approve_products or can_edit_after_approval is enabled)
+        // Check if product can be edited (defaulted to true now, but will require re-approval upon update)
         $vendorSettings = $vendor->vendorSettings;
-        $canEditApproved = $vendorSettings && ($vendorSettings->can_edit_after_approval || $vendorSettings->auto_approve_products);
+        $canEditApproved = true;
         if ($product->isApproved() && !$canEditApproved) {
-            return redirect()->back()->with('error', 'You cannot edit approved products. Setting [can_edit_after_approval] or [auto_approve_products] is required in Vendor Store Settings.');
+            return redirect()->back()->with('error', 'You cannot edit approved products.');
         }
 
         $validated = $request->validate([
@@ -1279,15 +1327,16 @@ class VendorProductController extends Controller
 
         $validated['seo'] = $seoData;
 
-        // Check vendor auto-approve / edit permission settings
-        $autoApprove = $vendorSettings && ($vendorSettings->auto_approve_products || $vendorSettings->can_edit_after_approval);
+        // Check vendor auto-approve settings (only auto-approve edits if auto_approve_products is enabled)
+        $autoApprove = $vendorSettings && $vendorSettings->auto_approve_products;
         
         if ($autoApprove) {
             $validated['approval_status'] = 'approved';
             $validated['status'] = 1;
-        } elseif ($product->isApproved()) {
+        } else {
+            // By default, if edited, it needs to be approved again
             $validated['approval_status'] = 'pending';
-            $validated['status'] = 0; // Deactivate until re-approved if auto-approve is disabled
+            $validated['status'] = 0; // Deactivate until re-approved
         }
 
         $isCreator = ($product->created_by === $vendor->id) || ($product->vendor_id === $vendor->id);

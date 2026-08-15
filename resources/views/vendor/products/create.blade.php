@@ -747,22 +747,12 @@
 
                             <!-- Pricing Fields -->
                             <div id="pricingFields">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <input type="number" class="form-control" name="old_price" id="productOldPrice"
-                                                placeholder="Enter regular price" value="{{ old('old_price') }}" step="0.01" required>
-                                            <label for="productOldPrice">Regular Price</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-3">
-                                            <input type="number" class="form-control" name="offer" id="productOfferPrice"
-                                                placeholder="Enter sale price" value="{{ old('offer') }}" step="0.01">
-                                            <label for="productOfferPrice">Sale Price</label>
-                                        </div>
-                                    </div>
-                                </div>
+                                @php
+                                    $vendorSettings = auth()->user()->vendorSettings;
+                                    $saleMarkup = floatval($vendorSettings->sale_price_markup_pct ?? 10.00);
+                                    $oldMarkup = floatval($vendorSettings->old_price_markup_pct ?? 25.00);
+                                    $wsMarkup = floatval($vendorSettings->wholesale_price_markup_pct ?? 5.00);
+                                @endphp
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-floating mb-3">
@@ -778,6 +768,22 @@
                                                 placeholder="Enter wholesale price" value="{{ old('wholesale_price') }}" step="0.01">
                                             <label for="wholesalePrice">Wholesale Price</label>
                                             <div class="form-text">Price for bulk/wholesale customers</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" name="old_price" id="productOldPrice"
+                                                placeholder="Enter regular price" value="{{ old('old_price') }}" step="0.01" required>
+                                            <label for="productOldPrice">Regular Price</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" name="offer" id="productOfferPrice"
+                                                placeholder="Enter sale price" value="{{ old('offer') }}" step="0.01">
+                                            <label for="productOfferPrice">Sale Price</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1580,6 +1586,31 @@
 
         // SEO preview updates
         initializeSeoSection();
+
+        // Price Auto-Calculation from Product Cost using Settings Markup Percentages
+        const productCostInput = document.getElementById('productCost');
+        if (productCostInput) {
+            const saleMarkup = {{ $saleMarkup }};
+            const oldMarkup = {{ $oldMarkup }};
+            const wsMarkup = {{ $wsMarkup }};
+
+            productCostInput.addEventListener('input', function() {
+                const cost = parseFloat(this.value);
+                if (!isNaN(cost) && cost > 0) {
+                    const wholesaleVal = (cost * (1 + wsMarkup / 100)).toFixed(2);
+                    const regularVal = (cost * (1 + oldMarkup / 100)).toFixed(2);
+                    const saleVal = (cost * (1 + saleMarkup / 100)).toFixed(2);
+
+                    document.getElementById('wholesalePrice').value = wholesaleVal;
+                    document.getElementById('productOldPrice').value = regularVal;
+                    document.getElementById('productOfferPrice').value = saleVal;
+                } else {
+                    document.getElementById('wholesalePrice').value = '';
+                    document.getElementById('productOldPrice').value = '';
+                    document.getElementById('productOfferPrice').value = '';
+                }
+            });
+        }
     });
 
     let latestSlugToCheck = '';
