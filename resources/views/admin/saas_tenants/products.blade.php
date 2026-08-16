@@ -48,12 +48,29 @@
                     </li>
                 </ul>
 
-                <!-- Filter by Tenant -->
-                <form action="{{ route('admin.saas-tenants.wholesale-products') }}" method="GET" class="d-flex align-items-center gap-2 m-0">
+                <!-- Filter Controls (Tenant & Commission) -->
+                <form action="{{ route('admin.saas-tenants.wholesale-products') }}" method="GET" class="d-flex flex-wrap align-items-center gap-2 m-0">
                     <input type="hidden" name="tab" value="{{ $currentTab }}">
+                    
+                    <!-- Commission Input -->
+                    <div class="input-group input-group-sm" style="width: 175px;">
+                        <span class="input-group-text bg-white font-semibold text-muted" style="font-weight: 600; font-size: 11px;">
+                            <i class="fas fa-percentage text-primary me-1"></i> Markup:
+                        </span>
+                        <input type="number" 
+                               step="0.1" 
+                               min="0" 
+                               max="100" 
+                               name="commission" 
+                               class="form-control form-control-sm text-center font-bold" 
+                               value="{{ $commission > 0 ? $commission : '' }}" 
+                               placeholder="0">
+                        <span class="input-group-text bg-light text-muted small">%</span>
+                    </div>
+
+                    <!-- Tenant Selector -->
                     <div class="d-flex align-items-center gap-2">
-                        <label class="form-label small text-muted font-semibold mb-0 text-nowrap" style="font-weight: 600;">Tenant:</label>
-                        <select name="tenant_id" class="form-select form-select-sm rounded-3" style="min-width: 220px;" onchange="this.form.submit()">
+                        <select name="tenant_id" class="form-select form-select-sm rounded-3" style="min-width: 200px;" onchange="this.form.submit()">
                             <option value="">All Tenants (Combined View)</option>
                             @foreach($tenants as $tenant)
                                 <option value="{{ $tenant->id }}" {{ $selectedTenantId == $tenant->id ? 'selected' : '' }}>
@@ -61,8 +78,11 @@
                                 </option>
                             @endforeach
                         </select>
+                        <button type="submit" class="btn btn-sm btn-primary rounded-3 text-nowrap px-3" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); border: none;">
+                            Apply
+                        </button>
                         <a href="{{ route('admin.saas-tenants.wholesale-products', ['tab' => $currentTab]) }}" class="btn btn-sm btn-light rounded-3 text-nowrap" style="background-color: #f1f5f9; color: #475569; border: none;">
-                            <i class="fas fa-redo me-1"></i> Reset
+                            <i class="fas fa-redo"></i>
                         </a>
                     </div>
                 </form>
@@ -83,6 +103,9 @@
                 </h5>
                 <span class="text-muted small">
                     {{ $currentTab === 'wholeseller' ? 'Products supplied by registered wholeseller vendors across tenants' : 'Products created and managed directly by tenant store administrators' }}
+                    @if($commission > 0)
+                        &bull; <strong class="text-success">+{{ $commission }}% Platform Commission Applied</strong>
+                    @endif
                 </span>
             </div>
             <span class="badge bg-indigo-light text-primary px-3 py-2 rounded-3" style="background-color: rgba(79, 70, 229, 0.08); color: #4f46e5; font-weight: 600;">
@@ -99,7 +122,12 @@
                         <th class="py-3" style="white-space: nowrap;">Tenant Subdomain</th>
                         <th class="py-3" style="white-space: nowrap;">Wholeseller / Vendor</th>
                         <th class="py-3" style="white-space: nowrap;">Retail Price</th>
-                        <th class="py-3" style="white-space: nowrap;">Wholesale Price</th>
+                        <th class="py-3" style="white-space: nowrap;">
+                            Wholesale Price
+                            @if($commission > 0)
+                                <span class="badge rounded-pill px-2 py-0.5 ms-1" style="background-color: #ecfdf5; color: #047857; font-size: 10px;">+{{ $commission }}%</span>
+                            @endif
+                        </th>
                         <th class="py-3" style="white-space: nowrap;">Stock</th>
                         <th class="py-3" style="white-space: nowrap;">Status</th>
                     </tr>
@@ -149,9 +177,18 @@
                                 @endif
                             </td>
                             <td style="white-space: nowrap;">
-                                <span class="text-success font-bold" style="font-weight: 700;">
-                                    ৳{{ number_format($product['wholesale_price'] ?: 0, 2) }}
-                                </span>
+                                @if($commission > 0)
+                                    <span class="text-success font-bold d-block" style="font-weight: 700;">
+                                        ৳{{ number_format($product['final_wholesale_price'], 2) }}
+                                    </span>
+                                    <span class="text-muted small" style="font-size: 10px;">
+                                        Base: ৳{{ number_format($product['wholesale_price'], 2) }} (+৳{{ number_format($product['commission_amount'], 2) }})
+                                    </span>
+                                @else
+                                    <span class="text-success font-bold" style="font-weight: 700;">
+                                        ৳{{ number_format($product['wholesale_price'] ?: 0, 2) }}
+                                    </span>
+                                @endif
                             </td>
                             <td style="white-space: nowrap;">
                                 @if($product['quantity'] > 0)

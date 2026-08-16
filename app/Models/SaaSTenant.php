@@ -18,9 +18,11 @@ class SaaSTenant extends Model
         'subdomain',
         'db_name',
         'is_active',
+        'free_promotion',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'free_promotion' => 'boolean',
     ];
 }

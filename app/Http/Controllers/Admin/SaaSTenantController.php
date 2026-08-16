@@ -79,9 +79,36 @@ class SaaSTenantController extends Controller
             'subdomain' => strtolower($request->subdomain),
             'db_name' => $request->db_name ?: 'purnobd_' . strtolower($request->subdomain),
             'is_active' => $request->has('is_active'),
+            'free_promotion' => $request->has('free_promotion'),
         ]);
 
         return redirect()->route('admin.saas-tenants.index')->with('success', 'Tenant updated successfully!');
+    }
+
+    /**
+     * Toggle free promotion status for a tenant.
+     */
+    public function toggleFreePromotion(Request $request, $id)
+    {
+        $tenant = SaaSTenant::findOrFail($id);
+        
+        $newStatus = $request->has('free_promotion') 
+            ? filter_var($request->input('free_promotion'), FILTER_VALIDATE_BOOLEAN)
+            : !$tenant->free_promotion;
+
+        $tenant->update([
+            'free_promotion' => $newStatus,
+        ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Free promotion " . ($tenant->free_promotion ? 'enabled' : 'disabled') . " for tenant '{$tenant->name}'!",
+                'free_promotion' => $tenant->free_promotion,
+            ]);
+        }
+
+        return redirect()->route('admin.saas-tenants.index')->with('success', 'Free promotion status updated successfully!');
     }
 
     /**
@@ -103,6 +130,7 @@ class SaaSTenantController extends Controller
         $tenants = SaaSTenant::where('is_active', true)->get();
         $selectedTenantId = $request->input('tenant_id');
         $currentTab = $request->input('tab', 'wholeseller'); // 'wholeseller' or 'admin'
+        $commission = floatval($request->input('commission', 0));
         
         $allProducts = [];
         $errors = [];
@@ -206,13 +234,20 @@ class SaaSTenantController extends Controller
                         }
                     }
 
+                    $baseWholesale = floatval($prod->wholesale_price ?: 0);
+                    $commissionAmount = $commission > 0 ? ($baseWholesale * ($commission / 100)) : 0;
+                    $finalWholesale = $baseWholesale + $commissionAmount;
+
                     $allProducts[] = [
                         'tenant_name' => $tenant->name,
                         'tenant_subdomain' => $tenant->subdomain,
                         'id' => $prod->id,
                         'title' => $prod->title,
                         'thumb_image' => $thumbImageUrl,
-                        'wholesale_price' => $prod->wholesale_price,
+                        'wholesale_price' => $baseWholesale,
+                        'commission_percent' => $commission,
+                        'commission_amount' => $commissionAmount,
+                        'final_wholesale_price' => $finalWholesale,
                         'price' => isset($prod->price) ? $prod->price : ($prod->old_price ?? 0),
                         'offer' => $prod->offer,
                         'quantity' => $prod->quantity,
@@ -245,6 +280,7 @@ class SaaSTenantController extends Controller
             'tenants',
             'selectedTenantId',
             'currentTab',
+            'commission',
             'totalWholesellerCount',
             'totalAdminCount',
             'errors'

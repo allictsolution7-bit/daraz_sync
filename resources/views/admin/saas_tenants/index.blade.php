@@ -36,6 +36,7 @@
                         <th class="ps-4 py-3">Tenant Name</th>
                         <th class="py-3">Subdomain URL</th>
                         <th class="py-3">Database Connection</th>
+                        <th class="py-3 text-center">Free Promotion</th>
                         <th class="py-3">Status</th>
                         <th class="py-3 text-end pe-4">Actions</th>
                     </tr>
@@ -72,6 +73,24 @@
                                             <i class="fas fa-exclamation-triangle"></i> Not Connected
                                         </span>
                                     @endif
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex flex-column align-items-center justify-content-center">
+                                    <div class="form-check form-switch m-0">
+                                        <input class="form-check-input free-promotion-toggle" 
+                                               type="checkbox" 
+                                               role="switch" 
+                                               data-tenant-id="{{ $tenant->id }}" 
+                                               data-url="{{ route('admin.saas-tenants.toggle-free-promotion', $tenant->id) }}"
+                                               id="freePromoSwitch{{ $tenant->id }}" 
+                                               {{ $tenant->free_promotion ? 'checked' : '' }}
+                                               style="cursor: pointer; width: 2.4rem; height: 1.25rem;">
+                                    </div>
+                                    <span class="badge mt-1 status-badge-{{ $tenant->id }} {{ $tenant->free_promotion ? 'bg-success-light text-success' : 'bg-light text-muted' }}" 
+                                          style="font-size: 10px; font-weight: 600; {{ $tenant->free_promotion ? 'background-color: #ecfdf5; color: #047857;' : 'background-color: #f1f5f9; color: #64748b;' }}">
+                                        {{ $tenant->free_promotion ? 'Enabled' : 'Disabled' }}
+                                    </span>
                                 </div>
                             </td>
                             <td>
@@ -126,9 +145,19 @@
                                                 <input type="text" name="db_name" class="form-control rounded-3" value="{{ $tenant->db_name }}" placeholder="purnobd_{{ $tenant->subdomain }}">
                                                 <div class="form-text text-muted small">Leave blank to auto-detect using `purnobd_[subdomain]`.</div>
                                             </div>
-                                            <div class="mb-3 form-check form-switch mt-4">
-                                                <input class="form-check-input" type="checkbox" name="is_active" id="edit_is_active{{ $tenant->id }}" {{ $tenant->is_active ? 'checked' : '' }}>
-                                                <label class="form-check-label font-semibold text-slate-700" for="edit_is_active{{ $tenant->id }}" style="font-weight: 600;">Active Status</label>
+                                            <div class="row mt-3">
+                                                <div class="col-6">
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" name="is_active" id="edit_is_active{{ $tenant->id }}" {{ $tenant->is_active ? 'checked' : '' }}>
+                                                        <label class="form-check-label font-semibold text-slate-700 small" for="edit_is_active{{ $tenant->id }}" style="font-weight: 600;">Active Status</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" name="free_promotion" id="edit_free_promo{{ $tenant->id }}" {{ $tenant->free_promotion ? 'checked' : '' }}>
+                                                        <label class="form-check-label font-semibold text-slate-700 small" for="edit_free_promo{{ $tenant->id }}" style="font-weight: 600;">Free Promotion</label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer border-0 p-3 bg-light">
@@ -142,7 +171,7 @@
 
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center py-5">
+                            <td colspan="6" class="text-center py-5">
                                 <div class="py-4">
                                     <i class="fas fa-network-wired text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
                                     <h5 class="text-slate-600 mb-1" style="font-weight: 600;">No Subdomains Configured</h5>
@@ -189,9 +218,19 @@
                         <input type="text" name="db_name" class="form-control rounded-3" placeholder="e.g. purnobd_dhaka">
                         <div class="form-text text-muted small">Leave blank to automatically default to `purnobd_[subdomain]`.</div>
                     </div>
-                    <div class="mb-3 form-check form-switch mt-4">
-                        <input class="form-check-input" type="checkbox" name="is_active" id="is_active" checked>
-                        <label class="form-check-label font-semibold text-slate-700" for="is_active" style="font-weight: 600;">Mark as Active</label>
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_active" id="is_active" checked>
+                                <label class="form-check-label font-semibold text-slate-700 small" for="is_active" style="font-weight: 600;">Mark as Active</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="free_promotion" id="free_promotion">
+                                <label class="form-check-label font-semibold text-slate-700 small" for="free_promotion" style="font-weight: 600;">Free Promotion</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-3 bg-light">
@@ -202,4 +241,69 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '{{ csrf_token() }}';
+
+    document.querySelectorAll('.free-promotion-toggle').forEach(function (toggle) {
+        toggle.addEventListener('change', function () {
+            const tenantId = this.dataset.tenantId;
+            const url = this.dataset.url;
+            const isChecked = this.checked;
+            const badge = document.querySelector(`.status-badge-${tenantId}`);
+
+            // Disable during request
+            this.disabled = true;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    free_promotion: isChecked
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (badge) {
+                        badge.textContent = data.free_promotion ? 'Enabled' : 'Disabled';
+                        if (data.free_promotion) {
+                            badge.style.backgroundColor = '#ecfdf5';
+                            badge.style.color = '#047857';
+                        } else {
+                            badge.style.backgroundColor = '#f1f5f9';
+                            badge.style.color = '#64748b';
+                        }
+                    }
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(data.message);
+                    }
+                } else {
+                    this.checked = !isChecked;
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Failed to update free promotion');
+                    }
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                this.checked = !isChecked;
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('An error occurred while updating free promotion.');
+                }
+            })
+            .finally(() => {
+                this.disabled = false;
+            });
+        });
+    });
+});
+</script>
+@endpush
 @endsection
