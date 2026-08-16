@@ -112,7 +112,7 @@
         </div>
     </div>
 
-    <form action="{{ route('admin.vendors.update', $vendor) }}" method="POST">
+    <form action="{{ route('admin.vendors.update', $vendor) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         
@@ -192,7 +192,7 @@
                     </div>
                 </div>
 
-                <!-- Card 2: Business Profile -->
+                <!-- Card 2: Business Profile & KYC Information -->
                 <div class="vp-card">
                     <div class="card-header d-flex align-items-center gap-2">
                         <i class="fas fa-building text-primary"></i>
@@ -220,12 +220,74 @@
 
                         <div class="mb-3">
                             <label>Business Address</label>
-                            <textarea name="business_address" class="form-control" rows="3">{{ old('business_address', $vendorSettings->business_address) }}</textarea>
+                            <textarea name="business_address" class="form-control" rows="2">{{ old('business_address', $vendorSettings->business_address) }}</textarea>
                         </div>
 
-                        <div class="mb-3">
-                            <label>Tax ID / Trade License</label>
-                            <input type="text" name="tax_id" class="form-control" value="{{ old('tax_id', $vendorSettings->tax_id) }}">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label>Trade License Number</label>
+                                <input type="text" name="business_license" class="form-control" value="{{ old('business_license', $vendorSettings->business_license) }}" placeholder="e.g. TRAD/DNCC/123456">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Owner NID / Tax ID</label>
+                                <input type="text" name="tax_id" class="form-control" value="{{ old('tax_id', $vendorSettings->tax_id) }}" placeholder="e.g. 1990123456789">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 p-3 bg-light rounded-3 border">
+                            <label class="d-block mb-1">Trade License / Registration Document</label>
+                            @if($vendorSettings->business_license_document)
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-success bg-opacity-15 text-success"><i class="fas fa-file-check me-1"></i> Document Uploaded</span>
+                                    <a href="{{ asset('storage/' . $vendorSettings->business_license_document) }}" target="_blank" class="btn btn-xs btn-outline-primary px-2 py-0.5 rounded text-decoration-none" style="font-size: 0.75rem;">
+                                        <i class="fas fa-external-link-alt me-1"></i> View Current File
+                                    </a>
+                                </div>
+                            @endif
+                            <input type="file" name="business_license_document" class="form-control form-control-sm @error('business_license_document') is-invalid @enderror">
+                            <small class="text-muted">Upload new document to replace existing one (PDF, JPG, PNG up to 10MB).</small>
+                            @error('business_license_document')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Payout & Settlement Information -->
+                <div class="vp-card">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <i class="fas fa-money-check-dollar text-primary"></i>
+                        <h5>Payout & Settlement Configuration</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label>Payout Method</label>
+                                <select name="payout_method" class="form-select">
+                                    <option value="bank" {{ old('payout_method', $vendorSettings->payout_method) == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
+                                    <option value="bkash" {{ old('payout_method', $vendorSettings->payout_method) == 'bkash' ? 'selected' : '' }}>bKash</option>
+                                    <option value="nagad" {{ old('payout_method', $vendorSettings->payout_method) == 'nagad' ? 'selected' : '' }}>Nagad</option>
+                                    <option value="rocket" {{ old('payout_method', $vendorSettings->payout_method) == 'rocket' ? 'selected' : '' }}>Rocket</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Account / Wallet Number</label>
+                                <input type="text" name="payout_account_number" class="form-control" value="{{ old('payout_account_number', $vendorSettings->payout_account_number) }}" placeholder="e.g. 01700000000 or Account No">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Account Holder Name</label>
+                                <input type="text" name="payout_account_name" class="form-control" value="{{ old('payout_account_name', $vendorSettings->payout_account_name) }}" placeholder="Full name on account">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Bank Name</label>
+                                <input type="text" name="payout_bank_name" class="form-control" value="{{ old('payout_bank_name', $vendorSettings->payout_bank_name) }}" placeholder="e.g. DBBL / BRAC Bank">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Branch Name</label>
+                                <input type="text" name="payout_branch_name" class="form-control" value="{{ old('payout_branch_name', $vendorSettings->payout_branch_name) }}" placeholder="Branch Name">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Routing Number</label>
+                                <input type="text" name="payout_routing_number" class="form-control" value="{{ old('payout_routing_number', $vendorSettings->payout_routing_number) }}" placeholder="e.g. 090271234">
+                            </div>
                         </div>
                     </div>
                 </div>

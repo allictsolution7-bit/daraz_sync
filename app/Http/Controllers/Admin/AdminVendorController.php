@@ -147,7 +147,7 @@ class AdminVendorController extends Controller
      */
     public function show(User $vendor)
     {
-        $vendor->load(['vendorSettings', 'products', 'vendorOrderItems']);
+        $vendor->load(['vendorSettings.verifiedBy', 'products', 'vendorOrderItems']);
         $vendorSettings = $vendor->vendorSettings;
 
         $stats = $this->vendorService->getVendorStats($vendor->id);
@@ -194,7 +194,15 @@ class AdminVendorController extends Controller
             'business_email' => 'required|email',
             'business_phone' => 'required|string|max:20',
             'business_address' => 'nullable|string',
+            'business_license' => 'nullable|string|max:100',
+            'business_license_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:10240',
             'tax_id' => 'nullable|string|max:50',
+            'payout_method' => 'nullable|string|max:50',
+            'payout_account_number' => 'nullable|string|max:100',
+            'payout_account_name' => 'nullable|string|max:150',
+            'payout_bank_name' => 'nullable|string|max:150',
+            'payout_branch_name' => 'nullable|string|max:150',
+            'payout_routing_number' => 'nullable|string|max:100',
             'default_commission_rate' => 'nullable|numeric|min:0|max:100',
             'custom_min_commission_rate' => 'nullable|numeric|min:0|max:100',
             'custom_max_commission_rate' => 'nullable|numeric|min:0|max:100',
@@ -255,7 +263,14 @@ class AdminVendorController extends Controller
                 'business_email' => $validated['business_email'],
                 'business_phone' => $validated['business_phone'],
                 'business_address' => $validated['business_address'] ?? null,
+                'business_license' => $validated['business_license'] ?? $vendorSettings->business_license,
                 'tax_id' => $validated['tax_id'] ?? null,
+                'payout_method' => $validated['payout_method'] ?? $vendorSettings->payout_method,
+                'payout_account_number' => $validated['payout_account_number'] ?? $vendorSettings->payout_account_number,
+                'payout_account_name' => $validated['payout_account_name'] ?? $vendorSettings->payout_account_name,
+                'payout_bank_name' => $validated['payout_bank_name'] ?? $vendorSettings->payout_bank_name,
+                'payout_branch_name' => $validated['payout_branch_name'] ?? $vendorSettings->payout_branch_name,
+                'payout_routing_number' => $validated['payout_routing_number'] ?? $vendorSettings->payout_routing_number,
                 'default_commission_rate' => $validated['default_commission_rate'] ?? null,
                 'custom_min_commission_rate' => $validated['custom_min_commission_rate'] ?? null,
                 'custom_max_commission_rate' => $validated['custom_max_commission_rate'] ?? null,
@@ -265,6 +280,11 @@ class AdminVendorController extends Controller
                 'is_consignment' => $validated['is_consignment'] ?? false,
                 'additional_config' => $additionalConfig,
             ];
+
+            // Handle file upload for business license
+            if ($request->hasFile('business_license_document')) {
+                $settingsData['business_license_document'] = $request->file('business_license_document')->store('verification_documents', 'public');
+            }
 
             // Handle verification
             if (($validated['is_verified'] ?? false) && !$vendorSettings->is_verified) {
@@ -292,6 +312,23 @@ class AdminVendorController extends Controller
         $vendor->vendorSettings->verify(auth()->id());
 
         return redirect()->back()->with('success', 'Vendor verified successfully!');
+    }
+
+    /**
+     * Unverify / Revoke verification status
+     */
+    public function unverify(User $vendor)
+    {
+        $vendorSettings = $vendor->vendorSettings;
+        if ($vendorSettings) {
+            $vendorSettings->update([
+                'is_verified' => false,
+                'verified_at' => null,
+                'verified_by' => null,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Vendor verification status revoked successfully.');
     }
 
     /**

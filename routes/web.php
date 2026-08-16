@@ -974,6 +974,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'license', 'role:adm
     // Vendor Management
     Route::resource('partners', AdminVendorController::class)->parameters(['partners' => 'vendor'])->names(['index' => 'vendors.index', 'create' => 'vendors.create', 'store' => 'vendors.store', 'show' => 'vendors.show', 'edit' => 'vendors.edit', 'update' => 'vendors.update', 'destroy' => 'vendors.destroy']);
     Route::post('/partners/{vendor}/verify', [AdminVendorController::class, 'verify'])->name('vendors.verify');
+    Route::post('/partners/{vendor}/unverify', [AdminVendorController::class, 'unverify'])->name('vendors.unverify');
     Route::post('/partners/{vendor}/toggle-status', [AdminVendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
 
     // Vendor Product Approval

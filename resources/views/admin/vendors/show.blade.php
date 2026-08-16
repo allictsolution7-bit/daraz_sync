@@ -247,12 +247,190 @@
                                 <td>{{ $vendorSettings->business_address ?? 'Not provided' }}</td>
                             </tr>
                             <tr>
-                                <th class="text-muted">Tax ID / License:</th>
-                                <td><code>{{ $vendorSettings->tax_id ?? 'N/A' }}</code></td>
+                                <th class="text-muted">Default Commission:</th>
+                                <td><span class="badge bg-primary rounded-pill px-3">{{ number_format($vendorSettings->getDefaultCommissionRate(), 2) }}%</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: KYC & Verification Documents Review -->
+            <div class="vp-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-id-card text-success"></i>
+                        <h5>KYC & Identity Verification Details</h5>
+                    </div>
+                    @if($vendorSettings->is_verified)
+                        <span class="badge-soft-success">
+                            <i class="fas fa-check-circle me-1"></i> Account Verified
+                        </span>
+                    @elseif(!empty($vendorSettings->additional_config['verification_submitted']) || $vendorSettings->business_license_document || $vendorSettings->business_license)
+                        <span class="badge-soft-warning">
+                            <i class="fas fa-hourglass-half me-1"></i> Verification Pending Review
+                        </span>
+                    @else
+                        <span class="badge bg-secondary bg-opacity-25 text-secondary px-3 py-1 rounded-pill small fw-bold">
+                            <i class="fas fa-exclamation-circle me-1"></i> No Documents Submitted
+                        </span>
+                    @endif
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive mb-3">
+                        <table class="table table-borderless align-middle mb-0">
+                            <tr>
+                                <th width="32%" class="text-muted">Phone Verification:</th>
+                                <td>
+                                    @php
+                                        $phoneVerified = !empty($vendorSettings->additional_config['phone_verified']) || !empty($vendorSettings->additional_config['verified_phone_number']);
+                                        $verifiedPhone = $vendorSettings->additional_config['verified_phone_number'] ?? $vendor->phone;
+                                    @endphp
+                                    @if($phoneVerified)
+                                        <span class="badge bg-success bg-opacity-15 text-success rounded-pill px-2.5 py-1 small fw-bold">
+                                            <i class="fas fa-check-circle me-1"></i> OTP Verified
+                                        </span>
+                                        <span class="ms-2 font-weight-bold text-dark">{{ $verifiedPhone }}</span>
+                                    @else
+                                        <span class="badge bg-warning bg-opacity-15 text-warning rounded-pill px-2.5 py-1 small fw-bold">
+                                            <i class="fas fa-times-circle me-1"></i> Not Verified
+                                        </span>
+                                        <span class="ms-2 text-muted">{{ $vendor->phone ?? 'No phone' }}</span>
+                                    @endif
+                                </td>
                             </tr>
                             <tr>
-                                <th class="text-muted">Commission Rate:</th>
-                                <td><span class="badge bg-primary rounded-pill px-3">{{ number_format($vendorSettings->commission_rate, 2) }}%</span></td>
+                                <th class="text-muted">Trade License No:</th>
+                                <td>
+                                    @if(!empty($vendorSettings->business_license))
+                                        <span class="font-monospace fw-bold text-dark px-2 py-1 bg-light rounded border">{{ $vendorSettings->business_license }}</span>
+                                    @else
+                                        <span class="text-muted fst-italic">Not provided</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Owner NID / Tax ID:</th>
+                                <td>
+                                    @if(!empty($vendorSettings->tax_id))
+                                        <span class="font-monospace fw-bold text-dark px-2 py-1 bg-light rounded border">{{ $vendorSettings->tax_id }}</span>
+                                    @else
+                                        <span class="text-muted fst-italic">Not provided</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @if($vendorSettings->is_verified)
+                                <tr>
+                                    <th class="text-muted">Verified Date & Admin:</th>
+                                    <td>
+                                        <span class="text-dark fw-bold">{{ $vendorSettings->verified_at ? $vendorSettings->verified_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                                        @if($vendorSettings->verifiedBy)
+                                            <span class="text-muted small ms-1">(by {{ $vendorSettings->verifiedBy->name }})</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endif
+                        </table>
+                    </div>
+
+                    <!-- Document Inspection Section -->
+                    <div class="border rounded-3 p-3 bg-light">
+                        <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-2" style="font-size: 13px;">
+                            <i class="fas fa-file-invoice text-primary"></i> Uploaded Trade License / Legal Document
+                        </h6>
+                        @if($vendorSettings->business_license_document)
+                            @php
+                                $docPath = $vendorSettings->business_license_document;
+                                $ext = strtolower(pathinfo($docPath, PATHINFO_EXTENSION));
+                                $isImg = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif']);
+                                $docUrl = asset('storage/' . $docPath);
+                            @endphp
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 bg-white p-3 rounded-2 border">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-2 p-2 d-flex align-items-center justify-content-center {{ $isImg ? 'bg-info bg-opacity-10 text-info' : 'bg-danger bg-opacity-10 text-danger' }}" style="width: 46px; height: 46px; font-size: 22px;">
+                                        <i class="fas {{ $isImg ? 'fa-file-image' : 'fa-file-pdf' }}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 250px;">{{ basename($docPath) }}</div>
+                                        <span class="badge bg-secondary bg-opacity-15 text-secondary text-uppercase px-2 py-0.5" style="font-size: 10px;">{{ $ext }} DOCUMENT</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ $docUrl }}" target="_blank" class="btn btn-sm btn-primary rounded-3 px-3 fw-bold">
+                                        <i class="fas fa-external-link-alt me-1"></i> View / Inspect Document
+                                    </a>
+                                    <a href="{{ $docUrl }}" download class="btn btn-sm btn-outline-secondary rounded-3 px-3">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </a>
+                                </div>
+                            </div>
+
+                            @if($isImg)
+                                <div class="mt-3 text-center bg-white p-2 rounded-2 border">
+                                    <a href="{{ $docUrl }}" target="_blank">
+                                        <img src="{{ $docUrl }}" alt="Trade License Document" class="img-fluid rounded border" style="max-height: 250px; object-fit: contain;">
+                                    </a>
+                                    <div class="small text-muted mt-1 fst-italic">Click image to inspect full size</div>
+                                </div>
+                            @endif
+                        @else
+                            <div class="text-center py-3">
+                                <i class="fas fa-file-excel text-warning fa-2x mb-2 d-block"></i>
+                                <span class="text-muted small">No Trade License / Registration document uploaded yet.</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Payout & Settlement Information -->
+            <div class="vp-card">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <i class="fas fa-money-check-dollar text-primary"></i>
+                    <h5>Payout & Settlement Bank / MFS Details</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-borderless align-middle mb-0">
+                            <tr>
+                                <th width="32%" class="text-muted">Payout Method:</th>
+                                <td class="font-weight-bold text-dark">
+                                    <span class="badge bg-info bg-opacity-15 text-info text-uppercase px-2.5 py-1">
+                                        {{ $vendorSettings->payout_method ?? 'Not Configured' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Account Holder Name:</th>
+                                <td class="font-weight-bold text-dark">{{ $vendorSettings->payout_account_name ?? 'Not provided' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Account / Wallet No:</th>
+                                <td>
+                                    @if($vendorSettings->payout_account_number)
+                                        <code class="fs-6 fw-bold text-primary">{{ $vendorSettings->payout_account_number }}</code>
+                                    @else
+                                        <span class="text-muted fst-italic">Not provided</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @if(!empty($vendorSettings->payout_bank_name))
+                                <tr>
+                                    <th class="text-muted">Bank Name:</th>
+                                    <td class="font-weight-bold text-dark">{{ $vendorSettings->payout_bank_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Branch Name:</th>
+                                    <td>{{ $vendorSettings->payout_branch_name ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Routing Number:</th>
+                                    <td><code>{{ $vendorSettings->payout_routing_number ?? 'N/A' }}</code></td>
+                                </tr>
+                            @endif
+                            <tr>
+                                <th class="text-muted">Min Payout Threshold:</th>
+                                <td><span class="font-weight-bold text-dark">৳{{ number_format($vendorSettings->getMinWithdrawalAmount(), 2) }}</span></td>
                             </tr>
                         </table>
                     </div>
@@ -329,10 +507,17 @@
                 </div>
                 <div class="card-body p-4 d-flex flex-column gap-2">
                     @if(!$vendorSettings->is_verified)
-                        <form action="{{ route('admin.vendors.verify', $vendor) }}" method="POST">
+                        <form action="{{ route('admin.vendors.verify', $vendor) }}" method="POST" onsubmit="return confirm('Are you sure you want to approve and verify this partner account?');">
                             @csrf
                             <button type="submit" class="btn btn-success w-100 rounded-3 py-2 font-weight-bold">
-                                <i class="fas fa-check-circle me-1"></i> Verify Vendor
+                                <i class="fas fa-check-circle me-1"></i> Verify & Approve Partner
+                            </button>
+                        </form>
+                    @else
+                        <form action="{{ route('admin.vendors.unverify', $vendor) }}" method="POST" onsubmit="return confirm('Are you sure you want to revoke verification for this partner? They will need to be re-verified.');">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-warning w-100 rounded-3 py-2 font-weight-bold">
+                                <i class="fas fa-undo-alt me-1"></i> Revoke Verification
                             </button>
                         </form>
                     @endif
@@ -351,7 +536,7 @@
                     </form>
 
                     <a href="{{ route('admin.vendors.edit', $vendor) }}" class="btn btn-primary w-100 rounded-3 py-2 font-weight-bold">
-                        <i class="fas fa-pen me-1"></i> Edit Credentials
+                        <i class="fas fa-pen me-1"></i> Edit Partner & KYC
                     </a>
                 </div>
             </div>
