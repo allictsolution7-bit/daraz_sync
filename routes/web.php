@@ -322,6 +322,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     // SaaS Tenant Management Routes
     Route::get('/saas-tenants', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'index'])->name('saas-tenants.index');
     Route::post('/saas-tenants', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'store'])->name('saas-tenants.store');
+    Route::post('/saas-tenants/global-commission', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'saveGlobalCommission'])->name('saas-tenants.global-commission');
     Route::put('/saas-tenants/{id}', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'update'])->name('saas-tenants.update');
     Route::delete('/saas-tenants/{id}', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'destroy'])->name('saas-tenants.destroy');
     Route::post('/saas-tenants/{id}/toggle-free-promotion', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'toggleFreePromotion'])->name('saas-tenants.toggle-free-promotion');

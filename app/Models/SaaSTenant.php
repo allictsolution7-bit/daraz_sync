@@ -19,10 +19,12 @@ class SaaSTenant extends Model
         'db_name',
         'is_active',
         'free_promotion',
+        'commission_rate',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'free_promotion' => 'boolean',
+        'commission_rate' => 'float',
     ];
 }

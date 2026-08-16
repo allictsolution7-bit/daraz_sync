@@ -23,6 +23,55 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert" style="background-color: #fef2f2; color: #991b1b;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-circle me-2 fs-5"></i>
+                <div>{{ session('error') }}</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <!-- Global Wholesale Commission Card -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-left: 4px solid #4f46e5 !important;">
+        <div class="card-body p-4">
+            <form action="{{ route('admin.saas-tenants.global-commission') }}" method="POST" class="row align-items-center g-3">
+                @csrf
+                <div class="col-lg-6 col-md-5">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: rgba(79, 70, 229, 0.1); color: #4f46e5; font-size: 1.3rem;">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 font-bold text-slate-800" style="font-weight: 700; color: #1e293b;">Default Platform Wholesale Commission</h5>
+                            <p class="text-muted small mb-0">Global markup percentage automatically applied to wholesale products across all tenant stores unless a custom rate is set.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted font-semibold" style="font-weight: 600;">Commission Rate</span>
+                        <input type="number" 
+                               step="0.01" 
+                               min="0" 
+                               max="100" 
+                               name="global_commission" 
+                               value="{{ $globalCommission }}" 
+                               class="form-control text-center font-bold fs-6" 
+                               placeholder="0.00" 
+                               required>
+                        <span class="input-group-text bg-white text-muted font-bold">%</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 text-end">
+                    <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 font-semibold shadow-sm" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); border: none;">
+                        <i class="fas fa-save me-1.5"></i> Save Global
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Main Card -->
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -36,6 +85,7 @@
                         <th class="ps-4 py-3">Tenant Name</th>
                         <th class="py-3">Subdomain URL</th>
                         <th class="py-3">Database Connection</th>
+                        <th class="py-3 text-center">Commission (%)</th>
                         <th class="py-3 text-center">Free Promotion</th>
                         <th class="py-3">Status</th>
                         <th class="py-3 text-end pe-4">Actions</th>
@@ -74,6 +124,17 @@
                                         </span>
                                     @endif
                                 </div>
+                            </td>
+                            <td class="text-center">
+                                @if($tenant->commission_rate !== null && $tenant->commission_rate !== '')
+                                    <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #ecfdf5; color: #047857; font-weight: 600; font-size: 11px;" title="Custom rate set for this tenant store">
+                                        <i class="fas fa-user-tag me-1"></i> {{ number_format($tenant->commission_rate, 2) }}% (Custom)
+                                    </span>
+                                @else
+                                    <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #f1f5f9; color: #475569; font-weight: 600; font-size: 11px;" title="Inheriting default global platform commission">
+                                        <i class="fas fa-globe me-1"></i> {{ number_format($globalCommission, 2) }}% (Global)
+                                    </span>
+                                @endif
                             </td>
                             <td class="text-center">
                                 <div class="d-flex flex-column align-items-center justify-content-center">
@@ -145,6 +206,14 @@
                                                 <input type="text" name="db_name" class="form-control rounded-3" value="{{ $tenant->db_name }}" placeholder="purnobd_{{ $tenant->subdomain }}">
                                                 <div class="form-text text-muted small">Leave blank to auto-detect using `purnobd_[subdomain]`.</div>
                                             </div>
+                                            <div class="mb-3">
+                                                <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Custom Wholesale Commission (%)</label>
+                                                <div class="input-group">
+                                                    <input type="number" step="0.01" min="0" max="100" name="commission_rate" class="form-control rounded-3" value="{{ $tenant->commission_rate !== null ? $tenant->commission_rate : '' }}" placeholder="Default: {{ $globalCommission }}% (Inherit Global)">
+                                                    <span class="input-group-text bg-light text-muted small">%</span>
+                                                </div>
+                                                <div class="form-text text-muted small">Leave empty to use the global platform commission ({{ $globalCommission }}%).</div>
+                                            </div>
                                             <div class="row mt-3">
                                                 <div class="col-6">
                                                     <div class="form-check form-switch">
@@ -171,7 +240,7 @@
 
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-5">
+                            <td colspan="7" class="text-center py-5">
                                 <div class="py-4">
                                     <i class="fas fa-network-wired text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
                                     <h5 class="text-slate-600 mb-1" style="font-weight: 600;">No Subdomains Configured</h5>
@@ -217,6 +286,14 @@
                         <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Database Name</label>
                         <input type="text" name="db_name" class="form-control rounded-3" placeholder="e.g. purnobd_dhaka">
                         <div class="form-text text-muted small">Leave blank to automatically default to `purnobd_[subdomain]`.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Custom Wholesale Commission (%)</label>
+                        <div class="input-group">
+                            <input type="number" step="0.01" min="0" max="100" name="commission_rate" class="form-control rounded-3" placeholder="Default: {{ $globalCommission }}% (Inherit Global)">
+                            <span class="input-group-text bg-light text-muted small">%</span>
+                        </div>
+                        <div class="form-text text-muted small">Leave blank to use the global platform commission ({{ $globalCommission }}%).</div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-6">

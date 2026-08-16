@@ -16,6 +16,7 @@ class SaaSTenantController extends Controller
     public function index()
     {
         $tenants = SaaSTenant::orderBy('id', 'desc')->paginate(15);
+        $globalCommission = floatval(\App\Services\SettingsService::get('saas', 'wholesale_commission', 0));
 
         foreach ($tenants as $tenant) {
             $dbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
@@ -31,7 +32,21 @@ class SaaSTenantController extends Controller
             }
         }
 
-        return view('admin.saas_tenants.index', compact('tenants'));
+        return view('admin.saas_tenants.index', compact('tenants', 'globalCommission'));
+    }
+
+    /**
+     * Save the global platform wholesale commission.
+     */
+    public function saveGlobalCommission(Request $request)
+    {
+        $request->validate([
+            'global_commission' => 'required|numeric|min:0|max:100',
+        ]);
+
+        \App\Services\SettingsService::set('saas', 'wholesale_commission', $request->global_commission);
+
+        return redirect()->route('admin.saas-tenants.index')->with('success', 'Global wholesale commission updated to ' . $request->global_commission . '% successfully!');
     }
 
     /**
@@ -43,16 +58,24 @@ class SaaSTenantController extends Controller
             'name' => 'required|string|max:255',
             'subdomain' => 'required|string|unique:saas_tenants,subdomain|max:255|alpha_dash',
             'db_name' => 'nullable|string|max:255',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
         try {
             $provisioner = new \App\Services\TenantProvisioningService();
-            $provisioner->provision(
+            $tenant = $provisioner->provision(
                 $request->name,
                 $request->subdomain,
                 $request->db_name,
                 auth()->user()
             );
+
+            if ($request->filled('commission_rate')) {
+                $tenant->update([
+                    'commission_rate' => floatval($request->commission_rate),
+                    'free_promotion' => $request->has('free_promotion'),
+                ]);
+            }
 
             return redirect()->route('admin.saas-tenants.index')->with('success', 'Tenant database and subdomain created & provisioned successfully!');
         } catch (\Throwable $e) {
@@ -72,6 +95,7 @@ class SaaSTenantController extends Controller
             'name' => 'required|string|max:255',
             'subdomain' => 'required|string|max:255|alpha_dash|unique:saas_tenants,subdomain,' . $tenant->id,
             'db_name' => 'nullable|string|max:255',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
         $tenant->update([
@@ -80,6 +104,7 @@ class SaaSTenantController extends Controller
             'db_name' => $request->db_name ?: 'purnobd_' . strtolower($request->subdomain),
             'is_active' => $request->has('is_active'),
             'free_promotion' => $request->has('free_promotion'),
+            'commission_rate' => $request->filled('commission_rate') ? floatval($request->commission_rate) : null,
         ]);
 
         return redirect()->route('admin.saas-tenants.index')->with('success', 'Tenant updated successfully!');
@@ -130,7 +155,7 @@ class SaaSTenantController extends Controller
         $tenants = SaaSTenant::where('is_active', true)->get();
         $selectedTenantId = $request->input('tenant_id');
         $currentTab = $request->input('tab', 'wholeseller'); // 'wholeseller' or 'admin'
-        $commission = floatval($request->input('commission', 0));
+        $globalCommission = floatval(\App\Services\SettingsService::get('saas', 'wholesale_commission', 0));
         
         $allProducts = [];
         $errors = [];
@@ -217,8 +242,33 @@ class SaaSTenantController extends Controller
                         ->keyBy('id');
                 }
 
+                // Fetch variation combinations in batch to resolve prices for variable products
+                $productIds = $products->pluck('id')->toArray();
+                $variationsByProduct = [];
+                if (!empty($productIds)) {
+                    try {
+                        $combos = DB::connection('tenant_temp')
+                            ->table('variation_combinations')
+                            ->whereIn('product_id', $productIds)
+                            ->get();
+                        foreach ($combos as $combo) {
+                            if (!isset($variationsByProduct[$combo->product_id])) {
+                                $variationsByProduct[$combo->product_id] = $combo;
+                            }
+                        }
+                    } catch (\Throwable $ex) {
+                        // Variation table fallback
+                    }
+                }
+
+                $tenantCommission = ($tenant->commission_rate !== null && $tenant->commission_rate !== '') 
+                    ? floatval($tenant->commission_rate) 
+                    : $globalCommission;
+                $isCustomCommission = ($tenant->commission_rate !== null && $tenant->commission_rate !== '');
+
                 foreach ($products as $prod) {
                     $vendor = isset($vendors[$prod->vendor_id]) ? $vendors[$prod->vendor_id] : null;
+                    $varComb = $variationsByProduct[$prod->id] ?? null;
                     
                     $thumbImage = $prod->thumb_image;
                     $thumbImageUrl = null;
@@ -234,9 +284,62 @@ class SaaSTenantController extends Controller
                         }
                     }
 
-                    $baseWholesale = floatval($prod->wholesale_price ?: 0);
-                    $commissionAmount = $commission > 0 ? ($baseWholesale * ($commission / 100)) : 0;
-                    $finalWholesale = $baseWholesale + $commissionAmount;
+                    $resellerPrice = (isset($prod->reseller_price) && floatval($prod->reseller_price) > 0)
+                        ? floatval($prod->reseller_price)
+                        : ($varComb && isset($varComb->reseller_price) && floatval($varComb->reseller_price) > 0 ? floatval($varComb->reseller_price) : 0);
+
+                    $productCost = (isset($prod->product_cost) && floatval($prod->product_cost) > 0)
+                        ? floatval($prod->product_cost)
+                        : ($varComb && isset($varComb->product_cost) && floatval($varComb->product_cost) > 0 ? floatval($varComb->product_cost) : 0);
+
+                    $baseWholesale = (isset($prod->wholesale_price) && floatval($prod->wholesale_price) > 0)
+                        ? floatval($prod->wholesale_price)
+                        : ($varComb && isset($varComb->wholesale_price) && floatval($varComb->wholesale_price) > 0 ? floatval($varComb->wholesale_price) : 0);
+
+                    $sellingPrice = (isset($prod->offer) && floatval($prod->offer) > 0)
+                        ? floatval($prod->offer)
+                        : ((isset($prod->price) && floatval($prod->price) > 0) 
+                            ? floatval($prod->price) 
+                            : ((isset($prod->old_price) && floatval($prod->old_price) > 0) 
+                                ? floatval($prod->old_price) 
+                                : ($varComb && isset($varComb->offer_price) && floatval($varComb->offer_price) > 0 
+                                    ? floatval($varComb->offer_price) 
+                                    : ($varComb && isset($varComb->regular_price) && floatval($varComb->regular_price) > 0 
+                                        ? floatval($varComb->regular_price) 
+                                        : 0))));
+
+                    $hasResellerPrice = ($resellerPrice > 0);
+
+                    if ($currentTab === 'admin') {
+                        if ($hasResellerPrice) {
+                            $finalPrice = $resellerPrice;
+                            $commissionAmount = 0;
+                            $basePrice = $resellerPrice;
+                        } else {
+                            if ($productCost > 0) {
+                                $basePrice = $productCost;
+                            } elseif ($baseWholesale > 0) {
+                                $basePrice = $baseWholesale;
+                            } else {
+                                $basePrice = $sellingPrice;
+                            }
+
+                            $commissionAmount = $tenantCommission > 0 ? ($basePrice * ($tenantCommission / 100)) : 0;
+                            $finalPrice = $basePrice + $commissionAmount;
+                        }
+                    } else {
+                        // Wholesellers tab
+                        if ($baseWholesale > 0) {
+                            $basePrice = $baseWholesale;
+                        } elseif ($productCost > 0) {
+                            $basePrice = $productCost;
+                        } else {
+                            $basePrice = $sellingPrice;
+                        }
+
+                        $commissionAmount = $tenantCommission > 0 ? ($basePrice * ($tenantCommission / 100)) : 0;
+                        $finalPrice = $basePrice + $commissionAmount;
+                    }
 
                     $allProducts[] = [
                         'tenant_name' => $tenant->name,
@@ -244,12 +347,19 @@ class SaaSTenantController extends Controller
                         'id' => $prod->id,
                         'title' => $prod->title,
                         'thumb_image' => $thumbImageUrl,
+                        'is_admin_tab' => ($currentTab === 'admin'),
+                        'has_reseller_price' => $hasResellerPrice,
+                        'reseller_price' => $resellerPrice,
+                        'product_cost' => $productCost,
+                        'base_price' => $basePrice,
                         'wholesale_price' => $baseWholesale,
-                        'commission_percent' => $commission,
+                        'commission_percent' => $tenantCommission,
+                        'is_custom_commission' => $isCustomCommission,
                         'commission_amount' => $commissionAmount,
-                        'final_wholesale_price' => $finalWholesale,
-                        'price' => isset($prod->price) ? $prod->price : ($prod->old_price ?? 0),
-                        'offer' => $prod->offer,
+                        'final_wholesale_price' => $finalPrice,
+                        'price' => $sellingPrice > 0 ? $sellingPrice : (isset($prod->price) ? $prod->price : ($prod->old_price ?? 0)),
+                        'old_price' => isset($prod->old_price) && floatval($prod->old_price) > 0 ? floatval($prod->old_price) : ($varComb->regular_price ?? 0),
+                        'offer' => isset($prod->offer) && floatval($prod->offer) > 0 ? floatval($prod->offer) : ($varComb->offer_price ?? 0),
                         'quantity' => $prod->quantity,
                         'status' => $prod->status,
                         'vendor_name' => $vendor ? ($vendor->business_name ?: $vendor->name) : ($currentTab === 'admin' ? 'Tenant Admin' : 'N/A'),
@@ -280,7 +390,7 @@ class SaaSTenantController extends Controller
             'tenants',
             'selectedTenantId',
             'currentTab',
-            'commission',
+            'globalCommission',
             'totalWholesellerCount',
             'totalAdminCount',
             'errors'
