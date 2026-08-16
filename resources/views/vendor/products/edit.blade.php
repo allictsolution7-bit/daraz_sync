@@ -296,8 +296,7 @@
                                             <i class="fas fa-info-circle text-primary me-1"></i>
                                             This is the wholesale price set by admin. Set your Regular &amp; Sale prices above this amount.
                                         </small>
-                                        {{-- Keep hidden product_cost unchanged so it saves correctly --}}
-                                        <input type="hidden" name="product_cost" value="{{ old('product_cost', $product->product_cost) }}">
+                                        {{-- Keep hidden product_cost unchanged so it saves corre                                         <input type="hidden" name="product_cost" value="{{ old('product_cost', $product->product_cost) }}">
                                     @else
                                         <div class="form-floating mb-3">
                                             <input type="number" step="0.01" class="form-control" name="product_cost" id="productCost" value="{{ old('product_cost', $product->product_cost) }}">
@@ -305,6 +304,15 @@
                                         </div>
                                     @endif
                                 </div>
+                                @if(!$product->parent_product_id)
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" step="0.01" class="form-control" name="wholesale_price" id="wholesalePrice" value="{{ old('wholesale_price', $product->wholesale_price) }}" placeholder="Wholesale Price (৳)">
+                                            <label for="wholesalePrice">Wholesale Price (৳)</label>
+                                            <div class="form-text">Price for bulk/wholesale customers</div>
+                                        </div>
+                                    </div>
+                                @endif
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3">
                                         <input type="number" step="0.01" class="form-control" name="vendor_proposed_commission" id="proposedCommission" value="{{ old('vendor_proposed_commission', $product->vendor_proposed_commission) }}" min="{{ $commissionSettings['min'] }}" max="{{ $commissionSettings['max'] }}">
@@ -312,7 +320,39 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+
+                            @if(!$product->parent_product_id)
+                                <!-- Wholesale Pricing Tiers -->
+                                <div class="mb-3 border rounded-3 p-3 bg-light" id="simpleWholesaleTiersSection">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-layer-group text-primary me-2"></i> Tiered Wholesale Pricing (Optional)</h6>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary small">Bulk Pricing</span>
+                                    </div>
+                                    <p class="text-muted small mb-3">Add wholesale prices based on purchase quantity. For example, buying 50+ items @ ৳188, 100+ items @ ৳185.</p>
+                                    
+                                    <div id="simpleTiersContainer">
+                                        @if($product->wholesaleTiers && $product->wholesaleTiers->isNotEmpty())
+                                            @foreach($product->wholesaleTiers as $tierIndex => $tier)
+                                                <div class="row g-2 align-items-center mb-2 tier-row">
+                                                    <div class="col-5">
+                                                        <input type="number" class="form-control" name="wholesale_tiers[{{ $tierIndex }}][min_quantity]" value="{{ $tier->min_quantity }}" placeholder="Min Qty" required min="1">
+                                                    </div>
+                                                    <div class="col-5">
+                                                        <input type="number" step="0.01" class="form-control" name="wholesale_tiers[{{ $tierIndex }}][price]" value="{{ $tier->price }}" placeholder="Price (৳)" required min="0">
+                                                    </div>
+                                                    <div class="col-2 text-center">
+                                                        <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.tier-row').remove()"><i class="fas fa-trash-alt"></i></button>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addVendorSimpleWholesaleTier()">
+                                        <i class="fas fa-plus-circle me-1"></i> Add Pricing Tier
+                                    </button>
+                                </div>
+                            @endif
+                        </div>      </div>
 
                         <div class="form-section mb-4">
                             <h4>Inventory Management</h4>
@@ -631,5 +671,25 @@
             }
         });
     })();
+
+    let vendorSimpleTierCounter = {{ $product->wholesaleTiers ? $product->wholesaleTiers->count() : 0 }};
+    function addVendorSimpleWholesaleTier() {
+        const container = document.getElementById('simpleTiersContainer');
+        const row = document.createElement('div');
+        row.className = 'row g-2 align-items-center mb-2 tier-row';
+        row.innerHTML = `
+            <div class="col-5">
+                <input type="number" class="form-control" name="wholesale_tiers[${vendorSimpleTierCounter}][min_quantity]" placeholder="Min Qty (e.g. 50)" required min="1">
+            </div>
+            <div class="col-5">
+                <input type="number" step="0.01" class="form-control" name="wholesale_tiers[${vendorSimpleTierCounter}][price]" placeholder="Tier Price (৳)" required min="0">
+            </div>
+            <div class="col-2 text-center">
+                <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.tier-row').remove()"><i class="fas fa-trash-alt"></i></button>
+            </div>
+        `;
+        container.appendChild(row);
+        vendorSimpleTierCounter++;
+    }
 </script>
 @endpush

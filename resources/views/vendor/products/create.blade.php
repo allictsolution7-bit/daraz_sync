@@ -787,6 +787,22 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Tiered Wholesale Pricing (For Wholesalers / Bulk Discounts) -->
+                                <div class="mb-3 border rounded-3 p-3 bg-light" id="simpleWholesaleTiersSection">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-layer-group text-primary me-2"></i> Tiered Wholesale Pricing (Optional)</h6>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary small">Bulk Pricing</span>
+                                    </div>
+                                    <p class="text-muted small mb-2">Add wholesale prices based on purchase quantity. For example, buying 50+ items @ ৳188, 100+ items @ ৳185.</p>
+                                    
+                                    <div id="simpleTiersContainer">
+                                        <!-- Tiers added dynamically -->
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addVendorSimpleWholesaleTier()">
+                                        <i class="fas fa-plus-circle me-1"></i> Add Pricing Tier
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="row">
@@ -1749,5 +1765,25 @@
             toggleBookDetails();
         }
     });
+
+    let vendorSimpleTierCounter = 0;
+    function addVendorSimpleWholesaleTier() {
+        const container = document.getElementById('simpleTiersContainer');
+        const row = document.createElement('div');
+        row.className = 'row g-2 align-items-center mb-2 tier-row';
+        row.innerHTML = `
+            <div class="col-5">
+                <input type="number" class="form-control" name="wholesale_tiers[${vendorSimpleTierCounter}][min_quantity]" placeholder="Min Qty (e.g. 50)" required min="1">
+            </div>
+            <div class="col-5">
+                <input type="number" step="0.01" class="form-control" name="wholesale_tiers[${vendorSimpleTierCounter}][price]" placeholder="Tier Price (৳)" required min="0">
+            </div>
+            <div class="col-2 text-center">
+                <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.tier-row').remove()"><i class="fas fa-trash-alt"></i></button>
+            </div>
+        `;
+        container.appendChild(row);
+        vendorSimpleTierCounter++;
+    }
 </script>
 @endpush

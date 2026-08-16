@@ -854,7 +854,7 @@
                                   </div>
                              @endif
 
-                             @if(auth()->user()->hasRole('wholeseller'))
+                             @if(($source ?? 'my_products') === 'admin_products' || auth()->user()->hasRole('wholeseller') || auth()->user()->isVendorRetailer() || auth()->user()->hasRole('retailer'))
                                  <div class="mt-1">
                                      <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Wholesale Price</small>
                                      @php
@@ -874,19 +874,6 @@
                                          ৳{{ number_format($wholesalePrice, 2) }}
                                      </span>
                                  </div>
-
-                                 @if($product->wholesaleTiers && $product->wholesaleTiers->isNotEmpty())
-                                     <div class="mt-2">
-                                         <small class="text-muted d-block mb-1" style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Wholesale Tiers</small>
-                                         <div class="d-flex flex-column gap-1">
-                                             @foreach($product->wholesaleTiers as $tier)
-                                                 <span class="text-secondary" style="font-size: 0.75rem;">
-                                                     Buy <strong class="text-dark">{{ $tier->min_quantity }}+</strong> for <strong class="text-primary">৳{{ number_format($tier->price, 2) }}</strong>
-                                                 </span>
-                                             @endforeach
-                                         </div>
-                                     </div>
-                                 @endif
                              @endif
                         </td>
                         @if(($source ?? 'my_products') === 'my_products')
@@ -1056,16 +1043,41 @@
                                                          </div>
 
                                                          @if($product->product_type === 'variable' && $product->relationLoaded('variationCombinations') && $product->variationCombinations->isNotEmpty())
-                                                             <h6 class="font-weight-bold text-dark mb-2">Select Stock Quantity Per Variation:</h6>
-                                                             <div class="table-responsive mb-3 border rounded">
-                                                                 <table class="table table-sm align-middle mb-0">
-                                                                     <thead class="table-light">
+                                                             @php
+                                                                 $hasAnyVarTiers = $product->variationCombinations->some(fn($c) => $c->wholesaleTiers && $c->wholesaleTiers->isNotEmpty());
+                                                             @endphp
+
+                                                             @if($hasAnyVarTiers)
+                                                                 <!-- Variation Tier Discount Notification -->
+                                                                 <div class="p-2.5 px-3 rounded-3 mb-3 d-flex align-items-center justify-content-between border" style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border-color: #a7f3d0 !important;">
+                                                                     <div class="d-flex align-items-center gap-2">
+                                                                         <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 12px;">
+                                                                             <i class="fas fa-layer-group"></i>
+                                                                         </div>
+                                                                         <div>
+                                                                             <div class="fw-bold text-success-emphasis" style="font-size: 13px;">Bulk Tier Discounts Available on Variations!</div>
+                                                                             <small class="text-muted" style="font-size: 11px;">Click any tier button below to quickly select threshold quantities and unlock lower unit prices.</small>
+                                                                         </div>
+                                                                     </div>
+                                                                     <span class="badge bg-success bg-opacity-15 text-success fw-bold px-2 py-1" style="font-size: 11px;">
+                                                                         <i class="fas fa-bolt me-1"></i> Volume Savings
+                                                                     </span>
+                                                                 </div>
+                                                             @endif
+
+                                                             <h6 class="font-weight-bold text-dark mb-2 d-flex justify-content-between align-items-center">
+                                                                 <span>Select Stock Quantity Per Variation:</span>
+                                                                 <small class="text-muted fw-normal" style="font-size: 12px;">{{ $product->variationCombinations->count() }} variation combinations</small>
+                                                             </h6>
+                                                             <div class="table-responsive mb-3 border rounded-3 shadow-sm bg-white">
+                                                                 <table class="table table-hover align-middle mb-0" style="font-size: 13px;">
+                                                                     <thead class="table-light text-muted border-bottom" style="font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase;">
                                                                          <tr>
-                                                                             <th>Option / Variation</th>
-                                                                             <th>Unit Cost</th>
-                                                                             <th>Admin Stock</th>
-                                                                             <th width="130">Your Quantity</th>
-                                                                             <th class="text-end">Subtotal</th>
+                                                                             <th style="min-width: 200px;">Option / Variation</th>
+                                                                             <th style="width: 140px;">Unit Cost</th>
+                                                                             <th style="width: 100px;">Admin Stock</th>
+                                                                             <th style="width: 140px;">Your Quantity</th>
+                                                                             <th class="text-end" style="min-width: 140px;">Subtotal</th>
                                                                          </tr>
                                                                      </thead>
                                                                      <tbody>
@@ -1078,19 +1090,57 @@
                                                                                   );
                                                                                   $optNames = method_exists($comb, 'getOptionNamesArray') ? $comb->getOptionNamesArray() : [];
                                                                                   $optLabel = !empty($optNames) ? implode(' / ', $optNames) : (is_array($comb->variation_options) ? implode(' / ', $comb->variation_options) : $comb->variation_options);
+                                                                                  $combTiers = $comb->wholesaleTiers ? $comb->wholesaleTiers->map(fn($t) => ['min_quantity' => (int)$t->min_quantity, 'price' => (float)$t->price])->values() : collect();
+                                                                                  $sortedTiers = $comb->wholesaleTiers ? $comb->wholesaleTiers->sortBy('min_quantity') : collect();
+                                                                                  $firstTier = $sortedTiers->first();
                                                                               @endphp
-                                                                              <tr>
-                                                                                  <td><span class="badge" style="color: #4f46e5; background: #eef2ff; font-weight: 700;">{{ $optLabel }}</span></td>
-                                                                                  <td class="font-weight-bold">৳{{ number_format($unitCost, 2) }}</td>
-                                                                                  <td class="text-muted small">{{ $comb->stock_quantity ?? 'Unlimited' }}</td>
+                                                                              <tr class="var-row-{{ $product->id }}-{{ $comb->id }} {{ $sortedTiers->isNotEmpty() ? 'bg-light bg-opacity-25' : '' }}">
+                                                                                  <td>
+                                                                                      <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                                                                          <span class="badge px-2.5 py-1" style="color: #4338ca; background: #eef2ff; font-weight: 700; font-size: 12px; border: 1px solid #c7d2fe; border-radius: 6px;">
+                                                                                              {{ $optLabel }}
+                                                                                          </span>
+                                                                                      </div>
+
+                                                                                      @if($sortedTiers->isNotEmpty())
+                                                                                          <!-- Interactive Tier Pills -->
+                                                                                          <div class="d-flex flex-wrap gap-1 mt-2 var-tier-badges-{{ $product->id }}-{{ $comb->id }}">
+                                                                                              <span class="badge bg-light text-secondary border var-tier-pill" data-min="1" style="font-size: 10px; font-weight: 600; padding: 4px 7px; border-radius: 5px; cursor: pointer;" onclick="setVarQty({{ $product->id }}, {{ $comb->id }}, 1)" title="Base Price">
+                                                                                                  1-{{ $firstTier ? $firstTier->min_quantity - 1 : 'any' }}: ৳{{ number_format($unitCost, 0) }}
+                                                                                              </span>
+                                                                                              @foreach($sortedTiers as $tIdx => $t)
+                                                                                                  @php
+                                                                                                      $nextT = $sortedTiers->values()->get($tIdx + 1);
+                                                                                                      $tierRange = $t->min_quantity . ($nextT ? '-' . ($nextT->min_quantity - 1) : '+');
+                                                                                                  @endphp
+                                                                                                  <span class="badge bg-white text-dark border border-primary border-opacity-50 var-tier-pill shadow-xs" data-min="{{ $t->min_quantity }}" style="font-size: 10px; font-weight: 600; padding: 4px 7px; border-radius: 5px; cursor: pointer; transition: all 0.2s;" onclick="setVarQty({{ $product->id }}, {{ $comb->id }}, {{ $t->min_quantity }})" title="Click to select {{ $t->min_quantity }} units">
+                                                                                                      <i class="fas fa-layer-group text-primary me-1" style="font-size: 9px;"></i>{{ $tierRange }}: <strong class="text-success">৳{{ number_format($t->price, 0) }}</strong>
+                                                                                                  </span>
+                                                                                              @endforeach
+                                                                                          </div>
+                                                                                      @endif
+                                                                                  </td>
+                                                                                  <td id="var_cost_{{ $product->id }}_{{ $comb->id }}">
+                                                                                      <div class="fw-bold text-dark">৳{{ number_format($unitCost, 2) }}</div>
+                                                                                  </td>
+                                                                                  <td>
+                                                                                      <span class="badge bg-light text-dark border" style="font-size: 11px;">
+                                                                                          {{ $comb->stock_quantity ?? 'Unlimited' }}
+                                                                                      </span>
+                                                                                  </td>
                                                                                   <td>
                                                                                        <input type="number" name="quantities[{{ $product->id }}][variations][{{ $comb->id }}]" 
-                                                                                              class="form-control form-control-sm var-qty-input-{{ $product->id }}" 
+                                                                                              class="form-control form-control-sm font-weight-bold var-qty-input-{{ $product->id }}" 
+                                                                                              data-base-cost="{{ $unitCost }}"
                                                                                               data-cost="{{ $unitCost }}"
+                                                                                              data-tiers="{{ json_encode($combTiers) }}"
                                                                                               min="0" {{ ($comb->stock_quantity !== null && $comb->stock_quantity > 0) ? 'max='.$comb->stock_quantity : '' }} value="0"
+                                                                                              style="max-width: 100px; border-radius: 6px;"
                                                                                               oninput="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
                                                                                    </td>
-                                                                                  <td class="text-end font-weight-bold text-dark var-subtotal-{{ $product->id }}">৳{{ number_format($unitCost, 2) }}</td>
+                                                                                  <td class="text-end var-subtotal-{{ $product->id }}">
+                                                                                      <div class="fw-bold text-muted">৳0.00</div>
+                                                                                  </td>
                                                                               </tr>
                                                                           @endforeach
                                                                      </tbody>
@@ -1103,12 +1153,60 @@
                                                                      (($product->product_cost > 0) ? $product->product_cost : 
                                                                      (($product->offer > 0) ? $product->offer : ($product->old_price ?? 0)))
                                                                  );
+                                                                 $simpleTiers = $product->wholesaleTiers ? $product->wholesaleTiers->sortBy('min_quantity') : collect();
+                                                                 $firstTier = $simpleTiers->first();
                                                              @endphp
+
+                                                             @if($simpleTiers->isNotEmpty())
+                                                                 <!-- Tiered Wholesale Pricing Breakdown -->
+                                                                 <div class="mb-3 p-3 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                                                                     <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                         <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 13px;">
+                                                                             <i class="fas fa-layer-group text-primary"></i> Tiered Wholesale Pricing (Buy More & Save)
+                                                                         </span>
+                                                                         <span class="badge bg-success bg-opacity-15 text-success small fw-bold px-2 py-0.5" style="font-size: 11px;">Bulk Discounts Active</span>
+                                                                     </div>
+                                                                     <div class="border rounded-2 overflow-hidden bg-white">
+                                                                         <table class="table table-sm table-bordered text-center align-middle mb-0 w-100" style="font-size: 12px; table-layout: fixed;">
+                                                                             <thead class="table-light text-muted" style="font-size: 11px; text-transform: uppercase;">
+                                                                                 <tr>
+                                                                                     <th style="width: 38%;">Quantity Range</th>
+                                                                                     <th style="width: 31%;">Unit Price</th>
+                                                                                     <th style="width: 31%;">Savings / Unit</th>
+                                                                                 </tr>
+                                                                             </thead>
+                                                                             <tbody>
+                                                                                 <tr class="tier-row-{{ $product->id }} tier-row-base-{{ $product->id }}" data-min="1" data-price="{{ $unitCost }}" style="cursor: pointer;" onclick="document.getElementById('simple_qty_{{ $product->id }}').value=1; calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }});" title="Click to select 1 unit">
+                                                                                     <td class="fw-bold text-dark">1 - {{ ($firstTier ? $firstTier->min_quantity - 1 : 'any') }} units</td>
+                                                                                     <td class="fw-bold text-dark">৳{{ number_format($unitCost, 2) }}</td>
+                                                                                     <td class="text-muted">-</td>
+                                                                                 </tr>
+                                                                                 @foreach($simpleTiers as $tIdx => $tier)
+                                                                                     @php
+                                                                                         $nextTier = $simpleTiers->values()->get($tIdx + 1);
+                                                                                         $saving = max(0, $unitCost - $tier->price);
+                                                                                     @endphp
+                                                                                     <tr class="tier-row-{{ $product->id }}" data-min="{{ $tier->min_quantity }}" data-price="{{ $tier->price }}" style="cursor: pointer;" onclick="document.getElementById('simple_qty_{{ $product->id }}').value={{ $tier->min_quantity }}; calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }});" title="Click to select {{ $tier->min_quantity }} units">
+                                                                                         <td class="fw-bold text-dark">{{ $tier->min_quantity }}{{ $nextTier ? ' - ' . ($nextTier->min_quantity - 1) : '+' }} units</td>
+                                                                                         <td class="fw-bold text-success">৳{{ number_format($tier->price, 2) }}</td>
+                                                                                         <td><span class="badge bg-success bg-opacity-10 text-success fw-bold" style="font-size: 11px;">Save ৳{{ number_format($saving, 2) }}</span></td>
+                                                                                     </tr>
+                                                                                 @endforeach
+                                                                             </tbody>
+                                                                         </table>
+                                                                     </div>
+                                                                 </div>
+                                                             @endif
+
                                                              <div class="mb-3">
-                                                                 <label class="form-label font-weight-bold">Stock Quantity to Purchase (Unit Cost: ৳{{ number_format($unitCost, 2) }})</label>
+                                                                 <label class="form-label font-weight-bold d-flex justify-content-between align-items-center" id="unit_cost_label_{{ $product->id }}">
+                                                                     <span>Stock Quantity to Purchase (Unit Cost: ৳{{ number_format($unitCost, 2) }})</span>
+                                                                 </label>
                                                                  <input type="number" name="quantities[{{ $product->id }}][quantity]" id="simple_qty_{{ $product->id }}" 
                                                                         class="form-control form-control-lg font-weight-bold" 
+                                                                        data-base-cost="{{ $unitCost }}"
                                                                         data-cost="{{ $unitCost }}" 
+                                                                        data-tiers="{{ json_encode($simpleTiers->map(fn($t) => ['min_quantity' => (int)$t->min_quantity, 'price' => (float)$t->price])->values()) }}"
                                                                         min="1" {{ ($product->quantity !== null && $product->quantity > 0) ? 'max='.$product->quantity : '' }} value="1" required
                                                                         oninput="calculateProductStockCopy({{ $product->id }}, {{ auth()->user()->wallet_balance ?? 0 }})">
                                                              </div>
@@ -1353,6 +1451,20 @@ function openBulkCopyCartModal() {
     }
 }
 
+function getEffectiveTierPrice(baseCost, tiers, qty) {
+    if (!tiers || !Array.isArray(tiers) || tiers.length === 0 || qty <= 0) {
+        return { price: baseCost, tierApplied: null };
+    }
+    // Sort descending by min_quantity
+    let sorted = [...tiers].sort((a, b) => b.min_quantity - a.min_quantity);
+    for (let t of sorted) {
+        if (qty >= t.min_quantity) {
+            return { price: parseFloat(t.price), tierApplied: t };
+        }
+    }
+    return { price: baseCost, tierApplied: null };
+}
+
 function calculateBulkCart() {
     let currentBalance = {{ auth()->user()->wallet_balance ?? 0 }};
     let container = document.getElementById('bulkCartItemsContainer');
@@ -1367,21 +1479,50 @@ function calculateBulkCart() {
         if (varInputs && varInputs.length > 0) {
             varInputs.forEach(function(input) {
                 let qty = parseInt(input.value) || 0;
-                let cost = parseFloat(input.getAttribute('data-cost')) || 0;
-                let sub = qty * cost;
+                let baseCost = parseFloat(input.getAttribute('data-base-cost')) || parseFloat(input.getAttribute('data-cost')) || 0;
+                let tiers = [];
+                try {
+                    tiers = JSON.parse(input.getAttribute('data-tiers') || '[]');
+                } catch(e) {}
+
+                let res = getEffectiveTierPrice(baseCost, tiers, qty);
+                let effectiveCost = res.price;
+                let sub = qty * effectiveCost;
                 totalUnits += qty;
                 totalCost += sub;
 
                 let rowSub = input.closest('tr').querySelector('[class*="var-subtotal-"]');
-                if (rowSub) rowSub.innerText = '৳' + sub.toFixed(2);
+                if (rowSub) {
+                    if (res.tierApplied) {
+                        rowSub.innerHTML = `<div>৳${sub.toFixed(2)}</div><small class="text-success fw-bold" style="font-size:10px;">৳${effectiveCost.toFixed(2)}/unit</small>`;
+                    } else {
+                        rowSub.innerText = '৳' + sub.toFixed(2);
+                    }
+                }
             });
         } else {
             let simpleInput = card.querySelector('input[name*="[quantity]"]');
             if (simpleInput) {
                 let qty = parseInt(simpleInput.value) || 0;
-                let cost = parseFloat(simpleInput.getAttribute('data-cost')) || 0;
+                let baseCost = parseFloat(simpleInput.getAttribute('data-base-cost')) || parseFloat(simpleInput.getAttribute('data-cost')) || 0;
+                let tiers = [];
+                try {
+                    tiers = JSON.parse(simpleInput.getAttribute('data-tiers') || '[]');
+                } catch(e) {}
+
+                let res = getEffectiveTierPrice(baseCost, tiers, qty);
+                let effectiveCost = res.price;
                 totalUnits += qty;
-                totalCost += (qty * cost);
+                totalCost += (qty * effectiveCost);
+
+                let costLabel = card.querySelector('[id^="unit_cost_label_"]');
+                if (costLabel) {
+                    if (res.tierApplied) {
+                        costLabel.innerHTML = `<span>Stock Quantity to Purchase (Unit Cost: <span class="text-success fw-bold">৳${effectiveCost.toFixed(2)}</span> <span class="badge bg-success ms-1">Tier ${res.tierApplied.min_quantity}+ Applied</span>)</span>`;
+                    } else {
+                        costLabel.innerHTML = `<span>Stock Quantity to Purchase (Unit Cost: ৳${baseCost.toFixed(2)})</span>`;
+                    }
+                }
             }
         }
     });
@@ -1418,6 +1559,16 @@ function calculateBulkCart() {
     }
 }
 
+function setVarQty(productId, combId, qty) {
+    let modal = document.getElementById('copyStockModal_' + productId);
+    if (!modal) return;
+    let input = modal.querySelector(`input[name="quantities[${productId}][variations][${combId}]"]`);
+    if (input) {
+        input.value = qty;
+        calculateProductStockCopy(productId, {{ auth()->user()->wallet_balance ?? 0 }});
+    }
+}
+
 function calculateProductStockCopy(productId, currentBalance) {
     let modal = document.getElementById('copyStockModal_' + productId);
     if (!modal) return;
@@ -1429,23 +1580,105 @@ function calculateProductStockCopy(productId, currentBalance) {
     if (varInputs && varInputs.length > 0) {
         varInputs.forEach(function(input) {
             let qty = parseInt(input.value) || 0;
-            let cost = parseFloat(input.getAttribute('data-cost')) || 0;
-            let sub = qty * cost;
+            let baseCost = parseFloat(input.getAttribute('data-base-cost')) || parseFloat(input.getAttribute('data-cost')) || 0;
+            let tiers = [];
+            try {
+                tiers = JSON.parse(input.getAttribute('data-tiers') || '[]');
+            } catch(e) {}
+
+            let res = getEffectiveTierPrice(baseCost, tiers, qty);
+            let effectiveCost = res.price;
+            let sub = qty * effectiveCost;
             totalQty += qty;
             totalCost += sub;
 
+            let unitCostCell = input.closest('tr').querySelector('[id^="var_cost_"]');
+            if (unitCostCell) {
+                if (res.tierApplied) {
+                    unitCostCell.innerHTML = `
+                        <div class="text-decoration-line-through text-muted small" style="font-size: 11px;">৳${baseCost.toFixed(2)}</div>
+                        <div class="text-success fw-bold">৳${effectiveCost.toFixed(2)}</div>
+                        <span class="badge bg-success bg-opacity-15 text-success" style="font-size: 9px; font-weight: 700;">${res.tierApplied.min_quantity}+ Tier</span>
+                    `;
+                } else {
+                    unitCostCell.innerHTML = `<div class="fw-bold text-dark">৳${baseCost.toFixed(2)}</div>`;
+                }
+            }
+
+            // Highlight active tier pill in the row
+            let tierPills = input.closest('tr').querySelectorAll('.var-tier-pill');
+            if (tierPills && tierPills.length > 0) {
+                tierPills.forEach(pill => {
+                    let minQ = parseInt(pill.getAttribute('data-min')) || 0;
+                    if (res.tierApplied && res.tierApplied.min_quantity === minQ) {
+                        pill.className = 'badge bg-success text-white border-success shadow-sm var-tier-pill';
+                    } else if (!res.tierApplied && minQ === 1 && qty > 0) {
+                        pill.className = 'badge bg-primary text-white border-primary var-tier-pill';
+                    } else {
+                        pill.className = 'badge bg-white text-dark border border-primary border-opacity-50 var-tier-pill shadow-xs';
+                    }
+                });
+            }
+
             let rowSub = input.closest('tr').querySelector('.var-subtotal-' + productId);
             if (rowSub) {
-                rowSub.innerText = '৳' + sub.toFixed(2);
+                if (res.tierApplied) {
+                    let saved = (baseCost - effectiveCost) * qty;
+                    rowSub.innerHTML = `
+                        <div class="fw-bold text-dark fs-6">৳${sub.toFixed(2)}</div>
+                        <small class="text-success fw-bold d-block" style="font-size: 11px;">
+                            <i class="fas fa-check-circle me-1"></i>৳${effectiveCost.toFixed(2)}/unit <span class="text-muted">(Saved ৳${saved.toFixed(2)})</span>
+                        </small>
+                    `;
+                } else if (qty > 0) {
+                    rowSub.innerHTML = `<div class="fw-bold text-dark fs-6">৳${sub.toFixed(2)}</div><small class="text-muted" style="font-size: 11px;">৳${baseCost.toFixed(2)}/unit</small>`;
+                } else {
+                    rowSub.innerHTML = `<div class="fw-bold text-muted">৳0.00</div>`;
+                }
             }
         });
     } else {
         let simpleInput = modal.querySelector('#simple_qty_' + productId);
         if (simpleInput) {
             let qty = parseInt(simpleInput.value) || 0;
-            let cost = parseFloat(simpleInput.getAttribute('data-cost')) || 0;
+            let baseCost = parseFloat(simpleInput.getAttribute('data-base-cost')) || parseFloat(simpleInput.getAttribute('data-cost')) || 0;
+            let tiers = [];
+            try {
+                tiers = JSON.parse(simpleInput.getAttribute('data-tiers') || '[]');
+            } catch(e) {}
+
+            let res = getEffectiveTierPrice(baseCost, tiers, qty);
+            let effectiveCost = res.price;
             totalQty = qty;
-            totalCost = qty * cost;
+            totalCost = qty * effectiveCost;
+
+            let costLabel = modal.querySelector('#unit_cost_label_' + productId);
+            if (costLabel) {
+                if (res.tierApplied) {
+                    costLabel.innerHTML = `<span>Stock Quantity to Purchase (Unit Cost: <span class="text-success fw-bold">৳${effectiveCost.toFixed(2)}</span> <span class="badge bg-success ms-1">Tier ${res.tierApplied.min_quantity}+ Applied</span>)</span>`;
+                } else {
+                    costLabel.innerHTML = `<span>Stock Quantity to Purchase (Unit Cost: ৳${baseCost.toFixed(2)})</span>`;
+                }
+            }
+
+            // Highlight active tier row in modal table
+            let tierRows = modal.querySelectorAll('.tier-row-' + productId);
+            let baseRow = modal.querySelector('.tier-row-base-' + productId);
+            if (tierRows.length > 0) {
+                tierRows.forEach(row => {
+                    let minQ = parseInt(row.getAttribute('data-min')) || 0;
+                    if (res.tierApplied && res.tierApplied.min_quantity === minQ) {
+                        row.classList.add('table-success', 'fw-bold');
+                    } else {
+                        row.classList.remove('table-success', 'fw-bold');
+                    }
+                });
+                if (!res.tierApplied && baseRow) {
+                    baseRow.classList.add('table-primary', 'fw-bold');
+                } else if (baseRow) {
+                    baseRow.classList.remove('table-primary', 'fw-bold');
+                }
+            }
         }
     }
 

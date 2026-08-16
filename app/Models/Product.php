@@ -665,6 +665,6 @@ class Product extends Model
 
     public function wholesaleTiers()
     {
-        return $this->hasMany(ProductWholesaleTier::class, 'product_id')->orderBy('min_quantity');
+        return $this->hasMany(ProductWholesaleTier::class, 'product_id')->whereNull('variation_combination_id')->orderBy('min_quantity');
     }
 }

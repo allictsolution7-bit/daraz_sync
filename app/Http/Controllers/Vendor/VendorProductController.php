@@ -281,7 +281,7 @@ class VendorProductController extends Controller
         $totalCost = 0;
         $combStockMap = []; // combination_id => quantity
 
-        $product->load('variationCombinations');
+        $product->load(['variationCombinations.wholesaleTiers', 'wholesaleTiers']);
 
         if ($product->product_type === 'variable' && $product->variationCombinations->isNotEmpty()) {
             $requestedCombinations = $request->input('combinations', []);
@@ -301,11 +301,23 @@ class VendorProductController extends Controller
                             ->with('error', 'Requested quantity (' . $qty . ') exceeds available admin stock (' . $comb->stock_quantity . ') for combination options.');
                     }
 
-                    $unitCost = (float)(
+                    $baseCost = (float)(
                         ($comb->wholesale_price > 0) ? $comb->wholesale_price : 
                         (($comb->product_cost > 0) ? $comb->product_cost : 
                         (($comb->offer_price > 0) ? $comb->offer_price : ($comb->regular_price ?? 0)))
                     );
+
+                    $unitCost = $baseCost;
+                    if ($comb->wholesaleTiers && $comb->wholesaleTiers->isNotEmpty()) {
+                        $sortedTiers = $comb->wholesaleTiers->sortByDesc('min_quantity');
+                        foreach ($sortedTiers as $tier) {
+                            if ($qty >= (int)$tier->min_quantity) {
+                                $unitCost = (float)$tier->price;
+                                break;
+                            }
+                        }
+                    }
+
                     $combStockMap[$comb->id] = [
                         'quantity' => $qty,
                         'unit_cost' => $unitCost,
@@ -338,11 +350,23 @@ class VendorProductController extends Controller
                     ->with('error', 'Requested quantity (' . $qty . ') exceeds available admin stock (' . $product->quantity . ').');
             }
 
-            $unitCost = (float)(
+            $baseCost = (float)(
                 ($product->wholesale_price > 0) ? $product->wholesale_price : 
                 (($product->product_cost > 0) ? $product->product_cost : 
                 (($product->offer > 0) ? $product->offer : ($product->old_price ?? 0)))
             );
+
+            $unitCost = $baseCost;
+            if ($product->wholesaleTiers && $product->wholesaleTiers->isNotEmpty()) {
+                $sortedTiers = $product->wholesaleTiers->sortByDesc('min_quantity');
+                foreach ($sortedTiers as $tier) {
+                    if ($qty >= (int)$tier->min_quantity) {
+                        $unitCost = (float)$tier->price;
+                        break;
+                    }
+                }
+            }
+
             $totalQuantity = $qty;
             $totalCost = $qty * $unitCost;
         }
@@ -530,7 +554,7 @@ class VendorProductController extends Controller
                     }
                 })
                 ->whereNotIn('id', $allocatedProductIds)
-                ->with('variationCombinations')
+                ->with(['variationCombinations.wholesaleTiers', 'wholesaleTiers'])
                 ->get();
         } else {
             $products = Product::whereIn('id', $productIds)
@@ -542,7 +566,7 @@ class VendorProductController extends Controller
                     }
                 })
                 ->whereNotIn('id', $allocatedProductIds)
-                ->with('variationCombinations')
+                ->with(['variationCombinations.wholesaleTiers', 'wholesaleTiers'])
                 ->get();
         }
 
@@ -571,11 +595,23 @@ class VendorProductController extends Controller
                     }
 
                     if ($qty > 0) {
-                        $unitCost = (float)(
+                        $baseCost = (float)(
                             ($comb->wholesale_price > 0) ? $comb->wholesale_price : 
                             (($comb->product_cost > 0) ? $comb->product_cost : 
                             (($comb->offer_price > 0) ? $comb->offer_price : ($comb->regular_price ?? 0)))
                         );
+
+                        $unitCost = $baseCost;
+                        if ($comb->wholesaleTiers && $comb->wholesaleTiers->isNotEmpty()) {
+                            $sortedTiers = $comb->wholesaleTiers->sortByDesc('min_quantity');
+                            foreach ($sortedTiers as $tier) {
+                                if ($qty >= (int)$tier->min_quantity) {
+                                    $unitCost = (float)$tier->price;
+                                    break;
+                                }
+                            }
+                        }
+
                         $combStockMap[$comb->id] = [
                             'quantity' => $qty,
                             'unit_cost' => $unitCost,
@@ -593,11 +629,23 @@ class VendorProductController extends Controller
                     $qty = max(1, (int)$pReq['quantity']);
                 }
 
-                $unitCost = (float)(
+                $baseCost = (float)(
                     ($product->wholesale_price > 0) ? $product->wholesale_price : 
                     (($product->product_cost > 0) ? $product->product_cost : 
                     (($product->offer > 0) ? $product->offer : ($product->old_price ?? 0)))
                 );
+
+                $unitCost = $baseCost;
+                if ($product->wholesaleTiers && $product->wholesaleTiers->isNotEmpty()) {
+                    $sortedTiers = $product->wholesaleTiers->sortByDesc('min_quantity');
+                    foreach ($sortedTiers as $tier) {
+                        if ($qty >= (int)$tier->min_quantity) {
+                            $unitCost = (float)$tier->price;
+                            break;
+                        }
+                    }
+                }
+
                 $prodQty = $qty;
                 $prodCost = $qty * $unitCost;
             }
@@ -1018,6 +1066,22 @@ class VendorProductController extends Controller
         // Create product
         $product = Product::create($productData);
 
+        // Store wholesale tiers for simple product
+        $tiersInput = $request->input('wholesale_tiers');
+        if (is_string($tiersInput)) {
+            $tiersInput = json_decode($tiersInput, true);
+        }
+        if (is_array($tiersInput)) {
+            foreach ($tiersInput as $tier) {
+                if (isset($tier['min_quantity']) && isset($tier['price']) && (int)$tier['min_quantity'] > 0 && (float)$tier['price'] >= 0) {
+                    $product->wholesaleTiers()->create([
+                        'min_quantity' => (int)$tier['min_quantity'],
+                        'price' => (float)$tier['price']
+                    ]);
+                }
+            }
+        }
+
         // Process variations if this is a variable product
         if ($request->product_type === 'variable' && $request->has('variations') && is_array($request->input('variations'))) {
             $allVariationOptions = [];
@@ -1232,6 +1296,7 @@ class VendorProductController extends Controller
             'old_price' => 'required|numeric|min:0',
             'offer' => 'required|numeric|min:0',
             'product_cost' => 'nullable|numeric|min:0',
+            'wholesale_price' => 'nullable|numeric|min:0',
             'quantity' => 'nullable|integer|min:0',
             'manage_stock' => 'nullable|boolean',
             'low_stock_threshold' => 'nullable|integer|min:0',
@@ -1345,6 +1410,23 @@ class VendorProductController extends Controller
         }
 
         $product->update($validated);
+
+        // Store/Sync wholesale tiers for simple product
+        $product->wholesaleTiers()->delete();
+        $tiersInput = $request->input('wholesale_tiers');
+        if (is_string($tiersInput)) {
+            $tiersInput = json_decode($tiersInput, true);
+        }
+        if (is_array($tiersInput)) {
+            foreach ($tiersInput as $tier) {
+                if (isset($tier['min_quantity']) && isset($tier['price']) && (int)$tier['min_quantity'] > 0 && (float)$tier['price'] >= 0) {
+                    $product->wholesaleTiers()->create([
+                        'min_quantity' => (int)$tier['min_quantity'],
+                        'price' => (float)$tier['price']
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('vendor.products.index')
             ->with('success', 'Product updated successfully!');
