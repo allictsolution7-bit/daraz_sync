@@ -1141,7 +1141,7 @@
         $securityTrustActive = request()->is('admin/trust-scanner*') || request()->is('admin/trust-shield*') || request()->is('admin/snapshots*');
         $contentPagesActive = request()->is('admin/hero-banners*') || request()->is('admin/site-pages*') || request()->is('admin/nav-builder*') || request()->is('admin/articles*') || request()->is('admin/article-topics*') || request()->is('admin/article-subtopics*') || request()->is('admin/comments*');
         $vendorsActive = request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-payments*') || request()->is('admin/vendor-settings*') || request()->is('admin/partners*') || request()->is('admin/partner-items*') || request()->is('admin/partner-payouts*') || request()->is('admin/partner-config*') || request()->is('admin/partner-earnings*');
-        $controlSystemActive = request()->is('admin/team-members*') || request()->routeIs('admin.roles_permissions.*') || request()->is('admin/extensions*') || request()->is('admin/config*') || request()->is('admin/social-links*') || request()->is('admin/inquiries*') || request()->routeIs('admin.subscriptions.index');
+        $controlSystemActive = request()->is('admin/saas-tenants*') || request()->is('admin/team-members*') || request()->routeIs('admin.roles_permissions.*') || request()->is('admin/extensions*') || request()->is('admin/config*') || request()->is('admin/social-links*') || request()->is('admin/inquiries*') || request()->routeIs('admin.subscriptions.index');
         @endphp
 
         <style>
@@ -2258,6 +2258,24 @@
                                 <i class="fas fa-chevron-right section-caret"></i>
                             </a>
                             <ul class="left-menu-dp menu-section-list" style="{{ $controlSystemActive ? 'display: block;' : 'display: none;' }}">
+                                @if(auth()->user() && (auth()->user()->id == 1 || (method_exists(auth()->user(), 'hasAnyRole') && auth()->user()->hasAnyRole(['super_admin', 'super admin', 'Super Admin'])) || (auth()->user()->is_super_admin ?? false)))
+                                <li class="{{ request()->routeIs('admin.saas-tenants.index') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.saas-tenants.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-network-wired" style="color:#3b82f6;"></i>
+                                            SaaS Tenant Domains
+                                        </span>
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('admin.saas-tenants.wholesale-products') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.saas-tenants.wholesale-products') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-cubes" style="color:#f59e0b;"></i>
+                                            SaaS Wholesale Products
+                                        </span>
+                                    </a>
+                                </li>
+                                @endif
                                 <li class="{{ request()->is('admin/team-members*') && request()->get('view') === 'packages' ? 'active' : '' }}">
                                      <a href="{{ route('admin.users', ['view' => 'packages']) }}">
                                          <span class="menu-content">
