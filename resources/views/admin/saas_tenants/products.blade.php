@@ -20,36 +20,73 @@
         @endforeach
     @endif
 
-    <!-- Filters Panel -->
+    <!-- Filters & Tabs Panel -->
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body p-3">
-            <form action="{{ route('admin.saas-tenants.wholesale-products') }}" method="GET" class="row g-2 align-items-center">
-                <div class="col-md-4">
-                    <label class="form-label small text-muted font-semibold mb-1" style="font-weight: 600;">Filter by Tenant Subdomain</label>
-                    <select name="tenant_id" class="form-select rounded-3" onchange="this.form.submit()">
-                        <option value="">All Tenants (Combined View)</option>
-                        @foreach($tenants as $tenant)
-                            <option value="{{ $tenant->id }}" {{ $selectedTenantId == $tenant->id ? 'selected' : '' }}>
-                                {{ $tenant->name }} ({{ $tenant->subdomain }})
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2 d-flex align-items-end h-100 mt-md-4">
-                    <a href="{{ route('admin.saas-tenants.wholesale-products') }}" class="btn btn-light rounded-3 w-100" style="background-color: #f1f5f9; color: #475569; border: none;">
-                        <i class="fas fa-redo me-1"></i> Reset
-                    </a>
-                </div>
-            </form>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-pills bg-light p-1 rounded-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a href="{{ route('admin.saas-tenants.wholesale-products', array_merge(request()->query(), ['tab' => 'wholeseller', 'page' => 1])) }}" 
+                           class="nav-link py-2 px-3 rounded-3 font-semibold {{ $currentTab === 'wholeseller' ? 'active shadow-sm' : 'text-slate-600' }}"
+                           style="{{ $currentTab === 'wholeseller' ? 'background-color: #4f46e5; color: #fff;' : 'font-weight: 500;' }}">
+                            <i class="fas fa-store me-1.5"></i> Wholesellers Products
+                            <span class="badge ms-1.5 {{ $currentTab === 'wholeseller' ? 'bg-white text-primary' : 'bg-secondary text-white' }}" style="font-size: 11px;">
+                                {{ $totalWholesellerCount }}
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a href="{{ route('admin.saas-tenants.wholesale-products', array_merge(request()->query(), ['tab' => 'admin', 'page' => 1])) }}" 
+                           class="nav-link py-2 px-3 rounded-3 font-semibold {{ $currentTab === 'admin' ? 'active shadow-sm' : 'text-slate-600' }}"
+                           style="{{ $currentTab === 'admin' ? 'background-color: #4f46e5; color: #fff;' : 'font-weight: 500;' }}">
+                            <i class="fas fa-user-shield me-1.5"></i> Admin Products
+                            <span class="badge ms-1.5 {{ $currentTab === 'admin' ? 'bg-white text-primary' : 'bg-secondary text-white' }}" style="font-size: 11px;">
+                                {{ $totalAdminCount }}
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Filter by Tenant -->
+                <form action="{{ route('admin.saas-tenants.wholesale-products') }}" method="GET" class="d-flex align-items-center gap-2 m-0">
+                    <input type="hidden" name="tab" value="{{ $currentTab }}">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label small text-muted font-semibold mb-0 text-nowrap" style="font-weight: 600;">Tenant:</label>
+                        <select name="tenant_id" class="form-select form-select-sm rounded-3" style="min-width: 220px;" onchange="this.form.submit()">
+                            <option value="">All Tenants (Combined View)</option>
+                            @foreach($tenants as $tenant)
+                                <option value="{{ $tenant->id }}" {{ $selectedTenantId == $tenant->id ? 'selected' : '' }}>
+                                    {{ $tenant->name }} ({{ $tenant->subdomain }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <a href="{{ route('admin.saas-tenants.wholesale-products', ['tab' => $currentTab]) }}" class="btn btn-sm btn-light rounded-3 text-nowrap" style="background-color: #f1f5f9; color: #475569; border: none;">
+                            <i class="fas fa-redo me-1"></i> Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <!-- Products Table Card -->
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 font-semibold" style="color: #334155; font-weight: 600;">Wholeseller Products Listing</h5>
+            <div>
+                <h5 class="mb-0 font-semibold" style="color: #334155; font-weight: 600;">
+                    @if($currentTab === 'wholeseller')
+                        <i class="fas fa-boxes text-primary me-2"></i>Wholeseller Registered Products
+                    @else
+                        <i class="fas fa-cube text-primary me-2"></i>Admin Created Products
+                    @endif
+                </h5>
+                <span class="text-muted small">
+                    {{ $currentTab === 'wholeseller' ? 'Products supplied by registered wholeseller vendors across tenants' : 'Products created and managed directly by tenant store administrators' }}
+                </span>
+            </div>
             <span class="badge bg-indigo-light text-primary px-3 py-2 rounded-3" style="background-color: rgba(79, 70, 229, 0.08); color: #4f46e5; font-weight: 600;">
-                Total Found: {{ $paginatedProducts->total() }}
+                Total in view: {{ $paginatedProducts->total() }}
             </span>
         </div>
         
@@ -136,8 +173,14 @@
                             <td colspan="8" class="text-center py-5">
                                 <div class="py-4">
                                     <i class="fas fa-boxes text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
-                                    <h5 class="text-slate-600 mb-1" style="font-weight: 600;">No Wholesale Products Found</h5>
-                                    <p class="text-muted small">We couldn't locate any products marked for wholeselling or created by wholesellers across the selected tenants.</p>
+                                    <h5 class="text-slate-600 mb-1" style="font-weight: 600;">
+                                        {{ $currentTab === 'wholeseller' ? 'No Wholeseller Products Found' : 'No Admin Products Found' }}
+                                    </h5>
+                                    <p class="text-muted small">
+                                        {{ $currentTab === 'wholeseller' 
+                                            ? 'No products found from registered wholesellers across the selected tenants.' 
+                                            : 'No products found created directly by administrators across the selected tenants.' }}
+                                    </p>
                                 </div>
                             </td>
                         </tr>

@@ -83,7 +83,6 @@ class RegisterController extends Controller
 
         return Validator::make($data, $rules);
     }
-    }
 
     /**
      * Handle a registration request for the application.

@@ -81,8 +81,12 @@ class SaaSTenantController extends Controller
     {
         $tenants = SaaSTenant::where('is_active', true)->get();
         $selectedTenantId = $request->input('tenant_id');
+        $currentTab = $request->input('tab', 'wholeseller'); // 'wholeseller' or 'admin'
+        
         $allProducts = [];
         $errors = [];
+        $totalWholesellerCount = 0;
+        $totalAdminCount = 0;
 
         foreach ($tenants as $tenant) {
             // If a specific tenant filter is applied, skip other tenants
@@ -96,31 +100,73 @@ class SaaSTenantController extends Controller
                 $this->connectToTenantDatabase($dbName);
 
                 // Fetch wholesellers role user IDs
-                $wholesellerIds = DB::connection('tenant_temp')
+                $wholesellerRoleIds = DB::connection('tenant_temp')
                     ->table('model_has_roles')
                     ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
                     ->where('roles.name', 'wholeseller')
                     ->pluck('model_has_roles.model_id')
                     ->toArray();
 
-                // Fetch wholesale products
-                $products = DB::connection('tenant_temp')
+                // Also check vendor_settings additional_config for vendor_type = wholeseller
+                $vendorSettingWholesellers = DB::connection('tenant_temp')
+                    ->table('vendor_settings')
+                    ->get()
+                    ->filter(function($vs) {
+                        if (!empty($vs->additional_config)) {
+                            $cfg = is_string($vs->additional_config) ? json_decode($vs->additional_config, true) : $vs->additional_config;
+                            return is_array($cfg) && ($cfg['vendor_type'] ?? '') === 'wholeseller';
+                        }
+                        return false;
+                    })
+                    ->pluck('vendor_id')
+                    ->toArray();
+
+                $wholesellerIds = array_unique(array_merge($wholesellerRoleIds, $vendorSettingWholesellers));
+
+                // Count for both tabs
+                $wholesellerCount = !empty($wholesellerIds)
+                    ? DB::connection('tenant_temp')->table('products')->whereIn('vendor_id', $wholesellerIds)->count()
+                    : 0;
+                
+                $adminCount = DB::connection('tenant_temp')
                     ->table('products')
                     ->where(function ($q) use ($wholesellerIds) {
-                        $q->where('wholesale_price', '>', 0)
-                          ->orWhereIn('vendor_id', $wholesellerIds);
+                        $q->whereNull('vendor_id')
+                          ->orWhere('vendor_id', 0);
                     })
-                    ->get();
+                    ->count();
 
-                // Fetch vendor settings and details
+                $totalWholesellerCount += $wholesellerCount;
+                $totalAdminCount += $adminCount;
+
+                // Fetch products based on active tab
+                if ($currentTab === 'wholeseller') {
+                    $products = !empty($wholesellerIds)
+                        ? DB::connection('tenant_temp')->table('products')->whereIn('vendor_id', $wholesellerIds)->get()
+                        : collect();
+                } else {
+                    // Admin products
+                    $products = DB::connection('tenant_temp')
+                        ->table('products')
+                        ->where(function ($q) {
+                            $q->whereNull('vendor_id')
+                              ->orWhere('vendor_id', 0);
+                        })
+                        ->get();
+                }
+
+                // Fetch vendor settings and details for the selected products
                 $vendorIds = $products->pluck('vendor_id')->filter()->unique()->toArray();
-                $vendors = DB::connection('tenant_temp')
-                    ->table('users')
-                    ->leftJoin('vendor_settings', 'users.id', '=', 'vendor_settings.vendor_id')
-                    ->whereIn('users.id', $vendorIds)
-                    ->select('users.id', 'users.name', 'users.email', 'vendor_settings.business_name')
-                    ->get()
-                    ->keyBy('id');
+                $vendors = collect();
+                if (!empty($vendorIds)) {
+                    $vendors = DB::connection('tenant_temp')
+                        ->table('users')
+                        ->leftJoin('vendor_settings', 'users.id', '=', 'vendor_settings.vendor_id')
+                        ->whereIn('users.id', $vendorIds)
+                        ->select('users.id', 'users.name', 'users.email', 'vendor_settings.business_name')
+                        ->get()
+                        ->keyBy('id');
+                }
 
                 foreach ($products as $prod) {
                     $vendor = isset($vendors[$prod->vendor_id]) ? $vendors[$prod->vendor_id] : null;
@@ -150,8 +196,8 @@ class SaaSTenantController extends Controller
                         'offer' => $prod->offer,
                         'quantity' => $prod->quantity,
                         'status' => $prod->status,
-                        'vendor_name' => $vendor ? ($vendor->business_name ?: $vendor->name) : 'N/A',
-                        'vendor_email' => $vendor ? $vendor->email : 'N/A',
+                        'vendor_name' => $vendor ? ($vendor->business_name ?: $vendor->name) : ($currentTab === 'admin' ? 'Tenant Admin' : 'N/A'),
+                        'vendor_email' => $vendor ? $vendor->email : ($currentTab === 'admin' ? 'Store Owner' : 'N/A'),
                     ];
                 }
 
@@ -173,7 +219,15 @@ class SaaSTenantController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('admin.saas_tenants.products', compact('paginatedProducts', 'tenants', 'selectedTenantId', 'errors'));
+        return view('admin.saas_tenants.products', compact(
+            'paginatedProducts',
+            'tenants',
+            'selectedTenantId',
+            'currentTab',
+            'totalWholesellerCount',
+            'totalAdminCount',
+            'errors'
+        ));
     }
 
     /**
