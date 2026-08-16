@@ -16,6 +16,21 @@ class SaaSTenantController extends Controller
     public function index()
     {
         $tenants = SaaSTenant::orderBy('id', 'desc')->paginate(15);
+
+        foreach ($tenants as $tenant) {
+            $dbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+            try {
+                $this->connectToTenantDatabase($dbName);
+                $productCount = DB::connection('tenant_temp')->table('products')->count();
+                $tenant->db_status = 'connected';
+                $tenant->product_count = $productCount;
+            } catch (\Throwable $e) {
+                $tenant->db_status = 'error';
+                $tenant->db_error_message = $e->getMessage();
+                $tenant->product_count = 0;
+            }
+        }
+
         return view('admin.saas_tenants.index', compact('tenants'));
     }
 
@@ -30,14 +45,20 @@ class SaaSTenantController extends Controller
             'db_name' => 'nullable|string|max:255',
         ]);
 
-        SaaSTenant::create([
-            'name' => $request->name,
-            'subdomain' => strtolower($request->subdomain),
-            'db_name' => $request->db_name ?: 'purnobd_' . strtolower($request->subdomain),
-            'is_active' => $request->has('is_active'),
-        ]);
+        try {
+            $provisioner = new \App\Services\TenantProvisioningService();
+            $provisioner->provision(
+                $request->name,
+                $request->subdomain,
+                $request->db_name,
+                auth()->user()
+            );
 
-        return redirect()->route('admin.saas-tenants.index')->with('success', 'Tenant subdomain registered successfully!');
+            return redirect()->route('admin.saas-tenants.index')->with('success', 'Tenant database and subdomain created & provisioned successfully!');
+        } catch (\Throwable $e) {
+            Log::error("Manual tenant provisioning failed: " . $e->getMessage());
+            return redirect()->route('admin.saas-tenants.index')->with('error', 'Failed to provision tenant database: ' . $e->getMessage());
+        }
     }
 
     /**

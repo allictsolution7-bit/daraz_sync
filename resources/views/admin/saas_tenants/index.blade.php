@@ -35,7 +35,7 @@
                     <tr>
                         <th class="ps-4 py-3">Tenant Name</th>
                         <th class="py-3">Subdomain URL</th>
-                        <th class="py-3">Database Name</th>
+                        <th class="py-3">Database Connection</th>
                         <th class="py-3">Status</th>
                         <th class="py-3 text-end pe-4">Actions</th>
                     </tr>
@@ -50,18 +50,29 @@
                                     </div>
                                     <div>
                                         <h6 class="mb-0 text-slate-700" style="font-weight: 600; color: #334155;">{{ $tenant->name }}</h6>
-                                        <span class="text-muted small">ID: {{ $tenant->id }}</span>
+                                        <span class="text-muted small">ID: #{{ $tenant->id }}</span>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <a href="http://{{ $tenant->subdomain }}.{{ str_replace('127.0.0.1', 'localhost', request()->getHttpHost()) }}" target="_blank" class="text-decoration-none font-medium" style="color: #4f46e5; font-weight: 500;">
-                                    {{ $tenant->subdomain }}.{{ str_replace('127.0.0.1', 'localhost', request()->getHttpHost()) }}
-                                    <i class="fas fa-external-link-alt ms-1 small"></i>
+                                <a href="http://{{ $tenant->subdomain }}.{{ str_replace('127.0.0.1', 'localhost', request()->getHttpHost()) }}" target="_blank" class="text-decoration-none font-medium d-inline-flex align-items-center gap-1" style="color: #4f46e5; font-weight: 500;">
+                                    <span>{{ $tenant->subdomain }}.{{ str_replace('127.0.0.1', 'localhost', request()->getHttpHost()) }}</span>
+                                    <i class="fas fa-external-link-alt small"></i>
                                 </a>
                             </td>
                             <td>
-                                <code class="px-2 py-1 bg-light rounded text-dark fs-7">{{ $tenant->db_name ?: 'purnobd_' . $tenant->subdomain }}</code>
+                                <div class="d-flex flex-column gap-1">
+                                    <code class="px-2 py-0.5 bg-light rounded text-dark fs-7 d-inline-block">{{ $tenant->db_name ?: 'purnobd_' . $tenant->subdomain }}</code>
+                                    @if(isset($tenant->db_status) && $tenant->db_status === 'connected')
+                                        <span class="text-success small d-flex align-items-center gap-1" style="font-size: 11px; font-weight: 600;">
+                                            <i class="fas fa-check-circle"></i> Connected ({{ $tenant->product_count }} products)
+                                        </span>
+                                    @else
+                                        <span class="text-danger small d-flex align-items-center gap-1" style="font-size: 11px; font-weight: 600;" title="{{ $tenant->db_error_message ?? 'Connection failed' }}">
+                                            <i class="fas fa-exclamation-triangle"></i> Not Connected
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td>
                                 @if($tenant->is_active)
@@ -71,14 +82,17 @@
                                 @endif
                             </td>
                             <td class="text-end pe-4">
-                                <button type="button" class="btn btn-sm btn-light border-0 me-2 rounded-3" data-bs-toggle="modal" data-bs-target="#editTenantModal{{ $tenant->id }}" style="background-color: #f1f5f9; color: #475569;">
-                                    <i class="fas fa-edit"></i> Edit
+                                <a href="{{ route('admin.saas-tenants.wholesale-products', ['tenant_id' => $tenant->id]) }}" class="btn btn-sm btn-light border-0 me-1 rounded-3" style="background-color: #e0e7ff; color: #3730a3;" title="View Products">
+                                    <i class="fas fa-boxes me-1"></i> Products
+                                </a>
+                                <button type="button" class="btn btn-sm btn-light border-0 me-1 rounded-3" data-bs-toggle="modal" data-bs-target="#editTenantModal{{ $tenant->id }}" style="background-color: #f1f5f9; color: #475569;">
+                                    <i class="fas fa-edit"></i>
                                 </button>
                                 <form action="{{ route('admin.saas-tenants.destroy', $tenant->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this subdomain? This won\'t delete the actual tenant database, but will remove it from the superadmin listing.');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-light border-0 text-danger rounded-3" style="background-color: #fef2f2;">
-                                        <i class="fas fa-trash-alt"></i> Delete
+                                        <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>
                             </td>

@@ -9,6 +9,8 @@ class SaaSTenant extends Model
 {
     use HasFactory;
 
+    protected $connection = 'central';
+
     protected $table = 'saas_tenants';
 
     protected $fillable = [

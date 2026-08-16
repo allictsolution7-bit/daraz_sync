@@ -181,6 +181,9 @@ class RegisterController extends Controller
                 \Log::warning("Could not assign Spatie role '{$roleName}': " . $e->getMessage());
             }
 
+            // Auto-provision SaaS tenant record if registering new store/user
+            $this->autoProvisionTenant($user, $request->subdomain ?? null);
+
             // Log the user in
             Auth::login($user);
 
@@ -266,6 +269,9 @@ class RegisterController extends Controller
             \Log::warning("Could not assign Spatie role '{$roleName}': " . $e->getMessage());
         }
 
+        // Auto-provision SaaS tenant record if registering new store/user
+        $this->autoProvisionTenant($user, $registrationData['subdomain'] ?? null);
+
         // Clear session
         session()->forget('pending_registration');
 
@@ -338,6 +344,32 @@ class RegisterController extends Controller
                 'status' => 'error',
                 'message' => 'Failed to resend OTP. Please try again.',
             ], 500);
+        }
+    }
+
+    /**
+     * Auto-provision a SaaS tenant record upon registration.
+     */
+    protected function autoProvisionTenant($user, $customSubdomain = null)
+    {
+        try {
+            $raw = $customSubdomain ?: $user->name;
+            $subdomain = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', (string)$raw)));
+            
+            if (!empty($subdomain) && strlen($subdomain) >= 2) {
+                $existing = \App\Models\SaaSTenant::where('subdomain', $subdomain)->first();
+                if (!$existing) {
+                    $provisioner = new \App\Services\TenantProvisioningService();
+                    $provisioner->provision(
+                        $user->name,
+                        $subdomain,
+                        'purnobd_' . $subdomain,
+                        $user
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning("Could not auto-provision SaaS Tenant database for user {$user->id}: " . $e->getMessage());
         }
     }
 }
