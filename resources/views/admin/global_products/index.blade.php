@@ -1,12 +1,151 @@
 @extends('layouts.master')
 
+@section('styles')
+<style>
+    .global-header-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-tabs-modern {
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 12px;
+        border: none;
+        display: inline-flex;
+    }
+
+    .nav-tabs-modern .nav-link {
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #64748b;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .nav-tabs-modern .nav-link.active {
+        background: #4f46e5;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .table-modern {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+
+    .table-modern thead th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 0.725rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 12px 14px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .table-modern tbody tr {
+        transition: all 0.15s ease-in-out;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f8fafc !important;
+    }
+
+    .table-modern tbody td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        font-size: 0.85rem;
+    }
+
+    .btn-copy-action {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 6px 14px;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
+    }
+
+    .btn-copy-action:hover {
+        background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn-copy-action:disabled {
+        background: #cbd5e1;
+        color: #64748b;
+        transform: none;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+    .badge-in-store {
+        background-color: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .badge-available {
+        background-color: #e0e7ff;
+        color: #3730a3;
+        border: 1px solid #c7d2fe;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid py-4" style="max-width: 1600px;">
+    <!-- Header Block -->
+    <div class="global-header-card d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
-            <h1 class="h3 mb-1 text-slate-800 font-bold" style="font-weight: 700; color: #1e293b;">SaaS Wholesale Products</h1>
-            <p class="text-muted mb-0 small">Overview of all wholeselling products from every tenant registered on the platform.</p>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge rounded-pill px-2.5 py-1" style="background-color: #e0e7ff; color: #4338ca; font-weight: 700; font-size: 11px;">
+                    <i class="fas fa-globe me-1"></i> GLOBAL NETWORK
+                </span>
+                <span class="text-muted small">&bull;</span>
+                <span class="text-muted small">SaaS Multi-Store Wholesale Network</span>
+            </div>
+            <h1 class="h3 mb-0 text-slate-800 font-bold" style="font-weight: 700; color: #1e293b;">
+                Global Wholesale Products
+            </h1>
+            <p class="text-muted mb-0 small mt-1">
+                Browse and copy all products from the global SaaS platform network directly into your store's inventory catalog.
+            </p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('admin.items.index') }}" class="btn btn-outline-secondary btn-sm rounded-3 px-3 py-2" style="font-weight: 600;">
+                <i class="fas fa-arrow-left me-1.5"></i> Back to Store Inventory
+            </a>
         </div>
     </div>
 
@@ -20,49 +159,45 @@
         @endforeach
     @endif
 
-    <!-- Filters & Tabs Panel -->
+    <!-- Tabs & Filter Bar -->
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body p-3">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                <!-- Navigation Tabs -->
-                <ul class="nav nav-pills bg-light p-1 rounded-3" role="tablist">
+                <!-- Navigation Header / Tab -->
+                <ul class="nav nav-tabs-modern" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a href="{{ route('admin.saas-tenants.wholesale-products', array_merge(request()->query(), ['tab' => 'wholeseller', 'page' => 1])) }}" 
-                           class="nav-link py-2 px-3 rounded-3 font-semibold {{ $currentTab === 'wholeseller' ? 'active shadow-sm' : 'text-slate-600' }}"
-                           style="{{ $currentTab === 'wholeseller' ? 'background-color: #4f46e5; color: #fff;' : 'font-weight: 500;' }}">
-                            <i class="fas fa-store me-1.5"></i> Wholesellers Products
-                            <span class="badge ms-1.5 {{ $currentTab === 'wholeseller' ? 'bg-white text-primary' : 'bg-secondary text-white' }}" style="font-size: 11px;">
-                                {{ $totalWholesellerCount }}
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a href="{{ route('admin.saas-tenants.wholesale-products', array_merge(request()->query(), ['tab' => 'admin', 'page' => 1])) }}" 
-                           class="nav-link py-2 px-3 rounded-3 font-semibold {{ $currentTab === 'admin' ? 'active shadow-sm' : 'text-slate-600' }}"
-                           style="{{ $currentTab === 'admin' ? 'background-color: #4f46e5; color: #fff;' : 'font-weight: 500;' }}">
-                            <i class="fas fa-user-shield me-1.5"></i> Admin Products
-                            <span class="badge ms-1.5 {{ $currentTab === 'admin' ? 'bg-white text-primary' : 'bg-secondary text-white' }}" style="font-size: 11px;">
+                        <span class="nav-link active">
+                            <i class="fas fa-user-shield me-1.5"></i> Tenant Admin Products
+                            <span class="badge ms-1.5 bg-white text-primary" style="font-size: 11px;">
                                 {{ $totalAdminCount }}
                             </span>
-                        </a>
+                        </span>
                     </li>
                 </ul>
 
-                <!-- Filter by Tenant -->
-                <form action="{{ route('admin.saas-tenants.wholesale-products') }}" method="GET" class="d-flex align-items-center gap-2 m-0">
+                <!-- Filter Controls -->
+                <form action="{{ route('admin.global-products.index') }}" method="GET" class="d-flex flex-wrap align-items-center gap-2 m-0">
                     <input type="hidden" name="tab" value="{{ $currentTab }}">
                     
+                    <div class="input-group input-group-sm" style="width: 240px;">
+                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0" placeholder="Search products..." value="{{ request('search') }}">
+                    </div>
+
                     <div class="d-flex align-items-center gap-2">
-                        <label class="form-label small text-muted font-semibold mb-0 text-nowrap" style="font-weight: 600;">Tenant:</label>
-                        <select name="tenant_id" class="form-select form-select-sm rounded-3" style="min-width: 220px;" onchange="this.form.submit()">
-                            <option value="">All Tenants (Combined View)</option>
+                        <select name="tenant_id" class="form-select form-select-sm rounded-3" style="min-width: 200px;" onchange="this.form.submit()">
+                            <option value="">All SaaS Tenants</option>
                             @foreach($tenants as $tenant)
                                 <option value="{{ $tenant->id }}" {{ $selectedTenantId == $tenant->id ? 'selected' : '' }}>
                                     {{ $tenant->name }} ({{ $tenant->subdomain }})
                                 </option>
                             @endforeach
                         </select>
-                        <a href="{{ route('admin.saas-tenants.wholesale-products', ['tab' => $currentTab]) }}" class="btn btn-sm btn-light rounded-3 text-nowrap" style="background-color: #f1f5f9; color: #475569; border: none;">
+                        
+                        <button type="submit" class="btn btn-sm btn-primary rounded-3 text-nowrap">
+                            <i class="fas fa-filter me-1"></i> Filter
+                        </button>
+                        <a href="{{ route('admin.global-products.index', ['tab' => $currentTab]) }}" class="btn btn-sm btn-light rounded-3 text-nowrap" style="background-color: #f1f5f9; color: #475569; border: none;">
                             <i class="fas fa-redo me-1"></i> Reset
                         </a>
                     </div>
@@ -71,46 +206,46 @@
         </div>
     </div>
 
-    <!-- Products Table Card -->
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-            <div>
-                <h5 class="mb-0 font-semibold" style="color: #334155; font-weight: 600;">
-                    @if($currentTab === 'wholeseller')
-                        <i class="fas fa-boxes text-primary me-2"></i>Wholeseller Registered Products
-                    @else
-                        <i class="fas fa-cube text-primary me-2"></i>Admin Created Products
-                    @endif
-                </h5>
-                <span class="text-muted small">
-                    {{ $currentTab === 'wholeseller' ? 'Products supplied by registered wholeseller vendors across tenants' : 'Products created and managed directly by tenant store administrators' }}
-                    @if($globalCommission > 0)
-                        &bull; <span class="text-primary font-medium" style="font-weight: 500;">Default Platform Commission: <strong>{{ $globalCommission }}%</strong></span>
-                    @endif
-                </span>
-            </div>
-            <span class="badge bg-indigo-light text-primary px-3 py-2 rounded-3" style="background-color: rgba(79, 70, 229, 0.08); color: #4f46e5; font-weight: 600;">
-                Total in view: {{ $paginatedProducts->total() }}
+    <!-- Bulk Action & Status Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 px-1">
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" id="btn-bulk-copy" class="btn btn-success btn-sm rounded-3 px-3 py-2 shadow-sm font-semibold d-inline-flex align-items-center gap-2" style="font-weight: 600;" disabled onclick="executeBulkCopy()">
+                <i class="fas fa-cloud-arrow-down"></i> Copy Selected to Store (<span id="selected-count">0</span>)
+            </button>
+            <span class="text-muted small ms-2">
+                Showing {{ $paginatedProducts->firstItem() ?? 0 }} - {{ $paginatedProducts->lastItem() ?? 0 }} of {{ $paginatedProducts->total() }} global products
             </span>
         </div>
-        
+
+        <div>
+            @if($globalCommission > 0)
+                <span class="badge px-3 py-2 rounded-3" style="background-color: rgba(16, 185, 129, 0.1); color: #047857; font-weight: 600;">
+                    <i class="fas fa-percent me-1"></i> Platform Wholesale Commission: <strong>{{ $globalCommission }}%</strong>
+                </span>
+            @endif
+        </div>
+    </div>
+
+    <!-- Products Table Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-uppercase fs-7 text-muted" style="background-color: #f8fafc;">
+            <table class="table table-hover align-middle mb-0 table-modern">
+                <thead class="table-light">
                     <tr>
-                        <th class="ps-4 py-3" style="width: 70px;">Image</th>
-                        <th class="py-3" style="min-width: 180px; max-width: 280px;">Product Name</th>
-                        <th class="py-3" style="white-space: nowrap;">Tenant Subdomain</th>
-                        @if($currentTab !== 'admin')
-                            <th class="py-3" style="white-space: nowrap;">Wholeseller / Vendor</th>
-                        @endif
-                        <th class="py-3" style="white-space: nowrap;">Retail Price</th>
-                        <th class="py-3" style="white-space: nowrap;">
+                        <th class="ps-4" style="width: 40px;">
+                            <input type="checkbox" class="form-check-input" id="check-all-global" onchange="toggleSelectAll(this)">
+                        </th>
+                        <th style="width: 70px;">Image</th>
+                        <th style="min-width: 220px; max-width: 320px;">Product Name & Info</th>
+                        <th style="white-space: nowrap;">Source Tenant</th>
+                        <th style="white-space: nowrap;">Category</th>
+                        <th style="white-space: nowrap;">Retail Price</th>
+                        <th style="white-space: nowrap;">
                             {{ $currentTab === 'admin' ? 'Global Price' : 'Wholesale Price' }}
                         </th>
-                        <th class="py-3" style="white-space: nowrap;">Stock</th>
-                        <th class="py-3" style="white-space: nowrap;">Status</th>
-                        <th class="pe-4 py-3 text-end" style="white-space: nowrap;">Action</th>
+                        <th style="white-space: nowrap;">Stock</th>
+                        <th style="white-space: nowrap;">Store Status</th>
+                        <th class="pe-4 text-end" style="white-space: nowrap;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -118,14 +253,17 @@
                         @php
                             $rowUniqueKey = $product['tenant_subdomain'] . '_' . $product['id'];
                             $hasVariants = !empty($product['has_variants']) && count($product['variants']) > 0;
-                            $colspan = ($currentTab === 'admin') ? 8 : 9;
                         @endphp
-                        <tr class="{{ $hasVariants ? 'has-variants-row' : '' }}" 
-                            style="{{ $hasVariants ? 'cursor: pointer;' : '' }}"
-                            @if($hasVariants)
-                                onclick="toggleVariantRow('{{ $rowUniqueKey }}')"
-                            @endif>
-                            <td class="ps-4" style="width: 70px;">
+                        <tr id="row-{{ $rowUniqueKey }}">
+                            <td class="ps-4" style="width: 40px;">
+                                <input type="checkbox" 
+                                       class="form-check-input product-check" 
+                                       data-subdomain="{{ $product['tenant_subdomain'] }}" 
+                                       data-id="{{ $product['id'] }}"
+                                       data-title="{{ $product['title'] }}"
+                                       onchange="updateBulkButtonState()">
+                            </td>
+                            <td style="width: 70px;">
                                 @if(!empty($product['thumb_image']))
                                     <div class="position-relative" style="width: 48px; height: 48px;">
                                         <img src="{{ $product['thumb_image'] }}" 
@@ -143,15 +281,20 @@
                                     </div>
                                 @endif
                             </td>
-                            <td style="max-width: 280px;">
+                            <td style="max-width: 320px;">
                                 <div class="d-flex align-items-center gap-1.5">
-                                    <h6 class="mb-0 text-slate-800 font-semibold text-truncate" style="font-weight: 600; color: #1e293b; max-width: 230px;" title="{{ $product['title'] }}">{{ $product['title'] }}</h6>
+                                    <h6 class="mb-0 text-slate-800 font-semibold text-truncate" style="font-weight: 600; color: #1e293b; max-width: 250px;" title="{{ $product['title'] }}">{{ $product['title'] }}</h6>
                                     @if($hasVariants)
-                                        <i id="chevron-{{ $rowUniqueKey }}" class="fas fa-chevron-down text-primary fs-7 transition-all" style="font-size: 11px; transition: transform 0.2s ease;"></i>
+                                        <button type="button" class="btn btn-link p-0 text-primary border-0" onclick="toggleVariantRow('{{ $rowUniqueKey }}')" title="Toggle Variants">
+                                            <i id="chevron-{{ $rowUniqueKey }}" class="fas fa-chevron-down fs-7 transition-all" style="font-size: 11px;"></i>
+                                        </button>
                                     @endif
                                 </div>
                                 <div class="d-flex align-items-center gap-2 mt-0.5">
                                     <span class="text-muted small" style="font-size: 11px;">ID: #{{ $product['id'] }}</span>
+                                    <span class="badge rounded-pill bg-light text-muted border px-2 py-0.5" style="font-size: 10px;">
+                                        {{ ucfirst($product['product_type']) }}
+                                    </span>
                                     @if($hasVariants)
                                         <span class="badge rounded-pill bg-indigo-subtle text-indigo px-2 py-0.5" style="background-color: #ede9fe; color: #6366f1; font-size: 10px; font-weight: 600;">
                                             <i class="fas fa-layer-group me-1"></i>{{ count($product['variants']) }} variants
@@ -164,14 +307,11 @@
                                     <i class="fas fa-globe me-1"></i> {{ $product['tenant_subdomain'] }}
                                 </span>
                             </td>
-                            @if($currentTab !== 'admin')
-                                <td style="white-space: nowrap;">
-                                    <div>
-                                        <span class="font-medium text-slate-700 d-block" style="font-weight: 500; color: #334155;">{{ $product['vendor_name'] }}</span>
-                                        <span class="text-muted small fs-7">{{ $product['vendor_email'] }}</span>
-                                    </div>
-                                </td>
-                            @endif
+                            <td style="white-space: nowrap;">
+                                <span class="badge bg-light text-dark border px-2 py-1 rounded-2" style="font-size: 11px; font-weight: 500;">
+                                    {{ $product['category_name'] }}
+                                </span>
+                            </td>
                             <td style="white-space: nowrap;">
                                 @php
                                     $sellPrice = floatval($product['price'] ?? 0);
@@ -182,13 +322,11 @@
                                     $isVariableWithRetail = ($product['has_variants'] && $varRetailMin > 0 && $sellPrice <= 0 && $oldRegularPrice <= 0);
                                 @endphp
                                 @if($isVariableWithRetail)
-                                    {{-- Variable product: show price range from variants --}}
                                     @if($varRetailMin === $varRetailMax)
                                         <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($varRetailMin, 2) }}</span>
                                     @else
                                         <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($varRetailMin, 2) }} – ৳{{ number_format($varRetailMax, 2) }}</span>
                                     @endif
-                                    <div class="text-muted" style="font-size: 10px;">{{ count($product['variants']) }} variants</div>
                                 @elseif($hasDiscount)
                                     <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($sellPrice, 2) }}</span>
                                     <del class="text-muted small d-block" style="font-size: 10px;">৳{{ number_format($oldRegularPrice, 2) }}</del>
@@ -203,7 +341,6 @@
                                     $isVariableWithWholesale = ($product['has_variants'] && $varWholesaleMin > 0 && floatval($product['final_wholesale_price'] ?? 0) <= 0);
                                 @endphp
                                 @if($isVariableWithWholesale)
-                                    {{-- Variable product: show wholesale price range from variants --}}
                                     <div class="d-flex flex-column">
                                         <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
                                             @if($varWholesaleMin === $varWholesaleMax)
@@ -217,7 +354,6 @@
                                                 </span>
                                             @endif
                                         </span>
-                                        <span class="text-muted small" style="font-size: 10px;">{{ count($product['variants']) }} variant prices</span>
                                     </div>
                                 @elseif(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
                                     <div class="d-flex flex-column">
@@ -241,23 +377,26 @@
                                 @if($product['quantity'] > 0)
                                     <span class="text-slate-700" style="font-weight: 500;">{{ $product['quantity'] }} pcs</span>
                                 @else
-                                    <span class="text-danger font-semibold" style="font-weight: 600;">Out of Stock</span>
+                                    <span class="text-danger font-semibold" style="font-weight: 600;">0 pcs</span>
                                 @endif
                             </td>
-                            <td style="white-space: nowrap;">
-                                @if($product['status'] == 1 || $product['status'] == 'active' || $product['status'] === true)
-                                    <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #ecfdf5; color: #047857; font-weight: 600; font-size: 11px;">Published</span>
+                            <td style="white-space: nowrap;" id="status-cell-{{ $rowUniqueKey }}">
+                                @if($product['is_already_copied'])
+                                    <span class="badge-in-store">
+                                        <i class="fas fa-check-circle"></i> In Store
+                                    </span>
                                 @else
-                                    <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #f1f5f9; color: #64748b; font-weight: 600; font-size: 11px;">Draft</span>
+                                    <span class="badge-available">
+                                        <i class="fas fa-plus"></i> Ready to Add
+                                    </span>
                                 @endif
                             </td>
-                            <td class="pe-4 text-end" style="white-space: nowrap;" onclick="event.stopPropagation();">
+                            <td class="pe-4 text-end" style="white-space: nowrap;" id="action-cell-{{ $rowUniqueKey }}">
                                 <button type="button" 
-                                        class="btn btn-sm btn-primary rounded-3 px-3 py-1.5 font-semibold" 
-                                        style="font-size: 11.5px; font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;"
+                                        class="btn btn-copy-action btn-sm" 
                                         id="btn-copy-{{ $rowUniqueKey }}"
-                                        onclick="copySaasProduct('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $rowUniqueKey }}')">
-                                    <i class="fas fa-cloud-arrow-down me-1"></i> Copy to Store
+                                        onclick="copySingleProduct('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $rowUniqueKey }}')">
+                                    <i class="fas fa-cloud-arrow-down me-1"></i> {{ $product['is_already_copied'] ? 'Copy Again' : 'Add to Catalog' }}
                                 </button>
                             </td>
                         </tr>
@@ -265,7 +404,7 @@
                         {{-- Collapsible Child Variant Details --}}
                         @if($hasVariants)
                             <tr class="p-0 border-0">
-                                <td colspan="{{ $colspan }}" class="p-0 border-0">
+                                <td colspan="10" class="p-0 border-0">
                                     <div class="collapse" id="variants-{{ $rowUniqueKey }}">
                                         <div class="p-3 bg-light border-bottom" style="background-color: #f8fafc !important;">
                                             <div class="card border rounded-3 shadow-none overflow-hidden bg-white">
@@ -273,7 +412,7 @@
                                                     <span class="small font-semibold text-slate-700" style="font-weight: 600;">
                                                         <i class="fas fa-sitemap text-primary me-1.5"></i>Available Variants ({{ count($product['variants']) }})
                                                     </span>
-                                                    <span class="text-muted small" style="font-size: 11px;">Product ID #{{ $product['id'] }}</span>
+                                                    <span class="text-muted small" style="font-size: 11px;">Source Product ID #{{ $product['id'] }}</span>
                                                 </div>
                                                 <div class="table-responsive">
                                                     <table class="table table-sm table-borderless align-middle mb-0">
@@ -284,8 +423,7 @@
                                                                 <th class="py-2">SKU</th>
                                                                 <th class="py-2">Retail Price</th>
                                                                 <th class="py-2">{{ $currentTab === 'admin' ? 'Global Price' : 'Wholesale Price' }}</th>
-                                                                <th class="py-2">Stock</th>
-                                                                <th class="pe-3 py-2 text-end">Status</th>
+                                                                <th class="pe-3 py-2 text-end">Stock</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -296,14 +434,11 @@
                                                                             <img src="{{ $variant['image'] }}" 
                                                                                  alt="{{ $variant['display_name'] }}" 
                                                                                  class="rounded border" 
-                                                                                 style="width: 34px; height: 34px; object-fit: cover;" 
-                                                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                                                            <div class="rounded border bg-light align-items-center justify-content-center" style="width: 34px; height: 34px; display: none;">
-                                                                                <i class="fas fa-image text-muted" style="font-size: 0.8rem;"></i>
-                                                                            </div>
+                                                                                 style="width: 32px; height: 32px; object-fit: cover;" 
+                                                                                 onerror="this.style.display='none';">
                                                                         @else
-                                                                            <div class="rounded border bg-light d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
-                                                                                <i class="fas fa-image text-muted" style="font-size: 0.8rem;"></i>
+                                                                            <div class="rounded border bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                                                <i class="fas fa-image text-muted" style="font-size: 0.75rem;"></i>
                                                                             </div>
                                                                         @endif
                                                                     </td>
@@ -322,15 +457,12 @@
                                                                             $varSell = floatval($variant['price'] ?? 0);
                                                                             $varReg = floatval($variant['regular_price'] ?? 0);
                                                                             $varOffer = floatval($variant['offer_price'] ?? 0);
-                                                                            // Sell price = offer if exists, else regular
                                                                             $varDisplaySell = $varOffer > 0 ? $varOffer : ($varSell > 0 ? $varSell : $varReg);
-                                                                            // Old price = regular_price (show struck-through when different from sell)
                                                                             $varDisplayOld = $varReg > 0 ? $varReg : 0;
-                                                                            $varHasDisc = ($varDisplayOld > 0 && $varDisplaySell > 0 && $varDisplayOld > $varDisplaySell);
                                                                         @endphp
                                                                         <span class="text-slate-800 small font-semibold" style="font-weight: 600;">৳{{ number_format($varDisplaySell, 2) }}</span>
-                                                                        @if($varDisplayOld > 0)
-                                                                            <del class="text-muted d-block" style="font-size: 9px; {{ !$varHasDisc ? 'opacity: 0.7;' : '' }}">৳{{ number_format($varDisplayOld, 2) }}</del>
+                                                                        @if($varDisplayOld > 0 && $varDisplayOld > $varDisplaySell)
+                                                                            <del class="text-muted d-block" style="font-size: 9px;">৳{{ number_format($varDisplayOld, 2) }}</del>
                                                                         @endif
                                                                     </td>
                                                                     <td class="py-2">
@@ -352,18 +484,11 @@
                                                                             </span>
                                                                         @endif
                                                                     </td>
-                                                                    <td class="py-2">
+                                                                    <td class="pe-3 py-2 text-end">
                                                                         @if($variant['stock_quantity'] > 0)
                                                                             <span class="text-slate-700 small" style="font-weight: 500;">{{ $variant['stock_quantity'] }} pcs</span>
                                                                         @else
-                                                                            <span class="text-danger small font-semibold" style="font-weight: 600;">Out of Stock</span>
-                                                                        @endif
-                                                                    </td>
-                                                                    <td class="pe-3 py-2 text-end">
-                                                                        @if($variant['is_active'])
-                                                                            <span class="badge px-2 py-1 rounded-pill" style="background-color: #ecfdf5; color: #047857; font-size: 10px;">Active</span>
-                                                                        @else
-                                                                            <span class="badge px-2 py-1 rounded-pill" style="background-color: #f1f5f9; color: #64748b; font-size: 10px;">Inactive</span>
+                                                                            <span class="text-danger small font-semibold" style="font-weight: 600;">0 pcs</span>
                                                                         @endif
                                                                     </td>
                                                                 </tr>
@@ -379,16 +504,14 @@
                         @endif
                     @empty
                         <tr>
-                            <td colspan="{{ $currentTab === 'admin' ? 7 : 8 }}" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <div class="py-4">
                                     <i class="fas fa-boxes text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
-                                    <h5 class="text-slate-600 mb-1" style="font-weight: 600;">
-                                        {{ $currentTab === 'wholeseller' ? 'No Wholeseller Products Found' : 'No Admin Products Found' }}
-                                    </h5>
+                                    <h5 class="text-slate-600 mb-1" style="font-weight: 600;">No Global Products Found</h5>
                                     <p class="text-muted small">
-                                        {{ $currentTab === 'wholeseller' 
-                                            ? 'No products found from registered wholesellers across the selected tenants.' 
-                                            : 'No products found created directly by administrators across the selected tenants.' }}
+                                        {{ $currentTab === 'admin' 
+                                            ? 'No products found from administrators across active tenants with free promotion enabled.' 
+                                            : 'No products found from registered wholesellers across active tenants.' }}
                                     </p>
                                 </div>
                             </td>
@@ -406,7 +529,9 @@
     </div>
 </div>
 
+<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 function toggleVariantRow(uniqueKey) {
     const collapseElem = document.getElementById('variants-' + uniqueKey);
@@ -414,7 +539,6 @@ function toggleVariantRow(uniqueKey) {
 
     if (!collapseElem) return;
 
-    // Use Bootstrap Collapse API to toggle cleanly
     const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseElem, { toggle: false });
 
     if (collapseElem.classList.contains('show')) {
@@ -426,18 +550,36 @@ function toggleVariantRow(uniqueKey) {
     }
 }
 
-function copySaasProduct(subdomain, productId, title, rowKey) {
+function toggleSelectAll(masterCheckbox) {
+    const checkboxes = document.querySelectorAll('.product-check');
+    checkboxes.forEach(cb => {
+        cb.checked = masterCheckbox.checked;
+    });
+    updateBulkButtonState();
+}
+
+function updateBulkButtonState() {
+    const checked = document.querySelectorAll('.product-check:checked');
+    const bulkBtn = document.getElementById('btn-bulk-copy');
+    const countSpan = document.getElementById('selected-count');
+
+    countSpan.textContent = checked.length;
+    bulkBtn.disabled = (checked.length === 0);
+}
+
+// Single Copy Action
+function copySingleProduct(subdomain, productId, title, rowKey) {
     const btn = document.getElementById('btn-copy-' + rowKey);
     const originalContent = btn.innerHTML;
 
     Swal.fire({
-        title: 'Copy to Store Catalog?',
-        html: `Do you want to copy <strong>"${title}"</strong> into your central store catalog?`,
+        title: 'Add to Store Catalog?',
+        html: `Do you want to copy <strong>"${title}"</strong> into your store's product inventory?`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#4f46e5',
         cancelButtonColor: '#64748b',
-        confirmButtonText: '<i class="fas fa-cloud-arrow-down me-1"></i> Yes, Copy Product',
+        confirmButtonText: '<i class="fas fa-cloud-arrow-down me-1"></i> Yes, Copy to Catalog',
         cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
@@ -465,15 +607,17 @@ function copySaasProduct(subdomain, productId, title, rowKey) {
                         icon: 'success',
                         confirmButtonColor: '#4f46e5'
                     });
+
+                    // Update UI row status
+                    const statusCell = document.getElementById('status-cell-' + rowKey);
+                    if (statusCell) {
+                        statusCell.innerHTML = '<span class="badge-in-store"><i class="fas fa-check-circle"></i> In Store</span>';
+                    }
                     btn.innerHTML = '<i class="fas fa-check me-1"></i> Copied!';
-                    btn.classList.remove('btn-primary');
-                    btn.classList.add('btn-success');
                     setTimeout(() => {
                         btn.disabled = false;
                         btn.innerHTML = '<i class="fas fa-cloud-arrow-down me-1"></i> Copy Again';
-                        btn.classList.remove('btn-success');
-                        btn.classList.add('btn-primary');
-                    }, 2500);
+                    }, 2000);
                 } else {
                     Swal.fire({
                         title: 'Error',
@@ -494,6 +638,80 @@ function copySaasProduct(subdomain, productId, title, rowKey) {
                 });
                 btn.disabled = false;
                 btn.innerHTML = originalContent;
+            });
+        }
+    });
+}
+
+// Bulk Copy Action
+function executeBulkCopy() {
+    const checked = document.querySelectorAll('.product-check:checked');
+    if (checked.length === 0) return;
+
+    const items = [];
+    checked.forEach(cb => {
+        items.push({
+            subdomain: cb.dataset.subdomain,
+            product_id: parseInt(cb.dataset.id)
+        });
+    });
+
+    Swal.fire({
+        title: 'Bulk Copy Products?',
+        html: `Are you sure you want to copy <strong>${items.length}</strong> selected global products into your store catalog?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: `<i class="fas fa-cloud-arrow-down me-1"></i> Yes, Copy All ${items.length}`,
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Copying Products...',
+                html: 'Please wait while the products, images, and variations are being imported.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch("{{ route('admin.global-products.bulk-copy') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ items: items })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Completed!',
+                        text: `${data.success_count} products were successfully copied into your catalog!`,
+                        icon: 'success',
+                        confirmButtonColor: '#4f46e5'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed',
+                        text: 'Failed to copy products. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            })
+            .catch(err => {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An unexpected network error occurred during bulk copy.',
+                    icon: 'error',
+                    confirmButtonColor: '#ef4444'
+                });
             });
         }
     });

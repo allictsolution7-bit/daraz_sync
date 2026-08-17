@@ -104,6 +104,14 @@ class AuthorizeByRouteName
             abort(403, 'Permission required: (delayed_events.view). Please ask an administrator to grant this permission.');
         }
 
+        // Direct mapping for global SaaS products routes
+        if (str_starts_with($name, 'admin.global-products') || str_starts_with($name, 'global-products')) {
+            if ($user->can('products.view') || $user->can('products.create') || $user->can('items.view') || $user->can('global_products.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {
+                return $next($request);
+            }
+            abort(403, 'Permission required: (products.view). Please ask an administrator to grant this permission.');
+        }
+
         $parts = explode('.', $name);
         if (count($parts) < 2 || ($parts[0] !== 'admin' && $parts[0] !== 'vendor')) {
             return $next($request);
@@ -130,6 +138,8 @@ class AuthorizeByRouteName
         $resourceAliases = [
             'product' => 'products',
             'items' => 'products',
+            'global-products' => 'products',
+            'global_products' => 'products',
             'post' => 'posts',
             'landing-pages' => 'landing_pages',
             'postsubcategory' => 'post_subcategories',

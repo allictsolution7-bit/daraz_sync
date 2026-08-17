@@ -401,6 +401,11 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::get('/item-slug-availability', [AdminProductController::class, 'checkSlugAvailability'])->name('item-slug-availability');
     Route::post('/catalog/combination/{combination}/save-wholesale-tiers', [AdminProductController::class, 'saveCombinationWholesaleTiers'])->name('items.combination.save-wholesale-tiers');
 
+    // Global SaaS Wholesale Products
+    Route::get('/global-products', [\App\Http\Controllers\Admin\GlobalProductController::class, 'index'])->name('global-products.index');
+    Route::post('/global-products/copy', [\App\Http\Controllers\Admin\GlobalProductController::class, 'copy'])->name('global-products.copy');
+    Route::post('/global-products/bulk-copy', [\App\Http\Controllers\Admin\GlobalProductController::class, 'bulkCopy'])->name('global-products.bulk-copy');
+
     // Inventory Management
     Route::prefix('stock-control')->name('inventory.')->group(function () {
         Route::get('/', [InventoryController::class, 'index'])->name('index');

@@ -663,6 +663,9 @@
                 <a href="{{route ('admin.items.create')}}" class="btn-modern btn-modern-primary">
                     <i class="fas fa-plus"></i> Add Product
                 </a>
+                <a href="{{ route('admin.global-products.index') }}" class="btn-modern" style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: #ffffff; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);">
+                    <i class="fas fa-globe"></i> Browse Global Products
+                </a>
                 <button id="bulk-status-toggle" class="btn-modern btn-modern-warning">
                     <i class="fas fa-toggle-on"></i> Toggle Status
                 </button>
