@@ -101,7 +101,9 @@
                         <th class="ps-4 py-3" style="width: 70px;">Image</th>
                         <th class="py-3" style="min-width: 180px; max-width: 280px;">Product Name</th>
                         <th class="py-3" style="white-space: nowrap;">Tenant Subdomain</th>
-                        <th class="py-3" style="white-space: nowrap;">Wholeseller / Vendor</th>
+                        @if($currentTab !== 'admin')
+                            <th class="py-3" style="white-space: nowrap;">Wholeseller / Vendor</th>
+                        @endif
                         <th class="py-3" style="white-space: nowrap;">Retail Price</th>
                         <th class="py-3" style="white-space: nowrap;">
                             {{ $currentTab === 'admin' ? 'Global Price' : 'Wholesale Price' }}
@@ -112,7 +114,20 @@
                 </thead>
                 <tbody>
                     @forelse($paginatedProducts as $product)
-                        <tr>
+                        @php
+                            $rowUniqueKey = $product['tenant_subdomain'] . '_' . $product['id'];
+                            $hasVariants = !empty($product['has_variants']) && count($product['variants']) > 0;
+                            $colspan = ($currentTab === 'admin') ? 7 : 8;
+                        @endphp
+                        <tr class="{{ $hasVariants ? 'has-variants-row' : '' }}" 
+                            style="{{ $hasVariants ? 'cursor: pointer;' : '' }}"
+                            @if($hasVariants) 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#variants-{{ $rowUniqueKey }}" 
+                                aria-expanded="false" 
+                                aria-controls="variants-{{ $rowUniqueKey }}"
+                                onclick="toggleVariantRow('{{ $rowUniqueKey }}')"
+                            @endif>
                             <td class="ps-4" style="width: 70px;">
                                 @if(!empty($product['thumb_image']))
                                     <div class="position-relative" style="width: 48px; height: 48px;">
@@ -132,20 +147,34 @@
                                 @endif
                             </td>
                             <td style="max-width: 280px;">
-                                <h6 class="mb-0 text-slate-800 font-semibold text-truncate" style="font-weight: 600; color: #1e293b; max-width: 260px;" title="{{ $product['title'] }}">{{ $product['title'] }}</h6>
-                                <span class="text-muted small">ID: #{{ $product['id'] }}</span>
+                                <div class="d-flex align-items-center gap-1.5">
+                                    <h6 class="mb-0 text-slate-800 font-semibold text-truncate" style="font-weight: 600; color: #1e293b; max-width: 230px;" title="{{ $product['title'] }}">{{ $product['title'] }}</h6>
+                                    @if($hasVariants)
+                                        <i id="chevron-{{ $rowUniqueKey }}" class="fas fa-chevron-down text-primary fs-7 transition-all" style="font-size: 11px; transition: transform 0.2s ease;"></i>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center gap-2 mt-0.5">
+                                    <span class="text-muted small" style="font-size: 11px;">ID: #{{ $product['id'] }}</span>
+                                    @if($hasVariants)
+                                        <span class="badge rounded-pill bg-indigo-subtle text-indigo px-2 py-0.5" style="background-color: #ede9fe; color: #6366f1; font-size: 10px; font-weight: 600;">
+                                            <i class="fas fa-layer-group me-1"></i>{{ count($product['variants']) }} variants
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td style="white-space: nowrap;">
                                 <span class="badge rounded-pill px-2.5 py-1.5" style="background-color: #e0e7ff; color: #3730a3; font-weight: 600; font-size: 11px;">
                                     <i class="fas fa-globe me-1"></i> {{ $product['tenant_subdomain'] }}
                                 </span>
                             </td>
-                            <td style="white-space: nowrap;">
-                                <div>
-                                    <span class="font-medium text-slate-700 d-block" style="font-weight: 500; color: #334155;">{{ $product['vendor_name'] }}</span>
-                                    <span class="text-muted small fs-7">{{ $product['vendor_email'] }}</span>
-                                </div>
-                            </td>
+                            @if($currentTab !== 'admin')
+                                <td style="white-space: nowrap;">
+                                    <div>
+                                        <span class="font-medium text-slate-700 d-block" style="font-weight: 500; color: #334155;">{{ $product['vendor_name'] }}</span>
+                                        <span class="text-muted small fs-7">{{ $product['vendor_email'] }}</span>
+                                    </div>
+                                </td>
+                            @endif
                             <td style="white-space: nowrap;">
                                 @php
                                     $sellPrice = floatval($product['price'] ?? 0);
@@ -160,60 +189,22 @@
                                 @endif
                             </td>
                             <td style="white-space: nowrap;">
-                                @if($currentTab === 'admin')
-                                    @if(!empty($product['has_global_price']))
-                                        <div class="d-flex flex-column">
-                                            <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
-                                                ৳{{ number_format($product['final_wholesale_price'], 2) }}
+                                @if(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
+                                    <div class="d-flex flex-column">
+                                        <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
+                                            ৳{{ number_format($product['final_wholesale_price'], 2) }}
+                                            <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9px; font-weight: 600;">
+                                                +{{ $product['commission_percent'] }}%
                                             </span>
-                                            <span class="text-muted small" style="font-size: 10px;">
-                                                Set Global Price
-                                            </span>
-                                        </div>
-                                    @elseif(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
-                                        <div class="d-flex flex-column">
-                                            <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
-                                                ৳{{ number_format($product['final_wholesale_price'], 2) }}
-                                                <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9px; font-weight: 600;">
-                                                    +{{ $product['commission_percent'] }}%
-                                                </span>
-                                            </span>
-                                            <span class="text-muted small" style="font-size: 10px;">
-                                                Cost: ৳{{ number_format($product['base_price'], 2) }} (+৳{{ number_format($product['commission_amount'], 2) }})
-                                            </span>
-                                        </div>
-                                    @elseif(!empty($product['has_reseller_price']))
-                                        <div class="d-flex flex-column">
-                                            <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
-                                                ৳{{ number_format($product['final_wholesale_price'], 2) }}
-                                            </span>
-                                            <span class="text-muted small" style="font-size: 10px;">
-                                                Set Resell Price
-                                            </span>
-                                        </div>
-                                    @else
-                                        <span class="text-success font-bold" style="font-weight: 700;">
-                                            ৳{{ number_format($product['final_wholesale_price'] ?: 0, 2) }}
                                         </span>
-                                    @endif
+                                        <span class="text-muted small" style="font-size: 10px;">
+                                            Base: ৳{{ number_format($product['base_price'], 2) }} (+৳{{ number_format($product['commission_amount'], 2) }})
+                                        </span>
+                                    </div>
                                 @else
-                                    @if(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
-                                        <div class="d-flex flex-column">
-                                            <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
-                                                ৳{{ number_format($product['final_wholesale_price'], 2) }}
-                                                <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9px; font-weight: 600;">
-                                                    +{{ $product['commission_percent'] }}%
-                                                </span>
-                                            </span>
-                                            <span class="text-muted small" style="font-size: 10px;">
-                                                Base: ৳{{ number_format($product['wholesale_price'], 2) }} (+৳{{ number_format($product['commission_amount'], 2) }})
-                                            </span>
-                                        </div>
-                                    @else
-                                        <span class="text-success font-bold" style="font-weight: 700;">
-                                            ৳{{ number_format($product['wholesale_price'] ?: 0, 2) }}
-                                        </span>
-                                    @endif
+                                    <span class="text-success font-bold" style="font-weight: 700;">
+                                        ৳{{ number_format($product['final_wholesale_price'] ?: 0, 2) }}
+                                    </span>
                                 @endif
                             </td>
                             <td style="white-space: nowrap;">
@@ -231,9 +222,122 @@
                                 @endif
                             </td>
                         </tr>
+
+                        {{-- Collapsible Child Variant Details --}}
+                        @if($hasVariants)
+                            <tr class="p-0 border-0">
+                                <td colspan="{{ $colspan }}" class="p-0 border-0">
+                                    <div class="collapse" id="variants-{{ $rowUniqueKey }}">
+                                        <div class="p-3 bg-light border-bottom" style="background-color: #f8fafc !important;">
+                                            <div class="card border rounded-3 shadow-none overflow-hidden bg-white">
+                                                <div class="card-header bg-light py-2 px-3 border-bottom d-flex align-items-center justify-content-between" style="background-color: #f1f5f9;">
+                                                    <span class="small font-semibold text-slate-700" style="font-weight: 600;">
+                                                        <i class="fas fa-sitemap text-primary me-1.5"></i>Available Variants ({{ count($product['variants']) }})
+                                                    </span>
+                                                    <span class="text-muted small" style="font-size: 11px;">Product ID #{{ $product['id'] }}</span>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-borderless align-middle mb-0">
+                                                        <thead class="text-uppercase text-muted" style="font-size: 10px; background-color: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                                            <tr>
+                                                                <th class="ps-3 py-2" style="width: 50px;">Image</th>
+                                                                <th class="py-2">Variant / Options</th>
+                                                                <th class="py-2">SKU</th>
+                                                                <th class="py-2">Retail Price</th>
+                                                                <th class="py-2">{{ $currentTab === 'admin' ? 'Global Price' : 'Wholesale Price' }}</th>
+                                                                <th class="py-2">Stock</th>
+                                                                <th class="pe-3 py-2 text-end">Status</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($product['variants'] as $variant)
+                                                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                                                    <td class="ps-3 py-2" style="width: 50px;">
+                                                                        @if(!empty($variant['image']))
+                                                                            <img src="{{ $variant['image'] }}" 
+                                                                                 alt="{{ $variant['display_name'] }}" 
+                                                                                 class="rounded border" 
+                                                                                 style="width: 34px; height: 34px; object-fit: cover;" 
+                                                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                                            <div class="rounded border bg-light align-items-center justify-content-center" style="width: 34px; height: 34px; display: none;">
+                                                                                <i class="fas fa-image text-muted" style="font-size: 0.8rem;"></i>
+                                                                            </div>
+                                                                        @else
+                                                                            <div class="rounded border bg-light d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                                                                                <i class="fas fa-image text-muted" style="font-size: 0.8rem;"></i>
+                                                                            </div>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td class="py-2">
+                                                                        <span class="font-medium text-slate-800 d-block small" style="font-weight: 600;">
+                                                                            {{ $variant['display_name'] }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td class="py-2">
+                                                                        <span class="text-muted small" style="font-family: monospace; font-size: 11px;">
+                                                                            {{ $variant['sku'] ?: '—' }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td class="py-2">
+                                                                        @php
+                                                                            $varSell = floatval($variant['price'] ?? 0);
+                                                                            $varReg = floatval($variant['regular_price'] ?? 0);
+                                                                            $varHasDisc = ($varReg > 0 && $varSell > 0 && $varReg > $varSell);
+                                                                        @endphp
+                                                                        @if($varHasDisc)
+                                                                            <span class="text-slate-800 small font-semibold" style="font-weight: 600;">৳{{ number_format($varSell, 2) }}</span>
+                                                                            <del class="text-muted d-block" style="font-size: 9px;">৳{{ number_format($varReg, 2) }}</del>
+                                                                        @else
+                                                                            <span class="text-slate-800 small font-semibold" style="font-weight: 600;">৳{{ number_format($varSell > 0 ? $varSell : $varReg, 2) }}</span>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td class="py-2">
+                                                                        @if(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
+                                                                            <div class="d-flex flex-column">
+                                                                                <span class="text-success font-bold small d-inline-flex align-items-center gap-1" style="font-weight: 700;">
+                                                                                    ৳{{ number_format($variant['final_wholesale_price'], 2) }}
+                                                                                    <span class="badge rounded-pill px-1 py-0.2" style="background-color: #ecfdf5; color: #047857; font-size: 8.5px; font-weight: 600;">
+                                                                                        +{{ $product['commission_percent'] }}%
+                                                                                    </span>
+                                                                                </span>
+                                                                                <span class="text-muted" style="font-size: 9px;">
+                                                                                    Base: ৳{{ number_format($variant['base_price'], 2) }}
+                                                                                </span>
+                                                                            </div>
+                                                                        @else
+                                                                            <span class="text-success font-bold small" style="font-weight: 700;">
+                                                                                ৳{{ number_format($variant['final_wholesale_price'] ?: 0, 2) }}
+                                                                            </span>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td class="py-2">
+                                                                        @if($variant['stock_quantity'] > 0)
+                                                                            <span class="text-slate-700 small" style="font-weight: 500;">{{ $variant['stock_quantity'] }} pcs</span>
+                                                                        @else
+                                                                            <span class="text-danger small font-semibold" style="font-weight: 600;">Out of Stock</span>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td class="pe-3 py-2 text-end">
+                                                                        @if($variant['is_active'])
+                                                                            <span class="badge px-2 py-1 rounded-pill" style="background-color: #ecfdf5; color: #047857; font-size: 10px;">Active</span>
+                                                                        @else
+                                                                            <span class="badge px-2 py-1 rounded-pill" style="background-color: #f1f5f9; color: #64748b; font-size: 10px;">Inactive</span>
+                                                                        @endif
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endif
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="{{ $currentTab === 'admin' ? 7 : 8 }}" class="text-center py-5">
                                 <div class="py-4">
                                     <i class="fas fa-boxes text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
                                     <h5 class="text-slate-600 mb-1" style="font-weight: 600;">
@@ -259,4 +363,22 @@
         @endif
     </div>
 </div>
+
+<script>
+function toggleVariantRow(uniqueKey) {
+    const collapseElem = document.getElementById('variants-' + uniqueKey);
+    const chevron = document.getElementById('chevron-' + uniqueKey);
+    
+    if (collapseElem) {
+        // Toggle collapse display
+        if (collapseElem.classList.contains('show')) {
+            collapseElem.classList.remove('show');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        } else {
+            collapseElem.classList.add('show');
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        }
+    }
+}
+</script>
 @endsection
