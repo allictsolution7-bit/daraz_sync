@@ -1658,9 +1658,9 @@
         });
 
         tableHTML += `
+                                <th>Product Cost (৳)</th>
                                 <th>Regular Price (৳)</th>
                                 <th>Offer Price (৳)</th>
-                                <th>Product Cost (৳)</th>
                                 <th>Wholesale Price (৳)</th>
                                 <th>Reseller Price (৳)</th>
                                 <th>Global Price (৳)</th>
@@ -1688,6 +1688,16 @@
                         <input type="number" 
                                step="0.01" 
                                min="0" 
+                               class="form-control combination-product-cost" 
+                               name="combinations[${index}][product_cost]" 
+                               value=""
+                               placeholder="Cost"
+                               style="width: 90px;">
+                    </td>
+                    <td>
+                        <input type="number" 
+                               step="0.01" 
+                               min="0" 
                                class="form-control combination-regular-price" 
                                name="combinations[${index}][regular_price]" 
                                value=""
@@ -1702,16 +1712,6 @@
                                name="combinations[${index}][offer_price]" 
                                value=""
                                placeholder="Optional"
-                               style="width: 90px;">
-                    </td>
-                    <td>
-                        <input type="number" 
-                               step="0.01" 
-                               min="0" 
-                               class="form-control combination-product-cost" 
-                               name="combinations[${index}][product_cost]" 
-                               value=""
-                               placeholder="Cost"
                                style="width: 90px;">
                     </td>
                     <td>

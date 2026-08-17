@@ -121,11 +121,7 @@
                         @endphp
                         <tr class="{{ $hasVariants ? 'has-variants-row' : '' }}" 
                             style="{{ $hasVariants ? 'cursor: pointer;' : '' }}"
-                            @if($hasVariants) 
-                                data-bs-toggle="collapse" 
-                                data-bs-target="#variants-{{ $rowUniqueKey }}" 
-                                aria-expanded="false" 
-                                aria-controls="variants-{{ $rowUniqueKey }}"
+                            @if($hasVariants)
                                 onclick="toggleVariantRow('{{ $rowUniqueKey }}')"
                             @endif>
                             <td class="ps-4" style="width: 70px;">
@@ -180,8 +176,19 @@
                                     $sellPrice = floatval($product['price'] ?? 0);
                                     $oldRegularPrice = floatval($product['old_price'] ?? 0);
                                     $hasDiscount = ($oldRegularPrice > 0 && $sellPrice > 0 && $oldRegularPrice > $sellPrice);
+                                    $varRetailMin = floatval($product['variant_retail_min'] ?? 0);
+                                    $varRetailMax = floatval($product['variant_retail_max'] ?? 0);
+                                    $isVariableWithRetail = ($product['has_variants'] && $varRetailMin > 0 && $sellPrice <= 0 && $oldRegularPrice <= 0);
                                 @endphp
-                                @if($hasDiscount)
+                                @if($isVariableWithRetail)
+                                    {{-- Variable product: show price range from variants --}}
+                                    @if($varRetailMin === $varRetailMax)
+                                        <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($varRetailMin, 2) }}</span>
+                                    @else
+                                        <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($varRetailMin, 2) }} – ৳{{ number_format($varRetailMax, 2) }}</span>
+                                    @endif
+                                    <div class="text-muted" style="font-size: 10px;">{{ count($product['variants']) }} variants</div>
+                                @elseif($hasDiscount)
                                     <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($sellPrice, 2) }}</span>
                                     <del class="text-muted small d-block" style="font-size: 10px;">৳{{ number_format($oldRegularPrice, 2) }}</del>
                                 @else
@@ -189,7 +196,29 @@
                                 @endif
                             </td>
                             <td style="white-space: nowrap;">
-                                @if(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
+                                @php
+                                    $varWholesaleMin = floatval($product['variant_wholesale_min'] ?? 0);
+                                    $varWholesaleMax = floatval($product['variant_wholesale_max'] ?? 0);
+                                    $isVariableWithWholesale = ($product['has_variants'] && $varWholesaleMin > 0 && floatval($product['final_wholesale_price'] ?? 0) <= 0);
+                                @endphp
+                                @if($isVariableWithWholesale)
+                                    {{-- Variable product: show wholesale price range from variants --}}
+                                    <div class="d-flex flex-column">
+                                        <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
+                                            @if($varWholesaleMin === $varWholesaleMax)
+                                                ৳{{ number_format($varWholesaleMin, 2) }}
+                                            @else
+                                                ৳{{ number_format($varWholesaleMin, 2) }} – ৳{{ number_format($varWholesaleMax, 2) }}
+                                            @endif
+                                            @if(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
+                                                <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9px; font-weight: 600;">
+                                                    +{{ $product['commission_percent'] }}%
+                                                </span>
+                                            @endif
+                                        </span>
+                                        <span class="text-muted small" style="font-size: 10px;">{{ count($product['variants']) }} variant prices</span>
+                                    </div>
+                                @elseif(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
                                     <div class="d-flex flex-column">
                                         <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
                                             ৳{{ number_format($product['final_wholesale_price'], 2) }}
@@ -282,13 +311,16 @@
                                                                         @php
                                                                             $varSell = floatval($variant['price'] ?? 0);
                                                                             $varReg = floatval($variant['regular_price'] ?? 0);
-                                                                            $varHasDisc = ($varReg > 0 && $varSell > 0 && $varReg > $varSell);
+                                                                            $varOffer = floatval($variant['offer_price'] ?? 0);
+                                                                            // Sell price = offer if exists, else regular
+                                                                            $varDisplaySell = $varOffer > 0 ? $varOffer : ($varSell > 0 ? $varSell : $varReg);
+                                                                            // Old price = regular_price (show struck-through when different from sell)
+                                                                            $varDisplayOld = $varReg > 0 ? $varReg : 0;
+                                                                            $varHasDisc = ($varDisplayOld > 0 && $varDisplaySell > 0 && $varDisplayOld > $varDisplaySell);
                                                                         @endphp
-                                                                        @if($varHasDisc)
-                                                                            <span class="text-slate-800 small font-semibold" style="font-weight: 600;">৳{{ number_format($varSell, 2) }}</span>
-                                                                            <del class="text-muted d-block" style="font-size: 9px;">৳{{ number_format($varReg, 2) }}</del>
-                                                                        @else
-                                                                            <span class="text-slate-800 small font-semibold" style="font-weight: 600;">৳{{ number_format($varSell > 0 ? $varSell : $varReg, 2) }}</span>
+                                                                        <span class="text-slate-800 small font-semibold" style="font-weight: 600;">৳{{ number_format($varDisplaySell, 2) }}</span>
+                                                                        @if($varDisplayOld > 0)
+                                                                            <del class="text-muted d-block" style="font-size: 9px; {{ !$varHasDisc ? 'opacity: 0.7;' : '' }}">৳{{ number_format($varDisplayOld, 2) }}</del>
                                                                         @endif
                                                                     </td>
                                                                     <td class="py-2">
@@ -368,16 +400,18 @@
 function toggleVariantRow(uniqueKey) {
     const collapseElem = document.getElementById('variants-' + uniqueKey);
     const chevron = document.getElementById('chevron-' + uniqueKey);
-    
-    if (collapseElem) {
-        // Toggle collapse display
-        if (collapseElem.classList.contains('show')) {
-            collapseElem.classList.remove('show');
-            if (chevron) chevron.style.transform = 'rotate(0deg)';
-        } else {
-            collapseElem.classList.add('show');
-            if (chevron) chevron.style.transform = 'rotate(180deg)';
-        }
+
+    if (!collapseElem) return;
+
+    // Use Bootstrap Collapse API to toggle cleanly
+    const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseElem, { toggle: false });
+
+    if (collapseElem.classList.contains('show')) {
+        bsCollapse.hide();
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+    } else {
+        bsCollapse.show();
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
     }
 }
 </script>

@@ -247,6 +247,26 @@ class SaaSTenantController extends Controller
                         ->keyBy('id');
                 }
 
+                // Calculate tenant commission & markup BEFORE variant loop (used inside it)
+                $tenantCommission = ($tenant->commission_rate !== null && $tenant->commission_rate !== '') 
+                    ? floatval($tenant->commission_rate) 
+                    : $globalCommission;
+                $isCustomCommission = ($tenant->commission_rate !== null && $tenant->commission_rate !== '');
+
+                $tenantGlobalMarkupPercent = 10.0;
+                try {
+                    $gSetting = DB::connection('tenant_temp')
+                        ->table('site_settings')
+                        ->where('group', 'single_product')
+                        ->where('key', 'global_price_percent')
+                        ->first();
+                    if ($gSetting && is_numeric($gSetting->value)) {
+                        $tenantGlobalMarkupPercent = floatval($gSetting->value);
+                    }
+                } catch (\Throwable $e) {
+                    $tenantGlobalMarkupPercent = 10.0;
+                }
+
                 // Fetch variation combinations & option names in batch to resolve prices and variants for products
                 $productIds = $products->pluck('id')->toArray();
                 $variationsByProduct = [];
@@ -378,24 +398,7 @@ class SaaSTenantController extends Controller
                     }
                 }
 
-                $tenantCommission = ($tenant->commission_rate !== null && $tenant->commission_rate !== '') 
-                    ? floatval($tenant->commission_rate) 
-                    : $globalCommission;
-                $isCustomCommission = ($tenant->commission_rate !== null && $tenant->commission_rate !== '');
-
-                $tenantGlobalMarkupPercent = 10.0;
-                try {
-                    $gSetting = DB::connection('tenant_temp')
-                        ->table('site_settings')
-                        ->where('group', 'single_product')
-                        ->where('key', 'global_price_percent')
-                        ->first();
-                    if ($gSetting && is_numeric($gSetting->value)) {
-                        $tenantGlobalMarkupPercent = floatval($gSetting->value);
-                    }
-                } catch (\Throwable $e) {
-                    $tenantGlobalMarkupPercent = 10.0;
-                }
+                // (tenantCommission & tenantGlobalMarkupPercent already set above before variant loop)
 
                 foreach ($products as $prod) {
                     $vendor = isset($vendors[$prod->vendor_id]) ? $vendors[$prod->vendor_id] : null;
@@ -526,6 +529,10 @@ class SaaSTenantController extends Controller
                         $finalPrice = $basePrice + $commissionAmount;
                     }
 
+                    // Calculate variant retail price range for display (for variable products)
+                    $variantRetailPrices = array_filter(array_map(fn($v) => floatval($v['price'] ?? 0), $formattedVariants), fn($p) => $p > 0);
+                    $variantWholesalePrices = array_filter(array_map(fn($v) => floatval($v['final_wholesale_price'] ?? 0), $formattedVariants), fn($p) => $p > 0);
+
                     $allProducts[] = [
                         'tenant_name' => $tenant->name,
                         'tenant_subdomain' => $tenant->subdomain,
@@ -551,6 +558,10 @@ class SaaSTenantController extends Controller
                         'status' => $prod->status,
                         'variants' => $formattedVariants,
                         'has_variants' => !empty($formattedVariants),
+                        'variant_retail_min' => !empty($variantRetailPrices) ? min($variantRetailPrices) : 0,
+                        'variant_retail_max' => !empty($variantRetailPrices) ? max($variantRetailPrices) : 0,
+                        'variant_wholesale_min' => !empty($variantWholesalePrices) ? min($variantWholesalePrices) : 0,
+                        'variant_wholesale_max' => !empty($variantWholesalePrices) ? max($variantWholesalePrices) : 0,
                         'vendor_name' => $vendor ? ($vendor->business_name ?: $vendor->name) : ($currentTab === 'admin' ? 'Tenant Admin' : 'N/A'),
                         'vendor_email' => $vendor ? $vendor->email : ($currentTab === 'admin' ? 'Store Owner' : 'N/A'),
                     ];

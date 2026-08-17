@@ -1388,9 +1388,9 @@
         });
 
         tableHTML += `
+                            <th>Product Cost (৳)</th>
                             <th>Regular Price (৳)</th>
                             <th>Offer Price (৳)</th>
-                            <th>Product Cost (৳)</th>
                             <th>Wholesale Price (৳)</th>
                             <th>Stock</th>
                             <th>Description</th>
@@ -1411,13 +1411,13 @@
 
             tableHTML += `
                 <td>
+                    <input type="number" step="0.01" min="0" class="form-control" name="combinations[${index}][product_cost]" placeholder="Cost" style="width: 90px;">
+                </td>
+                <td>
                     <input type="number" step="0.01" min="0" class="form-control" name="combinations[${index}][regular_price]" placeholder="0.00" style="width: 90px;">
                 </td>
                 <td>
                     <input type="number" step="0.01" min="0" class="form-control" name="combinations[${index}][offer_price]" placeholder="Optional" style="width: 90px;">
-                </td>
-                <td>
-                    <input type="number" step="0.01" min="0" class="form-control" name="combinations[${index}][product_cost]" placeholder="Cost" style="width: 90px;">
                 </td>
                 <td>
                     <input type="number" step="0.01" min="0" class="form-control" name="combinations[${index}][wholesale_price]" placeholder="Wholesale" style="width: 90px;">

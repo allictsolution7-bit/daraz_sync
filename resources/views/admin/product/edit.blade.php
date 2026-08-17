@@ -719,9 +719,9 @@
                                                 <tr>
                                                     <th>#</th>
                                                     @foreach ($variations as $variation)<th>{{ $variation->name }}</th>@endforeach
+                                                    <th>Product Cost (৳)</th>
                                                     <th>Regular Price (৳)</th>
                                                     <th>Offer Price (৳)</th>
-                                                    <th>Product Cost (৳)</th>
                                                     <th>Wholesale Price (৳)</th>
                                                     <th>Reseller Price (৳)</th>
                                                     <th>Global Price (৳)</th>
@@ -738,9 +738,9 @@
                                                     @foreach ($combination->getOptionNamesArray() as $optionName)
                                                     <td><span class="badge bg-primary">{{ $optionName }}</span></td>
                                                     @endforeach
+                                                    <td><input type="number" step="0.01" min="0" class="form-control combination-product-cost" name="combinations[{{ $index }}][product_cost]" value="{{ $combination->product_cost }}" placeholder="Cost" style="width: 90px;"></td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-regular-price" name="combinations[{{ $index }}][regular_price]" value="{{ $combination->regular_price }}" placeholder="0.00" style="width: 90px;"></td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-offer-price" name="combinations[{{ $index }}][offer_price]" value="{{ $combination->offer_price }}" placeholder="Optional" style="width: 90px;"></td>
-                                                    <td><input type="number" step="0.01" min="0" class="form-control combination-product-cost" name="combinations[{{ $index }}][product_cost]" value="{{ $combination->product_cost }}" placeholder="Cost" style="width: 90px;"></td>
                                                     <td>
                                                         <div class="input-group input-group-sm" style="width: 110px;">
                                                             <input type="number" step="0.01" min="0" class="form-control combination-wholesale-price" name="combinations[{{ $index }}][wholesale_price]" value="{{ $combination->wholesale_price }}" placeholder="Wholesale">
@@ -1292,9 +1292,9 @@
         variations.forEach(variation => { const nameInput = variation.querySelector('input[name*="[name]"]'); if (nameInput && nameInput.value.trim()) variationNames.push(nameInput.value.trim()); });
         let rowHTML = `<tr><td>${currentIndex + 1}</td>`;
         variationNames.forEach(varName => { const optionValue = selectedValues[varName] || '-'; rowHTML += `<td><span class="badge bg-primary">${optionValue}</span></td>`; });
-        rowHTML += `<td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][regular_price]" value="0.00" placeholder="0.00" style="width: 90px;"></td>
-            <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][offer_price]" value="" placeholder="Optional" style="width: 90px;"></td>
-            <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][product_cost]" value="" placeholder="Cost" style="width: 90px;"></td>
+        rowHTML += `<td><input type="number" step="0.01" min="0" class="form-control combination-product-cost" name="combinations[${currentIndex}][product_cost]" value="" placeholder="Cost" style="width: 90px;"></td>
+            <td><input type="number" step="0.01" min="0" class="form-control combination-regular-price" name="combinations[${currentIndex}][regular_price]" value="0.00" placeholder="0.00" style="width: 90px;"></td>
+            <td><input type="number" step="0.01" min="0" class="form-control combination-offer-price" name="combinations[${currentIndex}][offer_price]" value="" placeholder="Optional" style="width: 90px;"></td>
             <td>
                 <div class="input-group input-group-sm" style="width: 110px;">
                     <input type="number" step="0.01" min="0" class="form-control combination-wholesale-price" name="combinations[${currentIndex}][wholesale_price]" value="" placeholder="Wholesale">
@@ -1328,7 +1328,7 @@
         variations.forEach(variation => { const nameInput = variation.querySelector('input[name*="[name]"]'); if (nameInput && nameInput.value.trim()) variationNames.push(nameInput.value.trim()); });
         let tableHTML = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle" style="min-width: 1200px;"><thead class="table-dark"><tr><th>#</th>`;
         variationNames.forEach(name => tableHTML += `<th>${name}</th>`);
-        tableHTML += `<th>Regular Price (৳)</th><th>Offer Price (৳)</th><th>Product Cost (৳)</th><th>Wholesale Price (৳)</th><th>Reseller Price (৳)</th><th>Global Price (৳)</th><th>Stock</th><th>Description</th><th>Images</th><th>Actions</th></tr></thead><tbody></tbody></table></div>`;
+        tableHTML += `<th>Product Cost (৳)</th><th>Regular Price (৳)</th><th>Offer Price (৳)</th><th>Wholesale Price (৳)</th><th>Reseller Price (৳)</th><th>Global Price (৳)</th><th>Stock</th><th>Description</th><th>Images</th><th>Actions</th></tr></thead><tbody></tbody></table></div>`;
         tableDiv.innerHTML = tableHTML;
      }
 
