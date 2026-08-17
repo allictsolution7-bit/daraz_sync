@@ -808,9 +808,11 @@
                 dom: '<"d-flex flex-wrap justify-content-between align-items-center mb-3"Bf>rt<"bottom-controls"lip>',
                 buttons: [
                     {
-                        extend: 'csv',
                         text: '<i class="fas fa-file-csv"></i> CSV',
-                        className: 'dt-button-modern'
+                        className: 'dt-button-modern',
+                        action: function (e, dt, node, config) {
+                            triggerProductExport();
+                        }
                     },
                     {
                         extend: 'pdf',
@@ -1164,7 +1166,56 @@
                 });
             }
 
-            // Export selected
+            // Product Export Function (Supports both Selected & Filtered All)
+            function triggerProductExport(forceExportAll = false) {
+                const selected = Array.from(selectedProductIds);
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{{ route('admin.items.export-selected') }}";
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                form.appendChild(csrfToken);
+                
+                if (!forceExportAll && selected.length > 0) {
+                    const productIds = document.createElement('input');
+                    productIds.type = 'hidden';
+                    productIds.name = 'product_ids';
+                    productIds.value = JSON.stringify(selected);
+                    form.appendChild(productIds);
+                } else {
+                    const filters = {
+                        primary_category_id: $('#primary-category-filter').val(),
+                        subcategory_id: $('#subcategory-filter').val(),
+                        third_category_id: $('#third-category-filter').val(),
+                        status: $('#status-filter').val(),
+                        product_type: $('#product-type-filter').val(),
+                        price_min: $('#price-min').val(),
+                        price_max: $('#price-max').val(),
+                        date_from: $('#date-from').val(),
+                        date_to: $('#date-to').val(),
+                        search: table.search()
+                    };
+
+                    for (const [key, val] of Object.entries(filters)) {
+                        if (val !== '' && val !== null && val !== undefined) {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = key;
+                            input.value = val;
+                            form.appendChild(input);
+                        }
+                    }
+                }
+                
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+            }
+
+            // Export selected button handler
             const exportSelectedBtn = document.getElementById('export-selected');
             if (exportSelectedBtn) {
                 exportSelectedBtn.addEventListener('click', function() {
@@ -1172,33 +1223,23 @@
 
                     if (selected.length === 0) {
                         Swal.fire({
-                            icon: 'warning',
-                            title: 'No Selection',
-                            text: 'Please select at least one product to export.',
-                            confirmButtonColor: '#4f46e5'
+                            title: 'Export Products',
+                            text: 'No products selected. Would you like to export all products matching current filters?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#10b981',
+                            cancelButtonColor: '#64748b',
+                            confirmButtonText: '<i class="fas fa-file-export me-1"></i> Yes, Export All',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                triggerProductExport(true);
+                            }
                         });
                         return;
                     }
 
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ route('admin.items.export-selected') }}";
-                    
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
-                    
-                    const productIds = document.createElement('input');
-                    productIds.type = 'hidden';
-                    productIds.name = 'product_ids';
-                    productIds.value = JSON.stringify(selected);
-                    
-                    form.appendChild(csrfToken);
-                    form.appendChild(productIds);
-                    document.body.appendChild(form);
-                    form.submit();
-                    document.body.removeChild(form);
+                    triggerProductExport(false);
                 });
             }
 

@@ -1677,44 +1677,382 @@ class ProductController extends Controller
 
     public function exportSelected(Request $request)
     {
-        $selectedIds = $request->input('selected_ids', []);
-        
-        if (empty($selectedIds)) {
-            return response()->json(['error' => 'No products selected']);
+        $productIds = $request->input('product_ids', $request->input('selected_ids', []));
+        if (is_string($productIds)) {
+            $decoded = json_decode($productIds, true);
+            $productIds = is_array($decoded) ? $decoded : [];
         }
 
-        $products = Product::forUser()->whereIn('id', $selectedIds)->get();
-
-        $filename = 'products_' . date('Y-m-d_H-i-s') . '.csv';
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ];
-
-        $callback = function() use ($products) {
-            $file = fopen('php://output', 'w');
-            
-            // CSV Headers
-            fputcsv($file, [
-                'ID', 'Title', 'Description', 'Price', 'Status', 'Category', 'Sub Category', 
-                'Quantity', 'Product Type', 'Featured', 'Created At'
+        $query = Product::query()
+            ->forUser()
+            ->with([
+                'category',
+                'subCategory',
+                'additionalCategories',
+                'additionalSubCategories',
+                'thirdCategories',
+                'brand',
+                'wholesaleTiers',
+                'book.writers',
+                'book.publisher',
+                'variations.options',
+                'variationCombinations.wholesaleTiers'
             ]);
 
-            foreach ($products as $product) {
-                fputcsv($file, [
-                    $product->id,
-                    $product->title,
-                    $product->description,
-                    $product->price,
-                    $product->status,
-                    $product->category ? $product->category->name : 'N/A',
-                    $product->subCategory ? $product->subCategory->name : 'N/A',
-                    $product->quantity,
-                    $product->product_type,
-                    $product->is_featured ? 'Yes' : 'No',
-                    $product->created_at->format('Y-m-d H:i:s')
-                ]);
+        if (!empty($productIds)) {
+            $query->whereIn('products.id', $productIds);
+        } else {
+            // Apply active filters from request if available
+            if ($request->filled('primary_category_id')) {
+                $categoryId = $request->primary_category_id;
+                $query->where(function($subQ) use ($categoryId) {
+                    $subQ->where('products.category_id', $categoryId)
+                         ->orWhereHas('additionalCategories', function($catQ) use ($categoryId) {
+                             $catQ->where('product_categories.id', $categoryId);
+                         });
+                });
             }
+            if ($request->filled('subcategory_id')) {
+                $subCategoryId = $request->subcategory_id;
+                $query->where(function($subQ) use ($subCategoryId) {
+                    $subQ->where('products.sub_category_id', $subCategoryId)
+                         ->orWhereHas('additionalSubCategories', function($catQ) use ($subCategoryId) {
+                             $catQ->where('sub_categories.id', $subCategoryId);
+                         });
+                });
+            }
+            if ($request->filled('third_category_id')) {
+                $thirdCategoryId = $request->third_category_id;
+                $query->whereHas('thirdCategories', function($subQ) use ($thirdCategoryId) {
+                    $subQ->where('third_categories.id', $thirdCategoryId);
+                });
+            }
+            if ($request->filled('status')) {
+                $query->where('products.status', $request->status);
+            }
+            if ($request->filled('product_type')) {
+                $query->where('products.product_type', $request->product_type);
+            }
+            if ($request->filled('price_min')) {
+                $query->where('products.old_price', '>=', $request->price_min);
+            }
+            if ($request->filled('price_max')) {
+                $query->where('products.old_price', '<=', $request->price_max);
+            }
+            if ($request->filled('date_from')) {
+                $query->whereDate('products.created_at', '>=', $request->date_from);
+            }
+            if ($request->filled('date_to')) {
+                $query->whereDate('products.created_at', '<=', $request->date_to);
+            }
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('products.title', 'like', "%{$search}%")
+                        ->orWhere('products.id', $search);
+                });
+            }
+        }
+
+        $filename = 'products_export_' . date('Y-m-d_H-i-s') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function() use ($query) {
+            $file = fopen('php://output', 'w');
+            
+            // Output UTF-8 BOM for full Unicode/Bangla compatibility in Excel and spreadsheet viewers
+            fputs($file, "\xEF\xBB\xBF");
+
+            // Helper closure to sanitize and clean HTML/base64 junk from descriptions
+            $cleanHtml = function(?string $html): string {
+                if (empty($html)) {
+                    return '';
+                }
+
+                // 1. Remove base64 images and large data URI strings
+                $clean = preg_replace('/<img[^>]+src=["\']data:image\/[^;]+;base64,[^"\']+["\'][^>]*>/i', '', $html);
+                $clean = preg_replace('/data:image\/[^;]+;base64,[a-zA-Z0-9+\/+=]+/i', '', $clean);
+
+                // 2. Remove script, style, and iframe blocks
+                $clean = preg_replace('/<(script|style|iframe)\b[^>]*>(.*?)<\/\1>/is', '', $clean);
+
+                // 3. Convert block level elements to line breaks and readable bullets
+                $clean = preg_replace('/<\/(p|div|h[1-6]|tr|table|article|section)>/i', "\n", $clean);
+                $clean = preg_replace('/<br\s*\/?>/i', "\n", $clean);
+                $clean = preg_replace('/<li[^>]*>/i', "• ", $clean);
+                $clean = preg_replace('/<\/li>/i', "\n", $clean);
+                $clean = preg_replace('/<\/t[dh]>/i', " | ", $clean);
+
+                // 4. Strip all remaining HTML tags
+                $clean = strip_tags($clean);
+
+                // 5. Decode HTML entities (e.g. &amp;, &quot;, &nbsp;)
+                $clean = html_entity_decode($clean, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $clean = str_replace("\xc2\xa0", ' ', $clean); // Non-breaking space
+
+                // 6. Clean whitespace and excess blank lines
+                $clean = preg_replace("/[ \t]+/", ' ', $clean);
+                $clean = preg_replace("/\n\s*\n\s*\n+/", "\n\n", $clean);
+                $clean = trim($clean);
+
+                return $clean;
+            };
+
+            // Comprehensive CSV Header Columns
+            fputcsv($file, [
+                'ID',
+                'Product Image',
+                'Image Link',
+                'Product Name',
+                'Slug',
+                'SKU',
+                'Product Type',
+                'Status',
+                'Is Featured',
+                'Category',
+                'Sub Category',
+                'Third Category',
+                'All Categories',
+                'Brand',
+                'Product Cost (Tk)',
+                'Sale Price / Offer (Tk)',
+                'Regular Price / Old Price (Tk)',
+                'Discount Percentage (%)',
+                'Profit Margin (%)',
+                'Wholesale Price (Tk)',
+                'Wholesale Pricing Tiers',
+                'Reseller Price (Tk)',
+                'Stock Quantity',
+                'Weight (KG)',
+                'Pay Advance Delivery',
+                'Easy Return Period (Days)',
+                'Short Description',
+                'Detailed Description',
+                'Tags',
+                'Main Image URL',
+                'Gallery Image URLs',
+                'Video URL',
+                'Variations List',
+                'Variation Combinations Breakdown',
+                'Book Edition',
+                'Book ISBN',
+                'Book Language',
+                'Book Total Pages',
+                'Book Cover',
+                'Book Country',
+                'Book Writers',
+                'Book Publisher',
+                'Digital File URL',
+                'Download Limit',
+                'External Affiliate URL',
+                'Affiliate Commission (%)',
+                'SEO Meta Title',
+                'SEO Meta Description',
+                'SEO Meta Keywords',
+                'Total Views',
+                'Unique Views',
+                'Created At',
+                'Updated At'
+            ]);
+
+            // Stream chunked products for performance and low memory footprint
+            $query->chunk(100, function($products) use ($file, $cleanHtml) {
+                foreach ($products as $product) {
+                    // Images
+                    $mainImageUrl = '';
+                    if (!empty($product->thumb_image)) {
+                        $mainImageUrl = str_starts_with($product->thumb_image, 'http') ? $product->thumb_image : url('storage/' . ltrim($product->thumb_image, '/'));
+                    }
+
+                    // Excel/Sheets formulas to render actual image and clickable link in spreadsheet
+                    $excelImageFormula = '';
+                    $excelHyperlink = '';
+                    if (!empty($mainImageUrl)) {
+                        $escapedUrl = str_replace('"', '""', $mainImageUrl);
+                        $excelImageFormula = '=IMAGE("' . $escapedUrl . '")';
+                        $excelHyperlink = '=HYPERLINK("' . $escapedUrl . '", "Open Photo")';
+                    }
+
+                    $galleryUrls = [];
+                    $images = is_array($product->images) ? $product->images : (is_string($product->images) ? json_decode($product->images, true) : []);
+                    if (is_array($images)) {
+                        foreach ($images as $img) {
+                            if (!empty($img)) {
+                                $galleryUrls[] = str_starts_with($img, 'http') ? $img : url('storage/' . ltrim($img, '/'));
+                            }
+                        }
+                    }
+                    $galleryUrlsStr = implode(' ; ', $galleryUrls);
+
+                    // Clean descriptions without HTML / base64 junk
+                    $cleanShortDesc = $cleanHtml($product->short_description);
+                    $cleanDesc = $cleanHtml($product->description);
+
+                    // Categories
+                    $primaryCat = $product->category ? $product->category->name : '';
+                    $primarySubCat = $product->subCategory ? $product->subCategory->name : '';
+                    $thirdCats = ($product->thirdCategories && $product->thirdCategories->isNotEmpty()) ? $product->thirdCategories->pluck('name')->implode(', ') : '';
+                    $allCats = $product->getAllCategories()->pluck('name')->implode(', ');
+
+                    // Book info
+                    $book = $product->book;
+                    $bookEdition = $book ? ($book->edition ?? '') : '';
+                    $bookIsbn = $book ? ($book->isbn ?? '') : '';
+                    $bookLang = $book ? ($book->language ?? '') : '';
+                    $bookPages = $book ? ($book->pages ?? '') : '';
+                    $bookCover = $book ? ($book->cover ?? '') : '';
+                    $bookCountry = $book ? ($book->country ?? '') : '';
+                    $bookWriters = ($book && $book->writers && $book->writers->isNotEmpty()) ? $book->writers->pluck('name')->implode(', ') : '';
+                    $bookPublisher = ($book && $book->publisher) ? $book->publisher->name : '';
+
+                    // Prices and percentages
+                    $oldPrice = !is_null($product->old_price) ? (float)$product->old_price : null;
+                    $offerPrice = !is_null($product->offer) ? (float)$product->offer : null;
+                    $cost = !is_null($product->product_cost) ? (float)$product->product_cost : null;
+                    $wholesale = !is_null($product->wholesale_price) ? (float)$product->wholesale_price : null;
+                    $reseller = !is_null($product->reseller_price) ? (float)$product->reseller_price : null;
+
+                    $discountPercent = '';
+                    if (!is_null($oldPrice) && !is_null($offerPrice) && $oldPrice > 0 && $oldPrice > $offerPrice) {
+                        $discountPercent = round((($oldPrice - $offerPrice) / $oldPrice) * 100, 2) . '%';
+                    }
+
+                    $profitMargin = '';
+                    $effectiveSell = $offerPrice ?? $oldPrice;
+                    if (!is_null($effectiveSell) && !is_null($cost) && $effectiveSell > 0 && $cost > 0) {
+                        $profitMargin = round((($effectiveSell - $cost) / $effectiveSell) * 100, 2) . '%';
+                    }
+
+                    // Simple Wholesale Tiers
+                    $wholesaleTiersStr = '';
+                    if ($product->wholesaleTiers && $product->wholesaleTiers->isNotEmpty()) {
+                        $tierArr = [];
+                        foreach ($product->wholesaleTiers->sortBy('min_quantity') as $tier) {
+                            $tierArr[] = 'Min ' . $tier->min_quantity . ' pcs: ' . number_format((float)$tier->price, 2);
+                        }
+                        $wholesaleTiersStr = implode(' | ', $tierArr);
+                    }
+
+                    // Variations & Combinations
+                    $variationsListStr = '';
+                    if ($product->variations && $product->variations->isNotEmpty()) {
+                        $vArr = [];
+                        foreach ($product->variations as $var) {
+                            $opts = ($var->options && $var->options->isNotEmpty()) ? $var->options->pluck('name')->implode(', ') : '';
+                            $vArr[] = $var->name . ' (' . $opts . ')';
+                        }
+                        $variationsListStr = implode(' | ', $vArr);
+                    }
+
+                    $combinationsBreakdownStr = '';
+                    if ($product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
+                        $combRows = [];
+                        foreach ($product->variationCombinations as $comb) {
+                            $cName = $comb->display_name ?: (is_array($comb->getOptionNamesArray()) ? implode('/', $comb->getOptionNamesArray()) : ($comb->combination_key ?? ''));
+                            $cParts = ['Options: ' . $cName];
+                            if ($comb->sku) $cParts[] = 'SKU: ' . $comb->sku;
+                            if (!is_null($comb->regular_price)) $cParts[] = 'Reg Price: ' . number_format((float)$comb->regular_price, 2);
+                            if (!is_null($comb->offer_price)) {
+                                $cDisc = '';
+                                if (!is_null($comb->regular_price) && (float)$comb->regular_price > (float)$comb->offer_price) {
+                                    $cDisc = ' (' . round((( (float)$comb->regular_price - (float)$comb->offer_price ) / (float)$comb->regular_price) * 100, 1) . '% OFF)';
+                                }
+                                $cParts[] = 'Offer Price: ' . number_format((float)$comb->offer_price, 2) . $cDisc;
+                            }
+                            if (!is_null($comb->product_cost)) $cParts[] = 'Cost: ' . number_format((float)$comb->product_cost, 2);
+                            if (!is_null($comb->wholesale_price)) $cParts[] = 'Wholesale: ' . number_format((float)$comb->wholesale_price, 2);
+                            if ($comb->wholesaleTiers && $comb->wholesaleTiers->isNotEmpty()) {
+                                $cTiers = [];
+                                foreach ($comb->wholesaleTiers->sortBy('min_quantity') as $ct) {
+                                    $cTiers[] = 'Min ' . $ct->min_quantity . ' pcs: ' . number_format((float)$ct->price, 2);
+                                }
+                                $cParts[] = 'Tiers: [' . implode(', ', $cTiers) . ']';
+                            }
+                            if (!is_null($comb->reseller_price)) $cParts[] = 'Reseller: ' . number_format((float)$comb->reseller_price, 2);
+                            if (isset($comb->stock_quantity)) $cParts[] = 'Stock: ' . $comb->stock_quantity;
+                            if (!empty($comb->featured_image)) {
+                                $cParts[] = 'Image: ' . (str_starts_with($comb->featured_image, 'http') ? $comb->featured_image : url('storage/' . ltrim($comb->featured_image, '/')));
+                            }
+                            $combRows[] = '[' . implode(' | ', $cParts) . ']';
+                        }
+                        $combinationsBreakdownStr = implode(" ; ", $combRows);
+                    }
+
+                    // SEO
+                    $seo = $product->formatted_seo ?? [];
+                    $seoTitle = $seo['meta_title'] ?? '';
+                    $seoDesc = $seo['meta_description'] ?? '';
+                    $seoKeywords = $seo['meta_keywords'] ?? '';
+
+                    // Digital File
+                    $digitalFileUrl = '';
+                    if (!empty($product->digital_file)) {
+                        $digitalFileUrl = str_starts_with($product->digital_file, 'http') ? $product->digital_file : url('storage/' . ltrim($product->digital_file, '/'));
+                    }
+
+                    fputcsv($file, [
+                        $product->id,
+                        $excelImageFormula,
+                        $excelHyperlink,
+                        $product->title,
+                        $product->slug,
+                        $product->sku,
+                        $product->product_type,
+                        $product->status ? 'Active' : 'Inactive',
+                        $product->is_featured ? 'Yes' : 'No',
+                        $primaryCat,
+                        $primarySubCat,
+                        $thirdCats,
+                        $allCats,
+                        $product->brand ? $product->brand->name : '',
+                        !is_null($cost) ? number_format($cost, 2, '.', '') : '',
+                        !is_null($offerPrice) ? number_format($offerPrice, 2, '.', '') : '',
+                        !is_null($oldPrice) ? number_format($oldPrice, 2, '.', '') : '',
+                        $discountPercent,
+                        $profitMargin,
+                        !is_null($wholesale) ? number_format($wholesale, 2, '.', '') : '',
+                        $wholesaleTiersStr,
+                        !is_null($reseller) ? number_format($reseller, 2, '.', '') : '',
+                        $product->quantity,
+                        $product->weight,
+                        $product->pay_advance_delivery ? 'Yes' : 'No',
+                        $product->return_period ?? 0,
+                        $cleanShortDesc,
+                        $cleanDesc,
+                        $product->tags,
+                        $mainImageUrl,
+                        $galleryUrlsStr,
+                        $product->video_url,
+                        $variationsListStr,
+                        $combinationsBreakdownStr,
+                        $bookEdition,
+                        $bookIsbn,
+                        $bookLang,
+                        $bookPages,
+                        $bookCover,
+                        $bookCountry,
+                        $bookWriters,
+                        $bookPublisher,
+                        $digitalFileUrl,
+                        $product->download_limit,
+                        $product->external_url,
+                        $product->affiliate_commission,
+                        $seoTitle,
+                        $seoDesc,
+                        $seoKeywords,
+                        $product->views_total ?? 0,
+                        $product->views_unique ?? 0,
+                        $product->created_at ? $product->created_at->format('Y-m-d H:i:s') : '',
+                        $product->updated_at ? $product->updated_at->format('Y-m-d H:i:s') : ''
+                    ]);
+                }
+            });
 
             fclose($file);
         };

@@ -202,13 +202,16 @@ class SaaSTenantController extends Controller
                     ? DB::connection('tenant_temp')->table('products')->whereIn('vendor_id', $wholesellerIds)->count()
                     : 0;
                 
-                $adminCount = DB::connection('tenant_temp')
-                    ->table('products')
-                    ->where(function ($q) use ($wholesellerIds) {
-                        $q->whereNull('vendor_id')
-                          ->orWhere('vendor_id', 0);
-                    })
-                    ->count();
+                // Admin products are only included if the tenant has free_promotion enabled
+                $adminCount = $tenant->free_promotion
+                    ? DB::connection('tenant_temp')
+                        ->table('products')
+                        ->where(function ($q) {
+                            $q->whereNull('vendor_id')
+                              ->orWhere('vendor_id', 0);
+                        })
+                        ->count()
+                    : 0;
 
                 $totalWholesellerCount += $wholesellerCount;
                 $totalAdminCount += $adminCount;
@@ -219,14 +222,16 @@ class SaaSTenantController extends Controller
                         ? DB::connection('tenant_temp')->table('products')->whereIn('vendor_id', $wholesellerIds)->get()
                         : collect();
                 } else {
-                    // Admin products
-                    $products = DB::connection('tenant_temp')
-                        ->table('products')
-                        ->where(function ($q) {
-                            $q->whereNull('vendor_id')
-                              ->orWhere('vendor_id', 0);
-                        })
-                        ->get();
+                    // Admin products - only fetched if tenant has free_promotion enabled
+                    $products = $tenant->free_promotion
+                        ? DB::connection('tenant_temp')
+                            ->table('products')
+                            ->where(function ($q) {
+                                $q->whereNull('vendor_id')
+                                  ->orWhere('vendor_id', 0);
+                            })
+                            ->get()
+                        : collect();
                 }
 
                 // Fetch vendor settings and details for the selected products
