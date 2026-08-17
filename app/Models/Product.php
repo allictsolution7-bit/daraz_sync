@@ -655,13 +655,17 @@ class Product extends Model
         // Only include Admin products (exclude vendor products)
         $query->whereNull('products.vendor_id');
 
-        // Super admins see all admin products
-        if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin'))) {
+        // Super admins or central admins see all store products
+        if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin') || $user->hasRole('admin') || ($user->role ?? '') === 'admin' || ($user->role ?? '') === 'super_admin')) {
             return $query;
         }
 
-        // Regular admins see products created by them
-        return $query->where('products.created_by', $user->id);
+        // Regular admin / tenant users see products created by them, copied by them, or default store products
+        return $query->where(function($q) use ($user) {
+            $q->where('products.created_by', $user->id)
+              ->orWhere('products.copied_by_admin_id', $user->id)
+              ->orWhereNull('products.created_by');
+        });
     }
 
     public function wholesaleTiers()

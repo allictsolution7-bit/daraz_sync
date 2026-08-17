@@ -1133,7 +1133,7 @@
         <!-- --sidebar-start-- -->
 
         @php
-        $coreShopActive = request()->is('admin/product*') || request()->is('admin/catalog-groups*') || request()->is('admin/catalog-tiers*') || request()->is('admin/catalog-levels*') || request()->is('admin/publishers-mark*') || request()->is('admin/stock-control*') || request()->is('admin/promo-pages*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/bundle-deals*') || request()->is('admin/catalog*') || request()->is('admin/global-products*');
+        $coreShopActive = request()->is('admin/product*') || request()->is('admin/catalog-groups*') || request()->is('admin/catalog-tiers*') || request()->is('admin/catalog-levels*') || request()->is('admin/publishers-mark*') || request()->is('admin/stock-control*') || request()->is('admin/promo-pages*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/bundle-deals*') || request()->is('admin/catalog*') || request()->is('admin/global-products*') || request()->is('admin/wholesale-orders*');
         $ordersSalesActive = request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/vendor-orders*') || request()->is('admin/reseller-orders*') || request()->is('admin/pending-queue*') || request()->is('admin/pos*') || request()->is('admin/customers*');
         $shippingDeliveryActive = request()->is('admin/shipping-basics*') || request()->is('admin/delivery-zones/rules*') || request()->is('admin/courier-connect*');
         $reportsAnalyticsActive = request()->routeIs('admin.orders.reports*') || request()->routeIs('admin.customers.reports*');
@@ -1341,6 +1341,14 @@
                                                 <span class="menu-content">
                                                     <i class="fas fa-globe" style="color: #4f46e5;"></i>
                                                     Global Wholesale Products
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <li class="{{ request()->routeIs('admin.wholesale-orders.*') ? 'active' : '' }}">
+                                            <a href="{{ route('admin.wholesale-orders.index') }}">
+                                                <span class="menu-content">
+                                                    <i class="fas fa-handshake" style="color: #059669;"></i>
+                                                    Wholesale Orders
                                                 </span>
                                             </a>
                                         </li>

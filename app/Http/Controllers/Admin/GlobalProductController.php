@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\GlobalProductService;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class GlobalProductController extends Controller
 {
@@ -50,6 +51,11 @@ class GlobalProductController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
+        $superAdminBkash = DB::table('settings')->where('key', 'bkash_number')->value('value') ?? '01830501062';
+        $superAdminNagad = DB::table('settings')->where('key', 'nagad_number')->value('value') ?? '01830501062';
+        $superAdminRocket = DB::table('settings')->where('key', 'rocket_number')->value('value') ?? '01830501062';
+        $superAdminBank = DB::table('settings')->where('key', 'bank_account_details')->value('value') ?? 'City Bank: AC 1234567890 (Branch: Dhaka)';
+
         return view('admin.global_products.index', compact(
             'paginatedProducts',
             'tenants',
@@ -58,23 +64,34 @@ class GlobalProductController extends Controller
             'globalCommission',
             'totalWholesellerCount',
             'totalAdminCount',
-            'errors'
+            'errors',
+            'superAdminBkash',
+            'superAdminNagad',
+            'superAdminRocket',
+            'superAdminBank'
         ));
     }
 
     /**
-     * Copy a single SaaS product into the store catalog.
+     * Copy / Purchase a single SaaS product into the store catalog.
      */
     public function copy(Request $request)
     {
         $request->validate([
             'subdomain' => 'required|string',
             'product_id' => 'required|integer',
+            'copy_mode' => 'nullable|string|in:copy,purchase',
+            'quantity' => 'nullable|integer|min:0',
         ]);
+
+        $copyMode = $request->input('copy_mode', 'copy');
+        $quantity = (int)$request->input('quantity', 0);
 
         $res = $this->globalProductService->copyProductToStore(
             $request->subdomain,
-            (int)$request->product_id
+            (int)$request->product_id,
+            $copyMode,
+            $quantity
         );
 
         if ($request->ajax() || $request->wantsJson()) {

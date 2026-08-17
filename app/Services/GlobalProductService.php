@@ -486,10 +486,20 @@ class GlobalProductService
      *
      * @param string $sourceSubdomain Subdomain of source tenant
      * @param int $sourceProductId ID of the product in the source tenant database
+     * @param string $copyMode 'purchase' or 'copy'
+     * @param int $quantity Quantity to purchase if mode is purchase
      * @param int|null $targetVendorId Target vendor ID (null for store admin)
+     * @param int|null $currentAdminId Current admin ID
      * @return array
      */
-    public function copyProductToStore(string $sourceSubdomain, int $sourceProductId, ?int $targetVendorId = null): array
+    public function copyProductToStore(
+        string $sourceSubdomain, 
+        int $sourceProductId, 
+        string $copyMode = 'copy', 
+        int $quantity = 0, 
+        ?int $targetVendorId = null, 
+        ?int $currentAdminId = null
+    ): array
     {
         $tenant = SaaSTenant::where('subdomain', $sourceSubdomain)->first();
         if (!$tenant) {
@@ -510,6 +520,24 @@ class GlobalProductService
             if (!$sourceProduct) {
                 return ['success' => false, 'message' => "Product #{$sourceProductId} not found in tenant [{$sourceSubdomain}]."];
             }
+
+            // Fetch original creator info from source tenant DB
+            $sourceCreatorId = $sourceProduct->created_by ?: ($sourceProduct->vendor_id ?: 1);
+            $sourceCreatorName = "Tenant Admin #{$sourceCreatorId}";
+            try {
+                $creatorUser = DB::connection('tenant_temp')
+                    ->table('users')
+                    ->where('id', $sourceCreatorId)
+                    ->first();
+                if ($creatorUser) {
+                    $sourceCreatorName = $creatorUser->name . ' (' . $creatorUser->email . ')';
+                }
+            } catch (\Throwable $e) {}
+
+            // Current admin info
+            $currentAdmin = auth()->user();
+            $currentAdminId = $currentAdminId ?? ($currentAdmin ? $currentAdmin->id : null);
+            $currentAdminName = $currentAdmin ? ($currentAdmin->name . ' (' . $currentAdmin->email . ')') : "Admin #{$currentAdminId}";
 
             // Fetch source category
             $sourceCategory = null;
@@ -558,7 +586,7 @@ class GlobalProductService
                 ->where('product_id', $sourceProductId)
                 ->get();
 
-            // 2. Now perform insertion into TARGET (current default database)
+            // 2. Insertion into TARGET database
             DB::beginTransaction();
 
             // Resolve / Map Category in target DB
@@ -617,6 +645,21 @@ class GlobalProductService
                 $counter++;
             }
 
+            // Prepare source metadata JSON
+            $sourceMetadata = [
+                'source_tenant_name' => $tenant->name,
+                'source_subdomain' => $tenant->subdomain,
+                'source_product_id' => $sourceProductId,
+                'original_creator_id' => $sourceCreatorId,
+                'original_creator_name' => $sourceCreatorName,
+                'copy_mode' => $copyMode,
+                'purchased_quantity' => ($copyMode === 'purchase') ? $quantity : 0,
+                'wholesale_price' => $sourceProduct->global_price ?? $sourceProduct->wholesale_price ?? $sourceProduct->product_cost ?? 0,
+                'copied_by_admin_id' => $currentAdminId,
+                'copied_by_admin_name' => $currentAdminName,
+                'copied_at' => now()->toDateTimeString(),
+            ];
+
             // Filter columns to match current Product schema
             $targetColumns = \Illuminate\Support\Facades\Schema::getColumnListing('products');
             $productData = (array)$sourceProduct;
@@ -631,6 +674,22 @@ class GlobalProductService
             $productData['vendor_id'] = $targetVendorId;
             $productData['status'] = 1;
             $productData['approval_status'] = 'approved';
+
+            // Source Attribution Tracking Columns
+            $productData['created_by'] = $currentAdminId;
+            $productData['source_tenant_subdomain'] = $sourceSubdomain;
+            $productData['source_product_id'] = $sourceProductId;
+            $productData['source_creator_id'] = $sourceCreatorId;
+            $productData['source_creator_name'] = $sourceCreatorName;
+            $productData['copied_by_admin_id'] = $currentAdminId;
+            $productData['source_metadata'] = json_encode($sourceMetadata);
+
+            // If purchase mode with quantity, set stock
+            if ($copyMode === 'purchase' && $quantity > 0) {
+                $productData['quantity'] = $quantity;
+                $productData['manage_stock'] = 1;
+                $productData['stock_status'] = 'in_stock';
+            }
 
             // Clean images/description of base64
             if (!empty($productData['description'])) {

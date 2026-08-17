@@ -750,13 +750,15 @@
                         return `<input type="checkbox" class="custom-control-input product-checkbox" value="${row.id}">`;
                     }},
                     { data: 'id', className: 'd-none d-md-table-cell' },
-                    { data: 'title', render: function(data) {
+                    { data: 'title', render: function(data, type, row) {
                         if (!data) return '<span class="text-muted">N/A</span>';
                         const maxLength = 40;
-                        if (data.length > maxLength) {
-                            return `<span class="fw-semibold" title="${data}">${data.substring(0, maxLength)}...</span>`;
+                        const titleText = data.length > maxLength ? `${data.substring(0, maxLength)}...` : data;
+                        let badge = '';
+                        if (row.source_tenant_subdomain) {
+                            badge = `<div class="mt-1"><span class="badge rounded-pill" style="background-color: #e0e7ff; color: #4338ca; font-size: 10px; font-weight: 600;"><i class="fas fa-globe me-1"></i> Origin: @${row.source_tenant_subdomain}${row.source_creator_name ? ' &bull; ' + row.source_creator_name : ''}</span></div>`;
                         }
-                        return `<span class="fw-semibold">${data}</span>`;
+                        return `<span class="fw-semibold" title="${data}">${titleText}</span>${badge}`;
                     }},
                     { data: 'thumb_image', orderable: false, searchable: false, render: function(path){
                         if (!path) return '<span class="text-muted">No Image</span>';

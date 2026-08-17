@@ -112,6 +112,14 @@ class AuthorizeByRouteName
             abort(403, 'Permission required: (products.view). Please ask an administrator to grant this permission.');
         }
 
+        // Direct mapping for wholesale purchase orders
+        if (str_starts_with($name, 'admin.wholesale-orders') || str_starts_with($name, 'wholesale-orders')) {
+            if ($user->can('orders.view') || $user->can('products.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {
+                return $next($request);
+            }
+            abort(403, 'Permission required: (orders.view). Please ask an administrator to grant this permission.');
+        }
+
         $parts = explode('.', $name);
         if (count($parts) < 2 || ($parts[0] !== 'admin' && $parts[0] !== 'vendor')) {
             return $next($request);

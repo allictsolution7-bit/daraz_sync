@@ -143,6 +143,9 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('admin.wholesale-orders.index') }}" class="btn btn-outline-primary btn-sm rounded-3 px-3 py-2" style="font-weight: 600;">
+                <i class="fas fa-receipt me-1.5"></i> My Wholesale Orders
+            </a>
             <a href="{{ route('admin.items.index') }}" class="btn btn-outline-secondary btn-sm rounded-3 px-3 py-2" style="font-weight: 600;">
                 <i class="fas fa-arrow-left me-1.5"></i> Back to Store Inventory
             </a>
@@ -393,10 +396,11 @@
                             </td>
                             <td class="pe-4 text-end" style="white-space: nowrap;" id="action-cell-{{ $rowUniqueKey }}">
                                 <button type="button" 
-                                        class="btn btn-copy-action btn-sm" 
-                                        id="btn-copy-{{ $rowUniqueKey }}"
-                                        onclick="copySingleProduct('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $rowUniqueKey }}')">
-                                    <i class="fas fa-cloud-arrow-down me-1"></i> {{ $product['is_already_copied'] ? 'Copy Again' : 'Add to Catalog' }}
+                                        class="btn btn-sm btn-primary rounded-3 px-3 py-1.5 font-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" 
+                                        id="btn-action-{{ $rowUniqueKey }}"
+                                        style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; font-size: 0.825rem;"
+                                        onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}')">
+                                    <i class="fas fa-cart-shopping"></i> Purchase
                                 </button>
                             </td>
                         </tr>
@@ -567,78 +571,399 @@ function updateBulkButtonState() {
     bulkBtn.disabled = (checked.length === 0);
 }
 
-// Single Copy Action
-function copySingleProduct(subdomain, productId, title, rowKey) {
-    const btn = document.getElementById('btn-copy-' + rowKey);
-    const originalContent = btn.innerHTML;
+// Gateway details passed from backend
+const GATEWAYS = {
+    bkash: {
+        name: 'bKash',
+        number: '{{ $superAdminBkash }}',
+        instruction: 'Send exact payment to Super Admin bKash number <strong>{{ $superAdminBkash }}</strong> and enter your sender number and Transaction ID (TrxID) below.'
+    },
+    nagad: {
+        name: 'Nagad',
+        number: '{{ $superAdminNagad }}',
+        instruction: 'Send exact payment to Super Admin Nagad number <strong>{{ $superAdminNagad }}</strong> and enter your sender number and Transaction ID (TrxID) below.'
+    },
+    rocket: {
+        name: 'Rocket',
+        number: '{{ $superAdminRocket }}',
+        instruction: 'Send exact payment to Super Admin Rocket number <strong>{{ $superAdminRocket }}</strong> and enter your sender number and Transaction ID (TrxID) below.'
+    },
+    bank: {
+        name: 'Bank Transfer',
+        number: '{{ $superAdminBank }}',
+        instruction: 'Transfer payment to Super Admin Bank Account: <strong>{{ $superAdminBank }}</strong> and enter your deposit reference or TrxID below.'
+    }
+};
+
+// Open Purchase / Copy Modal with Options
+function openPurchaseModal(subdomain, productId, title, unitPrice, availableStock, rowKey) {
+    const btn = document.getElementById('btn-action-' + rowKey);
+    const originalContent = btn ? btn.innerHTML : '';
+    const numPrice = parseFloat(unitPrice) || 0;
+    const numStock = parseInt(availableStock) || 0;
+
+    const modalHtml = `
+        <div class="text-start" style="font-size: 13px;">
+            <!-- Product Header Summary -->
+            <div class="p-3 mb-3 rounded-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge px-2 py-1 rounded-pill" style="background-color:#e0e7ff; color:#3730a3; font-size:11px; font-weight: 700;">
+                        <i class="fas fa-globe me-1"></i> Supplier Store: @${subdomain}
+                    </span>
+                    <span class="text-success font-bold" style="font-weight:700; font-size: 13.5px;">
+                        Wholesale: ৳${numPrice.toFixed(2)}
+                    </span>
+                </div>
+                <div class="text-slate-800 font-bold mb-1" style="font-weight:700; font-size: 13.5px;">${title}</div>
+                <div class="text-muted small" style="font-size:11px;">
+                    <i class="fas fa-cubes me-1"></i> Available Supplier Stock: <strong>${numStock} pcs</strong>
+                </div>
+            </div>
+
+            <!-- Choose Option -->
+            <div class="mb-3">
+                <label class="form-label small text-uppercase text-muted font-bold mb-2" style="font-size:11px; font-weight:700; letter-spacing: 0.5px;">Select Action:</label>
+
+                <!-- Option 1: Purchase Wholesale Stock -->
+                <div class="option-card p-3 rounded-3 mb-2 border" id="box-opt-purchase" style="cursor: pointer; background-color: #f0fdf4; border-color: #86efac !important; transition: all 0.2s;" onclick="selectActionOption('purchase')">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio" name="swal_global_action" id="opt_purchase" value="purchase" checked onchange="selectActionOption('purchase')">
+                        <label class="form-check-label ms-1" for="opt_purchase" style="cursor: pointer; width: 100%;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <strong class="text-success font-bold" style="font-weight:700; font-size: 13px;">
+                                    <i class="fas fa-cart-shopping me-1"></i> Purchase Wholesale Stock (Super Admin Payment)
+                                </strong>
+                                <span class="badge bg-success text-white" style="font-size: 10px;">Physical Delivery</span>
+                            </div>
+                            <div class="text-muted small mt-1" style="font-size:11.5px; line-height: 1.4;">
+                                Pay to Super Admin gateway. On verification, Super Admin dispatches the order to supplier (@${subdomain}) to deliver physical stock to your address.
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Purchase Details (Qty, Shipping, Payment Proof) -->
+                    <div id="purchase-details-section" class="mt-3 pt-3 border-top" style="border-top-color: #bbf7d0 !important;">
+                        <!-- Quantity & Total -->
+                        <div class="row g-2 mb-2.5">
+                            <div class="col-6">
+                                <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Units to Buy <span class="text-danger">*</span></label>
+                                <input type="number" id="swal_purchase_qty" class="form-control form-control-sm font-bold text-center" value="10" min="1" max="${numStock > 0 ? numStock : 99999}" oninput="updatePurchaseTotal(${numPrice})">
+                            </div>
+                            <div class="col-6">
+                                <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Payable to Super Admin</label>
+                                <div class="form-control form-control-sm bg-light text-success font-bold text-center" id="swal_total_cost" style="font-size: 13px;">
+                                    ৳${(numPrice * 10).toFixed(2)}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Destination Address -->
+                        <div class="mb-2.5">
+                            <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">
+                                Delivery Address (Where supplier will ship) <span class="text-danger">*</span>
+                            </label>
+                            <textarea id="swal_shipping_address" class="form-control form-control-sm" rows="2" placeholder="Enter complete store delivery address (Street, City, District, Postal Code)"></textarea>
+                        </div>
+
+                        <div class="mb-2.5">
+                            <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Contact Mobile Number <span class="text-danger">*</span></label>
+                            <input type="text" id="swal_contact_phone" class="form-control form-control-sm" placeholder="01712345678" value="{{ auth()->user()?->phone ?? '' }}">
+                        </div>
+
+                        <!-- Choose Super Admin Payment Gateway -->
+                        <div class="mb-2.5">
+                            <label class="small text-slate-700 font-semibold mb-1.5 d-block" style="font-size: 11.5px;">
+                                <i class="fas fa-wallet text-warning me-1"></i> Super Admin Payment Gateway <span class="text-danger">*</span>
+                            </label>
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <label class="btn btn-sm btn-outline-danger active px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="changePayGateway('bkash', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="bkash" class="d-none" checked> bKash
+                                </label>
+                                <label class="btn btn-sm btn-outline-warning px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="changePayGateway('nagad', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="nagad" class="d-none"> Nagad
+                                </label>
+                                <label class="btn btn-sm btn-outline-primary px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="changePayGateway('rocket', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="rocket" class="d-none"> Rocket
+                                </label>
+                                <label class="btn btn-sm btn-outline-success px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="changePayGateway('bank', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="bank" class="d-none"> Bank Transfer
+                                </label>
+                            </div>
+
+                            <div class="alert p-2 rounded-3 mb-2 small text-slate-800 border" id="swal_gateway_instruction" style="background-color: #f8fafc; font-size: 11px; line-height: 1.4;">
+                                ${GATEWAYS.bkash.instruction}
+                            </div>
+                        </div>
+
+                        <!-- Sender Phone & TrxID -->
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Sender Mobile / Account</label>
+                                <input type="text" id="swal_sender_phone" class="form-control form-control-sm" placeholder="01812345678">
+                            </div>
+                            <div class="col-6">
+                                <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Transaction ID (TrxID) <span class="text-danger">*</span></label>
+                                <input type="text" id="swal_trx_id" class="form-control form-control-sm font-bold" placeholder="e.g. TRX9823H">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Option 2: Just Copy as My Product -->
+                <div class="option-card p-3 rounded-3 border" id="box-opt-copy" style="cursor: pointer; background-color: #ffffff; border-color: #e2e8f0 !important; transition: all 0.2s;" onclick="selectActionOption('copy')">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="radio" name="swal_global_action" id="opt_copy" value="copy" onchange="selectActionOption('copy')">
+                        <label class="form-check-label ms-1" for="opt_copy" style="cursor: pointer; width: 100%;">
+                            <strong class="d-block text-slate-800 font-bold" style="font-weight:700; font-size: 13px;">
+                                <i class="fas fa-clone me-1 text-primary"></i> Just Copy as My Product (Catalog Listing Only)
+                            </strong>
+                            <div class="text-muted small mt-1" style="font-size:11.5px; line-height: 1.4;">
+                                Add this product to your catalog without purchasing inventory stock. Origin creator (@${subdomain}) and attribution are fully retained.
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 
     Swal.fire({
-        title: 'Add to Store Catalog?',
-        html: `Do you want to copy <strong>"${title}"</strong> into your store's product inventory?`,
-        icon: 'question',
+        title: 'Wholesale Product Purchase',
+        html: modalHtml,
         showCancelButton: true,
         confirmButtonColor: '#4f46e5',
         cancelButtonColor: '#64748b',
-        confirmButtonText: '<i class="fas fa-cloud-arrow-down me-1"></i> Yes, Copy to Catalog',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Copying...';
+        confirmButtonText: '<i class="fas fa-check-circle me-1"></i> Submit & Place Order',
+        cancelButtonText: 'Cancel',
+        focusConfirm: false,
+        width: '580px',
+        didOpen: () => {
+            window.selectActionOption = function(mode) {
+                const isPurchase = (mode === 'purchase');
+                document.getElementById('opt_purchase').checked = isPurchase;
+                document.getElementById('opt_copy').checked = !isPurchase;
 
-            fetch("{{ route('admin.global-products.copy') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    subdomain: subdomain,
-                    product_id: productId
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: data.message,
-                        icon: 'success',
-                        confirmButtonColor: '#4f46e5'
-                    });
+                const boxPurchase = document.getElementById('box-opt-purchase');
+                const boxCopy = document.getElementById('box-opt-copy');
+                const detailsSection = document.getElementById('purchase-details-section');
 
-                    // Update UI row status
-                    const statusCell = document.getElementById('status-cell-' + rowKey);
-                    if (statusCell) {
-                        statusCell.innerHTML = '<span class="badge-in-store"><i class="fas fa-check-circle"></i> In Store</span>';
-                    }
-                    btn.innerHTML = '<i class="fas fa-check me-1"></i> Copied!';
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-cloud-arrow-down me-1"></i> Copy Again';
-                    }, 2000);
+                if (isPurchase) {
+                    boxPurchase.style.backgroundColor = '#f0fdf4';
+                    boxPurchase.style.borderColor = '#86efac';
+                    boxCopy.style.backgroundColor = '#ffffff';
+                    boxCopy.style.borderColor = '#e2e8f0';
+                    if (detailsSection) detailsSection.style.display = 'block';
                 } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: data.message || 'Could not copy product.',
-                        icon: 'error',
-                        confirmButtonColor: '#ef4444'
-                    });
-                    btn.disabled = false;
-                    btn.innerHTML = originalContent;
+                    boxPurchase.style.backgroundColor = '#ffffff';
+                    boxPurchase.style.borderColor = '#e2e8f0';
+                    boxCopy.style.backgroundColor = '#f8fafc';
+                    boxCopy.style.borderColor = '#93c5fd';
+                    if (detailsSection) detailsSection.style.display = 'none';
                 }
-            })
-            .catch(err => {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'An unexpected network error occurred.',
-                    icon: 'error',
-                    confirmButtonColor: '#ef4444'
+            };
+
+            window.changePayGateway = function(gatewayKey, labelEl) {
+                document.querySelectorAll('input[name="swal_pay_gateway"]').forEach(i => i.checked = false);
+                document.querySelectorAll('.btn-outline-danger, .btn-outline-warning, .btn-outline-primary, .btn-outline-success').forEach(b => b.classList.remove('active'));
+                
+                const radio = labelEl.querySelector('input');
+                if (radio) radio.checked = true;
+                labelEl.classList.add('active');
+
+                const gInfo = GATEWAYS[gatewayKey];
+                const instBox = document.getElementById('swal_gateway_instruction');
+                if (instBox && gInfo) {
+                    instBox.innerHTML = gInfo.instruction;
+                }
+            };
+
+            window.updatePurchaseTotal = function(price) {
+                const qty = parseInt(document.getElementById('swal_purchase_qty').value) || 0;
+                const totalElem = document.getElementById('swal_total_cost');
+                if (totalElem) {
+                    totalElem.textContent = '৳' + (price * qty).toFixed(2);
+                }
+            };
+        },
+        preConfirm: () => {
+            const isPurchase = document.getElementById('opt_purchase').checked;
+            if (!isPurchase) {
+                return { mode: 'copy' };
+            }
+
+            const qty = parseInt(document.getElementById('swal_purchase_qty').value) || 0;
+            const address = document.getElementById('swal_shipping_address').value.trim();
+            const phone = document.getElementById('swal_contact_phone').value.trim();
+            const gatewayRadio = document.querySelector('input[name="swal_pay_gateway"]:checked');
+            const gateway = gatewayRadio ? gatewayRadio.value : 'bkash';
+            const senderPhone = document.getElementById('swal_sender_phone').value.trim();
+            const trxId = document.getElementById('swal_trx_id').value.trim();
+
+            if (qty <= 0) {
+                Swal.showValidationMessage('Please enter a valid purchase quantity (at least 1 unit)');
+                return false;
+            }
+            if (!address) {
+                Swal.showValidationMessage('Please enter the delivery shipping address');
+                return false;
+            }
+            if (!phone) {
+                Swal.showValidationMessage('Please enter your contact mobile number');
+                return false;
+            }
+            if (!trxId) {
+                Swal.showValidationMessage('Please enter the payment Transaction ID (TrxID)');
+                return false;
+            }
+
+            return {
+                mode: 'purchase',
+                quantity: qty,
+                shipping_address: address,
+                contact_phone: phone,
+                gateway: gateway,
+                sender_phone: senderPhone,
+                trx_id: trxId
+            };
+        }
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            const data = result.value;
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+            }
+
+            if (data.mode === 'purchase') {
+                // Submit Wholesale Purchase Order to Super Admin
+                fetch("{{ route('admin.wholesale-orders.checkout') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        subdomain: subdomain,
+                        product_id: productId,
+                        quantity: data.quantity,
+                        shipping_address: data.shipping_address,
+                        contact_phone: data.contact_phone,
+                        gateway: data.gateway,
+                        sender_phone: data.sender_phone,
+                        trx_id: data.trx_id
+                    })
+                })
+                .then(res => res.json())
+                .then(resData => {
+                    if (resData.success) {
+                        Swal.fire({
+                            title: 'Order Placed & Payment Submitted!',
+                            html: `
+                                <div class="text-start small">
+                                    <div class="alert alert-success border-0 mb-3 p-3 rounded-3">
+                                        <div class="fw-bold fs-6 mb-1">Order #${resData.order_number}</div>
+                                        <div>Your wholesale order has been submitted and is pending Super Admin payment verification.</div>
+                                    </div>
+                                    <ul class="text-muted ps-3 mb-3">
+                                        <li>Super Admin will verify your <strong>${data.gateway.toUpperCase()}</strong> transaction (<strong>${data.trx_id}</strong>).</li>
+                                        <li>Upon acceptance, a delivery order will be dispatched to supplier (<strong>@${subdomain}</strong>) to ship goods to your address.</li>
+                                        <li>Purchased units will be allocated into your store catalog.</li>
+                                    </ul>
+                                </div>
+                            `,
+                            icon: 'success',
+                            showCancelButton: true,
+                            confirmButtonColor: '#4f46e5',
+                            cancelButtonColor: '#64748b',
+                            confirmButtonText: '<i class="fas fa-receipt me-1"></i> View My Orders',
+                            cancelButtonText: 'Continue Browsing'
+                        }).then((r) => {
+                            if (r.isConfirmed) {
+                                window.location.href = "{{ route('admin.wholesale-orders.index') }}";
+                            }
+                        });
+
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-check me-1"></i> Order Placed';
+                            btn.classList.remove('btn-primary');
+                            btn.classList.add('btn-success');
+                        }
+                    } else {
+                        Swal.fire('Error', resData.message || 'Could not place wholesale order.', 'error');
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                        }
+                    }
+                })
+                .catch(err => {
+                    Swal.fire('Error', 'Network error submitting order.', 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = originalContent;
+                    }
                 });
-                btn.disabled = false;
-                btn.innerHTML = originalContent;
-            });
+
+            } else {
+                // Just Copy Mode (Catalog Listing)
+                fetch("{{ route('admin.global-products.copy') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        subdomain: subdomain,
+                        product_id: productId,
+                        copy_mode: 'copy',
+                        quantity: 0
+                    })
+                })
+                .then(res => res.json())
+                .then(resData => {
+                    if (resData.success) {
+                        Swal.fire({
+                            title: 'Product Copied!',
+                            text: resData.message,
+                            icon: 'success',
+                            confirmButtonColor: '#4f46e5'
+                        });
+
+                        const statusCell = document.getElementById('status-cell-' + rowKey);
+                        if (statusCell) {
+                            statusCell.innerHTML = '<span class="badge-in-store"><i class="fas fa-check-circle"></i> In Store</span>';
+                        }
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-check me-1"></i> Copied';
+                            btn.classList.remove('btn-primary');
+                            btn.classList.add('btn-success');
+                            setTimeout(() => {
+                                btn.classList.remove('btn-success');
+                                btn.classList.add('btn-primary');
+                                btn.innerHTML = '<i class="fas fa-cart-shopping"></i> Purchase';
+                            }, 2500);
+                        }
+                    } else {
+                        Swal.fire('Error', resData.message || 'Failed to copy product', 'error');
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                        }
+                    }
+                })
+                .catch(err => {
+                    Swal.fire('Error', 'Network error occurred', 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = originalContent;
+                    }
+                });
+            }
         }
     });
 }
