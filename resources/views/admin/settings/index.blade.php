@@ -3494,20 +3494,20 @@
                         </div>
                         <div class="card-body" style="padding: 20px;">
                             <div class="row">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Sale Price Markup (%)</label>
                                         <input type="number" name="single_product[sale_price_percent]" class="form-control"
                                             value="{{ $single_product['sale_price_percent'] ?? 10 }}" min="0" step="0.1">
-                                        <small class="form-text text-muted">Markup added to cost for Sale Price.</small>
+                                        <small class="form-text text-muted">Markup for Sale Price.</small>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Old Price Markup (%)</label>
                                         <input type="number" name="single_product[old_price_percent]" class="form-control"
                                             value="{{ $single_product['old_price_percent'] ?? 20 }}" min="0" step="0.1">
-                                        <small class="form-text text-muted">Markup added to cost for Old Price.</small>
+                                        <small class="form-text text-muted">Markup for Old Price.</small>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -3515,15 +3515,23 @@
                                         <label>Wholesale Price Markup (%)</label>
                                         <input type="number" name="single_product[wholesale_price_percent]" class="form-control"
                                             value="{{ $single_product['wholesale_price_percent'] ?? 2 }}" min="0" step="0.1">
-                                        <small class="form-text text-muted">Markup added to cost for Wholesale Price.</small>
+                                        <small class="form-text text-muted">Markup for Wholesale Price.</small>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Reseller Price Markup (%)</label>
                                         <input type="number" name="single_product[reseller_price_percent]" class="form-control"
                                             value="{{ $single_product['reseller_price_percent'] ?? 5 }}" min="0" step="0.1">
-                                        <small class="form-text text-muted">Markup added to cost for Reseller Price.</small>
+                                        <small class="form-text text-muted">Markup for Reseller Price.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Global Price Markup (%)</label>
+                                        <input type="number" name="single_product[global_price_percent]" class="form-control"
+                                            value="{{ $single_product['global_price_percent'] ?? 10 }}" min="0" step="0.1">
+                                        <small class="form-text text-muted">Markup for SaaS Global Price.</small>
                                     </div>
                                 </div>
                             </div>

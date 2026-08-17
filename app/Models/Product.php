@@ -119,6 +119,7 @@ class Product extends Model
         'product_cost',
         'wholesale_price',
         'reseller_price',
+        'global_price',
         'status',
         'quantity',
         'weight',

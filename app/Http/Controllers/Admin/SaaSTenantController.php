@@ -289,6 +289,10 @@ class SaaSTenantController extends Controller
                         }
                     }
 
+                    $globalPrice = (isset($prod->global_price) && floatval($prod->global_price) > 0)
+                        ? floatval($prod->global_price)
+                        : ($varComb && isset($varComb->global_price) && floatval($varComb->global_price) > 0 ? floatval($varComb->global_price) : 0);
+
                     $resellerPrice = (isset($prod->reseller_price) && floatval($prod->reseller_price) > 0)
                         ? floatval($prod->reseller_price)
                         : ($varComb && isset($varComb->reseller_price) && floatval($varComb->reseller_price) > 0 ? floatval($varComb->reseller_price) : 0);
@@ -301,22 +305,31 @@ class SaaSTenantController extends Controller
                         ? floatval($prod->wholesale_price)
                         : ($varComb && isset($varComb->wholesale_price) && floatval($varComb->wholesale_price) > 0 ? floatval($varComb->wholesale_price) : 0);
 
-                    $sellingPrice = (isset($prod->offer) && floatval($prod->offer) > 0)
-                        ? floatval($prod->offer)
-                        : ((isset($prod->price) && floatval($prod->price) > 0) 
-                            ? floatval($prod->price) 
-                            : ((isset($prod->old_price) && floatval($prod->old_price) > 0) 
-                                ? floatval($prod->old_price) 
-                                : ($varComb && isset($varComb->offer_price) && floatval($varComb->offer_price) > 0 
-                                    ? floatval($varComb->offer_price) 
-                                    : ($varComb && isset($varComb->regular_price) && floatval($varComb->regular_price) > 0 
-                                        ? floatval($varComb->regular_price) 
-                                        : 0))));
+                    $productOldPrice = (isset($prod->old_price) && floatval($prod->old_price) > 0)
+                        ? floatval($prod->old_price)
+                        : ($varComb && isset($varComb->regular_price) && floatval($varComb->regular_price) > 0 
+                            ? floatval($varComb->regular_price) 
+                            : ((isset($prod->price) && floatval($prod->price) > 0) ? floatval($prod->price) : 0));
 
+                    $productOfferPrice = (isset($prod->offer) && floatval($prod->offer) > 0)
+                        ? floatval($prod->offer)
+                        : ($varComb && isset($varComb->offer_price) && floatval($varComb->offer_price) > 0 
+                            ? floatval($varComb->offer_price) 
+                            : 0);
+
+                    $sellingPrice = ($productOfferPrice > 0) 
+                        ? $productOfferPrice 
+                        : ($productOldPrice > 0 ? $productOldPrice : ((isset($prod->price) && floatval($prod->price) > 0) ? floatval($prod->price) : 0));
+
+                    $hasGlobalPrice = ($globalPrice > 0);
                     $hasResellerPrice = ($resellerPrice > 0);
 
                     if ($currentTab === 'admin') {
-                        if ($hasResellerPrice) {
+                        if ($hasGlobalPrice) {
+                            $finalPrice = $globalPrice;
+                            $commissionAmount = 0;
+                            $basePrice = $globalPrice;
+                        } elseif ($hasResellerPrice) {
                             $finalPrice = $resellerPrice;
                             $commissionAmount = 0;
                             $basePrice = $resellerPrice;
@@ -336,6 +349,8 @@ class SaaSTenantController extends Controller
                         // Wholesellers tab
                         if ($baseWholesale > 0) {
                             $basePrice = $baseWholesale;
+                        } elseif ($globalPrice > 0) {
+                            $basePrice = $globalPrice;
                         } elseif ($productCost > 0) {
                             $basePrice = $productCost;
                         } else {
@@ -353,6 +368,8 @@ class SaaSTenantController extends Controller
                         'title' => $prod->title,
                         'thumb_image' => $thumbImageUrl,
                         'is_admin_tab' => ($currentTab === 'admin'),
+                        'has_global_price' => $hasGlobalPrice,
+                        'global_price' => $globalPrice,
                         'has_reseller_price' => $hasResellerPrice,
                         'reseller_price' => $resellerPrice,
                         'product_cost' => $productCost,
@@ -362,9 +379,9 @@ class SaaSTenantController extends Controller
                         'is_custom_commission' => $isCustomCommission,
                         'commission_amount' => $commissionAmount,
                         'final_wholesale_price' => $finalPrice,
-                        'price' => $sellingPrice > 0 ? $sellingPrice : (isset($prod->price) ? $prod->price : ($prod->old_price ?? 0)),
-                        'old_price' => isset($prod->old_price) && floatval($prod->old_price) > 0 ? floatval($prod->old_price) : ($varComb->regular_price ?? 0),
-                        'offer' => isset($prod->offer) && floatval($prod->offer) > 0 ? floatval($prod->offer) : ($varComb->offer_price ?? 0),
+                        'price' => $sellingPrice,
+                        'old_price' => $productOldPrice,
+                        'offer' => $productOfferPrice,
                         'quantity' => $prod->quantity,
                         'status' => $prod->status,
                         'vendor_name' => $vendor ? ($vendor->business_name ?: $vendor->name) : ($currentTab === 'admin' ? 'Tenant Admin' : 'N/A'),

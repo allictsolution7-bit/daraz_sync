@@ -327,6 +327,7 @@ class ProductController extends Controller
                 'combinations.*.product_cost' => 'nullable|numeric|min:0',
                 'combinations.*.wholesale_price' => 'nullable|numeric|min:0',
                 'combinations.*.reseller_price' => 'nullable|numeric|min:0',
+                'combinations.*.global_price' => 'nullable|numeric|min:0',
                 'combinations.*.stock_quantity' => 'nullable|numeric|min:0',
                 'combinations.*.short_description' => 'nullable|string|max:1000',
                 'combinations.*.featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,avif|max:15360',
@@ -399,6 +400,7 @@ class ProductController extends Controller
             'product_cost' => $request->input('product_cost'),
             'wholesale_price' => $request->input('wholesale_price'),
             'reseller_price' => $request->input('reseller_price'),
+            'global_price' => $request->input('global_price'),
             'quantity' => $request->input('quantity'),
             'weight' => $request->input('weight', 0.5),
             'status' => $request->input('status'),
@@ -794,6 +796,10 @@ class ProductController extends Controller
             if (isset($customData['reseller_price']) && is_numeric($customData['reseller_price'])) {
                 $combinationData['reseller_price'] = floatval($customData['reseller_price']);
             }
+
+            if (isset($customData['global_price']) && is_numeric($customData['global_price'])) {
+                $combinationData['global_price'] = floatval($customData['global_price']);
+            }
             
             // Handle stock_quantity: if provided (even as empty string), set to 0 if empty/null
             if (isset($customData['stock_quantity'])) {
@@ -1004,6 +1010,7 @@ class ProductController extends Controller
                 'product_cost' => isset($combinationData['product_cost']) && $combinationData['product_cost'] !== '' ? floatval($combinationData['product_cost']) : null,
                 'wholesale_price' => isset($combinationData['wholesale_price']) && $combinationData['wholesale_price'] !== '' ? floatval($combinationData['wholesale_price']) : null,
                 'reseller_price' => isset($combinationData['reseller_price']) && $combinationData['reseller_price'] !== '' ? floatval($combinationData['reseller_price']) : null,
+                'global_price' => isset($combinationData['global_price']) && $combinationData['global_price'] !== '' ? floatval($combinationData['global_price']) : null,
                 'stock_quantity' => isset($combinationData['stock_quantity']) && $combinationData['stock_quantity'] !== '' ? intval($combinationData['stock_quantity']) : 0,
                 'short_description' => $combinationData['short_description'] ?? null,
             ];
@@ -1044,7 +1051,7 @@ class ProductController extends Controller
                 if ($existingCombination) {
                     // Only update fields that were actually provided
                     foreach ($data as $key => $value) {
-                        if ($value !== null || $key === 'offer_price' || $key === 'product_cost' || $key === 'wholesale_price' || $key === 'reseller_price') {
+                        if ($value !== null || $key === 'offer_price' || $key === 'product_cost' || $key === 'wholesale_price' || $key === 'reseller_price' || $key === 'global_price') {
                             $existingCombination->$key = $value;
                         }
                     }
@@ -1195,6 +1202,7 @@ class ProductController extends Controller
                 'combinations.*.product_cost' => 'nullable|numeric|min:0',
                 'combinations.*.wholesale_price' => 'nullable|numeric|min:0',
                 'combinations.*.reseller_price' => 'nullable|numeric|min:0',
+                'combinations.*.global_price' => 'nullable|numeric|min:0',
                 'combinations.*.stock_quantity' => 'nullable|numeric|min:0',
                 'combinations.*.short_description' => 'nullable|string|max:1000',
                 'combinations.*.featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,avif|max:15360',
@@ -1293,6 +1301,7 @@ class ProductController extends Controller
             'product_cost' => $request->input('product_cost'),
             'wholesale_price' => $request->input('wholesale_price'),
             'reseller_price' => $request->input('reseller_price'),
+            'global_price' => $request->input('global_price'),
             'quantity' => $request->input('quantity'),
             'weight' => $request->input('weight', 0.5),
             'status' => $request->input('status'),
@@ -1975,6 +1984,7 @@ class ProductController extends Controller
                                 $cParts[] = 'Tiers: [' . implode(', ', $cTiers) . ']';
                             }
                             if (!is_null($comb->reseller_price)) $cParts[] = 'Reseller: ' . number_format((float)$comb->reseller_price, 2);
+                            if (!is_null($comb->global_price)) $cParts[] = 'Global: ' . number_format((float)$comb->global_price, 2);
                             if (isset($comb->stock_quantity)) $cParts[] = 'Stock: ' . $comb->stock_quantity;
                             if (!empty($comb->featured_image)) {
                                 $cParts[] = 'Image: ' . (str_starts_with($comb->featured_image, 'http') ? $comb->featured_image : url('storage/' . ltrim($comb->featured_image, '/')));

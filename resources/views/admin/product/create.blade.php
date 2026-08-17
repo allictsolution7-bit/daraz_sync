@@ -899,6 +899,13 @@
                                             <label for="resellerPrice">Reseller Price ({{ \App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5) }}%)</label>
                                         </div>
                                     </div>
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control" name="global_price" id="globalPrice"
+                                                placeholder="Enter global price" value="{{ old('global_price') }}" step="0.01">
+                                            <label for="globalPrice">Global Price ({{ \App\Services\SettingsService::get('single_product', 'global_price_percent', 10) }}%)</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -1656,6 +1663,7 @@
                                 <th>Product Cost (৳)</th>
                                 <th>Wholesale Price (৳)</th>
                                 <th>Reseller Price (৳)</th>
+                                <th>Global Price (৳)</th>
                                 <th>Stock</th>
                                 <th>Description</th>
                                 <th>Images</th>
@@ -1732,6 +1740,16 @@
                                name="combinations[${index}][reseller_price]" 
                                value=""
                                placeholder="Reseller"
+                               style="width: 90px;">
+                    </td>
+                    <td>
+                        <input type="number" 
+                               step="0.01" 
+                               min="0" 
+                               class="form-control combination-global-price" 
+                               name="combinations[${index}][global_price]" 
+                               value=""
+                               placeholder="Global"
                                style="width: 90px;">
                     </td>
                     <td>
@@ -2597,7 +2615,8 @@
             sale: {{ \App\Services\SettingsService::get('single_product', 'sale_price_percent', 10) }},
             old: {{ \App\Services\SettingsService::get('single_product', 'old_price_percent', 20) }},
             wholesale: {{ \App\Services\SettingsService::get('single_product', 'wholesale_price_percent', 2) }},
-            reseller: {{ \App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5) }}
+            reseller: {{ \App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5) }},
+            global: {{ \App\Services\SettingsService::get('single_product', 'global_price_percent', 10) }}
         };
 
         const productCostInput = document.getElementById('productCost');
@@ -2605,6 +2624,7 @@
         const oldPriceInput = document.getElementById('productOldPrice');
         const wholesalePriceInput = document.getElementById('wholesalePrice');
         const resellerPriceInput = document.getElementById('resellerPrice');
+        const globalPriceInput = document.getElementById('globalPrice');
 
         if (productCostInput) {
             productCostInput.addEventListener('input', function() {
@@ -2614,11 +2634,13 @@
                     if (oldPriceInput) oldPriceInput.value = (cost * (1 + pricingPercentages.old / 100)).toFixed(2);
                     if (wholesalePriceInput) wholesalePriceInput.value = (cost * (1 + pricingPercentages.wholesale / 100)).toFixed(2);
                     if (resellerPriceInput) resellerPriceInput.value = (cost * (1 + pricingPercentages.reseller / 100)).toFixed(2);
+                    if (globalPriceInput) globalPriceInput.value = (cost * (1 + pricingPercentages.global / 100)).toFixed(2);
                 } else if (this.value === '') {
                     if (salePriceInput) salePriceInput.value = '';
                     if (oldPriceInput) oldPriceInput.value = '';
                     if (wholesalePriceInput) wholesalePriceInput.value = '';
                     if (resellerPriceInput) resellerPriceInput.value = '';
+                    if (globalPriceInput) globalPriceInput.value = '';
                 }
             });
         }
@@ -2633,17 +2655,20 @@
                     const oldPriceInRow = tr.querySelector('.combination-regular-price');
                     const wholesalePriceInRow = tr.querySelector('.combination-wholesale-price');
                     const resellerPriceInRow = tr.querySelector('.combination-reseller-price');
+                    const globalPriceInRow = tr.querySelector('.combination-global-price');
 
                     if (!isNaN(cost) && cost > 0) {
                         if (salePriceInRow) salePriceInRow.value = (cost * (1 + pricingPercentages.sale / 100)).toFixed(2);
                         if (oldPriceInRow) oldPriceInRow.value = (cost * (1 + pricingPercentages.old / 100)).toFixed(2);
                         if (wholesalePriceInRow) wholesalePriceInRow.value = (cost * (1 + pricingPercentages.wholesale / 100)).toFixed(2);
                         if (resellerPriceInRow) resellerPriceInRow.value = (cost * (1 + pricingPercentages.reseller / 100)).toFixed(2);
+                        if (globalPriceInRow) globalPriceInRow.value = (cost * (1 + pricingPercentages.global / 100)).toFixed(2);
                     } else if (e.target.value === '') {
                         if (salePriceInRow) salePriceInRow.value = '';
                         if (oldPriceInRow) oldPriceInRow.value = '';
                         if (wholesalePriceInRow) wholesalePriceInRow.value = '';
                         if (resellerPriceInRow) resellerPriceInRow.value = '';
+                        if (globalPriceInRow) globalPriceInRow.value = '';
                     }
                 }
             }

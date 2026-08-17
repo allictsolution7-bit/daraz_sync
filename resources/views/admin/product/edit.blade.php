@@ -531,6 +531,14 @@
                                         </div>
                                         @error('reseller_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
+                                    <div class="col-12 col-sm-6 col-lg">
+                                        <label class="form-label">Global Price ({{ \App\Services\SettingsService::get('single_product', 'global_price_percent', 10) }}%)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">৳</span>
+                                            <input type="number" class="form-control @error('global_price') is-invalid @enderror" id="globalPrice" name="global_price" step="0.01" value="{{ old('global_price', $product->global_price) }}">
+                                        </div>
+                                        @error('global_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
                                 </div>
                             </div>
 
@@ -716,6 +724,7 @@
                                                     <th>Product Cost (৳)</th>
                                                     <th>Wholesale Price (৳)</th>
                                                     <th>Reseller Price (৳)</th>
+                                                    <th>Global Price (৳)</th>
                                                     <th>Stock</th>
                                                     <th>Description</th>
                                                     <th>Images</th>
@@ -747,6 +756,7 @@
                                                         </div>
                                                     </td>
                                                     <td><input type="number" step="0.01" min="0" class="form-control combination-reseller-price" name="combinations[{{ $index }}][reseller_price]" value="{{ $combination->reseller_price }}" placeholder="Reseller" style="width: 90px;"></td>
+                                                    <td><input type="number" step="0.01" min="0" class="form-control combination-global-price" name="combinations[{{ $index }}][global_price]" value="{{ $combination->global_price }}" placeholder="Global" style="width: 90px;"></td>
                                                     <td><input type="number" min="0" class="form-control combination-stock" name="combinations[{{ $index }}][stock_quantity]" value="{{ $combination->stock_quantity }}" placeholder="0" style="width: 70px;"></td>
                                                     <td><textarea class="form-control combination-description" name="combinations[{{ $index }}][short_description]" rows="2" placeholder="Brief description..." style="width: 200px; resize: vertical;">{{ $combination->short_description }}</textarea></td>
                                                     <td>
@@ -1297,7 +1307,8 @@
                     <span id="tier-badge-${currentIndex}" class="badge bg-success mt-1" style="font-size: 8px; display: none;">0 tier(s)</span>
                 </div>
             </td>
-            <td><input type="number" step="0.01" min="0" class="form-control" name="combinations[${currentIndex}][reseller_price]" value="" placeholder="Reseller" style="width: 90px;"></td>
+            <td><input type="number" step="0.01" min="0" class="form-control combination-reseller-price" name="combinations[${currentIndex}][reseller_price]" value="" placeholder="Reseller" style="width: 90px;"></td>
+            <td><input type="number" step="0.01" min="0" class="form-control combination-global-price" name="combinations[${currentIndex}][global_price]" value="" placeholder="Global" style="width: 90px;"></td>
             <td><input type="number" min="0" class="form-control" name="combinations[${currentIndex}][stock_quantity]" value="0" placeholder="0" style="width: 70px;"></td>
             <td><textarea class="form-control" name="combinations[${currentIndex}][short_description]" rows="2" placeholder="Brief description..." style="width: 200px; resize: vertical;"></textarea></td>
             <td>
@@ -1317,7 +1328,7 @@
         variations.forEach(variation => { const nameInput = variation.querySelector('input[name*="[name]"]'); if (nameInput && nameInput.value.trim()) variationNames.push(nameInput.value.trim()); });
         let tableHTML = `<div class="table-responsive"><table class="table table-bordered table-striped align-middle" style="min-width: 1200px;"><thead class="table-dark"><tr><th>#</th>`;
         variationNames.forEach(name => tableHTML += `<th>${name}</th>`);
-        tableHTML += `<th>Regular Price (৳)</th><th>Offer Price (৳)</th><th>Product Cost (৳)</th><th>Wholesale Price (৳)</th><th>Reseller Price (৳)</th><th>Stock</th><th>Description</th><th>Images</th><th>Actions</th></tr></thead><tbody></tbody></table></div>`;
+        tableHTML += `<th>Regular Price (৳)</th><th>Offer Price (৳)</th><th>Product Cost (৳)</th><th>Wholesale Price (৳)</th><th>Reseller Price (৳)</th><th>Global Price (৳)</th><th>Stock</th><th>Description</th><th>Images</th><th>Actions</th></tr></thead><tbody></tbody></table></div>`;
         tableDiv.innerHTML = tableHTML;
      }
 
@@ -1522,7 +1533,8 @@
             sale: {{ \App\Services\SettingsService::get('single_product', 'sale_price_percent', 10) }},
             old: {{ \App\Services\SettingsService::get('single_product', 'old_price_percent', 20) }},
             wholesale: {{ \App\Services\SettingsService::get('single_product', 'wholesale_price_percent', 2) }},
-            reseller: {{ \App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5) }}
+            reseller: {{ \App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5) }},
+            global: {{ \App\Services\SettingsService::get('single_product', 'global_price_percent', 10) }}
         };
 
         const productCostInput = document.getElementById('productCost');
@@ -1530,6 +1542,7 @@
         const oldPriceInput = document.getElementById('oldPrice');
         const wholesalePriceInput = document.getElementById('wholesalePrice');
         const resellerPriceInput = document.getElementById('resellerPrice');
+        const globalPriceInput = document.getElementById('globalPrice');
 
         if (productCostInput) {
             productCostInput.addEventListener('input', function() {
@@ -1539,11 +1552,13 @@
                     if (oldPriceInput) oldPriceInput.value = (cost * (1 + pricingPercentages.old / 100)).toFixed(2);
                     if (wholesalePriceInput) wholesalePriceInput.value = (cost * (1 + pricingPercentages.wholesale / 100)).toFixed(2);
                     if (resellerPriceInput) resellerPriceInput.value = (cost * (1 + pricingPercentages.reseller / 100)).toFixed(2);
+                    if (globalPriceInput) globalPriceInput.value = (cost * (1 + pricingPercentages.global / 100)).toFixed(2);
                 } else if (this.value === '') {
                     if (salePriceInput) salePriceInput.value = '';
                     if (oldPriceInput) oldPriceInput.value = '';
                     if (wholesalePriceInput) wholesalePriceInput.value = '';
                     if (resellerPriceInput) resellerPriceInput.value = '';
+                    if (globalPriceInput) globalPriceInput.value = '';
                 }
             });
         }
@@ -1558,17 +1573,20 @@
                     const oldPriceInRow = tr.querySelector('.combination-regular-price');
                     const wholesalePriceInRow = tr.querySelector('.combination-wholesale-price');
                     const resellerPriceInRow = tr.querySelector('.combination-reseller-price');
+                    const globalPriceInRow = tr.querySelector('.combination-global-price');
 
                     if (!isNaN(cost) && cost > 0) {
                         if (salePriceInRow) salePriceInRow.value = (cost * (1 + pricingPercentages.sale / 100)).toFixed(2);
                         if (oldPriceInRow) oldPriceInRow.value = (cost * (1 + pricingPercentages.old / 100)).toFixed(2);
                         if (wholesalePriceInRow) wholesalePriceInRow.value = (cost * (1 + pricingPercentages.wholesale / 100)).toFixed(2);
                         if (resellerPriceInRow) resellerPriceInRow.value = (cost * (1 + pricingPercentages.reseller / 100)).toFixed(2);
+                        if (globalPriceInRow) globalPriceInRow.value = (cost * (1 + pricingPercentages.global / 100)).toFixed(2);
                     } else if (e.target.value === '') {
                         if (salePriceInRow) salePriceInRow.value = '';
                         if (oldPriceInRow) oldPriceInRow.value = '';
                         if (wholesalePriceInRow) wholesalePriceInRow.value = '';
                         if (resellerPriceInRow) resellerPriceInRow.value = '';
+                        if (globalPriceInRow) globalPriceInRow.value = '';
                     }
                 }
             }

@@ -104,7 +104,7 @@
                         <th class="py-3" style="white-space: nowrap;">Wholeseller / Vendor</th>
                         <th class="py-3" style="white-space: nowrap;">Retail Price</th>
                         <th class="py-3" style="white-space: nowrap;">
-                            {{ $currentTab === 'admin' ? 'Resell Price' : 'Wholesale Price' }}
+                            {{ $currentTab === 'admin' ? 'Global Price' : 'Wholesale Price' }}
                         </th>
                         <th class="py-3" style="white-space: nowrap;">Stock</th>
                         <th class="py-3" style="white-space: nowrap;">Status</th>
@@ -147,22 +147,27 @@
                                 </div>
                             </td>
                             <td style="white-space: nowrap;">
-                                @if($product['offer'] > 0)
-                                    <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($product['offer'], 2) }}</span>
-                                    <del class="text-muted small d-block" style="font-size: 10px;">৳{{ number_format($product['price'], 2) }}</del>
+                                @php
+                                    $sellPrice = floatval($product['price'] ?? 0);
+                                    $oldRegularPrice = floatval($product['old_price'] ?? 0);
+                                    $hasDiscount = ($oldRegularPrice > 0 && $sellPrice > 0 && $oldRegularPrice > $sellPrice);
+                                @endphp
+                                @if($hasDiscount)
+                                    <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($sellPrice, 2) }}</span>
+                                    <del class="text-muted small d-block" style="font-size: 10px;">৳{{ number_format($oldRegularPrice, 2) }}</del>
                                 @else
-                                    <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($product['price'], 2) }}</span>
+                                    <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($sellPrice > 0 ? $sellPrice : $oldRegularPrice, 2) }}</span>
                                 @endif
                             </td>
                             <td style="white-space: nowrap;">
                                 @if($currentTab === 'admin')
-                                    @if(!empty($product['has_reseller_price']))
+                                    @if(!empty($product['has_global_price']))
                                         <div class="d-flex flex-column">
                                             <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
                                                 ৳{{ number_format($product['final_wholesale_price'], 2) }}
                                             </span>
                                             <span class="text-muted small" style="font-size: 10px;">
-                                                Set Resell Price
+                                                Set Global Price
                                             </span>
                                         </div>
                                     @elseif(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
@@ -175,6 +180,15 @@
                                             </span>
                                             <span class="text-muted small" style="font-size: 10px;">
                                                 Cost: ৳{{ number_format($product['base_price'], 2) }} (+৳{{ number_format($product['commission_amount'], 2) }})
+                                            </span>
+                                        </div>
+                                    @elseif(!empty($product['has_reseller_price']))
+                                        <div class="d-flex flex-column">
+                                            <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
+                                                ৳{{ number_format($product['final_wholesale_price'], 2) }}
+                                            </span>
+                                            <span class="text-muted small" style="font-size: 10px;">
+                                                Set Resell Price
                                             </span>
                                         </div>
                                     @else
