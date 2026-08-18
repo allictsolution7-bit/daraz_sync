@@ -74,9 +74,28 @@ class GlobalProductService
         $totalAdminCount = 0;
         $errors = [];
 
-        // Check local store product titles to mark already copied products
-        $localProductTitles = Product::pluck('title')->map(fn($t) => trim(strtolower($t)))->toArray();
-        $localTitlesSet = array_flip($localProductTitles);
+        // Check local store products strictly for current logged-in admin
+        $currentUser = auth()->user();
+        $currentUserId = $currentUser?->id;
+
+        $localQuery = Product::select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id');
+        if ($currentUserId) {
+            $localQuery->where(function($q) use ($currentUserId) {
+                $q->where('copied_by_admin_id', $currentUserId)
+                  ->orWhere('created_by', $currentUserId);
+            });
+        }
+        $localProducts = $localQuery->get();
+
+        $localBySource = [];
+        $localByTitle = [];
+        foreach ($localProducts as $lp) {
+            $cleanTitle = trim(strtolower($lp->title));
+            $localByTitle[$cleanTitle] = $lp;
+            if (!empty($lp->source_tenant_subdomain) && !empty($lp->source_product_id)) {
+                $localBySource[$lp->source_tenant_subdomain . '_' . $lp->source_product_id] = $lp;
+            }
+        }
 
         foreach ($tenants as $tenant) {
             try {
@@ -438,13 +457,25 @@ class GlobalProductService
                     $variantRetailPrices = array_filter(array_map(fn($v) => floatval($v['price'] ?? 0), $formattedVariants), fn($p) => $p > 0);
                     $variantWholesalePrices = array_filter(array_map(fn($v) => floatval($v['final_wholesale_price'] ?? 0), $formattedVariants), fn($p) => $p > 0);
 
-                    $isAlreadyCopied = isset($localTitlesSet[trim(strtolower($prod->title))]);
+                    $sourceKey = $tenant->subdomain . '_' . $prod->id;
+                    $matchedLocal = $localBySource[$sourceKey] ?? ($localByTitle[trim(strtolower($prod->title))] ?? null);
+                    
+                    $isAlreadyCopied = !is_null($matchedLocal);
+                    $localStock = $matchedLocal ? (int)$matchedLocal->quantity : 0;
+                    $storeStatusType = 'not_in_store';
+                    if ($matchedLocal) {
+                        $storeStatusType = ($localStock > 0) ? 'purchased' : 'copied';
+                    }
 
                     $allProducts[] = [
                         'tenant_name' => $tenant->name,
                         'tenant_subdomain' => $tenant->subdomain,
                         'tenant_id' => $tenant->id,
                         'id' => $prod->id,
+                        'is_already_copied' => $isAlreadyCopied,
+                        'store_status_type' => $storeStatusType,
+                        'local_stock' => $localStock,
+                        'local_product_id' => $matchedLocal?->id,
                         'title' => $prod->title,
                         'slug' => $prod->slug ?? Str::slug($prod->title),
                         'category_name' => $categories[$prod->category_id] ?? 'Uncategorized',
@@ -605,8 +636,6 @@ class GlobalProductService
                 ->get();
 
             // 2. Insertion into TARGET database
-            DB::beginTransaction();
-
             // Resolve / Map Category in target DB
             $targetCategoryId = null;
             if ($sourceCategory) {
@@ -811,8 +840,10 @@ class GlobalProductService
                 VariationCombination::create($combData);
             }
 
-            if ($ownsTransaction && DB::transactionLevel() > 0) {
-                DB::commit();
+            if ($ownsTransaction) {
+                while (DB::transactionLevel() > 0) {
+                    DB::commit();
+                }
             }
 
             return [
@@ -822,8 +853,10 @@ class GlobalProductService
                 'message' => "Product '{$newProduct->title}' was successfully copied into your store catalog!",
             ];
         } catch (\Throwable $e) {
-            if ($ownsTransaction && DB::transactionLevel() > 0) {
-                DB::rollBack();
+            if ($ownsTransaction) {
+                while (DB::transactionLevel() > 0) {
+                    DB::rollBack();
+                }
             }
             Log::error("Failed to copy global product #{$sourceProductId} from tenant {$sourceSubdomain}: " . $e->getMessage());
             return [

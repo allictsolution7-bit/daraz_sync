@@ -416,6 +416,8 @@
                                        data-unit-price="{{ $product['final_wholesale_price'] ?? $product['wholesale_price'] ?? $product['price'] ?? 0 }}"
                                        data-stock="{{ $product['quantity'] ?? 0 }}"
                                        data-image="{{ $product['thumb_image'] ?? '' }}"
+                                       data-status-type="{{ $product['store_status_type'] ?? ($product['is_already_copied'] ? 'copied' : 'not_in_store') }}"
+                                       data-local-stock="{{ $product['local_stock'] ?? 0 }}"
                                        onchange="updateBulkButtonState()">
                             </td>
                             <td style="width: 70px;">
@@ -517,24 +519,50 @@
                                 @endif
                             </td>
                             <td style="white-space: nowrap;" id="status-cell-{{ $rowUniqueKey }}">
-                                @if($product['is_already_copied'])
-                                    <span class="badge-in-store">
-                                        <i class="fas fa-check-circle"></i> In Store
+                                @if(($product['store_status_type'] ?? '') === 'purchased')
+                                    <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2.5 py-1" style="font-size: 11px; font-weight: 700;">
+                                        <i class="fas fa-boxes-stacked me-1"></i> Purchased ({{ $product['local_stock'] ?? 0 }} in store)
+                                    </span>
+                                @elseif(($product['store_status_type'] ?? '') === 'copied' || !empty($product['is_already_copied']))
+                                    <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle px-2.5 py-1" style="font-size: 11px; font-weight: 700;">
+                                        <i class="fas fa-copy me-1"></i> Copied (Listing) 0
                                     </span>
                                 @else
-                                    <span class="badge-available">
-                                        <i class="fas fa-plus"></i> Ready to Add
+                                    <span class="badge rounded-pill bg-light text-muted border px-2.5 py-1" style="font-size: 11px; font-weight: 600;">
+                                        <i class="fas fa-plus me-1"></i> Ready to Add
                                     </span>
                                 @endif
                             </td>
                             <td class="pe-4 text-end" style="white-space: nowrap;" id="action-cell-{{ $rowUniqueKey }}">
-                                <button type="button" 
-                                        class="btn btn-sm btn-primary rounded-3 px-3 py-1.5 font-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" 
-                                        id="btn-action-{{ $rowUniqueKey }}"
-                                        style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; font-size: 0.825rem;"
-                                        onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}')">
-                                    <i class="fas fa-cart-shopping"></i> Purchase
-                                </button>
+                                @php
+                                    $sStatus = $product['store_status_type'] ?? ($product['is_already_copied'] ? 'copied' : 'not_in_store');
+                                    $lStock = $product['local_stock'] ?? 0;
+                                @endphp
+                                @if($sStatus === 'purchased')
+                                    <button type="button" 
+                                            class="btn btn-sm btn-success rounded-3 px-3 py-1.5 font-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" 
+                                            id="btn-action-{{ $rowUniqueKey }}"
+                                            style="font-size: 0.825rem;"
+                                            onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'purchased', '{{ $lStock }}')">
+                                        <i class="fas fa-cart-plus"></i> Buy More Stock
+                                    </button>
+                                @elseif($sStatus === 'copied')
+                                    <button type="button" 
+                                            class="btn btn-sm btn-primary rounded-3 px-3 py-1.5 font-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" 
+                                            id="btn-action-{{ $rowUniqueKey }}"
+                                            style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; font-size: 0.825rem;"
+                                            onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'copied', '0')">
+                                        <i class="fas fa-truck-ramp-box"></i> Purchase Stock
+                                    </button>
+                                @else
+                                    <button type="button" 
+                                            class="btn btn-sm btn-primary rounded-3 px-3 py-1.5 font-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" 
+                                            id="btn-action-{{ $rowUniqueKey }}"
+                                            style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; font-size: 0.825rem;"
+                                            onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'not_in_store', '0')">
+                                        <i class="fas fa-cart-shopping"></i> Purchase
+                                    </button>
+                                @endif
                             </td>
                         </tr>
 
@@ -715,11 +743,12 @@ const GATEWAYS = {
 };
 
 // Open Purchase / Copy Modal with Modern Sleek Design
-function openPurchaseModal(subdomain, productId, title, unitPrice, availableStock, rowKey) {
+function openPurchaseModal(subdomain, productId, title, unitPrice, availableStock, rowKey, storeStatusType = 'not_in_store', localStock = 0) {
     const btn = document.getElementById('btn-action-' + rowKey);
     const originalContent = btn ? btn.innerHTML : '';
     const numPrice = parseFloat(unitPrice) || 0;
     const numStock = parseInt(availableStock) || 0;
+    const isAlreadyInStore = (storeStatusType === 'purchased' || storeStatusType === 'copied');
 
     const modalHtml = `
         <div class="text-start" style="font-size: 13px;">
@@ -742,12 +771,19 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
                 </div>
             </div>
 
+            ${isAlreadyInStore ? `
+                <div class="alert alert-info py-2 px-2.5 rounded-3 mb-3 small d-flex align-items-center justify-content-between" style="font-size: 11.5px; background-color: #f0fdf4; border-color: #bbf7d0; color: #166534;">
+                    <span><i class="fas fa-boxes-stacked text-success me-1"></i> <strong>Current Store Stock:</strong> ${localStock} pcs</span>
+                    <span class="fw-semibold text-success"><i class="fas fa-plus-circle me-1"></i> Restocking adds to your inventory</span>
+                </div>
+            ` : ''}
+
             <!-- Action Mode Selection Cards -->
             <div class="mb-3">
                 <label class="form-label small text-uppercase text-muted fw-bold mb-2" style="font-size: 10.5px; letter-spacing: 0.5px;">Choose Fulfillment Action:</label>
 
-                <!-- Option 1: Instant Catalog Sync (Listing Only) - FIRST -->
-                <div class="action-mode-box active-copy" id="box-opt-copy" style="margin-bottom: 14px;" onclick="selectActionOption('copy')">
+                <!-- Option 1: Instant Catalog Sync (Listing Only) -->
+                <div class="action-mode-box ${isAlreadyInStore ? '' : 'active-copy'}" id="box-opt-copy" style="margin-bottom: 14px;" onclick="selectActionOption('copy')">
                     <div class="d-flex align-items-start gap-2.5">
                         <div class="action-icon-circle" style="background: #e0e7ff; color: #4338ca;">
                             <i class="fas fa-clone"></i>
@@ -758,19 +794,19 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
                                     Instant Catalog Sync (Listing Only)
                                 </span>
                                 <span class="badge rounded-pill px-2 py-0.5" style="background-color: #e0e7ff; color: #3730a3; font-size: 9.5px; font-weight: 700;">
-                                    Free Sync
+                                    ${isAlreadyInStore ? 'Synced' : 'Free Sync'}
                                 </span>
                             </div>
                             <div class="text-muted" style="font-size: 11.5px; line-height: 1.35;">
-                                Add this product to your store catalog immediately without buying inventory stock.
+                                ${isAlreadyInStore ? 'Already in your store catalog. Select wholesale purchase below to add physical stock.' : 'Add this product to your store catalog immediately without buying inventory stock.'}
                             </div>
                         </div>
-                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_copy" value="copy" checked onchange="selectActionOption('copy')" style="cursor: pointer;">
+                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_copy" value="copy" ${isAlreadyInStore ? '' : 'checked'} onchange="selectActionOption('copy')" style="cursor: pointer;">
                     </div>
                 </div>
 
                 <!-- Option 2: Purchase Wholesale Stock -->
-                <div class="action-mode-box" id="box-opt-purchase" onclick="selectActionOption('purchase')">
+                <div class="action-mode-box ${isAlreadyInStore ? 'active-purchase' : ''}" id="box-opt-purchase" onclick="selectActionOption('purchase')">
                     <div class="d-flex align-items-start gap-2.5">
                         <div class="action-icon-circle" style="background: #dcfce7; color: #16a34a;">
                             <i class="fas fa-truck-ramp-box"></i>
@@ -778,21 +814,21 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
                         <div class="flex-grow-1">
                             <div class="d-flex align-items-center justify-content-between mb-0.5">
                                 <span class="fw-bold text-slate-800" style="font-size: 13px; color: #0f172a;">
-                                    Purchase Wholesale Stock (Super Admin Payment)
+                                    ${isAlreadyInStore ? 'Buy Additional Stock / Restock' : 'Purchase Wholesale Stock (Super Admin Payment)'}
                                 </span>
                                 <span class="badge rounded-pill px-2 py-0.5" style="background-color: #dcfce7; color: #15803d; font-size: 9.5px; font-weight: 700;">
                                     Physical Delivery
                                 </span>
                             </div>
                             <div class="text-muted" style="font-size: 11.5px; line-height: 1.35;">
-                                Pay to Super Admin. On approval, supplier (@${subdomain}) ships physical stock to your store.
+                                Pay to Super Admin. On delivery, ${numPrice > 0 ? 'the exact ordered units will be added to your store stock.' : 'supplier ships physical stock to your store.'}
                             </div>
                         </div>
-                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_purchase" value="purchase" onchange="selectActionOption('purchase')" style="cursor: pointer;">
+                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_purchase" value="purchase" ${isAlreadyInStore ? 'checked' : ''} onchange="selectActionOption('purchase')" style="cursor: pointer;">
                     </div>
 
-                    <!-- Purchase Form Details (Hidden until Purchase selected) -->
-                    <div id="purchase-details-section" class="mt-3 pt-3 border-top" style="display: none; border-top-color: #bbf7d0 !important;">
+                    <!-- Purchase Form Details -->
+                    <div id="purchase-details-section" class="mt-3 pt-3 border-top" style="${isAlreadyInStore ? 'display: block;' : 'display: none;'} border-top-color: #bbf7d0 !important;">
                         <!-- Quantity & Total -->
                         <div class="row g-2 mb-3">
                             <div class="col-6">
@@ -901,7 +937,7 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
         title: '<i class="fas fa-cart-flatbed text-primary me-2"></i>Wholesale Fulfillment',
         html: modalHtml,
         showCancelButton: true,
-        confirmButtonText: '<i class="fas fa-clone me-1.5"></i> Sync Product to Catalog',
+        confirmButtonText: isAlreadyInStore ? '<i class="fas fa-check-circle me-1.5"></i> Submit Wholesale Order' : '<i class="fas fa-clone me-1.5"></i> Sync Product to Catalog',
         cancelButtonText: 'Cancel',
         focusConfirm: false,
         width: '640px',
@@ -1184,6 +1220,8 @@ function openBulkPurchaseModal() {
             unit_price: parseFloat(cb.dataset.unitPrice) || 0,
             stock: parseInt(cb.dataset.stock) || 0,
             image: cb.dataset.image || '',
+            status_type: cb.dataset.statusType || 'not_in_store',
+            local_stock: parseInt(cb.dataset.localStock) || 0,
             quantity: 10
         });
     });
@@ -1211,12 +1249,22 @@ function openBulkPurchaseModal() {
             ? `<img src="${item.image}" class="rounded-2 border shadow-xs" style="width: 32px; height: 32px; object-fit: cover;">`
             : `<div class="rounded-2 border bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="fas fa-image text-muted" style="font-size: 10px;"></i></div>`;
 
+        let statusBadge = '';
+        if (item.status_type === 'purchased') {
+            statusBadge = `<span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle ms-1" style="font-size: 8.5px; font-weight: 700;"><i class="fas fa-box-check me-0.5"></i> ${item.local_stock} in stock</span>`;
+        } else if (item.status_type === 'copied') {
+            statusBadge = `<span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle ms-1" style="font-size: 8.5px; font-weight: 700;">Catalog Synced</span>`;
+        }
+
         itemsTableHtml += `
             <tr id="bulk-row-${idx}">
                 <td>${imgTag}</td>
                 <td>
                     <div class="fw-semibold text-slate-800 text-truncate" style="max-width: 190px;" title="${item.title}">${item.title}</div>
-                    <span class="badge rounded-pill" style="background-color: #e0e7ff; color: #4338ca; font-size: 9px; font-weight: 600;">@${item.subdomain}</span>
+                    <div class="d-flex align-items-center gap-1 mt-0.5">
+                        <span class="badge rounded-pill" style="background-color: #e0e7ff; color: #4338ca; font-size: 9px; font-weight: 600;">@${item.subdomain}</span>
+                        ${statusBadge}
+                    </div>
                 </td>
                 <td class="text-end fw-bold text-slate-700">৳${item.unit_price.toFixed(2)}</td>
                 <td class="text-center">
