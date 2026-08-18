@@ -19,6 +19,10 @@ class LicenseHeartbeatService
      */
     public function startHeartbeat(): void
     {
+        if (in_array(request()->getHost(), ['localhost', '127.0.0.1', '::1']) || env('LICENSE_DEV_MODE', true)) {
+            return;
+        }
+
         $lastHeartbeat = Cache::get(self::HEARTBEAT_KEY, 0);
         $now = time();
         

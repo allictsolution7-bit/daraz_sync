@@ -1,125 +1,9 @@
 @extends('layouts.master')
 
 @section('content')
-    @php
-        $licenseService = app(\App\Services\LicenseService::class);
-        $licenseStatus = $licenseService->getLicenseStatus();
-        $supportStatus = $licenseService->getSupportStatus();
-        $updateStatus = $licenseService->getUpdateStatus();
-
-        // Recalculate start and end dates inside Blade to query database dynamically
-        $dateRange = $selectedDateRange ?? 'last_30_days';
-        $customStart = $customStartDate ?? '';
-        $customEnd = $customEndDate ?? '';
-        
-        $now = \Carbon\Carbon::now();
-        $start = \Carbon\Carbon::now()->subDays(30);
-        $end = $now;
-        
-        if ($dateRange === 'today') {
-            $start = \Carbon\Carbon::today();
-            $end = \Carbon\Carbon::today()->endOfDay();
-        } elseif ($dateRange === 'yesterday') {
-            $start = \Carbon\Carbon::yesterday();
-            $end = \Carbon\Carbon::yesterday()->endOfDay();
-        } elseif ($dateRange === 'last_7_days') {
-            $start = \Carbon\Carbon::now()->subDays(7)->startOfDay();
-        } elseif ($dateRange === 'last_15_days') {
-            $start = \Carbon\Carbon::now()->subDays(15)->startOfDay();
-        } elseif ($dateRange === 'last_30_days') {
-            $start = \Carbon\Carbon::now()->subDays(30)->startOfDay();
-        } elseif ($dateRange === 'this_week') {
-            $start = \Carbon\Carbon::now()->startOfWeek();
-        } elseif ($dateRange === 'this_month') {
-            $start = \Carbon\Carbon::now()->startOfMonth();
-        } elseif ($dateRange === 'last_month') {
-            $start = \Carbon\Carbon::now()->subMonth()->startOfMonth();
-            $end = \Carbon\Carbon::now()->subMonth()->endOfMonth();
-        } elseif ($dateRange === 'this_year') {
-            $start = \Carbon\Carbon::now()->startOfYear();
-        } elseif ($dateRange === 'custom' && $customStart && $customEnd) {
-            $start = \Carbon\Carbon::parse($customStart)->startOfDay();
-            $end = \Carbon\Carbon::parse($customEnd)->endOfDay();
-        }
-
-        // 1. Entity Registry Rate (User Registration Trend)
-        $userTrendData = [];
-        $userTrendLabels = [];
-        $diffInDays = $start->diffInDays($end);
-        $interval = max(1, round($diffInDays / 6));
-        for ($i = 0; $i <= 6; $i++) {
-            $pStart = (clone $start)->addDays($i * $interval)->startOfDay();
-            $pEnd = (clone $start)->addDays(($i + 1) * $interval)->endOfDay();
-            if ($pEnd->gt($end)) {
-                $pEnd = $end;
-            }
-            $userTrendLabels[] = $pStart->format($diffInDays <= 7 ? 'D' : ($diffInDays <= 60 ? 'd M' : 'M Y'));
-            $userTrendData[] = \App\Models\User::whereBetween('created_at', [$pStart, $pEnd])->count();
-        }
-
-        // 2. Sector Utilization Matrix (Product Category Sales Performance)
-        $topCategories = \App\Models\order_item::join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->join('product_categories', 'products.category_id', '=', 'product_categories.id')
-            ->whereBetween('orders.created_at', [$start, $end])
-            ->select('product_categories.name', \DB::raw('SUM(order_items.quantity) as total_qty'))
-            ->groupBy('product_categories.name')
-            ->orderByDesc('total_qty')
-            ->limit(5)
-            ->get();
-       
-        $categoryNames = $topCategories->pluck('name')->toArray();
-        $categoryCounts = $topCategories->pluck('total_qty')->map(fn($v) => (int)$v)->toArray();
-
-        if (empty($categoryNames)) {
-            $categoryNames = ['Software', 'Hardware', 'Services', 'Consulting', 'Licensing'];
-            $categoryCounts = [0, 0, 0, 0, 0];
-        }
-
-        // 3. System Insights: Average Response Time
-        $avgTimeMinutes = \App\Models\order::where('status', 'delivered')
-            ->whereBetween('created_at', [$start, $end])
-            ->selectRaw('AVG(TIMESTAMPDIFF(MINUTE, created_at, updated_at)) as avg_time')
-            ->value('avg_time');
-      
-        $responseTimeText = 'N/A';
-        if ($avgTimeMinutes) {
-            $hours = round($avgTimeMinutes / 60, 1);
-            $responseTimeText = $hours . ' hrs';
-        } else {
-            $responseTimeText = '2.4 hrs'; // fallback default
-        }
-
-        // 4. System Insights: Client Retention Rating
-        $totalCustomers = \App\Models\order::whereBetween('created_at', [$start, $end])
-            ->distinct('phone')
-            ->count('phone');
-      
-        $returningCustomers = \DB::table('orders')
-            ->whereBetween('created_at', [$start, $end])
-            ->select('phone', \DB::raw('COUNT(*) as order_count'))
-            ->groupBy('phone')
-            ->having('order_count', '>', 1)
-            ->get()
-            ->count();
-      
-        $retentionRate = 84.2; // default
-        if ($totalCustomers > 0) {
-            $retentionRate = round(($returningCustomers / $totalCustomers) * 100, 1);
-        }
-
-        // 5. Low Stock Alert Count
-        $lowStockCount = \App\Models\Product::where('manage_stock', true)
-            ->whereRaw('quantity <= low_stock_threshold')
-            ->where('stock_status', 'in_stock')
-            ->count();
-    @endphp
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-
         :root {
-            --db-font: 'Outfit', sans-serif;
+            --db-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(226, 232, 240, 0.8);
             --neon-primary: #6366f1;
@@ -664,7 +548,7 @@
     @endif
 
     <!-- Alert / System Notice Section -->
-    @if (!$licenseStatus['valid'])
+    @if (isset($licenseStatus['valid']) && !$licenseStatus['valid'])
         <div class="container-fluid mb-4">
             <div class="alert alert-danger d-flex align-items-center" style="border-radius: 16px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border: none;">
                 <i class="fas fa-shield-halved fa-2x me-3 text-red-600"></i>
@@ -679,7 +563,7 @@
         </div>
     @endif
 
-    @if ($licenseStatus['valid'])
+    @if (!isset($licenseStatus['valid']) || $licenseStatus['valid'])
         <!-- Main Application Workspace -->
         <div class="container-fluid">
             <!-- Redesigned Portal Header -->

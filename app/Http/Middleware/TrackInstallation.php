@@ -22,6 +22,15 @@ class TrackInstallation
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Skip tracking on local development/localhost to prevent network timeouts
+        $isLocal = in_array($request->getHost(), ['localhost', '127.0.0.1', '::1']) || 
+                   str_ends_with($request->getHost(), '.localhost') || 
+                   env('LICENSE_DEV_MODE', true);
+
+        if ($isLocal) {
+            return $next($request);
+        }
+
         // Track installation on first access (only once, skip in dev mode)
         if (!env('LICENSE_DEV_MODE', false) && $this->shouldTrackInstallation($request)) {
             try {

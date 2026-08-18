@@ -51,10 +51,19 @@ class GlobalProductController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        $superAdminBkash = DB::table('settings')->where('key', 'bkash_number')->value('value') ?? '01830501062';
-        $superAdminNagad = DB::table('settings')->where('key', 'nagad_number')->value('value') ?? '01830501062';
-        $superAdminRocket = DB::table('settings')->where('key', 'rocket_number')->value('value') ?? '01830501062';
-        $superAdminBank = DB::table('settings')->where('key', 'bank_account_details')->value('value') ?? 'City Bank: AC 1234567890 (Branch: Dhaka)';
+        $superAdminBkash = '01830501062';
+        $superAdminNagad = '01830501062';
+        $superAdminRocket = '01830501062';
+        $superAdminBank = 'City Bank: AC 1234567890 (Branch: Dhaka)';
+
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('payment_gateways')) {
+                $bk = \App\Models\PaymentGateway::where('provider', 'bkash')->first();
+                if ($bk && !empty($bk->public_key)) $superAdminBkash = $bk->public_key;
+                $ng = \App\Models\PaymentGateway::where('provider', 'nagad')->first();
+                if ($ng && !empty($ng->public_key)) $superAdminNagad = $ng->public_key;
+            }
+        } catch (\Throwable $e) {}
 
         return view('admin.global_products.index', compact(
             'paginatedProducts',

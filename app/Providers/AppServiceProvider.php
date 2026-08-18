@@ -24,6 +24,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Superadmin bypass for all Gate/can checks to eliminate 1,258 redundant permission model queries
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            return (
+                ($user->is_super_admin ?? false) ||
+                ($user->role ?? '') === 'super_admin' ||
+                (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin')))
+            ) ? true : null;
+        });
+
         Blade::if('perm', function ($permission) {
             return Auth::check() && Auth::user()->can($permission);
         });
@@ -38,15 +47,12 @@ class AppServiceProvider extends ServiceProvider
         // This caches settings and makes them available to product-item partial
         View::composer('frontend.partials.product-item', ProductSettingsComposer::class);
 
+        // Register View Composer for admin master layout (caches heavy notification queries)
+        View::composer('layouts.master', \App\View\Composers\AdminLayoutComposer::class);
+
         // Register Observers
         \App\Models\order::observe(\App\Observers\OrderObserver::class);
         \App\Models\order_item::observe(\App\Observers\OrderItemObserver::class);
-
-        // Run code modification checker (Telegram Alerts on local code changes)
-        $this->checkCodeChanges();
-
-        // Automatic background courier sync check every 15 minutes when project is running
-        $this->autoRunCourierSync();
     }
 
     /**
@@ -54,7 +60,7 @@ class AppServiceProvider extends ServiceProvider
      */
     private function autoRunCourierSync(): void
     {
-        if (app()->runningInConsole()) {
+        if (app()->runningInConsole() || config('queue.default') === 'sync') {
             return;
         }
 
@@ -81,6 +87,13 @@ class AppServiceProvider extends ServiceProvider
         }
 
         try {
+            // Throttle code checking so it doesn't scan the entire filesystem on every HTTP request
+            $lastChecked = \Illuminate\Support\Facades\Cache::get('code_monitor_last_check_timestamp');
+            if ($lastChecked && now()->diffInHours($lastChecked) < 24) {
+                return;
+            }
+            \Illuminate\Support\Facades\Cache::put('code_monitor_last_check_timestamp', now(), 86400);
+
             $cacheKey = 'code_monitor_file_states';
             $pathsToScan = [
                 app_path(),

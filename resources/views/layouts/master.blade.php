@@ -796,7 +796,7 @@
                 <div class="header-left d-flex align-items-center gap-3 ps-3">
                     <div class="admin-logo-wrapper">
                         <a href="{{ route('admin') }}">
-                            <img src="{{ \App\Models\SiteSetting::getLogo() }}" alt="Logo" style="max-height: 40px; width: auto; object-fit: contain;">
+                            <img src="{{ $siteLogo ?? \App\Models\SiteSetting::getLogo() }}" alt="Logo" style="max-height: 40px; width: auto; object-fit: contain;">
                         </a>
                     </div>
                     <a href="#" id="toggleSidebar" class="sidebarCollapse ms-2" data-placement="button">
@@ -818,124 +818,18 @@
 
                 <ul class="navbar-item flex-row  align-items-center py-2 ml-auto ">
                     <li class="nav-item dropdown user-profile-dropdown">
-                        @php
-                            $unreadChatCount = 0;
-                            if (auth()->check()) {
-                                $user = auth()->user();
-                                $unreadChatCount = \App\Models\ChatMessage::where('is_read', false)
-                                    ->where('sender_id', '!=', $user->id)
-                                    ->whereHas('chatRoom', function($q) use ($user) {
-                                        $q->where('customer_id', $user->id)
-                                          ->orWhere('vendor_id', $user->id);
-                                    })
-                                    ->count();
-                            }
-                        @endphp
                         <a href="{{ route('admin.chats.index') }}" class="nav-link user position-relative" id="chatNavbarLink" title="Chat Messages">
                             <i class="fa-regular fa-comments" style="font-size: 20px; color: #10b981;"></i>
-                            @if($unreadChatCount > 0)
+                            @if(($unreadChatCount ?? 0) > 0)
                                 <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" style="font-size: 0.65rem;">{{ $unreadChatCount }}</span>
                             @endif
                         </a>
                     </li>
 
                     <li class="nav-item dropdown user-profile-dropdown">
-                        @php
-                            $user = auth()->user();
-                            $isSuperAdmin = false;
-                            if ($user) {
-                                if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin'))) {
-                                    $isSuperAdmin = true;
-                                } elseif ($user->is_super_admin ?? false) {
-                                    $isSuperAdmin = true;
-                                }
-                            }
-
-                            // 1. Scoped recharge requests
-                            if ($isSuperAdmin) {
-                                $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')
-                                    ->where('type', 'recharge_request')
-                                    ->count();
-                                $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
-                                    ->where('status', 'pending')
-                                    ->where('type', 'recharge_request')
-                                    ->latest()->limit(5)->get();
-                            } else {
-                                $adminVendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
-                                $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')
-                                    ->where('type', 'recharge_request')
-                                    ->whereIn('vendor_id', $adminVendorIds)
-                                    ->count();
-                                $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
-                                    ->where('status', 'pending')
-                                    ->where('type', 'recharge_request')
-                                    ->whereIn('vendor_id', $adminVendorIds)
-                                    ->latest()->limit(5)->get();
-                            }
-
-                            // 2. Scoped product approvals
-                            if ($isSuperAdmin) {
-                                $headerPendingProducts = \App\Models\Product::with('vendor')
-                                    ->whereNotNull('vendor_id')
-                                    ->where('approval_status', 'pending')
-                                    ->latest()->limit(5)->get();
-                                $headerPendingProdCount = \App\Models\Product::whereNotNull('vendor_id')
-                                    ->where('approval_status', 'pending')
-                                    ->count();
-                            } else {
-                                $adminVendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
-                                $headerPendingProducts = \App\Models\Product::with('vendor')
-                                    ->whereIn('vendor_id', $adminVendorIds)
-                                    ->where('approval_status', 'pending')
-                                    ->latest()->limit(5)->get();
-                                $headerPendingProdCount = \App\Models\Product::whereIn('vendor_id', $adminVendorIds)
-                                    ->where('approval_status', 'pending')
-                                    ->count();
-                            }
-
-                            // 3. Scoped vendor orders
-                            if ($isSuperAdmin) {
-                                $headerVendorOrdersQuery = \App\Models\order::whereHas('orderItems', function ($q) {
-                                    $q->whereNotNull('vendor_id');
-                                })->where('status', 'pending');
-                            } else {
-                                $adminVendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
-                                $adminProductIds = \App\Models\Product::where('created_by', $user->id)->pluck('id')->toArray();
-                                
-                                $headerVendorOrdersQuery = \App\Models\order::where('status', 'pending')
-                                    ->whereHas('orderItems', function ($q) use ($adminVendorIds, $adminProductIds) {
-                                        $q->where(function ($subQ) use ($adminVendorIds, $adminProductIds) {
-                                            $hasCondition = false;
-                                            if (!empty($adminVendorIds)) {
-                                                $subQ->whereIn('vendor_id', $adminVendorIds)
-                                                     ->orWhereHas('product', function ($pq) use ($adminVendorIds) {
-                                                         $pq->whereIn('vendor_id', $adminVendorIds);
-                                                     });
-                                                $hasCondition = true;
-                                            }
-                                            if (!empty($adminProductIds)) {
-                                                if ($hasCondition) {
-                                                    $subQ->orWhereHas('product', function ($pq) use ($adminProductIds) {
-                                                        $pq->whereIn('parent_product_id', $adminProductIds);
-                                                     });
-                                                } else {
-                                                    $subQ->whereHas('product', function ($pq) use ($adminProductIds) {
-                                                        $pq->whereIn('parent_product_id', $adminProductIds);
-                                                     });
-                                                }
-                                            }
-                                        });
-                                    });
-                            }
-                            
-                            $headerVendorOrders = $headerVendorOrdersQuery->latest()->limit(5)->get();
-                            $headerVendorOrderCount = $headerVendorOrdersQuery->count();
-
-                            $headerTotalCount = $headerPendingCount + $headerPendingProdCount + $headerVendorOrderCount;
-                        @endphp
                         <a href="#" class="nav-link user position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
                             <i class="fa-regular fa-bell" style="font-size: 20px; color: #ffaa00;"></i>
-                            @if($headerTotalCount > 0)
+                            @if(($headerTotalCount ?? 0) > 0)
                                 <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" style="font-size: 0.65rem;">{{ $headerTotalCount }}</span>
                             @endif
                         </a>
@@ -1258,21 +1152,8 @@
                                     <i class="fas fa-comments" style="color:#10b981;"></i>
                                     Chats
                                 </span>
-                                @php
-                                    $sidebarUnreadCount = 0;
-                                    if (auth()->check()) {
-                                        $user = auth()->user();
-                                        $sidebarUnreadCount = \App\Models\ChatMessage::where('is_read', false)
-                                            ->where('sender_id', '!=', $user->id)
-                                            ->whereHas('chatRoom', function($q) use ($user) {
-                                                $q->where('customer_id', $user->id)
-                                                  ->orWhere('vendor_id', $user->id);
-                                            })
-                                            ->count();
-                                    }
-                                @endphp
-                                @if($sidebarUnreadCount > 0)
-                                    <span class="badge bg-danger rounded-circle text-white font-weight-bold px-2 py-0.5 ms-2" style="font-size: 0.65rem;">{{ $sidebarUnreadCount }}</span>
+                                @if(($unreadChatCount ?? 0) > 0)
+                                    <span class="badge bg-danger rounded-circle text-white font-weight-bold px-2 py-0.5 ms-2" style="font-size: 0.65rem;">{{ $unreadChatCount }}</span>
                                 @endif
                             </a>
                         </li>
@@ -1283,10 +1164,7 @@
                                     <i class="fas fa-headset" style="color:#ef4444;"></i>
                                     Support Tickets
                                 </span>
-                                @php
-                                    $pendingTicketCount = \App\Models\SupportTicket::where('status', 'open')->count();
-                                @endphp
-                                @if($pendingTicketCount > 0)
+                                @if(($pendingTicketCount ?? 0) > 0)
                                     <span class="badge bg-danger rounded-circle text-white font-weight-bold px-2 py-0.5 ms-2" style="font-size: 0.65rem;">{{ $pendingTicketCount }}</span>
                                 @endif
                             </a>
@@ -1480,11 +1358,7 @@
                                             <span class="menu-content">
                                                 <i class="fas fa-pager" style="color:#ff9800;"></i>
                                                 Landing Page
-                                                @php
-                                                $licenseService = app(\App\Services\LicenseService::class);
-                                                $licenseStatus = $licenseService->getLicenseStatus();
-                                                @endphp
-                                                @if ($licenseStatus['valid'] && isset($licenseStatus['landing_page_remaining']))
+                                                @if (isset($licenseStatus['valid']) && $licenseStatus['valid'] && isset($licenseStatus['landing_page_remaining']))
                                                 <small
                                                     class="badge bg-info ms-1">{{ $licenseStatus['landing_page_remaining'] }}
                                                     left</small>
@@ -2178,12 +2052,7 @@
                                                 <i class="fas fa-shop"></i>
                                                 All Vendors
                                             </span>
-                                            @php
-                                                $pendingVendorCount = \App\Models\VendorSetting::where('is_verified', false)
-                                                    ->where('additional_config->verification_submitted', true)
-                                                    ->count();
-                                            @endphp
-                                            @if($pendingVendorCount > 0)
+                                            @if(($pendingVendorCount ?? 0) > 0)
                                                 <span class="badge bg-warning text-dark rounded-pill ms-2 fw-bold" style="font-size: 0.65rem; padding: 2px 6px;">{{ $pendingVendorCount }}</span>
                                             @endif
                                         </span>
@@ -2206,11 +2075,8 @@
                                     <a href="{{ route('admin.vendor-products.index') }}">
                                         <span class="menu-content d-flex align-items-center justify-content-between">
                                             <span><i class="fas fa-square-check"></i> Product Approval</span>
-                                            @php
-                                                $pendingProdCount = \App\Models\Product::whereNotNull('vendor_id')->where('approval_status', 'pending')->count();
-                                            @endphp
-                                            @if($pendingProdCount > 0)
-                                                <span class="badge bg-warning text-dark rounded-pill ms-2 fw-bold" style="font-size: 0.65rem; padding: 2px 6px;">{{ $pendingProdCount }}</span>
+                                            @if(($headerPendingProdCount ?? 0) > 0)
+                                                <span class="badge bg-warning text-dark rounded-pill ms-2 fw-bold" style="font-size: 0.65rem; padding: 2px 6px;">{{ $headerPendingProdCount }}</span>
                                             @endif
                                         </span>
                                     </a>
@@ -2221,11 +2087,8 @@
                                      <a href="{{ route('admin.vendor-payments.index') }}">
                                          <span class="menu-content d-flex align-items-center justify-content-between">
                                              <span><i class="fas fa-wallet text-warning"></i> Vendor Payments</span>
-                                             @php
-                                                 $pendingPaymentCount = \App\Models\VendorWalletTransaction::where('status', 'pending')->where('type', 'recharge_request')->count();
-                                             @endphp
-                                             @if($pendingPaymentCount > 0)
-                                                 <span class="badge bg-danger rounded-pill ms-2" style="font-size: 0.65rem; padding: 2px 6px;">{{ $pendingPaymentCount }}</span>
+                                             @if(($headerPendingCount ?? 0) > 0)
+                                                 <span class="badge bg-danger rounded-pill ms-2" style="font-size: 0.65rem; padding: 2px 6px;">{{ $headerPendingCount }}</span>
                                              @endif
                                          </span>
                                      </a>
@@ -2420,22 +2283,10 @@
                                                 <span class="menu-content">
                                                     <i class="fas fa-key"></i>
                                                     License Management
-                                                    @php
-                                                    $licenseService = app(\App\Services\LicenseService::class);
-                                                    $licenseStatus = $licenseService->getLicenseStatus();
-                                                    $supportStatus = $licenseService->getSupportStatus();
-                                                    $updateStatus = $licenseService->getUpdateStatus();
-                                                    @endphp
-                                                    @if (!$licenseStatus['valid'])
+                                                    @if (isset($licenseStatus['valid']) && !$licenseStatus['valid'])
                                                     <i class="fas fa-exclamation-triangle text-warning ms-1"
                                                         title="License Issue"></i>
-                                                    @elseif(($supportStatus['status'] ?? '') === 'expired')
-                                                    <i class="fas fa-exclamation-triangle text-danger ms-1"
-                                                        title="Support Expired"></i>
-                                                    @elseif(($updateStatus['status'] ?? '') === 'expired')
-                                                    <i class="fas fa-exclamation-triangle text-warning ms-1"
-                                                        title="Updates Expired"></i>
-                                                    @elseif($licenseStatus['needs_sync'])
+                                                    @elseif(isset($licenseStatus['needs_sync']) && $licenseStatus['needs_sync'])
                                                     <i class="fas fa-sync text-info ms-1" title="Needs Sync"></i>
                                                     @endif
                                                 </span>
@@ -3076,6 +2927,8 @@
         });
     });
     </script>
+    <!-- Instant.page: Preload links on hover/touch for instant page transitions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.2.0/instantpage.min.js" type="module" defer></script>
 </body>
 
 </html>

@@ -136,7 +136,13 @@ class WholesalePurchaseOrderController extends Controller
             $unitPrice = ($globalPrice > 0) ? $globalPrice : (($wholesalePrice > 0) ? $wholesalePrice : (($productCost > 0) ? $productCost : $sellingPrice));
 
             // Platform wholesale commission
-            $globalCommissionPercent = floatval(DB::table('settings')->where('key', 'global_wholesale_commission')->value('value') ?? 0);
+            $globalCommissionPercent = 0;
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                    $globalCommissionPercent = floatval(DB::table('settings')->where('key', 'global_wholesale_commission')->value('value') ?? 0);
+                }
+            } catch (\Throwable $e) {}
+
             if ($tenant->commission_rate !== null && $tenant->commission_rate !== '') {
                 $globalCommissionPercent = floatval($tenant->commission_rate);
             }

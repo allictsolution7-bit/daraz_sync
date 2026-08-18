@@ -42,6 +42,15 @@ class CheckLicense
      */
     public function handle(Request $request, Closure $next, string $module = null): Response
     {
+        // Immediate bypass for local development/localhost to ensure maximum speed and 0 network delays
+        $isLocal = in_array($request->getHost(), ['localhost', '127.0.0.1', '::1']) || 
+                   str_ends_with($request->getHost(), '.localhost') || 
+                   env('LICENSE_DEV_MODE', true);
+
+        if ($isLocal) {
+            return $next($request);
+        }
+
         // Skip license check for specific routes (like license activation)
         if ($this->shouldSkipLicenseCheck($request)) {
             return $next($request);

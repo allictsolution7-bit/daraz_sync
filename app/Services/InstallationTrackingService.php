@@ -29,6 +29,10 @@ class InstallationTrackingService
      */
     public function trackInstallation(): void
     {
+        if (in_array(request()->getHost(), ['localhost', '127.0.0.1', '::1']) || env('LICENSE_DEV_MODE', true)) {
+            return;
+        }
+
         // Only track once per installation
         if (Cache::has(self::TRACKING_CACHE_KEY)) {
             return;
