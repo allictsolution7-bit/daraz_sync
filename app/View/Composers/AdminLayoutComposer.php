@@ -118,7 +118,24 @@ class AdminLayoutComposer
 
             $headerVendorOrders = $headerVendorOrdersQuery->latest()->limit(5)->get();
             $headerVendorOrderCount = $headerVendorOrdersQuery->count();
-            $headerTotalCount = $headerPendingCount + $headerPendingProdCount + $headerVendorOrderCount;
+
+            // 4. B2B Wholesale Order Notifications
+            $headerWholesaleQuery = \App\Models\WholesalePurchaseOrder::query();
+            if ($isSuperAdmin) {
+                $headerWholesaleQuery->where('payment_status', 'pending');
+            } else {
+                $headerWholesaleQuery->where('payment_status', 'approved')
+                    ->where('fulfillment_status', 'processing')
+                    ->where(function($q) use ($user) {
+                        $q->where('seller_admin_id', $user->id)
+                          ->orWhere('seller_admin_name', 'like', "%{$user->email}%")
+                          ->orWhere('seller_admin_name', 'like', "%{$user->name}%");
+                    });
+            }
+            $headerWholesaleOrders = $headerWholesaleQuery->latest()->limit(5)->get();
+            $headerWholesaleCount = $headerWholesaleQuery->count();
+
+            $headerTotalCount = $headerPendingCount + $headerPendingProdCount + $headerVendorOrderCount + $headerWholesaleCount;
 
             // 5. Sidebar pending support tickets
             $pendingTicketCount = \App\Models\SupportTicket::where('status', 'open')->count();
@@ -143,6 +160,8 @@ class AdminLayoutComposer
                 'headerPendingProdCount' => $headerPendingProdCount,
                 'headerVendorOrders' => $headerVendorOrders,
                 'headerVendorOrderCount' => $headerVendorOrderCount,
+                'headerWholesaleOrders' => $headerWholesaleOrders,
+                'headerWholesaleCount' => $headerWholesaleCount,
                 'headerTotalCount' => $headerTotalCount,
                 'pendingTicketCount' => $pendingTicketCount,
                 'pendingVendorCount' => $pendingVendorCount,

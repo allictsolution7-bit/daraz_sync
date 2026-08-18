@@ -111,14 +111,42 @@
         </div>
     </div>
 
+    <!-- Navigation Tabs (My Purchases vs Orders to Deliver) -->
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+        @if($isSuperAdmin)
+            <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'all']) }}" 
+               class="btn btn-sm rounded-pill px-3.5 py-2 font-semibold {{ ($tab ?? 'all') === 'all' ? 'btn-primary shadow-sm' : 'btn-outline-secondary bg-white' }}"
+               style="{{ ($tab ?? 'all') === 'all' ? 'background: #1e293b; border-color: #1e293b; font-weight: 600;' : 'font-weight: 600;' }}">
+                <i class="fas fa-shield-alt me-1.5 text-warning"></i> Super Admin All Orders
+                <span class="badge rounded-pill ms-1.5 px-2 py-0.5 {{ ($tab ?? 'all') === 'all' ? 'bg-white text-dark' : 'bg-light text-dark border' }}" style="font-size: 10px; font-weight: 700;">{{ $orders->total() }}</span>
+            </a>
+        @endif
+        <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'purchases']) }}" 
+           class="btn btn-sm rounded-pill px-3.5 py-2 font-semibold {{ ($tab ?? 'purchases') === 'purchases' ? 'btn-primary shadow-sm' : 'btn-outline-secondary bg-white' }}"
+           style="{{ ($tab ?? 'purchases') === 'purchases' ? 'background: #4f46e5; border-color: #4f46e5; font-weight: 600;' : 'font-weight: 600;' }}">
+            <i class="fas fa-cart-shopping me-1.5 text-info"></i> My Purchases (Bought)
+            <span class="badge rounded-pill ms-1.5 px-2 py-0.5 {{ ($tab ?? 'purchases') === 'purchases' ? 'bg-white text-primary' : 'bg-light text-dark border' }}" style="font-size: 10px; font-weight: 700;">{{ $myPurchasesCount }}</span>
+        </a>
+        <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'sales']) }}" 
+           class="btn btn-sm rounded-pill px-3.5 py-2 font-semibold {{ ($tab ?? 'purchases') === 'sales' ? 'btn-primary shadow-sm' : 'btn-outline-secondary bg-white' }}"
+           style="{{ ($tab ?? 'purchases') === 'sales' ? 'background: #059669; border-color: #059669; font-weight: 600;' : 'font-weight: 600;' }}">
+            <i class="fas fa-truck-ramp-box me-1.5 text-warning"></i> Orders to Ship & Earn (My Sales)
+            <span class="badge rounded-pill ms-1.5 px-2 py-0.5 {{ ($tab ?? 'purchases') === 'sales' ? 'bg-white text-success' : 'bg-success text-white' }}" style="font-size: 10px; font-weight: 700;">{{ $mySalesCount }}</span>
+        </a>
+    </div>
+
     <!-- Statistics Cards -->
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-sm-6">
             <div class="stats-card-modern d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">Pending Verification</span>
+                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">
+                        {{ ($tab ?? 'purchases') === 'sales' ? 'Awaiting Packing' : 'Pending Verification' }}
+                    </span>
                     <h3 class="mb-0 font-bold text-warning mt-1" style="font-weight: 700;">{{ $pendingCount }}</h3>
-                    <span class="text-muted small" style="font-size: 11.5px;">Awaiting Super Admin</span>
+                    <span class="text-muted small" style="font-size: 11.5px;">
+                        {{ ($tab ?? 'purchases') === 'sales' ? 'Orders Ready to Ship' : 'Awaiting Super Admin' }}
+                    </span>
                 </div>
                 <div class="rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background-color: #fef3c7; color: #d97706;">
                     <i class="fas fa-clock fs-4"></i>
@@ -129,9 +157,13 @@
         <div class="col-xl-3 col-sm-6">
             <div class="stats-card-modern d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">Approved Orders</span>
+                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">
+                        {{ ($tab ?? 'purchases') === 'sales' ? 'Dispatched / Delivered' : 'Approved Orders' }}
+                    </span>
                     <h3 class="mb-0 font-bold text-success mt-1" style="font-weight: 700;">{{ $approvedCount }}</h3>
-                    <span class="text-muted small" style="font-size: 11.5px;">Dispatched to Sellers</span>
+                    <span class="text-muted small" style="font-size: 11.5px;">
+                        {{ ($tab ?? 'purchases') === 'sales' ? 'Completed Fulfillments' : 'Dispatched to Sellers' }}
+                    </span>
                 </div>
                 <div class="rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background-color: #d1fae5; color: #059669;">
                     <i class="fas fa-check-circle fs-4"></i>
@@ -142,9 +174,29 @@
         <div class="col-xl-3 col-sm-6">
             <div class="stats-card-modern d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">Total Wholesale Volume</span>
+                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">
+                        @if(($tab ?? 'purchases') === 'sales')
+                            Sales Earnings
+                        @elseif(($tab ?? 'purchases') === 'purchases')
+                            Total Purchased Spend
+                        @else
+                            Wholesale Volume & Profit
+                        @endif
+                    </span>
                     <h3 class="mb-0 font-bold text-primary mt-1" style="font-weight: 700;">৳{{ number_format($totalVolume, 2) }}</h3>
-                    <span class="text-muted small" style="font-size: 11.5px;">Settled Volume</span>
+                    @if($isSuperAdmin && ($tab ?? 'all') === 'all')
+                        <span class="text-success small fw-bold d-block mt-0.5" style="font-size: 11.5px;">
+                            <i class="fas fa-arrow-trend-up me-1"></i> Profit Comm: <strong>৳{{ number_format($totalProfit ?? 0, 2) }}</strong>
+                        </span>
+                    @elseif(($tab ?? 'purchases') === 'sales')
+                        <span class="text-success small fw-semibold d-block mt-0.5" style="font-size: 11.5px;">
+                            <i class="fas fa-wallet me-1"></i> Credited to Wallet
+                        </span>
+                    @else
+                        <span class="text-muted small d-block mt-0.5" style="font-size: 11.5px;">
+                            Settled Purchases
+                        </span>
+                    @endif
                 </div>
                 <div class="rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background-color: #e0e7ff; color: #4338ca;">
                     <i class="fas fa-money-bill-wave fs-4"></i>
@@ -157,7 +209,9 @@
                 <div>
                     <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">Total Orders</span>
                     <h3 class="mb-0 font-bold text-slate-800 mt-1" style="font-weight: 700;">{{ $orders->total() }}</h3>
-                    <span class="text-muted small" style="font-size: 11.5px;">All Recorded Purchases</span>
+                    <span class="text-muted small" style="font-size: 11.5px;">
+                        {{ ($tab ?? 'purchases') === 'sales' ? 'Seller Orders' : (($tab ?? 'purchases') === 'purchases' ? 'Your Purchases' : 'All Recorded Purchases') }}
+                    </span>
                 </div>
                 <div class="rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background-color: #f1f5f9; color: #64748b;">
                     <i class="fas fa-boxes-stacked fs-4"></i>
@@ -213,14 +267,13 @@
                 <thead>
                     <tr>
                         <th class="ps-4" style="white-space: nowrap;">Order Info</th>
-                        <th style="min-width: 180px;">Buyer Store & Address</th>
-                        <th style="white-space: nowrap;">Seller / Supplier</th>
-                        <th style="min-width: 200px;">Product & Qty</th>
-                        <th style="white-space: nowrap;">Total Amount</th>
-                        <th style="white-space: nowrap;">Payment Proof (Gateway)</th>
-                        <th style="white-space: nowrap;">Payment Status</th>
+                        <th style="min-width: 170px;">Buyer Store & Address</th>
+                        <th style="white-space: nowrap;">Seller Store</th>
+                        <th style="min-width: 180px;">Product & Qty</th>
+                        <th style="white-space: nowrap;">{{ ($tab ?? 'purchases') === 'sales' ? 'Your Earnings' : 'Total Amount' }}</th>
+                        <th style="white-space: nowrap;">Payment</th>
                         <th style="white-space: nowrap;">Fulfillment</th>
-                        <th class="pe-4 text-end" style="white-space: nowrap;">Action</th>
+                        <th class="pe-4 text-end" style="white-space: nowrap; min-width: 170px;">Actions & Delivery</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -238,9 +291,9 @@
                                     @endif
                                 </div>
                                 <div class="text-muted small" style="font-size: 11.5px;">
-                                    <i class="fas fa-phone-alt me-1"></i> {{ $order->buyer_admin_phone }}
+                                    <i class="fas fa-phone-alt me-1 text-primary"></i> {{ $order->buyer_admin_phone }}
                                 </div>
-                                <div class="text-muted small text-truncate" style="max-width: 220px; font-size: 11px;" title="{{ $order->buyer_shipping_address }}">
+                                <div class="text-muted small text-truncate" style="max-width: 200px; font-size: 11px;" title="{{ $order->buyer_shipping_address }}">
                                     <i class="fas fa-map-marker-alt me-1 text-danger"></i> {{ $order->buyer_shipping_address }}
                                 </div>
                             </td>
@@ -248,50 +301,68 @@
                                 <span class="badge rounded-pill px-2 py-1" style="background-color: #f1f5f9; color: #334155; font-size: 11.5px; font-weight: 600;">
                                     <i class="fas fa-store me-1 text-primary"></i> {{ '@' . $order->seller_subdomain }}
                                 </span>
-                                <div class="text-muted small mt-1" style="font-size: 11px;">
-                                    {{ $order->seller_admin_name }}
-                                </div>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     @if($order->product_thumb_image)
                                         <img src="{{ filter_var($order->product_thumb_image, FILTER_VALIDATE_URL) ? $order->product_thumb_image : asset('storage/' . $order->product_thumb_image) }}" 
-                                             class="rounded-3 border" style="width: 40px; height: 40px; object-fit: cover;">
+                                             class="rounded-3 border" style="width: 38px; height: 38px; object-fit: cover;">
                                     @endif
                                     <div>
-                                        <div class="font-semibold text-slate-800 text-truncate" style="max-width: 180px; font-weight: 600;" title="{{ $order->product_title }}">
+                                        <div class="font-semibold text-slate-800 text-truncate" style="max-width: 160px; font-weight: 600;" title="{{ $order->product_title }}">
                                             {{ $order->product_title }}
                                         </div>
+                                        @php
+                                            $sellerUnitPrice = $order->quantity > 0 ? ($order->seller_earnings / $order->quantity) : $order->unit_price;
+                                            $displayUnitPrice = (($tab ?? 'purchases') === 'sales') ? $sellerUnitPrice : $order->unit_price;
+                                        @endphp
                                         <div class="small text-muted" style="font-size: 11px;">
-                                            Qty: <strong class="text-primary">{{ $order->quantity }} pcs</strong> &bull; ৳{{ number_format($order->unit_price, 2) }}/unit
+                                            Qty: <strong class="text-primary">{{ $order->quantity }} pcs</strong> &bull; ৳{{ number_format($displayUnitPrice, 2) }}/unit
                                         </div>
                                     </div>
                                 </div>
                             </td>
                             <td style="white-space: nowrap;">
-                                <div class="font-bold text-success" style="font-weight: 700; font-size: 14px;">
-                                    ৳{{ number_format($order->total_amount, 2) }}
-                                </div>
-                                @if($isSuperAdmin)
+                                @if(($tab ?? 'purchases') === 'sales')
+                                    <div class="font-bold text-success" style="font-weight: 700; font-size: 14px;">
+                                        ৳{{ number_format($order->seller_earnings, 2) }}
+                                    </div>
+                                    <div class="text-muted small" style="font-size: 10.5px;">
+                                        <i class="fas fa-coins text-warning me-1"></i> Seller Earning
+                                    </div>
+                                @elseif($isSuperAdmin && ($tab ?? 'all') === 'all')
+                                    <div class="font-bold text-success" style="font-weight: 700; font-size: 14px;">
+                                        ৳{{ number_format($order->total_amount, 2) }}
+                                    </div>
                                     <div class="text-muted small" style="font-size: 10px;">
                                         Seller: ৳{{ number_format($order->seller_earnings, 2) }} | Comm: ৳{{ number_format($order->platform_commission, 2) }}
+                                    </div>
+                                @else
+                                    <div class="font-bold text-success" style="font-weight: 700; font-size: 14px;">
+                                        ৳{{ number_format($order->total_amount, 2) }}
                                     </div>
                                 @endif
                             </td>
                             <td style="white-space: nowrap;">
                                 <div class="d-flex align-items-center gap-2">
                                     <div>
-                                        <span class="badge px-2 py-1 rounded-pill" style="background-color: #fce7f3; color: #9d174d; font-weight: 700; font-size: 11px;">
-                                            {{ $order->payment_gateway }}
-                                        </span>
-                                        <div class="small font-monospace text-slate-700 mt-1" style="font-size: 11px;">
-                                            Trx: <strong>{{ $order->trx_id ?: 'N/A' }}</strong>
-                                        </div>
-                                        @if($order->sender_phone)
-                                            <div class="text-muted small" style="font-size: 10.5px;">
-                                                From: {{ $order->sender_phone }}
-                                            </div>
+                                        @if($order->payment_status === 'pending')
+                                            <span class="badge badge-status-pending px-2 py-1 rounded-pill" style="background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 700; font-size: 10.5px;">
+                                                <i class="fas fa-clock me-1"></i> Pending Verif.
+                                            </span>
+                                        @elseif($order->payment_status === 'approved')
+                                            <span class="badge badge-status-approved px-2 py-1 rounded-pill" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; font-weight: 700; font-size: 10.5px;">
+                                                <i class="fas fa-check-circle me-1"></i> Paid & Verified
+                                            </span>
+                                        @else
+                                            <span class="badge badge-status-rejected px-2 py-1 rounded-pill" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; font-weight: 700; font-size: 10.5px;">
+                                                <i class="fas fa-times-circle me-1"></i> Rejected
+                                            </span>
                                         @endif
+                                        <div class="small text-slate-600 mt-1" style="font-size: 10.5px;">
+                                            <span class="badge bg-light text-dark border px-1.5 py-0.5">{{ $order->payment_gateway }}</span>
+                                            <code>{{ $order->trx_id ?: 'N/A' }}</code>
+                                        </div>
                                     </div>
                                     @php
                                         $meta = is_array($order->metadata) ? $order->metadata : (is_string($order->metadata) ? json_decode($order->metadata, true) : []);
@@ -299,28 +370,10 @@
                                     @endphp
                                     @if($screenshot)
                                         <a href="{{ asset($screenshot) }}" target="_blank" title="View Payment Proof Slip" class="d-inline-block position-relative">
-                                            <img src="{{ asset($screenshot) }}" class="rounded border shadow-sm" style="width: 38px; height: 38px; object-fit: cover;">
-                                            <span class="position-absolute bottom-0 end-0 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 14px; height: 14px; font-size: 8px;">
-                                                <i class="fas fa-search-plus"></i>
-                                            </span>
+                                            <img src="{{ asset($screenshot) }}" class="rounded border shadow-sm" style="width: 32px; height: 32px; object-fit: cover;">
                                         </a>
                                     @endif
                                 </div>
-                            </td>
-                            <td style="white-space: nowrap;">
-                                @if($order->payment_status === 'pending')
-                                    <span class="badge badge-status-pending px-2.5 py-1.5 rounded-pill" style="background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 700; font-size: 11px;">
-                                        <i class="fas fa-clock me-1"></i> Pending Verification
-                                    </span>
-                                @elseif($order->payment_status === 'approved')
-                                    <span class="badge badge-status-approved px-2.5 py-1.5 rounded-pill" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; font-weight: 700; font-size: 11px;">
-                                        <i class="fas fa-check-circle me-1"></i> Paid & Verified
-                                    </span>
-                                @else
-                                    <span class="badge badge-status-rejected px-2.5 py-1.5 rounded-pill" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; font-weight: 700; font-size: 11px;">
-                                        <i class="fas fa-times-circle me-1"></i> Rejected
-                                    </span>
-                                @endif
                             </td>
                             <td style="white-space: nowrap;">
                                 @if($order->fulfillment_status === 'delivered')
@@ -332,7 +385,7 @@
                                         <i class="fas fa-truck-fast me-1"></i> Shipped
                                     </span>
                                     @if($order->tracking_number)
-                                        <div class="text-muted small mt-1" style="font-size: 10.5px;">{{ $order->courier_name }}: {{ $order->tracking_number }}</div>
+                                        <div class="text-muted small mt-1" style="font-size: 10.5px;">{{ $order->courier_name }}: <strong>{{ $order->tracking_number }}</strong></div>
                                     @endif
                                 @elseif($order->fulfillment_status === 'processing')
                                     <span class="badge badge-fulfillment-processing px-2.5 py-1 rounded-pill" style="background-color: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; font-weight: 600; font-size: 11px;">
@@ -345,18 +398,24 @@
                                 @endif
                             </td>
                             <td class="pe-4 text-end" style="white-space: nowrap;">
-                                @if($isSuperAdmin && $order->payment_status === 'pending')
-                                    <button type="button" class="btn btn-sm btn-success rounded-3 px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="approveOrder('{{ $order->id }}', '{{ $order->order_number }}', '{{ $order->seller_subdomain }}', '{{ $order->quantity }}')">
-                                        <i class="fas fa-check me-1"></i> Accept Payment
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-3 px-2.5 py-1 font-semibold ms-1" style="font-size: 11.5px;" onclick="rejectOrder('{{ $order->id }}', '{{ $order->order_number }}')">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                @elseif($order->payment_status === 'approved')
-                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-3 px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="openFulfillmentModal('{{ $order->id }}', '{{ $order->order_number }}', '{{ $order->fulfillment_status }}', '{{ $order->courier_name }}', '{{ $order->tracking_number }}')">
-                                        <i class="fas fa-truck me-1"></i> Shipping
-                                    </button>
-                                @endif
+                                <div class="d-inline-flex align-items-center gap-1.5">
+                                    <a href="{{ route('admin.wholesale-orders.invoice', $order->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-3 px-2 py-1 font-semibold" style="font-size: 11px;" title="Print Dispatch Packing Slip">
+                                        <i class="fas fa-file-invoice text-primary me-1"></i> Invoice
+                                    </a>
+
+                                    @if($isSuperAdmin && $order->payment_status === 'pending')
+                                        <button type="button" class="btn btn-sm btn-success rounded-3 px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="approveOrder('{{ $order->id }}', '{{ $order->order_number }}', '{{ $order->seller_subdomain }}', '{{ $order->quantity }}')">
+                                            <i class="fas fa-check me-1"></i> Accept Payment
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-3 px-2.5 py-1 font-semibold ms-1" style="font-size: 11.5px;" onclick="rejectOrder('{{ $order->id }}', '{{ $order->order_number }}')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    @elseif($order->payment_status === 'approved')
+                                        <button type="button" class="btn btn-sm btn-success rounded-3 px-2.5 py-1 font-semibold text-white shadow-sm" style="font-size: 11.5px; background: linear-gradient(135deg, #059669 0%, #047857 100%); border: none;" onclick="openFulfillmentModal('{{ $order->id }}', '{{ $order->order_number }}', '{{ $order->fulfillment_status }}', '{{ $order->courier_name }}', '{{ $order->tracking_number }}')">
+                                            <i class="fas fa-truck-fast me-1"></i> Ship / Courier
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

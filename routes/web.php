@@ -408,6 +408,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
 
     // B2B Wholesale Purchase Orders & Super Admin Payment Verification
     Route::get('/wholesale-orders', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'index'])->name('wholesale-orders.index');
+    Route::get('/wholesale-orders/{id}/invoice', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'invoice'])->name('wholesale-orders.invoice');
     Route::post('/wholesale-orders/checkout', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'checkout'])->name('wholesale-orders.checkout');
     Route::post('/wholesale-orders/{id}/approve', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'approve'])->name('wholesale-orders.approve');
     Route::post('/wholesale-orders/{id}/reject', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'reject'])->name('wholesale-orders.reject');

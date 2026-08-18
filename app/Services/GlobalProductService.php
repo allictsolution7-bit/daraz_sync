@@ -520,6 +520,12 @@ class GlobalProductService
 
         $sourceDb = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
 
+        $ownsTransaction = false;
+        if (DB::transactionLevel() === 0) {
+            DB::beginTransaction();
+            $ownsTransaction = true;
+        }
+
         try {
             // 1. Fetch raw product data and relationships from source tenant DB
             $this->connectToTenantDatabase($sourceDb);
@@ -764,7 +770,9 @@ class GlobalProductService
                 VariationCombination::create($combData);
             }
 
-            DB::commit();
+            if ($ownsTransaction && DB::transactionLevel() > 0) {
+                DB::commit();
+            }
 
             return [
                 'success' => true,
@@ -773,7 +781,9 @@ class GlobalProductService
                 'message' => "Product '{$newProduct->title}' was successfully copied into your store catalog!",
             ];
         } catch (\Throwable $e) {
-            DB::rollBack();
+            if ($ownsTransaction && DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
             Log::error("Failed to copy global product #{$sourceProductId} from tenant {$sourceSubdomain}: " . $e->getMessage());
             return [
                 'success' => false,

@@ -888,6 +888,27 @@
                                     </a>
                                 @endforeach
 
+                                <!-- B2B Wholesale Orders -->
+                                @if(!empty($headerWholesaleOrders))
+                                    @foreach($headerWholesaleOrders as $nWOrder)
+                                        <a href="{{ route('admin.wholesale-orders.index') }}" class="list-group-item list-group-item-action p-3 border-bottom" style="background: #eef2ff;">
+                                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                                <span class="fw-bold text-indigo small" style="color: #4338ca;"><i class="fas fa-boxes-packing text-primary me-1"></i> {{ $nWOrder->order_number }}</span>
+                                                <span class="badge rounded-pill text-white font-weight-bold" style="background: #4f46e5; font-size: 0.68rem;">
+                                                    {{ $nWOrder->payment_status === 'pending' ? 'Wholesale Payment Verification' : 'Wholesale Order to Ship' }}
+                                                </span>
+                                            </div>
+                                            <div class="small text-dark fw-semibold mb-1">
+                                                {{ $nWOrder->product_title }} ({{ $nWOrder->quantity }} pcs) — <strong>৳{{ number_format($nWOrder->total_amount, 2) }}</strong>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-between text-muted" style="font-size: 0.7rem;">
+                                                <span>Buyer: <strong>{{ '@' . $nWOrder->buyer_subdomain }}</strong></span>
+                                                <span><i class="fas fa-clock me-1"></i> {{ $nWOrder->created_at ? $nWOrder->created_at->diffForHumans() : 'Just now' }}</span>
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                @endif
+
                                 @if($headerTotalCount === 0)
                                     <div class="p-4 text-center text-muted small">
                                         <i class="fas fa-bell-slash fs-4 d-block mb-1 opacity-50"></i>
@@ -895,9 +916,9 @@
                                     </div>
                                 @endif
                             </div>
-                            <div class="p-2 text-center bg-light border-top d-flex justify-content-around">
-                                <a href="{{ route('admin.vendor-orders.index') }}" class="text-success fw-bold text-decoration-none" style="font-size: 0.75rem;">Vendor Orders ({{ $headerVendorOrderCount }}) &rarr;</a>
-                                <a href="{{ route('admin.vendor-products.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">Approvals ({{ $headerPendingProdCount }}) &rarr;</a>
+                            <div class="p-2 text-center bg-light border-top d-flex justify-content-around flex-wrap gap-1">
+                                <a href="{{ route('admin.wholesale-orders.index') }}" class="text-indigo fw-bold text-decoration-none" style="color: #4f46e5; font-size: 0.75rem;"><i class="fas fa-boxes-stacked me-1"></i> Wholesale ({{ $headerWholesaleCount ?? 0 }}) &rarr;</a>
+                                <a href="{{ route('admin.vendor-orders.index') }}" class="text-success fw-bold text-decoration-none" style="font-size: 0.75rem;">Orders ({{ $headerVendorOrderCount }}) &rarr;</a>
                                 <a href="{{ route('admin.vendor-payments.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">Payments ({{ $headerPendingCount }}) &rarr;</a>
                             </div>
                         </div>

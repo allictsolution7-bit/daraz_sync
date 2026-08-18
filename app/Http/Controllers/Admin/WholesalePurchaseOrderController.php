@@ -38,19 +38,39 @@ class WholesalePurchaseOrderController extends Controller
             ?? session('current_subdomain') 
             ?? ($request->attributes->get('tenant') ? $request->attributes->get('tenant')->subdomain : null);
 
+        $tab = $request->input('tab', $isSuperAdmin ? 'all' : 'purchases');
+        if (!$isSuperAdmin && !in_array($tab, ['purchases', 'sales'])) {
+            $tab = 'purchases';
+        }
+
         $query = WholesalePurchaseOrder::query()->orderByDesc('created_at');
 
-        // Non-superadmin filters
+        // Scoping
         if (!$isSuperAdmin) {
-            $query->where(function($q) use ($user, $currentSubdomain) {
-                if ($user) {
-                    $q->where('buyer_admin_id', $user->id);
-                }
-                if ($currentSubdomain) {
-                    $q->orWhere('buyer_subdomain', $currentSubdomain)
-                      ->orWhere('seller_subdomain', $currentSubdomain);
-                }
-            });
+            if ($tab === 'sales') {
+                $query->where('payment_status', 'approved')
+                    ->where(function($q) use ($user, $currentSubdomain) {
+                        if ($user) {
+                            $q->where('seller_admin_id', $user->id)
+                              ->orWhere('seller_admin_name', 'like', "%{$user->email}%")
+                              ->orWhere('seller_admin_name', 'like', "%{$user->name}%");
+                        }
+                        if ($currentSubdomain) {
+                            $q->orWhere('seller_subdomain', $currentSubdomain);
+                        }
+                    });
+            } else {
+                // Default: purchases
+                $query->where(function($q) use ($user, $currentSubdomain) {
+                    if ($user) {
+                        $q->where('buyer_admin_id', $user->id)
+                          ->orWhere('buyer_admin_email', $user->email);
+                    }
+                    if ($currentSubdomain) {
+                        $q->orWhere('buyer_subdomain', $currentSubdomain);
+                    }
+                });
+            }
         }
 
         // Status Filter
@@ -77,10 +97,59 @@ class WholesalePurchaseOrderController extends Controller
 
         $orders = $query->paginate(20)->withQueryString();
 
-        // Statistics
-        $pendingCount = WholesalePurchaseOrder::where('payment_status', 'pending')->count();
-        $approvedCount = WholesalePurchaseOrder::where('payment_status', 'approved')->count();
-        $totalVolume = WholesalePurchaseOrder::where('payment_status', 'approved')->sum('total_amount');
+        // Statistics Scoped by Tab
+        if ($tab === 'sales') {
+            $salesBaseQuery = WholesalePurchaseOrder::where('payment_status', 'approved')
+                ->where(function($q) use ($user, $currentSubdomain) {
+                    if ($user) {
+                        $q->where('seller_admin_id', $user->id)
+                          ->orWhere('seller_admin_name', 'like', "%{$user->email}%")
+                          ->orWhere('seller_admin_name', 'like', "%{$user->name}%");
+                    }
+                    if ($currentSubdomain) $q->orWhere('seller_subdomain', $currentSubdomain);
+                });
+
+            $pendingCount = (clone $salesBaseQuery)->where('fulfillment_status', 'processing')->count();
+            $approvedCount = (clone $salesBaseQuery)->whereIn('fulfillment_status', ['shipped', 'delivered'])->count();
+            $totalVolume = (clone $salesBaseQuery)->sum('seller_earnings');
+            $totalProfit = 0;
+        } elseif ($tab === 'purchases') {
+            $purchasesBaseQuery = WholesalePurchaseOrder::where(function($q) use ($user, $currentSubdomain) {
+                if ($user) {
+                    $q->where('buyer_admin_id', $user->id)
+                      ->orWhere('buyer_admin_email', $user->email);
+                }
+                if ($currentSubdomain) $q->orWhere('buyer_subdomain', $currentSubdomain);
+            });
+
+            $pendingCount = (clone $purchasesBaseQuery)->where('payment_status', 'pending')->count();
+            $approvedCount = (clone $purchasesBaseQuery)->where('payment_status', 'approved')->count();
+            $totalVolume = (clone $purchasesBaseQuery)->where('payment_status', 'approved')->sum('total_amount');
+            $totalProfit = 0;
+        } else {
+            // Super Admin All Tab
+            $pendingCount = WholesalePurchaseOrder::where('payment_status', 'pending')->count();
+            $approvedCount = WholesalePurchaseOrder::where('payment_status', 'approved')->count();
+            $totalVolume = WholesalePurchaseOrder::where('payment_status', 'approved')->sum('total_amount');
+            $totalProfit = WholesalePurchaseOrder::where('payment_status', 'approved')->sum('platform_commission');
+        }
+
+        $myPurchasesCount = 0;
+        $mySalesCount = 0;
+        if ($user) {
+            $myPurchasesCount = WholesalePurchaseOrder::where(function($q) use ($user, $currentSubdomain) {
+                $q->where('buyer_admin_id', $user->id)->orWhere('buyer_admin_email', $user->email);
+                if ($currentSubdomain) $q->orWhere('buyer_subdomain', $currentSubdomain);
+            })->count();
+
+            $mySalesCount = WholesalePurchaseOrder::where('payment_status', 'approved')
+                ->where(function($q) use ($user, $currentSubdomain) {
+                    $q->where('seller_admin_id', $user->id)
+                      ->orWhere('seller_admin_name', 'like', "%{$user->email}%")
+                      ->orWhere('seller_admin_name', 'like', "%{$user->name}%");
+                    if ($currentSubdomain) $q->orWhere('seller_subdomain', $currentSubdomain);
+                })->count();
+        }
 
         return view('admin.wholesale_orders.index', compact(
             'orders',
@@ -88,6 +157,10 @@ class WholesalePurchaseOrderController extends Controller
             'pendingCount',
             'approvedCount',
             'totalVolume',
+            'totalProfit',
+            'tab',
+            'myPurchasesCount',
+            'mySalesCount',
             'currentSubdomain'
         ));
     }
@@ -309,7 +382,12 @@ class WholesalePurchaseOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Order is already approved.'], 400);
         }
 
-        DB::beginTransaction();
+        $ownsTransaction = false;
+        if (DB::transactionLevel() === 0) {
+            DB::beginTransaction();
+            $ownsTransaction = true;
+        }
+
         try {
             $order->payment_status = 'approved';
             $order->approved_by_superadmin_id = $user->id;
@@ -340,11 +418,14 @@ class WholesalePurchaseOrderController extends Controller
 
                 // Insert into seller order_items
                 $sellerUnitPrice = $order->quantity > 0 ? ($order->seller_earnings / $order->quantity) : $order->unit_price;
+                $sellerSubTotal = $sellerUnitPrice * $order->quantity;
                 DB::connection('tenant_temp')->table('order_items')->insert([
                     'order_id' => $sellerOrderId,
                     'product_id' => $order->product_id,
                     'quantity' => $order->quantity,
                     'price' => $sellerUnitPrice,
+                    'sub_total' => $sellerSubTotal,
+                    'others' => "B2B Wholesale Order #{$order->order_number}",
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -366,16 +447,60 @@ class WholesalePurchaseOrderController extends Controller
                 $order->buyer_local_product_id = $copyResult['product_id'];
             }
 
+            // 3. Credit Seller Admin's Wallet Balance
+            $sellerUser = null;
+            if ($order->seller_admin_id) {
+                $sellerUser = \App\Models\User::find($order->seller_admin_id);
+            }
+            if (!$sellerUser && $order->seller_subdomain) {
+                $sellerTenantObj = SaaSTenant::where('subdomain', $order->seller_subdomain)->first();
+                if ($sellerTenantObj && $sellerTenantObj->admin_id) {
+                    $sellerUser = \App\Models\User::find($sellerTenantObj->admin_id);
+                }
+            }
+            if (!$sellerUser && !empty($order->seller_admin_name)) {
+                if (preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $order->seller_admin_name, $m)) {
+                    $sellerUser = \App\Models\User::where('email', $m[0])->first();
+                }
+            }
+
+            if ($sellerUser && $order->seller_earnings > 0) {
+                $sellerUser->increment('wallet_balance', $order->seller_earnings);
+
+                // Create recorded transaction in central database
+                try {
+                    \App\Models\VendorWalletTransaction::create([
+                        'vendor_id' => $sellerUser->id,
+                        'product_id' => $order->buyer_local_product_id ?: $order->product_id,
+                        'admin_id' => $user->id,
+                        'type' => 'wholesale_earning',
+                        'amount' => $order->seller_earnings,
+                        'payment_method' => 'B2B Wholesale Settlement',
+                        'transaction_id' => $order->order_number,
+                        'status' => 'approved',
+                        'admin_note' => "B2B Wholesale payout for #{$order->order_number} ({$order->quantity} pcs)",
+                        'is_seen' => false,
+                    ]);
+                } catch (\Throwable $we) {
+                    Log::warning("Could not record VendorWalletTransaction: " . $we->getMessage());
+                }
+            }
+
             $order->save();
-            DB::commit();
+
+            if ($ownsTransaction && DB::transactionLevel() > 0) {
+                DB::commit();
+            }
 
             return response()->json([
                 'success' => true,
-                'message' => "Payment for {$order->order_number} approved! Delivery order dispatched to seller (@{$order->seller_subdomain}) and {$order->quantity} units allocated to buyer store.",
+                'message' => "Payment for {$order->order_number} approved! ৳" . number_format($order->seller_earnings, 2) . " credited to seller wallet, delivery order dispatched to (@{$order->seller_subdomain}), and {$order->quantity} units allocated to buyer store.",
             ]);
 
         } catch (\Throwable $e) {
-            DB::rollBack();
+            if ($ownsTransaction && DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
             Log::error("Super admin wholesale order approval error: " . $e->getMessage());
             return response()->json([
                 'success' => false,
@@ -434,5 +559,16 @@ class WholesalePurchaseOrderController extends Controller
             'success' => true,
             'message' => "Fulfillment status for {$order->order_number} updated to " . ucfirst($order->fulfillment_status) . "."
         ]);
+    }
+
+    /**
+     * Printable Wholesale Delivery Invoice & Packing Slip.
+     */
+    public function invoice($id)
+    {
+        $order = WholesalePurchaseOrder::findOrFail($id);
+        $siteLogo = \App\Models\SiteSetting::getLogo();
+
+        return view('admin.wholesale_orders.invoice', compact('order', 'siteLogo'));
     }
 }
