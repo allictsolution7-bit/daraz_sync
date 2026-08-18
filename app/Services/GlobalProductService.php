@@ -41,11 +41,23 @@ class GlobalProductService
         $globalCommission = 0.0;
         try {
             $setting = DB::table('site_settings')
-                ->where('group', 'single_product')
-                ->where('key', 'saas_wholesale_commission_rate')
+                ->where('key', 'wholesale_commission')
+                ->where(function ($q) {
+                    $q->where('group', 'saas')
+                      ->orWhere('group', 'like', '%_saas');
+                })
+                ->orderBy('id', 'desc')
                 ->first();
-            if ($setting && is_numeric($setting->value)) {
+
+            if ($setting && is_numeric($setting->value) && floatval($setting->value) > 0) {
                 $globalCommission = floatval($setting->value);
+            } else {
+                $alt = DB::table('site_settings')
+                    ->where('key', 'saas_wholesale_commission_rate')
+                    ->value('value');
+                if (is_numeric($alt) && floatval($alt) > 0) {
+                    $globalCommission = floatval($alt);
+                }
             }
         } catch (\Throwable $e) {
             $globalCommission = 0.0;

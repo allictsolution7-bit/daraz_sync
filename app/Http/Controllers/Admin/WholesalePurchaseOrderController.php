@@ -106,11 +106,25 @@ class WholesalePurchaseOrderController extends Controller
             'gateway' => 'required|string|max:50',
             'sender_phone' => 'nullable|string|max:30',
             'trx_id' => 'required|string|max:100',
+            'payment_screenshot' => 'nullable|file|image|mimes:jpeg,png,jpg,webp,gif|max:8192',
         ]);
 
         $sourceSubdomain = $request->subdomain;
         $productId = (int)$request->product_id;
         $quantity = (int)$request->quantity;
+
+        // Handle Payment Screenshot Upload
+        $screenshotPath = null;
+        if ($request->hasFile('payment_screenshot')) {
+            try {
+                $file = $request->file('payment_screenshot');
+                $filename = 'wpo_receipt_' . time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('uploads/wholesale_receipts', $filename, 'public');
+                $screenshotPath = 'storage/' . $path;
+            } catch (\Throwable $e) {
+                Log::warning("Failed to store payment screenshot: " . $e->getMessage());
+            }
+        }
 
         $tenant = SaaSTenant::where('subdomain', $sourceSubdomain)->first();
         if (!$tenant) {
@@ -127,31 +141,88 @@ class WholesalePurchaseOrderController extends Controller
                 return response()->json(['success' => false, 'message' => "Product #{$productId} not found in tenant @{$sourceSubdomain}."], 404);
             }
 
-            // Determine unit wholesale price
+            // Determine unit wholesale price & markup
             $globalPrice = floatval($product->global_price ?? 0);
             $wholesalePrice = floatval($product->wholesale_price ?? 0);
             $productCost = floatval($product->product_cost ?? 0);
+            $resellerPrice = floatval($product->reseller_price ?? 0);
             $sellingPrice = floatval($product->offer ?? ($product->old_price ?? ($product->price ?? 0)));
 
-            $unitPrice = ($globalPrice > 0) ? $globalPrice : (($wholesalePrice > 0) ? $wholesalePrice : (($productCost > 0) ? $productCost : $sellingPrice));
-
-            // Platform wholesale commission
-            $globalCommissionPercent = 0;
+            $tenantGlobalMarkupPercent = 10.0;
             try {
-                if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
-                    $globalCommissionPercent = floatval(DB::table('settings')->where('key', 'global_wholesale_commission')->value('value') ?? 0);
+                $gSetting = DB::connection('tenant_temp')
+                    ->table('site_settings')
+                    ->where('group', 'single_product')
+                    ->where('key', 'global_price_percent')
+                    ->first();
+                if ($gSetting && is_numeric($gSetting->value)) {
+                    $tenantGlobalMarkupPercent = floatval($gSetting->value);
                 }
-            } catch (\Throwable $e) {}
-
-            if ($tenant->commission_rate !== null && $tenant->commission_rate !== '') {
-                $globalCommissionPercent = floatval($tenant->commission_rate);
+            } catch (\Throwable $e) {
+                $tenantGlobalMarkupPercent = 10.0;
             }
 
-            $commissionPerUnit = ($globalCommissionPercent > 0) ? ($unitPrice * ($globalCommissionPercent / 100)) : 0;
-            $finalUnitPrice = $unitPrice + $commissionPerUnit;
+            // Check if seller product is Wholeseller or Admin created
+            $isWholeseller = !empty($product->vendor_id) && $product->vendor_id > 0;
+            if ($isWholeseller) {
+                if ($wholesalePrice > 0) {
+                    $basePrice = $wholesalePrice;
+                } elseif ($globalPrice > 0) {
+                    $basePrice = $globalPrice;
+                } elseif ($productCost > 0) {
+                    $basePrice = $productCost;
+                } else {
+                    $basePrice = $sellingPrice;
+                }
+            } else {
+                if ($globalPrice > 0) {
+                    $basePrice = $globalPrice;
+                } elseif ($productCost > 0) {
+                    $basePrice = $productCost * (1 + ($tenantGlobalMarkupPercent / 100));
+                } elseif ($wholesalePrice > 0) {
+                    $basePrice = $wholesalePrice;
+                } elseif ($resellerPrice > 0) {
+                    $basePrice = $resellerPrice;
+                } else {
+                    $basePrice = $sellingPrice;
+                }
+            }
+
+            // Platform wholesale commission
+            $globalCommissionPercent = 0.0;
+            try {
+                $setting = DB::table('site_settings')
+                    ->where('key', 'wholesale_commission')
+                    ->where(function ($q) {
+                        $q->where('group', 'saas')
+                          ->orWhere('group', 'like', '%_saas');
+                    })
+                    ->orderBy('id', 'desc')
+                    ->first();
+
+                if ($setting && is_numeric($setting->value) && floatval($setting->value) > 0) {
+                    $globalCommissionPercent = floatval($setting->value);
+                } else {
+                    $alt = DB::table('site_settings')
+                        ->where('key', 'saas_wholesale_commission_rate')
+                        ->value('value');
+                    if (is_numeric($alt) && floatval($alt) > 0) {
+                        $globalCommissionPercent = floatval($alt);
+                    }
+                }
+            } catch (\Throwable $e) {
+                $globalCommissionPercent = 0.0;
+            }
+
+            $tenantCommissionPercent = ($tenant->commission_rate !== null && $tenant->commission_rate !== '') 
+                ? floatval($tenant->commission_rate) 
+                : $globalCommissionPercent;
+
+            $commissionPerUnit = ($tenantCommissionPercent > 0) ? ($basePrice * ($tenantCommissionPercent / 100)) : 0;
+            $finalUnitPrice = $basePrice + $commissionPerUnit;
             $totalAmount = $finalUnitPrice * $quantity;
             $platformCommissionTotal = $commissionPerUnit * $quantity;
-            $sellerEarnings = $unitPrice * $quantity;
+            $sellerEarnings = $basePrice * $quantity;
 
             // Creator info in seller DB
             $sellerCreatorId = $product->created_by ?: ($product->vendor_id ?: 1);
@@ -198,9 +269,10 @@ class WholesalePurchaseOrderController extends Controller
                 'payment_status' => 'pending',
                 'fulfillment_status' => 'pending',
                 'metadata' => [
-                    'base_unit_price' => $unitPrice,
-                    'commission_percent' => $globalCommissionPercent,
+                    'base_unit_price' => $basePrice,
+                    'commission_percent' => $tenantCommissionPercent,
                     'tenant_name' => $tenant->name,
+                    'payment_screenshot' => $screenshotPath,
                     'submitted_at' => now()->toDateTimeString(),
                 ],
             ]);
@@ -253,7 +325,7 @@ class WholesalePurchaseOrderController extends Controller
                 $sellerOrderId = DB::connection('tenant_temp')->table('orders')->insertGetId([
                     'name' => $order->buyer_admin_name ?: 'Wholesale Buyer Admin',
                     'phone' => $order->buyer_admin_phone ?: '01700000000',
-                    'address' => $order->buyer_shipping_address ?: 'Store Delivery Address',
+                    'address' => Str::limit($order->buyer_shipping_address ?: 'Store Delivery Address', 240, '...'),
                     'total' => $order->seller_earnings,
                     'discount' => 0,
                     'shipping' => 0,
@@ -261,17 +333,18 @@ class WholesalePurchaseOrderController extends Controller
                     'payment_status' => 'Paid',
                     'order_source' => 'B2B Wholesale Network',
                     'status' => 'Processing',
-                    'admin_note' => "📦 B2B WHOLESALE ORDER #{$order->order_number}\nBuyer: {$order->buyer_admin_name} (@{$order->buyer_subdomain})\nPhone: {$order->buyer_admin_phone}\nAddress: {$order->buyer_shipping_address}\nPayment of ৳{$order->seller_earnings} verified by Super Admin.\nPlease pack and ship {$order->quantity} pcs of product #{$order->product_id} ({$order->product_title}).",
+                    'admin_note' => Str::limit("B2B Wholesale #{$order->order_number} | Buyer: {$order->buyer_admin_name} (@{$order->buyer_subdomain}) | Paid ৳{$order->seller_earnings}", 190, '...'),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
 
                 // Insert into seller order_items
+                $sellerUnitPrice = $order->quantity > 0 ? ($order->seller_earnings / $order->quantity) : $order->unit_price;
                 DB::connection('tenant_temp')->table('order_items')->insert([
                     'order_id' => $sellerOrderId,
                     'product_id' => $order->product_id,
                     'quantity' => $order->quantity,
-                    'price' => $order->unit_price,
+                    'price' => $sellerUnitPrice,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

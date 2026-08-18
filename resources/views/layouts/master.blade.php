@@ -1186,7 +1186,7 @@
                             <ul class="left-menu-dp menu-section-list" style="{{ $coreShopActive ? 'display: block;' : 'display: none;' }}">
                                 @can('products.view')
                                 <li
-                                    class="sub-menu {{ request()->is('admin/product*') || request()->is('admin/product_categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/publishers-mark*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/combo_offers*') ? 'active' : '' }}">
+                                    class="sub-menu {{ request()->is('admin/product*') || request()->is('admin/catalog*') || request()->is('admin/global-products*') || request()->is('admin/wholesale-orders*') || request()->is('admin/product_categories*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/publishers-mark*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/combo_offers*') ? 'active' : '' }}">
                                     <a href="#">
                                         <span class="menu-content">
                                             <i class="fas fa-boxes-stacked" style="color:#197A94;"></i>
@@ -1195,7 +1195,7 @@
                                         <span class="fas fa-caret-down right"></span>
                                     </a>
                                     <ul class="left-menu-dp"
-                                        style="{{ request()->is('admin/catalog*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/publishers-mark*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/combo_offers*') ? 'display: block;' : '' }}">
+                                        style="{{ request()->is('admin/product*') || request()->is('admin/catalog*') || request()->is('admin/global-products*') || request()->is('admin/wholesale-orders*') || request()->is('admin/categories*') || request()->is('admin/sub-categories*') || request()->is('admin/third-categories*') || request()->is('admin/publishers-mark*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/combo_offers*') ? 'display: block;' : '' }}">
                                         <li class="{{ request()->routeIs('admin.items.index') ? 'active' : '' }}">
                                             <a href="{{ route('admin.items.index') }}">
                                                 <span class="menu-content">

@@ -655,16 +655,19 @@ class Product extends Model
         // Only include Admin products (exclude vendor products)
         $query->whereNull('products.vendor_id');
 
-        // Super admins or central admins see all store products
-        if (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin') || $user->hasRole('admin') || ($user->role ?? '') === 'admin' || ($user->role ?? '') === 'super_admin')) {
+        // Only super admins see all store products
+        $isSuperAdmin = method_exists($user, 'hasRole')
+            ? ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('Super Admin') || ($user->role ?? '') === 'super_admin')
+            : (($user->role ?? '') === 'super_admin');
+
+        if ($isSuperAdmin) {
             return $query;
         }
 
-        // Regular admin / tenant users see products created by them, copied by them, or default store products
+        // Regular admin / tenant users see products created by them or copied by them
         return $query->where(function($q) use ($user) {
             $q->where('products.created_by', $user->id)
-              ->orWhere('products.copied_by_admin_id', $user->id)
-              ->orWhereNull('products.created_by');
+              ->orWhere('products.copied_by_admin_id', $user->id);
         });
     }
 

@@ -45,6 +45,10 @@ class SaaSTenantController extends Controller
         ]);
 
         \App\Services\SettingsService::set('saas', 'wholesale_commission', $request->global_commission);
+        \App\Models\SiteSetting::updateOrCreate(
+            ['group' => 'saas', 'key' => 'wholesale_commission'],
+            ['value' => $request->global_commission]
+        );
 
         return redirect()->route('admin.saas-tenants.index')->with('success', 'Global wholesale commission updated to ' . $request->global_commission . '% successfully!');
     }

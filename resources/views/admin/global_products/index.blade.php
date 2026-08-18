@@ -119,6 +119,155 @@
         align-items: center;
         gap: 4px;
     }
+
+    /* Modern Wholesale Modal Styling */
+    .swal2-popup.modern-wholesale-popup {
+        border-radius: 20px !important;
+        padding: 1.5rem 1.75rem !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+        font-family: inherit !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+    .swal2-popup.modern-wholesale-popup .swal2-title {
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        padding: 0 0 1rem 0 !important;
+    }
+    .swal2-popup.modern-wholesale-popup .swal2-html-container {
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden !important;
+    }
+    .swal2-popup.modern-wholesale-popup .swal2-actions {
+        margin-top: 1.25rem !important;
+        gap: 0.75rem !important;
+        width: 100% !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+    .swal2-popup.modern-wholesale-popup .swal2-confirm {
+        border-radius: 10px !important;
+        padding: 10px 22px !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+        border: none !important;
+        margin: 0 !important;
+    }
+    .swal2-popup.modern-wholesale-popup .swal2-cancel {
+        border-radius: 10px !important;
+        padding: 10px 20px !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        background: #f1f5f9 !important;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1 !important;
+        margin: 0 !important;
+    }
+    .swal2-popup.modern-wholesale-popup .swal2-cancel:hover {
+        background: #e2e8f0 !important;
+        color: #1e293b !important;
+    }
+
+    .modal-product-hero {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+    }
+    .action-mode-box {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 14px 16px;
+        background: #ffffff;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        position: relative;
+    }
+    .action-mode-box:hover {
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+    .action-mode-box.active-purchase {
+        border-color: #10b981 !important;
+        background-color: #f0fdf4 !important;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12) !important;
+    }
+    .action-mode-box.active-copy {
+        border-color: #6366f1 !important;
+        background-color: #f5f3ff !important;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.12) !important;
+    }
+    .action-icon-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    .form-control-clean {
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 13px;
+        transition: all 0.2s ease;
+        background-color: #ffffff;
+        width: 100%;
+    }
+    .form-control-clean:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        outline: none;
+    }
+    .gateway-pill {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 7px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        background: #ffffff;
+        color: #475569;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .gateway-pill:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    .gateway-pill.active[data-gw="bkash"] {
+        border-color: #d11261 !important;
+        background: #fdf2f8 !important;
+        color: #d11261 !important;
+        box-shadow: 0 2px 8px rgba(209, 18, 97, 0.15);
+    }
+    .gateway-pill.active[data-gw="nagad"] {
+        border-color: #ea580c !important;
+        background: #fff7ed !important;
+        color: #ea580c !important;
+        box-shadow: 0 2px 8px rgba(234, 88, 12, 0.15);
+    }
+    .gateway-pill.active[data-gw="rocket"] {
+        border-color: #8c3494 !important;
+        background: #faf5ff !important;
+        color: #8c3494 !important;
+        box-shadow: 0 2px 8px rgba(140, 52, 148, 0.15);
+    }
+    .gateway-pill.active[data-gw="bank"] {
+        border-color: #059669 !important;
+        background: #ecfdf5 !important;
+        color: #059669 !important;
+        box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+    }
 </style>
 @endsection
 
@@ -344,34 +493,15 @@
                                     $isVariableWithWholesale = ($product['has_variants'] && $varWholesaleMin > 0 && floatval($product['final_wholesale_price'] ?? 0) <= 0);
                                 @endphp
                                 @if($isVariableWithWholesale)
-                                    <div class="d-flex flex-column">
-                                        <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
-                                            @if($varWholesaleMin === $varWholesaleMax)
-                                                ৳{{ number_format($varWholesaleMin, 2) }}
-                                            @else
-                                                ৳{{ number_format($varWholesaleMin, 2) }} – ৳{{ number_format($varWholesaleMax, 2) }}
-                                            @endif
-                                            @if(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
-                                                <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9px; font-weight: 600;">
-                                                    +{{ $product['commission_percent'] }}%
-                                                </span>
-                                            @endif
-                                        </span>
-                                    </div>
-                                @elseif(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
-                                    <div class="d-flex flex-column">
-                                        <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
-                                            ৳{{ number_format($product['final_wholesale_price'], 2) }}
-                                            <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9px; font-weight: 600;">
-                                                +{{ $product['commission_percent'] }}%
-                                            </span>
-                                        </span>
-                                        <span class="text-muted small" style="font-size: 10px;">
-                                            Base: ৳{{ number_format($product['base_price'], 2) }} (+৳{{ number_format($product['commission_amount'], 2) }})
-                                        </span>
-                                    </div>
-                                @else
                                     <span class="text-success font-bold" style="font-weight: 700;">
+                                        @if($varWholesaleMin === $varWholesaleMax)
+                                            ৳{{ number_format($varWholesaleMin, 2) }}
+                                        @else
+                                            ৳{{ number_format($varWholesaleMin, 2) }} – ৳{{ number_format($varWholesaleMax, 2) }}
+                                        @endif
+                                    </span>
+                                @else
+                                    <span class="text-success font-bold" style="font-weight: 700; font-size: 14px;">
                                         ৳{{ number_format($product['final_wholesale_price'] ?: 0, 2) }}
                                     </span>
                                 @endif
@@ -470,23 +600,9 @@
                                                                         @endif
                                                                     </td>
                                                                     <td class="py-2">
-                                                                        @if(!empty($product['commission_percent']) && $product['commission_percent'] > 0)
-                                                                            <div class="d-flex flex-column">
-                                                                                <span class="text-success font-bold small d-inline-flex align-items-center gap-1" style="font-weight: 700;">
-                                                                                    ৳{{ number_format($variant['final_wholesale_price'], 2) }}
-                                                                                    <span class="badge rounded-pill px-1 py-0.2" style="background-color: #ecfdf5; color: #047857; font-size: 8.5px; font-weight: 600;">
-                                                                                        +{{ $product['commission_percent'] }}%
-                                                                                    </span>
-                                                                                </span>
-                                                                                <span class="text-muted" style="font-size: 9px;">
-                                                                                    Base: ৳{{ number_format($variant['base_price'], 2) }}
-                                                                                </span>
-                                                                            </div>
-                                                                        @else
-                                                                            <span class="text-success font-bold small" style="font-weight: 700;">
-                                                                                ৳{{ number_format($variant['final_wholesale_price'] ?: 0, 2) }}
-                                                                            </span>
-                                                                        @endif
+                                                                        <span class="text-success font-bold small" style="font-weight: 700;">
+                                                                            ৳{{ number_format($variant['final_wholesale_price'] ?: 0, 2) }}
+                                                                        </span>
                                                                     </td>
                                                                     <td class="pe-3 py-2 text-end">
                                                                         @if($variant['stock_quantity'] > 0)
@@ -595,7 +711,7 @@ const GATEWAYS = {
     }
 };
 
-// Open Purchase / Copy Modal with Options
+// Open Purchase / Copy Modal with Modern Sleek Design
 function openPurchaseModal(subdomain, productId, title, unitPrice, availableStock, rowKey) {
     const btn = document.getElementById('btn-action-' + rowKey);
     const originalContent = btn ? btn.innerHTML : '';
@@ -604,123 +720,166 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
 
     const modalHtml = `
         <div class="text-start" style="font-size: 13px;">
-            <!-- Product Header Summary -->
-            <div class="p-3 mb-3 rounded-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="badge px-2 py-1 rounded-pill" style="background-color:#e0e7ff; color:#3730a3; font-size:11px; font-weight: 700;">
-                        <i class="fas fa-globe me-1"></i> Supplier Store: @${subdomain}
+            <!-- Product Header Hero -->
+            <div class="modal-product-hero">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge rounded-pill px-2.5 py-1" style="background-color: #e0e7ff; color: #4338ca; font-weight: 700; font-size: 11px;">
+                        <i class="fas fa-store me-1"></i> Supplier: @${subdomain}
                     </span>
-                    <span class="text-success font-bold" style="font-weight:700; font-size: 13.5px;">
-                        Wholesale: ৳${numPrice.toFixed(2)}
+                    <span class="badge rounded-pill px-2.5 py-1" style="background-color: #ecfdf5; color: #047857; font-weight: 700; font-size: 11px;">
+                        <i class="fas fa-cubes me-1"></i> ${numStock} pcs available
                     </span>
                 </div>
-                <div class="text-slate-800 font-bold mb-1" style="font-weight:700; font-size: 13.5px;">${title}</div>
-                <div class="text-muted small" style="font-size:11px;">
-                    <i class="fas fa-cubes me-1"></i> Available Supplier Stock: <strong>${numStock} pcs</strong>
+                <div class="text-slate-800 fw-bold mb-2" style="font-size: 14px; line-height: 1.4; color: #1e293b;">
+                    ${title}
+                </div>
+                <div class="d-flex align-items-center justify-content-between pt-2 border-top" style="border-top-color: #e2e8f0 !important;">
+                    <span class="text-muted small" style="font-size: 11.5px;">Wholesale Unit Price:</span>
+                    <span class="text-success fw-bold" style="font-size: 15px; color: #059669;">৳${numPrice.toFixed(2)} <small class="text-muted" style="font-size: 11px; font-weight: normal;">/ unit</small></span>
                 </div>
             </div>
 
-            <!-- Choose Option -->
+            <!-- Action Mode Selection Cards -->
             <div class="mb-3">
-                <label class="form-label small text-uppercase text-muted font-bold mb-2" style="font-size:11px; font-weight:700; letter-spacing: 0.5px;">Select Action:</label>
+                <label class="form-label small text-uppercase text-muted fw-bold mb-2" style="font-size: 10.5px; letter-spacing: 0.5px;">Choose Fulfillment Action:</label>
 
-                <!-- Option 1: Purchase Wholesale Stock -->
-                <div class="option-card p-3 rounded-3 mb-2 border" id="box-opt-purchase" style="cursor: pointer; background-color: #f0fdf4; border-color: #86efac !important; transition: all 0.2s;" onclick="selectActionOption('purchase')">
-                    <div class="form-check mb-0">
-                        <input class="form-check-input" type="radio" name="swal_global_action" id="opt_purchase" value="purchase" checked onchange="selectActionOption('purchase')">
-                        <label class="form-check-label ms-1" for="opt_purchase" style="cursor: pointer; width: 100%;">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <strong class="text-success font-bold" style="font-weight:700; font-size: 13px;">
-                                    <i class="fas fa-cart-shopping me-1"></i> Purchase Wholesale Stock (Super Admin Payment)
-                                </strong>
-                                <span class="badge bg-success text-white" style="font-size: 10px;">Physical Delivery</span>
+                <!-- Option 1: Instant Catalog Sync (Listing Only) - FIRST -->
+                <div class="action-mode-box active-copy" id="box-opt-copy" style="margin-bottom: 14px;" onclick="selectActionOption('copy')">
+                    <div class="d-flex align-items-start gap-2.5">
+                        <div class="action-icon-circle" style="background: #e0e7ff; color: #4338ca;">
+                            <i class="fas fa-clone"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                <span class="fw-bold text-slate-800" style="font-size: 13px; color: #0f172a;">
+                                    Instant Catalog Sync (Listing Only)
+                                </span>
+                                <span class="badge rounded-pill px-2 py-0.5" style="background-color: #e0e7ff; color: #3730a3; font-size: 9.5px; font-weight: 700;">
+                                    Free Sync
+                                </span>
                             </div>
-                            <div class="text-muted small mt-1" style="font-size:11.5px; line-height: 1.4;">
-                                Pay to Super Admin gateway. On verification, Super Admin dispatches the order to supplier (@${subdomain}) to deliver physical stock to your address.
+                            <div class="text-muted" style="font-size: 11.5px; line-height: 1.35;">
+                                Add this product to your store catalog immediately without buying inventory stock.
                             </div>
-                        </label>
+                        </div>
+                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_copy" value="copy" checked onchange="selectActionOption('copy')" style="cursor: pointer;">
+                    </div>
+                </div>
+
+                <!-- Option 2: Purchase Wholesale Stock -->
+                <div class="action-mode-box" id="box-opt-purchase" onclick="selectActionOption('purchase')">
+                    <div class="d-flex align-items-start gap-2.5">
+                        <div class="action-icon-circle" style="background: #dcfce7; color: #16a34a;">
+                            <i class="fas fa-truck-ramp-box"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                <span class="fw-bold text-slate-800" style="font-size: 13px; color: #0f172a;">
+                                    Purchase Wholesale Stock (Super Admin Payment)
+                                </span>
+                                <span class="badge rounded-pill px-2 py-0.5" style="background-color: #dcfce7; color: #15803d; font-size: 9.5px; font-weight: 700;">
+                                    Physical Delivery
+                                </span>
+                            </div>
+                            <div class="text-muted" style="font-size: 11.5px; line-height: 1.35;">
+                                Pay to Super Admin. On approval, supplier (@${subdomain}) ships physical stock to your store.
+                            </div>
+                        </div>
+                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_purchase" value="purchase" onchange="selectActionOption('purchase')" style="cursor: pointer;">
                     </div>
 
-                    <!-- Purchase Details (Qty, Shipping, Payment Proof) -->
-                    <div id="purchase-details-section" class="mt-3 pt-3 border-top" style="border-top-color: #bbf7d0 !important;">
+                    <!-- Purchase Form Details (Hidden until Purchase selected) -->
+                    <div id="purchase-details-section" class="mt-3 pt-3 border-top" style="display: none; border-top-color: #bbf7d0 !important;">
                         <!-- Quantity & Total -->
-                        <div class="row g-2 mb-2.5">
+                        <div class="row g-2 mb-3">
                             <div class="col-6">
-                                <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Units to Buy <span class="text-danger">*</span></label>
-                                <input type="number" id="swal_purchase_qty" class="form-control form-control-sm font-bold text-center" value="10" min="1" max="${numStock > 0 ? numStock : 99999}" oninput="updatePurchaseTotal(${numPrice})">
+                                <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                    <i class="fas fa-boxes-stacked text-primary me-1"></i> Order Units <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" id="swal_purchase_qty" class="form-control form-control-clean text-center fw-bold" value="10" min="1" max="${numStock > 0 ? numStock : 99999}" oninput="updatePurchaseTotal(${numPrice})">
                             </div>
                             <div class="col-6">
-                                <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Payable to Super Admin</label>
-                                <div class="form-control form-control-sm bg-light text-success font-bold text-center" id="swal_total_cost" style="font-size: 13px;">
+                                <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                    <i class="fas fa-receipt text-success me-1"></i> Payable Total
+                                </label>
+                                <div class="form-control form-control-clean text-center fw-bold" id="swal_total_cost" style="background-color: #ecfdf5; color: #059669; font-size: 13.5px; border-color: #a7f3d0;">
                                     ৳${(numPrice * 10).toFixed(2)}
                                 </div>
                             </div>
                         </div>
 
                         <!-- Delivery Destination Address -->
-                        <div class="mb-2.5">
-                            <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">
-                                Delivery Address (Where supplier will ship) <span class="text-danger">*</span>
+                        <div class="mb-3">
+                            <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                <i class="fas fa-location-dot text-danger me-1"></i> Delivery Address (Where supplier will ship) <span class="text-danger">*</span>
                             </label>
-                            <textarea id="swal_shipping_address" class="form-control form-control-sm" rows="2" placeholder="Enter complete store delivery address (Street, City, District, Postal Code)"></textarea>
+                            <textarea id="swal_shipping_address" class="form-control form-control-clean" rows="2" placeholder="Complete address: Street, Area, City, District"></textarea>
                         </div>
 
-                        <div class="mb-2.5">
-                            <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Contact Mobile Number <span class="text-danger">*</span></label>
-                            <input type="text" id="swal_contact_phone" class="form-control form-control-sm" placeholder="01712345678" value="{{ auth()->user()?->phone ?? '' }}">
+                        <!-- Contact Mobile -->
+                        <div class="mb-3">
+                            <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                <i class="fas fa-phone text-secondary me-1"></i> Contact Mobile Number <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="swal_contact_phone" class="form-control form-control-clean" placeholder="017xxxxxxxx" value="{{ auth()->user()?->phone ?? '' }}">
                         </div>
 
-                        <!-- Choose Super Admin Payment Gateway -->
-                        <div class="mb-2.5">
-                            <label class="small text-slate-700 font-semibold mb-1.5 d-block" style="font-size: 11.5px;">
-                                <i class="fas fa-wallet text-warning me-1"></i> Super Admin Payment Gateway <span class="text-danger">*</span>
+                        <!-- Super Admin Payment Gateway -->
+                        <div class="mb-3">
+                            <label class="small text-slate-700 fw-semibold mb-2 d-block" style="font-size: 11.5px;">
+                                <i class="fas fa-wallet text-warning me-1"></i> Select Payment Gateway <span class="text-danger">*</span>
                             </label>
-                            <div class="d-flex flex-wrap gap-2 mb-2">
-                                <label class="btn btn-sm btn-outline-danger active px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="changePayGateway('bkash', this)">
-                                    <input type="radio" name="swal_pay_gateway" value="bkash" class="d-none" checked> bKash
-                                </label>
-                                <label class="btn btn-sm btn-outline-warning px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="changePayGateway('nagad', this)">
-                                    <input type="radio" name="swal_pay_gateway" value="nagad" class="d-none"> Nagad
-                                </label>
-                                <label class="btn btn-sm btn-outline-primary px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="changePayGateway('rocket', this)">
-                                    <input type="radio" name="swal_pay_gateway" value="rocket" class="d-none"> Rocket
-                                </label>
-                                <label class="btn btn-sm btn-outline-success px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="changePayGateway('bank', this)">
-                                    <input type="radio" name="swal_pay_gateway" value="bank" class="d-none"> Bank Transfer
-                                </label>
+                            <div class="d-flex flex-wrap gap-2 mb-2.5">
+                                <div class="gateway-pill active" data-gw="bkash" onclick="changePayGateway('bkash', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="bkash" class="d-none" checked>
+                                    <i class="fas fa-bolt text-danger"></i> bKash
+                                </div>
+                                <div class="gateway-pill" data-gw="nagad" onclick="changePayGateway('nagad', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="nagad" class="d-none">
+                                    <i class="fas fa-fire text-warning"></i> Nagad
+                                </div>
+                                <div class="gateway-pill" data-gw="rocket" onclick="changePayGateway('rocket', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="rocket" class="d-none">
+                                    <i class="fas fa-paper-plane" style="color: #8c3494;"></i> Rocket
+                                </div>
+                                <div class="gateway-pill" data-gw="bank" onclick="changePayGateway('bank', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="bank" class="d-none">
+                                    <i class="fas fa-building-columns text-success"></i> Bank Transfer
+                                </div>
                             </div>
 
-                            <div class="alert p-2 rounded-3 mb-2 small text-slate-800 border" id="swal_gateway_instruction" style="background-color: #f8fafc; font-size: 11px; line-height: 1.4;">
+                            <!-- Payment Instruction Card -->
+                            <div class="p-2.5 rounded-3 mb-2 small border" id="swal_gateway_instruction" style="background-color: #f8fafc; border-color: #e2e8f0; font-size: 11.5px; line-height: 1.45;">
                                 ${GATEWAYS.bkash.instruction}
                             </div>
                         </div>
 
-                        <!-- Sender Phone & TrxID -->
-                        <div class="row g-2">
+                        <!-- Sender Mobile & TrxID -->
+                        <div class="row g-2 mb-3">
                             <div class="col-6">
-                                <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Sender Mobile / Account</label>
-                                <input type="text" id="swal_sender_phone" class="form-control form-control-sm" placeholder="01812345678">
+                                <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                    <i class="fas fa-mobile-screen me-1"></i> Sender Mobile / AC
+                                </label>
+                                <input type="text" id="swal_sender_phone" class="form-control form-control-clean" placeholder="018xxxxxxxx">
                             </div>
                             <div class="col-6">
-                                <label class="small text-slate-700 font-semibold mb-1" style="font-size: 11.5px;">Transaction ID (TrxID) <span class="text-danger">*</span></label>
-                                <input type="text" id="swal_trx_id" class="form-control form-control-sm font-bold" placeholder="e.g. TRX9823H">
+                                <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                    <i class="fas fa-key text-primary me-1"></i> Transaction ID (TrxID) <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="swal_trx_id" class="form-control form-control-clean fw-bold" placeholder="e.g. 9J87K12A">
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Option 2: Just Copy as My Product -->
-                <div class="option-card p-3 rounded-3 border" id="box-opt-copy" style="cursor: pointer; background-color: #ffffff; border-color: #e2e8f0 !important; transition: all 0.2s;" onclick="selectActionOption('copy')">
-                    <div class="form-check mb-0">
-                        <input class="form-check-input" type="radio" name="swal_global_action" id="opt_copy" value="copy" onchange="selectActionOption('copy')">
-                        <label class="form-check-label ms-1" for="opt_copy" style="cursor: pointer; width: 100%;">
-                            <strong class="d-block text-slate-800 font-bold" style="font-weight:700; font-size: 13px;">
-                                <i class="fas fa-clone me-1 text-primary"></i> Just Copy as My Product (Catalog Listing Only)
-                            </strong>
-                            <div class="text-muted small mt-1" style="font-size:11.5px; line-height: 1.4;">
-                                Add this product to your catalog without purchasing inventory stock. Origin creator (@${subdomain}) and attribution are fully retained.
+                        <!-- Payment Screenshot / Receipt Proof -->
+                        <div class="mb-2">
+                            <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                <i class="fas fa-image text-info me-1"></i> Payment Proof Screenshot / Slip <span class="text-muted">(Optional)</span>
+                            </label>
+                            <input type="file" id="swal_payment_screenshot" class="form-control form-control-clean" accept="image/*" style="padding: 6px 10px; font-size: 12px;" onchange="previewPaymentScreenshot(this)">
+                            <div id="swal_screenshot_preview_box" class="mt-2 text-center" style="display: none;">
+                                <img id="swal_screenshot_preview_img" src="" alt="Receipt Preview" class="rounded-3 border shadow-sm" style="max-height: 100px; max-width: 100%; object-fit: contain;">
                             </div>
-                        </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -728,15 +887,16 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
     `;
 
     Swal.fire({
-        title: 'Wholesale Product Purchase',
+        title: '<i class="fas fa-cart-flatbed text-primary me-2"></i>Wholesale Fulfillment',
         html: modalHtml,
         showCancelButton: true,
-        confirmButtonColor: '#4f46e5',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: '<i class="fas fa-check-circle me-1"></i> Submit & Place Order',
+        confirmButtonText: '<i class="fas fa-clone me-1.5"></i> Sync Product to Catalog',
         cancelButtonText: 'Cancel',
         focusConfirm: false,
-        width: '580px',
+        width: '640px',
+        customClass: {
+            popup: 'modern-wholesale-popup'
+        },
         didOpen: () => {
             window.selectActionOption = function(mode) {
                 const isPurchase = (mode === 'purchase');
@@ -746,34 +906,48 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
                 const boxPurchase = document.getElementById('box-opt-purchase');
                 const boxCopy = document.getElementById('box-opt-copy');
                 const detailsSection = document.getElementById('purchase-details-section');
+                const confirmBtn = Swal.getConfirmButton();
 
                 if (isPurchase) {
-                    boxPurchase.style.backgroundColor = '#f0fdf4';
-                    boxPurchase.style.borderColor = '#86efac';
-                    boxCopy.style.backgroundColor = '#ffffff';
-                    boxCopy.style.borderColor = '#e2e8f0';
+                    boxPurchase.classList.add('active-purchase');
+                    boxCopy.classList.remove('active-copy');
                     if (detailsSection) detailsSection.style.display = 'block';
+                    if (confirmBtn) confirmBtn.innerHTML = '<i class="fas fa-check-circle me-1.5"></i> Submit Wholesale Order';
                 } else {
-                    boxPurchase.style.backgroundColor = '#ffffff';
-                    boxPurchase.style.borderColor = '#e2e8f0';
-                    boxCopy.style.backgroundColor = '#f8fafc';
-                    boxCopy.style.borderColor = '#93c5fd';
+                    boxPurchase.classList.remove('active-purchase');
+                    boxCopy.classList.add('active-copy');
                     if (detailsSection) detailsSection.style.display = 'none';
+                    if (confirmBtn) confirmBtn.innerHTML = '<i class="fas fa-clone me-1.5"></i> Sync Product to Catalog';
                 }
             };
 
-            window.changePayGateway = function(gatewayKey, labelEl) {
+            window.changePayGateway = function(gatewayKey, pillEl) {
                 document.querySelectorAll('input[name="swal_pay_gateway"]').forEach(i => i.checked = false);
-                document.querySelectorAll('.btn-outline-danger, .btn-outline-warning, .btn-outline-primary, .btn-outline-success').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.gateway-pill').forEach(b => b.classList.remove('active'));
                 
-                const radio = labelEl.querySelector('input');
+                const radio = pillEl.querySelector('input');
                 if (radio) radio.checked = true;
-                labelEl.classList.add('active');
+                pillEl.classList.add('active');
 
                 const gInfo = GATEWAYS[gatewayKey];
                 const instBox = document.getElementById('swal_gateway_instruction');
                 if (instBox && gInfo) {
                     instBox.innerHTML = gInfo.instruction;
+                }
+            };
+
+            window.previewPaymentScreenshot = function(input) {
+                const previewBox = document.getElementById('swal_screenshot_preview_box');
+                const previewImg = document.getElementById('swal_screenshot_preview_img');
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewBox.style.display = 'block';
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                } else {
+                    previewBox.style.display = 'none';
                 }
             };
 
@@ -798,6 +972,8 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
             const gateway = gatewayRadio ? gatewayRadio.value : 'bkash';
             const senderPhone = document.getElementById('swal_sender_phone').value.trim();
             const trxId = document.getElementById('swal_trx_id').value.trim();
+            const screenshotInput = document.getElementById('swal_payment_screenshot');
+            const screenshotFile = (screenshotInput && screenshotInput.files && screenshotInput.files[0]) ? screenshotInput.files[0] : null;
 
             if (qty <= 0) {
                 Swal.showValidationMessage('Please enter a valid purchase quantity (at least 1 unit)');
@@ -823,7 +999,8 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
                 contact_phone: phone,
                 gateway: gateway,
                 sender_phone: senderPhone,
-                trx_id: trxId
+                trx_id: trxId,
+                payment_screenshot: screenshotFile
             };
         }
     }).then((result) => {
@@ -836,24 +1013,27 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
             }
 
             if (data.mode === 'purchase') {
-                // Submit Wholesale Purchase Order to Super Admin
+                // Submit Wholesale Purchase Order with FormData (supports screenshot file)
+                const formData = new FormData();
+                formData.append('subdomain', subdomain);
+                formData.append('product_id', productId);
+                formData.append('quantity', data.quantity);
+                formData.append('shipping_address', data.shipping_address);
+                formData.append('contact_phone', data.contact_phone);
+                formData.append('gateway', data.gateway);
+                formData.append('sender_phone', data.sender_phone);
+                formData.append('trx_id', data.trx_id);
+                if (data.payment_screenshot) {
+                    formData.append('payment_screenshot', data.payment_screenshot);
+                }
+
                 fetch("{{ route('admin.wholesale-orders.checkout') }}", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        subdomain: subdomain,
-                        product_id: productId,
-                        quantity: data.quantity,
-                        shipping_address: data.shipping_address,
-                        contact_phone: data.contact_phone,
-                        gateway: data.gateway,
-                        sender_phone: data.sender_phone,
-                        trx_id: data.trx_id
-                    })
+                    body: formData
                 })
                 .then(res => res.json())
                 .then(resData => {

@@ -2,7 +2,7 @@
 
 @section('title', 'Wholesale Purchase Orders')
 
-@section('style')
+@section('styles')
 <style>
     .stats-card-modern {
         background: #ffffff;
@@ -17,46 +17,53 @@
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
     }
     .badge-status-pending {
-        background-color: #fef3c7;
-        color: #92400e;
-        border: 1px solid #fde68a;
-        font-weight: 700;
-        font-size: 11px;
+        background-color: #fef3c7 !important;
+        color: #92400e !important;
+        border: 1px solid #fde68a !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
     }
     .badge-status-approved {
-        background-color: #d1fae5;
-        color: #065f46;
-        border: 1px solid #a7f3d0;
-        font-weight: 700;
-        font-size: 11px;
+        background-color: #d1fae5 !important;
+        color: #065f46 !important;
+        border: 1px solid #a7f3d0 !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
     }
     .badge-status-rejected {
-        background-color: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-        font-weight: 700;
-        font-size: 11px;
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+        border: 1px solid #fecaca !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
     }
     .badge-fulfillment-processing {
-        background-color: #e0e7ff;
-        color: #3730a3;
-        border: 1px solid #c7d2fe;
-        font-weight: 600;
-        font-size: 11px;
+        background-color: #e0e7ff !important;
+        color: #3730a3 !important;
+        border: 1px solid #c7d2fe !important;
+        font-weight: 600 !important;
+        font-size: 11px !important;
     }
     .badge-fulfillment-shipped {
-        background-color: #e0f2fe;
-        color: #0369a1;
-        border: 1px solid #bae6fd;
-        font-weight: 600;
-        font-size: 11px;
+        background-color: #e0f2fe !important;
+        color: #0369a1 !important;
+        border: 1px solid #bae6fd !important;
+        font-weight: 600 !important;
+        font-size: 11px !important;
     }
     .badge-fulfillment-delivered {
-        background-color: #ecfdf5;
-        color: #047857;
-        border: 1px solid #a7f3d0;
-        font-weight: 600;
-        font-size: 11px;
+        background-color: #ecfdf5 !important;
+        color: #047857 !important;
+        border: 1px solid #a7f3d0 !important;
+        font-weight: 600 !important;
+        font-size: 11px !important;
+    }
+    .badge-fulfillment-pending {
+        background-color: #f1f5f9 !important;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1 !important;
+        font-weight: 600 !important;
+        font-size: 11px !important;
     }
     .table-modern thead th {
         background-color: #f8fafc;
@@ -226,7 +233,9 @@
                             <td>
                                 <div class="font-semibold text-slate-800" style="font-weight: 600;">
                                     {{ $order->buyer_admin_name }}
-                                    <span class="badge rounded-pill ms-1" style="background-color: #e0e7ff; color: #3730a3; font-size: 10px;">@{{ $order->buyer_subdomain }}</span>
+                                    @if($order->buyer_subdomain)
+                                        <span class="badge rounded-pill ms-1" style="background-color: #e0e7ff; color: #3730a3; font-size: 10px;">{{ '@' . $order->buyer_subdomain }}</span>
+                                    @endif
                                 </div>
                                 <div class="text-muted small" style="font-size: 11.5px;">
                                     <i class="fas fa-phone-alt me-1"></i> {{ $order->buyer_admin_phone }}
@@ -237,7 +246,7 @@
                             </td>
                             <td style="white-space: nowrap;">
                                 <span class="badge rounded-pill px-2 py-1" style="background-color: #f1f5f9; color: #334155; font-size: 11.5px; font-weight: 600;">
-                                    <i class="fas fa-store me-1 text-primary"></i> @{{ $order->seller_subdomain }}
+                                    <i class="fas fa-store me-1 text-primary"></i> {{ '@' . $order->seller_subdomain }}
                                 </span>
                                 <div class="text-muted small mt-1" style="font-size: 11px;">
                                     {{ $order->seller_admin_name }}
@@ -270,52 +279,68 @@
                                 @endif
                             </td>
                             <td style="white-space: nowrap;">
-                                <span class="badge px-2 py-1 rounded-pill" style="background-color: #fce7f3; color: #9d174d; font-weight: 700; font-size: 11px;">
-                                    {{ $order->payment_gateway }}
-                                </span>
-                                <div class="small font-monospace text-slate-700 mt-1" style="font-size: 11px;">
-                                    Trx: <strong>{{ $order->trx_id ?: 'N/A' }}</strong>
-                                </div>
-                                @if($order->sender_phone)
-                                    <div class="text-muted small" style="font-size: 10.5px;">
-                                        From: {{ $order->sender_phone }}
+                                <div class="d-flex align-items-center gap-2">
+                                    <div>
+                                        <span class="badge px-2 py-1 rounded-pill" style="background-color: #fce7f3; color: #9d174d; font-weight: 700; font-size: 11px;">
+                                            {{ $order->payment_gateway }}
+                                        </span>
+                                        <div class="small font-monospace text-slate-700 mt-1" style="font-size: 11px;">
+                                            Trx: <strong>{{ $order->trx_id ?: 'N/A' }}</strong>
+                                        </div>
+                                        @if($order->sender_phone)
+                                            <div class="text-muted small" style="font-size: 10.5px;">
+                                                From: {{ $order->sender_phone }}
+                                            </div>
+                                        @endif
                                     </div>
-                                @endif
+                                    @php
+                                        $meta = is_array($order->metadata) ? $order->metadata : (is_string($order->metadata) ? json_decode($order->metadata, true) : []);
+                                        $screenshot = $meta['payment_screenshot'] ?? null;
+                                    @endphp
+                                    @if($screenshot)
+                                        <a href="{{ asset($screenshot) }}" target="_blank" title="View Payment Proof Slip" class="d-inline-block position-relative">
+                                            <img src="{{ asset($screenshot) }}" class="rounded border shadow-sm" style="width: 38px; height: 38px; object-fit: cover;">
+                                            <span class="position-absolute bottom-0 end-0 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 14px; height: 14px; font-size: 8px;">
+                                                <i class="fas fa-search-plus"></i>
+                                            </span>
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                             <td style="white-space: nowrap;">
                                 @if($order->payment_status === 'pending')
-                                    <span class="badge badge-status-pending px-2.5 py-1.5 rounded-pill">
+                                    <span class="badge badge-status-pending px-2.5 py-1.5 rounded-pill" style="background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 700; font-size: 11px;">
                                         <i class="fas fa-clock me-1"></i> Pending Verification
                                     </span>
                                 @elseif($order->payment_status === 'approved')
-                                    <span class="badge badge-status-approved px-2.5 py-1.5 rounded-pill">
+                                    <span class="badge badge-status-approved px-2.5 py-1.5 rounded-pill" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; font-weight: 700; font-size: 11px;">
                                         <i class="fas fa-check-circle me-1"></i> Paid & Verified
                                     </span>
                                 @else
-                                    <span class="badge badge-status-rejected px-2.5 py-1.5 rounded-pill">
+                                    <span class="badge badge-status-rejected px-2.5 py-1.5 rounded-pill" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; font-weight: 700; font-size: 11px;">
                                         <i class="fas fa-times-circle me-1"></i> Rejected
                                     </span>
                                 @endif
                             </td>
                             <td style="white-space: nowrap;">
                                 @if($order->fulfillment_status === 'delivered')
-                                    <span class="badge badge-fulfillment-delivered px-2.5 py-1 rounded-pill">
+                                    <span class="badge badge-fulfillment-delivered px-2.5 py-1 rounded-pill" style="background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 600; font-size: 11px;">
                                         <i class="fas fa-box-open me-1"></i> Delivered
                                     </span>
                                 @elseif($order->fulfillment_status === 'shipped')
-                                    <span class="badge badge-fulfillment-shipped px-2.5 py-1 rounded-pill">
+                                    <span class="badge badge-fulfillment-shipped px-2.5 py-1 rounded-pill" style="background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: 600; font-size: 11px;">
                                         <i class="fas fa-truck-fast me-1"></i> Shipped
                                     </span>
                                     @if($order->tracking_number)
                                         <div class="text-muted small mt-1" style="font-size: 10.5px;">{{ $order->courier_name }}: {{ $order->tracking_number }}</div>
                                     @endif
                                 @elseif($order->fulfillment_status === 'processing')
-                                    <span class="badge badge-fulfillment-processing px-2.5 py-1 rounded-pill">
+                                    <span class="badge badge-fulfillment-processing px-2.5 py-1 rounded-pill" style="background-color: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; font-weight: 600; font-size: 11px;">
                                         <i class="fas fa-boxes-packing me-1"></i> Seller Packing
                                     </span>
                                 @else
-                                    <span class="badge bg-light text-muted px-2 py-1 rounded-pill border" style="font-size: 11px;">
-                                        Pending Payment
+                                    <span class="badge badge-fulfillment-pending px-2.5 py-1 rounded-pill" style="background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 600; font-size: 11px;">
+                                        <i class="fas fa-hourglass-start me-1"></i> Pending Payment
                                     </span>
                                 @endif
                             </td>
