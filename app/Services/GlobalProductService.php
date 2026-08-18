@@ -872,4 +872,131 @@ class GlobalProductService
             'messages' => $messages,
         ];
     }
+
+    /**
+     * Route downstream customer/reseller order items of copied global products to their original suppliers.
+     *
+     * @param \App\Models\order $order
+     * @return array
+     */
+    public function routeDropshipOrdersForCustomerOrder($order): array
+    {
+        $routedOrders = [];
+        try {
+            $order->loadMissing('order_items.product');
+            $buyerSubdomain = request()->route('subdomain') 
+                ?? session('current_subdomain') 
+                ?? (request()->attributes->get('tenant') ? request()->attributes->get('tenant')->subdomain : 'main');
+
+            $buyerUser = auth()->user() ?: \App\Models\User::find($order->user_id);
+
+            foreach ($order->order_items as $item) {
+                $product = $item->product;
+                if (!$product || empty($product->source_tenant_subdomain) || empty($product->source_product_id)) {
+                    continue; // Local product, no upstream dropship routing needed
+                }
+
+                $sourceSubdomain = $product->source_tenant_subdomain;
+                $sourceProductId = (int)$product->source_product_id;
+
+                // Find supplier tenant
+                $supplierTenant = SaaSTenant::where('subdomain', $sourceSubdomain)->first();
+                if (!$supplierTenant) continue;
+
+                $supplierDb = $supplierTenant->db_name ?: 'purnobd_' . $supplierTenant->subdomain;
+                $this->connectToTenantDatabase($supplierDb);
+
+                // Fetch source product from supplier DB
+                $sourceProd = DB::connection('tenant_temp')->table('products')->where('id', $sourceProductId)->first();
+                if (!$sourceProd) continue;
+
+                $baseWholesalePrice = floatval($sourceProd->global_price ?? $sourceProd->wholesale_price ?? $sourceProd->product_cost ?? 0);
+                if ($baseWholesalePrice <= 0) {
+                    $baseWholesalePrice = floatval($sourceProd->reseller_price ?? $sourceProd->offer ?? $sourceProd->price ?? 0);
+                }
+
+                $itemQuantity = max(1, (int)$item->quantity);
+                $sellerEarnings = $baseWholesalePrice * $itemQuantity;
+
+                // Create fulfillment order in supplier tenant DB
+                $supplierOrderId = DB::connection('tenant_temp')->table('orders')->insertGetId([
+                    'name' => $order->name ?: 'Customer Delivery',
+                    'phone' => $order->phone ?: '01700000000',
+                    'address' => \Illuminate\Support\Str::limit($order->address ?: 'Delivery Address', 240, '...'),
+                    'total' => $sellerEarnings,
+                    'discount' => 0,
+                    'shipping' => 0,
+                    'payment_method' => 'B2B Wholesale Dropship (Paid)',
+                    'payment_status' => 'Paid',
+                    'order_source' => 'B2B Wholesale Network',
+                    'status' => 'Processing',
+                    'admin_note' => \Illuminate\Support\Str::limit("Dropship Order for @{$buyerSubdomain} (Order #{$order->id}) | Customer: {$order->name} ({$order->phone})", 190, '...'),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Insert into supplier order_items
+                DB::connection('tenant_temp')->table('order_items')->insert([
+                    'order_id' => $supplierOrderId,
+                    'product_id' => $sourceProductId,
+                    'quantity' => $itemQuantity,
+                    'price' => $baseWholesalePrice,
+                    'sub_total' => $sellerEarnings,
+                    'others' => "Dropship Order #{$order->id} from @{$buyerSubdomain}",
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Also log in central WholesalePurchaseOrder for tracking
+                $orderNumber = 'WPO-' . date('Ymd') . '-' . strtoupper(\Illuminate\Support\Str::random(6));
+                WholesalePurchaseOrder::create([
+                    'order_number' => $orderNumber,
+                    'buyer_tenant_id' => null,
+                    'buyer_subdomain' => $buyerSubdomain,
+                    'buyer_admin_id' => $buyerUser?->id,
+                    'buyer_admin_name' => $buyerUser?->name ?? 'Store Admin',
+                    'buyer_admin_phone' => $order->phone,
+                    'buyer_admin_email' => $buyerUser?->email,
+                    'buyer_shipping_address' => $order->address,
+                    'seller_tenant_id' => $supplierTenant->id,
+                    'seller_subdomain' => $sourceSubdomain,
+                    'seller_admin_id' => $sourceProd->created_by ?: ($sourceProd->vendor_id ?: 1),
+                    'seller_admin_name' => "Supplier Admin (@{$sourceSubdomain})",
+                    'product_id' => $sourceProductId,
+                    'product_title' => $sourceProd->title,
+                    'product_thumb_image' => $sourceProd->thumb_image,
+                    'unit_price' => $baseWholesalePrice,
+                    'quantity' => $itemQuantity,
+                    'total_amount' => $sellerEarnings,
+                    'platform_commission' => 0,
+                    'seller_earnings' => $sellerEarnings,
+                    'payment_gateway' => 'DROPSHIP',
+                    'sender_phone' => $order->phone,
+                    'trx_id' => 'DROPSHIP-' . $order->id,
+                    'payment_status' => 'approved',
+                    'fulfillment_status' => 'pending',
+                    'seller_order_id' => $supplierOrderId,
+                    'buyer_local_product_id' => $product->id,
+                    'metadata' => [
+                        'retail_order_id' => $order->id,
+                        'customer_name' => $order->name,
+                        'customer_phone' => $order->phone,
+                        'source_type' => 'dropship_auto_routed',
+                        'submitted_at' => now()->toDateTimeString(),
+                    ],
+                ]);
+
+                $routedOrders[] = [
+                    'order_number' => $orderNumber,
+                    'supplier_subdomain' => $sourceSubdomain,
+                    'product_title' => $sourceProd->title,
+                    'quantity' => $itemQuantity
+                ];
+            }
+        } catch (\Throwable $e) {
+            Log::error("Error auto-routing dropship order: " . $e->getMessage());
+        }
+
+        return $routedOrders;
+    }
 }

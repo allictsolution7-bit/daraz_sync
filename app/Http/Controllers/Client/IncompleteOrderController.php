@@ -806,10 +806,11 @@ class IncompleteOrderController extends Controller
             // This prevents duplicate data and keeps the incomplete orders table clean
             $incompleteOrder = IncompleteOrder::findOrFail($request->incomplete_order_id);
             
+            // Auto-route global dropship items to upstream supplier admin
             try {
-                $incompleteOrder->delete();
-            } catch (\Exception $e) {
-                throw new \Exception('Order created but failed to delete incomplete order: ' . $e->getMessage());
+                app(\App\Services\GlobalProductService::class)->routeDropshipOrdersForCustomerOrder($order);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error("Dropship auto-route error: " . $e->getMessage());
             }
 
             \DB::commit();

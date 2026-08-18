@@ -634,6 +634,7 @@ function bulkDispatchCourier(courierName) {
             });
 
             const orderIds = selected.map(o => o.id);
+            const courierProvider = (res.value?.courier_name || courierName).toLowerCase().includes('pathao') ? 'pathao' : 'steadfast';
 
             fetch("{{ route('admin.wholesale-orders.courier.send') }}", {
                 method: 'POST',
@@ -643,7 +644,7 @@ function bulkDispatchCourier(courierName) {
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    provider: provider,
+                    provider: courierProvider,
                     order_ids: orderIds
                 })
             })

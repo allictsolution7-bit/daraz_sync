@@ -796,14 +796,17 @@ class WholesalePurchaseOrderController extends Controller
         $errors = [];
 
         foreach ($orders as $order) {
-            $phone = preg_replace('/[^0-9]/', '', $order->delivery_phone ?: '');
+            $rawPhone = $order->buyer_admin_phone ?: ($order->sender_phone ?: '');
+            $phone = preg_replace('/[^0-9]/', '', $rawPhone);
             if (str_starts_with($phone, '880') && strlen($phone) === 13) {
                 $phone = substr($phone, 2);
             }
-            if (empty($phone)) $phone = '01700000000';
+            if (strlen($phone) < 11 || empty($phone)) {
+                $phone = '01700000000';
+            }
 
             $recipientName = $order->buyer_admin_name ?: ($order->buyer_subdomain ? 'Store @' . $order->buyer_subdomain : 'Wholesale Buyer');
-            $address = $order->delivery_address ?: 'Buyer Store Warehouse Address';
+            $address = $order->buyer_shipping_address ?: 'Buyer Store Warehouse Address';
             $itemDesc = ($order->product_title ?: 'Wholesale Stock') . ' (Qty: ' . $order->quantity . ' pcs)';
 
             $invoice = $order->order_number;

@@ -356,6 +356,13 @@ class OrderController extends Controller
 
                         // Delete incomplete orders for this phone number (using normalized phone)
                         IncompleteOrder::deleteByPhone($order->phone);
+
+                        // Auto-route global dropship items to upstream supplier admin
+                        try {
+                            app(\App\Services\GlobalProductService::class)->routeDropshipOrdersForCustomerOrder($order);
+                        } catch (\Throwable $e) {
+                            \Illuminate\Support\Facades\Log::error("Dropship auto-route error: " . $e->getMessage());
+                        }
                     }
 
                     $response = [
