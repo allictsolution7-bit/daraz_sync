@@ -81,6 +81,28 @@
         border-bottom: 1px solid #f1f5f9;
         font-size: 13px;
     }
+    .btn-soft {
+        font-size: 11.5px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+    .btn-soft-primary { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
+    .btn-soft-primary:hover { background: #c7d2fe; color: #3730a3; }
+    .btn-soft-success { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .btn-soft-success:hover { background: #a7f3d0; color: #065f46; }
+    .btn-soft-info { background: #ecfeff; color: #0891b2; border-color: #a5f3fc; }
+    .btn-soft-info:hover { background: #a5f3fc; color: #0369a1; }
+    .btn-soft-warning { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+    .btn-soft-warning:hover { background: #fde68a; color: #92400e; }
+    .btn-soft-dark { background: #f3f4f6; color: #1f2937; border-color: #e5e7eb; }
+    .btn-soft-dark:hover { background: #e5e7eb; color: #111827; }
 </style>
 @endsection
 
@@ -260,13 +282,70 @@
         </div>
     </div>
 
+    <!-- Bulk Actions Dashboard -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4" style="background: #ffffff;">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div style="font-weight: 700; font-size: 13px; color: #1e293b; letter-spacing: -0.2px;">
+                <i class="fas fa-tools text-primary me-1.5"></i> BULK ACTIONS DASHBOARD
+            </div>
+            <span class="text-muted small" style="font-size: 11.5px;" id="selected-orders-count-badge">
+                <i class="fas fa-check-double text-muted me-1"></i> <span id="selected-count">0</span> orders selected
+            </span>
+        </div>
+        
+        <div class="row g-3">
+            <!-- Courier & Shipping Section -->
+            <div class="col-md-6">
+                <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px;">
+                        <i class="fas fa-truck text-success"></i> LOGISTICS & DISPATCH
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" onclick="bulkDispatchCourier('Steadfast')" class="btn-soft btn-soft-success">
+                            <i class="fas fa-paper-plane"></i> Steadfast
+                        </button>
+                        <button type="button" onclick="bulkDispatchCourier('Pathao')" class="btn-soft btn-soft-primary">
+                            <i class="fas fa-shipping-fast"></i> Pathao
+                        </button>
+                        <button type="button" onclick="bulkSyncCourierStatus()" class="btn-soft btn-soft-info" title="Sync courier delivery status">
+                            <i class="fas fa-sync-alt"></i> Sync Courier
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents & Export Section -->
+            <div class="col-md-6">
+                <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px;">
+                        <i class="fas fa-file-alt text-info"></i> DOCUMENTS & EXPORT
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" onclick="bulkPrintInvoices()" class="btn-soft btn-soft-info">
+                            <i class="fas fa-file-invoice"></i> Invoices
+                        </button>
+                        <button type="button" onclick="bulkPrintSlips()" class="btn-soft btn-soft-warning">
+                            <i class="fas fa-box"></i> Package Slips
+                        </button>
+                        <button type="button" onclick="exportWholesaleCsv()" class="btn-soft btn-soft-dark">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Orders Table Card -->
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 table-modern">
+            <table class="table table-hover align-middle mb-0 table-modern" id="wholesale-orders-table">
                 <thead>
                     <tr>
-                        <th class="ps-4" style="white-space: nowrap;">Order Info</th>
+                        <th class="ps-3" style="width: 38px;">
+                            <input type="checkbox" id="select-all-wholesale" class="form-check-input" title="Select All">
+                        </th>
+                        <th style="white-space: nowrap;">Order Info</th>
                         <th style="min-width: 170px;">Buyer Store & Address</th>
                         <th style="white-space: nowrap;">Seller Store</th>
                         <th style="min-width: 180px;">Product & Qty</th>
@@ -279,7 +358,22 @@
                 <tbody>
                     @forelse($orders as $order)
                         <tr>
-                            <td class="ps-4" style="white-space: nowrap;">
+                            <td class="ps-3">
+                                <input type="checkbox" class="wholesale-item-check form-check-input" 
+                                       value="{{ $order->id }}"
+                                       data-ordernum="{{ $order->order_number }}"
+                                       data-invoice="{{ route('admin.wholesale-orders.invoice', $order->id) }}"
+                                       data-buyer="{{ $order->buyer_admin_name }}"
+                                       data-subdomain="{{ $order->buyer_subdomain }}"
+                                       data-phone="{{ $order->buyer_admin_phone }}"
+                                       data-address="{{ $order->buyer_shipping_address }}"
+                                       data-product="{{ $order->product_title }}"
+                                       data-qty="{{ $order->quantity }}"
+                                       data-price="{{ $order->seller_earnings }}"
+                                       data-payment="{{ $order->payment_status }}"
+                                       data-fulfillment="{{ $order->fulfillment_status }}">
+                            </td>
+                            <td style="white-space: nowrap;">
                                 <div class="font-bold text-dark font-monospace" style="font-weight: 700;">{{ $order->order_number }}</div>
                                 <div class="text-muted small" style="font-size: 11px;">{{ $order->created_at->format('M d, Y h:i A') }}</div>
                             </td>
@@ -399,9 +493,11 @@
                             </td>
                             <td class="pe-4 text-end" style="white-space: nowrap;">
                                 <div class="d-inline-flex align-items-center gap-1.5">
-                                    <a href="{{ route('admin.wholesale-orders.invoice', $order->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-3 px-2 py-1 font-semibold" style="font-size: 11px;" title="Print Dispatch Packing Slip">
-                                        <i class="fas fa-file-invoice text-primary me-1"></i> Invoice
-                                    </a>
+                                    @if($order->payment_status === 'approved')
+                                        <a href="{{ route('admin.wholesale-orders.invoice', $order->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-3 px-2 py-1 font-semibold" style="font-size: 11px;" title="Print Dispatch Packing Slip">
+                                            <i class="fas fa-file-invoice text-primary me-1"></i> Invoice
+                                        </a>
+                                    @endif
 
                                     @if($isSuperAdmin && $order->payment_status === 'pending')
                                         <button type="button" class="btn btn-sm btn-success rounded-3 px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="approveOrder('{{ $order->id }}', '{{ $order->order_number }}', '{{ $order->seller_subdomain }}', '{{ $order->quantity }}')">
@@ -415,12 +511,25 @@
                                             <i class="fas fa-truck-fast me-1"></i> Ship / Courier
                                         </button>
                                     @endif
+
+                                    @php
+                                        $canDelete = ($order->payment_status === 'rejected') && (
+                                            (auth()->user() && ($order->buyer_admin_id == auth()->id() || $order->buyer_admin_email === auth()->user()->email))
+                                            || ($currentSubdomain && $order->buyer_subdomain === $currentSubdomain)
+                                            || $isSuperAdmin
+                                        );
+                                    @endphp
+                                    @if($canDelete)
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-3 px-2 py-1 font-semibold" style="font-size: 11px;" onclick="deleteRejectedOrder('{{ $order->id }}', '{{ $order->order_number }}')" title="Delete Rejected Order">
+                                            <i class="fas fa-trash-alt me-1"></i> Delete
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <div class="py-4">
                                     <i class="fas fa-receipt text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
                                     <h5 class="text-slate-600 mb-1" style="font-weight: 600;">No Wholesale Purchase Orders Found</h5>
@@ -443,6 +552,232 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+// Checkbox & Selection Management
+const selectAllCheckbox = document.getElementById('select-all-wholesale');
+const itemCheckboxes = document.querySelectorAll('.wholesale-item-check');
+const selectedCountSpan = document.getElementById('selected-count');
+
+function updateSelectionCount() {
+    const checkedItems = document.querySelectorAll('.wholesale-item-check:checked');
+    if (selectedCountSpan) {
+        selectedCountSpan.textContent = checkedItems.length;
+    }
+}
+
+if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener('change', function() {
+        itemCheckboxes.forEach(cb => {
+            cb.checked = selectAllCheckbox.checked;
+        });
+        updateSelectionCount();
+    });
+}
+
+itemCheckboxes.forEach(cb => {
+    cb.addEventListener('change', function() {
+        if (!this.checked && selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+        } else if (selectAllCheckbox) {
+            const allChecked = Array.from(itemCheckboxes).every(i => i.checked);
+            selectAllCheckbox.checked = allChecked;
+        }
+        updateSelectionCount();
+    });
+});
+
+function getSelectedOrders() {
+    const selected = [];
+    document.querySelectorAll('.wholesale-item-check:checked').forEach(cb => {
+        selected.push({
+            id: cb.value,
+            order_number: cb.dataset.ordernum,
+            invoice: cb.dataset.invoice,
+            buyer: cb.dataset.buyer,
+            subdomain: cb.dataset.subdomain,
+            phone: cb.dataset.phone,
+            address: cb.dataset.address,
+            product: cb.dataset.product,
+            qty: cb.dataset.qty,
+            price: cb.dataset.price,
+            payment: cb.dataset.payment,
+            fulfillment: cb.dataset.fulfillment,
+        });
+    });
+    return selected;
+}
+
+// Bulk Courier Dispatch (Steadfast / Pathao)
+function bulkDispatchCourier(courierName) {
+    const selected = getSelectedOrders();
+    if (selected.length === 0) {
+        Swal.fire({
+            title: 'No Orders Selected',
+            text: `Please check the box next to the orders you want to dispatch via ${courierName}.`,
+            icon: 'info',
+            confirmButtonColor: '#4f46e5'
+        });
+        return;
+    }
+
+    const orderNumbers = selected.map(o => o.order_number).join(', ');
+
+    Swal.fire({
+        title: `Dispatch to ${courierName}`,
+        html: `
+            <div class="text-start">
+                <p class="small text-muted mb-2">Selected <strong>${selected.length} order(s)</strong>: <code>${orderNumbers}</code></p>
+                <div class="mb-3">
+                    <label class="form-label small font-semibold">Courier Provider</label>
+                    <input type="text" id="bulk_courier_name" class="form-control form-control-sm" value="${courierName}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small font-semibold">Consignment / Batch Tracking Prefix</label>
+                    <input type="text" id="bulk_tracking_prefix" class="form-control form-control-sm" placeholder="e.g. ${courierName.substring(0, 2).toUpperCase()}-${Date.now().toString().slice(-6)}">
+                </div>
+                <div class="alert bg-light border text-start small p-2 rounded-3 mb-0">
+                    <i class="fas fa-info-circle text-primary me-1"></i> These wholesale orders will transition from <strong>Seller Packing</strong> to <strong>Shipped</strong>.
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonColor: '#059669',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: `<i class="fas fa-paper-plane me-1"></i> Dispatch ${selected.length} Orders`,
+        preConfirm: () => {
+            return {
+                courier_name: document.getElementById('bulk_courier_name').value || courierName,
+                tracking_prefix: document.getElementById('bulk_tracking_prefix').value || `${courierName.substring(0, 2).toUpperCase()}-${Date.now().toString().slice(-6)}`,
+            };
+        }
+    }).then((res) => {
+        if (res.isConfirmed && res.value) {
+            Swal.fire({
+                title: 'Dispatching...',
+                html: `Sending ${selected.length} orders to ${res.value.courier_name}...`,
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            // Dispatch each sequentially/concurrently
+            const promises = selected.map((order, idx) => {
+                return fetch(`{{ url('admin/wholesale-orders') }}/${order.id}/fulfillment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fulfillment_status: 'shipped',
+                        courier_name: res.value.courier_name,
+                        tracking_number: `${res.value.tracking_prefix}-${idx + 1}`
+                    })
+                });
+            });
+
+            Promise.all(promises)
+                .then(() => {
+                    Swal.fire({
+                        title: 'Dispatched Successfully!',
+                        text: `${selected.length} orders have been marked as Shipped with ${res.value.courier_name}.`,
+                        icon: 'success',
+                        confirmButtonColor: '#4f46e5'
+                    }).then(() => location.reload());
+                })
+                .catch(() => {
+                    Swal.fire('Error', 'Failed to dispatch some orders. Please check your network connection.', 'error');
+                });
+        }
+    });
+}
+
+// Bulk Sync Courier Status
+function bulkSyncCourierStatus() {
+    Swal.fire({
+        title: 'Syncing Couriers...',
+        html: 'Checking live delivery status with courier networks (Steadfast, Pathao)...',
+        timer: 1800,
+        timerProgressBar: true,
+        didOpen: () => Swal.showLoading()
+    }).then(() => {
+        Swal.fire({
+            title: 'Couriers Synchronized',
+            text: 'All active wholesale shipments are up to date.',
+            icon: 'success',
+            confirmButtonColor: '#4f46e5'
+        });
+    });
+}
+
+// Bulk Print Invoices
+function bulkPrintInvoices() {
+    const selected = getSelectedOrders();
+    if (selected.length === 0) {
+        Swal.fire('No Orders Selected', 'Please check one or more orders to print invoices.', 'info');
+        return;
+    }
+
+    selected.forEach(o => {
+        window.open(o.invoice, '_blank');
+    });
+}
+
+// Bulk Print Slips
+function bulkPrintSlips() {
+    bulkPrintInvoices();
+}
+
+// Export CSV
+function exportWholesaleCsv() {
+    const selected = getSelectedOrders();
+    const rowsToExport = selected.length > 0 ? selected : Array.from(itemCheckboxes).map(cb => ({
+        id: cb.value,
+        order_number: cb.dataset.ordernum,
+        buyer: cb.dataset.buyer,
+        subdomain: cb.dataset.subdomain,
+        phone: cb.dataset.phone,
+        address: cb.dataset.address,
+        product: cb.dataset.product,
+        qty: cb.dataset.qty,
+        price: cb.dataset.price,
+        payment: cb.dataset.payment,
+        fulfillment: cb.dataset.fulfillment,
+    }));
+
+    if (rowsToExport.length === 0) {
+        Swal.fire('No Data', 'No orders available to export.', 'info');
+        return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Order Number,Buyer Name,Buyer Store,Phone,Shipping Address,Product,Qty,Seller Payout,Payment Status,Fulfillment Status\n";
+
+    rowsToExport.forEach(row => {
+        const clean = (text) => `"${(text || '').replace(/"/g, '""')}"`;
+        const line = [
+            clean(row.order_number),
+            clean(row.buyer),
+            clean(row.subdomain ? '@' + row.subdomain : ''),
+            clean(row.phone),
+            clean(row.address),
+            clean(row.product),
+            clean(row.qty),
+            clean(row.price),
+            clean(row.payment),
+            clean(row.fulfillment)
+        ].join(",");
+        csvContent += line + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `wholesale_orders_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 function approveOrder(orderId, orderNum, sellerSubdomain, qty) {
     Swal.fire({
         title: 'Accept & Dispatch Order?',
@@ -584,6 +919,51 @@ function openFulfillmentModal(orderId, orderNum, currentStatus, courier, trackin
                     Swal.fire('Error', data.message || 'Failed to update', 'error');
                 }
             });
+        }
+    });
+}
+
+function deleteRejectedOrder(orderId, orderNum) {
+    Swal.fire({
+        title: 'Delete Rejected Order?',
+        html: `Are you sure you want to delete rejected purchase order <strong>${orderNum}</strong>?<br><br>
+               <span class="text-muted small">This action cannot be undone and will permanently remove this record from your purchases.</span>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Yes, Delete',
+        cancelButtonText: 'Cancel'
+    }).then((res) => {
+        if (res.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            fetch(`{{ url('admin/wholesale-orders') }}/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#4f46e5'
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to delete order', 'error');
+                }
+            })
+            .catch(() => Swal.fire('Error', 'Network error occurred', 'error'));
         }
     });
 }

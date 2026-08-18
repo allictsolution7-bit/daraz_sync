@@ -141,6 +141,7 @@
     .icon-bkash { background: linear-gradient(135deg, #d81b60 0%, #ec4899 100%); }
     .icon-nagad { background: linear-gradient(135deg, #ea580c 0%, #f97316 100%); }
     .icon-rocket { background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%); }
+    .icon-bank { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
 
     /* Gateway body and inputs */
     .gateway-body {
@@ -401,6 +402,36 @@
                                 <input type="text" name="ecommerce[rocket_number]" class="form-control"
                                     value="{{ setting('ecommerce', 'rocket_number', '') }}" placeholder="e.g. 017XXXXXXXX">
                                 <small class="form-text text-muted">Manual payment destination number shown to customers.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bank Transfer Gateway -->
+                <div class="gateway-card">
+                    <div>
+                        <div class="gateway-header">
+                            <div class="gateway-title">
+                                <div class="gateway-icon icon-bank">
+                                    <i class="fas fa-building-columns"></i>
+                                </div>
+                                <span>Bank Transfer</span>
+                            </div>
+                        </div>
+                        <div class="gateway-body">
+                            <div class="form-group d-flex align-items-center justify-content-between mb-4">
+                                <span class="form-label mb-0">Gateway Status</span>
+                                <label class="switch-toggle">
+                                    <input type="hidden" name="ecommerce[bank]" value="0">
+                                    <input type="checkbox" name="ecommerce[bank]" value="1" {{ setting('ecommerce', 'bank', '1') == '1' ? 'checked' : '' }}>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Bank Account Details</label>
+                                <textarea name="ecommerce[bank_account_info]" class="form-control" rows="3"
+                                    placeholder="e.g. Bank: City Bank | A/C: 1234567890 | Name: PurnoBD Ltd | Branch: Dhaka">{{ setting('ecommerce', 'bank_account_info', '') }}</textarea>
+                                <small class="form-text text-muted">Bank name, AC number, and routing details shown to customers/buyers.</small>
                             </div>
                         </div>
                     </div>

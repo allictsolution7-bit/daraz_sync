@@ -571,4 +571,47 @@ class WholesalePurchaseOrderController extends Controller
 
         return view('admin.wholesale_orders.invoice', compact('order', 'siteLogo'));
     }
+
+    /**
+     * Delete a rejected wholesale purchase order (Only buyer who ordered it or super admin).
+     */
+    public function destroy($id)
+    {
+        $order = WholesalePurchaseOrder::findOrFail($id);
+
+        if ($order->payment_status !== 'rejected') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only rejected wholesale purchase orders can be deleted.'
+            ], 403);
+        }
+
+        $user = auth()->user();
+        $currentSubdomain = \App\Services\TenantContext::currentSubdomain();
+
+        $isBuyer = false;
+        if ($user) {
+            $isBuyer = ($order->buyer_admin_id == $user->id) || ($order->buyer_admin_email === $user->email);
+        }
+        if ($currentSubdomain && $order->buyer_subdomain === $currentSubdomain) {
+            $isBuyer = true;
+        }
+
+        $isSuperAdmin = $user && ($user->role === 'super_admin' || $user->is_super_admin || $user->email === 'sabbir@purnobd.com');
+
+        if (!$isBuyer && !$isSuperAdmin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized: Only the buyer store administrator who ordered this product can delete this rejected record.'
+            ], 403);
+        }
+
+        $orderNum = $order->order_number;
+        $order->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Rejected order {$orderNum} has been deleted successfully."
+        ]);
+    }
 }

@@ -413,6 +413,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::post('/wholesale-orders/{id}/approve', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'approve'])->name('wholesale-orders.approve');
     Route::post('/wholesale-orders/{id}/reject', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'reject'])->name('wholesale-orders.reject');
     Route::post('/wholesale-orders/{id}/fulfillment', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'updateFulfillment'])->name('wholesale-orders.fulfillment');
+    Route::delete('/wholesale-orders/{id}', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'destroy'])->name('wholesale-orders.destroy');
 
     // Inventory Management
     Route::prefix('stock-control')->name('inventory.')->group(function () {

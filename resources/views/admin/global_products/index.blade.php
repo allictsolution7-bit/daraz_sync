@@ -830,22 +830,30 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
                                 <i class="fas fa-wallet text-warning me-1"></i> Select Payment Gateway <span class="text-danger">*</span>
                             </label>
                             <div class="d-flex flex-wrap gap-2 mb-2.5">
+                                @if($superAdminBkashEnabled ?? true)
                                 <div class="gateway-pill active" data-gw="bkash" onclick="changePayGateway('bkash', this)">
                                     <input type="radio" name="swal_pay_gateway" value="bkash" class="d-none" checked>
                                     <i class="fas fa-bolt text-danger"></i> bKash
                                 </div>
-                                <div class="gateway-pill" data-gw="nagad" onclick="changePayGateway('nagad', this)">
-                                    <input type="radio" name="swal_pay_gateway" value="nagad" class="d-none">
+                                @endif
+                                @if($superAdminNagadEnabled ?? true)
+                                <div class="gateway-pill {{ !($superAdminBkashEnabled ?? true) ? 'active' : '' }}" data-gw="nagad" onclick="changePayGateway('nagad', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="nagad" class="d-none" {{ !($superAdminBkashEnabled ?? true) ? 'checked' : '' }}>
                                     <i class="fas fa-fire text-warning"></i> Nagad
                                 </div>
-                                <div class="gateway-pill" data-gw="rocket" onclick="changePayGateway('rocket', this)">
-                                    <input type="radio" name="swal_pay_gateway" value="rocket" class="d-none">
+                                @endif
+                                @if($superAdminRocketEnabled ?? true)
+                                <div class="gateway-pill {{ !($superAdminBkashEnabled ?? true) && !($superAdminNagadEnabled ?? true) ? 'active' : '' }}" data-gw="rocket" onclick="changePayGateway('rocket', this)">
+                                    <input type="radio" name="swal_pay_gateway" value="rocket" class="d-none" {{ !($superAdminBkashEnabled ?? true) && !($superAdminNagadEnabled ?? true) ? 'checked' : '' }}>
                                     <i class="fas fa-paper-plane" style="color: #8c3494;"></i> Rocket
                                 </div>
+                                @endif
+                                @if($superAdminBankEnabled ?? true)
                                 <div class="gateway-pill" data-gw="bank" onclick="changePayGateway('bank', this)">
                                     <input type="radio" name="swal_pay_gateway" value="bank" class="d-none">
                                     <i class="fas fa-building-columns text-success"></i> Bank Transfer
                                 </div>
+                                @endif
                             </div>
 
                             <!-- Payment Instruction Card -->
