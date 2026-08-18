@@ -361,8 +361,8 @@
     <!-- Bulk Action & Status Bar -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 px-1">
         <div class="d-flex align-items-center gap-2">
-            <button type="button" id="btn-bulk-copy" class="btn btn-success btn-sm rounded-3 px-3 py-2 shadow-sm font-semibold d-inline-flex align-items-center gap-2" style="font-weight: 600;" disabled onclick="executeBulkCopy()">
-                <i class="fas fa-cloud-arrow-down"></i> Copy Selected to Store (<span id="selected-count">0</span>)
+            <button type="button" id="btn-bulk-action" class="btn btn-primary btn-sm rounded-3 px-3.5 py-2 shadow-sm font-semibold d-inline-flex align-items-center gap-2" style="font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;" disabled onclick="openBulkPurchaseModal()">
+                <i class="fas fa-cart-shopping"></i> Purchase / Copy Selected (<span id="selected-count">0</span>)
             </button>
             <span class="text-muted small ms-2">
                 Showing {{ $paginatedProducts->firstItem() ?? 0 }} - {{ $paginatedProducts->lastItem() ?? 0 }} of {{ $paginatedProducts->total() }} global products
@@ -413,6 +413,9 @@
                                        data-subdomain="{{ $product['tenant_subdomain'] }}" 
                                        data-id="{{ $product['id'] }}"
                                        data-title="{{ $product['title'] }}"
+                                       data-unit-price="{{ $product['final_wholesale_price'] ?? $product['wholesale_price'] ?? $product['price'] ?? 0 }}"
+                                       data-stock="{{ $product['quantity'] ?? 0 }}"
+                                       data-image="{{ $product['thumb_image'] ?? '' }}"
                                        onchange="updateBulkButtonState()">
                             </td>
                             <td style="width: 70px;">
@@ -1156,76 +1159,478 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
     });
 }
 
-// Bulk Copy Action
-function executeBulkCopy() {
+function updateBulkButtonState() {
     const checked = document.querySelectorAll('.product-check:checked');
-    if (checked.length === 0) return;
+    const btn = document.getElementById('btn-bulk-action');
+    const countSpan = document.getElementById('selected-count');
+    if (countSpan) countSpan.textContent = checked.length;
+    if (btn) btn.disabled = (checked.length === 0);
+}
 
-    const items = [];
-    checked.forEach(cb => {
-        items.push({
+// Bulk Purchase / Copy Modal
+function openBulkPurchaseModal() {
+    const checked = document.querySelectorAll('.product-check:checked');
+    if (checked.length === 0) {
+        Swal.fire('No Products Selected', 'Please select one or more products using the checkboxes first.', 'info');
+        return;
+    }
+
+    const bulkItems = [];
+    checked.forEach((cb, idx) => {
+        bulkItems.push({
             subdomain: cb.dataset.subdomain,
-            product_id: parseInt(cb.dataset.id)
+            product_id: parseInt(cb.dataset.id),
+            title: cb.dataset.title,
+            unit_price: parseFloat(cb.dataset.unitPrice) || 0,
+            stock: parseInt(cb.dataset.stock) || 0,
+            image: cb.dataset.image || '',
+            quantity: 10
         });
     });
 
-    Swal.fire({
-        title: 'Bulk Copy Products?',
-        html: `Are you sure you want to copy <strong>${items.length}</strong> selected global products into your store catalog?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#10b981',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: `<i class="fas fa-cloud-arrow-down me-1"></i> Yes, Copy All ${items.length}`,
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Copying Products...',
-                html: 'Please wait while the products, images, and variations are being imported.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
+    let itemsTableHtml = `
+        <div class="table-responsive mb-3 border rounded-3 overflow-hidden" style="max-height: 220px; overflow-y: auto;">
+            <table class="table table-sm table-hover align-middle mb-0" style="font-size: 12px;">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 45px;">Image</th>
+                        <th>Product & Supplier</th>
+                        <th class="text-end" style="width: 90px;">Unit Price</th>
+                        <th class="text-center" style="width: 100px;">Quantity</th>
+                        <th class="text-end" style="width: 100px;">Total (৳)</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
 
-            fetch("{{ route('admin.global-products.bulk-copy') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ items: items })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Completed!',
-                        text: `${data.success_count} products were successfully copied into your catalog!`,
-                        icon: 'success',
-                        confirmButtonColor: '#4f46e5'
-                    }).then(() => {
-                        window.location.reload();
-                    });
+    let initialGrandTotal = 0;
+    bulkItems.forEach((item, idx) => {
+        const lineTotal = item.unit_price * item.quantity;
+        initialGrandTotal += lineTotal;
+        const imgTag = item.image 
+            ? `<img src="${item.image}" class="rounded-2 border shadow-xs" style="width: 32px; height: 32px; object-fit: cover;">`
+            : `<div class="rounded-2 border bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;"><i class="fas fa-image text-muted" style="font-size: 10px;"></i></div>`;
+
+        itemsTableHtml += `
+            <tr id="bulk-row-${idx}">
+                <td>${imgTag}</td>
+                <td>
+                    <div class="fw-semibold text-slate-800 text-truncate" style="max-width: 190px;" title="${item.title}">${item.title}</div>
+                    <span class="badge rounded-pill" style="background-color: #e0e7ff; color: #4338ca; font-size: 9px; font-weight: 600;">@${item.subdomain}</span>
+                </td>
+                <td class="text-end fw-bold text-slate-700">৳${item.unit_price.toFixed(2)}</td>
+                <td class="text-center">
+                    <input type="number" class="form-control form-control-sm text-center fw-bold px-1" id="bulk_qty_${idx}" value="${item.quantity}" min="1" max="${item.stock > 0 ? item.stock : 99999}" style="height: 28px; font-size: 12px;" oninput="window.updateBulkItemLineTotal(${idx})">
+                </td>
+                <td class="text-end fw-bold text-success" id="bulk_line_total_${idx}">৳${lineTotal.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+
+    itemsTableHtml += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    const modalHtml = `
+        <div class="text-start" style="font-size: 13px;">
+            <!-- Hero Banner -->
+            <div class="modal-product-hero mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge rounded-pill px-2.5 py-1" style="background-color: #e0e7ff; color: #4338ca; font-weight: 700; font-size: 11px;">
+                        <i class="fas fa-layer-group me-1"></i> Multi-Product Bulk Fulfillment
+                    </span>
+                    <span class="badge rounded-pill px-2.5 py-1" style="background-color: #ecfdf5; color: #047857; font-weight: 700; font-size: 11px;">
+                        <i class="fas fa-check-double me-1"></i> ${bulkItems.length} Products Selected
+                    </span>
+                </div>
+                <div class="text-muted small" style="font-size: 11.5px;">
+                    Select whether you want to sync these products directly into your store catalog for retail listing, or place a bulk wholesale purchase order with physical delivery.
+                </div>
+            </div>
+
+            <!-- Action Mode Selection Cards -->
+            <div class="mb-3">
+                <label class="form-label small text-uppercase text-muted fw-bold mb-2" style="font-size: 10.5px; letter-spacing: 0.5px;">Choose Fulfillment Action:</label>
+
+                <!-- Option 1: Instant Catalog Sync -->
+                <div class="action-mode-box active-copy" id="box-opt-bulk-copy" style="margin-bottom: 12px;" onclick="selectBulkActionOption('copy')">
+                    <div class="d-flex align-items-start gap-2.5">
+                        <div class="action-icon-circle" style="background: #e0e7ff; color: #4338ca;">
+                            <i class="fas fa-clone"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                <span class="fw-bold text-slate-800" style="font-size: 13px; color: #0f172a;">
+                                    Instant Catalog Sync (${bulkItems.length} Products)
+                                </span>
+                                <span class="badge rounded-pill px-2 py-0.5" style="background-color: #e0e7ff; color: #3730a3; font-size: 9.5px; font-weight: 700;">
+                                    Free Sync
+                                </span>
+                            </div>
+                            <div class="text-muted" style="font-size: 11.5px; line-height: 1.35;">
+                                Add all ${bulkItems.length} selected products to your catalog immediately with 0 stock. Sell on-demand.
+                            </div>
+                        </div>
+                        <input class="form-check-input mt-1" type="radio" name="swal_bulk_action" id="opt_bulk_copy" value="copy" checked onchange="selectBulkActionOption('copy')" style="cursor: pointer;">
+                    </div>
+                </div>
+
+                <!-- Option 2: Purchase Wholesale Stock -->
+                <div class="action-mode-box" id="box-opt-bulk-purchase" onclick="selectBulkActionOption('purchase')">
+                    <div class="d-flex align-items-start gap-2.5">
+                        <div class="action-icon-circle" style="background: #dcfce7; color: #16a34a;">
+                            <i class="fas fa-truck-ramp-box"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                <span class="fw-bold text-slate-800" style="font-size: 13px; color: #0f172a;">
+                                    Purchase Wholesale Stock (Super Admin Payment)
+                                </span>
+                                <span class="badge rounded-pill px-2 py-0.5" style="background-color: #dcfce7; color: #15803d; font-size: 9.5px; font-weight: 700;">
+                                    Physical Delivery
+                                </span>
+                            </div>
+                            <div class="text-muted" style="font-size: 11.5px; line-height: 1.35;">
+                                Purchase physical stock. Pay Super Admin; suppliers will ship goods to your delivery address.
+                            </div>
+                        </div>
+                        <input class="form-check-input mt-1" type="radio" name="swal_bulk_action" id="opt_bulk_purchase" value="purchase" onchange="selectBulkActionOption('purchase')" style="cursor: pointer;">
+                    </div>
+
+                    <!-- Bulk Purchase Form (Hidden initially) -->
+                    <div id="bulk-purchase-details-section" class="mt-3 pt-3 border-top" style="display: none; border-top-color: #bbf7d0 !important;">
+                        <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                            <i class="fas fa-cubes-stacked text-primary me-1"></i> Order Quantities & Items:
+                        </label>
+                        ${itemsTableHtml}
+
+                        <!-- Grand Total Bar -->
+                        <div class="d-flex justify-content-between align-items-center p-2.5 rounded-3 mb-3" style="background-color: #ecfdf5; border: 1px solid #a7f3d0;">
+                            <div>
+                                <span class="fw-bold text-slate-800 d-block" style="font-size: 12px;">Grand Total Payable:</span>
+                                <small class="text-muted" style="font-size: 10.5px;">Includes platform wholesale commission</small>
+                            </div>
+                            <div class="fw-bold text-success" id="swal_bulk_grand_total" style="font-size: 17px; color: #059669;">
+                                ৳${initialGrandTotal.toFixed(2)}
+                            </div>
+                        </div>
+
+                        <!-- Delivery Destination Address -->
+                        <div class="mb-3">
+                            <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                <i class="fas fa-location-dot text-danger me-1"></i> Delivery Address (Where suppliers will ship) <span class="text-danger">*</span>
+                            </label>
+                            <textarea id="swal_bulk_shipping_address" class="form-control form-control-clean" rows="2" placeholder="Complete address: Street, Area, City, District"></textarea>
+                        </div>
+
+                        <!-- Contact Mobile -->
+                        <div class="mb-3">
+                            <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                <i class="fas fa-phone text-secondary me-1"></i> Contact Mobile Number <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="swal_bulk_contact_phone" class="form-control form-control-clean" placeholder="017xxxxxxxx" value="{{ auth()->user()?->phone ?? '' }}">
+                        </div>
+
+                        <!-- Super Admin Payment Gateway -->
+                        <div class="mb-3">
+                            <label class="small text-slate-700 fw-semibold mb-2 d-block" style="font-size: 11.5px;">
+                                <i class="fas fa-wallet text-warning me-1"></i> Select Super Admin Payment Gateway <span class="text-danger">*</span>
+                            </label>
+                            <div class="d-flex flex-wrap gap-2 mb-2.5">
+                                @if($superAdminBkashEnabled ?? true)
+                                <div class="gateway-pill active" data-gw="bkash" onclick="changeBulkPayGateway('bkash', this)">
+                                    <input type="radio" name="swal_bulk_pay_gateway" value="bkash" class="d-none" checked>
+                                    <i class="fas fa-bolt text-danger"></i> bKash
+                                </div>
+                                @endif
+                                @if($superAdminNagadEnabled ?? true)
+                                <div class="gateway-pill {{ !($superAdminBkashEnabled ?? true) ? 'active' : '' }}" data-gw="nagad" onclick="changeBulkPayGateway('nagad', this)">
+                                    <input type="radio" name="swal_bulk_pay_gateway" value="nagad" class="d-none" {{ !($superAdminBkashEnabled ?? true) ? 'checked' : '' }}>
+                                    <i class="fas fa-fire text-warning"></i> Nagad
+                                </div>
+                                @endif
+                                @if($superAdminRocketEnabled ?? true)
+                                <div class="gateway-pill {{ !($superAdminBkashEnabled ?? true) && !($superAdminNagadEnabled ?? true) ? 'active' : '' }}" data-gw="rocket" onclick="changeBulkPayGateway('rocket', this)">
+                                    <input type="radio" name="swal_bulk_pay_gateway" value="rocket" class="d-none" {{ !($superAdminBkashEnabled ?? true) && !($superAdminNagadEnabled ?? true) ? 'checked' : '' }}>
+                                    <i class="fas fa-paper-plane" style="color: #8c3494;"></i> Rocket
+                                </div>
+                                @endif
+                                @if($superAdminBankEnabled ?? true)
+                                <div class="gateway-pill" data-gw="bank" onclick="changeBulkPayGateway('bank', this)">
+                                    <input type="radio" name="swal_bulk_pay_gateway" value="bank" class="d-none">
+                                    <i class="fas fa-building-columns text-success"></i> Bank Transfer
+                                </div>
+                                @endif
+                            </div>
+
+                            <!-- Payment Instruction Card -->
+                            <div class="p-2.5 rounded-3 mb-2 small border" id="swal_bulk_gateway_instruction" style="background-color: #f8fafc; border-color: #e2e8f0; font-size: 11.5px; line-height: 1.45;">
+                                ${GATEWAYS.bkash.instruction}
+                            </div>
+                        </div>
+
+                        <!-- Sender Mobile & TrxID -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                    <i class="fas fa-mobile-screen me-1"></i> Sender Mobile / AC
+                                </label>
+                                <input type="text" id="swal_bulk_sender_phone" class="form-control form-control-clean" placeholder="018xxxxxxxx">
+                            </div>
+                            <div class="col-6">
+                                <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                    <i class="fas fa-key text-primary me-1"></i> Transaction ID (TrxID) <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="swal_bulk_trx_id" class="form-control form-control-clean fw-bold" placeholder="e.g. 9J87K12A">
+                            </div>
+                        </div>
+
+                        <!-- Payment Screenshot / Receipt Proof -->
+                        <div class="mb-2">
+                            <label class="small text-slate-700 fw-semibold mb-1 d-block" style="font-size: 11.5px;">
+                                <i class="fas fa-image text-info me-1"></i> Payment Proof Screenshot / Slip <span class="text-muted">(Optional)</span>
+                            </label>
+                            <input type="file" id="swal_bulk_payment_screenshot" class="form-control form-control-clean" accept="image/*" style="padding: 6px 10px; font-size: 12px;" onchange="previewBulkPaymentScreenshot(this)">
+                            <div id="swal_bulk_screenshot_preview_box" class="mt-2 text-center" style="display: none;">
+                                <img id="swal_bulk_screenshot_preview_img" src="" alt="Receipt Preview" class="rounded-3 border shadow-sm" style="max-height: 100px; max-width: 100%; object-fit: contain;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    Swal.fire({
+        title: `<i class="fas fa-cart-flatbed text-primary me-2"></i>Bulk Wholesale (${bulkItems.length} Products)`,
+        html: modalHtml,
+        showCancelButton: true,
+        confirmButtonText: `<i class="fas fa-clone me-1.5"></i> Sync All ${bulkItems.length} Products to Catalog`,
+        cancelButtonText: 'Cancel',
+        focusConfirm: false,
+        width: '720px',
+        customClass: {
+            popup: 'modern-wholesale-popup'
+        },
+        didOpen: () => {
+            window.selectBulkActionOption = function(mode) {
+                const isPurchase = (mode === 'purchase');
+                document.getElementById('opt_bulk_purchase').checked = isPurchase;
+                document.getElementById('opt_bulk_copy').checked = !isPurchase;
+
+                const boxPurchase = document.getElementById('box-opt-bulk-purchase');
+                const boxCopy = document.getElementById('box-opt-bulk-copy');
+                const detailsSection = document.getElementById('bulk-purchase-details-section');
+                const confirmBtn = Swal.getConfirmButton();
+
+                if (isPurchase) {
+                    boxPurchase.classList.add('active-purchase');
+                    boxCopy.classList.remove('active-copy');
+                    if (detailsSection) detailsSection.style.display = 'block';
+                    if (confirmBtn) confirmBtn.innerHTML = `<i class="fas fa-check-circle me-1.5"></i> Submit Wholesale Order (৳${initialGrandTotal.toFixed(2)})`;
                 } else {
+                    boxPurchase.classList.remove('active-purchase');
+                    boxCopy.classList.add('active-copy');
+                    if (detailsSection) detailsSection.style.display = 'none';
+                    if (confirmBtn) confirmBtn.innerHTML = `<i class="fas fa-clone me-1.5"></i> Sync All ${bulkItems.length} Products to Catalog`;
+                }
+            };
+
+            window.updateBulkItemLineTotal = function(idx) {
+                const qtyInput = document.getElementById(`bulk_qty_${idx}`);
+                let qty = parseInt(qtyInput.value) || 1;
+                if (qty < 1) { qty = 1; qtyInput.value = 1; }
+                bulkItems[idx].quantity = qty;
+
+                const lineTotal = bulkItems[idx].unit_price * qty;
+                const lineTotalEl = document.getElementById(`bulk_line_total_${idx}`);
+                if (lineTotalEl) lineTotalEl.textContent = `৳${lineTotal.toFixed(2)}`;
+
+                let newGrandTotal = 0;
+                bulkItems.forEach(it => {
+                    newGrandTotal += (it.unit_price * it.quantity);
+                });
+                initialGrandTotal = newGrandTotal;
+
+                const grandTotalEl = document.getElementById('swal_bulk_grand_total');
+                if (grandTotalEl) grandTotalEl.textContent = `৳${newGrandTotal.toFixed(2)}`;
+
+                const confirmBtn = Swal.getConfirmButton();
+                if (confirmBtn && document.getElementById('opt_bulk_purchase').checked) {
+                    confirmBtn.innerHTML = `<i class="fas fa-check-circle me-1.5"></i> Submit Wholesale Order (৳${newGrandTotal.toFixed(2)})`;
+                }
+            };
+
+            window.changeBulkPayGateway = function(gatewayKey, pillEl) {
+                document.querySelectorAll('input[name="swal_bulk_pay_gateway"]').forEach(i => i.checked = false);
+                document.querySelectorAll('.gateway-pill').forEach(b => b.classList.remove('active'));
+                
+                const radio = pillEl.querySelector('input');
+                if (radio) radio.checked = true;
+                pillEl.classList.add('active');
+
+                const gInfo = GATEWAYS[gatewayKey];
+                const instBox = document.getElementById('swal_bulk_gateway_instruction');
+                if (instBox && gInfo) {
+                    instBox.innerHTML = gInfo.instruction;
+                }
+            };
+
+            window.previewBulkPaymentScreenshot = function(input) {
+                const previewBox = document.getElementById('swal_bulk_screenshot_preview_box');
+                const previewImg = document.getElementById('swal_bulk_screenshot_preview_img');
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewBox.style.display = 'block';
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                } else {
+                    previewBox.style.display = 'none';
+                }
+            };
+        },
+        preConfirm: () => {
+            const isPurchase = document.getElementById('opt_bulk_purchase').checked;
+            if (isPurchase) {
+                const shippingAddress = document.getElementById('swal_bulk_shipping_address').value.trim();
+                const contactPhone = document.getElementById('swal_bulk_contact_phone').value.trim();
+                const trxId = document.getElementById('swal_bulk_trx_id').value.trim();
+                const senderPhone = document.getElementById('swal_bulk_sender_phone').value.trim();
+                const gatewayChecked = document.querySelector('input[name="swal_bulk_pay_gateway"]:checked');
+                const gateway = gatewayChecked ? gatewayChecked.value : 'bkash';
+                const screenshotFile = document.getElementById('swal_bulk_payment_screenshot').files[0];
+
+                if (!shippingAddress) {
+                    Swal.showValidationMessage('Please provide your complete shipping/delivery address.');
+                    return false;
+                }
+                if (!contactPhone) {
+                    Swal.showValidationMessage('Please provide a contact phone number for the delivery courier.');
+                    return false;
+                }
+                if (!trxId) {
+                    Swal.showValidationMessage('Please enter your payment Transaction ID (TrxID).');
+                    return false;
+                }
+
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('shipping_address', shippingAddress);
+                formData.append('contact_phone', contactPhone);
+                formData.append('gateway', gateway);
+                formData.append('trx_id', trxId);
+                formData.append('sender_phone', senderPhone);
+                formData.append('items', JSON.stringify(bulkItems));
+                if (screenshotFile) {
+                    formData.append('payment_screenshot', screenshotFile);
+                }
+
+                return {
+                    mode: 'purchase',
+                    formData: formData,
+                    itemCount: bulkItems.length
+                };
+            } else {
+                return {
+                    mode: 'copy',
+                    items: bulkItems.map(it => ({ subdomain: it.subdomain, product_id: it.product_id }))
+                };
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            if (result.value.mode === 'purchase') {
+                Swal.fire({
+                    title: 'Processing Wholesale Order...',
+                    html: `Submitting purchase orders for ${result.value.itemCount} items...`,
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                fetch("{{ route('admin.wholesale-orders.bulk-checkout') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: result.value.formData
+                })
+                .then(res => res.json())
+                .then(resData => {
+                    if (resData.success) {
+                        Swal.fire({
+                            title: 'Wholesale Order Placed!',
+                            text: resData.message || 'Orders submitted successfully!',
+                            icon: 'success',
+                            confirmButtonText: '<i class="fas fa-receipt me-1.5"></i> View Wholesale Orders',
+                            confirmButtonColor: '#4f46e5',
+                            showCancelButton: true,
+                            cancelButtonText: 'Stay on Page'
+                        }).then((choice) => {
+                            if (choice.isConfirmed) {
+                                window.location.href = "{{ route('admin.wholesale-orders.index') }}";
+                            } else {
+                                window.location.reload();
+                            }
+                        });
+                    } else {
+                        Swal.fire('Order Submission Failed', resData.message || 'Failed to place bulk wholesale order.', 'error');
+                    }
+                })
+                .catch(err => {
+                    Swal.fire('Error', 'Network error occurred while submitting order.', 'error');
+                });
+            } else {
+                // Free Instant Catalog Sync
+                Swal.fire({
+                    title: 'Copying Products...',
+                    html: 'Please wait while the products, images, and variations are being imported.',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                fetch("{{ route('admin.global-products.bulk-copy') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ items: result.value.items })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Completed!',
+                            text: `${data.success_count} products were successfully copied into your catalog!`,
+                            icon: 'success',
+                            confirmButtonColor: '#4f46e5'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Failed',
+                            text: 'Failed to copy products. Please try again.',
+                            icon: 'error',
+                            confirmButtonColor: '#ef4444'
+                        });
+                    }
+                })
+                .catch(err => {
                     Swal.fire({
-                        title: 'Failed',
-                        text: 'Failed to copy products. Please try again.',
+                        title: 'Error',
+                        text: 'An unexpected network error occurred during bulk copy.',
                         icon: 'error',
                         confirmButtonColor: '#ef4444'
                     });
-                }
-            })
-            .catch(err => {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'An unexpected network error occurred during bulk copy.',
-                    icon: 'error',
-                    confirmButtonColor: '#ef4444'
                 });
-            });
+            }
         }
     });
 }

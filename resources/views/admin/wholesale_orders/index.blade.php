@@ -6,15 +6,15 @@
 <style>
     .stats-card-modern {
         background: #ffffff;
-        border-radius: 16px;
-        padding: 20px 24px;
+        border-radius: 12px;
+        padding: 12px 16px;
         border: 1px solid #edf2f7;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        transition: transform 0.15s, box-shadow 0.15s;
     }
     .stats-card-modern:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
     .badge-status-pending {
         background-color: #fef3c7 !important;
@@ -72,24 +72,24 @@
         font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        padding: 14px 16px;
+        padding: 10px 14px;
         border-bottom: 1px solid #e2e8f0;
     }
     .table-modern tbody td {
-        padding: 14px 16px;
+        padding: 10px 14px;
         vertical-align: middle;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 13px;
+        font-size: 12.5px;
     }
     .btn-soft {
-        font-size: 11.5px;
+        font-size: 11px;
         font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 8px;
+        padding: 4px 10px;
+        border-radius: 6px;
         border: 1px solid transparent;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         cursor: pointer;
         transition: all 0.15s ease-in-out;
     }
@@ -107,108 +107,96 @@
     /* Custom Navigation Tabs */
     .tab-pill-btn {
         font-weight: 600;
-        font-size: 13px;
-        padding: 8px 18px;
+        font-size: 12px;
+        padding: 5px 14px;
         border-radius: 50px;
         display: inline-flex;
         align-items: center;
         text-decoration: none !important;
-        transition: all 0.2s ease-in-out;
+        transition: all 0.15s ease-in-out;
         border: 1.5px solid #e2e8f0;
         background: #ffffff;
         color: #334155 !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
     }
     .tab-pill-btn:hover {
         background: #f1f5f9 !important;
         color: #0f172a !important;
         border-color: #cbd5e1 !important;
-        transform: translateY(-1px);
     }
     .tab-pill-btn.active-all {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
         border-color: #0f172a !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2) !important;
     }
     .tab-pill-btn.active-purchases {
         background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
         border-color: #4338ca !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+        box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2) !important;
     }
     .tab-pill-btn.active-sales {
         background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
         border-color: #047857 !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
+        box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2) !important;
     }
 </style>
 @endsection
 
 @section('content')
-<div class="container-fluid py-4" style="max-width: 1650px;">
-    <!-- Header Block -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge rounded-pill px-2.5 py-1" style="background-color: #e0e7ff; color: #4338ca; font-weight: 700; font-size: 11px;">
-                    <i class="fas fa-handshake me-1"></i> B2B WHOLESALE NETWORK
-                </span>
-                <span class="text-muted small">&bull;</span>
-                <span class="text-muted small">Super Admin Payment Verification & Dispatch</span>
+<div class="container-fluid py-3" style="max-width: 1650px;">
+    <!-- Compact Header & Navigation Tabs Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 pb-2 border-bottom">
+        <div class="d-flex flex-wrap align-items-center gap-3">
+            <div>
+                <h1 class="h5 mb-0 font-bold" style="font-weight: 700; color: #1e293b;">
+                    <i class="fas fa-boxes-stacked text-primary me-1.5"></i> Wholesale Orders
+                </h1>
             </div>
-            <h1 class="h3 mb-0 text-slate-800 font-bold" style="font-weight: 700; color: #1e293b;">
-                Wholesale Purchase Orders
-            </h1>
-            <p class="text-muted mb-0 small mt-1">
-                Manage B2B stock purchase orders between store administrators and supplier stores.
-            </p>
+
+            <!-- Navigation Tabs -->
+            <div class="d-flex flex-wrap align-items-center gap-1.5">
+                @if($isSuperAdmin)
+                    <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'all']) }}" 
+                       class="tab-pill-btn {{ ($tab ?? 'all') === 'all' ? 'active-all' : '' }}">
+                        <i class="fas fa-shield-alt me-1 {{ ($tab ?? 'all') === 'all' ? 'text-warning' : 'text-slate-500' }}"></i> Super Admin
+                        <span class="badge rounded-pill ms-1 px-1.5 py-0.2 {{ ($tab ?? 'all') === 'all' ? 'bg-white text-dark' : 'bg-light text-dark border' }}" style="font-size: 9.5px; font-weight: 700;">{{ $orders->total() }}</span>
+                    </a>
+                @endif
+                <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'purchases']) }}" 
+                   class="tab-pill-btn {{ ($tab ?? 'purchases') === 'purchases' ? 'active-purchases' : '' }}">
+                    <i class="fas fa-cart-shopping me-1 {{ ($tab ?? 'purchases') === 'purchases' ? 'text-white' : 'text-indigo-600' }}"></i> My Purchases
+                    <span class="badge rounded-pill ms-1 px-1.5 py-0.2 {{ ($tab ?? 'purchases') === 'purchases' ? 'bg-white text-primary' : 'bg-light text-dark border' }}" style="font-size: 9.5px; font-weight: 700;">{{ $myPurchasesCount }}</span>
+                </a>
+                <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'sales']) }}" 
+                   class="tab-pill-btn {{ ($tab ?? 'purchases') === 'sales' ? 'active-sales' : '' }}">
+                    <i class="fas fa-truck-ramp-box me-1 {{ ($tab ?? 'purchases') === 'sales' ? 'text-white' : 'text-amber-500' }}"></i> Orders to Ship
+                    <span class="badge rounded-pill ms-1 px-1.5 py-0.2 {{ ($tab ?? 'purchases') === 'sales' ? 'bg-white text-success' : 'bg-success text-white' }}" style="font-size: 9.5px; font-weight: 700;">{{ $mySalesCount }}</span>
+                </a>
+            </div>
         </div>
 
         <div class="d-flex align-items-center gap-2">
-            <a href="{{ route('admin.global-products.index') }}" class="btn btn-primary btn-sm rounded-3 px-3 py-2" style="font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;">
-                <i class="fas fa-globe me-1.5"></i> Browse Global Wholesale Products
+            <a href="{{ route('admin.global-products.index') }}" class="btn btn-primary btn-sm rounded-3 px-2.5 py-1.5" style="font-size: 12px; font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;">
+                <i class="fas fa-globe me-1"></i> Global Wholesale Products
             </a>
         </div>
     </div>
 
-    <!-- Navigation Tabs (My Purchases vs Orders to Deliver) -->
-    <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-        @if($isSuperAdmin)
-            <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'all']) }}" 
-               class="tab-pill-btn {{ ($tab ?? 'all') === 'all' ? 'active-all' : '' }}">
-                <i class="fas fa-shield-alt me-1.5 {{ ($tab ?? 'all') === 'all' ? 'text-warning' : 'text-slate-500' }}"></i> Super Admin All Orders
-                <span class="badge rounded-pill ms-1.5 px-2 py-0.5 {{ ($tab ?? 'all') === 'all' ? 'bg-white text-dark' : 'bg-light text-dark border' }}" style="font-size: 10px; font-weight: 700;">{{ $orders->total() }}</span>
-            </a>
-        @endif
-        <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'purchases']) }}" 
-           class="tab-pill-btn {{ ($tab ?? 'purchases') === 'purchases' ? 'active-purchases' : '' }}">
-            <i class="fas fa-cart-shopping me-1.5 {{ ($tab ?? 'purchases') === 'purchases' ? 'text-white' : 'text-indigo-600' }}"></i> My Purchases (Bought)
-            <span class="badge rounded-pill ms-1.5 px-2 py-0.5 {{ ($tab ?? 'purchases') === 'purchases' ? 'bg-white text-primary' : 'bg-light text-dark border' }}" style="font-size: 10px; font-weight: 700;">{{ $myPurchasesCount }}</span>
-        </a>
-        <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'sales']) }}" 
-           class="tab-pill-btn {{ ($tab ?? 'purchases') === 'sales' ? 'active-sales' : '' }}">
-            <i class="fas fa-truck-ramp-box me-1.5 {{ ($tab ?? 'purchases') === 'sales' ? 'text-white' : 'text-amber-500' }}"></i> Orders to Ship & Earn (My Sales)
-            <span class="badge rounded-pill ms-1.5 px-2 py-0.5 {{ ($tab ?? 'purchases') === 'sales' ? 'bg-white text-success' : 'bg-success text-white' }}" style="font-size: 10px; font-weight: 700;">{{ $mySalesCount }}</span>
-        </a>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="row g-3 mb-4">
+    <!-- Compact Statistics Cards -->
+    <div class="row g-2 mb-3">
         <div class="col-xl-3 col-sm-6">
             <div class="stats-card-modern d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">
+                    <span class="text-muted text-uppercase d-block" style="font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">
                         {{ ($tab ?? 'purchases') === 'sales' ? 'Awaiting Packing' : 'Pending Verification' }}
                     </span>
-                    <h3 class="mb-0 font-bold text-warning mt-1" style="font-weight: 700;">{{ $pendingCount }}</h3>
-                    <span class="text-muted small" style="font-size: 11.5px;">
-                        {{ ($tab ?? 'purchases') === 'sales' ? 'Orders Ready to Ship' : 'Awaiting Super Admin' }}
-                    </span>
+                    <div class="h5 mb-0 font-bold text-warning mt-0.5" style="font-weight: 700;">{{ $pendingCount }}</div>
                 </div>
-                <div class="rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background-color: #fef3c7; color: #d97706;">
-                    <i class="fas fa-clock fs-4"></i>
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: #fef3c7; color: #d97706;">
+                    <i class="fas fa-clock fs-6"></i>
                 </div>
             </div>
         </div>
@@ -216,16 +204,13 @@
         <div class="col-xl-3 col-sm-6">
             <div class="stats-card-modern d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">
+                    <span class="text-muted text-uppercase d-block" style="font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">
                         {{ ($tab ?? 'purchases') === 'sales' ? 'Dispatched / Delivered' : 'Approved Orders' }}
                     </span>
-                    <h3 class="mb-0 font-bold text-success mt-1" style="font-weight: 700;">{{ $approvedCount }}</h3>
-                    <span class="text-muted small" style="font-size: 11.5px;">
-                        {{ ($tab ?? 'purchases') === 'sales' ? 'Completed Fulfillments' : 'Dispatched to Sellers' }}
-                    </span>
+                    <div class="h5 mb-0 font-bold text-success mt-0.5" style="font-weight: 700;">{{ $approvedCount }}</div>
                 </div>
-                <div class="rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background-color: #d1fae5; color: #059669;">
-                    <i class="fas fa-check-circle fs-4"></i>
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: #d1fae5; color: #059669;">
+                    <i class="fas fa-check-circle fs-6"></i>
                 </div>
             </div>
         </div>
@@ -233,32 +218,13 @@
         <div class="col-xl-3 col-sm-6">
             <div class="stats-card-modern d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">
-                        @if(($tab ?? 'purchases') === 'sales')
-                            Sales Earnings
-                        @elseif(($tab ?? 'purchases') === 'purchases')
-                            Total Purchased Spend
-                        @else
-                            Wholesale Volume & Profit
-                        @endif
+                    <span class="text-muted text-uppercase d-block" style="font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">
+                        {{ ($tab ?? 'purchases') === 'sales' ? 'Sales Earnings' : (($tab ?? 'purchases') === 'purchases' ? 'Purchased Spend' : 'Volume & Profit') }}
                     </span>
-                    <h3 class="mb-0 font-bold text-primary mt-1" style="font-weight: 700;">৳{{ number_format($totalVolume, 2) }}</h3>
-                    @if($isSuperAdmin && ($tab ?? 'all') === 'all')
-                        <span class="text-success small fw-bold d-block mt-0.5" style="font-size: 11.5px;">
-                            <i class="fas fa-arrow-trend-up me-1"></i> Profit Comm: <strong>৳{{ number_format($totalProfit ?? 0, 2) }}</strong>
-                        </span>
-                    @elseif(($tab ?? 'purchases') === 'sales')
-                        <span class="text-success small fw-semibold d-block mt-0.5" style="font-size: 11.5px;">
-                            <i class="fas fa-wallet me-1"></i> Credited to Wallet
-                        </span>
-                    @else
-                        <span class="text-muted small d-block mt-0.5" style="font-size: 11.5px;">
-                            Settled Purchases
-                        </span>
-                    @endif
+                    <div class="h5 mb-0 font-bold text-primary mt-0.5" style="font-weight: 700;">৳{{ number_format($totalVolume, 2) }}</div>
                 </div>
-                <div class="rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background-color: #e0e7ff; color: #4338ca;">
-                    <i class="fas fa-money-bill-wave fs-4"></i>
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: #e0e7ff; color: #4338ca;">
+                    <i class="fas fa-money-bill-wave fs-6"></i>
                 </div>
             </div>
         </div>
@@ -266,37 +232,36 @@
         <div class="col-xl-3 col-sm-6">
             <div class="stats-card-modern d-flex align-items-center justify-content-between">
                 <div>
-                    <span class="text-muted small font-semibold text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">Total Orders</span>
-                    <h3 class="mb-0 font-bold text-slate-800 mt-1" style="font-weight: 700;">{{ $orders->total() }}</h3>
-                    <span class="text-muted small" style="font-size: 11.5px;">
-                        {{ ($tab ?? 'purchases') === 'sales' ? 'Seller Orders' : (($tab ?? 'purchases') === 'purchases' ? 'Your Purchases' : 'All Recorded Purchases') }}
-                    </span>
+                    <span class="text-muted text-uppercase d-block" style="font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">Total Orders</span>
+                    <div class="h5 mb-0 font-bold text-slate-800 mt-0.5" style="font-weight: 700;">{{ $orders->total() }}</div>
                 </div>
-                <div class="rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background-color: #f1f5f9; color: #64748b;">
-                    <i class="fas fa-boxes-stacked fs-4"></i>
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: #f1f5f9; color: #64748b;">
+                    <i class="fas fa-boxes-stacked fs-6"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Filters & Search Bar -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-body p-3">
-            <form action="{{ route('admin.wholesale-orders.index') }}" method="GET" class="d-flex flex-wrap align-items-center justify-content-between gap-3 m-0">
-                <div class="d-flex flex-wrap align-items-center gap-2">
-                    <div class="input-group input-group-sm" style="width: 280px;">
-                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" name="search" class="form-control border-start-0" placeholder="Search order #, product, TrxID..." value="{{ request('search') }}">
+    <!-- Unified Slim Toolbar: Filters & Bulk Actions in One Card -->
+    <div class="card border-0 shadow-sm rounded-3 mb-3" style="background: #ffffff;">
+        <div class="card-body p-2 px-3">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <!-- Search & Filters -->
+                <form action="{{ route('admin.wholesale-orders.index') }}" method="GET" class="d-flex flex-wrap align-items-center gap-1.5 m-0">
+                    <input type="hidden" name="tab" value="{{ $tab ?? 'purchases' }}">
+                    <div class="input-group input-group-sm" style="width: 220px;">
+                        <span class="input-group-text bg-light border-end-0 py-1"><i class="fas fa-search text-muted" style="font-size: 11px;"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0 py-1" style="font-size: 12px;" placeholder="Search order #, TrxID..." value="{{ request('search') }}">
                     </div>
 
-                    <select name="status" class="form-select form-select-sm rounded-3" style="width: 170px;" onchange="this.form.submit()">
+                    <select name="status" class="form-select form-select-sm rounded-2 py-1" style="width: 140px; font-size: 12px;" onchange="this.form.submit()">
                         <option value="">Payment: All</option>
-                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending Verification</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
                         <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
                     </select>
 
-                    <select name="fulfillment" class="form-select form-select-sm rounded-3" style="width: 170px;" onchange="this.form.submit()">
+                    <select name="fulfillment" class="form-select form-select-sm rounded-2 py-1" style="width: 140px; font-size: 12px;" onchange="this.form.submit()">
                         <option value="">Fulfillment: All</option>
                         <option value="pending" {{ request('fulfillment') === 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="processing" {{ request('fulfillment') === 'processing' ? 'selected' : '' }}>Processing</option>
@@ -304,68 +269,41 @@
                         <option value="delivered" {{ request('fulfillment') === 'delivered' ? 'selected' : '' }}>Delivered</option>
                     </select>
 
-                    <button type="submit" class="btn btn-sm btn-primary rounded-3 px-3">Filter</button>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-2 px-2.5 py-1" style="font-size: 12px;">Filter</button>
                     @if(request()->anyFilled(['search', 'status', 'fulfillment']))
-                        <a href="{{ route('admin.wholesale-orders.index') }}" class="btn btn-sm btn-outline-secondary rounded-3">Reset</a>
+                        <a href="{{ route('admin.wholesale-orders.index', ['tab' => $tab ?? 'purchases']) }}" class="btn btn-sm btn-light rounded-2 px-2 py-1 text-muted" style="font-size: 12px;">Reset</a>
                     @endif
-                </div>
+                </form>
 
-                @if($isSuperAdmin)
-                    <span class="badge bg-dark text-white px-2.5 py-1.5 rounded-3" style="font-size: 11px;">
-                        <i class="fas fa-shield-alt me-1 text-warning"></i> Super Admin Mode
+                <!-- Bulk Actions Toolbar -->
+                <div class="d-flex flex-wrap align-items-center gap-1.5">
+                    <span class="badge bg-light text-slate-700 border px-2 py-1 me-1" style="font-size: 11px; font-weight: 600;" id="selected-orders-count-badge">
+                        <i class="fas fa-check-double text-primary me-1"></i><span id="selected-count">0</span> selected
                     </span>
-                @endif
-            </form>
-        </div>
-    </div>
 
-    <!-- Bulk Actions Dashboard -->
-    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4" style="background: #ffffff;">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <div style="font-weight: 700; font-size: 13px; color: #1e293b; letter-spacing: -0.2px;">
-                <i class="fas fa-tools text-primary me-1.5"></i> BULK ACTIONS DASHBOARD
-            </div>
-            <span class="text-muted small" style="font-size: 11.5px;" id="selected-orders-count-badge">
-                <i class="fas fa-check-double text-muted me-1"></i> <span id="selected-count">0</span> orders selected
-            </span>
-        </div>
-        
-        <div class="row g-3">
-            <!-- Courier & Shipping Section -->
-            <div class="col-md-6">
-                <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px;">
-                        <i class="fas fa-truck text-success"></i> LOGISTICS & DISPATCH
-                    </div>
-                    <div class="d-flex flex-wrap gap-2">
-                        <button type="button" onclick="bulkDispatchCourier('Steadfast')" class="btn-soft btn-soft-success">
-                            <i class="fas fa-paper-plane"></i> Steadfast
+                    <!-- Logistics & Courier -->
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" onclick="bulkDispatchCourier('Steadfast')" class="btn btn-sm btn-outline-success" style="font-size: 11.5px; font-weight: 600;" title="Dispatch with Steadfast">
+                            <i class="fas fa-paper-plane me-1"></i> Steadfast
                         </button>
-                        <button type="button" onclick="bulkDispatchCourier('Pathao')" class="btn-soft btn-soft-primary">
-                            <i class="fas fa-shipping-fast"></i> Pathao
+                        <button type="button" onclick="bulkDispatchCourier('Pathao')" class="btn btn-sm btn-outline-primary" style="font-size: 11.5px; font-weight: 600;" title="Dispatch with Pathao">
+                            <i class="fas fa-shipping-fast me-1"></i> Pathao
                         </button>
-                        <button type="button" onclick="bulkSyncCourierStatus()" class="btn-soft btn-soft-info" title="Sync courier delivery status">
-                            <i class="fas fa-sync-alt"></i> Sync Courier
+                        <button type="button" onclick="bulkSyncCourierStatus()" class="btn btn-sm btn-outline-info" style="font-size: 11.5px; font-weight: 600;" title="Sync live courier delivery status">
+                            <i class="fas fa-sync-alt me-1"></i> Sync Courier
                         </button>
                     </div>
-                </div>
-            </div>
 
-            <!-- Documents & Export Section -->
-            <div class="col-md-6">
-                <div class="p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px;">
-                        <i class="fas fa-file-alt text-info"></i> DOCUMENTS & EXPORT
-                    </div>
-                    <div class="d-flex flex-wrap gap-2">
-                        <button type="button" onclick="bulkPrintInvoices()" class="btn-soft btn-soft-info">
-                            <i class="fas fa-file-invoice"></i> Invoices
+                    <!-- Documents & Export -->
+                    <div class="btn-group btn-group-sm ms-1">
+                        <button type="button" onclick="bulkPrintInvoices()" class="btn btn-sm btn-light border" style="font-size: 11.5px; font-weight: 600;" title="Print selected invoices">
+                            <i class="fas fa-file-invoice text-info me-1"></i> Invoices
                         </button>
-                        <button type="button" onclick="bulkPrintSlips()" class="btn-soft btn-soft-warning">
-                            <i class="fas fa-box"></i> Package Slips
+                        <button type="button" onclick="bulkPrintSlips()" class="btn btn-sm btn-light border" style="font-size: 11.5px; font-weight: 600;" title="Print packaging slips">
+                            <i class="fas fa-box text-warning me-1"></i> Slips
                         </button>
-                        <button type="button" onclick="exportWholesaleCsv()" class="btn-soft btn-soft-dark">
-                            <i class="fas fa-download"></i> Export CSV
+                        <button type="button" onclick="exportWholesaleCsv()" class="btn btn-sm btn-light border" style="font-size: 11.5px; font-weight: 600;" title="Export wholesale orders to CSV">
+                            <i class="fas fa-download text-dark me-1"></i> CSV
                         </button>
                     </div>
                 </div>

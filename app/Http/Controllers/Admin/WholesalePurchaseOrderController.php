@@ -369,6 +369,163 @@ class WholesalePurchaseOrderController extends Controller
     }
 
     /**
+     * Submit a bulk checkout for multiple wholesale products simultaneously.
+     */
+    public function bulkCheckout(Request $request)
+    {
+        $request->validate([
+            'items' => 'required',
+            'shipping_address' => 'required|string',
+            'contact_phone' => 'required|string',
+            'gateway' => 'required|string',
+            'trx_id' => 'required|string',
+            'sender_phone' => 'nullable|string',
+            'payment_screenshot' => 'nullable|image|max:5120',
+        ]);
+
+        $rawItems = $request->input('items');
+        if (is_string($rawItems)) {
+            $items = json_decode($rawItems, true) ?: [];
+        } else {
+            $items = (array)$rawItems;
+        }
+
+        if (empty($items)) {
+            return response()->json(['success' => false, 'message' => 'No products selected for wholesale purchase.'], 422);
+        }
+
+        try {
+            $screenshotPath = null;
+            if ($request->hasFile('payment_screenshot')) {
+                $screenshotPath = $request->file('payment_screenshot')->store('wholesale/payments', 'public');
+            }
+
+            // Central Platform Commission
+            $globalCommissionPercent = 25.0;
+            try {
+                $settingsService = app(\App\Services\SettingsService::class);
+                if (method_exists($settingsService, 'getGlobalCommission')) {
+                    $globalCommissionPercent = floatval($settingsService->getGlobalCommission());
+                } else {
+                    $alt = DB::table('site_settings')->where('key', 'saas_wholesale_commission_rate')->value('value');
+                    if (is_numeric($alt) && floatval($alt) > 0) {
+                        $globalCommissionPercent = floatval($alt);
+                    }
+                }
+            } catch (\Throwable $e) {
+                $globalCommissionPercent = 0.0;
+            }
+
+            $buyerUser = auth()->user();
+            $buyerSubdomain = request()->route('subdomain') 
+                ?? session('current_subdomain') 
+                ?? ($request->attributes->get('tenant') ? $request->attributes->get('tenant')->subdomain : 'main');
+
+            $createdOrders = [];
+            $batchCode = strtoupper(Str::random(5));
+
+            foreach ($items as $index => $item) {
+                $sourceSubdomain = $item['subdomain'] ?? '';
+                $productId = (int)($item['product_id'] ?? 0);
+                $quantity = max(1, (int)($item['quantity'] ?? 1));
+
+                if (empty($sourceSubdomain) || $productId <= 0) continue;
+
+                $tenant = SaaSTenant::where('subdomain', $sourceSubdomain)->first();
+                if (!$tenant) continue;
+
+                $sourceDb = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+                $this->globalProductService->connectToTenantDatabase($sourceDb);
+
+                $product = DB::connection('tenant_temp')->table('products')->where('id', $productId)->first();
+                if (!$product) continue;
+
+                $basePrice = floatval($product->global_price ?? $product->wholesale_price ?? $product->product_cost ?? 0);
+                if ($basePrice <= 0) {
+                    $basePrice = floatval($product->reseller_price ?? $product->offer ?? $product->price ?? 0);
+                }
+
+                $tenantCommissionPercent = ($tenant->commission_rate !== null && $tenant->commission_rate !== '') 
+                    ? floatval($tenant->commission_rate) 
+                    : $globalCommissionPercent;
+
+                $commissionPerUnit = ($tenantCommissionPercent > 0) ? ($basePrice * ($tenantCommissionPercent / 100)) : 0;
+                $finalUnitPrice = $basePrice + $commissionPerUnit;
+                $totalAmount = $finalUnitPrice * $quantity;
+                $platformCommissionTotal = $commissionPerUnit * $quantity;
+                $sellerEarnings = $basePrice * $quantity;
+
+                $sellerCreatorId = $product->created_by ?: ($product->vendor_id ?: 1);
+                $sellerCreatorName = "Tenant Admin #{$sellerCreatorId}";
+                try {
+                    $sellerUser = DB::connection('tenant_temp')->table('users')->where('id', $sellerCreatorId)->first();
+                    if ($sellerUser) {
+                        $sellerCreatorName = $sellerUser->name . ' (' . $sellerUser->email . ')';
+                    }
+                } catch (\Throwable $e) {}
+
+                $orderNumber = 'WPO-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+
+                $order = WholesalePurchaseOrder::create([
+                    'order_number' => $orderNumber,
+                    'buyer_tenant_id' => null,
+                    'buyer_subdomain' => $buyerSubdomain,
+                    'buyer_admin_id' => $buyerUser?->id,
+                    'buyer_admin_name' => $buyerUser?->name ?? 'Store Admin',
+                    'buyer_admin_phone' => $request->contact_phone,
+                    'buyer_admin_email' => $buyerUser?->email,
+                    'buyer_shipping_address' => $request->shipping_address,
+                    'seller_tenant_id' => $tenant->id,
+                    'seller_subdomain' => $sourceSubdomain,
+                    'seller_admin_id' => $sellerCreatorId,
+                    'seller_admin_name' => $sellerCreatorName,
+                    'product_id' => $productId,
+                    'product_title' => $product->title,
+                    'product_thumb_image' => $product->thumb_image,
+                    'unit_price' => $finalUnitPrice,
+                    'quantity' => $quantity,
+                    'total_amount' => $totalAmount,
+                    'platform_commission' => $platformCommissionTotal,
+                    'seller_earnings' => $sellerEarnings,
+                    'payment_gateway' => strtoupper($request->gateway),
+                    'sender_phone' => $request->sender_phone,
+                    'trx_id' => $request->trx_id,
+                    'payment_status' => 'pending',
+                    'fulfillment_status' => 'pending',
+                    'metadata' => [
+                        'batch_code' => $batchCode,
+                        'base_unit_price' => $basePrice,
+                        'commission_percent' => $tenantCommissionPercent,
+                        'tenant_name' => $tenant->name,
+                        'payment_screenshot' => $screenshotPath,
+                        'submitted_at' => now()->toDateTimeString(),
+                    ],
+                ]);
+
+                $createdOrders[] = $orderNumber;
+            }
+
+            if (empty($createdOrders)) {
+                return response()->json(['success' => false, 'message' => 'Unable to create purchase orders for selected items.'], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'count' => count($createdOrders),
+                'order_numbers' => $createdOrders,
+                'message' => "Successfully submitted " . count($createdOrders) . " wholesale purchase orders! Super Admin will verify your payment and dispatch fulfillment to suppliers.",
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error("Bulk wholesale checkout error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => "Error processing bulk wholesale order: " . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Super Admin approves/accepts payment for a wholesale purchase order.
      */
     public function approve(Request $request, $id)

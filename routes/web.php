@@ -410,6 +410,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::get('/wholesale-orders', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'index'])->name('wholesale-orders.index');
     Route::get('/wholesale-orders/{id}/invoice', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'invoice'])->name('wholesale-orders.invoice');
     Route::post('/wholesale-orders/checkout', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'checkout'])->name('wholesale-orders.checkout');
+    Route::post('/wholesale-orders/bulk-checkout', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'bulkCheckout'])->name('wholesale-orders.bulk-checkout');
     Route::post('/wholesale-orders/courier/send', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'sendToCourier'])->name('wholesale-orders.courier.send');
     Route::post('/wholesale-orders/courier/sync', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'syncCourierStatus'])->name('wholesale-orders.courier.sync');
     Route::post('/wholesale-orders/{id}/approve', [\App\Http\Controllers\Admin\WholesalePurchaseOrderController::class, 'approve'])->name('wholesale-orders.approve');
