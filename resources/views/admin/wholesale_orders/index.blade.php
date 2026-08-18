@@ -103,6 +103,46 @@
     .btn-soft-warning:hover { background: #fde68a; color: #92400e; }
     .btn-soft-dark { background: #f3f4f6; color: #1f2937; border-color: #e5e7eb; }
     .btn-soft-dark:hover { background: #e5e7eb; color: #111827; }
+
+    /* Custom Navigation Tabs */
+    .tab-pill-btn {
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 18px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none !important;
+        transition: all 0.2s ease-in-out;
+        border: 1.5px solid #e2e8f0;
+        background: #ffffff;
+        color: #334155 !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .tab-pill-btn:hover {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-color: #cbd5e1 !important;
+        transform: translateY(-1px);
+    }
+    .tab-pill-btn.active-all {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+        border-color: #0f172a !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+    }
+    .tab-pill-btn.active-purchases {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+        border-color: #4338ca !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+    }
+    .tab-pill-btn.active-sales {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+        border-color: #047857 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
+    }
 </style>
 @endsection
 
@@ -137,22 +177,19 @@
     <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
         @if($isSuperAdmin)
             <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'all']) }}" 
-               class="btn btn-sm rounded-pill px-3.5 py-2 font-semibold {{ ($tab ?? 'all') === 'all' ? 'btn-primary shadow-sm' : 'btn-outline-secondary bg-white' }}"
-               style="{{ ($tab ?? 'all') === 'all' ? 'background: #1e293b; border-color: #1e293b; font-weight: 600;' : 'font-weight: 600;' }}">
-                <i class="fas fa-shield-alt me-1.5 text-warning"></i> Super Admin All Orders
+               class="tab-pill-btn {{ ($tab ?? 'all') === 'all' ? 'active-all' : '' }}">
+                <i class="fas fa-shield-alt me-1.5 {{ ($tab ?? 'all') === 'all' ? 'text-warning' : 'text-slate-500' }}"></i> Super Admin All Orders
                 <span class="badge rounded-pill ms-1.5 px-2 py-0.5 {{ ($tab ?? 'all') === 'all' ? 'bg-white text-dark' : 'bg-light text-dark border' }}" style="font-size: 10px; font-weight: 700;">{{ $orders->total() }}</span>
             </a>
         @endif
         <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'purchases']) }}" 
-           class="btn btn-sm rounded-pill px-3.5 py-2 font-semibold {{ ($tab ?? 'purchases') === 'purchases' ? 'btn-primary shadow-sm' : 'btn-outline-secondary bg-white' }}"
-           style="{{ ($tab ?? 'purchases') === 'purchases' ? 'background: #4f46e5; border-color: #4f46e5; font-weight: 600;' : 'font-weight: 600;' }}">
-            <i class="fas fa-cart-shopping me-1.5 text-info"></i> My Purchases (Bought)
+           class="tab-pill-btn {{ ($tab ?? 'purchases') === 'purchases' ? 'active-purchases' : '' }}">
+            <i class="fas fa-cart-shopping me-1.5 {{ ($tab ?? 'purchases') === 'purchases' ? 'text-white' : 'text-indigo-600' }}"></i> My Purchases (Bought)
             <span class="badge rounded-pill ms-1.5 px-2 py-0.5 {{ ($tab ?? 'purchases') === 'purchases' ? 'bg-white text-primary' : 'bg-light text-dark border' }}" style="font-size: 10px; font-weight: 700;">{{ $myPurchasesCount }}</span>
         </a>
         <a href="{{ route('admin.wholesale-orders.index', ['tab' => 'sales']) }}" 
-           class="btn btn-sm rounded-pill px-3.5 py-2 font-semibold {{ ($tab ?? 'purchases') === 'sales' ? 'btn-primary shadow-sm' : 'btn-outline-secondary bg-white' }}"
-           style="{{ ($tab ?? 'purchases') === 'sales' ? 'background: #059669; border-color: #059669; font-weight: 600;' : 'font-weight: 600;' }}">
-            <i class="fas fa-truck-ramp-box me-1.5 text-warning"></i> Orders to Ship & Earn (My Sales)
+           class="tab-pill-btn {{ ($tab ?? 'purchases') === 'sales' ? 'active-sales' : '' }}">
+            <i class="fas fa-truck-ramp-box me-1.5 {{ ($tab ?? 'purchases') === 'sales' ? 'text-white' : 'text-amber-500' }}"></i> Orders to Ship & Earn (My Sales)
             <span class="badge rounded-pill ms-1.5 px-2 py-0.5 {{ ($tab ?? 'purchases') === 'sales' ? 'bg-white text-success' : 'bg-success text-white' }}" style="font-size: 10px; font-weight: 700;">{{ $mySalesCount }}</span>
         </a>
     </div>
@@ -653,59 +690,109 @@ function bulkDispatchCourier(courierName) {
         if (res.isConfirmed && res.value) {
             Swal.fire({
                 title: 'Dispatching...',
-                html: `Sending ${selected.length} orders to ${res.value.courier_name}...`,
+                html: `Sending ${selected.length} orders to ${courierName}...`,
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
 
-            // Dispatch each sequentially/concurrently
-            const promises = selected.map((order, idx) => {
-                return fetch(`{{ url('admin/wholesale-orders') }}/${order.id}/fulfillment`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fulfillment_status: 'shipped',
-                        courier_name: res.value.courier_name,
-                        tracking_number: `${res.value.tracking_prefix}-${idx + 1}`
-                    })
-                });
-            });
+            const orderIds = selected.map(o => o.id);
 
-            Promise.all(promises)
-                .then(() => {
+            fetch("{{ route('admin.wholesale-orders.courier.send') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    provider: provider,
+                    order_ids: orderIds
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
                     Swal.fire({
                         title: 'Dispatched Successfully!',
-                        text: `${selected.length} orders have been marked as Shipped with ${res.value.courier_name}.`,
+                        text: data.message,
                         icon: 'success',
                         confirmButtonColor: '#4f46e5'
                     }).then(() => location.reload());
-                })
-                .catch(() => {
-                    Swal.fire('Error', 'Failed to dispatch some orders. Please check your network connection.', 'error');
-                });
+                } else {
+                    // Fallback to manual consignment entry if API not configured
+                    const promises = selected.map((order, idx) => {
+                        return fetch(`{{ url('admin/wholesale-orders') }}/${order.id}/fulfillment`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                fulfillment_status: 'shipped',
+                                courier_name: res.value.courier_name,
+                                tracking_number: `${res.value.tracking_prefix}-${idx + 1}`
+                            })
+                        });
+                    });
+
+                    Promise.all(promises).then(() => {
+                        Swal.fire({
+                            title: 'Shipment Created!',
+                            text: `${selected.length} orders have been marked as Shipped (${res.value.courier_name}).`,
+                            icon: 'success',
+                            confirmButtonColor: '#4f46e5'
+                        }).then(() => location.reload());
+                    });
+                }
+            })
+            .catch(() => {
+                Swal.fire('Error', 'Network error during dispatch. Please check connection.', 'error');
+            });
         }
     });
 }
 
 // Bulk Sync Courier Status
 function bulkSyncCourierStatus() {
+    const selected = getSelectedOrders();
+    const orderIds = selected.map(o => o.id);
+
     Swal.fire({
-        title: 'Syncing Couriers...',
+        title: 'Syncing Courier Status...',
         html: 'Checking live delivery status with courier networks (Steadfast, Pathao)...',
-        timer: 1800,
-        timerProgressBar: true,
+        allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
-    }).then(() => {
-        Swal.fire({
-            title: 'Couriers Synchronized',
-            text: 'All active wholesale shipments are up to date.',
-            icon: 'success',
-            confirmButtonColor: '#4f46e5'
-        });
+    });
+
+    fetch("{{ route('admin.wholesale-orders.courier.sync') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            order_ids: orderIds
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                title: data.updated_count > 0 ? 'Delivery Status Updated!' : 'Couriers Synchronized',
+                html: `${data.message}${data.summary && data.summary.length ? '<br><br><span class="badge bg-success">' + data.summary.join('</span> <span class="badge bg-success">') + '</span>' : ''}`,
+                icon: 'success',
+                confirmButtonColor: '#4f46e5'
+            }).then(() => {
+                if (data.updated_count > 0) location.reload();
+            });
+        } else {
+            Swal.fire('Sync Error', data.message || 'Failed to synchronize couriers.', 'error');
+        }
+    })
+    .catch(() => {
+        Swal.fire('Error', 'Network error during courier synchronization.', 'error');
     });
 }
 

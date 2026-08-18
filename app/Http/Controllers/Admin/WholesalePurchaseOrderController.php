@@ -8,7 +8,9 @@ use App\Models\SaaSTenant;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\GlobalProductService;
+use App\Services\Delivery\DeliveryServiceManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -433,21 +435,7 @@ class WholesalePurchaseOrderController extends Controller
                 $order->seller_order_id = $sellerOrderId;
             }
 
-            // 2. Add/Replicate product with purchased stock into Buyer's Catalog
-            $copyResult = $this->globalProductService->copyProductToStore(
-                $order->seller_subdomain,
-                $order->product_id,
-                'purchase',
-                $order->quantity,
-                null,
-                $order->buyer_admin_id
-            );
-
-            if (!empty($copyResult['product_id'])) {
-                $order->buyer_local_product_id = $copyResult['product_id'];
-            }
-
-            // 3. Credit Seller Admin's Wallet Balance
+            // 2. Credit Seller Admin's Wallet Balance
             $sellerUser = null;
             if ($order->seller_admin_id) {
                 $sellerUser = \App\Models\User::find($order->seller_admin_id);
@@ -555,9 +543,13 @@ class WholesalePurchaseOrderController extends Controller
         if ($request->filled('seller_notes')) $order->seller_notes = $request->seller_notes;
         $order->save();
 
+        if ($order->fulfillment_status === 'delivered') {
+            $this->provisionDeliveredProductToBuyerStore($order);
+        }
+
         return response()->json([
             'success' => true,
-            'message' => "Fulfillment status for {$order->order_number} updated to " . ucfirst($order->fulfillment_status) . "."
+            'message' => "Fulfillment status for {$order->order_number} updated to " . ucfirst($order->fulfillment_status) . ($order->fulfillment_status === 'delivered' ? ". Product inventory allocated to buyer store catalog!" : ".")
         ]);
     }
 
@@ -613,5 +605,252 @@ class WholesalePurchaseOrderController extends Controller
             'success' => true,
             'message' => "Rejected order {$orderNum} has been deleted successfully."
         ]);
+    }
+
+    /**
+     * Dispatch wholesale order(s) to Steadfast or Pathao courier.
+     */
+    public function sendToCourier(Request $request)
+    {
+        $request->validate([
+            'provider' => 'required|string|in:steadfast,pathao',
+            'order_ids' => 'required|array|min:1',
+            'order_ids.*' => 'required',
+        ]);
+
+        $provider = $request->provider;
+        $orderIds = $request->order_ids;
+        $vendorId = Auth::id() ?: 1;
+
+        $delivery = DeliveryServiceManager::forProvider($provider, $vendorId, false);
+        if (!$delivery) {
+            $delivery = DeliveryServiceManager::forProvider($provider, 1, false);
+        }
+
+        if (!$delivery) {
+            return response()->json([
+                'success' => false,
+                'message' => ucfirst($provider) . ' integration is not configured. Please configure your API keys in Delivery Integration Settings.'
+            ], 422);
+        }
+
+        $orders = WholesalePurchaseOrder::whereIn('id', $orderIds)->get();
+        $dispatchedCount = 0;
+        $errors = [];
+
+        foreach ($orders as $order) {
+            $phone = preg_replace('/[^0-9]/', '', $order->delivery_phone ?: '');
+            if (str_starts_with($phone, '880') && strlen($phone) === 13) {
+                $phone = substr($phone, 2);
+            }
+            if (empty($phone)) $phone = '01700000000';
+
+            $recipientName = $order->buyer_admin_name ?: ($order->buyer_subdomain ? 'Store @' . $order->buyer_subdomain : 'Wholesale Buyer');
+            $address = $order->delivery_address ?: 'Buyer Store Warehouse Address';
+            $itemDesc = ($order->product_title ?: 'Wholesale Stock') . ' (Qty: ' . $order->quantity . ' pcs)';
+
+            $invoice = $order->order_number;
+            if (!empty($order->tracking_number)) {
+                $invoice .= '-' . time();
+            }
+
+            try {
+                $orderData = [
+                    'invoice'           => $invoice,
+                    'recipient_name'    => Str::limit($recipientName, 90, ''),
+                    'recipient_phone'   => $phone,
+                    'recipient_address' => Str::limit($address, 240, ''),
+                    'cod_amount'        => 0, // Prepaid wholesale order
+                    'note'              => 'B2B Wholesale Shipment #' . $order->order_number,
+                    'item_description'  => Str::limit($itemDesc, 200, ''),
+                    'total_lot'         => max(1, (int)$order->quantity),
+                ];
+
+                $response = $delivery->createOrder($orderData);
+
+                $consignmentId = $response['consignment']['consignment_id'] 
+                    ?? $response['consignment_id'] 
+                    ?? $response['data']['consignment_id'] 
+                    ?? $response['tracking_code'] 
+                    ?? null;
+
+                $order->courier_name = ucfirst($provider);
+                if ($consignmentId) {
+                    $order->tracking_number = (string)$consignmentId;
+                }
+                $order->fulfillment_status = 'shipped';
+                $order->save();
+
+                $dispatchedCount++;
+            } catch (\Throwable $e) {
+                $errors[] = "#{$order->order_number}: " . $e->getMessage();
+            }
+        }
+
+        if ($dispatchedCount > 0) {
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully dispatched {$dispatchedCount} wholesale order(s) to " . ucfirst($provider) . "!",
+                'errors' => $errors
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => "Courier dispatch failed: " . implode(', ', $errors)
+        ], 422);
+    }
+
+    /**
+     * Sync delivery status for wholesale orders with live courier APIs.
+     */
+    public function syncCourierStatus(Request $request)
+    {
+        $vendorId = Auth::id() ?: 1;
+        $orderIds = $request->input('order_ids', []);
+
+        $query = WholesalePurchaseOrder::query();
+        if (!empty($orderIds)) {
+            $query->whereIn('id', $orderIds);
+        } else {
+            // Check all non-final wholesale orders that have tracking numbers or couriers
+            $query->whereNotNull('tracking_number')
+                  ->whereNotIn('fulfillment_status', ['delivered', 'cancelled']);
+        }
+
+        $orders = $query->get();
+        if ($orders->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'No active wholesale shipments pending courier synchronization.',
+                'updated_count' => 0
+            ]);
+        }
+
+        $updatedCount = 0;
+        $statusSummary = [];
+
+        foreach ($orders as $order) {
+            $trackingId = trim($order->tracking_number ?? '');
+            $courierName = strtolower(trim($order->courier_name ?? 'steadfast'));
+            if (empty($trackingId)) continue;
+
+            $provider = str_contains($courierName, 'pathao') ? 'pathao' : 'steadfast';
+
+            try {
+                $delivery = DeliveryServiceManager::forProvider($provider, $vendorId, false);
+                if (!$delivery) {
+                    $delivery = DeliveryServiceManager::forProvider($provider, 1, false);
+                }
+                if (!$delivery) continue;
+
+                $response = $delivery->trackOrder((string)$trackingId);
+
+                $statusText = '';
+                if ($provider === 'steadfast' && isset($response['delivery_status'])) {
+                    $statusText = is_string($response['delivery_status']) 
+                        ? ucfirst($response['delivery_status']) 
+                        : ($response['delivery_status']['status'] ?? '');
+                } elseif ($provider === 'pathao' && isset($response['data']['order_status'])) {
+                    $statusText = $response['data']['order_status'];
+                }
+
+                if (!empty($statusText)) {
+                    $cleanStatus = strtolower($statusText);
+                    if (in_array($cleanStatus, ['delivered', 'partial_delivered', 'completed'])) {
+                        $order->fulfillment_status = 'delivered';
+                        $order->save();
+                        $this->provisionDeliveredProductToBuyerStore($order);
+                        $updatedCount++;
+                        $statusSummary[] = "#{$order->order_number} -> Delivered";
+                    } elseif (in_array($cleanStatus, ['in_transit', 'in review', 'shipped', 'picked_up', 'out_for_delivery'])) {
+                        if ($order->fulfillment_status !== 'shipped') {
+                            $order->fulfillment_status = 'shipped';
+                            $order->save();
+                            $updatedCount++;
+                        }
+                    } elseif (in_array($cleanStatus, ['cancelled', 'returned'])) {
+                        $order->fulfillment_status = 'cancelled';
+                        $order->save();
+                        $updatedCount++;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Wholesale courier track error for order #{$order->order_number}: " . $e->getMessage());
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $updatedCount > 0 
+                ? "Synchronized {$updatedCount} wholesale shipment(s) with courier network!" 
+                : "All wholesale shipments checked. No status updates reported by courier yet.",
+            'updated_count' => $updatedCount,
+            'summary' => $statusSummary
+        ]);
+    }
+
+    /**
+     * Provision or update the copied product in buyer admin catalog upon physical delivery.
+     */
+    protected function provisionDeliveredProductToBuyerStore(WholesalePurchaseOrder $order): ?Product
+    {
+        try {
+            // Guard against duplicate stock crediting for the same wholesale order
+            if (str_contains($order->seller_notes ?? '', '[STOCK_CREDITED]')) {
+                return $order->buyer_local_product_id ? Product::find($order->buyer_local_product_id) : null;
+            }
+
+            $buyerProduct = null;
+            if ($order->buyer_local_product_id) {
+                $buyerProduct = Product::find($order->buyer_local_product_id);
+            }
+
+            if (!$buyerProduct && !empty($order->buyer_admin_id)) {
+                $buyerProduct = Product::where('source_product_id', $order->product_id)
+                    ->where(function($q) use ($order) {
+                        $q->where('created_by', $order->buyer_admin_id)
+                          ->orWhere('copied_by_admin_id', $order->buyer_admin_id);
+                    })
+                    ->first();
+            }
+
+            if ($buyerProduct) {
+                $buyerProduct->increment('quantity', (int)$order->quantity);
+                $buyerProduct->manage_stock = 1;
+                $buyerProduct->stock_status = 'in_stock';
+                $buyerProduct->status = 1;
+                $buyerProduct->approval_status = 'approved';
+                $buyerProduct->save();
+
+                $order->buyer_local_product_id = $buyerProduct->id;
+                $order->seller_notes = trim(($order->seller_notes ?? '') . ' [STOCK_CREDITED]');
+                $order->save();
+                return $buyerProduct;
+            }
+
+            // Copy product afresh into the buyer store catalog
+            if (!empty($order->seller_subdomain) && !empty($order->product_id)) {
+                $copyRes = $this->globalProductService->copyProductToStore(
+                    $order->seller_subdomain,
+                    (int)$order->product_id,
+                    'purchase',
+                    (int)$order->quantity,
+                    null,
+                    $order->buyer_admin_id
+                );
+
+                if ($copyRes['success'] && !empty($copyRes['product_id'])) {
+                    $order->buyer_local_product_id = $copyRes['product_id'];
+                    $order->seller_notes = trim(($order->seller_notes ?? '') . ' [STOCK_CREDITED]');
+                    $order->save();
+                    return Product::find($copyRes['product_id']);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error("Failed to provision delivered product to buyer store for order #{$order->order_number}: " . $e->getMessage());
+        }
+
+        return null;
     }
 }

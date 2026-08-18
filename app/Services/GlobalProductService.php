@@ -702,6 +702,47 @@ class GlobalProductService
             $productData['copied_by_admin_id'] = $currentAdminId;
             $productData['source_metadata'] = json_encode($sourceMetadata);
 
+            // Set suggested retail pricing and buyer's acquisition cost
+            $buyerCost = floatval($sourceProduct->global_price ?? $sourceProduct->wholesale_price ?? $sourceProduct->product_cost ?? 0);
+            if ($buyerCost <= 0) {
+                $buyerCost = floatval($sourceProduct->reseller_price ?? $sourceProduct->price ?? 0);
+            }
+
+            $productData['product_cost'] = $buyerCost;
+            $productData['price'] = floatval($sourceProduct->price ?? $sourceProduct->offer ?? 0);
+            $productData['old_price'] = floatval($sourceProduct->old_price ?? 0);
+            if (isset($sourceProduct->offer) && floatval($sourceProduct->offer) > 0) {
+                $productData['offer'] = floatval($sourceProduct->offer);
+            }
+
+            // Percentages for tiered pricing
+            $wholesalePercent = floatval(\App\Services\SettingsService::get('single_product', 'wholesale_price_percent', 2));
+            $resellerPercent = floatval(\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5));
+            $globalPercent = floatval(\App\Services\SettingsService::get('single_product', 'global_price_percent', 10));
+
+            $productData['wholesale_price'] = floatval(
+                (isset($sourceProduct->wholesale_price) && $sourceProduct->wholesale_price > 0)
+                ? $sourceProduct->wholesale_price
+                : ($buyerCost > 0 ? ($buyerCost * (1 + $wholesalePercent / 100)) : 0)
+            );
+            $productData['reseller_price'] = floatval(
+                (isset($sourceProduct->reseller_price) && $sourceProduct->reseller_price > 0)
+                ? $sourceProduct->reseller_price
+                : ($buyerCost > 0 ? ($buyerCost * (1 + $resellerPercent / 100)) : 0)
+            );
+            $productData['global_price'] = floatval(
+                (isset($sourceProduct->global_price) && $sourceProduct->global_price > 0)
+                ? $sourceProduct->global_price
+                : ($buyerCost > 0 ? ($buyerCost * (1 + $globalPercent / 100)) : 0)
+            );
+
+            // Always reset views and sales counters to 0 for buyer's newly copied/purchased product
+            $productData['views_total'] = 0;
+            $productData['views_unique'] = 0;
+            if (array_key_exists('views', $productData)) $productData['views'] = 0;
+            if (array_key_exists('total_sold', $productData)) $productData['total_sold'] = 0;
+            if (array_key_exists('orders_count', $productData)) $productData['orders_count'] = 0;
+
             // If purchase mode with quantity, set stock
             if ($copyMode === 'purchase' && $quantity > 0) {
                 $productData['quantity'] = $quantity;

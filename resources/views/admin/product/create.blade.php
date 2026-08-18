@@ -2627,6 +2627,15 @@
         const globalPriceInput = document.getElementById('globalPrice');
 
         if (productCostInput) {
+            const initialCost = parseFloat(productCostInput.value);
+            if (!isNaN(initialCost) && initialCost > 0) {
+                if (salePriceInput && (!salePriceInput.value || parseFloat(salePriceInput.value) <= 0)) salePriceInput.value = (initialCost * (1 + pricingPercentages.sale / 100)).toFixed(2);
+                if (oldPriceInput && (!oldPriceInput.value || parseFloat(oldPriceInput.value) <= 0)) oldPriceInput.value = (initialCost * (1 + pricingPercentages.old / 100)).toFixed(2);
+                if (wholesalePriceInput && (!wholesalePriceInput.value || parseFloat(wholesalePriceInput.value) <= 0)) wholesalePriceInput.value = (initialCost * (1 + pricingPercentages.wholesale / 100)).toFixed(2);
+                if (resellerPriceInput && (!resellerPriceInput.value || parseFloat(resellerPriceInput.value) <= 0)) resellerPriceInput.value = (initialCost * (1 + pricingPercentages.reseller / 100)).toFixed(2);
+                if (globalPriceInput && (!globalPriceInput.value || parseFloat(globalPriceInput.value) <= 0)) globalPriceInput.value = (initialCost * (1 + pricingPercentages.global / 100)).toFixed(2);
+            }
+
             productCostInput.addEventListener('input', function() {
                 const cost = parseFloat(this.value);
                 if (!isNaN(cost) && cost > 0) {
