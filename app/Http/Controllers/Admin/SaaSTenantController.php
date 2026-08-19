@@ -60,28 +60,45 @@ class SaaSTenantController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'subdomain' => 'required|string|unique:saas_tenants,subdomain|max:255|alpha_dash',
+            'subdomain' => 'nullable|string|max:255|alpha_dash|unique:saas_tenants,subdomain',
+            'custom_domain' => 'nullable|string|max:255|unique:saas_tenants,custom_domain',
             'db_name' => 'nullable|string|max:255',
             'commission_rate' => 'nullable|numeric|min:0|max:100',
         ]);
+
+        if (empty($request->subdomain) && empty($request->custom_domain)) {
+            return redirect()->back()->with('error', 'Please provide either a Subdomain Prefix or a Custom Domain.');
+        }
+
+        $customDomain = $request->filled('custom_domain') ? strtolower(trim(preg_replace('#^https?://#i', '', rtrim($request->custom_domain, '/')))) : null;
+        $subdomain = $request->subdomain;
+        if (empty($subdomain) && $customDomain) {
+            $parts = explode('.', $customDomain);
+            $subdomain = strtolower(preg_replace('/[^a-zA-Z0-9_-]/', '', $parts[0]));
+        }
 
         try {
             $provisioner = new \App\Services\TenantProvisioningService();
             $tenant = $provisioner->provision(
                 $request->name,
-                $request->subdomain,
+                $subdomain,
                 $request->db_name,
-                auth()->user()
+                auth()->user(),
+                $customDomain
             );
 
+            $updateData = [
+                'is_active' => $request->has('is_active'),
+                'free_promotion' => $request->has('free_promotion'),
+            ];
+
             if ($request->filled('commission_rate')) {
-                $tenant->update([
-                    'commission_rate' => floatval($request->commission_rate),
-                    'free_promotion' => $request->has('free_promotion'),
-                ]);
+                $updateData['commission_rate'] = floatval($request->commission_rate);
             }
 
-            return redirect()->route('admin.saas-tenants.index')->with('success', 'Tenant database and subdomain created & provisioned successfully!');
+            $tenant->update($updateData);
+
+            return redirect()->route('admin.saas-tenants.index')->with('success', 'Tenant database, domain & subdomain created & provisioned successfully!');
         } catch (\Throwable $e) {
             Log::error("Manual tenant provisioning failed: " . $e->getMessage());
             return redirect()->route('admin.saas-tenants.index')->with('error', 'Failed to provision tenant database: ' . $e->getMessage());
@@ -98,13 +115,17 @@ class SaaSTenantController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'subdomain' => 'required|string|max:255|alpha_dash|unique:saas_tenants,subdomain,' . $tenant->id,
+            'custom_domain' => 'nullable|string|max:255|unique:saas_tenants,custom_domain,' . $tenant->id,
             'db_name' => 'nullable|string|max:255',
             'commission_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
+        $customDomain = $request->filled('custom_domain') ? strtolower(trim(preg_replace('#^https?://#i', '', rtrim($request->custom_domain, '/')))) : null;
+
         $tenant->update([
             'name' => $request->name,
             'subdomain' => strtolower($request->subdomain),
+            'custom_domain' => $customDomain,
             'db_name' => $request->db_name ?: 'purnobd_' . strtolower($request->subdomain),
             'is_active' => $request->has('is_active'),
             'free_promotion' => $request->has('free_promotion'),

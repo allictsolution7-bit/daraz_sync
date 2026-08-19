@@ -78,7 +78,7 @@ class GlobalProductService
         $currentUser = auth()->user();
         $currentUserId = $currentUser?->id;
 
-        $localQuery = Product::select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id');
+        $localQuery = Product::select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata');
         if ($currentUserId) {
             $localQuery->where(function($q) use ($currentUserId) {
                 $q->where('copied_by_admin_id', $currentUserId)
@@ -94,6 +94,33 @@ class GlobalProductService
             $localByTitle[$cleanTitle] = $lp;
             if (!empty($lp->source_tenant_subdomain) && !empty($lp->source_product_id)) {
                 $localBySource[$lp->source_tenant_subdomain . '_' . $lp->source_product_id] = $lp;
+            }
+        }
+
+        // Fetch approved wholesale purchase orders for the current logged-in buyer
+        $approvedPurchases = [];
+        if ($currentUser) {
+            try {
+                $wpoQuery = \App\Models\WholesalePurchaseOrder::where('payment_status', 'approved')
+                    ->where(function($q) use ($currentUserId, $currentUser) {
+                        if ($currentUserId) {
+                            $q->where('buyer_admin_id', $currentUserId);
+                        }
+                        if (!empty($currentUser->email)) {
+                            $q->orWhere('buyer_admin_email', $currentUser->email);
+                        }
+                    })
+                    ->get();
+                
+                foreach ($wpoQuery as $wpo) {
+                    $key = $wpo->seller_subdomain . '_' . $wpo->product_id;
+                    if (!isset($approvedPurchases[$key])) {
+                        $approvedPurchases[$key] = 0;
+                    }
+                    $approvedPurchases[$key] += (int)$wpo->quantity;
+                }
+            } catch (\Throwable $wEx) {
+                $approvedPurchases = [];
             }
         }
 
@@ -461,10 +488,22 @@ class GlobalProductService
                     $matchedLocal = $localBySource[$sourceKey] ?? ($localByTitle[trim(strtolower($prod->title))] ?? null);
                     
                     $isAlreadyCopied = !is_null($matchedLocal);
-                    $localStock = $matchedLocal ? (int)$matchedLocal->quantity : 0;
+                    $purchasedStockQty = $approvedPurchases[$sourceKey] ?? 0;
+                    $localStock = 0;
                     $storeStatusType = 'not_in_store';
+
                     if ($matchedLocal) {
-                        $storeStatusType = ($localStock > 0) ? 'purchased' : 'copied';
+                        $meta = is_string($matchedLocal->source_metadata) ? json_decode($matchedLocal->source_metadata, true) : $matchedLocal->source_metadata;
+                        $copyMode = is_array($meta) ? ($meta['copy_mode'] ?? null) : null;
+                        $metaPurchasedQty = is_array($meta) ? (int)($meta['purchased_quantity'] ?? 0) : 0;
+
+                        if ($purchasedStockQty > 0 || $metaPurchasedQty > 0 || $copyMode === 'purchase') {
+                            $storeStatusType = 'purchased';
+                            $localStock = $purchasedStockQty > 0 ? $purchasedStockQty : ($metaPurchasedQty > 0 ? $metaPurchasedQty : (int)$matchedLocal->quantity);
+                        } else {
+                            $storeStatusType = 'copied';
+                            $localStock = 0;
+                        }
                     }
 
                     $allProducts[] = [
@@ -772,11 +811,15 @@ class GlobalProductService
             if (array_key_exists('total_sold', $productData)) $productData['total_sold'] = 0;
             if (array_key_exists('orders_count', $productData)) $productData['orders_count'] = 0;
 
-            // If purchase mode with quantity, set stock
+            // If purchase mode with quantity, set stock; otherwise reset to 0 for listing copy
             if ($copyMode === 'purchase' && $quantity > 0) {
                 $productData['quantity'] = $quantity;
                 $productData['manage_stock'] = 1;
                 $productData['stock_status'] = 'in_stock';
+            } else {
+                $productData['quantity'] = 0;
+                $productData['manage_stock'] = 1;
+                $productData['stock_status'] = 'out_of_stock';
             }
 
             // Clean images/description of base64
@@ -836,6 +879,9 @@ class GlobalProductService
                 $combData['product_id'] = $newProduct->id;
                 $combData['variation_options'] = json_encode($newOpts);
                 $combData['sku'] = !empty($sComb->sku) ? $sComb->sku . '-' . $newProduct->id : 'SKU-' . $newProduct->id . '-' . rand(100, 999);
+                if ($copyMode !== 'purchase') {
+                    $combData['stock_quantity'] = 0;
+                }
 
                 VariationCombination::create($combData);
             }

@@ -259,7 +259,9 @@
                     <div class="info-card-title" style="color: #6b21a8;">
                         <i class="fas fa-location-dot text-danger"></i> Ship To / Buyer Delivery Address
                     </div>
-                    <div class="info-name" style="color: #581c87;">{{ $order->buyer_admin_name }} (@{{ $order->buyer_subdomain }})</div>
+                    <div class="info-name" style="color: #581c87;">
+                        {{ $order->buyer_admin_name }} @if($order->buyer_subdomain)({{ '@' . $order->buyer_subdomain }})@endif
+                    </div>
                     <div class="info-line"><i class="fas fa-phone-alt me-1 text-muted"></i> <strong>{{ $order->buyer_admin_phone }}</strong></div>
                     <div class="info-line" style="margin-top: 6px; line-height: 1.4;">
                         <i class="fas fa-map-pin me-1 text-danger"></i> {{ $order->buyer_shipping_address }}
@@ -284,7 +286,7 @@
                                 {{ $order->product_title }}
                             </div>
                             <div style="font-size: 11px; color: #64748b;">
-                                Product ID: #{{ $order->product_id }} &bull; Source: @{{ $order->seller_subdomain }}
+                                Product ID: #{{ $order->product_id }} &bull; Source: {{ '@' . $order->seller_subdomain }}
                             </div>
                         </td>
                         <td style="text-align: center; font-weight: 700; font-size: 14px; color: #4338ca;">

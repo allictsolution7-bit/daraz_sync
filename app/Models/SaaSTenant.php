@@ -16,6 +16,7 @@ class SaaSTenant extends Model
     protected $fillable = [
         'name',
         'subdomain',
+        'custom_domain',
         'db_name',
         'is_active',
         'free_promotion',

@@ -20,10 +20,22 @@ class TenantProvisioningService
      * @param mixed|null $adminUser User instance or array
      * @return SaaSTenant
      */
-    public function provision(string $name, string $subdomain, ?string $customDbName = null, $adminUser = null): SaaSTenant
+    public function provision(string $name, string $subdomain, ?string $customDbName = null, $adminUser = null, ?string $customDomain = null): SaaSTenant
     {
-        $cleanSubdomain = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $subdomain));
-        $dbName = $customDbName ?: 'purnobd_' . $cleanSubdomain;
+        $cleanCustomDomain = $customDomain ? strtolower(trim(preg_replace('#^https?://#i', '', rtrim($customDomain, '/')))) : null;
+
+        // If subdomain is provided, sanitize it; otherwise derive from custom domain
+        if (!empty($subdomain)) {
+            $cleanSubdomain = strtolower(preg_replace('/[^a-zA-Z0-9_-]/', '', $subdomain));
+        } elseif (!empty($cleanCustomDomain)) {
+            $domainParts = explode('.', $cleanCustomDomain);
+            $cleanSubdomain = strtolower(preg_replace('/[^a-zA-Z0-9_-]/', '', $domainParts[0]));
+        } else {
+            $cleanSubdomain = 'tenant_' . time();
+        }
+
+        // Database naming: custom, or based on subdomain/custom domain
+        $dbName = $customDbName ?: ('purnobd_' . preg_replace('/[^a-zA-Z0-9_]/', '_', $cleanSubdomain));
 
         // 1. Create MySQL Database if not exists
         $this->createDatabase($dbName);
@@ -42,6 +54,7 @@ class TenantProvisioningService
             ['subdomain' => $cleanSubdomain],
             [
                 'name' => $name,
+                'custom_domain' => $cleanCustomDomain,
                 'db_name' => $dbName,
                 'is_active' => true,
             ]

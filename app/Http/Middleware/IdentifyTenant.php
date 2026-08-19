@@ -19,28 +19,41 @@ class IdentifyTenant
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $host = $request->getHost();
-        $subdomain = $this->extractSubdomain($host);
+        $host = strtolower($request->getHost());
 
-        if ($subdomain) {
-            try {
-                $tenant = SaaSTenant::where('subdomain', $subdomain)->where('is_active', true)->first();
+        try {
+            $tenant = null;
 
-                if ($tenant) {
-                    $dbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+            // 1. Try finding by custom domain first (e.g. mystore.com, shop.customdomain.com)
+            $cleanHost = preg_replace('/^www\./i', '', $host);
+            $tenant = SaaSTenant::where(function($q) use ($host, $cleanHost) {
+                $q->where('custom_domain', $host)
+                  ->orWhere('custom_domain', $cleanHost)
+                  ->orWhere('custom_domain', 'www.' . $cleanHost);
+            })->where('is_active', true)->first();
 
-                    // Switch default mysql database to tenant's database
-                    Config::set('database.connections.mysql.database', $dbName);
-                    DB::purge('mysql');
-                    DB::reconnect('mysql');
-
-                    // Share tenant instance
-                    $request->attributes->set('tenant', $tenant);
-                    view()->share('currentTenant', $tenant);
+            // 2. If not matched, extract and check by subdomain (e.g. sabbir.localhost or sabbir.purnobd.com)
+            if (!$tenant) {
+                $subdomain = $this->extractSubdomain($host);
+                if ($subdomain) {
+                    $tenant = SaaSTenant::where('subdomain', $subdomain)->where('is_active', true)->first();
                 }
-            } catch (\Throwable $e) {
-                Log::warning("Tenant database switch failed for subdomain [{$subdomain}]: " . $e->getMessage());
             }
+
+            if ($tenant) {
+                $dbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+
+                // Switch default mysql database to tenant's database
+                Config::set('database.connections.mysql.database', $dbName);
+                DB::purge('mysql');
+                DB::reconnect('mysql');
+
+                // Share tenant instance
+                $request->attributes->set('tenant', $tenant);
+                view()->share('currentTenant', $tenant);
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Tenant database switch failed for host [{$host}]: " . $e->getMessage());
         }
 
         return $next($request);

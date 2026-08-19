@@ -83,7 +83,7 @@
                 <thead class="table-light text-uppercase fs-7 text-muted" style="background-color: #f8fafc;">
                     <tr>
                         <th class="ps-4 py-3">Tenant Name</th>
-                        <th class="py-3">Subdomain URL</th>
+                        <th class="py-3">Domain / Subdomain</th>
                         <th class="py-3">Database Connection</th>
                         <th class="py-3 text-center">Commission (%)</th>
                         <th class="py-3 text-center">Free Promotion</th>
@@ -106,10 +106,20 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="http://{{ $tenant->subdomain }}.{{ str_replace('127.0.0.1', 'localhost', request()->getHttpHost()) }}" target="_blank" class="text-decoration-none font-medium d-inline-flex align-items-center gap-1" style="color: #4f46e5; font-weight: 500;">
-                                    <span>{{ $tenant->subdomain }}.{{ str_replace('127.0.0.1', 'localhost', request()->getHttpHost()) }}</span>
-                                    <i class="fas fa-external-link-alt small"></i>
-                                </a>
+                                <div class="d-flex flex-column gap-1">
+                                    @if($tenant->custom_domain)
+                                        <a href="http://{{ $tenant->custom_domain }}" target="_blank" class="text-decoration-none font-semibold d-inline-flex align-items-center gap-1.5" style="color: #059669; font-size: 13px;">
+                                            <i class="fas fa-globe small"></i>
+                                            <span>{{ $tenant->custom_domain }}</span>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-1.5 py-0.5" style="font-size: 9.5px;">Custom Domain</span>
+                                        </a>
+                                    @endif
+                                    <a href="http://{{ $tenant->subdomain }}.{{ str_replace('127.0.0.1', 'localhost', request()->getHttpHost()) }}" target="_blank" class="text-decoration-none text-muted small d-inline-flex align-items-center gap-1">
+                                        <i class="fas fa-link small text-primary"></i>
+                                        <span>{{ $tenant->subdomain }}.{{ str_replace('127.0.0.1', 'localhost', request()->getHttpHost()) }}</span>
+                                        <i class="fas fa-external-link-alt small text-muted" style="font-size: 9px;"></i>
+                                    </a>
+                                </div>
                             </td>
                             <td>
                                 <div class="d-flex flex-column gap-1">
@@ -195,6 +205,13 @@
                                                 <input type="text" name="name" class="form-control rounded-3" value="{{ $tenant->name }}" required>
                                             </div>
                                             <div class="mb-3">
+                                                <label class="form-label font-semibold small text-muted" style="font-weight: 600;">
+                                                    <i class="fas fa-globe text-success me-1"></i> Custom Domain (e.g. 'mystore.com')
+                                                </label>
+                                                <input type="text" name="custom_domain" class="form-control rounded-3" value="{{ $tenant->custom_domain }}" placeholder="e.g. mystore.com">
+                                                <div class="form-text text-muted small">Enter custom top-level domain without http:// or https://</div>
+                                            </div>
+                                            <div class="mb-3">
                                                 <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Subdomain (e.g. 'wholesale')</label>
                                                 <div class="input-group">
                                                     <input type="text" name="subdomain" class="form-control" value="{{ $tenant->subdomain }}" required>
@@ -272,15 +289,25 @@
                 @csrf
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Tenant Name</label>
+                        <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Tenant Name <span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Dhaka Branch Wholesellers" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Subdomain Prefix</label>
+                        <label class="form-label font-semibold small text-muted" style="font-weight: 600;">
+                            <i class="fas fa-globe text-success me-1"></i> Custom Domain (Optional)
+                        </label>
+                        <input type="text" name="custom_domain" id="add_custom_domain" class="form-control rounded-3" placeholder="e.g. mystore.com or shop.example.com">
+                        <div class="form-text text-muted small">Enter domain (e.g. <code>mystore.com</code>). Point your DNS to this server.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label font-semibold small text-muted" style="font-weight: 600;">
+                            <i class="fas fa-network-wired text-primary me-1"></i> Subdomain Prefix
+                        </label>
                         <div class="input-group">
-                            <input type="text" name="subdomain" class="form-control" placeholder="e.g. dhaka-wholesale" required>
+                            <input type="text" name="subdomain" id="add_subdomain" class="form-control" placeholder="e.g. dhaka-wholesale">
                             <span class="input-group-text bg-light text-muted small">.{{ str_replace('127.0.0.1', 'localhost', request()->getHttpHost()) }}</span>
                         </div>
+                        <div class="form-text text-muted small">Leave blank if using Custom Domain (auto-generates subdomain prefix).</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Database Name</label>
@@ -312,7 +339,7 @@
                 </div>
                 <div class="modal-footer border-0 p-3 bg-light">
                     <button type="button" class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-3 px-4" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); border: none;">Create Subdomain</button>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); border: none;">Create Tenant & Database</button>
                 </div>
             </form>
         </div>

@@ -170,6 +170,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user is super admin
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->id == 1 || !empty($this->is_super_admin) || $this->hasAnyRole(['super_admin', 'super admin', 'Super Admin', 'super-admin']);
+    }
+
+    /**
      * Get vendor settings
      */
     public function vendorSettings()

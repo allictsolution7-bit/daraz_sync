@@ -272,6 +272,9 @@
 @endsection
 
 @section('content')
+@php
+    $isSuperAdmin = auth()->user()?->isSuperAdmin() ?? false;
+@endphp
 <div class="container-fluid py-4" style="max-width: 1600px;">
     <!-- Header Block -->
     <div class="global-header-card d-flex flex-wrap justify-content-between align-items-center gap-3">
@@ -496,18 +499,48 @@
                                     $varWholesaleMin = floatval($product['variant_wholesale_min'] ?? 0);
                                     $varWholesaleMax = floatval($product['variant_wholesale_max'] ?? 0);
                                     $isVariableWithWholesale = ($product['has_variants'] && $varWholesaleMin > 0 && floatval($product['final_wholesale_price'] ?? 0) <= 0);
+                                    $commPercent = floatval($product['commission_percent'] ?? 0);
+                                    $basePrice = floatval($product['base_price'] ?? 0);
+                                    $commAmount = floatval($product['commission_amount'] ?? 0);
+                                    $finalPrice = floatval($product['final_wholesale_price'] ?: 0);
                                 @endphp
                                 @if($isVariableWithWholesale)
-                                    <span class="text-success font-bold" style="font-weight: 700;">
-                                        @if($varWholesaleMin === $varWholesaleMax)
-                                            ৳{{ number_format($varWholesaleMin, 2) }}
-                                        @else
-                                            ৳{{ number_format($varWholesaleMin, 2) }} – ৳{{ number_format($varWholesaleMax, 2) }}
+                                    <div class="d-flex flex-column">
+                                        <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
+                                            @if($varWholesaleMin === $varWholesaleMax)
+                                                ৳{{ number_format($varWholesaleMin, 2) }}
+                                            @else
+                                                ৳{{ number_format($varWholesaleMin, 2) }} – ৳{{ number_format($varWholesaleMax, 2) }}
+                                            @endif
+                                            @if($isSuperAdmin && $commPercent > 0)
+                                                <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9.5px; font-weight: 600;">
+                                                    +{{ $commPercent }}% profit
+                                                </span>
+                                            @endif
+                                        </span>
+                                        @if($isSuperAdmin && $commPercent > 0)
+                                            <span class="text-muted small" style="font-size: 10px; margin-top: 1px;">
+                                                Includes {{ $commPercent }}% super admin profit
+                                            </span>
                                         @endif
-                                    </span>
+                                    </div>
+                                @elseif($isSuperAdmin && $commPercent > 0 && $commAmount > 0)
+                                    <div class="d-flex flex-column">
+                                        <span class="text-success font-bold d-inline-flex align-items-center gap-1.5" style="font-weight: 700; font-size: 14px;">
+                                            ৳{{ number_format($finalPrice, 2) }}
+                                            <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9.5px; font-weight: 600;">
+                                                +{{ $commPercent }}% profit
+                                            </span>
+                                        </span>
+                                        <div class="text-muted d-flex align-items-center gap-1 mt-0.5" style="font-size: 10.5px;">
+                                            <span>Base: <strong style="color: #475569;">৳{{ number_format($basePrice, 2) }}</strong></span>
+                                            <span style="color: #cbd5e1;">&bull;</span>
+                                            <span style="color: #059669; font-weight: 600;">+৳{{ number_format($commAmount, 2) }} profit</span>
+                                        </div>
+                                    </div>
                                 @else
                                     <span class="text-success font-bold" style="font-weight: 700; font-size: 14px;">
-                                        ৳{{ number_format($product['final_wholesale_price'] ?: 0, 2) }}
+                                        ৳{{ number_format($finalPrice, 2) }}
                                     </span>
                                 @endif
                             </td>
@@ -539,29 +572,56 @@
                                     $lStock = $product['local_stock'] ?? 0;
                                 @endphp
                                 @if($sStatus === 'purchased')
-                                    <button type="button" 
-                                            class="btn btn-sm btn-success rounded-3 px-3 py-1.5 font-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" 
-                                            id="btn-action-{{ $rowUniqueKey }}"
-                                            style="font-size: 0.825rem;"
-                                            onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'purchased', '{{ $lStock }}')">
-                                        <i class="fas fa-cart-plus"></i> Buy More Stock
-                                    </button>
+                                    <div class="d-inline-flex align-items-center gap-1.5">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-secondary rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
+                                                style="font-size: 0.775rem;"
+                                                disabled
+                                                title="Already in store catalog">
+                                            <i class="fas fa-check"></i> Copied
+                                        </button>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-success rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
+                                                id="btn-action-{{ $rowUniqueKey }}"
+                                                style="font-size: 0.775rem;"
+                                                onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'purchased', '{{ $lStock }}', 'purchase')">
+                                            <i class="fas fa-cart-plus"></i> Buy More Stock
+                                        </button>
+                                    </div>
                                 @elseif($sStatus === 'copied')
-                                    <button type="button" 
-                                            class="btn btn-sm btn-primary rounded-3 px-3 py-1.5 font-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" 
-                                            id="btn-action-{{ $rowUniqueKey }}"
-                                            style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; font-size: 0.825rem;"
-                                            onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'copied', '0')">
-                                        <i class="fas fa-truck-ramp-box"></i> Purchase Stock
-                                    </button>
+                                    <div class="d-inline-flex align-items-center gap-1.5">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-secondary rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
+                                                style="font-size: 0.775rem;"
+                                                disabled
+                                                title="Already in store catalog">
+                                            <i class="fas fa-check"></i> Copied
+                                        </button>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-primary rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
+                                                id="btn-action-{{ $rowUniqueKey }}"
+                                                style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; font-size: 0.775rem;"
+                                                onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'copied', '0', 'purchase')">
+                                            <i class="fas fa-truck-ramp-box"></i> Purchase Stock
+                                        </button>
+                                    </div>
                                 @else
-                                    <button type="button" 
-                                            class="btn btn-sm btn-primary rounded-3 px-3 py-1.5 font-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" 
-                                            id="btn-action-{{ $rowUniqueKey }}"
-                                            style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; font-size: 0.825rem;"
-                                            onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'not_in_store', '0')">
-                                        <i class="fas fa-cart-shopping"></i> Purchase
-                                    </button>
+                                    <div class="d-inline-flex align-items-center gap-1.5">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-light border rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
+                                                id="btn-action-copy-{{ $rowUniqueKey }}"
+                                                style="background: #f5f3ff; border-color: #ddd6fe !important; color: #4f46e5 !important; font-size: 0.775rem;"
+                                                onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'not_in_store', '0', 'copy')">
+                                            <i class="fas fa-clone"></i> Copy
+                                        </button>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-primary rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
+                                                id="btn-action-purchase-{{ $rowUniqueKey }}"
+                                                style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; font-size: 0.775rem;"
+                                                onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'not_in_store', '0', 'purchase')">
+                                            <i class="fas fa-cart-shopping"></i> Purchase
+                                        </button>
+                                    </div>
                                 @endif
                             </td>
                         </tr>
@@ -630,10 +690,22 @@
                                                                             <del class="text-muted d-block" style="font-size: 9px;">৳{{ number_format($varDisplayOld, 2) }}</del>
                                                                         @endif
                                                                     </td>
-                                                                    <td class="py-2">
-                                                                        <span class="text-success font-bold small" style="font-weight: 700;">
-                                                                            ৳{{ number_format($variant['final_wholesale_price'] ?: 0, 2) }}
-                                                                        </span>
+                                                                    <td class="py-2" style="white-space: nowrap;">
+                                                                        @php
+                                                                            $vFinal = floatval($variant['final_wholesale_price'] ?: 0);
+                                                                            $vBase = floatval($variant['base_price'] ?? 0);
+                                                                            $vComm = floatval($variant['commission_amount'] ?? 0);
+                                                                        @endphp
+                                                                        <div class="d-flex flex-column">
+                                                                            <span class="text-success font-bold small" style="font-weight: 700;">
+                                                                                ৳{{ number_format($vFinal, 2) }}
+                                                                            </span>
+                                                                            @if($isSuperAdmin && $vComm > 0)
+                                                                                <div class="text-muted" style="font-size: 9.5px; margin-top: 1px;">
+                                                                                    Base: ৳{{ number_format($vBase, 2) }} <span style="color: #059669; font-weight: 600;">(+৳{{ number_format($vComm, 2) }} profit)</span>
+                                                                                </div>
+                                                                            @endif
+                                                                        </div>
                                                                     </td>
                                                                     <td class="pe-3 py-2 text-end">
                                                                         @if($variant['stock_quantity'] > 0)
@@ -743,12 +815,14 @@ const GATEWAYS = {
 };
 
 // Open Purchase / Copy Modal with Modern Sleek Design
-function openPurchaseModal(subdomain, productId, title, unitPrice, availableStock, rowKey, storeStatusType = 'not_in_store', localStock = 0) {
-    const btn = document.getElementById('btn-action-' + rowKey);
+function openPurchaseModal(subdomain, productId, title, unitPrice, availableStock, rowKey, storeStatusType = 'not_in_store', localStock = 0, defaultMode = 'auto') {
+    const btn = document.getElementById('btn-action-' + rowKey) || document.getElementById('btn-action-purchase-' + rowKey) || document.getElementById('btn-action-copy-' + rowKey);
     const originalContent = btn ? btn.innerHTML : '';
     const numPrice = parseFloat(unitPrice) || 0;
     const numStock = parseInt(availableStock) || 0;
     const isAlreadyInStore = (storeStatusType === 'purchased' || storeStatusType === 'copied');
+    const isPurchaseDefault = (defaultMode === 'purchase' || (defaultMode === 'auto' && isAlreadyInStore));
+    const isCopyDefault = !isPurchaseDefault;
 
     const modalHtml = `
         <div class="text-start" style="font-size: 13px;">
@@ -783,7 +857,7 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
                 <label class="form-label small text-uppercase text-muted fw-bold mb-2" style="font-size: 10.5px; letter-spacing: 0.5px;">Choose Fulfillment Action:</label>
 
                 <!-- Option 1: Instant Catalog Sync (Listing Only) -->
-                <div class="action-mode-box ${isAlreadyInStore ? '' : 'active-copy'}" id="box-opt-copy" style="margin-bottom: 14px;" onclick="selectActionOption('copy')">
+                <div class="action-mode-box ${isCopyDefault ? 'active-copy' : ''}" id="box-opt-copy" style="margin-bottom: 14px;" onclick="selectActionOption('copy')">
                     <div class="d-flex align-items-start gap-2.5">
                         <div class="action-icon-circle" style="background: #e0e7ff; color: #4338ca;">
                             <i class="fas fa-clone"></i>
@@ -801,12 +875,12 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
                                 ${isAlreadyInStore ? 'Already in your store catalog. Select wholesale purchase below to add physical stock.' : 'Add this product to your store catalog immediately without buying inventory stock.'}
                             </div>
                         </div>
-                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_copy" value="copy" ${isAlreadyInStore ? '' : 'checked'} onchange="selectActionOption('copy')" style="cursor: pointer;">
+                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_copy" value="copy" ${isCopyDefault ? 'checked' : ''} onchange="selectActionOption('copy')" style="cursor: pointer;">
                     </div>
                 </div>
 
                 <!-- Option 2: Purchase Wholesale Stock -->
-                <div class="action-mode-box ${isAlreadyInStore ? 'active-purchase' : ''}" id="box-opt-purchase" onclick="selectActionOption('purchase')">
+                <div class="action-mode-box ${isPurchaseDefault ? 'active-purchase' : ''}" id="box-opt-purchase" onclick="selectActionOption('purchase')">
                     <div class="d-flex align-items-start gap-2.5">
                         <div class="action-icon-circle" style="background: #dcfce7; color: #16a34a;">
                             <i class="fas fa-truck-ramp-box"></i>
@@ -824,11 +898,11 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
                                 Pay to Super Admin. On delivery, ${numPrice > 0 ? 'the exact ordered units will be added to your store stock.' : 'supplier ships physical stock to your store.'}
                             </div>
                         </div>
-                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_purchase" value="purchase" ${isAlreadyInStore ? 'checked' : ''} onchange="selectActionOption('purchase')" style="cursor: pointer;">
+                        <input class="form-check-input mt-1" type="radio" name="swal_global_action" id="opt_purchase" value="purchase" ${isPurchaseDefault ? 'checked' : ''} onchange="selectActionOption('purchase')" style="cursor: pointer;">
                     </div>
 
                     <!-- Purchase Form Details -->
-                    <div id="purchase-details-section" class="mt-3 pt-3 border-top" style="${isAlreadyInStore ? 'display: block;' : 'display: none;'} border-top-color: #bbf7d0 !important;">
+                    <div id="purchase-details-section" class="mt-3 pt-3 border-top" style="${isPurchaseDefault ? 'display: block;' : 'display: none;'} border-top-color: #bbf7d0 !important;">
                         <!-- Quantity & Total -->
                         <div class="row g-2 mb-3">
                             <div class="col-6">
@@ -937,7 +1011,7 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
         title: '<i class="fas fa-cart-flatbed text-primary me-2"></i>Wholesale Fulfillment',
         html: modalHtml,
         showCancelButton: true,
-        confirmButtonText: isAlreadyInStore ? '<i class="fas fa-check-circle me-1.5"></i> Submit Wholesale Order' : '<i class="fas fa-clone me-1.5"></i> Sync Product to Catalog',
+        confirmButtonText: isPurchaseDefault ? '<i class="fas fa-check-circle me-1.5"></i> Submit Wholesale Order' : '<i class="fas fa-clone me-1.5"></i> Sync Product to Catalog',
         cancelButtonText: 'Cancel',
         focusConfirm: false,
         width: '640px',

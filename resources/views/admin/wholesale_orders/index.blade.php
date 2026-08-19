@@ -221,7 +221,19 @@
                     <span class="text-muted text-uppercase d-block" style="font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">
                         {{ ($tab ?? 'purchases') === 'sales' ? 'Sales Earnings' : (($tab ?? 'purchases') === 'purchases' ? 'Purchased Spend' : 'Volume & Profit') }}
                     </span>
-                    <div class="h5 mb-0 font-bold text-primary mt-0.5" style="font-weight: 700;">৳{{ number_format($totalVolume, 2) }}</div>
+                    <div class="d-flex align-items-baseline gap-2 mt-0.5">
+                        <div class="h5 mb-0 font-bold text-primary" style="font-weight: 700;">৳{{ number_format($totalVolume, 2) }}</div>
+                        @if($isSuperAdmin && ($tab ?? 'all') === 'all')
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-1.5 py-0.5 rounded-pill" style="font-size: 10px; font-weight: 700;">
+                                Profit: ৳{{ number_format($totalProfit, 2) }}
+                            </span>
+                        @endif
+                    </div>
+                    @if($isSuperAdmin && ($tab ?? 'all') === 'all')
+                        <div class="text-muted small mt-0.5" style="font-size: 10px;">
+                            <i class="fas fa-coins text-success me-1"></i> Net Comm Profit: <strong style="color: #059669;">৳{{ number_format($totalProfit, 2) }}</strong>
+                        </div>
+                    @endif
                 </div>
                 <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: #e0e7ff; color: #4338ca;">
                     <i class="fas fa-money-bill-wave fs-6"></i>
@@ -475,7 +487,34 @@
                                     @endif
 
                                     @if($isSuperAdmin && $order->payment_status === 'pending')
-                                        <button type="button" class="btn btn-sm btn-success rounded-3 px-2.5 py-1 font-semibold" style="font-size: 11.5px;" onclick="approveOrder('{{ $order->id }}', '{{ $order->order_number }}', '{{ $order->seller_subdomain }}', '{{ $order->quantity }}')">
+                                        @php
+                                            $orderMeta = is_array($order->metadata) ? $order->metadata : (is_string($order->metadata) ? json_decode($order->metadata, true) : []);
+                                            $orderScreenshot = $orderMeta['payment_screenshot'] ?? null;
+                                            $orderScreenshotUrl = $orderScreenshot ? asset($orderScreenshot) : '';
+                                            $orderRefNote = $orderMeta['reference_note'] ?? ($orderMeta['note'] ?? '');
+                                        @endphp
+                                        <button type="button" 
+                                                class="btn btn-sm btn-success rounded-3 px-2.5 py-1 font-semibold" 
+                                                style="font-size: 11.5px;" 
+                                                onclick='approveOrder({
+                                                    id: "{{ $order->id }}",
+                                                    orderNum: "{{ $order->order_number }}",
+                                                    buyerName: "{{ addslashes($order->buyer_admin_name) }}",
+                                                    buyerSubdomain: "{{ $order->buyer_subdomain }}",
+                                                    buyerPhone: "{{ $order->buyer_admin_phone }}",
+                                                    buyerAddress: "{{ addslashes($order->buyer_shipping_address) }}",
+                                                    sellerSubdomain: "{{ $order->seller_subdomain }}",
+                                                    productTitle: "{{ addslashes($order->product_title) }}",
+                                                    qty: "{{ $order->quantity }}",
+                                                    totalAmount: "{{ number_format($order->total_amount, 2) }}",
+                                                    sellerEarnings: "{{ number_format($order->seller_earnings, 2) }}",
+                                                    platformCommission: "{{ number_format($order->platform_commission, 2) }}",
+                                                    paymentGateway: "{{ addslashes(strtoupper($order->payment_gateway)) }}",
+                                                    senderPhone: "{{ $order->sender_phone ?: ($order->buyer_admin_phone ?: 'N/A') }}",
+                                                    trxId: "{{ $order->trx_id ?: 'N/A' }}",
+                                                    referenceNote: "{{ addslashes($orderRefNote) }}",
+                                                    screenshotUrl: "{{ $orderScreenshotUrl }}"
+                                                })'>
                                             <i class="fas fa-check me-1"></i> Accept Payment
                                         </button>
                                         <button type="button" class="btn btn-sm btn-outline-danger rounded-3 px-2.5 py-1 font-semibold ms-1" style="font-size: 11.5px;" onclick="rejectOrder('{{ $order->id }}', '{{ $order->order_number }}')">
@@ -804,20 +843,132 @@ function exportWholesaleCsv() {
     document.body.removeChild(link);
 }
 
-function approveOrder(orderId, orderNum, sellerSubdomain, qty) {
+function approveOrder(orderParam, orderNum, sellerSubdomain, qty) {
+    let order = {};
+    if (typeof orderParam === 'object' && orderParam !== null) {
+        order = orderParam;
+    } else {
+        order = {
+            id: orderParam,
+            orderNum: orderNum,
+            sellerSubdomain: sellerSubdomain,
+            qty: qty,
+            totalAmount: '0.00',
+            sellerEarnings: '0.00',
+            platformCommission: '0.00',
+            paymentGateway: 'MANUAL',
+            senderPhone: 'N/A',
+            trxId: 'N/A',
+            referenceNote: '',
+            screenshotUrl: ''
+        };
+    }
+
+    const modalHtml = `
+        <div class="text-start" style="font-size: 13px;">
+            <!-- Order Summary Banner -->
+            <div class="p-3 rounded-3 mb-3 border" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-color: #e2e8f0;">
+                <div class="d-flex justify-content-between align-items-center mb-1.5">
+                    <span class="font-monospace fw-bold text-dark" style="font-size: 13px;">#${order.orderNum}</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5 rounded-pill font-bold" style="font-size: 11px;">
+                        Payable: ৳${order.totalAmount}
+                    </span>
+                </div>
+                ${order.productTitle ? `
+                    <div class="text-slate-800 fw-semibold text-truncate mb-1" style="font-size: 13px;" title="${order.productTitle}">
+                        <i class="fas fa-box text-primary me-1"></i> ${order.productTitle}
+                    </div>
+                ` : ''}
+                <div class="d-flex flex-wrap gap-2 text-muted small" style="font-size: 11.5px;">
+                    <span><i class="fas fa-cubes text-secondary me-1"></i> Quantity: <strong>${order.qty} pcs</strong></span>
+                    <span>&bull;</span>
+                    <span><i class="fas fa-store text-primary me-1"></i> Buyer: <strong>@${order.buyerSubdomain || 'main'}</strong></span>
+                    <span>&bull;</span>
+                    <span><i class="fas fa-truck text-success me-1"></i> Supplier: <strong>@${order.sellerSubdomain}</strong></span>
+                </div>
+            </div>
+
+            <!-- Payment Verification Details Card -->
+            <div class="card border rounded-3 p-3 mb-3 shadow-none" style="background-color: #ffffff; border-color: #cbd5e1 !important;">
+                <div class="d-flex align-items-center justify-content-between mb-2.5 pb-2 border-bottom">
+                    <span class="small fw-bold text-uppercase text-muted" style="font-size: 11px; letter-spacing: 0.5px;">
+                        <i class="fas fa-shield-halved text-success me-1"></i> Submitted Payment Details
+                    </span>
+                    <span class="badge bg-primary text-white px-2.5 py-1 rounded-pill fw-bold" style="font-size: 11px;">
+                        ${order.paymentGateway}
+                    </span>
+                </div>
+
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <span class="text-muted small d-block" style="font-size: 11px;">Sender Mobile / Account:</span>
+                        <strong class="text-dark font-monospace" style="font-size: 13px;">${order.senderPhone}</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted small d-block" style="font-size: 11px;">Transaction ID (TrxID):</span>
+                        <code class="fw-bold text-primary" style="font-size: 13px; background: #eef2ff; padding: 2px 6px; border-radius: 4px;">${order.trxId}</code>
+                    </div>
+                </div>
+
+                ${order.referenceNote ? `
+                    <div class="mb-2 p-2 bg-light rounded-2 small text-slate-700" style="font-size: 11.5px;">
+                        <i class="fas fa-comment-dots text-muted me-1"></i> <strong>Reference Note:</strong> ${order.referenceNote}
+                    </div>
+                ` : ''}
+
+                <!-- Payment Screenshot Slip Preview -->
+                <div class="mt-2 pt-2 border-top">
+                    <span class="text-muted small d-block mb-1.5" style="font-size: 11px;">
+                        <i class="fas fa-receipt text-warning me-1"></i> Payment Proof / Screenshot Slip:
+                    </span>
+                    ${order.screenshotUrl ? `
+                        <div class="d-flex align-items-center gap-2.5">
+                            <a href="${order.screenshotUrl}" target="_blank" class="d-inline-block position-relative">
+                                <img src="${order.screenshotUrl}" alt="Payment Proof" class="rounded-3 border shadow-sm" style="max-width: 140px; max-height: 90px; object-fit: contain; background: #f8fafc; cursor: pointer;">
+                            </a>
+                            <div>
+                                <a href="${order.screenshotUrl}" target="_blank" class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-2 font-semibold" style="font-size: 11.5px;">
+                                    <i class="fas fa-arrow-up-right-from-square me-1"></i> View Full Image
+                                </a>
+                                <div class="text-muted small mt-1" style="font-size: 10.5px;">Click to view full payment slip in new tab</div>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="alert alert-light border py-1.5 px-2 text-muted small mb-0 rounded-2" style="font-size: 11px;">
+                            <i class="fas fa-info-circle me-1"></i> No image screenshot was attached with this submission.
+                        </div>
+                    `}
+                </div>
+            </div>
+
+            <!-- Financial Settlement Split -->
+            <div class="d-flex justify-content-between align-items-center px-2.5 py-2 bg-light rounded-2 border mb-3 small" style="font-size: 11.5px;">
+                <span>Supplier Payout: <strong class="text-dark">৳${order.sellerEarnings}</strong></span>
+                <span class="text-muted">|</span>
+                <span class="text-success fw-bold"><i class="fas fa-coins me-1"></i> Platform Commission: ৳${order.platformCommission}</span>
+            </div>
+
+            <!-- Automatic Action Notice -->
+            <div class="alert bg-success-subtle text-success border border-success-subtle p-2.5 rounded-3 mb-0 small" style="font-size: 11.5px;">
+                <div class="fw-bold mb-1"><i class="fas fa-check-circle me-1"></i> On Accepting Payment:</div>
+                <div>&bull; Automatically generates a delivery dispatch order in <strong>@${order.sellerSubdomain}</strong>.</div>
+                <div>&bull; Allocates <strong>${order.qty} physical units</strong> into <strong>@${order.buyerSubdomain || 'main'}</strong> inventory catalog.</div>
+            </div>
+        </div>
+    `;
+
     Swal.fire({
-        title: 'Accept & Dispatch Order?',
-        html: `Accept Super Admin payment for <strong>${orderNum}</strong>?<br><br>
-               <div class="alert bg-light border text-start small p-2.5 rounded-3 mb-0">
-                 &bull; Creates a delivery order in seller store (<strong>@${sellerSubdomain}</strong>).<br>
-                 &bull; Allocates <strong>${qty} units</strong> into the buyer store catalog.
-               </div>`,
-        icon: 'question',
+        title: '<i class="fas fa-money-check-dollar text-success me-2"></i>Verify & Accept Payment',
+        html: modalHtml,
         showCancelButton: true,
         confirmButtonColor: '#059669',
         cancelButtonColor: '#64748b',
-        confirmButtonText: '<i class="fas fa-check-circle me-1"></i> Yes, Accept & Dispatch',
-        cancelButtonText: 'Cancel'
+        confirmButtonText: '<i class="fas fa-check-circle me-1.5"></i> Verify, Accept & Dispatch',
+        cancelButtonText: 'Cancel',
+        width: '580px',
+        customClass: {
+            popup: 'modern-wholesale-popup'
+        }
     }).then((res) => {
         if (res.isConfirmed) {
             Swal.fire({
@@ -827,7 +978,7 @@ function approveOrder(orderId, orderNum, sellerSubdomain, qty) {
                 didOpen: () => Swal.showLoading()
             });
 
-            fetch(`{{ url('admin/wholesale-orders') }}/${orderId}/approve`, {
+            fetch(`{{ url('admin/wholesale-orders') }}/${order.id}/approve`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -839,7 +990,7 @@ function approveOrder(orderId, orderNum, sellerSubdomain, qty) {
             .then(data => {
                 if (data.success) {
                     Swal.fire({
-                        title: 'Success!',
+                        title: 'Payment Accepted!',
                         text: data.message,
                         icon: 'success',
                         confirmButtonColor: '#4f46e5'
