@@ -844,8 +844,13 @@
                                 @foreach($headerPendingProducts as $nProd)
                                     <a href="{{ route('admin.vendor-products.show', $nProd->id) }}" class="list-group-item list-group-item-action p-3 border-bottom" style="background: #fffdf5;">
                                         <div class="d-flex align-items-center justify-content-between mb-1">
-                                            <span class="fw-bold text-dark small"><i class="fas fa-box text-primary me-1"></i> {{ $nProd->vendor->name ?? 'Vendor' }}</span>
-                                            <span class="badge bg-warning text-dark font-weight-bold" style="font-size: 0.7rem;">Product Approval</span>
+                                            <span class="fw-bold text-dark small"><i class="fas fa-box text-primary me-1"></i> {{ $nProd->vendor->name ?? ($nProd->tenant_name ?? 'Vendor') }}</span>
+                                            <div class="d-flex align-items-center gap-1">
+                                                @if(!empty($nProd->tenant_subdomain))
+                                                    <span class="badge" style="background: #e0e7ff; color: #4338ca; font-size: 0.65rem;">{{ '@' . $nProd->tenant_subdomain }}</span>
+                                                @endif
+                                                <span class="badge bg-warning text-dark font-weight-bold" style="font-size: 0.7rem;">Product Approval</span>
+                                            </div>
                                         </div>
                                         <div class="small text-dark fw-semibold mb-1">
                                             Requested approval for: <strong>{{ Str::limit($nProd->title, 28) }}</strong>
@@ -860,14 +865,19 @@
                                 @foreach($headerPendingPayments as $nTrx)
                                     <a href="{{ route('admin.vendor-payments.index', ['status' => 'pending']) }}" class="list-group-item list-group-item-action p-3 border-bottom">
                                         <div class="d-flex align-items-center justify-content-between mb-1">
-                                            <span class="fw-bold text-dark small"><i class="fas fa-wallet text-warning me-1"></i> {{ $nTrx->vendor->name ?? 'Vendor' }}</span>
-                                            <span class="badge bg-success bg-opacity-10 text-success fw-bold">৳{{ number_format($nTrx->amount, 2) }}</span>
+                                            <span class="fw-bold text-dark small"><i class="fas fa-wallet text-warning me-1"></i> {{ $nTrx->vendor->name ?? ($nTrx->tenant_name ?? 'Vendor') }}</span>
+                                            <div class="d-flex align-items-center gap-1">
+                                                @if(!empty($nTrx->tenant_subdomain))
+                                                    <span class="badge" style="background: #e0e7ff; color: #4338ca; font-size: 0.65rem;">{{ '@' . $nTrx->tenant_subdomain }}</span>
+                                                @endif
+                                                <span class="badge bg-success bg-opacity-10 text-success fw-bold">৳{{ number_format($nTrx->amount, 2) }}</span>
+                                            </div>
                                         </div>
                                         <div class="small text-muted mb-1">
                                             Requested recharge via <strong>{{ $nTrx->payment_method ?? 'Gateway' }}</strong>
                                         </div>
                                         <div class="text-muted" style="font-size: 0.7rem;">
-                                            <i class="fas fa-clock me-1"></i> {{ $nTrx->created_at->diffForHumans() }}
+                                            <i class="fas fa-clock me-1"></i> {{ $nTrx->created_at ? $nTrx->created_at->diffForHumans() : 'Just now' }}
                                         </div>
                                     </a>
                                 @endforeach
@@ -876,11 +886,16 @@
                                 @foreach($headerVendorOrders as $nVOrder)
                                     <a href="{{ route('admin.vendor-orders.index') }}" class="list-group-item list-group-item-action p-3 border-bottom" style="background: #f0fdf4;">
                                         <div class="d-flex align-items-center justify-content-between mb-1">
-                                            <span class="fw-bold text-dark small"><i class="fas fa-shopping-bag text-success me-1"></i> #{{ $nVOrder->invoice_no ?? $nVOrder->order_number ?? $nVOrder->id }}</span>
-                                            <span class="badge bg-success text-white font-weight-bold" style="font-size: 0.68rem;">Vendor Order</span>
+                                            <span class="fw-bold text-dark small"><i class="fas fa-shopping-bag text-success me-1"></i> #{{ $nVOrder->invoice_no ?? ($nVOrder->order_number ?? $nVOrder->id) }}</span>
+                                            <div class="d-flex align-items-center gap-1">
+                                                @if(!empty($nVOrder->tenant_subdomain))
+                                                    <span class="badge" style="background: #e0e7ff; color: #4338ca; font-size: 0.65rem;">{{ '@' . $nVOrder->tenant_subdomain }}</span>
+                                                @endif
+                                                <span class="badge bg-success text-white font-weight-bold" style="font-size: 0.68rem;">Store Order</span>
+                                            </div>
                                         </div>
                                         <div class="small text-dark fw-semibold mb-1">
-                                            New vendor order from: <strong>{{ $nVOrder->name ?? 'Customer' }}</strong> — ৳{{ number_format($nVOrder->total, 2) }}
+                                            New store order from: <strong>{{ $nVOrder->name ?? ($nVOrder->customer_name ?? 'Customer') }}</strong> — ৳{{ number_format($nVOrder->total ?? 0, 2) }}
                                         </div>
                                         <div class="text-muted" style="font-size: 0.7rem;">
                                             <i class="fas fa-clock me-1"></i> {{ $nVOrder->created_at ? $nVOrder->created_at->diffForHumans() : 'Just now' }}
@@ -894,9 +909,14 @@
                                         <a href="{{ route('admin.wholesale-orders.index') }}" class="list-group-item list-group-item-action p-3 border-bottom" style="background: #eef2ff;">
                                             <div class="d-flex align-items-center justify-content-between mb-1">
                                                 <span class="fw-bold text-indigo small" style="color: #4338ca;"><i class="fas fa-boxes-packing text-primary me-1"></i> {{ $nWOrder->order_number }}</span>
-                                                <span class="badge rounded-pill text-white font-weight-bold" style="background: #4f46e5; font-size: 0.68rem;">
-                                                    {{ $nWOrder->payment_status === 'pending' ? 'Wholesale Payment Verification' : 'Wholesale Order to Ship' }}
-                                                </span>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    @if(!empty($nWOrder->tenant_subdomain))
+                                                        <span class="badge" style="background: #e0e7ff; color: #4338ca; font-size: 0.65rem;">{{ '@' . $nWOrder->tenant_subdomain }}</span>
+                                                    @endif
+                                                    <span class="badge rounded-pill text-white font-weight-bold" style="background: #4f46e5; font-size: 0.68rem;">
+                                                        {{ $nWOrder->payment_status === 'pending' ? 'Wholesale Payment' : 'Wholesale Ship' }}
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div class="small text-dark fw-semibold mb-1">
                                                 {{ $nWOrder->product_title }} ({{ $nWOrder->quantity }} pcs) — <strong>৳{{ number_format($nWOrder->total_amount, 2) }}</strong>

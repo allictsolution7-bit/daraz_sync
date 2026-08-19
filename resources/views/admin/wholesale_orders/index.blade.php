@@ -219,17 +219,17 @@
             <div class="stats-card-modern d-flex align-items-center justify-content-between">
                 <div>
                     <span class="text-muted text-uppercase d-block" style="font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">
-                        {{ ($tab ?? 'purchases') === 'sales' ? 'Sales Earnings' : (($tab ?? 'purchases') === 'purchases' ? 'Purchased Spend' : 'Volume & Profit') }}
+                        {{ $isSuperAdmin ? 'Volume & Profit' : (($tab ?? 'purchases') === 'sales' ? 'Sales Earnings' : 'Purchased Spend') }}
                     </span>
                     <div class="d-flex align-items-baseline gap-2 mt-0.5">
                         <div class="h5 mb-0 font-bold text-primary" style="font-weight: 700;">৳{{ number_format($totalVolume, 2) }}</div>
-                        @if($isSuperAdmin && ($tab ?? 'all') === 'all')
+                        @if($isSuperAdmin)
                             <span class="badge bg-success-subtle text-success border border-success-subtle px-1.5 py-0.5 rounded-pill" style="font-size: 10px; font-weight: 700;">
                                 Profit: ৳{{ number_format($totalProfit, 2) }}
                             </span>
                         @endif
                     </div>
-                    @if($isSuperAdmin && ($tab ?? 'all') === 'all')
+                    @if($isSuperAdmin)
                         <div class="text-muted small mt-0.5" style="font-size: 10px;">
                             <i class="fas fa-coins text-success me-1"></i> Net Comm Profit: <strong style="color: #059669;">৳{{ number_format($totalProfit, 2) }}</strong>
                         </div>
@@ -289,8 +289,8 @@
 
                 <!-- Bulk Actions Toolbar -->
                 <div class="d-flex flex-wrap align-items-center gap-1.5">
-                    <span class="badge bg-light text-slate-700 border px-2 py-1 me-1" style="font-size: 11px; font-weight: 600;" id="selected-orders-count-badge">
-                        <i class="fas fa-check-double text-primary me-1"></i><span id="selected-count">0</span> selected
+                    <span class="badge px-2.5 py-1.5 me-1 d-inline-flex align-items-center rounded-2" style="background-color: #e0e7ff !important; color: #3730a3 !important; border: 1px solid #c7d2fe !important; font-size: 11.5px; font-weight: 700;" id="selected-orders-count-badge">
+                        <i class="fas fa-check-double me-1" style="color: #4338ca !important;"></i><span id="selected-count" style="color: #3730a3 !important; font-weight: 700;">0</span>&nbsp;<span style="color: #3730a3 !important; font-weight: 700;">selected</span>
                     </span>
 
                     <!-- Logistics & Courier -->
@@ -336,7 +336,7 @@
                         <th style="min-width: 170px;">Buyer Store & Address</th>
                         <th style="white-space: nowrap;">Seller Store</th>
                         <th style="min-width: 180px;">Product & Qty</th>
-                        <th style="white-space: nowrap;">{{ ($tab ?? 'purchases') === 'sales' ? 'Your Earnings' : 'Total Amount' }}</th>
+                        <th style="white-space: nowrap;">{{ $isSuperAdmin ? 'Total & Profit Breakdown' : (($tab ?? 'purchases') === 'sales' ? 'Your Earnings' : 'Total Amount') }}</th>
                         <th style="white-space: nowrap;">Payment</th>
                         <th style="white-space: nowrap;">Fulfillment</th>
                         <th class="pe-4 text-end" style="white-space: nowrap; min-width: 170px;">Actions & Delivery</th>
@@ -404,23 +404,37 @@
                                 </div>
                             </td>
                             <td style="white-space: nowrap;">
-                                @if(($tab ?? 'purchases') === 'sales')
+                                @if($isSuperAdmin)
+                                    <div class="d-flex flex-column">
+                                        <div class="d-flex align-items-center gap-1.5">
+                                            <span class="font-bold text-slate-800" style="font-weight: 700; font-size: 14px;" title="Total amount paid by buyer">
+                                                ৳{{ number_format($order->total_amount, 2) }}
+                                            </span>
+                                            @if($order->platform_commission > 0)
+                                                <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9.5px; font-weight: 700;" title="Super Admin net profit">
+                                                    +৳{{ number_format($order->platform_commission, 2) }} Profit
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="text-muted small mt-0.5" style="font-size: 10.5px;">
+                                            <span>Seller: <strong style="color: #059669;">৳{{ number_format($order->seller_earnings, 2) }}</strong></span>
+                                            <span style="color: #cbd5e1;">&bull;</span>
+                                            <span style="color: #4f46e5; font-weight: 600;">Admin: ৳{{ number_format($order->platform_commission, 2) }}</span>
+                                        </div>
+                                    </div>
+                                @elseif(($tab ?? 'purchases') === 'sales')
                                     <div class="font-bold text-success" style="font-weight: 700; font-size: 14px;">
                                         ৳{{ number_format($order->seller_earnings, 2) }}
                                     </div>
                                     <div class="text-muted small" style="font-size: 10.5px;">
                                         <i class="fas fa-coins text-warning me-1"></i> Seller Earning
                                     </div>
-                                @elseif($isSuperAdmin && ($tab ?? 'all') === 'all')
-                                    <div class="font-bold text-success" style="font-weight: 700; font-size: 14px;">
-                                        ৳{{ number_format($order->total_amount, 2) }}
-                                    </div>
-                                    <div class="text-muted small" style="font-size: 10px;">
-                                        Seller: ৳{{ number_format($order->seller_earnings, 2) }} | Comm: ৳{{ number_format($order->platform_commission, 2) }}
-                                    </div>
                                 @else
                                     <div class="font-bold text-success" style="font-weight: 700; font-size: 14px;">
                                         ৳{{ number_format($order->total_amount, 2) }}
+                                    </div>
+                                    <div class="text-muted small" style="font-size: 10.5px;">
+                                        <i class="fas fa-receipt text-primary me-1"></i> Buyer Paid
                                     </div>
                                 @endif
                             </td>

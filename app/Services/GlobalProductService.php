@@ -77,6 +77,23 @@ class GlobalProductService
         // Check local store products strictly for current logged-in admin
         $currentUser = auth()->user();
         $currentUserId = $currentUser?->id;
+        $isSuperAdminUser = $currentUser?->isSuperAdmin() ?? false;
+
+        $currentTenantObj = request()->attributes->get('tenant') ?? (view()->shared('currentTenant') ?? null);
+        $currentSubdomain = $currentTenantObj?->subdomain;
+        if (!$currentSubdomain) {
+            $host = request()->getHost();
+            $parts = explode('.', $host);
+            if (count($parts) >= 2 && !in_array($parts[0], ['www', 'admin', 'api', 'central', '127', 'localhost'])) {
+                $currentSubdomain = strtolower($parts[0]);
+            }
+        }
+        if (!$currentSubdomain) {
+            $dbName = config('database.connections.mysql.database');
+            if (is_string($dbName) && str_starts_with($dbName, 'purnobd_') && $dbName !== 'purnobd_central') {
+                $currentSubdomain = str_replace('purnobd_', '', $dbName);
+            }
+        }
 
         $localQuery = Product::select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata');
         if ($currentUserId) {
@@ -506,11 +523,18 @@ class GlobalProductService
                         }
                     }
 
+                    $isOwnProduct = false;
+                    if (!$isSuperAdminUser && $currentSubdomain && strtolower($tenant->subdomain) === strtolower($currentSubdomain)) {
+                        $isOwnProduct = true;
+                        $storeStatusType = 'own_product';
+                    }
+
                     $allProducts[] = [
                         'tenant_name' => $tenant->name,
                         'tenant_subdomain' => $tenant->subdomain,
                         'tenant_id' => $tenant->id,
                         'id' => $prod->id,
+                        'is_own_product' => $isOwnProduct,
                         'is_already_copied' => $isAlreadyCopied,
                         'store_status_type' => $storeStatusType,
                         'local_stock' => $localStock,

@@ -244,34 +244,19 @@ class ProductController extends Controller
                 $unique = number_format($product->views_unique ?? 0);
                 return $total . ' / ' . $unique;
             })
-            ->addColumn('source_tenant_subdomain', function($product) {
-                if (!empty($product->source_tenant_subdomain)) {
-                    return $product->source_tenant_subdomain;
-                }
-                if (!empty($product->source_metadata)) {
-                    $meta = is_string($product->source_metadata) ? json_decode($product->source_metadata, true) : $product->source_metadata;
-                    if (is_array($meta)) {
-                        if (!empty($meta['source_tenant_subdomain'])) return $meta['source_tenant_subdomain'];
-                        if (!empty($meta['source_subdomain'])) return $meta['source_subdomain'];
-                        if (!empty($meta['supplier_subdomain'])) return $meta['supplier_subdomain'];
-                    }
-                }
-                if (!empty($product->source_product_id)) {
-                    return 'sabbir';
-                }
-                return null;
+            ->addColumn('is_copied', function($product) {
+                return !empty($product->source_tenant_subdomain) 
+                    || !empty($product->source_product_id) 
+                    || !empty($product->copied_by_admin_id) 
+                    || !empty($product->source_metadata);
             })
-            ->addColumn('source_creator_name', function($product) {
-                if (!empty($product->source_creator_name)) {
-                    return $product->source_creator_name;
-                }
-                if (!empty($product->source_metadata)) {
-                    $meta = is_string($product->source_metadata) ? json_decode($product->source_metadata, true) : $product->source_metadata;
-                    if (is_array($meta) && !empty($meta['source_creator_name'])) {
-                        return $meta['source_creator_name'];
-                    }
-                }
-                return null;
+            ->addColumn('origin_label', function($product) {
+                $isCopied = !empty($product->source_tenant_subdomain) 
+                    || !empty($product->source_product_id) 
+                    || !empty($product->copied_by_admin_id) 
+                    || !empty($product->source_metadata);
+
+                return $isCopied ? 'S.Admin' : null;
             })
             ->rawColumns(['checkbox', 'actions'])
             ->toJson();

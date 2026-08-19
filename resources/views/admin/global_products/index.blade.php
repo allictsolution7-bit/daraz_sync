@@ -340,6 +340,7 @@
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
+                        @if($isSuperAdmin)
                         <select name="tenant_id" class="form-select form-select-sm rounded-3" style="min-width: 200px;" onchange="this.form.submit()">
                             <option value="">All SaaS Tenants</option>
                             @foreach($tenants as $tenant)
@@ -348,6 +349,7 @@
                                 </option>
                             @endforeach
                         </select>
+                        @endif
                         
                         <button type="submit" class="btn btn-sm btn-primary rounded-3 text-nowrap">
                             <i class="fas fa-filter me-1"></i> Filter
@@ -364,8 +366,11 @@
     <!-- Bulk Action & Status Bar -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 px-1">
         <div class="d-flex align-items-center gap-2">
-            <button type="button" id="btn-bulk-action" class="btn btn-primary btn-sm rounded-3 px-3.5 py-2 shadow-sm font-semibold d-inline-flex align-items-center gap-2" style="font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;" disabled onclick="openBulkPurchaseModal()">
-                <i class="fas fa-cart-shopping"></i> Purchase / Copy Selected (<span id="selected-count">0</span>)
+            <button type="button" id="btn-bulk-import" class="btn btn-sm btn-light border rounded-3 px-3.5 py-2 shadow-sm font-semibold d-inline-flex align-items-center gap-2" style="font-weight: 600; background-color: #f5f3ff; border-color: #ddd6fe !important; color: #4f46e5 !important;" disabled onclick="openBulkImportModal()">
+                <i class="fas fa-file-import"></i> Import Selected (<span id="selected-import-count">0</span>)
+            </button>
+            <button type="button" id="btn-bulk-purchase" class="btn btn-primary btn-sm rounded-3 px-3.5 py-2 shadow-sm font-semibold d-inline-flex align-items-center gap-2" style="font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;" disabled onclick="openBulkPurchaseModal()">
+                <i class="fas fa-cart-shopping"></i> Purchase Selected (<span id="selected-purchase-count">0</span>)
             </button>
             <span class="text-muted small ms-2">
                 Showing {{ $paginatedProducts->firstItem() ?? 0 }} - {{ $paginatedProducts->lastItem() ?? 0 }} of {{ $paginatedProducts->total() }} global products
@@ -392,7 +397,9 @@
                         </th>
                         <th style="width: 70px;">Image</th>
                         <th style="min-width: 220px; max-width: 320px;">Product Name & Info</th>
+                        @if($isSuperAdmin)
                         <th style="white-space: nowrap;">Source Tenant</th>
+                        @endif
                         <th style="white-space: nowrap;">Category</th>
                         <th style="white-space: nowrap;">Retail Price</th>
                         <th style="white-space: nowrap;">
@@ -421,6 +428,7 @@
                                        data-image="{{ $product['thumb_image'] ?? '' }}"
                                        data-status-type="{{ $product['store_status_type'] ?? ($product['is_already_copied'] ? 'copied' : 'not_in_store') }}"
                                        data-local-stock="{{ $product['local_stock'] ?? 0 }}"
+                                       {{ !empty($product['is_own_product']) ? 'disabled title="Your own store product"' : '' }}
                                        onchange="updateBulkButtonState()">
                             </td>
                             <td style="width: 70px;">
@@ -462,55 +470,48 @@
                                     @endif
                                 </div>
                             </td>
+                            @if($isSuperAdmin)
                             <td style="white-space: nowrap;">
                                 <span class="badge rounded-pill px-2.5 py-1.5" style="background-color: #e0e7ff; color: #3730a3; font-weight: 600; font-size: 11px;">
                                     <i class="fas fa-globe me-1"></i> {{ $product['tenant_subdomain'] }}
                                 </span>
                             </td>
+                            @endif
                             <td style="white-space: nowrap;">
                                 <span class="badge bg-light text-dark border px-2 py-1 rounded-2" style="font-size: 11px; font-weight: 500;">
                                     {{ $product['category_name'] }}
                                 </span>
                             </td>
                             <td style="white-space: nowrap;">
-                                @php
-                                    $sellPrice = floatval($product['price'] ?? 0);
-                                    $oldRegularPrice = floatval($product['old_price'] ?? 0);
-                                    $hasDiscount = ($oldRegularPrice > 0 && $sellPrice > 0 && $oldRegularPrice > $sellPrice);
-                                    $varRetailMin = floatval($product['variant_retail_min'] ?? 0);
-                                    $varRetailMax = floatval($product['variant_retail_max'] ?? 0);
-                                    $isVariableWithRetail = ($product['has_variants'] && $varRetailMin > 0 && $sellPrice <= 0 && $oldRegularPrice <= 0);
-                                @endphp
-                                @if($isVariableWithRetail)
-                                    @if($varRetailMin === $varRetailMax)
-                                        <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($varRetailMin, 2) }}</span>
-                                    @else
-                                        <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($varRetailMin, 2) }} – ৳{{ number_format($varRetailMax, 2) }}</span>
+                                <div class="d-flex flex-column">
+                                    <span class="text-slate-800 font-bold" style="font-weight: 700; font-size: 14px;">
+                                        ৳{{ number_format($product['price'], 2) }}
+                                    </span>
+                                    @if(!empty($product['old_price']) && $product['old_price'] > $product['price'])
+                                        <span class="text-muted text-decoration-line-through small" style="font-size: 11px;">
+                                            ৳{{ number_format($product['old_price'], 2) }}
+                                        </span>
                                     @endif
-                                @elseif($hasDiscount)
-                                    <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($sellPrice, 2) }}</span>
-                                    <del class="text-muted small d-block" style="font-size: 10px;">৳{{ number_format($oldRegularPrice, 2) }}</del>
-                                @else
-                                    <span class="text-slate-800" style="font-weight: 600;">৳{{ number_format($sellPrice > 0 ? $sellPrice : $oldRegularPrice, 2) }}</span>
-                                @endif
+                                </div>
                             </td>
                             <td style="white-space: nowrap;">
                                 @php
-                                    $varWholesaleMin = floatval($product['variant_wholesale_min'] ?? 0);
-                                    $varWholesaleMax = floatval($product['variant_wholesale_max'] ?? 0);
-                                    $isVariableWithWholesale = ($product['has_variants'] && $varWholesaleMin > 0 && floatval($product['final_wholesale_price'] ?? 0) <= 0);
+                                    $finalPrice = floatval($product['final_wholesale_price'] ?? $product['wholesale_price'] ?? $product['price'] ?? 0);
+                                    $basePrice = floatval($product['base_price'] ?? $product['wholesale_price'] ?? $product['price'] ?? 0);
                                     $commPercent = floatval($product['commission_percent'] ?? 0);
-                                    $basePrice = floatval($product['base_price'] ?? 0);
                                     $commAmount = floatval($product['commission_amount'] ?? 0);
-                                    $finalPrice = floatval($product['final_wholesale_price'] ?: 0);
+                                    $hasVariants = !empty($product['has_variants']) && count($product['variants']) > 0;
+                                    $varWholesaleMin = floatval($product['variants_wholesale_min'] ?? 0);
+                                    $varWholesaleMax = floatval($product['variants_wholesale_max'] ?? 0);
                                 @endphp
-                                @if($isVariableWithWholesale)
+                                
+                                @if($hasVariants && $varWholesaleMin > 0)
                                     <div class="d-flex flex-column">
-                                        <span class="text-success font-bold d-inline-flex align-items-center gap-1" style="font-weight: 700;">
-                                            @if($varWholesaleMin === $varWholesaleMax)
-                                                ৳{{ number_format($varWholesaleMin, 2) }}
+                                        <span class="text-success font-bold" style="font-weight: 700; font-size: 13px;">
+                                            @if($varWholesaleMin != $varWholesaleMax)
+                                                ৳{{ number_format($varWholesaleMin, 2) }} - ৳{{ number_format($varWholesaleMax, 2) }}
                                             @else
-                                                ৳{{ number_format($varWholesaleMin, 2) }} – ৳{{ number_format($varWholesaleMax, 2) }}
+                                                ৳{{ number_format($varWholesaleMin, 2) }}
                                             @endif
                                             @if($isSuperAdmin && $commPercent > 0)
                                                 <span class="badge rounded-pill px-1.5 py-0.5" style="background-color: #ecfdf5; color: #047857; font-size: 9.5px; font-weight: 600;">
@@ -518,11 +519,9 @@
                                                 </span>
                                             @endif
                                         </span>
-                                        @if($isSuperAdmin && $commPercent > 0)
-                                            <span class="text-muted small" style="font-size: 10px; margin-top: 1px;">
-                                                Includes {{ $commPercent }}% super admin profit
-                                            </span>
-                                        @endif
+                                        <span class="badge rounded-pill bg-light text-muted border px-1.5 py-0.5 mt-0.5 align-self-start" style="font-size: 9px;">
+                                            Variable Wholesale
+                                        </span>
                                     </div>
                                 @elseif($isSuperAdmin && $commPercent > 0 && $commAmount > 0)
                                     <div class="d-flex flex-column">
@@ -552,7 +551,11 @@
                                 @endif
                             </td>
                             <td style="white-space: nowrap;" id="status-cell-{{ $rowUniqueKey }}">
-                                @if(($product['store_status_type'] ?? '') === 'purchased')
+                                @if(!empty($product['is_own_product']) || ($product['store_status_type'] ?? '') === 'own_product')
+                                    <span class="badge rounded-pill px-2.5 py-1" style="background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 600; font-size: 11px;">
+                                        <i class="fas fa-store me-1"></i> Own Product
+                                    </span>
+                                @elseif(($product['store_status_type'] ?? '') === 'purchased')
                                     <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2.5 py-1" style="font-size: 11px; font-weight: 700;">
                                         <i class="fas fa-boxes-stacked me-1"></i> Purchased ({{ $product['local_stock'] ?? 0 }} in store)
                                     </span>
@@ -571,14 +574,18 @@
                                     $sStatus = $product['store_status_type'] ?? ($product['is_already_copied'] ? 'copied' : 'not_in_store');
                                     $lStock = $product['local_stock'] ?? 0;
                                 @endphp
-                                @if($sStatus === 'purchased')
+                                @if(!empty($product['is_own_product']) || $sStatus === 'own_product')
+                                    <span class="badge rounded-pill px-2.5 py-1.5 font-semibold" style="background-color: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; font-size: 0.775rem;">
+                                        <i class="fas fa-check-circle text-muted me-1"></i> Own Product
+                                    </span>
+                                @elseif($sStatus === 'purchased')
                                     <div class="d-inline-flex align-items-center gap-1.5">
                                         <button type="button" 
                                                 class="btn btn-sm btn-outline-secondary rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
                                                 style="font-size: 0.775rem;"
                                                 disabled
-                                                title="Already in store catalog">
-                                            <i class="fas fa-check"></i> Copied
+                                                title="Already imported into store catalog">
+                                            <i class="fas fa-check"></i> Imported
                                         </button>
                                         <button type="button" 
                                                 class="btn btn-sm btn-success rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
@@ -594,8 +601,8 @@
                                                 class="btn btn-sm btn-outline-secondary rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
                                                 style="font-size: 0.775rem;"
                                                 disabled
-                                                title="Already in store catalog">
-                                            <i class="fas fa-check"></i> Copied
+                                                title="Already imported into store catalog">
+                                            <i class="fas fa-check"></i> Imported
                                         </button>
                                         <button type="button" 
                                                 class="btn btn-sm btn-primary rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
@@ -612,7 +619,7 @@
                                                 id="btn-action-copy-{{ $rowUniqueKey }}"
                                                 style="background: #f5f3ff; border-color: #ddd6fe !important; color: #4f46e5 !important; font-size: 0.775rem;"
                                                 onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'not_in_store', '0', 'copy')">
-                                            <i class="fas fa-clone"></i> Copy
+                                            <i class="fas fa-file-import"></i> Import
                                         </button>
                                         <button type="button" 
                                                 class="btn btn-sm btn-primary rounded-3 px-2.5 py-1.5 font-semibold d-inline-flex align-items-center gap-1 shadow-sm" 
@@ -629,7 +636,7 @@
                         {{-- Collapsible Child Variant Details --}}
                         @if($hasVariants)
                             <tr class="p-0 border-0">
-                                <td colspan="10" class="p-0 border-0">
+                                <td colspan="{{ $isSuperAdmin ? 10 : 9 }}" class="p-0 border-0">
                                     <div class="collapse" id="variants-{{ $rowUniqueKey }}">
                                         <div class="p-3 bg-light border-bottom" style="background-color: #f8fafc !important;">
                                             <div class="card border rounded-3 shadow-none overflow-hidden bg-white">
@@ -783,11 +790,18 @@ function toggleSelectAll(masterCheckbox) {
 
 function updateBulkButtonState() {
     const checked = document.querySelectorAll('.product-check:checked');
-    const bulkBtn = document.getElementById('btn-bulk-copy');
-    const countSpan = document.getElementById('selected-count');
+    const count = checked.length;
 
-    countSpan.textContent = checked.length;
-    bulkBtn.disabled = (checked.length === 0);
+    const btnImport = document.getElementById('btn-bulk-import');
+    const btnPurchase = document.getElementById('btn-bulk-purchase');
+    const countImportSpan = document.getElementById('selected-import-count');
+    const countPurchaseSpan = document.getElementById('selected-purchase-count');
+
+    if (countImportSpan) countImportSpan.textContent = count;
+    if (countPurchaseSpan) countPurchaseSpan.textContent = count;
+
+    if (btnImport) btnImport.disabled = (count === 0);
+    if (btnPurchase) btnPurchase.disabled = (count === 0);
 }
 
 // Gateway details passed from backend
@@ -1269,15 +1283,81 @@ function openPurchaseModal(subdomain, productId, title, unitPrice, availableStoc
     });
 }
 
-function updateBulkButtonState() {
+// Bulk Import Selected (Free Listing - 0 Stock)
+function openBulkImportModal() {
     const checked = document.querySelectorAll('.product-check:checked');
-    const btn = document.getElementById('btn-bulk-action');
-    const countSpan = document.getElementById('selected-count');
-    if (countSpan) countSpan.textContent = checked.length;
-    if (btn) btn.disabled = (checked.length === 0);
+    if (checked.length === 0) {
+        Swal.fire('No Products Selected', 'Please select one or more products using the checkboxes first.', 'info');
+        return;
+    }
+
+    const items = [];
+    checked.forEach(cb => {
+        items.push({
+            subdomain: cb.dataset.subdomain,
+            product_id: parseInt(cb.dataset.id),
+            title: cb.dataset.title
+        });
+    });
+
+    Swal.fire({
+        title: '<i class="fas fa-file-import text-primary me-2"></i>Import Selected Products',
+        html: `
+            <div class="text-start" style="font-size: 13px;">
+                <p class="mb-2">Are you sure you want to import <strong>${items.length} selected product(s)</strong> into your store catalog?</p>
+                <div class="alert alert-light border small text-muted p-2.5 rounded-3 mb-0">
+                    <i class="fas fa-info-circle text-primary me-1"></i> These products will be added to your catalog immediately with <strong>0 inventory stock</strong> (Listing Only). You can sell on-demand and purchase wholesale stock anytime.
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonColor: '#4f46e5',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: `<i class="fas fa-file-import me-1"></i> Yes, Import ${items.length} Products`,
+        cancelButtonText: 'Cancel',
+        focusConfirm: false
+    }).then((res) => {
+        if (res.isConfirmed) {
+            Swal.fire({
+                title: 'Importing Products...',
+                html: `Syncing ${items.length} products to your store catalog...`,
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            fetch("{{ route('admin.global-products.bulk-copy') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    items: items,
+                    copy_mode: 'copy'
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Import Complete!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#4f46e5'
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire('Import Error', data.message || 'Failed to import products.', 'error');
+                }
+            })
+            .catch(() => {
+                Swal.fire('Error', 'Network error occurred during bulk import.', 'error');
+            });
+        }
+    });
 }
 
-// Bulk Purchase / Copy Modal
+// Bulk Wholesale Purchase Modal
 function openBulkPurchaseModal() {
     const checked = document.querySelectorAll('.product-check:checked');
     if (checked.length === 0) {

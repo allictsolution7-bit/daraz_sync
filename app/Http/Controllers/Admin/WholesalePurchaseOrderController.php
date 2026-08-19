@@ -101,8 +101,9 @@ class WholesalePurchaseOrderController extends Controller
 
         // Statistics Scoped by Tab
         if ($tab === 'sales') {
-            $salesBaseQuery = WholesalePurchaseOrder::where('payment_status', 'approved')
-                ->where(function($q) use ($user, $currentSubdomain) {
+            $salesBaseQuery = WholesalePurchaseOrder::where('payment_status', 'approved');
+            if (!$isSuperAdmin) {
+                $salesBaseQuery->where(function($q) use ($user, $currentSubdomain) {
                     if ($user) {
                         $q->where('seller_admin_id', $user->id)
                           ->orWhere('seller_admin_name', 'like', "%{$user->email}%")
@@ -110,24 +111,28 @@ class WholesalePurchaseOrderController extends Controller
                     }
                     if ($currentSubdomain) $q->orWhere('seller_subdomain', $currentSubdomain);
                 });
+            }
 
             $pendingCount = (clone $salesBaseQuery)->where('fulfillment_status', 'processing')->count();
             $approvedCount = (clone $salesBaseQuery)->whereIn('fulfillment_status', ['shipped', 'delivered'])->count();
-            $totalVolume = (clone $salesBaseQuery)->sum('seller_earnings');
-            $totalProfit = 0;
+            $totalVolume = (clone $salesBaseQuery)->sum($isSuperAdmin ? 'total_amount' : 'seller_earnings');
+            $totalProfit = (clone $salesBaseQuery)->sum('platform_commission');
         } elseif ($tab === 'purchases') {
-            $purchasesBaseQuery = WholesalePurchaseOrder::where(function($q) use ($user, $currentSubdomain) {
-                if ($user) {
-                    $q->where('buyer_admin_id', $user->id)
-                      ->orWhere('buyer_admin_email', $user->email);
-                }
-                if ($currentSubdomain) $q->orWhere('buyer_subdomain', $currentSubdomain);
-            });
+            $purchasesBaseQuery = WholesalePurchaseOrder::query();
+            if (!$isSuperAdmin) {
+                $purchasesBaseQuery->where(function($q) use ($user, $currentSubdomain) {
+                    if ($user) {
+                        $q->where('buyer_admin_id', $user->id)
+                          ->orWhere('buyer_admin_email', $user->email);
+                    }
+                    if ($currentSubdomain) $q->orWhere('buyer_subdomain', $currentSubdomain);
+                });
+            }
 
             $pendingCount = (clone $purchasesBaseQuery)->where('payment_status', 'pending')->count();
             $approvedCount = (clone $purchasesBaseQuery)->where('payment_status', 'approved')->count();
             $totalVolume = (clone $purchasesBaseQuery)->where('payment_status', 'approved')->sum('total_amount');
-            $totalProfit = 0;
+            $totalProfit = (clone $purchasesBaseQuery)->where('payment_status', 'approved')->sum('platform_commission');
         } else {
             // Super Admin All Tab
             $pendingCount = WholesalePurchaseOrder::where('payment_status', 'pending')->count();
