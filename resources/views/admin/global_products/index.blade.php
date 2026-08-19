@@ -575,9 +575,16 @@
                                     $lStock = $product['local_stock'] ?? 0;
                                 @endphp
                                 @if(!empty($product['is_own_product']) || $sStatus === 'own_product')
-                                    <span class="badge rounded-pill px-2.5 py-1.5 font-semibold" style="background-color: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; font-size: 0.775rem;">
-                                        <i class="fas fa-check-circle text-muted me-1"></i> Own Product
-                                    </span>
+                                    <div class="d-inline-flex align-items-center gap-1.5">
+                                        <span class="badge rounded-pill px-2.5 py-1.5 font-semibold" style="background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 0.775rem;">
+                                            <i class="fas fa-store text-muted me-1"></i> Own Product
+                                        </span>
+                                        @if(!empty($product['local_product_id']) || !empty($product['id']))
+                                            <a href="{{ route('admin.items.edit', $product['local_product_id'] ?? $product['id']) }}" class="btn btn-sm btn-light border rounded-3 px-2 py-1" style="font-size: 0.775rem; color: #475569;" title="Edit Product in Catalog">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                        @endif
+                                    </div>
                                 @elseif($sStatus === 'purchased')
                                     <div class="d-inline-flex align-items-center gap-1.5">
                                         <button type="button" 
@@ -781,7 +788,7 @@ function toggleVariantRow(uniqueKey) {
 }
 
 function toggleSelectAll(masterCheckbox) {
-    const checkboxes = document.querySelectorAll('.product-check');
+    const checkboxes = document.querySelectorAll('.product-check:not(:disabled)');
     checkboxes.forEach(cb => {
         cb.checked = masterCheckbox.checked;
     });

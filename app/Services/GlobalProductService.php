@@ -74,7 +74,7 @@ class GlobalProductService
         $totalAdminCount = 0;
         $errors = [];
 
-        // Check local store products strictly for current logged-in admin
+        // Check local store products for current store/admin
         $currentUser = auth()->user();
         $currentUserId = $currentUser?->id;
         $isSuperAdminUser = $currentUser?->isSuperAdmin() ?? false;
@@ -88,21 +88,13 @@ class GlobalProductService
                 $currentSubdomain = strtolower($parts[0]);
             }
         }
-        if (!$currentSubdomain) {
-            $dbName = config('database.connections.mysql.database');
-            if (is_string($dbName) && str_starts_with($dbName, 'purnobd_') && $dbName !== 'purnobd_central') {
-                $currentSubdomain = str_replace('purnobd_', '', $dbName);
-            }
+        $activeStoreDb = config('database.connections.mysql.database');
+        if (!$currentSubdomain && is_string($activeStoreDb) && str_starts_with($activeStoreDb, 'purnobd_') && $activeStoreDb !== 'purnobd_central') {
+            $currentSubdomain = str_replace('purnobd_', '', $activeStoreDb);
         }
 
-        $localQuery = Product::select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata');
-        if ($currentUserId) {
-            $localQuery->where(function($q) use ($currentUserId) {
-                $q->where('copied_by_admin_id', $currentUserId)
-                  ->orWhere('created_by', $currentUserId);
-            });
-        }
-        $localProducts = $localQuery->get();
+        // Retrieve local store catalog products to distinguish copied products vs original own products
+        $localProducts = Product::select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata')->get();
 
         $localBySource = [];
         $localByTitle = [];
@@ -504,29 +496,44 @@ class GlobalProductService
                     $sourceKey = $tenant->subdomain . '_' . $prod->id;
                     $matchedLocal = $localBySource[$sourceKey] ?? ($localByTitle[trim(strtolower($prod->title))] ?? null);
                     
-                    $isAlreadyCopied = !is_null($matchedLocal);
-                    $purchasedStockQty = $approvedPurchases[$sourceKey] ?? 0;
-                    $localStock = 0;
-                    $storeStatusType = 'not_in_store';
-
-                    if ($matchedLocal) {
-                        $meta = is_string($matchedLocal->source_metadata) ? json_decode($matchedLocal->source_metadata, true) : $matchedLocal->source_metadata;
-                        $copyMode = is_array($meta) ? ($meta['copy_mode'] ?? null) : null;
-                        $metaPurchasedQty = is_array($meta) ? (int)($meta['purchased_quantity'] ?? 0) : 0;
-
-                        if ($purchasedStockQty > 0 || $metaPurchasedQty > 0 || $copyMode === 'purchase') {
-                            $storeStatusType = 'purchased';
-                            $localStock = $purchasedStockQty > 0 ? $purchasedStockQty : ($metaPurchasedQty > 0 ? $metaPurchasedQty : (int)$matchedLocal->quantity);
-                        } else {
-                            $storeStatusType = 'copied';
-                            $localStock = 0;
-                        }
+                    // Determine if this product is the current admin's / store's own product
+                    $isOwnProduct = false;
+                    $tenantDbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+                    
+                    if ($currentSubdomain && strtolower($tenant->subdomain) === strtolower($currentSubdomain)) {
+                        $isOwnProduct = true;
+                    } elseif ($activeStoreDb && ($activeStoreDb === $tenantDbName || $activeStoreDb === ('purnobd_' . $tenant->subdomain))) {
+                        $isOwnProduct = true;
+                    } elseif ($matchedLocal && empty($matchedLocal->source_tenant_subdomain) && empty($matchedLocal->copied_by_admin_id)) {
+                        // Original product created directly in local store
+                        $isOwnProduct = true;
+                    } elseif ($currentUserId && !empty($prod->created_by) && (int)$prod->created_by === (int)$currentUserId) {
+                        $isOwnProduct = true;
                     }
 
-                    $isOwnProduct = false;
-                    if (!$isSuperAdminUser && $currentSubdomain && strtolower($tenant->subdomain) === strtolower($currentSubdomain)) {
-                        $isOwnProduct = true;
+                    if ($isOwnProduct) {
                         $storeStatusType = 'own_product';
+                        $isAlreadyCopied = false;
+                        $localStock = (int)($prod->quantity ?? ($matchedLocal?->quantity ?? 0));
+                    } else {
+                        $isAlreadyCopied = !is_null($matchedLocal);
+                        $purchasedStockQty = $approvedPurchases[$sourceKey] ?? 0;
+                        $localStock = 0;
+                        $storeStatusType = 'not_in_store';
+
+                        if ($matchedLocal) {
+                            $meta = is_string($matchedLocal->source_metadata) ? json_decode($matchedLocal->source_metadata, true) : $matchedLocal->source_metadata;
+                            $copyMode = is_array($meta) ? ($meta['copy_mode'] ?? null) : null;
+                            $metaPurchasedQty = is_array($meta) ? (int)($meta['purchased_quantity'] ?? 0) : 0;
+
+                            if ($purchasedStockQty > 0 || $metaPurchasedQty > 0 || $copyMode === 'purchase') {
+                                $storeStatusType = 'purchased';
+                                $localStock = $purchasedStockQty > 0 ? $purchasedStockQty : ($metaPurchasedQty > 0 ? $metaPurchasedQty : (int)$matchedLocal->quantity);
+                            } else {
+                                $storeStatusType = 'copied';
+                                $localStock = 0;
+                            }
+                        }
                     }
 
                     $allProducts[] = [
