@@ -27,4 +27,4 @@ Artisan::command('inspire', function () {
     }
 })->purpose('Display an inspiring quote');
 
-Schedule::command('sheets:sync-products')->everyFifteenMinutes()->withoutOverlapping();
+Schedule::command('sheets:sync-products')->everyTwoMinutes()->withoutOverlapping();

@@ -303,3 +303,22 @@ Route::group(['prefix' => '', 'middleware' => []], function() {
     }
     })->middleware('throttle:10,1'); // Rate limit to 10 requests per minute
 });
+
+// Google Sheets Real-time Webhook (Instant Zero-Delay Push on Sheet Edit)
+Route::post('/google-sheets/webhook', function (Request $request, \App\Services\GoogleSheetSyncService $syncService) {
+    try {
+        $data = $request->all();
+        if (empty($data)) {
+            $data = json_decode($request->getContent(), true) ?: [];
+        }
+
+        $result = $syncService->syncSingleRowFromWebhook($data);
+        return response()->json($result);
+    } catch (\Exception $e) {
+        \Log::error('Google Sheet Webhook Error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});

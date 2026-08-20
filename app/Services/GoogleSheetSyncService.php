@@ -304,6 +304,70 @@ class GoogleSheetSyncService
     }
 
     /**
+     * Instantly sync / update a single product when Google Sheets triggers a webhook on edit
+     */
+    public function syncSingleRowFromWebhook(array $row): array
+    {
+        $id = $row['id'] ?? $row['ID'] ?? null;
+        $sku = $row['sku'] ?? $row['SKU'] ?? null;
+        $title = $row['title'] ?? $row['product_name'] ?? $row['Product Name'] ?? null;
+        $quantity = $row['quantity'] ?? $row['stock_quantity'] ?? $row['Stock Quantity'] ?? null;
+        $cost = $row['cost'] ?? $row['product_cost'] ?? $row['Product Cost (Tk)'] ?? null;
+        $salePrice = $row['sale_price'] ?? $row['offer'] ?? $row['Sale Price / Offer (Tk)'] ?? null;
+        $regularPrice = $row['regular_price'] ?? $row['old_price'] ?? $row['Regular Price / Old Price (Tk)'] ?? null;
+        $wholesalePrice = $row['wholesale_price'] ?? $row['Wholesale Price (Tk)'] ?? null;
+        $status = isset($row['status']) ? (strtolower($row['status']) === 'active' ? 1 : 0) : null;
+
+        $product = null;
+        if (!empty($id) && is_numeric($id)) {
+            $product = Product::find((int) $id);
+        }
+        if (!$product && !empty($sku)) {
+            $product = Product::where('sku', $sku)->first();
+        }
+
+        if ($product) {
+            if ($quantity !== null && $quantity !== '') {
+                $product->quantity = (int) $quantity;
+                $product->stock_status = (int) $quantity > 0 ? 'in_stock' : 'out_of_stock';
+            }
+            if ($cost !== null && $cost !== '') {
+                $product->product_cost = (float) str_replace(',', '', (string) $cost);
+            }
+            if ($salePrice !== null && $salePrice !== '') {
+                $product->offer = (float) str_replace(',', '', (string) $salePrice);
+            }
+            if ($regularPrice !== null && $regularPrice !== '') {
+                $product->old_price = (float) str_replace(',', '', (string) $regularPrice);
+            }
+            if ($wholesalePrice !== null && $wholesalePrice !== '') {
+                $product->wholesale_price = (float) str_replace(',', '', (string) $wholesalePrice);
+            }
+            if ($status !== null) {
+                $product->status = $status;
+            }
+            if (!empty($title) && $title !== $product->title) {
+                $product->title = $title;
+            }
+
+            $product->save();
+
+            return [
+                'success' => true,
+                'action' => 'updated',
+                'product_id' => $product->id,
+                'product_title' => $product->title,
+                'quantity' => $product->quantity,
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'No matching product found by ID (' . $id . ') or SKU (' . $sku . ').',
+        ];
+    }
+
+    /**
      * Push a product stock/price update to the Google Sheet
      */
     public function pushProductToSheet(Product $product): bool

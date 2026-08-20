@@ -185,14 +185,13 @@
                                 </ul>
                             </div>
 
-                            <div>
+                            <div class="mb-3">
                                 <span class="badge bg-success me-1">Step 5</span> <strong>Upload Key & Sync</strong>
                                 <ul class="text-muted ps-3 mt-1 mb-0">
                                     <li>Paste your Google Sheet link/ID on the left.</li>
                                     <li>Choose the downloaded <code>.json</code> key file in <strong>Upload Service Account JSON Key File</strong>.</li>
                                     <li>Check <strong>Enable Live Background Sync</strong> & click <strong>Save Settings</strong>.</li>
                                     <li>Click <strong>Test Connection</strong> to verify, then <strong>Sync Now</strong>!</li>
-                                </ul>
                             </div>
                         </div>
                     </div>

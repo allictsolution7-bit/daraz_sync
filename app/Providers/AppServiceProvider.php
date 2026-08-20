@@ -54,6 +54,41 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\order::observe(\App\Observers\OrderObserver::class);
         \App\Models\order_item::observe(\App\Observers\OrderItemObserver::class);
         \App\Models\Product::observe(\App\Observers\ProductStockSyncObserver::class);
+
+        // Auto-run Google Sheet pull sync in background on page requests if interval elapsed
+        $this->autoRunGoogleSheetSync();
+    }
+
+    /**
+     * Auto-trigger Google Sheets sync every 2 minutes without needing a running artisan schedule worker
+     */
+    private function autoRunGoogleSheetSync(): void
+    {
+        if (app()->runningInConsole()) {
+            return;
+        }
+
+        try {
+            if (!\App\Models\BackupSetting::get('google_sheet_auto_sync_enabled', false)) {
+                return;
+            }
+
+            $lastRun = \Illuminate\Support\Facades\Cache::get('auto_google_sheet_sync_last_run');
+            if (!$lastRun || now()->diffInSeconds($lastRun) >= 120) {
+                \Illuminate\Support\Facades\Cache::put('auto_google_sheet_sync_last_run', now(), 300);
+                
+                dispatch(function () {
+                    try {
+                        $service = app(\App\Services\GoogleSheetSyncService::class);
+                        $service->pullAndSyncFromSheet();
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::error('Auto sheet sync error: ' . $e->getMessage());
+                    }
+                })->afterResponse();
+            }
+        } catch (\Throwable $e) {
+            // fail silently
+        }
     }
 
     /**
