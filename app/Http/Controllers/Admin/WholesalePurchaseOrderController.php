@@ -631,6 +631,11 @@ class WholesalePurchaseOrderController extends Controller
                         'admin_note' => "B2B Wholesale payout for #{$order->order_number} ({$order->quantity} pcs)",
                         'is_seen' => false,
                     ]);
+                } catch (\Throwable $we) {
+                    Log::warning("Could not record VendorWalletTransaction: " . $we->getMessage());
+                }
+            }
+
             // 3. Ensure product is copied / stock allocated in Buyer Store Catalog
             try {
                 $buyerLocalProductId = $order->buyer_local_product_id;
