@@ -162,11 +162,12 @@ class VendorPOSController extends Controller
             $products = $query->orderBy('products.title')
                 ->paginate($perPage, ['*'], 'page', $page);
 
+            $resellerPriceMode = $vendor->vendorSettings?->reseller_price_mode ?? 'markup';
             $markupPct = (float)($vendor->vendorSettings?->reseller_markup_pct ?? 10.00);
 
             $productCollection = $products->getCollection();
             return response()->json([
-                'products' => $productCollection->map(function($product) use ($markupPct) {
+                'products' => $productCollection->map(function($product) use ($markupPct, $resellerPriceMode) {
                     $computedStatus = $product->computed_stock_status ?? 'in_stock';
                     $isBackorder = ($product->stock_status ?? null) === 'on_backorder';
                     $inStock = $computedStatus !== 'out_of_stock' || $isBackorder;
@@ -183,7 +184,7 @@ class VendorPOSController extends Controller
 
                     if ($product->product_type === 'variable') {
                         $variations = $product->variationCombinations;
-                        $data['variations'] = $variations->map(function($combo) use ($product, $markupPct) {
+                        $data['variations'] = $variations->map(function($combo) use ($product, $markupPct, $resellerPriceMode) {
                             // Calculate reseller calculated price
                             $adminResellerPrice = (float)($combo->reseller_price ?? 0);
                             if ($adminResellerPrice <= 0) {
@@ -196,7 +197,11 @@ class VendorPOSController extends Controller
                                 }
                             }
                             $adminResellerPrice = ceil($adminResellerPrice);
-                            $finalPrice = ceil($adminResellerPrice + ($adminResellerPrice * ($markupPct / 100)));
+                            if ($resellerPriceMode === 'admin_selling_price') {
+                                $finalPrice = (float)($combo->offer_price > 0 ? $combo->offer_price : ($combo->regular_price ?? $adminResellerPrice));
+                            } else {
+                                $finalPrice = ceil($adminResellerPrice + ($adminResellerPrice * ($markupPct / 100)));
+                            }
 
                             return [
                                 'id' => $combo->id,
@@ -230,7 +235,11 @@ class VendorPOSController extends Controller
                             }
                         }
                         $adminResellerPrice = ceil($adminResellerPrice);
-                        $finalPrice = ceil($adminResellerPrice + ($adminResellerPrice * ($markupPct / 100)));
+                        if ($resellerPriceMode === 'admin_selling_price') {
+                            $finalPrice = (float)($product->offer > 0 ? $product->offer : ($product->old_price ?? $adminResellerPrice));
+                        } else {
+                            $finalPrice = ceil($adminResellerPrice + ($adminResellerPrice * ($markupPct / 100)));
+                        }
 
                         $quantity = (int) ($product->computed_quantity ?? $product->quantity ?? 0);
                         $data['price'] = $finalPrice;

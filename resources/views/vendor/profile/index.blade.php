@@ -663,26 +663,113 @@
                                 @method('PUT')
                                 
                                 @if(auth()->user()?->hasRole('reseller'))
+                                    @php
+                                        $currentMode = old('reseller_price_mode', $vendorSettings->reseller_price_mode ?? 'markup');
+                                    @endphp
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-12">
-                                            <div class="alert alert-info border-0 rounded-3 mb-4">
+                                            <div class="alert alert-info border-0 rounded-3 mb-3">
                                                 <i class="fas fa-info-circle me-1"></i>
-                                                Configure your markup percentage here. Your Reseller Price will be auto-calculated by adding this markup percentage on top of the base product price.
+                                                Choose how your selling prices and profits are calculated across your store and catalog.
                                             </div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-bold fs-7 text-dark mb-2">Select Selling Price Calculation Method</label>
+                                            <div class="row g-3">
+                                                <!-- Option 1: Markup Percentage -->
+                                                <div class="col-md-6">
+                                                    <div class="card h-100 border p-3 rounded-3 cursor-pointer price-mode-card {{ $currentMode === 'markup' ? 'border-primary bg-primary bg-opacity-10' : 'bg-light' }}" 
+                                                         onclick="selectPriceMode('markup')" style="cursor: pointer; transition: all 0.2s ease;">
+                                                        <div class="form-check d-flex align-items-start gap-2 m-0">
+                                                            <input class="form-check-input mt-1" type="radio" name="reseller_price_mode" id="mode_markup" value="markup" {{ $currentMode === 'markup' ? 'checked' : '' }} onchange="togglePriceModeFields()">
+                                                            <label class="form-check-label w-100" for="mode_markup" style="cursor: pointer;">
+                                                                <strong class="d-block text-dark fs-7 mb-1">Reseller Price Markup (%)</strong>
+                                                                <small class="text-muted d-block" style="font-size: 0.75rem; line-height: 1.4;">
+                                                                    Add a custom profit percentage on top of the base Reseller cost (e.g. 10%).
+                                                                </small>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Option 2: Admin Selling Price -->
+                                                <div class="col-md-6">
+                                                    <div class="card h-100 border p-3 rounded-3 cursor-pointer price-mode-card {{ $currentMode === 'admin_selling_price' ? 'border-primary bg-primary bg-opacity-10' : 'bg-light' }}" 
+                                                         onclick="selectPriceMode('admin_selling_price')" style="cursor: pointer; transition: all 0.2s ease;">
+                                                        <div class="form-check d-flex align-items-start gap-2 m-0">
+                                                            <input class="form-check-input mt-1" type="radio" name="reseller_price_mode" id="mode_admin_selling_price" value="admin_selling_price" {{ $currentMode === 'admin_selling_price' ? 'checked' : '' }} onchange="togglePriceModeFields()">
+                                                            <label class="form-check-label w-100" for="mode_admin_selling_price" style="cursor: pointer;">
+                                                                <strong class="d-block text-dark fs-7 mb-1">Admin Selling Price</strong>
+                                                                <small class="text-muted d-block" style="font-size: 0.75rem; line-height: 1.4;">
+                                                                    Use the Admin's standard Sale/Selling price directly. Profit is the difference from base cost.
+                                                                </small>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Markup Percentage Input (Only for Markup Mode) -->
+                                        <div class="col-md-6" id="markup_percentage_wrapper" style="{{ $currentMode === 'admin_selling_price' ? 'display: none;' : '' }}">
                                             <label class="form-label fw-semibold fs-7">Reseller Price Markup (%)</label>
-                                            <input type="number" 
-                                                   step="0.01" 
-                                                   name="reseller_markup_pct" 
-                                                   class="form-control fs-7" 
-                                                   value="{{ old('reseller_markup_pct', $vendorSettings->reseller_markup_pct ?? 10.00) }}"
-                                                   min="0"
-                                                   required>
-                                            <small class="text-muted fs-8">Markup added to product price for your Reseller selling price.</small>
+                                            <div class="input-group">
+                                                <input type="number" 
+                                                       step="0.01" 
+                                                       name="reseller_markup_pct" 
+                                                       id="reseller_markup_pct_input"
+                                                       class="form-control fs-7" 
+                                                       value="{{ old('reseller_markup_pct', $vendorSettings->reseller_markup_pct ?? 10.00) }}"
+                                                       min="0">
+                                                <span class="input-group-text bg-light text-muted font-weight-bold">%</span>
+                                            </div>
+                                            <small class="text-muted fs-8">Markup added to base product price for your Reseller selling price.</small>
+                                        </div>
+
+                                        <div class="col-md-12" id="admin_selling_price_info_wrapper" style="{{ $currentMode === 'admin_selling_price' ? '' : 'display: none;' }}">
+                                            <div class="p-3 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 text-success small d-flex align-items-center gap-2">
+                                                <i class="fas fa-check-circle fs-5"></i>
+                                                <span><strong>Admin Selling Price Mode Active:</strong> Your catalog selling prices will automatically match the Admin's Sale Price, and your profit is calculated directly from the Admin's price minus your reseller base price.</span>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    @push('scripts')
+                                    <script>
+                                        function selectPriceMode(mode) {
+                                            const radio = document.getElementById(mode === 'markup' ? 'mode_markup' : 'mode_admin_selling_price');
+                                            if (radio) {
+                                                radio.checked = true;
+                                                togglePriceModeFields();
+                                            }
+                                        }
+
+                                        function togglePriceModeFields() {
+                                            const isMarkup = document.getElementById('mode_markup')?.checked;
+                                            const markupWrapper = document.getElementById('markup_percentage_wrapper');
+                                            const adminInfoWrapper = document.getElementById('admin_selling_price_info_wrapper');
+                                            
+                                            // Update card styles
+                                            document.querySelectorAll('.price-mode-card').forEach(card => {
+                                                card.classList.remove('border-primary', 'bg-primary', 'bg-opacity-10');
+                                                card.classList.add('bg-light');
+                                            });
+
+                                            if (isMarkup) {
+                                                if (markupWrapper) markupWrapper.style.display = 'block';
+                                                if (adminInfoWrapper) adminInfoWrapper.style.display = 'none';
+                                                document.getElementById('mode_markup')?.closest('.price-mode-card')?.classList.add('border-primary', 'bg-primary', 'bg-opacity-10');
+                                                document.getElementById('mode_markup')?.closest('.price-mode-card')?.classList.remove('bg-light');
+                                            } else {
+                                                if (markupWrapper) markupWrapper.style.display = 'none';
+                                                if (adminInfoWrapper) adminInfoWrapper.style.display = 'block';
+                                                document.getElementById('mode_admin_selling_price')?.closest('.price-mode-card')?.classList.add('border-primary', 'bg-primary', 'bg-opacity-10');
+                                                document.getElementById('mode_admin_selling_price')?.closest('.price-mode-card')?.classList.remove('bg-light');
+                                            }
+                                        }
+                                    </script>
+                                    @endpush
                                 @else
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-12">

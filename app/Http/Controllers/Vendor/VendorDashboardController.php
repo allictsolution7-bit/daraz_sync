@@ -206,6 +206,7 @@ class VendorDashboardController extends Controller
             'old_price_markup_pct' => 'nullable|numeric|min:0',
             'wholesale_price_markup_pct' => 'nullable|numeric|min:0',
             'reseller_markup_pct' => 'nullable|numeric|min:0',
+            'reseller_price_mode' => 'nullable|string|in:markup,admin_selling_price',
             'return_policy_text' => 'nullable|string',
         ]);
 

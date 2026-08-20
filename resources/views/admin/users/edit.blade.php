@@ -247,7 +247,7 @@
                                 <label for="password" class="form-label font-weight-semibold text-dark small">New Password</label>
                                 <div class="input-icon-group position-relative">
                                     <i class="fas fa-key input-icon"></i>
-                                    <input type="password" class="form-control pe-5" id="password" name="password" placeholder="••••••••" oninput="checkPassStrength(this.value)">
+                                    <input type="password" class="form-control pe-5" id="password" name="password" autocomplete="new-password" placeholder="••••••••" oninput="checkPassStrength(this.value)">
                                     <i class="fas fa-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted" id="togglePasswordBtn" style="cursor: pointer;" onclick="togglePasswordVisibility('password', this)"></i>
                                 </div>
                                 <div class="mt-2">
@@ -258,7 +258,7 @@
                                 <label for="password_confirmation" class="form-label font-weight-semibold text-dark small">Confirm New Password</label>
                                 <div class="input-icon-group position-relative">
                                     <i class="fas fa-shield-alt input-icon"></i>
-                                    <input type="password" class="form-control pe-5" id="password_confirmation" name="password_confirmation" placeholder="••••••••">
+                                    <input type="password" class="form-control pe-5" id="password_confirmation" name="password_confirmation" autocomplete="new-password" placeholder="••••••••">
                                     <i class="fas fa-eye position-absolute top-50 end-0 translate-middle-y me-3 text-muted" onclick="togglePasswordVisibility('password_confirmation', this)"></i>
                                 </div>
                             </div>

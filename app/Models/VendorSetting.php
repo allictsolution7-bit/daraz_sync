@@ -52,6 +52,7 @@ class VendorSetting extends Model
         'wholesale_price_markup_pct',
         'is_consignment',
         'reseller_markup_pct',
+        'reseller_price_mode',
     ];
 
     protected $casts = [

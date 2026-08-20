@@ -291,6 +291,30 @@
     </div>
 @endif
 
+@php
+    $normalizeImagesArray = function($imgs) {
+        if (is_array($imgs)) {
+            return array_values(array_filter($imgs));
+        }
+        if (empty($imgs)) {
+            return [];
+        }
+        if (is_string($imgs)) {
+            $decoded = json_decode($imgs, true);
+            if (is_array($decoded)) {
+                return array_values(array_filter($decoded));
+            }
+            if (str_contains($imgs, ',')) {
+                return array_values(array_filter(array_map('trim', explode(',', $imgs))));
+            }
+            if (trim($imgs) !== '') {
+                return [trim($imgs)];
+            }
+        }
+        return [];
+    };
+@endphp
+
 <!-- Top Filter Panel -->
 <div class="card mb-4 shadow-sm border-0">
     <div class="card-body">
@@ -453,32 +477,61 @@
                                                 </td>
                                                 <td><strong>{{ $product->title }}</strong></td>
                                                 <td>
-                                                     @if(auth()->user()->hasRole('wholeseller'))
-                                                         @php
-                                                             $wholesalePrice = (float)($product->wholesale_price ?? 0);
-                                                             if ($wholesalePrice <= 0 && $product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
-                                                                 $wPrices = [];
-                                                                 foreach ($product->variationCombinations as $comb) {
-                                                                     $wp = $comb->wholesale_price > 0 ? $comb->wholesale_price : ($comb->offer_price ?? $comb->regular_price ?? 0);
-                                                                     if ($wp > 0) $wPrices[] = (float)$wp;
-                                                                 }
-                                                                 if (!empty($wPrices)) {
-                                                                     $wholesalePrice = min($wPrices);
-                                                                 }
-                                                             }
-                                                         @endphp
-                                                         <strong>৳{{ number_format($wholesalePrice, 2) }}</strong>
-                                                         @if($product->wholesaleTiers && $product->wholesaleTiers->isNotEmpty())
-                                                             <div class="mt-1" style="font-size: 0.7rem; line-height: 1.2;">
-                                                                 @foreach($product->wholesaleTiers as $tier)
-                                                                     <div class="text-secondary">Buy <strong>{{ $tier->min_quantity }}+</strong>: ৳{{ number_format($tier->price, 2) }}</div>
-                                                                 @endforeach
-                                                             </div>
-                                                         @endif
-                                                     @else
-                                                         ৳{{ number_format($product->price ?? $product->old_price, 2) }}
-                                                     @endif
-                                                 </td>
+                                                      @if(auth()->user()->hasRole('reseller'))
+                                                          @php
+                                                              $resellerPriceMode = auth()->user()?->vendorSettings?->reseller_price_mode ?? 'markup';
+                                                              $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
+                                                              $basePrice = (float)($product->reseller_price ?? 0);
+                                                              if ($basePrice <= 0) {
+                                                                  $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                                                                  $prodCost = (float)($product->product_cost ?? 0);
+                                                                  if ($prodCost > 0) {
+                                                                      $basePrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                                                                  } else {
+                                                                      $basePrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)));
+                                                                  }
+                                                              }
+                                                              if ($resellerPriceMode === 'admin_selling_price') {
+                                                                  $adminSale = (float)($product->offer > 0 ? $product->offer : ($product->old_price ?? 0));
+                                                                  $sellingPrice = $adminSale > 0 ? $adminSale : $basePrice;
+                                                              } else {
+                                                                  $sellingPrice = $basePrice + ceil($basePrice * ($markupPct / 100));
+                                                              }
+                                                              $profit = $sellingPrice - $basePrice;
+                                                          @endphp
+                                                          <strong class="text-dark">৳{{ number_format($basePrice, 2) }}</strong>
+                                                          <div class="mt-1" style="font-size: 0.72rem;">
+                                                              <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-1.5 py-0.5">
+                                                                  ৳{{ number_format($sellingPrice, 2) }}
+                                                              </span>
+                                                              <span class="text-warning fw-bold d-block mt-0.5">+৳{{ number_format($profit, 2) }} profit</span>
+                                                          </div>
+                                                      @elseif(auth()->user()->hasRole('wholeseller'))
+                                                          @php
+                                                              $wholesalePrice = (float)($product->wholesale_price ?? 0);
+                                                              if ($wholesalePrice <= 0 && $product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
+                                                                  $wPrices = [];
+                                                                  foreach ($product->variationCombinations as $comb) {
+                                                                      $wp = $comb->wholesale_price > 0 ? $comb->wholesale_price : ($comb->offer_price ?? $comb->regular_price ?? 0);
+                                                                      if ($wp > 0) $wPrices[] = (float)$wp;
+                                                                  }
+                                                                  if (!empty($wPrices)) {
+                                                                      $wholesalePrice = min($wPrices);
+                                                                  }
+                                                              }
+                                                          @endphp
+                                                          <strong>৳{{ number_format($wholesalePrice, 2) }}</strong>
+                                                          @if($product->wholesaleTiers && $product->wholesaleTiers->isNotEmpty())
+                                                              <div class="mt-1" style="font-size: 0.7rem; line-height: 1.2;">
+                                                                  @foreach($product->wholesaleTiers as $tier)
+                                                                      <div class="text-secondary">Buy <strong>{{ $tier->min_quantity }}+</strong>: ৳{{ number_format($tier->price, 2) }}</div>
+                                                                  @endforeach
+                                                              </div>
+                                                          @endif
+                                                      @else
+                                                          ৳{{ number_format($product->price ?? $product->old_price, 2) }}
+                                                      @endif
+                                                  </td>
                                                 <td>{{ $product->quantity ?? 0 }}</td>
                                                 <td>
                                                     @php
@@ -488,6 +541,25 @@
                                                                  || in_array($product->title, $allCopiedTitles ?? []);
                                                     @endphp
                                                     @if(auth()->user()->hasRole('reseller'))
+                                                        @php
+                                                            $resellerPriceMode = auth()->user()?->vendorSettings?->reseller_price_mode ?? 'markup';
+                                                            $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
+                                                            $baseResellerPrice = (float)($product->reseller_price ?? 0);
+                                                            if ($baseResellerPrice <= 0) {
+                                                                $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                                                                $prodCost = (float)($product->product_cost ?? 0);
+                                                                if ($prodCost > 0) {
+                                                                    $baseResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                                                                } else {
+                                                                    $baseResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)));
+                                                                }
+                                                            }
+                                                            if ($resellerPriceMode === 'admin_selling_price') {
+                                                                $calculatedSellingPrice = (float)($product->offer > 0 ? $product->offer : ($product->old_price ?? $baseResellerPrice));
+                                                            } else {
+                                                                $calculatedSellingPrice = $baseResellerPrice + ceil($baseResellerPrice * ($markupPct / 100));
+                                                            }
+                                                        @endphp
                                                         <div class="d-flex justify-content-end gap-2">
                                                             <button type="button" class="btn btn-gradient-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
                                                                     data-product="{{ json_encode([
@@ -500,20 +572,26 @@
                                                                         'description' => preg_replace('/<img[^>]*>/i', '', $product->description ?? ''),
                                                                         'short_description' => preg_replace('/<img[^>]*>/i', '', $product->short_description ?? ''),
                                                                         'old_price' => $product->old_price,
-                                                                        'offer' => $product->offer,
-                                                                        'reseller_price' => $product->reseller_price,
+                                                                        'offer' => $calculatedSellingPrice,
+                                                                        'reseller_price' => $baseResellerPrice,
                                                                         'sku' => $product->sku ?? '',
                                                                         'thumb_image' => asset('storage/' . $product->thumb_image),
-                                                                        'gallery_images' => array_map(fn($img) => asset('storage/' . $img), is_array($product->images) ? $product->images : (json_decode($product->images, true) ?: [])),
-                                                                        'variations' => $product->variationCombinations->map(function($comb) {
-                                                                            return $comb->combination_string . ': ৳' . number_format($comb->reseller_price ?? $comb->regular_price ?? 0, 2);
+                                                                        'gallery_images' => array_map(fn($img) => asset('storage/' . $img), $normalizeImagesArray($product->images)),
+                                                                        'variations' => $product->variationCombinations->map(function($comb) use ($resellerPriceMode, $markupPct) {
+                                                                            $combBase = (float)($comb->reseller_price > 0 ? $comb->reseller_price : ($comb->offer_price ?? $comb->regular_price ?? 0));
+                                                                            if ($resellerPriceMode === 'admin_selling_price') {
+                                                                                $combSelling = (float)($comb->offer_price > 0 ? $comb->offer_price : ($comb->regular_price ?? $combBase));
+                                                                            } else {
+                                                                                $combSelling = $combBase + ceil($combBase * ($markupPct / 100));
+                                                                            }
+                                                                            return $comb->combination_string . ': ৳' . number_format($combSelling, 2);
                                                                         })->toArray()
                                                                     ]) }}"
                                                                     onclick="copyProductContentFromBtn(this)">
                                                                 <i class="fas fa-copy"></i> Copy Info
                                                             </button>
                                                             <button type="button" class="btn btn-gradient-blue btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
-                                                                    onclick="downloadProductImages('{{ $product->id }}', '{{ addslashes($product->title) }}', '{{ asset('storage/' . $product->thumb_image) }}', {{ json_encode(array_map(fn($img) => asset('storage/' . $img), is_array($product->images) ? $product->images : (json_decode($product->images, true) ?: []))) }})">
+                                                                    onclick="downloadProductImages('{{ $product->id }}', '{{ addslashes($product->title) }}', '{{ asset('storage/' . $product->thumb_image) }}', {{ json_encode(array_map(fn($img) => asset('storage/' . $img), $normalizeImagesArray($product->images))) }})">
                                                                 <i class="fas fa-download"></i> Download Images
                                                             </button>
                                                         </div>
@@ -799,7 +877,7 @@
                              @endif
 
                              @if(auth()->user()->hasRole('reseller'))
-                                  <div class="mt-1">
+                                 <div class="mt-1">
                                       @php
                                            if ($product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
                                                $firstComb = $product->variationCombinations->first();
@@ -830,10 +908,25 @@
                                                }
                                            }
                                            
+                                           $resellerPriceMode = auth()->user()?->vendorSettings?->reseller_price_mode ?? 'markup';
                                            $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
-                                           $sellingPrice = $basePrice + ceil($basePrice * ($markupPct / 100));
+
+                                           if ($resellerPriceMode === 'admin_selling_price') {
+                                               if ($product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
+                                                   $firstComb = $product->variationCombinations->first();
+                                                   $adminSalePrice = (float)($firstComb->offer_price > 0 ? $firstComb->offer_price : ($firstComb->regular_price ?? 0));
+                                                   if ($adminSalePrice <= 0) {
+                                                       $adminSalePrice = (float)($product->offer > 0 ? $product->offer : ($product->old_price ?? 0));
+                                                   }
+                                               } else {
+                                                   $adminSalePrice = (float)($product->offer > 0 ? $product->offer : ($product->old_price ?? 0));
+                                               }
+                                               $sellingPrice = $adminSalePrice > 0 ? $adminSalePrice : $basePrice;
+                                           } else {
+                                               $sellingPrice = $basePrice + ceil($basePrice * ($markupPct / 100));
+                                           }
                                            $profit = $sellingPrice - $basePrice;
-                                       @endphp
+                                      @endphp
                                        
                                        <!-- Large price is the Reseller Cost -->
                                        <strong class="text-dark fs-6" title="Reseller Cost">৳{{ number_format($basePrice, 2) }}</strong>
@@ -854,7 +947,7 @@
                                   </div>
                              @endif
 
-                             @if(($source ?? 'my_products') === 'admin_products' || auth()->user()->hasRole('wholeseller') || auth()->user()->isVendorRetailer() || auth()->user()->hasRole('retailer'))
+                             @if(!auth()->user()->hasRole('reseller') && ((($source ?? 'my_products') === 'admin_products') || auth()->user()->hasRole('wholeseller') || auth()->user()->isVendorRetailer() || auth()->user()->hasRole('retailer')))
                                  <div class="mt-1">
                                      <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Wholesale Price</small>
                                      @php
@@ -955,6 +1048,25 @@
                                          || in_array($product->title, $allCopiedTitles ?? []);
                             @endphp
                             @if(auth()->user()->hasRole('reseller'))
+                                @php
+                                    $resellerPriceMode = auth()->user()?->vendorSettings?->reseller_price_mode ?? 'markup';
+                                    $markupPct = (float)(auth()->user()?->vendorSettings?->reseller_markup_pct ?? 10.00);
+                                    $baseResellerPrice = (float)($product->reseller_price ?? 0);
+                                    if ($baseResellerPrice <= 0) {
+                                        $resellerPct = (float)\App\Services\SettingsService::get('single_product', 'reseller_price_percent', 5);
+                                        $prodCost = (float)($product->product_cost ?? 0);
+                                        if ($prodCost > 0) {
+                                            $baseResellerPrice = $prodCost + ($prodCost * ($resellerPct / 100));
+                                        } else {
+                                            $baseResellerPrice = (float)($product->wholesale_price > 0 ? $product->wholesale_price : ($product->offer > 0 ? $product->offer : ($product->old_price ?? 0)));
+                                        }
+                                    }
+                                    if ($resellerPriceMode === 'admin_selling_price') {
+                                        $calculatedSellingPrice = (float)($product->offer > 0 ? $product->offer : ($product->old_price ?? $baseResellerPrice));
+                                    } else {
+                                        $calculatedSellingPrice = $baseResellerPrice + ceil($baseResellerPrice * ($markupPct / 100));
+                                    }
+                                @endphp
                                 <div class="d-flex justify-content-end gap-2">
                                     <button type="button" class="btn btn-gradient-success btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
                                             data-product="{{ json_encode([
@@ -967,20 +1079,26 @@
                                                 'description' => preg_replace('/<img[^>]*>/i', '', $product->description ?? ''),
                                                 'short_description' => preg_replace('/<img[^>]*>/i', '', $product->short_description ?? ''),
                                                 'old_price' => $product->old_price,
-                                                'offer' => $product->offer,
-                                                'reseller_price' => $product->reseller_price,
+                                                'offer' => $calculatedSellingPrice,
+                                                'reseller_price' => $baseResellerPrice,
                                                 'sku' => $product->sku ?? '',
                                                 'thumb_image' => asset('storage/' . $product->thumb_image),
-                                                'gallery_images' => array_map(fn($img) => asset('storage/' . $img), is_array($product->images) ? $product->images : (json_decode($product->images, true) ?: [])),
-                                                'variations' => $product->variationCombinations->map(function($comb) {
-                                                    return $comb->combination_string . ': ৳' . number_format($comb->reseller_price ?? $comb->regular_price ?? 0, 2);
+                                                'gallery_images' => array_map(fn($img) => asset('storage/' . $img), $normalizeImagesArray($product->images)),
+                                                'variations' => $product->variationCombinations->map(function($comb) use ($resellerPriceMode, $markupPct) {
+                                                    $combBase = (float)($comb->reseller_price > 0 ? $comb->reseller_price : ($comb->offer_price ?? $comb->regular_price ?? 0));
+                                                    if ($resellerPriceMode === 'admin_selling_price') {
+                                                        $combSelling = (float)($comb->offer_price > 0 ? $comb->offer_price : ($comb->regular_price ?? $combBase));
+                                                    } else {
+                                                        $combSelling = $combBase + ceil($combBase * ($markupPct / 100));
+                                                    }
+                                                    return $comb->combination_string . ': ৳' . number_format($combSelling, 2);
                                                 })->toArray()
                                             ]) }}"
                                             onclick="copyProductContentFromBtn(this)">
                                         <i class="fas fa-copy"></i> Copy Info
                                     </button>
                                     <button type="button" class="btn btn-gradient-blue btn-sm font-weight-bold d-inline-flex align-items-center gap-1.5 px-3 py-1.5" 
-                                            onclick="downloadProductImages('{{ $product->id }}', '{{ addslashes($product->title) }}', '{{ asset('storage/' . $product->thumb_image) }}', {{ json_encode(array_map(fn($img) => asset('storage/' . $img), is_array($product->images) ? $product->images : (json_decode($product->images, true) ?: []))) }})">
+                                            onclick="downloadProductImages('{{ $product->id }}', '{{ addslashes($product->title) }}', '{{ asset('storage/' . $product->thumb_image) }}', {{ json_encode(array_map(fn($img) => asset('storage/' . $img), $normalizeImagesArray($product->images))) }})">
                                         <i class="fas fa-download"></i> Download Images
                                     </button>
                                 </div>
@@ -1368,18 +1486,34 @@
     </div>
 </div>
 
-<!-- Info Alert -->
-@if(($source ?? 'my_products') === 'admin_products')
-<div class="alert alert-success mt-4">
-    <i class="fas fa-info-circle me-1"></i>
-    <strong>Parent Admin Catalog:</strong> Click <strong>"Copy to My Products"</strong> on any item to duplicate it into your store. Once copied, it becomes your product and you can edit details or sync it to Daraz.
+<!-- Bottom Guidance Information Card -->
+<div class="mb-5">
+    @if(($source ?? 'my_products') === 'admin_products')
+        <div class="card border-0 shadow-sm rounded-4 mt-4 p-3.5 d-flex flex-row align-items-center gap-3" style="background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%); border: 1px solid #bbf7d0 !important; border-left: 5px solid #10b981 !important;">
+            <div class="bg-success bg-opacity-15 text-success rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; background-color: rgba(16, 185, 129, 0.15);">
+                <i class="fas fa-store fs-5"></i>
+            </div>
+            <div>
+                <h6 class="mb-1 fw-bold" style="color: #065f46; font-size: 0.9rem;">Parent Admin Catalog Guide</h6>
+                <p class="mb-0 text-muted small" style="color: #047857 !important; line-height: 1.5;">
+                    Click <strong>"Copy to My Products"</strong> (or use <strong>"Copy Info"</strong> / <strong>"Download Images"</strong>) on any item to duplicate it into your store inventory. Once copied, it becomes your product and you can customize details or sync it to Daraz.
+                </p>
+            </div>
+        </div>
+    @elseif($products->isNotEmpty())
+        <div class="card border-0 shadow-sm rounded-4 mt-4 p-3.5 d-flex flex-row align-items-center gap-3" style="background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%); border: 1px solid #bae6fd !important; border-left: 5px solid #0284c7 !important;">
+            <div class="bg-info bg-opacity-15 text-info rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; background-color: rgba(14, 165, 233, 0.15);">
+                <i class="fas fa-info-circle fs-5"></i>
+            </div>
+            <div>
+                <h6 class="mb-1 fw-bold" style="color: #0369a1; font-size: 0.9rem;">Store Inventory Note</h6>
+                <p class="mb-0 text-muted small" style="color: #0284c7 !important; line-height: 1.5;">
+                    Products with <strong>"Pending"</strong> status are awaiting admin approval. Once approved, they will be visible on your storefront and ready to sync with connected sales channels.
+                </p>
+            </div>
+        </div>
+    @endif
 </div>
-@elseif($products->isNotEmpty())
-<div class="alert alert-info mt-4">
-    <i class="fas fa-info-circle me-1"></i>
-    <strong>Note:</strong> Products with "Pending" status are awaiting admin approval. Once approved, they will be visible on your store and syncable with Daraz.
-</div>
-@endif
 @endsection
 
 @push('scripts')
