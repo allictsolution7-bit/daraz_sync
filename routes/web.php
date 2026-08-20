@@ -326,6 +326,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     Route::put('/saas-tenants/{id}', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'update'])->name('saas-tenants.update');
     Route::delete('/saas-tenants/{id}', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'destroy'])->name('saas-tenants.destroy');
     Route::post('/saas-tenants/{id}/toggle-free-promotion', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'toggleFreePromotion'])->name('saas-tenants.toggle-free-promotion');
+    Route::post('/saas-tenants/{id}/reprovision', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'reprovision'])->name('saas-tenants.reprovision');
     Route::get('/saas-tenants/wholesale-products', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'wholesaleProducts'])->name('saas-tenants.wholesale-products');
 
     // Users Management

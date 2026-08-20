@@ -88,22 +88,63 @@ class GlobalProductService
                 $currentSubdomain = strtolower($parts[0]);
             }
         }
-        $activeStoreDb = config('database.connections.mysql.database');
-        if (!$currentSubdomain && is_string($activeStoreDb) && str_starts_with($activeStoreDb, 'purnobd_') && $activeStoreDb !== 'purnobd_central') {
-            $currentSubdomain = str_replace('purnobd_', '', $activeStoreDb);
+
+        // If not resolved from host, check if the authenticated user belongs to a specific tenant
+        if (!$currentSubdomain && $currentUser) {
+            $userTenant = SaaSTenant::where('is_active', true)
+                ->where(function($q) use ($currentUser) {
+                    if (!empty($currentUser->name)) {
+                        $q->where('subdomain', strtolower(preg_replace('/[^a-zA-Z0-9_-]/', '', $currentUser->name)))
+                          ->orWhere('name', $currentUser->name);
+                    }
+                    if (!empty($currentUser->email)) {
+                        $emailPrefix = explode('@', $currentUser->email)[0];
+                        $q->orWhere('subdomain', strtolower(preg_replace('/[^a-zA-Z0-9_-]/', '', $emailPrefix)));
+                    }
+                })
+                ->first();
+            if ($userTenant) {
+                $currentSubdomain = $userTenant->subdomain;
+            }
         }
 
-        // Retrieve local store catalog products to distinguish copied products vs original own products
-        $localProducts = Product::select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata')->get();
+        // If still not identified and user is superadmin on default host, default to master store 'sabbir'
+        if (!$currentSubdomain && $isSuperAdminUser) {
+            $currentSubdomain = 'sabbir';
+        }
 
+        // Determine viewer store database
+        $viewerDbName = null;
+        if ($currentSubdomain) {
+            $viewerTenant = SaaSTenant::where('subdomain', $currentSubdomain)->first();
+            $viewerDbName = $viewerTenant?->db_name ?: ('purnobd_' . $currentSubdomain);
+        } else {
+            $viewerDbName = config('database.connections.mysql.database');
+        }
+
+        // Retrieve local store catalog products for this viewer's store
         $localBySource = [];
         $localByTitle = [];
-        foreach ($localProducts as $lp) {
-            $cleanTitle = trim(strtolower($lp->title));
-            $localByTitle[$cleanTitle] = $lp;
-            if (!empty($lp->source_tenant_subdomain) && !empty($lp->source_product_id)) {
-                $localBySource[$lp->source_tenant_subdomain . '_' . $lp->source_product_id] = $lp;
+        try {
+            if ($viewerDbName && $viewerDbName !== config('database.connections.mysql.database')) {
+                $this->connectToTenantDatabase($viewerDbName);
+                $localProducts = DB::connection('tenant_temp')
+                    ->table('products')
+                    ->select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata')
+                    ->get();
+            } else {
+                $localProducts = Product::select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata')->get();
             }
+
+            foreach ($localProducts as $lp) {
+                $cleanTitle = trim(strtolower($lp->title));
+                $localByTitle[$cleanTitle] = $lp;
+                if (!empty($lp->source_tenant_subdomain) && !empty($lp->source_product_id)) {
+                    $localBySource[$lp->source_tenant_subdomain . '_' . $lp->source_product_id] = $lp;
+                }
+            }
+        } catch (\Throwable $lpEx) {
+            Log::warning("Could not load local products for viewer: " . $lpEx->getMessage());
         }
 
         // Fetch approved wholesale purchase orders for the current logged-in buyer
@@ -496,20 +537,8 @@ class GlobalProductService
                     $sourceKey = $tenant->subdomain . '_' . $prod->id;
                     $matchedLocal = $localBySource[$sourceKey] ?? ($localByTitle[trim(strtolower($prod->title))] ?? null);
                     
-                    // Determine if this product is the current admin's / store's own product
-                    $isOwnProduct = false;
-                    $tenantDbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
-                    
-                    if ($currentSubdomain && strtolower($tenant->subdomain) === strtolower($currentSubdomain)) {
-                        $isOwnProduct = true;
-                    } elseif ($activeStoreDb && ($activeStoreDb === $tenantDbName || $activeStoreDb === ('purnobd_' . $tenant->subdomain))) {
-                        $isOwnProduct = true;
-                    } elseif ($matchedLocal && empty($matchedLocal->source_tenant_subdomain) && empty($matchedLocal->copied_by_admin_id)) {
-                        // Original product created directly in local store
-                        $isOwnProduct = true;
-                    } elseif ($currentUserId && !empty($prod->created_by) && (int)$prod->created_by === (int)$currentUserId) {
-                        $isOwnProduct = true;
-                    }
+                    // Determine if this product is the current viewer's own store product
+                    $isOwnProduct = ($currentSubdomain && strtolower($tenant->subdomain) === strtolower($currentSubdomain));
 
                     if ($isOwnProduct) {
                         $storeStatusType = 'own_product';

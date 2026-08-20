@@ -1068,6 +1068,12 @@
         <!-- --sidebar-start-- -->
 
         @php
+        $isSuperAdminUser = (
+            (auth()->user() && method_exists(auth()->user(), 'hasRole') && (auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('super admin') || auth()->user()->hasRole('Super Admin'))) ||
+            (auth()->user()?->is_super_admin ?? false) ||
+            (auth()->user()?->role ?? '') === 'super_admin' ||
+            (auth()->user()?->email ?? '') === 'admin@purnobd.com'
+        );
         $coreShopActive = request()->is('admin/product*') || request()->is('admin/catalog-groups*') || request()->is('admin/catalog-tiers*') || request()->is('admin/catalog-levels*') || request()->is('admin/publishers-mark*') || request()->is('admin/stock-control*') || request()->is('admin/promo-pages*') || request()->is('admin/content-authors*') || request()->is('admin/content-publishers*') || request()->is('admin/feedback*') || request()->is('admin/bundle-deals*') || request()->is('admin/catalog*') || request()->is('admin/global-products*') || request()->is('admin/wholesale-orders*');
         $ordersSalesActive = request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/vendor-orders*') || request()->is('admin/reseller-orders*') || request()->is('admin/pending-queue*') || request()->is('admin/pos*') || request()->is('admin/customers*');
         $shippingDeliveryActive = request()->is('admin/shipping-basics*') || request()->is('admin/delivery-zones/rules*') || request()->is('admin/courier-connect*');
@@ -1176,6 +1182,182 @@
             <div class="menubar-content">
                 <nav class="animated bounceInDown">
                     <ul id="sidebar">
+                        @if($isSuperAdminUser)
+                        {{-- ========================================================================= --}}
+                        {{-- SUPER ADMIN DEDICATED PORTAL NAVIGATION                                  --}}
+                        {{-- ========================================================================= --}}
+                        <li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                            <a href="{{ route('admin.dashboard') }}">
+                                <span class="menu-content">
+                                    <i class="fas fa-chart-pie" style="color:#3b82f6;"></i>
+                                    Dashboard
+                                </span>
+                            </a>
+                        </li>
+
+                        <li class="{{ request()->routeIs('admin.chats.index') ? 'active' : '' }}">
+                            <a href="{{ route('admin.chats.index') }}" class="d-flex align-items-center justify-content-between">
+                                <span class="menu-content">
+                                    <i class="fas fa-comments" style="color:#10b981;"></i>
+                                    Chats
+                                </span>
+                                @if(($unreadChatCount ?? 0) > 0)
+                                    <span class="badge bg-danger rounded-circle text-white font-weight-bold px-2 py-0.5 ms-2" style="font-size: 0.65rem;">{{ $unreadChatCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+
+                        <li class="{{ request()->is('admin/support-tickets*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.support-tickets.index') }}" class="d-flex align-items-center justify-content-between">
+                                <span class="menu-content">
+                                    <i class="fas fa-headset" style="color:#ef4444;"></i>
+                                    Support Tickets
+                                </span>
+                                @if(($pendingTicketCount ?? 0) > 0)
+                                    <span class="badge bg-danger rounded-circle text-white font-weight-bold px-2 py-0.5 ms-2" style="font-size: 0.65rem;">{{ $pendingTicketCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+
+                        <li class="{{ request()->routeIs('admin.global-products.index') ? 'active' : '' }}">
+                            <a href="{{ route('admin.global-products.index') }}">
+                                <span class="menu-content">
+                                    <i class="fas fa-globe" style="color: #4f46e5;"></i>
+                                    Global Wholesale Products
+                                </span>
+                            </a>
+                        </li>
+
+                        <li class="{{ request()->routeIs('admin.wholesale-orders.*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.wholesale-orders.index') }}" class="d-flex align-items-center justify-content-between">
+                                <span class="menu-content">
+                                    <i class="fas fa-handshake" style="color: #059669;"></i>
+                                    Wholesale Orders
+                                </span>
+                                @if(($headerWholesaleCount ?? 0) > 0)
+                                    <span class="badge rounded-pill bg-warning text-dark font-weight-bold ms-2" style="font-size: 0.65rem; padding: 2px 6px;">{{ $headerWholesaleCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+
+                        <li class="{{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.customers.index') }}">
+                                <span class="menu-content">
+                                    <i class="fas fa-users" style="color:#1abc9c;"></i>
+                                    Customers
+                                </span>
+                            </a>
+                        </li>
+
+                        <!-- SYSTEM SETTINGS SECTION FOR SUPER ADMIN -->
+                        <li class="menu-section {{ $controlSystemActive ? 'expanded' : 'collapsed' }}">
+                            <a class="menu-section-toggle">
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-gears" style="color: #64748b; font-size: 13px;"></i>
+                                    System Settings
+                                </span>
+                                <i class="fas fa-chevron-right section-caret"></i>
+                            </a>
+                            <ul class="left-menu-dp menu-section-list" style="{{ $controlSystemActive ? 'display: block;' : 'display: none;' }}">
+                                <li class="{{ request()->routeIs('admin.saas-tenants.index') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.saas-tenants.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-network-wired" style="color:#3b82f6;"></i>
+                                            SaaS Tenant Domains
+                                        </span>
+                                    </a>
+                                </li>
+                                <li class="{{ request()->routeIs('admin.saas-tenants.wholesale-products') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.saas-tenants.wholesale-products') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-cubes" style="color:#f59e0b;"></i>
+                                            SaaS Wholesale Products
+                                        </span>
+                                    </a>
+                                </li>
+                                <li class="{{ request()->is('admin/team-members*') && request()->get('view') === 'packages' ? 'active' : '' }}">
+                                     <a href="{{ route('admin.users', ['view' => 'packages']) }}">
+                                         <span class="menu-content">
+                                             <i class="fas fa-boxes-packing" style="color:#10b981;"></i>
+                                             SaaS Packages & Pricing Config
+                                         </span>
+                                     </a>
+                                 </li>
+                                 <li class="{{ request()->is('admin/team-members*') && request()->get('view') !== 'packages' ? 'active' : '' }}">
+                                     <a href="{{ route('admin.users') }}">
+                                         <span class="menu-content">
+                                             <i class="fas fa-user-gear" style="color:#20c997;"></i>
+                                             Customers & Users
+                                         </span>
+                                     </a>
+                                 </li>
+                                 <li class="{{ request()->routeIs('admin.roles_permissions.*') ? 'active' : '' }}">
+                                     <a href="{{ route('admin.roles_permissions.index') }}">
+                                         <span class="menu-content">
+                                             <i class="fas fa-user-shield" style="color:#ff00a6;"></i>
+                                             Roles & Permissions
+                                         </span>
+                                     </a>
+                                 </li>
+                                 <li class="{{ request()->is('admin/extensions*') ? 'active' : '' }}">
+                                     <a href="{{ route('admin.modules.index') }}">
+                                         <span class="menu-content">
+                                             <i class="fas fa-puzzle-piece" style="color:#9c27b0;"></i>
+                                             Modules & Tools
+                                         </span>
+                                     </a>
+                                 </li>
+                                 <li class="sub-menu {{ request()->is('admin/config*') || request()->is('admin/socials*') ? 'active' : '' }}">
+                                     <a href="#">
+                                         <span class="menu-content">
+                                             <i class="fas fa-gears"></i>
+                                             Settings
+                                         </span>
+                                         <span class="fas fa-caret-down right"></span>
+                                     </a>
+                                     <ul class="left-menu-dp"
+                                         style="{{ request()->is('admin/config*') || request()->is('admin/socials*') ? 'display: block;' : '' }}">
+                                         <li class="{{ request()->routeIs('admin.settings.index') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.settings.index') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-sliders"></i>
+                                                     All Website Settings
+                                                 </span>
+                                             </a>
+                                         </li>
+                                         <li class="{{ request()->routeIs('admin.settings.payment-gateway') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.settings.payment-gateway') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-wallet"></i>
+                                                     Payment Gateway
+                                                 </span>
+                                             </a>
+                                         </li>
+                                         <li class="{{ request()->routeIs('admin.verification.*') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.verification.index') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-key"></i>
+                                                     License Management
+                                                 </span>
+                                             </a>
+                                         </li>
+                                         <li class="{{ request()->routeIs('admin.updates.*') ? 'active' : '' }}">
+                                             <a href="{{ route('admin.updates.index') }}">
+                                                 <span class="menu-content">
+                                                     <i class="fas fa-rotate"></i>
+                                                     System Updates
+                                                 </span>
+                                             </a>
+                                         </li>
+                                     </ul>
+                                 </li>
+                            </ul>
+                        </li>
+
+                        @else
+                        {{-- ========================================================================= --}}
+                        {{-- STORE ADMIN / MANAGER / STAFF NAVIGATION                                 --}}
+                        {{-- ========================================================================= --}}
                         @can('dashboard.view')
                         <li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                             <a href="{{ route('admin.dashboard') }}">
@@ -2353,6 +2535,7 @@
                                 @endcan
                             </ul>
                         </li>
+                        @endif
                         @endif
 
                     </ul>

@@ -11,9 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('landing_page_sections')) {
+            return;
+        }
+
         Schema::table('landing_page_sections', function (Blueprint $table) {
-            // Add badge_image field for hero section
-            $table->string('badge_image')->nullable()->after('hero_video_url');
+            if (!Schema::hasColumn('landing_page_sections', 'badge_image')) {
+                // Add badge_image field for hero section
+                $table->string('badge_image')->nullable()->after('hero_video_url');
+            }
         });
     }
 

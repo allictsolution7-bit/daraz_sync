@@ -173,6 +173,23 @@ class SaaSTenantController extends Controller
     }
 
     /**
+     * Re-provision or repair a tenant's database schema.
+     */
+    public function reprovision($id)
+    {
+        $tenant = SaaSTenant::findOrFail($id);
+        try {
+            $provisioner = new \App\Services\TenantProvisioningService();
+            $provisioner->reprovisionExisting($tenant, auth()->user());
+
+            return redirect()->route('admin.saas-tenants.index')->with('success', "Tenant database '{$tenant->name}' provisioned & synchronized with all tables successfully!");
+        } catch (\Throwable $e) {
+            Log::error("Tenant reprovisioning failed: " . $e->getMessage());
+            return redirect()->route('admin.saas-tenants.index')->with('error', 'Failed to provision tenant database: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * View all wholeselling products from all tenants.
      */
     public function wholesaleProducts(Request $request)

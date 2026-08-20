@@ -11,10 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('landing_page_sections')) {
+            return;
+        }
+
         Schema::table('landing_page_sections', function (Blueprint $table) {
-            // Add badge width fields for hero section
-            $table->integer('badge_desktop_width')->nullable()->after('badge_image')->default(100);
-            $table->integer('badge_mobile_width')->nullable()->after('badge_desktop_width')->default(80);
+            if (!Schema::hasColumn('landing_page_sections', 'badge_desktop_width')) {
+                // Add badge width fields for hero section
+                $table->integer('badge_desktop_width')->nullable()->after('badge_image')->default(100);
+                $table->integer('badge_mobile_width')->nullable()->after('badge_desktop_width')->default(80);
+            }
         });
     }
 

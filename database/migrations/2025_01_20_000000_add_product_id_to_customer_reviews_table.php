@@ -11,16 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('customer_reviews')) {
+            return;
+        }
+
         Schema::table('customer_reviews', function (Blueprint $table) {
-            $table->unsignedBigInteger('product_id')->nullable()->after('id');
-            $table->unsignedBigInteger('user_id')->nullable()->after('product_id');
-            $table->string('reviewer_email')->nullable()->after('reviewer_name');
-            $table->json('review_images')->nullable()->after('review_text');
-            $table->boolean('is_verified_purchase')->default(false)->after('is_active');
-            
-            // Add foreign key constraints
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            if (!Schema::hasColumn('customer_reviews', 'product_id')) {
+                $table->unsignedBigInteger('product_id')->nullable()->after('id');
+                $table->unsignedBigInteger('user_id')->nullable()->after('product_id');
+                $table->string('reviewer_email')->nullable()->after('reviewer_name');
+                $table->json('review_images')->nullable()->after('review_text');
+                $table->boolean('is_verified_purchase')->default(false)->after('is_active');
+                
+                // Add foreign key constraints
+                $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            }
         });
     }
 

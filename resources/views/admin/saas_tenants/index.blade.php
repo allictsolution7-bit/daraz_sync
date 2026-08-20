@@ -129,9 +129,17 @@
                                             <i class="fas fa-check-circle"></i> Connected ({{ $tenant->product_count }} products)
                                         </span>
                                     @else
-                                        <span class="text-danger small d-flex align-items-center gap-1" style="font-size: 11px; font-weight: 600;" title="{{ $tenant->db_error_message ?? 'Connection failed' }}">
-                                            <i class="fas fa-exclamation-triangle"></i> Not Connected
-                                        </span>
+                                        <div class="d-flex align-items-center gap-1.5 mt-0.5">
+                                            <span class="text-danger small d-flex align-items-center gap-1" style="font-size: 11px; font-weight: 600;" title="{{ $tenant->db_error_message ?? 'Connection failed' }}">
+                                                <i class="fas fa-exclamation-triangle"></i> Not Connected
+                                            </span>
+                                            <form action="{{ route('admin.saas-tenants.reprovision', $tenant->id) }}" method="POST" class="d-inline m-0">
+                                                @csrf
+                                                <button type="submit" class="btn btn-xs btn-outline-primary py-0 px-1.5 rounded-2" style="font-size: 10px; font-weight: 600;" title="Provision all tables & sync database">
+                                                    <i class="fas fa-sync-alt me-0.5"></i> Provision DB
+                                                </button>
+                                            </form>
+                                        </div>
                                     @endif
                                 </div>
                             </td>
@@ -172,16 +180,22 @@
                                 @endif
                             </td>
                             <td class="text-end pe-4">
+                                <form action="{{ route('admin.saas-tenants.reprovision', $tenant->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Synchronize and provision all database tables and settings for this tenant?');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-light border-0 me-1 rounded-3" style="background-color: #e0f2fe; color: #0369a1;" title="Sync & Provision Database Tables">
+                                        <i class="fas fa-database me-1"></i> Sync DB
+                                    </button>
+                                </form>
                                 <a href="{{ route('admin.saas-tenants.wholesale-products', ['tenant_id' => $tenant->id]) }}" class="btn btn-sm btn-light border-0 me-1 rounded-3" style="background-color: #e0e7ff; color: #3730a3;" title="View Products">
                                     <i class="fas fa-boxes me-1"></i> Products
                                 </a>
-                                <button type="button" class="btn btn-sm btn-light border-0 me-1 rounded-3" data-bs-toggle="modal" data-bs-target="#editTenantModal{{ $tenant->id }}" style="background-color: #f1f5f9; color: #475569;">
+                                <button type="button" class="btn btn-sm btn-light border-0 me-1 rounded-3" data-bs-toggle="modal" data-bs-target="#editTenantModal{{ $tenant->id }}" style="background-color: #f1f5f9; color: #475569;" title="Edit Subdomain">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <form action="{{ route('admin.saas-tenants.destroy', $tenant->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this subdomain? This won\'t delete the actual tenant database, but will remove it from the superadmin listing.');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-light border-0 text-danger rounded-3" style="background-color: #fef2f2;">
+                                    <button type="submit" class="btn btn-sm btn-light border-0 text-danger rounded-3" style="background-color: #fef2f2;" title="Delete Subdomain Entry">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>
