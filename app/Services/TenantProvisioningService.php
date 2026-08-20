@@ -153,6 +153,17 @@ class TenantProvisioningService
                 'delayed_event_settings',
                 'cities',
                 'delivery_locations',
+                'product_categories',
+                'sub_categories',
+                'third_categories',
+                'brands',
+                'sliders',
+                'banners',
+                'customer_reviews',
+                'activities',
+                'menus',
+                'menu_items',
+                'pages',
                 'migrations',
             ];
 
@@ -206,7 +217,7 @@ class TenantProvisioningService
     }
 
     /**
-     * Seed initial roles, permissions, settings, and admin user.
+     * Seed initial roles, permissions, settings, sliders, reviews, and admin user.
      */
     protected function seedInitialData(string $name, $adminUser = null): void
     {
@@ -223,38 +234,139 @@ class TenantProvisioningService
             }
 
             // Create or sync the Tenant Admin user in the tenant's users table
-            if ($adminUser) {
-                $email = is_object($adminUser) ? $adminUser->email : ($adminUser['email'] ?? null);
-                $phone = is_object($adminUser) ? $adminUser->phone : ($adminUser['phone'] ?? null);
-                $password = is_object($adminUser) ? $adminUser->password : ($adminUser['password'] ?? Hash::make('12345678'));
-                $userName = is_object($adminUser) ? $adminUser->name : ($adminUser['name'] ?? $name);
+            $email = is_object($adminUser) ? $adminUser->email : ($adminUser['email'] ?? null);
+            $phone = is_object($adminUser) ? $adminUser->phone : ($adminUser['phone'] ?? null);
+            $password = is_object($adminUser) ? $adminUser->password : ($adminUser['password'] ?? Hash::make('12345678'));
+            $userName = is_object($adminUser) ? $adminUser->name : ($adminUser['name'] ?? $name);
 
-                if (!empty($email)) {
-                    $existingUser = DB::connection('tenant_temp')->table('users')->where('email', $email)->first();
-                    if (!$existingUser) {
-                        $userId = DB::connection('tenant_temp')->table('users')->insertGetId([
-                            'name' => $userName,
-                            'email' => $email,
-                            'phone' => $phone,
-                            'password' => $password,
-                            'otp_verified' => 1,
-                            'created_at' => $now,
-                            'updated_at' => $now,
+            if (!empty($email)) {
+                $existingUser = DB::connection('tenant_temp')->table('users')->where('email', $email)->first();
+                if (!$existingUser) {
+                    $userId = DB::connection('tenant_temp')->table('users')->insertGetId([
+                        'name' => $userName,
+                        'email' => $email,
+                        'phone' => $phone,
+                        'password' => $password,
+                        'otp_verified' => 1,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+
+                    // Assign super_admin / admin role in tenant_temp
+                    $adminRole = DB::connection('tenant_temp')->table('roles')->where('name', 'super_admin')->first()
+                        ?: DB::connection('tenant_temp')->table('roles')->where('name', 'admin')->first();
+
+                    if ($adminRole && $userId) {
+                        DB::connection('tenant_temp')->table('model_has_roles')->updateOrInsert([
+                            'role_id' => $adminRole->id,
+                            'model_type' => 'App\\Models\\User',
+                            'model_id' => $userId,
                         ]);
-
-                        // Assign super_admin / admin role in tenant_temp
-                        $adminRole = DB::connection('tenant_temp')->table('roles')->where('name', 'super_admin')->first()
-                            ?: DB::connection('tenant_temp')->table('roles')->where('name', 'admin')->first();
-
-                        if ($adminRole && $userId) {
-                            DB::connection('tenant_temp')->table('model_has_roles')->updateOrInsert([
-                                'role_id' => $adminRole->id,
-                                'model_type' => 'App\\Models\\User',
-                                'model_id' => $userId,
-                            ]);
-                        }
                     }
                 }
+            }
+
+            // Ensure Default Sliders in Tenant Database
+            try {
+                if (DB::connection('tenant_temp')->table('sliders')->count() == 0) {
+                    DB::connection('tenant_temp')->table('sliders')->insert([
+                        [
+                            'title' => 'Welcome to ' . $name,
+                            'description' => 'Discover our exclusive range of high-quality products designed for your comfort and style.',
+                            'button_text' => 'Shop Now',
+                            'button_url' => '/shop',
+                            'image' => 'sliders/vVV0cwK97XSfpTwKjDFLWK47JN1ug2JCzrVnnJeE.webp',
+                            'overlay_color' => 'rgba(0, 0, 0, 0.4)',
+                            'position' => 1,
+                            'status' => 1,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ],
+                        [
+                            'title' => 'Trending Collections',
+                            'description' => 'Explore our latest arrivals and premium selections tailored just for you.',
+                            'button_text' => 'Explore More',
+                            'button_url' => '/shop',
+                            'image' => 'sliders/D3t6TPKxOuda0FQZDc1aaOxqOOG0jTKd4i58m5bS.webp',
+                            'overlay_color' => 'rgba(0, 0, 0, 0.35)',
+                            'position' => 2,
+                            'status' => 1,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ]
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Slider initial seeding warning: " . $e->getMessage());
+            }
+
+            // Ensure Default Customer Reviews in Tenant Database
+            try {
+                if (DB::connection('tenant_temp')->table('customer_reviews')->count() == 0) {
+                    DB::connection('tenant_temp')->table('customer_reviews')->insert([
+                        [
+                            'reviewer_name' => 'Rafiqul Islam',
+                            'reviewer_email' => 'rafiq@example.com',
+                            'reviewer_image' => 'https://randomuser.me/api/portraits/men/32.jpg',
+                            'review_date' => now()->subDays(5)->toDateString(),
+                            'rating' => 5,
+                            'product_name' => 'Premium Collection',
+                            'product_image' => 'https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+                            'review_text' => 'The quality of the product is exceptional. The fit is perfect and the design is elegant. Highly recommended!',
+                            'is_active' => 1,
+                            'is_verified_purchase' => 1,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ],
+                        [
+                            'reviewer_name' => 'Tanvir Ahmed',
+                            'reviewer_email' => 'tanvir@example.com',
+                            'reviewer_image' => 'https://randomuser.me/api/portraits/men/44.jpg',
+                            'review_date' => now()->subDays(2)->toDateString(),
+                            'rating' => 5,
+                            'product_name' => 'Exclusive Collection',
+                            'product_image' => 'https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+                            'review_text' => 'Fast delivery and very good packaging. Product matches the description exactly.',
+                            'is_active' => 1,
+                            'is_verified_purchase' => 1,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ]
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Customer review initial seeding warning: " . $e->getMessage());
+            }
+
+            // Customize Tenant Site Settings
+            try {
+                $settingsToUpdate = [
+                    ['group' => 'general', 'key' => 'site_name', 'value' => $name],
+                    ['group' => 'general', 'key' => 'site_title', 'value' => $name],
+                    ['group' => 'general', 'key' => 'company_name', 'value' => $name],
+                    ['group' => 'general', 'key' => 'top_header_bar_text', 'value' => 'Welcome to ' . $name],
+                    ['group' => 'seo', 'key' => 'meta_title', 'value' => $name . ' - Online Store'],
+                ];
+
+                if (!empty($email)) {
+                    $settingsToUpdate[] = ['group' => 'general', 'key' => 'top_header_bar_email', 'value' => $email];
+                    $settingsToUpdate[] = ['group' => 'general', 'key' => 'contact_email', 'value' => $email];
+                    $settingsToUpdate[] = ['group' => 'general', 'key' => 'contact_support_email', 'value' => $email];
+                }
+
+                if (!empty($phone)) {
+                    $settingsToUpdate[] = ['group' => 'general', 'key' => 'top_header_bar_phone', 'value' => $phone];
+                    $settingsToUpdate[] = ['group' => 'general', 'key' => 'contact_phone', 'value' => $phone];
+                }
+
+                foreach ($settingsToUpdate as $st) {
+                    DB::connection('tenant_temp')->table('site_settings')->updateOrInsert(
+                        ['group' => $st['group'], 'key' => $st['key']],
+                        ['value' => $st['value'], 'updated_at' => $now]
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Site settings customization warning: " . $e->getMessage());
             }
         } catch (\Throwable $e) {
             Log::warning("Initial seeding for tenant database had warning: " . $e->getMessage());

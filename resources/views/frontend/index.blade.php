@@ -828,7 +828,7 @@
                                 {{-- Fallback slide if no sliders are available --}}
                                 <div class="slide">
                                     <div class="slide-image">
-                                        <img src="{{ asset('banner/Thikana Benapole.jpg') }}" alt="Welcome to Our Store"
+                                        <img src="{{ asset('sliders/vVV0cwK97XSfpTwKjDFLWK47JN1ug2JCzrVnnJeE.webp') }}" alt="Welcome to Our Store"
                                             loading="eager" width="1340" height="550">
                                         <div class="slide-overlay"></div>
                                         <div class="slide-content">

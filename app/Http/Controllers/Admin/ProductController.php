@@ -1810,14 +1810,38 @@ class ProductController extends Controller
             'Expires' => '0',
         ];
 
-        $callback = function() use ($query) {
+        return response()->streamDownload(function() use ($query) {
+            // Clear any active output buffers to ensure BOM is written at exact byte 0
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
             $file = fopen('php://output', 'w');
             
             // Output UTF-8 BOM for full Unicode/Bangla compatibility in Excel and spreadsheet viewers
-            fputs($file, "\xEF\xBB\xBF");
+            fwrite($file, "\xEF\xBB\xBF");
+
+            // Helper function to clean text strings
+            $cleanText = function(?string $text): string {
+                if ($text === null || $text === '') {
+                    return '';
+                }
+                $text = strip_tags($text);
+                $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $text = str_replace(["\xc2\xa0", '&nbsp;'], ' ', $text);
+                $text = str_replace(
+                    ['“', '”', '‘', '’', '`', '–', '—', '…', '•', '⦁', '●', '▪', '✔', '✓', '✨', '⭐', '🛡', '📦'],
+                    ['"', '"', "'", "'", "'", '-', '-', '...', '-', '-', '-', '-', '', '', '', '', '', ''],
+                    $text
+                );
+                // Strip all emojis and 4-byte/3-byte miscellaneous symbols
+                $text = preg_replace('/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FE0F}\x{1F1E0}-\x{1F1FF}]/u', '', $text);
+                $text = preg_replace("/[ \t]+/", ' ', $text);
+                return trim($text);
+            };
 
             // Helper closure to sanitize and clean HTML/base64 junk from descriptions
-            $cleanHtml = function(?string $html): string {
+            $cleanHtml = function(?string $html) use ($cleanText): string {
                 if (empty($html)) {
                     return '';
                 }
@@ -1832,7 +1856,7 @@ class ProductController extends Controller
                 // 3. Convert block level elements to line breaks and readable bullets
                 $clean = preg_replace('/<\/(p|div|h[1-6]|tr|table|article|section)>/i', "\n", $clean);
                 $clean = preg_replace('/<br\s*\/?>/i', "\n", $clean);
-                $clean = preg_replace('/<li[^>]*>/i', "• ", $clean);
+                $clean = preg_replace('/<li[^>]*>/i', "- ", $clean);
                 $clean = preg_replace('/<\/li>/i', "\n", $clean);
                 $clean = preg_replace('/<\/t[dh]>/i', " | ", $clean);
 
@@ -1841,9 +1865,17 @@ class ProductController extends Controller
 
                 // 5. Decode HTML entities (e.g. &amp;, &quot;, &nbsp;)
                 $clean = html_entity_decode($clean, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                $clean = str_replace("\xc2\xa0", ' ', $clean); // Non-breaking space
+                $clean = str_replace(["\xc2\xa0", '&nbsp;'], ' ', $clean);
 
-                // 6. Clean whitespace and excess blank lines
+                // 6. Replace special quotes, dashes, bullets, and emojis
+                $clean = str_replace(
+                    ['“', '”', '‘', '’', '`', '–', '—', '…', '•', '⦁', '●', '▪', '✔', '✓', '✨', '⭐', '🛡', '📦'],
+                    ['"', '"', "'", "'", "'", '-', '-', '...', '-', '-', '-', '-', '', '', '', '', '', ''],
+                    $clean
+                );
+                $clean = preg_replace('/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FE0F}\x{1F1E0}-\x{1F1FF}]/u', '', $clean);
+
+                // 7. Clean whitespace and excess blank lines
                 $clean = preg_replace("/[ \t]+/", ' ', $clean);
                 $clean = preg_replace("/\n\s*\n\s*\n+/", "\n\n", $clean);
                 $clean = trim($clean);
@@ -1909,7 +1941,7 @@ class ProductController extends Controller
             ]);
 
             // Stream chunked products for performance and low memory footprint
-            $query->chunk(100, function($products) use ($file, $cleanHtml) {
+            $query->chunk(100, function($products) use ($file, $cleanHtml, $cleanText) {
                 foreach ($products as $product) {
                     // Images
                     $mainImageUrl = '';
@@ -1917,12 +1949,11 @@ class ProductController extends Controller
                         $mainImageUrl = str_starts_with($product->thumb_image, 'http') ? $product->thumb_image : url('storage/' . ltrim($product->thumb_image, '/'));
                     }
 
-                    // Excel/Sheets formulas to render actual image and clickable link in spreadsheet
-                    $excelImageFormula = '';
+                    // Excel/Sheets image link and clickable hyperlink in spreadsheet
+                    $excelImageFormula = $mainImageUrl;
                     $excelHyperlink = '';
                     if (!empty($mainImageUrl)) {
                         $escapedUrl = str_replace('"', '""', $mainImageUrl);
-                        $excelImageFormula = '=IMAGE("' . $escapedUrl . '")';
                         $excelHyperlink = '=HYPERLINK("' . $escapedUrl . '", "Open Photo")';
                     }
 
@@ -1942,21 +1973,22 @@ class ProductController extends Controller
                     $cleanDesc = $cleanHtml($product->description);
 
                     // Categories
-                    $primaryCat = $product->category ? $product->category->name : '';
-                    $primarySubCat = $product->subCategory ? $product->subCategory->name : '';
-                    $thirdCats = ($product->thirdCategories && $product->thirdCategories->isNotEmpty()) ? $product->thirdCategories->pluck('name')->implode(', ') : '';
-                    $allCats = $product->getAllCategories()->pluck('name')->implode(', ');
+                    $primaryCat = $product->category ? $cleanText($product->category->name) : '';
+                    $primarySubCat = $product->subCategory ? $cleanText($product->subCategory->name) : '';
+                    $thirdCats = ($product->thirdCategories && $product->thirdCategories->isNotEmpty()) ? $cleanText($product->thirdCategories->pluck('name')->implode(', ')) : '';
+                    $allCats = $cleanText($product->getAllCategories()->pluck('name')->implode(', '));
+                    $brandName = $product->brand ? $cleanText($product->brand->name) : '';
 
                     // Book info
                     $book = $product->book;
-                    $bookEdition = $book ? ($book->edition ?? '') : '';
-                    $bookIsbn = $book ? ($book->isbn ?? '') : '';
-                    $bookLang = $book ? ($book->language ?? '') : '';
+                    $bookEdition = $book ? $cleanText($book->edition ?? '') : '';
+                    $bookIsbn = $book ? $cleanText($book->isbn ?? '') : '';
+                    $bookLang = $book ? $cleanText($book->language ?? '') : '';
                     $bookPages = $book ? ($book->pages ?? '') : '';
-                    $bookCover = $book ? ($book->cover ?? '') : '';
-                    $bookCountry = $book ? ($book->country ?? '') : '';
-                    $bookWriters = ($book && $book->writers && $book->writers->isNotEmpty()) ? $book->writers->pluck('name')->implode(', ') : '';
-                    $bookPublisher = ($book && $book->publisher) ? $book->publisher->name : '';
+                    $bookCover = $book ? $cleanText($book->cover ?? '') : '';
+                    $bookCountry = $book ? $cleanText($book->country ?? '') : '';
+                    $bookWriters = ($book && $book->writers && $book->writers->isNotEmpty()) ? $cleanText($book->writers->pluck('name')->implode(', ')) : '';
+                    $bookPublisher = ($book && $book->publisher) ? $cleanText($book->publisher->name) : '';
 
                     // Prices and percentages
                     $oldPrice = !is_null($product->old_price) ? (float)$product->old_price : null;
@@ -1992,7 +2024,7 @@ class ProductController extends Controller
                         $vArr = [];
                         foreach ($product->variations as $var) {
                             $opts = ($var->options && $var->options->isNotEmpty()) ? $var->options->pluck('name')->implode(', ') : '';
-                            $vArr[] = $var->name . ' (' . $opts . ')';
+                            $vArr[] = $cleanText($var->name) . ' (' . $cleanText($opts) . ')';
                         }
                         $variationsListStr = implode(' | ', $vArr);
                     }
@@ -2002,7 +2034,7 @@ class ProductController extends Controller
                         $combRows = [];
                         foreach ($product->variationCombinations as $comb) {
                             $cName = $comb->display_name ?: (is_array($comb->getOptionNamesArray()) ? implode('/', $comb->getOptionNamesArray()) : ($comb->combination_key ?? ''));
-                            $cParts = ['Options: ' . $cName];
+                            $cParts = ['Options: ' . $cleanText($cName)];
                             if ($comb->sku) $cParts[] = 'SKU: ' . $comb->sku;
                             if (!is_null($comb->regular_price)) $cParts[] = 'Reg Price: ' . number_format((float)$comb->regular_price, 2);
                             if (!is_null($comb->offer_price)) {
@@ -2034,9 +2066,9 @@ class ProductController extends Controller
 
                     // SEO
                     $seo = $product->formatted_seo ?? [];
-                    $seoTitle = $seo['meta_title'] ?? '';
-                    $seoDesc = $seo['meta_description'] ?? '';
-                    $seoKeywords = $seo['meta_keywords'] ?? '';
+                    $seoTitle = $cleanText($seo['meta_title'] ?? '');
+                    $seoDesc = $cleanText($seo['meta_description'] ?? '');
+                    $seoKeywords = $cleanText($seo['meta_keywords'] ?? '');
 
                     // Digital File
                     $digitalFileUrl = '';
@@ -2048,7 +2080,7 @@ class ProductController extends Controller
                         $product->id,
                         $excelImageFormula,
                         $excelHyperlink,
-                        $product->title,
+                        $cleanText($product->title),
                         $product->slug,
                         $product->sku,
                         $product->product_type,
@@ -2058,7 +2090,7 @@ class ProductController extends Controller
                         $primarySubCat,
                         $thirdCats,
                         $allCats,
-                        $product->brand ? $product->brand->name : '',
+                        $brandName,
                         !is_null($cost) ? number_format($cost, 2, '.', '') : '',
                         !is_null($offerPrice) ? number_format($offerPrice, 2, '.', '') : '',
                         !is_null($oldPrice) ? number_format($oldPrice, 2, '.', '') : '',
@@ -2073,7 +2105,7 @@ class ProductController extends Controller
                         $product->return_period ?? 0,
                         $cleanShortDesc,
                         $cleanDesc,
-                        $product->tags,
+                        $cleanText($product->tags),
                         $mainImageUrl,
                         $galleryUrlsStr,
                         $product->video_url,
@@ -2103,9 +2135,7 @@ class ProductController extends Controller
             });
 
             fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        }, $filename, $headers);
     }
 
     public function search(Request $request)

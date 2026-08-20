@@ -431,10 +431,71 @@ class OthersController extends Controller
             ->orderBy('position', 'asc')
             ->get();
 
+        if ($sliders->isEmpty()) {
+            try {
+                $siteName = SettingsService::get('general', 'site_name', 'Our Store');
+                Slider::create([
+                    'title' => 'Welcome to ' . $siteName,
+                    'description' => 'Discover our exclusive range of high-quality products designed for your comfort and style.',
+                    'button_text' => 'Shop Now',
+                    'button_url' => '/shop',
+                    'image' => 'sliders/vVV0cwK97XSfpTwKjDFLWK47JN1ug2JCzrVnnJeE.webp',
+                    'overlay_color' => 'rgba(0, 0, 0, 0.4)',
+                    'position' => 1,
+                    'status' => 1,
+                ]);
+                Slider::create([
+                    'title' => 'Trending Collections',
+                    'description' => 'Explore the latest arrivals and premium selections tailored just for you.',
+                    'button_text' => 'Explore More',
+                    'button_url' => '/shop',
+                    'image' => 'sliders/D3t6TPKxOuda0FQZDc1aaOxqOOG0jTKd4i58m5bS.webp',
+                    'overlay_color' => 'rgba(0, 0, 0, 0.35)',
+                    'position' => 2,
+                    'status' => 1,
+                ]);
+                $sliders = Slider::where('status', '1')->orderBy('position', 'asc')->get();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Could not auto-seed sliders: " . $e->getMessage());
+            }
+        }
+
         $customerReviews = CustomerReview::where('is_active', true)
             ->orderBy('review_date', 'desc')
             ->limit(6)
             ->get();
+
+        if ($customerReviews->isEmpty()) {
+            try {
+                CustomerReview::create([
+                    'reviewer_name' => 'Rafiqul Islam',
+                    'reviewer_email' => 'rafiq@example.com',
+                    'reviewer_image' => 'https://randomuser.me/api/portraits/men/32.jpg',
+                    'review_date' => now()->subDays(5)->toDateString(),
+                    'rating' => 5,
+                    'product_name' => 'Premium Collection',
+                    'product_image' => 'https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+                    'review_text' => 'The quality of the product is exceptional. The fit is perfect and the design is elegant. Highly recommended!',
+                    'is_active' => 1,
+                    'is_verified_purchase' => 1,
+                ]);
+                CustomerReview::create([
+                    'reviewer_name' => 'Tanvir Ahmed',
+                    'reviewer_email' => 'tanvir@example.com',
+                    'reviewer_image' => 'https://randomuser.me/api/portraits/men/44.jpg',
+                    'review_date' => now()->subDays(2)->toDateString(),
+                    'rating' => 5,
+                    'product_name' => 'Exclusive Collection',
+                    'product_image' => 'https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+                    'review_text' => 'Fast delivery and very good packaging. Product matches the description exactly.',
+                    'is_active' => 1,
+                    'is_verified_purchase' => 1,
+                ]);
+                $customerReviews = CustomerReview::where('is_active', true)->orderBy('review_date', 'desc')->limit(6)->get();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Could not auto-seed reviews: " . $e->getMessage());
+            }
+        }
 
         // Build featured items efficiently
         $featuredItems = collect($featuredOrder)->map(function ($item) use ($categories, $subcategories) {
