@@ -698,7 +698,15 @@ class AdminController extends Controller
     // Create User Page
     public function create()
     {
-        return view('admin.users.create');
+        $isSuperAdmin = auth()->check() && auth()->user()->isSuperAdmin();
+        $allRoles = \Spatie\Permission\Models\Role::all();
+        if (!$isSuperAdmin) {
+            $allRoles = $allRoles->filter(function($role) {
+                $r = strtolower($role->name);
+                return !str_contains($r, 'super') && !str_contains($r, 'admin');
+            });
+        }
+        return view('admin.users.create', compact('allRoles', 'isSuperAdmin'));
     }
 
     // Store User
@@ -712,7 +720,10 @@ class AdminController extends Controller
             'address' => 'nullable|string|max:255',
             'upazila' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
-            'otp_verified' => 'boolean',
+            'otp_verified' => 'nullable|boolean',
+            'roles' => 'nullable|array',
+            'roles.*' => 'string|exists:roles,name',
+            'role' => 'nullable|string|exists:roles,name',
         ]);
 
         if ($validator->fails()) {
@@ -733,6 +744,34 @@ class AdminController extends Controller
             'created_by' => auth()->id(),
         ]);
 
+        $isSuperAdmin = auth()->check() && auth()->user()->isSuperAdmin();
+
+        $selectedRoles = [];
+        if ($request->has('roles') && is_array($request->roles)) {
+            $selectedRoles = $request->roles;
+        } elseif ($request->filled('role')) {
+            $selectedRoles = [$request->role];
+        }
+
+        if (!$isSuperAdmin) {
+            // Non-superadmin cannot assign admin or super admin roles
+            $selectedRoles = array_filter($selectedRoles, function($roleName) {
+                $r = strtolower($roleName);
+                return !str_contains($r, 'super') && !str_contains($r, 'admin');
+            });
+        }
+
+        if (empty($selectedRoles)) {
+            $selectedRoles = ['customer'];
+        }
+
+        if (method_exists($user, 'syncRoles')) {
+            try {
+                $user->syncRoles($selectedRoles);
+            } catch (\Throwable $e) {
+                \Log::warning("Could not sync roles: " . $e->getMessage());
+            }
+        }
 
         return redirect()->route('admin.users')
             ->with('success', 'User created successfully!');
@@ -742,24 +781,47 @@ class AdminController extends Controller
     public function usersedit(Request $request)
     {
         $user = User::findOrFail($request->id);
-        return view('admin.users.edit', compact('user'));
+        $isSuperAdmin = auth()->check() && auth()->user()->isSuperAdmin();
+        $allRoles = \Spatie\Permission\Models\Role::all();
+        if (!$isSuperAdmin) {
+            $allRoles = $allRoles->filter(function($role) {
+                $r = strtolower($role->name);
+                return !str_contains($r, 'super') && !str_contains($r, 'admin');
+            });
+        }
+        return view('admin.users.edit', compact('user', 'allRoles', 'isSuperAdmin'));
     }
 
     // Update User
     public function usersupdate(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $isSuperAdmin = auth()->check() && auth()->user()->isSuperAdmin();
 
-        $validator = Validator::make($request->all(), [
+        // If target user is a super admin and current user is not super admin, forbid modification
+        if (!$isSuperAdmin && $user->isSuperAdmin()) {
+            return redirect()->route('admin.users')
+                ->withErrors(['error' => 'You do not have permission to modify a Super Administrator account.']);
+        }
+
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'password' => 'nullable|string|min:8|confirmed',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
             'upazila' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
-            'otp_verified' => 'boolean',
-        ]);
+            'otp_verified' => 'nullable|boolean',
+            'roles' => 'nullable|array',
+            'roles.*' => 'string|exists:roles,name',
+            'role' => 'nullable|string|exists:roles,name',
+        ];
+
+        if ($request->filled('password')) {
+            $rules['password'] = 'required|string|min:8|confirmed';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -786,10 +848,30 @@ class AdminController extends Controller
 
         if (method_exists($user, 'syncRoles')) {
             try {
+                $requestedRoles = [];
                 if ($request->has('roles') && is_array($request->roles)) {
-                    $user->syncRoles($request->roles);
-                } else if ($request->filled('role')) {
-                    $user->syncRoles([$request->role]);
+                    $requestedRoles = $request->roles;
+                } elseif ($request->filled('role')) {
+                    $requestedRoles = [$request->role];
+                }
+
+                if (!$isSuperAdmin) {
+                    // Filter out any super or admin roles from requested
+                    $requestedRoles = array_filter($requestedRoles, function($rName) {
+                        $r = strtolower($rName);
+                        return !str_contains($r, 'super') && !str_contains($r, 'admin');
+                    });
+                    
+                    // If target user already has administrative roles that current admin cannot touch, preserve them
+                    $existingAdminRoles = $user->getRoleNames()->filter(function($rName) {
+                        $r = strtolower($rName);
+                        return str_contains($r, 'super') || str_contains($r, 'admin');
+                    })->toArray();
+                    
+                    $finalRoles = array_unique(array_merge($requestedRoles, $existingAdminRoles));
+                    $user->syncRoles($finalRoles);
+                } else {
+                    $user->syncRoles($requestedRoles);
                 }
             } catch (\Throwable $e) {
                 \Log::warning("Could not sync roles: " . $e->getMessage());

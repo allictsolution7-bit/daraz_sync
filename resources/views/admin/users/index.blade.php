@@ -1056,30 +1056,51 @@
                 <div class="col-md-4">
                     <div class="stat-card-premium gradient-1">
                         <div>
-                            <div class="stat-card-title">Total Registered Users</div>
+                            <div class="stat-card-title">{{ $isSuperAdmin ? 'Total Registered Users' : 'Total Accounts' }}</div>
                             <div class="stat-card-value">{{ $totalUsersCount }}</div>
                         </div>
                         <i class="fas fa-users stat-card-icon"></i>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="stat-card-premium gradient-2">
-                        <div>
-                            <div class="stat-card-title">System Administrators</div>
-                            <div class="stat-card-value">{{ $adminUsersCount }}</div>
+                @if($isSuperAdmin)
+                    <div class="col-md-4">
+                        <div class="stat-card-premium gradient-2">
+                            <div>
+                                <div class="stat-card-title">System Administrators</div>
+                                <div class="stat-card-value">{{ $adminUsersCount }}</div>
+                            </div>
+                            <i class="fas fa-user-shield stat-card-icon"></i>
                         </div>
-                        <i class="fas fa-user-shield stat-card-icon"></i>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-card-premium gradient-3">
-                        <div>
-                            <div class="stat-card-title">Customers & Members</div>
-                            <div class="stat-card-value">{{ $standardUsersCount }}</div>
+                    <div class="col-md-4">
+                        <div class="stat-card-premium gradient-3">
+                            <div>
+                                <div class="stat-card-title">Customers & Members</div>
+                                <div class="stat-card-value">{{ $standardUsersCount }}</div>
+                            </div>
+                            <i class="fas fa-user-tag stat-card-icon"></i>
                         </div>
-                        <i class="fas fa-user-tag stat-card-icon"></i>
                     </div>
-                </div>
+                @else
+                    <div class="col-md-4">
+                        <div class="stat-card-premium gradient-2">
+                            <div>
+                                <div class="stat-card-title">Verified Accounts</div>
+                                <div class="stat-card-value">{{ $users->where('otp_verified', 1)->count() }}</div>
+                            </div>
+                            <i class="fas fa-user-check stat-card-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card-premium gradient-3">
+                            <div>
+                                <div class="stat-card-title">Active Members</div>
+                                <div class="stat-card-value">{{ $totalUsersCount }}</div>
+                            </div>
+                            <i class="fas fa-user-tag stat-card-icon"></i>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <!-- Table Workspace Wrapper -->
@@ -1101,14 +1122,22 @@
                 <!-- Role Management Tabs and Select Filter -->
                 <div class="row align-items-center mb-3">
                     <div class="col-md-7">
-                        <div class="portal-tabs-container mb-0" style="max-width: 500px;">
-                            <button type="button" class="portal-tab-btn active" id="tab-management" onclick="switchRoleTab('management')">
-                                <i class="fas fa-user-shield"></i> Admin & Store Managers
-                            </button>
-                            <button type="button" class="portal-tab-btn" id="tab-others" onclick="switchRoleTab('others')">
-                                <i class="fas fa-users"></i> Other Roles
-                            </button>
-                        </div>
+                        @if($isSuperAdmin)
+                            <div class="portal-tabs-container mb-0" style="max-width: 500px;">
+                                <button type="button" class="portal-tab-btn active" id="tab-management" onclick="switchRoleTab('management')">
+                                    <i class="fas fa-user-shield"></i> Admin & Store Managers
+                                </button>
+                                <button type="button" class="portal-tab-btn" id="tab-others" onclick="switchRoleTab('others')">
+                                    <i class="fas fa-users"></i> Other Roles
+                                </button>
+                            </div>
+                        @else
+                            <div class="portal-tabs-container mb-0" style="max-width: 250px;">
+                                <button type="button" class="portal-tab-btn active" id="tab-others" onclick="switchRoleTab('others')">
+                                    <i class="fas fa-users"></i> Member Accounts
+                                </button>
+                            </div>
+                        @endif
                     </div>
                     <div class="col-md-5 d-flex justify-content-md-end justify-content-start align-items-center gap-2 mt-2 mt-md-0">
                         <label for="roleSelectFilter" class="mb-0 text-muted fw-bold" style="font-size: 13px; white-space: nowrap;">
@@ -2576,36 +2605,41 @@
             }
         };
 
+        window.isSuperAdmin = {{ $isSuperAdmin ? 'true' : 'false' }};
+        window.activeTab = window.isSuperAdmin ? 'management' : 'others';
+
         $(document).ready(function() {
-            // Dynamically inject mock registered admins if present
-            const mockAdmins = JSON.parse(localStorage.getItem('registered_admins') || '[]');
-            const tbody = document.querySelector('#users tbody');
-            if (tbody && mockAdmins.length > 0) {
-                mockAdmins.forEach(adm => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td style="text-align: center;">
-                            <input type="checkbox" class="user-checkbox form-check-input" value="${adm.id}" onchange="updateDeleteButton()">
-                        </td>
-                        <td><strong>#${adm.id}</strong></td>
-                        <td></td>
-                        <td>${adm.name}</td>
-                        <td><span class="text-muted">${adm.email}</span></td>
-                        <td>
-                            <span class="badge-premium badge-premium-admin mb-1"><i class="fas fa-shield-alt"></i> admin</span>
-                            <span class="badge-premium badge-premium-success"><i class="fas fa-gem"></i> ${adm.packageName} (${adm.billingCycle})</span>
-                        </td>
-                        <td>${adm.created_at}</td>
-                        <td>
-                            <div class="d-flex justify-content-center gap-1">
-                                <button class="btn-action-circle btn-action-delete" title="Delete Mock Admin" onclick="deleteMockAdmin('${adm.id}')">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.insertBefore(tr, tbody.firstChild);
-                });
+            // Dynamically inject mock registered admins if present (super admin only)
+            if (window.isSuperAdmin) {
+                const mockAdmins = JSON.parse(localStorage.getItem('registered_admins') || '[]');
+                const tbody = document.querySelector('#users tbody');
+                if (tbody && mockAdmins.length > 0) {
+                    mockAdmins.forEach(adm => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style="text-align: center;">
+                                <input type="checkbox" class="user-checkbox form-check-input" value="${adm.id}" onchange="updateDeleteButton()">
+                            </td>
+                            <td><strong>#${adm.id}</strong></td>
+                            <td></td>
+                            <td>${adm.name}</td>
+                            <td><span class="text-muted">${adm.email}</span></td>
+                            <td>
+                                <span class="badge-premium badge-premium-admin mb-1"><i class="fas fa-shield-alt"></i> admin</span>
+                                <span class="badge-premium badge-premium-success"><i class="fas fa-gem"></i> ${adm.packageName} (${adm.billingCycle})</span>
+                            </td>
+                            <td>${adm.created_at}</td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-1">
+                                    <button class="btn-action-circle btn-action-delete" title="Delete Mock Admin" onclick="deleteMockAdmin('${adm.id}')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.insertBefore(tr, tbody.firstChild);
+                    });
+                }
             }
 
             if ($('#users').length) {
@@ -2639,9 +2673,6 @@
             }
         });
 
-        // Tab & Select filter variables and functions
-        window.activeTab = 'management';
-        
         window.switchRoleTab = function(tab) {
             window.activeTab = tab;
             
@@ -2669,7 +2700,7 @@
             roleSelect.empty();
             roleSelect.append('<option value="all">All Roles</option>');
             
-            if (window.activeTab === 'management') {
+            if (window.isSuperAdmin && window.activeTab === 'management') {
                 roleSelect.append('<option value="admin">Admin</option>');
                 roleSelect.append('<option value="super-admin">Super Admin</option>');
                 roleSelect.append('<option value="shop-manager">Shop Manager</option>');
@@ -2677,26 +2708,25 @@
             } else {
                 roleSelect.append('<option value="reseller">Reseller</option>');
                 roleSelect.append('<option value="customer">Customer</option>');
+                roleSelect.append('<option value="vendor">Vendor</option>');
+                roleSelect.append('<option value="vendor_staff">Vendor Staff</option>');
                 
                 // Try to find any other roles present in the table dynamically
                 if (window.jQuery && $.fn.DataTable && $.fn.DataTable.isDataTable('#users')) {
                     const table = $('#users').DataTable();
-                    const roles = [];
+                    const roles = ['reseller', 'customer', 'vendor', 'vendor_staff'];
                     table.rows().every(function() {
                         const rowNode = this.node();
                         $(rowNode).find('td:eq(5) .badge-premium').each(function() {
                             const roleText = $(this).text().trim().toLowerCase();
-                            if (roleText && !roleText.includes('admin') && !roleText.includes('manager')) {
-                                if (!roles.includes(roleText) && roleText !== 'reseller' && roleText !== 'customer') {
+                            if (roleText && !roleText.includes('admin') && !roleText.includes('manager') && !roleText.includes('super')) {
+                                if (!roles.includes(roleText)) {
                                     roles.push(roleText);
+                                    const displayRole = roleText.charAt(0).toUpperCase() + roleText.slice(1);
+                                    roleSelect.append(`<option value="${roleText}">${displayRole}</option>`);
                                 }
                             }
                         });
-                    });
-                    
-                    roles.forEach(role => {
-                        const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-                        roleSelect.append(`<option value="${role}">${displayRole}</option>`);
                     });
                 }
             }
@@ -2721,8 +2751,13 @@
                     const roleCell = $(rowNode).find('td:eq(5)');
                     const roleText = roleCell.text().toLowerCase();
                     
-                    const isManagementRole = roleText.includes('admin') || roleText.includes('manager') || roleText.includes('shop') || roleText.includes('store');
+                    const isManagementRole = roleText.includes('admin') || roleText.includes('manager') || roleText.includes('shop') || roleText.includes('store') || roleText.includes('super');
                     
+                    // If not super admin, ALWAYS hide management roles from the table
+                    if (!window.isSuperAdmin && isManagementRole) {
+                        return false;
+                    }
+
                     // Tab filter
                     if (window.activeTab === 'management') {
                         if (!isManagementRole) {

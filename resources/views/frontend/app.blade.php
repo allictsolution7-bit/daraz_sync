@@ -4735,9 +4735,17 @@
 	                    ->orderBy('order')
 	                    ->get()
 	                : collect();
+
+	            $topCategories = \App\Models\ProductCategory::where(function($q) {
+	                    $q->where('status', '1')->orWhere('status', 'active');
+	                })
+	                ->withCount('products')
+	                ->orderByDesc('products_count')
+	                ->take(6)
+	                ->get();
 	        @endphp
 
-	        @if ($menuItems->count() > 0 || (isset($topCategories) && $topCategories->count() > 0))
+	        @if ($menuItems->count() > 0)
 	            @foreach ($menuItems as $item)
 	                @if (strtolower($item->title) === 'home' || $item->url === '/' || $item->url === url('/'))
 	                    @continue
@@ -4746,13 +4754,6 @@
 	            @endforeach
 
 	            @php
-	                $topCategories = \App\Models\ProductCategory::where(function($q) {
-	                    $q->where('status', '1')->orWhere('status', 'active');
-	                })
-	                ->withCount('products')
-	                ->orderByDesc('products_count')
-	                ->take(5)
-	                ->get();
 	                $menuItemTitles = $menuItems->map(fn($item) => strtolower($item->title))->toArray();
 	            @endphp
 	            @foreach ($topCategories as $cat)
@@ -4762,11 +4763,22 @@
 	                    </a>
 	                @endif
 	            @endforeach
+	        @elseif ($topCategories->count() > 0)
+	            @foreach ($topCategories as $cat)
+	                <a href="{{ url('/shop?category=' . $cat->slug) }}" class="menu-item-level-1">
+	                    <span>{{ $cat->name }}</span>
+	                </a>
+	            @endforeach
 	        @else
-	            {{-- Debug: Show if no menu items found --}}
-	            <div style="color: red; padding: 10px;">
-	                No menu items found. Header Menu: {{ $headerMenu ? 'Found' : 'Not Found' }}
-	            </div>
+	            <a href="{{ url('/') }}" class="menu-item-level-1">
+	                <span>Home</span>
+	            </a>
+	            <a href="{{ url('/shop') }}" class="menu-item-level-1">
+	                <span>All Products</span>
+	            </a>
+	            <a href="{{ url('/contact') }}" class="menu-item-level-1">
+	                <span>Contact Us</span>
+	            </a>
 	        @endif
 	    </nav>
 	    </div>

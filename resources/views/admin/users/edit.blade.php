@@ -276,7 +276,14 @@
                     </div>
                     <div class="card-body p-4">
                         @php
-                            $allDbRoles = \Spatie\Permission\Models\Role::all();
+                            $isSuperAdmin = $isSuperAdmin ?? (auth()->check() && auth()->user()->isSuperAdmin());
+                            $allDbRoles = isset($allRoles) ? $allRoles : \Spatie\Permission\Models\Role::all();
+                            if (!$isSuperAdmin) {
+                                $allDbRoles = $allDbRoles->filter(function($role) {
+                                    $r = strtolower($role->name);
+                                    return !str_contains($r, 'super') && !str_contains($r, 'admin');
+                                });
+                            }
                             $userAssignedRoles = $user->getRoleNames()->toArray();
                             if (empty($userAssignedRoles) && !empty($user->role)) {
                                 $userAssignedRoles = [$user->role];

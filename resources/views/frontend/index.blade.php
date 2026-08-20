@@ -721,7 +721,7 @@
             }
         </style>
         <section class="image-slider-section">
-            <div class="base-container {{ $showCategoryMega ? 'slider-layout' : ($sliderLayout === 'slider_with_one_image' ? 'slider-one-image-layout' : '') }}">
+            <div class="base-container {{ ($showCategoryMega && $sliderCategoriesList->count() > 0) ? 'slider-layout' : ($sliderLayout === 'slider_with_one_image' ? 'slider-one-image-layout' : '') }}">
                 @if ($showCategoryMega && $sliderCategoriesList->count() > 0)
                     <aside class="slider-category-menu">
                         <div class="slider-category-heading">Categories</div>
@@ -2836,7 +2836,7 @@
         ];
     @endphp
     @foreach ($sections as $key => $label)
-        @if (!empty($homepage['enable_' . $key . '_section']) && $homepage['enable_' . $key . '_section'])
+        @if (!empty($homepage['enable_' . $key . '_section']) && $homepage['enable_' . $key . '_section'] && isset($featuredSections[$key]) && $featuredSections[$key]->count() > 0)
             <section class="{{ $key }}-section">
                 <div class="base-container section-header">
                     <h2>{{ $homepage[$key . '_section_heading'] ?? $label }}</h2>
@@ -3297,7 +3297,7 @@
     @endif
 
     <!-- Products By Category v1-->
-    @if (!empty($homepage['enable_products_by_category_section']) && $homepage['enable_products_by_category_section'])
+    @if (!empty($homepage['enable_products_by_category_section']) && $homepage['enable_products_by_category_section'] && isset($productsByCategoryItems) && $productsByCategoryItems->count() > 0)
         <style>
             .products-by-category {
                 padding-top: 15px;
@@ -3636,37 +3636,39 @@
     @if (setting('homepage', 'enable_products_by_category_v2_location1', '0') == '1' && !empty($sliderCategories1))
         <!-- Product By Category v2 with slide -->
         @foreach ($sliderCategories1 as $i => $catData)
-            <section class="category-slider-section" style="margin-top: 15px;">
-                <div class="base-container section-header">
-                    <h2>{{ $catData['category']->name }}</h2>
-                    <a href="{{ route('shop', $catData['category']->slug) }}"
-                        class="view-all">{{ \App\Services\SettingsService::getViewAllButtonText() }}</a>
-                </div>
-                <div class="base-container products-slider products-slider-category1-{{ $i }}">
-                    <button class="slider-arrow prev-arrow prev-arrow-category1-{{ $i }}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="12" fill="none"></circle>
-                            <path d="M15 6L9 12L15 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                        </svg>
-                    </button>
-                    <div class="products-container products-container-category1-{{ $i }}">
-                        @foreach ($catData['products'] as $product)
-                            @include('frontend.partials.product-item', [
-                                'product' => $product,
-                                'badge' => 'Shop!',
-                            ])
-                        @endforeach
+            @if (!empty($catData['products']) && count($catData['products']) > 0)
+                <section class="category-slider-section" style="margin-top: 15px;">
+                    <div class="base-container section-header">
+                        <h2>{{ $catData['category']->name }}</h2>
+                        <a href="{{ route('shop', $catData['category']->slug) }}"
+                            class="view-all">{{ \App\Services\SettingsService::getViewAllButtonText() }}</a>
                     </div>
-                    <button class="slider-arrow next-arrow next-arrow-category1-{{ $i }}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="12" fill="none"></circle>
-                            <path d="M9 6L15 12L9 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                        </svg>
-                    </button>
-                </div>
-            </section>
+                    <div class="base-container products-slider products-slider-category1-{{ $i }}">
+                        <button class="slider-arrow prev-arrow prev-arrow-category1-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="12" fill="none"></circle>
+                                <path d="M15 6L9 12L15 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                        <div class="products-container products-container-category1-{{ $i }}">
+                            @foreach ($catData['products'] as $product)
+                                @include('frontend.partials.product-item', [
+                                    'product' => $product,
+                                    'badge' => 'Shop!',
+                                ])
+                            @endforeach
+                        </div>
+                        <button class="slider-arrow next-arrow next-arrow-category1-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="12" fill="none"></circle>
+                                <path d="M9 6L15 12L9 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+            @endif
         @endforeach
         <!-- End Product By Category v2 with slide -->
     @endif
@@ -3938,42 +3940,44 @@
     @if (setting('homepage', 'enable_products_by_category_v2_location2', '0') == '1' && !empty($sliderCategories2))
         <!-- Product By Category v2 with slide -->
         @foreach ($sliderCategories2 as $i => $catData)
-            <section class="category-slider-section" style="margin-top: 15px;">
-                <div class="base-container section-header">
-                    <h2>{{ $catData['category']->name }}</h2>
-                    <a href="{{ route('shop', $catData['category']->slug) }}"
-                        class="view-all">{{ \App\Services\SettingsService::getViewAllButtonText() }}</a>
-                </div>
-                <div class="base-container products-slider products-slider-category2-{{ $i }}">
-                    <button class="slider-arrow prev-arrow prev-arrow-category2-{{ $i }}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="12" fill="none"></circle>
-                            <path d="M15 6L9 12L15 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                        </svg>
-                    </button>
-                    <div class="products-container products-container-category2-{{ $i }}">
-                        @foreach ($catData['products'] as $product)
-                            @include('frontend.partials.product-item', [
-                                'product' => $product,
-                                'badge' => 'Shop!',
-                            ])
-                        @endforeach
+            @if (!empty($catData['products']) && count($catData['products']) > 0)
+                <section class="category-slider-section" style="margin-top: 15px;">
+                    <div class="base-container section-header">
+                        <h2>{{ $catData['category']->name }}</h2>
+                        <a href="{{ route('shop', $catData['category']->slug) }}"
+                            class="view-all">{{ \App\Services\SettingsService::getViewAllButtonText() }}</a>
                     </div>
-                    <button class="slider-arrow next-arrow next-arrow-category2-{{ $i }}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="12" fill="none"></circle>
-                            <path d="M9 6L15 12L9 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                        </svg>
-                    </button>
-                </div>
-            </section>
+                    <div class="base-container products-slider products-slider-category2-{{ $i }}">
+                        <button class="slider-arrow prev-arrow prev-arrow-category2-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="12" fill="none"></circle>
+                                <path d="M15 6L9 12L15 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                        <div class="products-container products-container-category2-{{ $i }}">
+                            @foreach ($catData['products'] as $product)
+                                @include('frontend.partials.product-item', [
+                                    'product' => $product,
+                                    'badge' => 'Shop!',
+                                ])
+                            @endforeach
+                        </div>
+                        <button class="slider-arrow next-arrow next-arrow-category2-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="12" fill="none"></circle>
+                                <path d="M9 6L15 12L9 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+            @endif
         @endforeach
         <!-- End Product By Category v2 with slide -->
     @endif
 
-    @if (setting('homepage', 'enable_best_publisher_section', '1') == '1')
+    @if (setting('homepage', 'enable_best_publisher_section', '1') == '1' && isset($publishers) && $publishers->count() > 0)
         <!-- Best Pubslisher Section -->
         <section class="base-container circle-slider-section author-slider-section">
             <div class="circle-slider-header">
@@ -4020,42 +4024,44 @@
     @if (setting('homepage', 'enable_products_by_category_v2_location3', '0') == '1' && !empty($sliderCategories3))
         <!-- Product By Category v2 with slide -->
         @foreach ($sliderCategories3 as $i => $catData)
-            <section class="category-slider-section" style="margin-top: 15px;">
-                <div class="base-container section-header">
-                    <h2>{{ $catData['category']->name }}</h2>
-                    <a href="{{ route('shop', $catData['category']->slug) }}"
-                        class="view-all">{{ \App\Services\SettingsService::getViewAllButtonText() }}</a>
-                </div>
-                <div class="base-container products-slider products-slider-category3-{{ $i }}">
-                    <button class="slider-arrow prev-arrow prev-arrow-category3-{{ $i }}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="12" fill="none"></circle>
-                            <path d="M15 6L9 12L15 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                        </svg>
-                    </button>
-                    <div class="products-container products-container-category3-{{ $i }}">
-                        @foreach ($catData['products'] as $product)
-                            @include('frontend.partials.product-item', [
-                                'product' => $product,
-                                'badge' => 'Shop!',
-                            ])
-                        @endforeach
+            @if (!empty($catData['products']) && count($catData['products']) > 0)
+                <section class="category-slider-section" style="margin-top: 15px;">
+                    <div class="base-container section-header">
+                        <h2>{{ $catData['category']->name }}</h2>
+                        <a href="{{ route('shop', $catData['category']->slug) }}"
+                            class="view-all">{{ \App\Services\SettingsService::getViewAllButtonText() }}</a>
                     </div>
-                    <button class="slider-arrow next-arrow next-arrow-category3-{{ $i }}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="12" fill="none"></circle>
-                            <path d="M9 6L15 12L9 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"></path>
-                        </svg>
-                    </button>
-                </div>
-            </section>
+                    <div class="base-container products-slider products-slider-category3-{{ $i }}">
+                        <button class="slider-arrow prev-arrow prev-arrow-category3-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="12" fill="none"></circle>
+                                <path d="M15 6L9 12L15 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                        <div class="products-container products-container-category3-{{ $i }}">
+                            @foreach ($catData['products'] as $product)
+                                @include('frontend.partials.product-item', [
+                                    'product' => $product,
+                                    'badge' => 'Shop!',
+                                ])
+                            @endforeach
+                        </div>
+                        <button class="slider-arrow next-arrow next-arrow-category3-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="12" fill="none"></circle>
+                                <path d="M9 6L15 12L9 18" stroke="#2d4379" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+            @endif
         @endforeach
         <!-- End Product By Category v2 with slide -->
     @endif
 
-    @if (!empty($homepage['enable_latest_products_section']) && $homepage['enable_latest_products_section'])
+    @if (!empty($homepage['enable_latest_products_section']) && $homepage['enable_latest_products_section'] && isset($latestProducts) && $latestProducts->count() > 0)
         <!-- Start Latest Products Section -->
         <section class="latest-products-section">
             <div class="base-container section-header" style="margin-bottom: 10px;">
