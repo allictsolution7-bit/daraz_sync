@@ -1937,6 +1937,15 @@
                                     </a>
                                 </li>
                                 @endcan
+
+                                <li class="{{ request()->routeIs('admin.google-sheets.*') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.google-sheets.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-file-excel text-success"></i>
+                                            Google Sheets Sync
+                                        </span>
+                                    </a>
+                                </li>
  
                                 {{-- Delayed Purchase Events --}}
                                 @can('delayed_events.view')

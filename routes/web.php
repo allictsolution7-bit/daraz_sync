@@ -526,6 +526,15 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
         ->middleware(['license:landing_page', 'license.landing_page'])
         ->name('landing-pages.store');
 
+    // Google Sheet Sync
+    Route::prefix('google-sheets')->name('google-sheets.')->group(function () {
+        Route::get('/settings', [\App\Http\Controllers\Admin\GoogleSheetSyncController::class, 'index'])->name('index');
+        Route::post('/settings', [\App\Http\Controllers\Admin\GoogleSheetSyncController::class, 'update'])->name('update');
+        Route::post('/test-connection', [\App\Http\Controllers\Admin\GoogleSheetSyncController::class, 'testConnection'])->name('test');
+        Route::post('/sync-now', [\App\Http\Controllers\Admin\GoogleSheetSyncController::class, 'triggerSync'])->name('sync-now');
+        Route::post('/push-to-sheet', [\App\Http\Controllers\Admin\GoogleSheetSyncController::class, 'pushToSheet'])->name('push-to-sheet');
+    });
+
     // Site Settings
     Route::get('/config', [SettingController::class, 'index'])->name('settings.index');
     Route::get('/config/payment-gateway', [SettingController::class, 'paymentGateway'])->name('settings.payment-gateway');

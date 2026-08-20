@@ -672,6 +672,9 @@
                 <button id="export-selected" class="btn-modern btn-modern-success">
                     <i class="fas fa-file-export"></i> Export Selected
                 </button>
+                <a href="{{ route('admin.google-sheets.index') }}" class="btn-modern" style="background: #10b981; color: white;">
+                    <i class="fas fa-file-excel"></i> Google Sheets Sync
+                </a>
                 <button id="bulk-delete-products" class="btn-modern btn-modern-danger">
                     <i class="fas fa-trash-alt"></i> Bulk Delete
                 </button>
