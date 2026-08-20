@@ -125,22 +125,57 @@ class GlobalProductService
         // Retrieve local store catalog products for this viewer's store
         $localBySource = [];
         $localByTitle = [];
+        $localByTitleWithoutCopy = [];
+        $localBySlug = [];
+
         try {
+            $localProductsList = collect();
+
+            // 1. Fetch from active store database
+            $activeProds = Product::query()
+                ->where(function($q) use ($currentUserId, $currentSubdomain) {
+                    if ($currentUserId) {
+                        $q->where('created_by', $currentUserId)
+                          ->orWhere('copied_by_admin_id', $currentUserId);
+                    }
+                    $q->orWhereNotNull('source_product_id');
+                })
+                ->get();
+            $localProductsList = $localProductsList->concat($activeProds);
+
+            // 2. Fetch from tenant-specific database if different
             if ($viewerDbName && $viewerDbName !== config('database.connections.mysql.database')) {
-                $this->connectToTenantDatabase($viewerDbName);
-                $localProducts = DB::connection('tenant_temp')
-                    ->table('products')
-                    ->select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata')
-                    ->get();
-            } else {
-                $localProducts = Product::select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata')->get();
+                try {
+                    $this->connectToTenantDatabase($viewerDbName);
+                    $tenantProds = DB::connection('tenant_temp')
+                        ->table('products')
+                        ->select('id', 'title', 'quantity', 'source_tenant_subdomain', 'source_product_id', 'created_by', 'copied_by_admin_id', 'source_metadata')
+                        ->get();
+                    $localProductsList = $localProductsList->concat($tenantProds);
+                } catch (\Throwable $tEx) {
+                    Log::warning("Could not load products from tenant DB {$viewerDbName}: " . $tEx->getMessage());
+                }
             }
 
-            foreach ($localProducts as $lp) {
-                $cleanTitle = trim(strtolower($lp->title));
+            foreach ($localProductsList as $lp) {
+                $rawTitle = trim((string)$lp->title);
+                $cleanTitle = strtolower($rawTitle);
+                $titleNoCopy = trim(preg_replace('/^copy\s+/i', '', $cleanTitle));
+                $titleSlug = Str::slug($titleNoCopy);
+
                 $localByTitle[$cleanTitle] = $lp;
+                if (!empty($titleNoCopy)) {
+                    $localByTitleWithoutCopy[$titleNoCopy] = $lp;
+                }
+                if (!empty($titleSlug)) {
+                    $localBySlug[$titleSlug] = $lp;
+                }
+
                 if (!empty($lp->source_tenant_subdomain) && !empty($lp->source_product_id)) {
                     $localBySource[$lp->source_tenant_subdomain . '_' . $lp->source_product_id] = $lp;
+                }
+                if (!empty($lp->source_product_id)) {
+                    $localBySource[$lp->source_product_id] = $lp;
                 }
             }
         } catch (\Throwable $lpEx) {
@@ -163,11 +198,9 @@ class GlobalProductService
                     ->get();
                 
                 foreach ($wpoQuery as $wpo) {
-                    $key = $wpo->seller_subdomain . '_' . $wpo->product_id;
-                    if (!isset($approvedPurchases[$key])) {
-                        $approvedPurchases[$key] = 0;
-                    }
-                    $approvedPurchases[$key] += (int)$wpo->quantity;
+                    $keyWithSubdomain = $wpo->seller_subdomain . '_' . $wpo->product_id;
+                    $approvedPurchases[$keyWithSubdomain] = ($approvedPurchases[$keyWithSubdomain] ?? 0) + (int)$wpo->quantity;
+                    $approvedPurchases[$wpo->product_id] = ($approvedPurchases[$wpo->product_id] ?? 0) + (int)$wpo->quantity;
                 }
             } catch (\Throwable $wEx) {
                 $approvedPurchases = [];
@@ -535,7 +568,15 @@ class GlobalProductService
                     $variantWholesalePrices = array_filter(array_map(fn($v) => floatval($v['final_wholesale_price'] ?? 0), $formattedVariants), fn($p) => $p > 0);
 
                     $sourceKey = $tenant->subdomain . '_' . $prod->id;
-                    $matchedLocal = $localBySource[$sourceKey] ?? ($localByTitle[trim(strtolower($prod->title))] ?? null);
+                    $prodTitleClean = trim(strtolower((string)$prod->title));
+                    $prodTitleNoCopy = trim(preg_replace('/^copy\s+/i', '', $prodTitleClean));
+                    $prodTitleSlug = Str::slug($prodTitleNoCopy);
+
+                    $matchedLocal = $localBySource[$sourceKey] 
+                        ?? ($localBySource[$prod->id] 
+                        ?? ($localByTitle[$prodTitleClean] 
+                        ?? ($localByTitleWithoutCopy[$prodTitleNoCopy] 
+                        ?? ($localBySlug[$prodTitleSlug] ?? null))));
                     
                     // Determine if this product is the current viewer's own store product
                     $isOwnProduct = ($currentSubdomain && strtolower($tenant->subdomain) === strtolower($currentSubdomain));
@@ -545,19 +586,22 @@ class GlobalProductService
                         $isAlreadyCopied = false;
                         $localStock = (int)($prod->quantity ?? ($matchedLocal?->quantity ?? 0));
                     } else {
-                        $isAlreadyCopied = !is_null($matchedLocal);
-                        $purchasedStockQty = $approvedPurchases[$sourceKey] ?? 0;
+                        $purchasedStockQty = $approvedPurchases[$sourceKey] ?? ($approvedPurchases[$prod->id] ?? 0);
+                        $isAlreadyCopied = (!is_null($matchedLocal) || $purchasedStockQty > 0);
                         $localStock = 0;
                         $storeStatusType = 'not_in_store';
 
-                        if ($matchedLocal) {
+                        if ($purchasedStockQty > 0) {
+                            $storeStatusType = 'purchased';
+                            $localStock = $purchasedStockQty;
+                        } elseif ($matchedLocal) {
                             $meta = is_string($matchedLocal->source_metadata) ? json_decode($matchedLocal->source_metadata, true) : $matchedLocal->source_metadata;
                             $copyMode = is_array($meta) ? ($meta['copy_mode'] ?? null) : null;
                             $metaPurchasedQty = is_array($meta) ? (int)($meta['purchased_quantity'] ?? 0) : 0;
 
-                            if ($purchasedStockQty > 0 || $metaPurchasedQty > 0 || $copyMode === 'purchase') {
+                            if ($metaPurchasedQty > 0 || $copyMode === 'purchase') {
                                 $storeStatusType = 'purchased';
-                                $localStock = $purchasedStockQty > 0 ? $purchasedStockQty : ($metaPurchasedQty > 0 ? $metaPurchasedQty : (int)$matchedLocal->quantity);
+                                $localStock = $metaPurchasedQty;
                             } else {
                                 $storeStatusType = 'copied';
                                 $localStock = 0;
@@ -954,6 +998,7 @@ class GlobalProductService
 
             return [
                 'success' => true,
+                'product' => $newProduct,
                 'product_id' => $newProduct->id,
                 'title' => $newProduct->title,
                 'message' => "Product '{$newProduct->title}' was successfully copied into your store catalog!",

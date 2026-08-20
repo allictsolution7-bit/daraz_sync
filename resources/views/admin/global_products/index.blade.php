@@ -560,8 +560,8 @@
                                         <i class="fas fa-boxes-stacked me-1"></i> Purchased ({{ $product['local_stock'] ?? 0 }} in store)
                                     </span>
                                 @elseif(($product['store_status_type'] ?? '') === 'copied' || !empty($product['is_already_copied']))
-                                    <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle px-2.5 py-1" style="font-size: 11px; font-weight: 700;">
-                                        <i class="fas fa-copy me-1"></i> Copied (Listing) 0
+                                    <span class="badge rounded-pill px-2.5 py-1" style="background-color: #ede9fe; color: #6366f1; border: 1px solid #c7d2fe; font-size: 11px; font-weight: 700;">
+                                        <i class="fas fa-file-import me-1"></i> Imported
                                     </span>
                                 @else
                                     <span class="badge rounded-pill bg-light text-muted border px-2.5 py-1" style="font-size: 11px; font-weight: 600;">
@@ -616,7 +616,7 @@
                                                 id="btn-action-{{ $rowUniqueKey }}"
                                                 style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none; font-size: 0.775rem;"
                                                 onclick="openPurchaseModal('{{ $product['tenant_subdomain'] }}', '{{ $product['id'] }}', '{{ addslashes($product['title']) }}', '{{ $product['final_wholesale_price'] }}', '{{ $product['quantity'] }}', '{{ $rowUniqueKey }}', 'copied', '0', 'purchase')">
-                                            <i class="fas fa-truck-ramp-box"></i> Purchase Stock
+                                            <i class="fas fa-cart-shopping"></i> Purchase
                                         </button>
                                     </div>
                                 @else

@@ -755,8 +755,8 @@
                         const maxLength = 40;
                         const titleText = data.length > maxLength ? `${data.substring(0, maxLength)}...` : data;
                         let badge = '';
-                        if (row.origin_label || row.is_copied || row.source_tenant_subdomain || row.source_product_id) {
-                            badge = `<div class="mt-1"><span class="badge rounded-pill" style="background-color: #e0e7ff; color: #4338ca; font-size: 10px; font-weight: 600;"><i class="fas fa-globe me-1"></i> Origin: S.Admin</span></div>`;
+                        if (row.origin_label) {
+                            badge = `<div class="mt-1"><span class="badge rounded-pill" style="background-color: #ede9fe; color: #6366f1; font-size: 10px; font-weight: 600;"><i class="fas fa-file-import me-1"></i> Imported</span></div>`;
                         }
                         return `<span class="fw-semibold" title="${data}">${titleText}</span>${badge}`;
                     }},

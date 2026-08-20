@@ -631,9 +631,48 @@ class WholesalePurchaseOrderController extends Controller
                         'admin_note' => "B2B Wholesale payout for #{$order->order_number} ({$order->quantity} pcs)",
                         'is_seen' => false,
                     ]);
-                } catch (\Throwable $we) {
-                    Log::warning("Could not record VendorWalletTransaction: " . $we->getMessage());
+            // 3. Ensure product is copied / stock allocated in Buyer Store Catalog
+            try {
+                $buyerLocalProductId = $order->buyer_local_product_id;
+                $existingLocal = null;
+
+                if ($buyerLocalProductId) {
+                    $existingLocal = Product::find($buyerLocalProductId);
                 }
+
+                if (!$existingLocal) {
+                    $existingLocal = Product::where('source_tenant_subdomain', $order->seller_subdomain)
+                        ->where('source_product_id', $order->product_id)
+                        ->where(function($q) use ($order) {
+                            if ($order->buyer_admin_id) {
+                                $q->where('created_by', $order->buyer_admin_id)
+                                  ->orWhere('copied_by_admin_id', $order->buyer_admin_id);
+                            }
+                        })
+                        ->first();
+                }
+
+                if ($existingLocal) {
+                    $existingLocal->increment('quantity', $order->quantity);
+                    $existingLocal->manage_stock = 1;
+                    $existingLocal->stock_status = 'in_stock';
+                    $existingLocal->save();
+                    $order->buyer_local_product_id = $existingLocal->id;
+                } else {
+                    $copyRes = $this->globalProductService->copyProductToStore(
+                        $order->seller_subdomain,
+                        $order->product_id,
+                        'purchase',
+                        $order->quantity,
+                        null,
+                        $order->buyer_admin_id
+                    );
+                    if (!empty($copyRes['success']) && !empty($copyRes['product_id'])) {
+                        $order->buyer_local_product_id = $copyRes['product_id'];
+                    }
+                }
+            } catch (\Throwable $buyerSyncEx) {
+                Log::warning("Could not auto-sync product to buyer catalog on wholesale approval: " . $buyerSyncEx->getMessage());
             }
 
             $order->save();

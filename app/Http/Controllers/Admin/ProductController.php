@@ -247,16 +247,34 @@ class ProductController extends Controller
             ->addColumn('is_copied', function($product) {
                 return !empty($product->source_tenant_subdomain) 
                     || !empty($product->source_product_id) 
-                    || !empty($product->copied_by_admin_id) 
-                    || !empty($product->source_metadata);
+                    || !empty($product->copied_by_admin_id);
             })
             ->addColumn('origin_label', function($product) {
-                $isCopied = !empty($product->source_tenant_subdomain) 
-                    || !empty($product->source_product_id) 
-                    || !empty($product->copied_by_admin_id) 
-                    || !empty($product->source_metadata);
+                $meta = is_string($product->source_metadata) ? json_decode($product->source_metadata, true) : $product->source_metadata;
+                $copyMode = is_array($meta) ? ($meta['copy_mode'] ?? null) : null;
+                $metaPurchasedQty = is_array($meta) ? (int)($meta['purchased_quantity'] ?? 0) : 0;
 
-                return $isCopied ? 'S.Admin' : null;
+                // Check if product was acquired via approved wholesale purchase
+                $hasWholesalePurchase = \App\Models\WholesalePurchaseOrder::where('payment_status', 'approved')
+                    ->where(function($q) use ($product) {
+                        $q->where('buyer_local_product_id', $product->id)
+                          ->orWhere(function($sub) use ($product) {
+                              if (!empty($product->source_product_id)) {
+                                  $sub->where('product_id', $product->source_product_id);
+                              }
+                          });
+                    })
+                    ->exists();
+
+                if ($hasWholesalePurchase || $copyMode === 'purchase' || $metaPurchasedQty > 0) {
+                    return null; // Wholesale purchased product (not a listing import)
+                }
+
+                $isImported = !empty($product->source_tenant_subdomain) 
+                    || !empty($product->source_product_id) 
+                    || !empty($product->copied_by_admin_id);
+
+                return $isImported ? 'Imported' : null;
             })
             ->rawColumns(['checkbox', 'actions'])
             ->toJson();
