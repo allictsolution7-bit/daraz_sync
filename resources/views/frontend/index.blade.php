@@ -1,7 +1,78 @@
 @extends('frontend.app')
 @section('content')
 
-    <!-- Main Slider -->
+@php
+    $currentTemplateId = setting('homepage', 'template_id', '1');
+@endphp
+
+<div class="homepage-template-wrapper template-{{ $currentTemplateId }}">
+    <style>
+        /* Base Template Styles */
+        .template-2 .product-card {
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .template-2 .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        }
+        .template-2 .slider-layout {
+            grid-template-columns: 1fr !important;
+        }
+        .template-2 .slider-mega-category-drawer {
+            display: none !important;
+        }
+
+        /* Template 3: High Tech / Electronic Hub */
+        .template-3 {
+            background-color: #0b0f19;
+            color: #f1f5f9;
+        }
+        .template-3 .product-card {
+            background: #131b2e;
+            border: 1px solid #1e293b;
+            color: #fff;
+            border-radius: 10px;
+        }
+        .template-3 .product-title, .template-3 h2, .template-3 h3, .template-3 h4 {
+            color: #f8fafc !important;
+        }
+        .template-3 .categories-section {
+            background: #111827 !important;
+            border-color: #1f2937 !important;
+        }
+
+        /* Template 4: High Conversion Flash Sale */
+        .template-4 .product-card {
+            border: 1.5px solid #fee2e2;
+            position: relative;
+        }
+        .template-4 .product-card:hover {
+            border-color: #ef4444;
+        }
+        .template-4 .section-heading h2 {
+            color: #dc2626 !important;
+            font-weight: 800;
+        }
+        .template-4 .heading-underline {
+            background: linear-gradient(90deg, #ef4444, #f97316) !important;
+        }
+
+        /* Template 5: Grocery / Fresh Express */
+        .template-5 .product-card {
+            border-radius: 12px;
+            border: 1px solid #dcfce7;
+        }
+        .template-5 .section-heading h2 {
+            color: #15803d !important;
+        }
+        .template-5 .heading-underline {
+            background: linear-gradient(90deg, #22c55e, #15803d) !important;
+        }
+    </style>
+
     @if (!empty($homepage['enable_main_slider_section']) && $homepage['enable_main_slider_section'])
         @php
             $sliderHeight = $homepage['slider_height'] ?? 300;
@@ -5131,4 +5202,5 @@
             });
         });
     </script>
+</div>
 @endsection
