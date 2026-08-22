@@ -33,7 +33,7 @@
     border-radius: 24px;
     overflow: hidden;
     position: relative;
-    height: 440px;
+    height: clamp(260px, 30.5vw, 410px);
     box-shadow: 0 10px 30px rgba(22, 101, 52, 0.08);
     border: 2px solid #dcfce7;
 }
@@ -71,6 +71,8 @@
     transition: opacity 0.6s ease;
     display: flex;
     align-items: flex-end;
+    text-decoration: none;
+    color: inherit;
 }
 .t5-slide.t5-active {
     opacity: 1;
@@ -82,11 +84,13 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
 }
 .t5-slide-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent 40%, rgba(20, 83, 45, 0.75) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
 }
 .t5-slide-content {
     position: relative;
@@ -377,33 +381,29 @@
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
                     @forelse($sliders as $idx => $slider)
-                        <div class="t5-slide {{ $idx === 0 ? 't5-active' : '' }}">
+                        <a href="{{ $slider->button_url ?? route('shop') }}" class="t5-slide {{ $idx === 0 ? 't5-active' : '' }}">
                             <img class="t5-slide-img" src="{{ asset($slider->image) }}" alt="{{ $slider->title ?? 'Fresh Groceries' }}">
-                            <div class="t5-slide-overlay"></div>
-                            <div class="t5-slide-content">
-                                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                    <div class="t5-eco-badge" style="margin-bottom: 0;">🌿 100% FRESH & ORGANIC</div>
-                                    <a href="{{ $slider->button_url ?? route('shop') }}" class="t5-fresh-btn">
-                                        {{ $slider->button_text ?? 'Order Fresh Now' }}
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                    </a>
+                            @if($slider->title || $slider->button_text)
+                                <div class="t5-slide-overlay"></div>
+                                <div class="t5-slide-content">
+                                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                        @if($slider->title)
+                                            <div class="t5-eco-badge" style="margin-bottom: 0;">{{ $slider->title }}</div>
+                                        @endif
+                                        @if($slider->button_text)
+                                            <span class="t5-fresh-btn">
+                                                {{ $slider->button_text }}
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            @endif
+                        </a>
                     @empty
-                        <div class="t5-slide t5-active">
+                        <a href="{{ route('shop') }}" class="t5-slide t5-active">
                             <img class="t5-slide-img" src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1600&q=80" alt="Fresh Produce">
-                            <div class="t5-slide-overlay"></div>
-                            <div class="t5-slide-content">
-                                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                    <div class="t5-eco-badge" style="margin-bottom: 0;">🌿 100% FARM FRESH</div>
-                                    <a href="{{ route('shop') }}" class="t5-fresh-btn">
-                                        Shop Farm Fresh
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        </a>
                     @endforelse
                 </div>
 

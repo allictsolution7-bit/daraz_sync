@@ -13,12 +13,12 @@
     width: 100%;
     overflow: hidden;
     background: #0a0a0a;
-    min-height: 480px;
+    min-height: 260px;
 }
 .t2-hero-slider {
     position: relative;
     width: 100%;
-    height: 480px;
+    height: clamp(260px, 30.5vw, 410px);
     overflow: hidden;
 }
 .t2-slide {
@@ -42,7 +42,8 @@
 .t2-slide-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(120deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 60%, rgba(0,0,0,0.06) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
 }
 .t2-slide-content {
     position: relative;
@@ -391,6 +392,11 @@
     .t2-banners { grid-template-columns: repeat(2, 1fr); }
     .t2-prod-card-wrap { flex: 0 0 calc(33% - 11px); min-width: 180px; }
     .t2-hero-slider { height: 360px; }
+    .t2-features-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 14px !important;
+        padding: 14px 16px !important;
+    }
 }
 @media (max-width: 576px) {
     .t2-banners { grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px; }
@@ -399,6 +405,10 @@
     .t2-slide-title { font-size: 26px; }
     .t2-slide-content { padding: 0 16px 36px; }
     .t2-categories { padding: 32px 0; }
+    .t2-features-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
 }
 </style>
 
@@ -429,35 +439,29 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
         </button>
         @forelse($sliders as $idx => $slider)
-            <div class="t2-slide {{ $idx === 0 ? 't2-active' : '' }}" id="t2-slide-{{ $idx }}">
+            <a href="{{ $slider->button_url ?? route('shop') }}" class="t2-slide {{ $idx === 0 ? 't2-active' : '' }}" id="t2-slide-{{ $idx }}" style="text-decoration:none; color:inherit;">
                 <div class="t2-slide-bg" style="background-image: url('{{ asset($slider->image) }}');"></div>
-                <div class="t2-slide-overlay"></div>
-                <div class="t2-slide-content">
-                    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                        <div class="t2-slide-label" style="margin-bottom: 0;">
-                            ✦ Curated Collection
+                @if($slider->title || $slider->button_text)
+                    <div class="t2-slide-overlay"></div>
+                    <div class="t2-slide-content">
+                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                            @if($slider->title)
+                                <div class="t2-slide-label" style="margin-bottom: 0;">{{ $slider->title }}</div>
+                            @endif
+                            @if($slider->button_text)
+                                <span class="t2-slide-btn">
+                                    {{ $slider->button_text }}
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                </span>
+                            @endif
                         </div>
-                        <a href="{{ $slider->button_url ?? route('shop') }}" class="t2-slide-btn">
-                            {{ $slider->button_text ?? 'Explore Collection' }}
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                        </a>
                     </div>
-                </div>
-            </div>
+                @endif
+            </a>
         @empty
-            <div class="t2-slide t2-active">
+            <a href="{{ route('shop') }}" class="t2-slide t2-active">
                 <div class="t2-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&q=80'); background-position: center;"></div>
-                <div class="t2-slide-overlay"></div>
-                <div class="t2-slide-content">
-                    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                        <div class="t2-slide-label" style="margin-bottom: 0;">✦ Curated Collection</div>
-                        <a href="{{ route('shop') }}" class="t2-slide-btn">
-                            Shop Now
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            </a>
         @endforelse
     </div>
     @if(count($sliders) > 1)
@@ -468,6 +472,48 @@
     </div>
     @endif
 </section>
+
+{{-- ─── SHOP FEATURES (Placed right below Hero Slider) ─── --}}
+@if (!empty($homepage['enable_shop_features_section']) && $homepage['enable_shop_features_section'])
+<div class="t2-features-wrap" style="max-width: 1340px; margin: 22px auto 0; padding: 0 20px;">
+    <div class="t2-features-grid" style="
+        background: #ffffff;
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        padding: 18px 24px;
+    ">
+        @foreach([
+            ['🚚', 'Free Delivery', 'On all orders over ৳999'],
+            ['🔒', 'Secure Payment', '100% safe & encrypted'],
+            ['↩️', 'Easy Returns', '7-day hassle-free returns'],
+            ['⭐', 'Premium Quality', 'Curated authentic products']
+        ] as $feat)
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="
+                    font-size: 24px;
+                    width: 46px;
+                    height: 46px;
+                    border-radius: 12px;
+                    background: rgba(212, 175, 55, 0.12);
+                    border: 1px solid rgba(212, 175, 55, 0.25);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                ">{{ $feat[0] }}</div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 800; color: #1e293b; letter-spacing: -0.2px; line-height: 1.2;">{{ $feat[1] }}</div>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 3px; line-height: 1.2;">{{ $feat[2] }}</div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+@endif
 
 {{-- ─── FEATURED BANNERS ─── --}}
 @php
@@ -570,21 +616,6 @@
                 @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'NEW'])
             @endforeach
         </div>
-    </div>
-</section>
-@endif
-
-{{-- ─── SHOP FEATURES ─── --}}
-@if (!empty($homepage['enable_shop_features_section']) && $homepage['enable_shop_features_section'])
-<section style="background: linear-gradient(135deg, #1a1206, #2a1f0a); padding: 48px 20px;">
-    <div style="max-width:1340px; margin:0 auto; display:grid; grid-template-columns: repeat(4,1fr); gap:28px; text-align:center;">
-        @foreach([['🚚','Free Delivery','On all orders over ৳999'],['🔒','Secure Payment','100% safe & encrypted'],['↩️','Easy Returns','7-day hassle-free returns'],['⭐','Premium Quality','Curated authentic products']] as $feat)
-        <div>
-            <div style="font-size:32px; margin-bottom:10px;">{{ $feat[0] }}</div>
-            <div style="font-size:15px; font-weight:800; color:#d4af37; margin-bottom:6px; letter-spacing:0.3px;">{{ $feat[1] }}</div>
-            <div style="font-size:13px; color:rgba(255,255,255,0.55);">{{ $feat[2] }}</div>
-        </div>
-        @endforeach
     </div>
 </section>
 @endif

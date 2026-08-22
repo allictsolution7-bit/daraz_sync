@@ -2399,225 +2399,332 @@
                         <div class="card-body bg-light-50 p-4">
                             <input type="hidden" name="homepage[template_id]" id="selected_homepage_template" value="{{ $selectedTemplate }}">
 
-                            <div class="row g-3">
+                            <style>
+                                .template-selector-grid {
+                                    display: grid;
+                                    grid-template-columns: repeat(2, 1fr);
+                                    gap: 14px;
+                                }
+                                @media (max-width: 768px) {
+                                    .template-selector-grid {
+                                        grid-template-columns: 1fr;
+                                    }
+                                }
+                                .template-card {
+                                    background: #ffffff;
+                                    border-radius: 12px;
+                                    border: 2px solid #e2e8f0;
+                                    padding: 12px 14px;
+                                    cursor: pointer;
+                                    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                                    position: relative;
+                                    display: flex;
+                                    flex-direction: column;
+                                    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+                                }
+                                .template-card:hover {
+                                    transform: translateY(-2px);
+                                    border-color: #93c5fd;
+                                    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.1);
+                                }
+                                .template-card.active-template-card {
+                                    border-color: #2563eb !important;
+                                    background: #ffffff;
+                                    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.16) !important;
+                                }
+                                .template-card.active-template-card::before {
+                                    content: 'ACTIVE';
+                                    position: absolute;
+                                    top: -9px;
+                                    right: 14px;
+                                    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                                    color: #ffffff;
+                                    font-size: 8px;
+                                    font-weight: 800;
+                                    letter-spacing: 0.8px;
+                                    padding: 2px 8px;
+                                    border-radius: 20px;
+                                    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+                                }
+                                .tpl-preview-box {
+                                    height: 95px;
+                                    border-radius: 8px;
+                                    overflow: hidden;
+                                    position: relative;
+                                    margin-bottom: 8px;
+                                    border: 1px solid #e2e8f0;
+                                    box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+                                    padding: 6px;
+                                }
+                            </style>
+
+                            <div class="template-selector-grid">
                                 <!-- Template 1 -->
-                                <div class="col-xl-4 col-md-6 mb-3">
-                                    <div class="template-card h-100 p-3 bg-white rounded-lg border {{ $selectedTemplate == '1' ? 'active-template-card' : '' }}"
-                                         data-template="1"
-                                         style="border-radius: 12px; cursor: pointer; transition: all 0.25s ease; border: 2px solid {{ $selectedTemplate == '1' ? '#3b82f6' : '#e2e8f0' }}; position: relative; box-shadow: {{ $selectedTemplate == '1' ? '0 8px 24px rgba(59,130,246,0.18)' : '0 2px 6px rgba(0,0,0,0.03)' }};">
-                                        <div class="template-preview-mockup rounded mb-3 p-2" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 130px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative;">
-                                            <!-- Mini UI Mockup T1 -->
-                                            <div style="height: 12px; background: #3b82f6; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
-                                                <div style="width: 20px; height: 4px; background: #fff; border-radius: 2px;"></div>
-                                                <div style="width: 40px; height: 4px; background: rgba(255,255,255,0.7); border-radius: 2px;"></div>
-                                            </div>
-                                            <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
-                                                <div style="width: 25%; background: #e2e8f0; border-radius: 4px; padding: 3px;">
-                                                    <div style="height: 3px; background: #cbd5e1; margin-bottom: 2px; border-radius: 1px;"></div>
-                                                    <div style="height: 3px; background: #cbd5e1; margin-bottom: 2px; border-radius: 1px;"></div>
-                                                    <div style="height: 3px; background: #cbd5e1; border-radius: 1px;"></div>
-                                                </div>
-                                                <div style="flex: 1; background: linear-gradient(135deg, #fb923c, #f97316); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                                                    <span style="color: #fff; font-size: 8px; font-weight: bold;">Main Slider</span>
-                                                </div>
-                                            </div>
-                                            <div style="display: flex; gap: 4px;">
-                                                <div style="flex: 1; height: 26px; background: #fff; border: 1px solid #e2e8f0; border-radius: 3px;"></div>
-                                                <div style="flex: 1; height: 26px; background: #fff; border: 1px solid #e2e8f0; border-radius: 3px;"></div>
-                                                <div style="flex: 1; height: 26px; background: #fff; border: 1px solid #e2e8f0; border-radius: 3px;"></div>
+                                <div class="template-card {{ $selectedTemplate == '1' ? 'active-template-card' : '' }}" data-template="1">
+                                    <div class="tpl-preview-box" style="background: #f8fafc; border-color: #fed7aa;">
+                                        <div style="height: 10px; background: #ea580c; border-radius: 3px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                            <div style="width: 18px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                            <div style="display: flex; gap: 3px;">
+                                                <div style="width: 14px; height: 3px; background: rgba(255,255,255,0.8); border-radius: 1px;"></div>
+                                                <div style="width: 14px; height: 3px; background: rgba(255,255,255,0.8); border-radius: 1px;"></div>
                                             </div>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 15px;">Template 1: Classic Marketplace</h6>
-                                            <span class="badge badge-light text-primary border border-primary small px-2">Default</span>
+                                        <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
+                                            <div style="width: 26%; background: #ffffff; border: 1px solid #fed7aa; border-radius: 4px; padding: 2px; display: flex; flex-direction: column; justify-content: space-around;">
+                                                <div style="height: 3px; background: #fdba74; border-radius: 1px;"></div>
+                                                <div style="height: 3px; background: #e2e8f0; border-radius: 1px;"></div>
+                                                <div style="height: 3px; background: #e2e8f0; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; background: linear-gradient(135deg, #ea580c, #f97316); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; padding: 2px;">
+                                                <span style="font-size: 7.5px; font-weight: 800; letter-spacing: 0.3px;">MARKETPLACE</span>
+                                                <span style="font-size: 6px; opacity: 0.9;">Drawer + Slider</span>
+                                            </div>
                                         </div>
-                                        <p class="text-muted small mb-2" style="line-height: 1.4; font-size: 12px;">
-                                            Classic Daraz-style e-commerce layout with left category drawer, wide hero slider, deal highlights & multi-row showcases.
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                            <span class="badge badge-pill {{ $selectedTemplate == '1' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
-                                                {{ $selectedTemplate == '1' ? '✓ Currently Applied' : 'Click to Apply' }}
-                                            </span>
-                                            <a href="{{ url('/') }}?preview_template=1" target="_blank"
-                                               class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 11px;">
-                                                <i class="fas fa-external-link-alt"></i> Live Preview
-                                            </a>
+                                        <div style="display: flex; gap: 4px;">
+                                            <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #fed7aa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #ffedd5; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #fed7aa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #ffedd5; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #fed7aa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #ffedd5; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 1: Classic Marketplace</h6>
+                                        <span class="badge badge-warning text-dark font-weight-bold px-2" style="font-size: 9px; border-radius: 4px;">Default</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        Daraz-style multi-category architecture with category menu drawer & wide carousel.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '1' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '1' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=1" target="_blank"
+                                           class="btn btn-sm btn-outline-primary px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
                                     </div>
                                 </div>
 
                                 <!-- Template 2 -->
-                                <div class="col-xl-4 col-md-6 mb-3">
-                                    <div class="template-card h-100 p-3 bg-white rounded-lg border {{ $selectedTemplate == '2' ? 'active-template-card' : '' }}"
-                                         data-template="2"
-                                         style="border-radius: 12px; cursor: pointer; transition: all 0.25s ease; border: 2px solid {{ $selectedTemplate == '2' ? '#3b82f6' : '#e2e8f0' }}; position: relative; box-shadow: {{ $selectedTemplate == '2' ? '0 8px 24px rgba(59,130,246,0.18)' : '0 2px 6px rgba(0,0,0,0.03)' }};">
-                                        <div class="template-preview-mockup rounded mb-3 p-2" style="background: #f8fafc; border: 1px solid #e2e8f0; height: 130px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative;">
-                                            <!-- Mini UI Mockup T2 -->
-                                            <div style="height: 10px; background: #0f172a; border-radius: 3px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
-                                                <div style="width: 16px; height: 3px; background: #fff; border-radius: 1px;"></div>
-                                                <div style="width: 50px; height: 3px; background: rgba(255,255,255,0.6); border-radius: 1px;"></div>
-                                            </div>
-                                            <div style="flex: 1; background: linear-gradient(135deg, #38bdf8, #6366f1); border-radius: 6px; margin: 4px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;">
-                                                <span style="font-size: 8px; font-weight: bold; letter-spacing: 0.5px;">MODERN MINIMAL HERO</span>
-                                                <span style="font-size: 6px; opacity: 0.85;">Full Width • Sleek Elevation</span>
-                                            </div>
-                                            <div style="display: flex; gap: 4px;">
-                                                <div style="flex: 1; height: 28px; background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"></div>
-                                                <div style="flex: 1; height: 28px; background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"></div>
-                                                <div style="flex: 1; height: 28px; background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"></div>
-                                                <div style="flex: 1; height: 28px; background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"></div>
+                                <div class="template-card {{ $selectedTemplate == '2' ? 'active-template-card' : '' }}" data-template="2">
+                                    <div class="tpl-preview-box" style="background: #0a0a0a; border-color: #d4af37;">
+                                        <div style="height: 10px; background: #171717; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; border-bottom: 1px solid rgba(212,175,55,0.4);">
+                                            <div style="width: 18px; height: 3px; background: #d4af37; border-radius: 1px;"></div>
+                                            <div style="display: flex; gap: 3px;">
+                                                <div style="width: 10px; height: 2px; background: rgba(255,255,255,0.6); border-radius: 1px;"></div>
                                             </div>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 15px;">Template 2: Modern Minimal</h6>
-                                            <span class="badge badge-info small px-2">Boutique</span>
+                                        <div style="flex: 1; background: linear-gradient(135deg, #1e1b18, #2a2012); border-radius: 4px; margin: 4px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #d4af37; border: 1px solid rgba(212,175,55,0.35);">
+                                            <span style="font-size: 7.5px; font-weight: 800; letter-spacing: 0.8px;">MODERN BOUTIQUE</span>
+                                            <span style="font-size: 6px; color: rgba(255,255,255,0.7);">Full-Width Canvas • Top Trust Bar</span>
                                         </div>
-                                        <p class="text-muted small mb-2" style="line-height: 1.4; font-size: 12px;">
-                                            Clean boutique presentation with full-width hero canvas, elegant floating badges, airy typography and soft shadows.
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                            <span class="badge badge-pill {{ $selectedTemplate == '2' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
-                                                {{ $selectedTemplate == '2' ? '✓ Currently Applied' : 'Click to Apply' }}
-                                            </span>
-                                            <a href="{{ url('/') }}?preview_template=2" target="_blank"
-                                               class="btn btn-sm btn-outline-info py-0 px-2" style="font-size: 11px;">
-                                                <i class="fas fa-external-link-alt"></i> Live Preview
-                                            </a>
+                                        <div style="display: flex; gap: 4px;">
+                                            <div style="flex: 1; height: 20px; background: #141414; border: 1px solid rgba(212,175,55,0.25); border-radius: 3px; display: flex; align-items: center; justify-content: center;">
+                                                <span style="font-size: 5.5px; color: #d4af37;">🚚 Free Delivery</span>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #141414; border: 1px solid rgba(212,175,55,0.25); border-radius: 3px; display: flex; align-items: center; justify-content: center;">
+                                                <span style="font-size: 5.5px; color: #d4af37;">🔒 Secure</span>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #141414; border: 1px solid rgba(212,175,55,0.25); border-radius: 3px; display: flex; align-items: center; justify-content: center;">
+                                                <span style="font-size: 5.5px; color: #d4af37;">⭐ Premium</span>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 2: Modern Minimal</h6>
+                                        <span class="badge badge-dark text-warning font-weight-bold px-2" style="font-size: 9px; border-radius: 4px; border: 1px solid #d4af37;">Luxury</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        High-end boutique look with gold accents, edge-to-edge slider & top trust strip.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '2' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '2' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=2" target="_blank"
+                                           class="btn btn-sm btn-outline-dark px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
                                     </div>
                                 </div>
 
                                 <!-- Template 3 -->
-                                <div class="col-xl-4 col-md-6 mb-3">
-                                    <div class="template-card h-100 p-3 bg-white rounded-lg border {{ $selectedTemplate == '3' ? 'active-template-card' : '' }}"
-                                         data-template="3"
-                                         style="border-radius: 12px; cursor: pointer; transition: all 0.25s ease; border: 2px solid {{ $selectedTemplate == '3' ? '#3b82f6' : '#e2e8f0' }}; position: relative; box-shadow: {{ $selectedTemplate == '3' ? '0 8px 24px rgba(59,130,246,0.18)' : '0 2px 6px rgba(0,0,0,0.03)' }};">
-                                        <div class="template-preview-mockup rounded mb-3 p-2" style="background: #0f172a; border: 1px solid #1e293b; height: 130px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative;">
-                                            <!-- Mini UI Mockup T3 -->
-                                            <div style="height: 10px; background: #1e293b; border-radius: 3px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
-                                                <div style="width: 18px; height: 3px; background: #38bdf8; border-radius: 1px;"></div>
-                                                <div style="width: 35px; height: 3px; background: #64748b; border-radius: 1px;"></div>
+                                <div class="template-card {{ $selectedTemplate == '3' ? 'active-template-card' : '' }}" data-template="3">
+                                    <div class="tpl-preview-box" style="background: #080c14; border-color: #38bdf8;">
+                                        <div style="height: 10px; background: #0d1322; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; border-bottom: 1px solid rgba(56, 189, 248, 0.4);">
+                                            <div style="width: 18px; height: 3px; background: #38bdf8; border-radius: 1px;"></div>
+                                            <div style="display: flex; gap: 3px;">
+                                                <div style="width: 10px; height: 2px; background: #64748b; border-radius: 1px;"></div>
                                             </div>
-                                            <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
-                                                <div style="flex: 1.4; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid #475569;">
-                                                    <span style="color: #38bdf8; font-size: 7px; font-weight: bold;">TECH BANNER</span>
+                                        </div>
+                                        <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
+                                            <div style="flex: 2; background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #38bdf8;">
+                                                <span style="color: #38bdf8; font-size: 7.5px; font-weight: 800;">⚡ TECH HUB</span>
+                                                <span style="color: #94a3b8; font-size: 5.5px;">Gadget Spec Grids</span>
+                                            </div>
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                                <div style="flex: 1; background: #0d1322; border-radius: 2px; border: 1px solid rgba(56,189,248,0.3); display: flex; align-items: center; justify-content: center;">
+                                                    <span style="font-size: 5px; color: #38bdf8;">Side 1</span>
                                                 </div>
-                                                <div style="flex: 0.8; display: flex; flex-direction: column; gap: 3px;">
-                                                    <div style="flex: 1; background: #1e293b; border-radius: 3px; border: 1px solid #334155;"></div>
-                                                    <div style="flex: 1; background: #1e293b; border-radius: 3px; border: 1px solid #334155;"></div>
+                                                <div style="flex: 1; background: #0d1322; border-radius: 2px; border: 1px solid rgba(56,189,248,0.3); display: flex; align-items: center; justify-content: center;">
+                                                    <span style="font-size: 5px; color: #38bdf8;">Side 2</span>
                                                 </div>
                                             </div>
-                                            <div style="display: flex; gap: 4px;">
-                                                <div style="flex: 1; height: 26px; background: #1e293b; border-radius: 3px; border: 1px solid #334155;"></div>
-                                                <div style="flex: 1; height: 26px; background: #1e293b; border-radius: 3px; border: 1px solid #334155;"></div>
-                                                <div style="flex: 1; height: 26px; background: #1e293b; border-radius: 3px; border: 1px solid #334155;"></div>
+                                        </div>
+                                        <div style="display: flex; gap: 4px;">
+                                            <div style="flex: 1; height: 20px; background: #0d1322; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #1e293b; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #38bdf8; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #0d1322; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #1e293b; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #38bdf8; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #0d1322; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #1e293b; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #38bdf8; border-radius: 1px;"></div>
                                             </div>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 15px;">Template 3: Electronic & Tech Hub</h6>
-                                            <span class="badge badge-dark small px-2">Tech Store</span>
-                                        </div>
-                                        <p class="text-muted small mb-2" style="line-height: 1.4; font-size: 12px;">
-                                            High-tech dark accents, dense product showcase grids, side deal banners, and specialized gadget-oriented styling.
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                            <span class="badge badge-pill {{ $selectedTemplate == '3' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
-                                                {{ $selectedTemplate == '3' ? '✓ Currently Applied' : 'Click to Apply' }}
-                                            </span>
-                                            <div class="d-flex gap-1">
-                                                <a href="{{ url('/') }}?preview_template=3" target="_blank" class="btn btn-sm btn-outline-dark py-0 px-2" style="font-size: 11px;">Preview</a>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(3, 'Electronic & Tech Hub')">Details</button>
-                                            </div>
-                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 3: Electronic & Tech Hub</h6>
+                                        <span class="badge badge-info font-weight-bold px-2" style="font-size: 9px; border-radius: 4px; background: #0284c7; color: #fff;">Cyber Tech</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        Cyberpunk dark theme, cyan glow, 2.5:1 hero with 2-row rotating promo deals.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '3' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '3' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=3" target="_blank"
+                                           class="btn btn-sm btn-outline-info px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
                                     </div>
                                 </div>
 
                                 <!-- Template 4 -->
-                                <div class="col-xl-4 col-md-6 mb-3">
-                                    <div class="template-card h-100 p-3 bg-white rounded-lg border {{ $selectedTemplate == '4' ? 'active-template-card' : '' }}"
-                                         data-template="4"
-                                         style="border-radius: 12px; cursor: pointer; transition: all 0.25s ease; border: 2px solid {{ $selectedTemplate == '4' ? '#3b82f6' : '#e2e8f0' }}; position: relative; box-shadow: {{ $selectedTemplate == '4' ? '0 8px 24px rgba(59,130,246,0.18)' : '0 2px 6px rgba(0,0,0,0.03)' }};">
-                                        <div class="template-preview-mockup rounded mb-3 p-2" style="background: #fff5f5; border: 1px solid #fed7d7; height: 130px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative;">
-                                            <!-- Mini UI Mockup T4 -->
-                                            <div style="height: 12px; background: #e53e3e; border-radius: 3px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
-                                                <div style="width: 25px; height: 4px; background: #fff; border-radius: 1px;"></div>
-                                                <div style="display: flex; gap: 2px;">
-                                                    <div style="width: 6px; height: 6px; background: #000; color: #fff; font-size: 4px; text-align: center; border-radius: 1px;">09</div>
-                                                    <div style="width: 6px; height: 6px; background: #000; color: #fff; font-size: 4px; text-align: center; border-radius: 1px;">45</div>
+                                <div class="template-card {{ $selectedTemplate == '4' ? 'active-template-card' : '' }}" data-template="4">
+                                    <div class="tpl-preview-box" style="background: #0f1115; border-color: #e11d48;">
+                                        <div style="height: 10px; background: #1e1117; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; border-bottom: 1px solid rgba(225, 29, 72, 0.4);">
+                                            <div style="width: 20px; height: 3px; background: #e11d48; border-radius: 1px;"></div>
+                                            <div style="display: flex; gap: 2px;">
+                                                <div style="padding: 1px 3px; background: #e11d48; color: #fff; font-size: 5px; border-radius: 1px; font-weight: 800;">SALE</div>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
+                                            <div style="flex: 2; background: linear-gradient(135deg, #881337, #be123c); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; border: 1px solid #f43f5e;">
+                                                <span style="font-size: 7.5px; font-weight: 900;">🔥 FLASH SALE</span>
+                                                <span style="font-size: 5.5px; color: #fecdd3;">Live Deal Timers</span>
+                                            </div>
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                                <div style="flex: 1; background: #1e1117; border-radius: 2px; border: 1px solid rgba(244,63,94,0.3); display: flex; align-items: center; justify-content: center;">
+                                                    <span style="font-size: 5px; color: #fb7185;">Deal 1</span>
+                                                </div>
+                                                <div style="flex: 1; background: #1e1117; border-radius: 2px; border: 1px solid rgba(244,63,94,0.3); display: flex; align-items: center; justify-content: center;">
+                                                    <span style="font-size: 5px; color: #fb7185;">Deal 2</span>
                                                 </div>
                                             </div>
-                                            <div style="flex: 1; background: linear-gradient(135deg, #e53e3e, #dd6b20); border-radius: 4px; margin: 4px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;">
-                                                <span style="font-size: 8px; font-weight: 900;">🔥 FLASH MEGA SALE</span>
-                                                <span style="font-size: 6px;">UP TO 70% OFF TODAY</span>
-                                            </div>
-                                            <div style="display: flex; gap: 4px;">
-                                                <div style="flex: 1; height: 26px; background: #fff; border: 1px solid #feb2b2; border-radius: 3px; position: relative;">
-                                                    <div style="position: absolute; top: -2px; right: 2px; width: 8px; height: 4px; background: #e53e3e; border-radius: 1px;"></div>
-                                                </div>
-                                                <div style="flex: 1; height: 26px; background: #fff; border: 1px solid #feb2b2; border-radius: 3px;"></div>
-                                                <div style="flex: 1; height: 26px; background: #fff; border: 1px solid #feb2b2; border-radius: 3px;"></div>
-                                            </div>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 15px;">Template 4: High-Conversion Flash Sale</h6>
-                                            <span class="badge badge-danger small px-2">High Conversion</span>
-                                        </div>
-                                        <p class="text-muted small mb-2" style="line-height: 1.4; font-size: 12px;">
-                                            Urgency-driven e-commerce layout featuring animated sale tickers, flash deal banners, and conversion-optimized buy actions.
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                            <span class="badge badge-pill {{ $selectedTemplate == '4' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
-                                                {{ $selectedTemplate == '4' ? '✓ Currently Applied' : 'Click to Apply' }}
-                                            </span>
-                                            <div class="d-flex gap-1">
-                                                <a href="{{ url('/') }}?preview_template=4" target="_blank" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size: 11px;">Preview</a>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(4, 'High-Conversion Flash Sale')">Details</button>
+                                        <div style="display: flex; gap: 4px;">
+                                            <div style="flex: 1; height: 20px; background: #1e1117; border: 1px solid rgba(225, 29, 72, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #33131d; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #e11d48; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #1e1117; border: 1px solid rgba(225, 29, 72, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #33131d; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #e11d48; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #1e1117; border: 1px solid rgba(225, 29, 72, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #33131d; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #e11d48; border-radius: 1px;"></div>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 4: Flash Sale</h6>
+                                        <span class="badge badge-danger font-weight-bold px-2" style="font-size: 9px; border-radius: 4px;">Conversion</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        High-conversion urgency architecture with animated sale marquee & flash deal rows.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '4' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '4' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=4" target="_blank"
+                                           class="btn btn-sm btn-outline-danger px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
                                     </div>
                                 </div>
 
                                 <!-- Template 5 -->
-                                <div class="col-xl-4 col-md-6 mb-3">
-                                    <div class="template-card h-100 p-3 bg-white rounded-lg border {{ $selectedTemplate == '5' ? 'active-template-card' : '' }}"
-                                         data-template="5"
-                                         style="border-radius: 12px; cursor: pointer; transition: all 0.25s ease; border: 2px solid {{ $selectedTemplate == '5' ? '#3b82f6' : '#e2e8f0' }}; position: relative; box-shadow: {{ $selectedTemplate == '5' ? '0 8px 24px rgba(59,130,246,0.18)' : '0 2px 6px rgba(0,0,0,0.03)' }};">
-                                        <div class="template-preview-mockup rounded mb-3 p-2" style="background: #f0fdf4; border: 1px solid #bbf7d0; height: 130px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative;">
-                                            <!-- Mini UI Mockup T5 -->
-                                            <div style="height: 10px; background: #16a34a; border-radius: 3px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
-                                                <div style="width: 20px; height: 3px; background: #fff; border-radius: 1px;"></div>
-                                                <div style="width: 30px; height: 3px; background: rgba(255,255,255,0.7); border-radius: 1px;"></div>
-                                            </div>
-                                            <div style="display: flex; gap: 3px; margin: 2px 0;">
-                                                <div style="flex: 1; height: 14px; background: #dcfce7; border-radius: 10px; border: 1px solid #86efac;"></div>
-                                                <div style="flex: 1; height: 14px; background: #dcfce7; border-radius: 10px; border: 1px solid #86efac;"></div>
-                                                <div style="flex: 1; height: 14px; background: #dcfce7; border-radius: 10px; border: 1px solid #86efac;"></div>
-                                            </div>
-                                            <div style="flex: 1; background: linear-gradient(135deg, #22c55e, #15803d); border-radius: 4px; margin-bottom: 3px; display: flex; align-items: center; justify-content: center; color: #fff;">
-                                                <span style="font-size: 7px; font-weight: bold;">FRESH & ORGANIC EXPRESS</span>
-                                            </div>
-                                            <div style="display: flex; gap: 4px;">
-                                                <div style="flex: 1; height: 26px; background: #fff; border: 1px solid #bbf7d0; border-radius: 3px;"></div>
-                                                <div style="flex: 1; height: 26px; background: #fff; border: 1px solid #bbf7d0; border-radius: 3px;"></div>
-                                                <div style="flex: 1; height: 26px; background: #fff; border: 1px solid #bbf7d0; border-radius: 3px;"></div>
+                                <div class="template-card {{ $selectedTemplate == '5' ? 'active-template-card' : '' }}" data-template="5">
+                                    <div class="tpl-preview-box" style="background: #f0fdf4; border-color: #86efac;">
+                                        <div style="height: 10px; background: #15803d; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                            <div style="width: 18px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                            <div style="display: flex; gap: 3px;">
+                                                <div style="width: 10px; height: 2px; background: rgba(255,255,255,0.7); border-radius: 1px;"></div>
                                             </div>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 15px;">Template 5: Grocery & Fresh Express</h6>
-                                            <span class="badge badge-success small px-2">Fast Express</span>
-                                        </div>
-                                        <p class="text-muted small mb-2" style="line-height: 1.4; font-size: 12px;">
-                                            Fresh organic grocery layout with quick category pill tabs, rapid multi-item cart additions, and crisp eco-friendly aesthetics.
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                            <span class="badge badge-pill {{ $selectedTemplate == '5' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
-                                                {{ $selectedTemplate == '5' ? '✓ Currently Applied' : 'Click to Apply' }}
-                                            </span>
-                                            <div class="d-flex gap-1">
-                                                <a href="{{ url('/') }}?preview_template=5" target="_blank" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size: 11px;">Preview</a>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(5, 'Grocery & Fresh Express')">Details</button>
+                                        <div style="display: flex; gap: 3px; margin: 3px 0;">
+                                            <div style="flex: 1; height: 9px; background: #dcfce7; border-radius: 6px; border: 1px solid #86efac; display: flex; align-items: center; justify-content: center;">
+                                                <span style="font-size: 4.5px; color: #15803d; font-weight: 700;">Organic</span>
+                                            </div>
+                                            <div style="flex: 1; height: 9px; background: #dcfce7; border-radius: 6px; border: 1px solid #86efac; display: flex; align-items: center; justify-content: center;">
+                                                <span style="font-size: 4.5px; color: #15803d; font-weight: 700;">Fruits</span>
+                                            </div>
+                                            <div style="flex: 1; height: 9px; background: #dcfce7; border-radius: 6px; border: 1px solid #86efac; display: flex; align-items: center; justify-content: center;">
+                                                <span style="font-size: 4.5px; color: #15803d; font-weight: 700;">Dairy</span>
                                             </div>
                                         </div>
+                                        <div style="flex: 1; background: linear-gradient(135deg, #16a34a, #15803d); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; margin-bottom: 3px;">
+                                            <span style="font-size: 7.5px; font-weight: 800;">🌿 FRESH GROCERY</span>
+                                            <span style="font-size: 5.5px; opacity: 0.9;">Farm Fresh Produce</span>
+                                        </div>
+                                        <div style="display: flex; gap: 4px;">
+                                            <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #86efac; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #dcfce7; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #86efac; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #dcfce7; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #86efac; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 8px; background: #dcfce7; border-radius: 1px;"></div>
+                                                <div style="height: 3px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 5: Grocery & Fresh Express</h6>
+                                        <span class="badge badge-success font-weight-bold px-2" style="font-size: 9px; border-radius: 4px;">Organic</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        Fresh eco-friendly grocery layout with category pill tabs & full-width carousel.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '5' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '5' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=5" target="_blank"
+                                           class="btn btn-sm btn-outline-success px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -5599,7 +5706,7 @@
         // Template Card Click Selection
         document.querySelectorAll('.template-card').forEach(function(card) {
             card.addEventListener('click', function(e) {
-                if (e.target.closest('button')) return; // ignore details button click
+                if (e.target.closest('a') || e.target.closest('button')) return; // ignore links and buttons
                 const templateId = this.getAttribute('data-template');
                 const templateInput = document.getElementById('selected_homepage_template');
                 if (templateInput) {
@@ -5610,21 +5717,21 @@
                 document.querySelectorAll('.template-card').forEach(function(c) {
                     c.classList.remove('active-template-card');
                     c.style.borderColor = '#e2e8f0';
-                    c.style.boxShadow = '0 2px 6px rgba(0,0,0,0.03)';
+                    c.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
                     const badge = c.querySelector('.template-status-badge');
                     if (badge) {
-                        badge.className = 'badge badge-pill badge-secondary px-2 py-1 template-status-badge';
-                        badge.textContent = 'Click to Apply';
+                        badge.className = 'badge badge-light text-secondary border px-3 py-1 template-status-badge';
+                        badge.textContent = 'Select Template';
                     }
                 });
 
                 this.classList.add('active-template-card');
-                this.style.borderColor = '#3b82f6';
-                this.style.boxShadow = '0 8px 24px rgba(59,130,246,0.18)';
+                this.style.borderColor = '#2563eb';
+                this.style.boxShadow = '0 12px 32px rgba(37, 99, 235, 0.18)';
                 const activeBadge = this.querySelector('.template-status-badge');
                 if (activeBadge) {
-                    activeBadge.className = 'badge badge-pill badge-success px-2 py-1 template-status-badge';
-                    activeBadge.textContent = '✓ Currently Applied';
+                    activeBadge.className = 'badge badge-success px-3 py-1 template-status-badge';
+                    activeBadge.textContent = '✓ Currently Active';
                 }
 
                 // Show subtle toast or notification

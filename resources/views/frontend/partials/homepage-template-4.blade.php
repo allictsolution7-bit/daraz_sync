@@ -66,8 +66,8 @@
 }
 .t4-hero-layout {
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 18px;
+    grid-template-columns: 2.5fr 1fr;
+    gap: 14px;
     align-items: stretch;
 }
 @media (max-width: 900px) {
@@ -84,7 +84,7 @@
     position: relative;
     border-radius: 16px;
     overflow: hidden;
-    height: 480px;
+    height: 270px;
     background: #171a21;
     border: 1px solid rgba(212, 175, 55, 0.3);
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
@@ -123,6 +123,9 @@
     transition: opacity 0.6s ease;
     display: flex;
     align-items: flex-end;
+    background: #0f1115;
+    text-decoration: none;
+    color: inherit;
 }
 .t4-slide.t4-active {
     opacity: 1;
@@ -139,7 +142,8 @@
 .t4-slide-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(15,17,21,0.1) 0%, rgba(15,17,21,0.4) 50%, rgba(15,17,21,0.92) 100%);
+    background: linear-gradient(180deg, rgba(15,17,21,0) 0%, rgba(15,17,21,0.1) 60%, rgba(15,17,21,0.4) 100%);
+    pointer-events: none;
 }
 .t4-slide-content {
     position: relative;
@@ -190,66 +194,81 @@
     text-decoration: none;
 }
 
-/* Side Rotating Carousels (Luxury Dark Panels) */
+/* Side Rotating Deals (2-Row Groups with 1 set of Left/Right Buttons) */
 .t4-side-deals {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    height: 480px;
-}
-.t4-side-carousel {
     position: relative;
-    flex: 1;
+    height: 270px;
     background: #171a21;
     border: 1px solid rgba(212, 175, 55, 0.25);
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
-.t4-side-slide {
+.t4-side-group {
     position: absolute;
     inset: 0;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     opacity: 0;
-    transition: opacity 0.45s ease;
+    pointer-events: none;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    transform: scale(0.98);
+}
+.t4-side-group.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+    transform: scale(1);
+}
+.t4-side-card {
+    flex: 1;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0f1115;
+    border: 1px solid rgba(212, 175, 55, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    padding: 6px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
 }
-.t4-side-slide.active {
-    opacity: 1;
-    z-index: 1;
+.t4-side-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(212, 175, 55, 0.5);
 }
-.t4-side-slide img {
+.t4-side-card img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center;
     display: block;
-    border-radius: 12px;
 }
 .t4-side-nav-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: rgba(15, 17, 21, 0.9);
-    border: 1px solid #d4af37;
+    border: 1.5px solid #d4af37;
     color: #d4af37;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 5;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    z-index: 10;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
     transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
 }
 .t4-side-nav-btn:hover {
     background: #d4af37;
     color: #0f1115;
+    transform: translateY(-50%) scale(1.08);
 }
 .t4-side-prev { left: 10px; }
 .t4-side-next { right: 10px; }
@@ -461,100 +480,79 @@
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
                     @forelse($sliders as $idx => $slider)
-                        <div class="t4-slide {{ $idx === 0 ? 't4-active' : '' }}">
+                        <a href="{{ $slider->button_url ?? route('shop') }}" class="t4-slide {{ $idx === 0 ? 't4-active' : '' }}">
                             <img class="t4-slide-img" src="{{ asset($slider->image) }}" alt="{{ $slider->title ?? 'Luxury Boutique' }}">
-                            <div class="t4-slide-overlay"></div>
-                            <div class="t4-slide-content">
-                                <div class="t4-slide-cta-row">
-                                    <div class="t4-badge-flash">✨ LUXURY EDITION</div>
-                                    <a href="{{ $slider->button_url ?? route('shop') }}" class="t4-deal-btn">
-                                        {{ $slider->button_text ?? 'Explore Collection' }}
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                    </a>
+                            @if($slider->title || $slider->button_text)
+                                <div class="t4-slide-overlay"></div>
+                                <div class="t4-slide-content">
+                                    <div class="t4-slide-cta-row">
+                                        @if($slider->title)
+                                            <div class="t4-badge-flash">{{ $slider->title }}</div>
+                                        @endif
+                                        @if($slider->button_text)
+                                            <span class="t4-deal-btn">
+                                                {{ $slider->button_text }}
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            @endif
+                        </a>
                     @empty
-                        <div class="t4-slide t4-active">
+                        <a href="{{ route('shop') }}" class="t4-slide t4-active">
                             <img class="t4-slide-img" src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&q=80" alt="Luxury Boutique">
-                            <div class="t4-slide-overlay"></div>
-                            <div class="t4-slide-content">
-                                <div class="t4-slide-cta-row">
-                                    <div class="t4-badge-flash">✨ LUXURY EDITION</div>
-                                    <a href="{{ route('shop') }}" class="t4-deal-btn">
-                                        Explore Collection
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        </a>
                     @endforelse
                 </div>
 
-                {{-- RIGHT PROMO TILES (2 ROWS OF CAROUSELS WITH NEXT/PREV BUTTONS) --}}
+                {{-- RIGHT PROMO TILES (2 ROWS VISIBLE PER GROUP, 1 PAIR OF NEXT/PREV BUTTONS) --}}
                 <div class="t4-side-deals">
                     @php
-                        $side1 = array_filter([
-                            $homepage['featured_image_1'] ?? ($homepage['slider_side_image_one'] ?? ($homepage['slider_side_image'] ?? null)),
-                            $homepage['featured_image_3'] ?? null,
-                        ]);
-                        $side2 = array_filter([
-                            $homepage['featured_image_2'] ?? ($homepage['slider_side_image_two'] ?? null),
-                            $homepage['featured_image_4'] ?? null,
-                        ]);
+                        $t4AllImages = [];
+                        for ($i = 1; $i <= 6; $i++) {
+                            $img = $homepage['featured_image_' . $i] ?? ($i === 1 ? ($homepage['slider_side_image_one'] ?? ($homepage['slider_side_image'] ?? null)) : ($i === 2 ? ($homepage['slider_side_image_two'] ?? null) : null));
+                            if (!empty($img)) {
+                                $t4AllImages[] = [
+                                    'image' => $img,
+                                    'link'  => $homepage['featured_image_' . $i . '_link'] ?? ($i === 1 ? ($homepage['slider_side_image_one_link'] ?? route('shop')) : ($i === 2 ? ($homepage['slider_side_image_two_link'] ?? route('shop')) : route('shop'))),
+                                    'alt'   => $homepage['featured_image_' . $i . '_alt'] ?? ('Promo Banner ' . $i),
+                                ];
+                            }
+                        }
+                        if (empty($t4AllImages)) {
+                            $t4AllImages = [
+                                ['image' => 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&q=80', 'link' => route('shop'), 'alt' => 'Promo 1'],
+                                ['image' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80', 'link' => route('shop'), 'alt' => 'Promo 2'],
+                            ];
+                        }
+                        $t4Groups = array_chunk($t4AllImages, 2);
                     @endphp
 
-                    {{-- Top Row Carousel --}}
-                    <div class="t4-side-carousel" id="t4-side-car-1">
-                        @if(count($side1) > 1)
-                            <button class="t4-side-nav-btn t4-side-prev" data-carousel="t4-side-car-1" data-dir="-1" aria-label="Previous">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                            </button>
-                            <button class="t4-side-nav-btn t4-side-next" data-carousel="t4-side-car-1" data-dir="1" aria-label="Next">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                            </button>
-                        @endif
-                        @forelse($side1 as $sIdx => $sImg)
-                            @php
-                                $sImgKey = ($sIdx === 0) ? '1' : '3';
-                                $sLink = $homepage['featured_image_' . $sImgKey . '_link'] ?? ($homepage['slider_side_image_one_link'] ?? route('shop'));
-                                $sAlt  = $homepage['featured_image_' . $sImgKey . '_alt'] ?? 'Promo Banner';
-                            @endphp
-                            <a href="{{ $sLink }}" class="t4-side-slide {{ $loop->first ? 'active' : '' }}">
-                                <img src="{{ asset($sImg) }}" alt="{{ $sAlt }}" loading="lazy">
-                            </a>
-                        @empty
-                            <a href="{{ route('shop') }}" class="t4-side-slide active">
-                                <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&q=80" alt="Flash Promo 1">
-                            </a>
-                        @endforelse
-                    </div>
+                    @if(count($t4Groups) > 1)
+                        <button class="t4-side-nav-btn t4-side-prev" data-dir="-1" aria-label="Previous Promo Pair">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button class="t4-side-nav-btn t4-side-next" data-dir="1" aria-label="Next Promo Pair">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                    @endif
 
-                    {{-- Bottom Row Carousel --}}
-                    <div class="t4-side-carousel" id="t4-side-car-2">
-                        @if(count($side2) > 1)
-                            <button class="t4-side-nav-btn t4-side-prev" data-carousel="t4-side-car-2" data-dir="-1" aria-label="Previous">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                            </button>
-                            <button class="t4-side-nav-btn t4-side-next" data-carousel="t4-side-car-2" data-dir="1" aria-label="Next">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                            </button>
-                        @endif
-                        @forelse($side2 as $sIdx => $sImg)
-                            @php
-                                $sImgKey = ($sIdx === 0) ? '2' : '4';
-                                $sLink = $homepage['featured_image_' . $sImgKey . '_link'] ?? ($homepage['slider_side_image_two_link'] ?? route('shop'));
-                                $sAlt  = $homepage['featured_image_' . $sImgKey . '_alt'] ?? 'Promo Banner';
-                            @endphp
-                            <a href="{{ $sLink }}" class="t4-side-slide {{ $loop->first ? 'active' : '' }}">
-                                <img src="{{ asset($sImg) }}" alt="{{ $sAlt }}" loading="lazy">
-                            </a>
-                        @empty
-                            <a href="{{ route('shop') }}" class="t4-side-slide active">
-                                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80" alt="Flash Promo 2">
-                            </a>
-                        @endforelse
-                    </div>
+                    @foreach($t4Groups as $gIdx => $group)
+                        <div class="t4-side-group {{ $gIdx === 0 ? 'active' : '' }}">
+                            @foreach($group as $item)
+                                <a href="{{ $item['link'] }}" class="t4-side-card">
+                                    <img src="{{ str_starts_with($item['image'], 'http') ? $item['image'] : asset($item['image']) }}" alt="{{ $item['alt'] }}" loading="lazy">
+                                </a>
+                            @endforeach
+                            @if(count($group) === 1 && count($t4AllImages) > 1)
+                                {{-- Fill 2nd slot with first image if odd number --}}
+                                <a href="{{ $t4AllImages[0]['link'] }}" class="t4-side-card">
+                                    <img src="{{ str_starts_with($t4AllImages[0]['image'], 'http') ? $t4AllImages[0]['image'] : asset($t4AllImages[0]['image']) }}" alt="{{ $t4AllImages[0]['alt'] }}" loading="lazy">
+                                </a>
+                            @endif
+                        </div>
+                    @endforeach
                 </div>
 
             </div>
@@ -683,34 +681,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     t4StartTimer();
 
-    // T4 Side Carousels (Top & Bottom rows)
-    document.querySelectorAll('.t4-side-carousel').forEach(carousel => {
-        const slides = carousel.querySelectorAll('.t4-side-slide');
-        if (slides.length <= 1) return;
-        let cIdx = 0;
-        let cTimer;
+    // T4 Side Groups (2-row pair rotation with 1 Left/Right button)
+    const sideDealsContainer = document.querySelector('.t4-side-deals');
+    if (sideDealsContainer) {
+        const groups = sideDealsContainer.querySelectorAll('.t4-side-group');
+        if (groups.length > 1) {
+            let gIdx = 0;
+            let gTimer;
 
-        function showSideSlide(n) {
-            slides[cIdx].classList.remove('active');
-            cIdx = (n + slides.length) % slides.length;
-            slides[cIdx].classList.add('active');
-        }
+            function showSideGroup(n) {
+                groups[gIdx].classList.remove('active');
+                gIdx = (n + groups.length) % groups.length;
+                groups[gIdx].classList.add('active');
+            }
 
-        function startSideTimer() {
-            clearInterval(cTimer);
-            cTimer = setInterval(() => showSideSlide(cIdx + 1), 4000);
-        }
+            function startSideGroupTimer() {
+                clearInterval(gTimer);
+                gTimer = setInterval(() => showSideGroup(gIdx + 1), 4500);
+            }
 
-        carousel.querySelectorAll('.t4-side-nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const dir = parseInt(btn.dataset.dir || '1');
-                showSideSlide(cIdx + dir);
-                startSideTimer();
+            sideDealsContainer.querySelectorAll('.t4-side-nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const dir = parseInt(btn.dataset.dir || '1');
+                    showSideGroup(gIdx + dir);
+                    startSideGroupTimer();
+                });
             });
-        });
 
-        startSideTimer();
-    });
+            startSideGroupTimer();
+        }
+    }
 });
 </script>

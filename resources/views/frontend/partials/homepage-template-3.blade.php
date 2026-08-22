@@ -41,8 +41,8 @@
 }
 .t3-hero-grid {
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 16px;
+    grid-template-columns: 2.5fr 1fr;
+    gap: 14px;
     align-items: stretch;
 }
 @media (max-width: 960px) {
@@ -118,7 +118,7 @@
     border-radius: 14px;
     overflow: hidden;
     position: relative;
-    height: 480px;
+    height: 270px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 20px rgba(56, 189, 248, 0.08);
 }
 .t3-hero-nav-arrow {
@@ -160,6 +160,9 @@
     transition: opacity 0.6s ease;
     display: flex;
     align-items: flex-end;
+    background: #080c14;
+    text-decoration: none;
+    color: inherit;
 }
 .t3-slide.t3-active {
     opacity: 1;
@@ -176,7 +179,8 @@
 .t3-slide-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(8,12,20,0.1) 0%, rgba(8,12,20,0.6) 60%, rgba(8,12,20,0.92) 100%);
+    background: linear-gradient(180deg, rgba(8,12,20,0) 0%, rgba(8,12,20,0.15) 60%, rgba(8,12,20,0.45) 100%);
+    pointer-events: none;
 }
 .t3-slide-content {
     position: relative;
@@ -233,56 +237,84 @@
     transform: translateY(-2px);
 }
 
-/* Right Side Promo Banners (2 Stacked Carousels) */
+/* Side Rotating Promos (2-Row Groups with 1 set of Left/Right Buttons) */
 .t3-hero-side-promos {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    height: 480px;
-}
-.t3-side-carousel {
     position: relative;
-    flex: 1;
+    height: 270px;
     background: #0d1322;
     border: 1px solid rgba(56, 189, 248, 0.2);
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
-.t3-side-slide {
+.t3-side-group {
     position: absolute;
     inset: 0;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    pointer-events: none;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    transform: scale(0.98);
+}
+.t3-side-group.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+    transform: scale(1);
+}
+.t3-side-card {
+    flex: 1;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #080c14;
+    border: 1px solid rgba(56, 189, 248, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    padding: 6px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
 }
-.t3-side-slide.active {
-    opacity: 1;
-    z-index: 1;
+.t3-side-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(56, 189, 248, 0.5);
 }
-.t3-side-slide img {
+.t3-side-card img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center;
     display: block;
-    border-radius: 10px;
 }
 .t3-side-nav-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: rgba(13, 19, 34, 0.9);
-    border: 1px solid #38bdf8;
+    border: 1.5px solid #38bdf8;
     color: #38bdf8;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+}
+.t3-side-nav-btn:hover {
+    background: #38bdf8;
+    color: #080c14;
+    transform: translateY(-50%) scale(1.08);
+}
+.t3-side-prev { left: 10px; }
+.t3-side-next { right: 10px; }
     align-items: center;
     justify-content: center;
     cursor: pointer;
@@ -523,8 +555,9 @@
                     </button>
                     <div class="t3-slides-container" id="t3-slides">
                         @forelse($sliders as $idx => $slider)
-                            <div class="t3-slide {{ $idx === 0 ? 't3-active' : '' }}">
-                                <img class="t3-bg" src="{{ asset($slider->image) }}" alt="{{ $slider->title ?? 'Tech Hub' }}">
+                        <a href="{{ $slider->button_url ?? route('shop') }}" class="t3-slide {{ $idx === 0 ? 't3-active' : '' }}">
+                            <img class="t3-bg" src="{{ asset($slider->image) }}" alt="{{ $slider->title ?? 'Tech Hub' }}">
+                            @if($slider->title || $slider->button_text || $slider->description)
                                 <div class="t3-slide-overlay"></div>
                                 <div class="t3-slide-content">
                                     @if($slider->title)
@@ -533,99 +566,72 @@
                                     @if($slider->description)
                                         <p class="t3-slide-desc">{{ $slider->description }}</p>
                                     @endif
-                                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                        <div class="t3-badge" style="margin-bottom: 0;">⚡ NEXT-GEN TECH</div>
-                                        <a href="{{ $slider->button_url ?? route('shop') }}" class="t3-neon-btn">
-                                            {{ $slider->button_text ?? 'Shop Now' }}
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                        </a>
-                                    </div>
+                                    @if($slider->button_text)
+                                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                            <span class="t3-neon-btn">
+                                                {{ $slider->button_text }}
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                            </span>
+                                        </div>
+                                    @endif
                                 </div>
-                            </div>
+                            @endif
+                        </a>
                         @empty
-                            <div class="t3-slide t3-active">
-                                <img class="t3-bg" src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1600&q=80" alt="Cyber Tech">
-                                <div class="t3-slide-overlay"></div>
-                                <div class="t3-slide-content">
-                                    <h2 class="t3-slide-title">Unleash Ultimate Performance</h2>
-                                    <p class="t3-slide-desc">Top tier gadgets, pro gaming rigs & modern smart gear delivered to your doorstep.</p>
-                                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                        <div class="t3-badge" style="margin-bottom: 0;">⚡ FUTURE HARDWARE</div>
-                                        <a href="{{ route('shop') }}" class="t3-neon-btn">
-                                            Explore Hardware
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                        <a href="{{ route('shop') }}" class="t3-slide t3-active">
+                            <img class="t3-bg" src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1600&q=80" alt="Cyber Tech">
+                        </a>
                         @endforelse
                     </div>
                 </div>
 
-                {{-- RIGHT: 2 ROWS OF CAROUSELS WITH NEXT/PREV BUTTONS --}}
+                {{-- RIGHT: UNIFIED 2-ROW SIDE PROMO GROUP WITH 1 PAIR OF NEXT/PREV BUTTONS --}}
                 <div class="t3-hero-side-promos">
                     @php
-                        $t3Side1 = array_filter([
-                            $homepage['featured_image_1'] ?? ($homepage['slider_side_image_one'] ?? ($homepage['slider_side_image'] ?? null)),
-                            $homepage['featured_image_3'] ?? null,
-                        ]);
-                        $t3Side2 = array_filter([
-                            $homepage['featured_image_2'] ?? ($homepage['slider_side_image_two'] ?? null),
-                            $homepage['featured_image_4'] ?? null,
-                        ]);
+                        $t3AllImages = [];
+                        for ($i = 1; $i <= 6; $i++) {
+                            $img = $homepage['featured_image_' . $i] ?? ($i === 1 ? ($homepage['slider_side_image_one'] ?? ($homepage['slider_side_image'] ?? null)) : ($i === 2 ? ($homepage['slider_side_image_two'] ?? null) : null));
+                            if (!empty($img)) {
+                                $t3AllImages[] = [
+                                    'image' => $img,
+                                    'link'  => $homepage['featured_image_' . $i . '_link'] ?? ($i === 1 ? ($homepage['slider_side_image_one_link'] ?? route('shop')) : ($i === 2 ? ($homepage['slider_side_image_two_link'] ?? route('shop')) : route('shop'))),
+                                    'alt'   => $homepage['featured_image_' . $i . '_alt'] ?? ('Tech Promo ' . $i),
+                                ];
+                            }
+                        }
+                        if (empty($t3AllImages)) {
+                            $t3AllImages = [
+                                ['image' => 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80', 'link' => route('shop'), 'alt' => 'Tech Deal 1'],
+                                ['image' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80', 'link' => route('shop'), 'alt' => 'Tech Deal 2'],
+                            ];
+                        }
+                        $t3Groups = array_chunk($t3AllImages, 2);
                     @endphp
 
-                    {{-- Top Row Carousel --}}
-                    <div class="t3-side-carousel" id="t3-side-car-1">
-                        @if(count($t3Side1) > 1)
-                            <button class="t3-side-nav-btn t3-side-prev" data-carousel="t3-side-car-1" data-dir="-1" aria-label="Previous">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                            </button>
-                            <button class="t3-side-nav-btn t3-side-next" data-carousel="t3-side-car-1" data-dir="1" aria-label="Next">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                            </button>
-                        @endif
-                        @forelse($t3Side1 as $sIdx => $sImg)
-                            @php
-                                $sImgKey = ($sIdx === 0) ? '1' : '3';
-                                $sLink = $homepage['featured_image_' . $sImgKey . '_link'] ?? ($homepage['slider_side_image_one_link'] ?? route('shop'));
-                                $sAlt  = $homepage['featured_image_' . $sImgKey . '_alt'] ?? 'Tech Promo';
-                            @endphp
-                            <a href="{{ $sLink }}" class="t3-side-slide {{ $loop->first ? 'active' : '' }}">
-                                <img src="{{ asset($sImg) }}" alt="{{ $sAlt }}" loading="lazy">
-                            </a>
-                        @empty
-                            <a href="{{ route('shop') }}" class="t3-side-slide active">
-                                <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80" alt="Tech Deal 1">
-                            </a>
-                        @endforelse
-                    </div>
+                    @if(count($t3Groups) > 1)
+                        <button class="t3-side-nav-btn t3-side-prev" data-dir="-1" aria-label="Previous Promo Pair">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button class="t3-side-nav-btn t3-side-next" data-dir="1" aria-label="Next Promo Pair">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                    @endif
 
-                    {{-- Bottom Row Carousel --}}
-                    <div class="t3-side-carousel" id="t3-side-car-2">
-                        @if(count($t3Side2) > 1)
-                            <button class="t3-side-nav-btn t3-side-prev" data-carousel="t3-side-car-2" data-dir="-1" aria-label="Previous">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                            </button>
-                            <button class="t3-side-nav-btn t3-side-next" data-carousel="t3-side-car-2" data-dir="1" aria-label="Next">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                            </button>
-                        @endif
-                        @forelse($t3Side2 as $sIdx => $sImg)
-                            @php
-                                $sImgKey = ($sIdx === 0) ? '2' : '4';
-                                $sLink = $homepage['featured_image_' . $sImgKey . '_link'] ?? ($homepage['slider_side_image_two_link'] ?? route('shop'));
-                                $sAlt  = $homepage['featured_image_' . $sImgKey . '_alt'] ?? 'Tech Promo';
-                            @endphp
-                            <a href="{{ $sLink }}" class="t3-side-slide {{ $loop->first ? 'active' : '' }}">
-                                <img src="{{ asset($sImg) }}" alt="{{ $sAlt }}" loading="lazy">
-                            </a>
-                        @empty
-                            <a href="{{ route('shop') }}" class="t3-side-slide active">
-                                <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80" alt="Tech Deal 2">
-                            </a>
-                        @endforelse
-                    </div>
+                    @foreach($t3Groups as $gIdx => $group)
+                        <div class="t3-side-group {{ $gIdx === 0 ? 'active' : '' }}">
+                            @foreach($group as $item)
+                                <a href="{{ $item['link'] }}" class="t3-side-card">
+                                    <img src="{{ str_starts_with($item['image'], 'http') ? $item['image'] : asset($item['image']) }}" alt="{{ $item['alt'] }}" loading="lazy">
+                                </a>
+                            @endforeach
+                            @if(count($group) === 1 && count($t3AllImages) > 1)
+                                {{-- Fill 2nd slot with first image if odd number --}}
+                                <a href="{{ $t3AllImages[0]['link'] }}" class="t3-side-card">
+                                    <img src="{{ str_starts_with($t3AllImages[0]['image'], 'http') ? $t3AllImages[0]['image'] : asset($t3AllImages[0]['image']) }}" alt="{{ $t3AllImages[0]['alt'] }}" loading="lazy">
+                                </a>
+                            @endif
+                        </div>
+                    @endforeach
                 </div>
 
             </div>
@@ -757,34 +763,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     t3StartTimer();
 
-    // T3 Side Carousels (Top & Bottom rows)
-    document.querySelectorAll('.t3-side-carousel').forEach(carousel => {
-        const slides = carousel.querySelectorAll('.t3-side-slide');
-        if (slides.length <= 1) return;
-        let cIdx = 0;
-        let cTimer;
+    // T3 Side Groups (2-row pair rotation with 1 Left/Right button)
+    const sidePromosContainer = document.querySelector('.t3-hero-side-promos');
+    if (sidePromosContainer) {
+        const groups = sidePromosContainer.querySelectorAll('.t3-side-group');
+        if (groups.length > 1) {
+            let gIdx = 0;
+            let gTimer;
 
-        function showSideSlide(n) {
-            slides[cIdx].classList.remove('active');
-            cIdx = (n + slides.length) % slides.length;
-            slides[cIdx].classList.add('active');
-        }
+            function showSideGroup(n) {
+                groups[gIdx].classList.remove('active');
+                gIdx = (n + groups.length) % groups.length;
+                groups[gIdx].classList.add('active');
+            }
 
-        function startSideTimer() {
-            clearInterval(cTimer);
-            cTimer = setInterval(() => showSideSlide(cIdx + 1), 4000);
-        }
+            function startSideGroupTimer() {
+                clearInterval(gTimer);
+                gTimer = setInterval(() => showSideGroup(gIdx + 1), 4500);
+            }
 
-        carousel.querySelectorAll('.t3-side-nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const dir = parseInt(btn.dataset.dir || '1');
-                showSideSlide(cIdx + dir);
-                startSideTimer();
+            sidePromosContainer.querySelectorAll('.t3-side-nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const dir = parseInt(btn.dataset.dir || '1');
+                    showSideGroup(gIdx + dir);
+                    startSideGroupTimer();
+                });
             });
-        });
 
-        startSideTimer();
-    });
+            startSideGroupTimer();
+        }
+    }
 });
 </script>

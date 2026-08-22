@@ -30,9 +30,9 @@
 @if ($isAdminPreview ?? false)
 {{-- Preview Mode Banner --}}
 <div id="template-preview-banner" style="
-    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    position: relative; width: 100%; z-index: 99999;
     background: linear-gradient(135deg, #1e293b, #0f172a);
-    color: #fff; padding: 10px 20px;
+    color: #fff; padding: 8px 20px;
     display: flex; align-items: center; justify-content: space-between;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     box-shadow: 0 4px 20px rgba(0,0,0,0.35);
@@ -67,7 +67,6 @@
                 style="background:transparent; border:none; color:#64748b; font-size:18px; cursor:pointer; padding:0 4px; line-height:1;">✕</button>
     </div>
 </div>
-<div style="height: 48px;"></div>
 @endif
 
 <div class="homepage-template-wrapper template-{{ $currentTemplateId }}">
