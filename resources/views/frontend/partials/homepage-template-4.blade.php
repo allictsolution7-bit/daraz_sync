@@ -452,18 +452,27 @@
 }
 </style>
 
+@php
+    $t4OfferEndTime = $homepage['template_4_offer_end_time'] ?? null;
+    $t4OfferHeadline = $homepage['template_4_offer_heading'] ?? '✨ EXCLUSIVE CURATED COLLECTION • LIMITED BOUTIQUE EDITIONS';
+    $t4OfferLabel = $homepage['template_4_offer_label'] ?? 'OFFER CLOSES IN:';
+    $t4OfferBtnText = $homepage['template_4_offer_btn_text'] ?? 'EXPLORE CATALOG →';
+    $t4OfferBtnUrl = $homepage['template_4_offer_btn_url'] ?? route('shop');
+@endphp
+
 <div class="t4-page">
 
     {{-- ── EDITORIAL TOP RIBBON ── --}}
     <div class="t4-top-bar">
-        <span>✨ EXCLUSIVE CURATED COLLECTION &bull; LIMITED BOUTIQUE EDITIONS</span>
+        <span>{{ $t4OfferHeadline }}</span>
         <div class="t4-timer-wrap">
-            <span>OFFER CLOSES IN:</span>
+            <span>{{ $t4OfferLabel }}</span>
+            <span id="t4-days-container" style="display:none;"><span class="t4-timer-box" id="t4-days">00</span> :</span>
             <span class="t4-timer-box" id="t4-hours">08</span> :
             <span class="t4-timer-box" id="t4-mins">45</span> :
             <span class="t4-timer-box" id="t4-secs">20</span>
         </div>
-        <a href="{{ route('shop') }}" style="color:#d4af37; text-decoration:underline; font-weight:700; font-size:12px;">EXPLORE CATALOG &rarr;</a>
+        <a href="{{ $t4OfferBtnUrl }}" style="color:#d4af37; text-decoration:underline; font-weight:700; font-size:12px;">{{ $t4OfferBtnText }}</a>
     </div>
 
     {{-- ── HERO SECTION ── --}}
@@ -506,7 +515,7 @@
                     @endforelse
                 </div>
 
-                {{-- RIGHT PROMO TILES (2 ROWS VISIBLE PER GROUP, 1 PAIR OF NEXT/PREV BUTTONS) --}}
+                {{-- RIGHT PROMO TILES --}}
                 <div class="t4-side-deals">
                     @php
                         $t4AllImages = [];
@@ -520,13 +529,6 @@
                                 ];
                             }
                         }
-                        if (empty($t4AllImages)) {
-                            $t4AllImages = [
-                                ['image' => 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&q=80', 'link' => route('shop'), 'alt' => 'Promo 1'],
-                                ['image' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80', 'link' => route('shop'), 'alt' => 'Promo 2'],
-                            ];
-                        }
-                        $t4Groups = array_chunk($t4AllImages, 2);
                     @endphp
 
                     @if(count($t4Groups) > 1)
@@ -627,24 +629,45 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // T4 Live Countdown
-    let h = 8, m = 45, s = 20;
+    // T4 Live Countdown calculation
+    const endTimestampStr = @json($t4OfferEndTime ?? '');
+    const dContainer = document.getElementById('t4-days-container');
+    const dEl = document.getElementById('t4-days');
     const hEl = document.getElementById('t4-hours');
     const mEl = document.getElementById('t4-mins');
     const sEl = document.getElementById('t4-secs');
 
-    setInterval(() => {
-        if (s > 0) { s--; } else {
-            s = 59;
-            if (m > 0) { m--; } else {
-                m = 59;
-                if (h > 0) { h--; } else { h = 12; }
-            }
+    let targetDate = endTimestampStr ? new Date(endTimestampStr).getTime() : null;
+
+    // Fallback: If not configured or passed, countdown to end of current day
+    if (!targetDate || isNaN(targetDate) || targetDate <= Date.now()) {
+        const now = new Date();
+        targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).getTime();
+    }
+
+    function updateT4Countdown() {
+        const now = Date.now();
+        let diff = Math.max(0, targetDate - now);
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (days > 0 && dContainer && dEl) {
+            dContainer.style.display = 'inline';
+            dEl.textContent = String(days).padStart(2, '0');
+        } else if (dContainer) {
+            dContainer.style.display = 'none';
         }
-        if (hEl) hEl.textContent = String(h).padStart(2, '0');
-        if (mEl) mEl.textContent = String(m).padStart(2, '0');
-        if (sEl) sEl.textContent = String(s).padStart(2, '0');
-    }, 1000);
+
+        if (hEl) hEl.textContent = String(hours).padStart(2, '0');
+        if (mEl) mEl.textContent = String(mins).padStart(2, '0');
+        if (sEl) sEl.textContent = String(secs).padStart(2, '0');
+    }
+
+    updateT4Countdown();
+    setInterval(updateT4Countdown, 1000);
 
     // T4 Hero Slider
     const t4Slides = document.querySelectorAll('.t4-slide');

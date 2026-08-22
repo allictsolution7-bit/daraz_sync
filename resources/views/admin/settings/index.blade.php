@@ -2755,6 +2755,70 @@
                         </div>
                     </div>
 
+                    {{-- Template 4 Flash Sale Offer Settings --}}
+                    @if($isSuperAdmin || $selectedTemplate == '4')
+                    <div class="card mb-4 border-0 shadow-sm rounded-4" id="template4_settings_card">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-bolt text-danger mr-2"></i> Template 4: Flash Sale Top Ribbon & Countdown Configuration
+                                </h5>
+                                <small class="text-muted">Configure the announcement banner text, countdown closing time, and promotional link for Template 4.</small>
+                            </div>
+                            <span class="badge badge-danger px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px;">
+                                Template 4 Exclusive
+                            </span>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="far fa-clock text-primary mr-1"></i> Offer Closing Date & Time (End Time)
+                                    </label>
+                                    <input type="datetime-local" name="homepage[template_4_offer_end_time]" class="form-control" 
+                                           value="{{ $homepage['template_4_offer_end_time'] ?? '' }}"
+                                           placeholder="Select offer closing date & time">
+                                    <small class="form-text text-muted">The live timer will count down dynamically to this exact date & time.</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-hourglass-half text-warning mr-1"></i> Countdown Timer Label
+                                    </label>
+                                    <input type="text" name="homepage[template_4_offer_label]" class="form-control" 
+                                           value="{{ $homepage['template_4_offer_label'] ?? 'OFFER CLOSES IN:' }}" 
+                                           placeholder="e.g. OFFER CLOSES IN: or FLASH DEAL ENDS IN:">
+                                    <small class="form-text text-muted">Prefix text displayed right before the HH:MM:SS timer boxes.</small>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-bullhorn text-info mr-1"></i> Banner Headline Text
+                                    </label>
+                                    <input type="text" name="homepage[template_4_offer_heading]" class="form-control" 
+                                           value="{{ $homepage['template_4_offer_heading'] ?? '✨ EXCLUSIVE CURATED COLLECTION • LIMITED BOUTIQUE EDITIONS' }}" 
+                                           placeholder="e.g. ✨ EXCLUSIVE CURATED COLLECTION • LIMITED BOUTIQUE EDITIONS">
+                                    <small class="form-text text-muted">Left-side announcement banner text on the top ribbon.</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-link text-success mr-1"></i> Action Button Text
+                                    </label>
+                                    <input type="text" name="homepage[template_4_offer_btn_text]" class="form-control" 
+                                           value="{{ $homepage['template_4_offer_btn_text'] ?? 'EXPLORE CATALOG →' }}" 
+                                           placeholder="e.g. EXPLORE CATALOG → or SHOP FLASH DEALS →">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-external-link-alt text-secondary mr-1"></i> Action Button URL
+                                    </label>
+                                    <input type="text" name="homepage[template_4_offer_btn_url]" class="form-control" 
+                                           value="{{ $homepage['template_4_offer_btn_url'] ?? route('shop') }}" 
+                                           placeholder="e.g. /shop or https://...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="card">
                         <div class="card-header">
                             <h5 class="card-title">Product Category & Products By Category Sections</h5>
