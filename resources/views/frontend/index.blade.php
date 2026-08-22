@@ -5158,98 +5158,157 @@
                 gap: 12px;
             }
 
+            .customer-reviews {
+                padding: 36px 0 40px;
+                background: #f8fafc;
+            }
+
+            .reviews-container {
+                display: flex;
+                gap: 20px;
+                justify-content: flex-start;
+                transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+                position: relative;
+                margin-top: 20px;
+            }
+
+            .review-card {
+                background: #ffffff;
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+                transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+                border: 1px solid #e2e8f0;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-width: 280px;
+                flex: 1 1 0;
+            }
+
+            .review-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+                border-color: #cbd5e1;
+            }
+
+            .review-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+                gap: 8px;
+            }
+
+            .reviewer-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                min-width: 0;
+            }
+
             .reviewer-img {
-                width: 50px;
-                height: 50px;
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
                 border-radius: 50%;
                 object-fit: cover;
-                border: 2px solid #fff;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                border: 2px solid #ffffff;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                background: #f1f5f9;
             }
 
             .reviewer-details {
                 display: flex;
                 flex-direction: column;
-                max-width: 140px;
+                min-width: 0;
             }
 
             .reviewer-name {
-                font-size: 15px;
-                font-weight: 600;
-                color: var(--secondary-color);
-                margin-bottom: 3px;
+                font-size: 14px;
+                font-weight: 700;
+                color: #1e293b;
+                margin-bottom: 2px;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
 
             .review-date {
-                font-size: 12px;
-                color: #777;
+                font-size: 11.5px;
+                color: #94a3b8;
             }
 
             .review-rating {
-                color: var(--primary-color);
-                font-size: 14px;
+                color: #f59e0b;
+                font-size: 13px;
                 white-space: nowrap;
                 flex-shrink: 0;
+                display: flex;
+                gap: 2px;
             }
 
             .review-product {
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                padding: 10px;
-                background-color: #fff;
-                border-radius: 6px;
-                margin-bottom: 15px;
-                border: 1px solid var(--border-color);
+                padding: 8px 12px;
+                background-color: #f8fafc;
+                border-radius: 10px;
+                margin-bottom: 12px;
+                border: 1px solid #edf2f7;
             }
 
             .review-product-img {
-                width: 40px;
-                height: 40px;
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
                 object-fit: cover;
-                border-radius: 4px;
+                border-radius: 6px;
+                border: 1px solid #e2e8f0;
+                background: #ffffff;
             }
 
             .review-product-name {
-                font-size: 13px;
-                font-weight: 500;
-                color: var(--text-color);
+                font-size: 12px;
+                font-weight: 600;
+                color: #334155;
+                line-height: 1.35;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
             }
 
             .review-text {
-                font-size: 14px;
-                line-height: 1.6;
-                color: var(--text-color);
+                font-size: 13px;
+                line-height: 1.55;
+                color: #64748b;
+                margin-bottom: 0;
+                font-style: normal;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
             }
 
             @media (max-width: 1340px) {
                 .reviews-container {
-                    max-width: 100%;
                     flex-wrap: wrap;
                 }
-            }
-
-            @media (max-width: 992px) {
-                .reviews-container {
-                    flex-wrap: wrap;
-                    justify-content: center;
-                }
-
-                .customer-reviews {
-                    padding: 18px 0;
-                }
-
                 .review-card {
-                    width: calc(50% - 15px);
+                    min-width: calc(50% - 10px);
                 }
             }
 
             @media (max-width: 768px) {
+                .customer-reviews {
+                    padding: 24px 0;
+                }
                 .review-card {
-                    width: 100%;
+                    min-width: 100%;
                 }
             }
         </style>
@@ -5261,19 +5320,51 @@
 
             <div class="reviews-container">
                 @forelse($customerReviews as $review)
+                    @php
+                        // Resolve product image
+                        $pImg = $review->product_image;
+                        if (empty($pImg) && $review->product && !empty($review->product->thumb_image)) {
+                            $pImg = $review->product->thumb_image;
+                        }
+                        if (!empty($pImg)) {
+                            if (str_starts_with($pImg, 'http://') || str_starts_with($pImg, 'https://')) {
+                                $pImgUrl = $pImg;
+                            } elseif (str_starts_with($pImg, 'uploads/') || str_starts_with($pImg, 'storage/')) {
+                                $pImgUrl = asset($pImg);
+                            } elseif (str_starts_with($pImg, 'clientside/')) {
+                                $pImgUrl = asset($pImg);
+                            } else {
+                                $pImgUrl = asset('uploads/custom-images/' . $pImg);
+                            }
+                        } else {
+                            $pImgUrl = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=150&auto=format&fit=crop&q=80';
+                        }
+
+                        // Resolve reviewer avatar
+                        $rImg = $review->reviewer_image;
+                        $reviewerName = !empty($review->reviewer_name) ? $review->reviewer_name : 'Customer';
+                        if (!empty($rImg)) {
+                            if (str_starts_with($rImg, 'http://') || str_starts_with($rImg, 'https://')) {
+                                $rImgUrl = $rImg;
+                            } elseif (str_starts_with($rImg, 'uploads/') || str_starts_with($rImg, 'storage/')) {
+                                $rImgUrl = asset($rImg);
+                            } else {
+                                $rImgUrl = asset('storage/' . $rImg);
+                            }
+                        } else {
+                            $rImgUrl = 'https://ui-avatars.com/api/?name=' . urlencode($reviewerName) . '&background=0284c7&color=fff&size=100';
+                        }
+                    @endphp
                     <div class="review-card">
                         <div class="review-header">
                             <div class="reviewer-info">
-                                @if ($review->reviewer_image)
-                                    <img src="{{ asset($review->reviewer_image) }}" alt="{{ $review->reviewer_name }}"
-                                        class="reviewer-img">
-                                @else
-                                    <img src="https://randomuser.me/api/portraits/men/32.jpg"
-                                        alt="{{ $review->reviewer_name }}" class="reviewer-img">
-                                @endif
+                                <img src="{{ $rImgUrl }}" 
+                                     alt="{{ $reviewerName }}" 
+                                     class="reviewer-img" 
+                                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Customer&background=0284c7&color=fff';">
                                 <div class="reviewer-details">
-                                    <h4 class="reviewer-name">{{ $review->reviewer_name }}</h4>
-                                    <div class="review-date">{{ $review->review_date->format('F d, Y') }}</div>
+                                    <h4 class="reviewer-name">{{ $reviewerName }}</h4>
+                                    <div class="review-date">{{ $review->review_date ? $review->review_date->format('M d, Y') : 'Recent' }}</div>
                                 </div>
                             </div>
                             <div class="review-rating">
@@ -5289,27 +5380,22 @@
                             </div>
                         </div>
                         <div class="review-product">
-                            @if ($review->product_image)
-                                <img src="{{ asset($review->product_image) }}"
-                                    alt="{{ $review->product_name }}" class="review-product-img">
-                            @else
-                                <img src="https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                                    alt="{{ $review->product_name }}" class="review-product-img">
-                            @endif
-                            <span class="review-product-name">{{ $review->product_name }}</span>
+                            <img src="{{ $pImgUrl }}"
+                                 alt="{{ $review->product_name ?? 'Product' }}" 
+                                 class="review-product-img"
+                                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=150&auto=format&fit=crop&q=80';">
+                            <span class="review-product-name">{{ $review->product_name ?? 'Featured Product' }}</span>
                         </div>
-                        <p class="review-text">{{ $review->review_text }}</p>
+                        <p class="review-text">"{{ $review->review_text }}"</p>
                     </div>
                 @empty
-                    <!-- Fallback content if no reviews are available -->
                     <div class="review-card">
                         <div class="review-header">
                             <div class="reviewer-info">
-                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer"
-                                    class="reviewer-img">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer" class="reviewer-img">
                                 <div class="reviewer-details">
                                     <h4 class="reviewer-name">Rafiqul Islam</h4>
-                                    <div class="review-date">August 15, 2023</div>
+                                    <div class="review-date">August 15, 2026</div>
                                 </div>
                             </div>
                             <div class="review-rating">
@@ -5321,13 +5407,11 @@
                             </div>
                         </div>
                         <div class="review-product">
-                            <img src="https://images.pexels.com/photos/2887766/pexels-photo-2887766.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=150&auto=format&fit=crop&q=80"
                                 alt="Product" class="review-product-img">
                             <span class="review-product-name">Obsidian Black Panjabi</span>
                         </div>
-                        <p class="review-text">The quality of the fabric is exceptional. The fit is perfect and the design
-                            is
-                            elegant. I've received many compliments wearing this panjabi. Highly recommended!</p>
+                        <p class="review-text">"The quality of the fabric is exceptional. The fit is perfect and the design is elegant. Highly recommended!"</p>
                     </div>
                 @endforelse
             </div>
