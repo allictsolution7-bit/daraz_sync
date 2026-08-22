@@ -712,5 +712,21 @@ document.addEventListener('DOMContentLoaded', function() {
             startSideGroupTimer();
         }
     }
+
+    // T4 Product Row Arrow Scrolling
+    document.querySelectorAll('.t4-arrow').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.dataset.target;
+            const row = document.getElementById(targetId);
+            if (!row) return;
+            const isPrev = this.classList.contains('t4-arrow-prev');
+            const scrollAmount = row.clientWidth * 0.75 || 320;
+            row.scrollBy({
+                left: isPrev ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        });
+    });
 });
 </script>

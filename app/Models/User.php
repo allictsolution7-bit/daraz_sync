@@ -87,6 +87,7 @@ class User extends Authenticatable
         'otp_verified',
         'wallet_balance',
         'created_by',
+        'template_id',
     ];
 
 

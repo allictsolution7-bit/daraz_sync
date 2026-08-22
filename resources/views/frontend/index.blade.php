@@ -4,6 +4,10 @@
 @php
     $currentTemplateId = setting('homepage', 'template_id', '1');
 
+    if (auth()->check() && !empty(auth()->user()->template_id)) {
+        $currentTemplateId = (string) auth()->user()->template_id;
+    }
+
     // Allow admins to preview any template via ?preview_template=X
     // Only applies to authenticated admins — never exposed to regular visitors
     $isAdminPreview = request()->has('preview_template') &&

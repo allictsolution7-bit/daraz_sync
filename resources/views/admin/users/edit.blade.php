@@ -362,6 +362,122 @@
             </div>
         </div>
 
+        @if($isSuperAdmin)
+        <!-- Website Homepage Template Assignment Card (Super Admin Exclusive) -->
+        <div class="form-card mt-4">
+            <div class="form-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h6 class="mb-0 font-weight-bold text-dark"><i class="fas fa-layer-group text-primary me-2"></i> Website Homepage Template Architecture</h6>
+                    <small class="text-muted">Select and assign the default homepage layout theme for this administrator / store.</small>
+                </div>
+                <span class="badge bg-primary text-white rounded-pill px-3 py-1.5 font-weight-semibold" id="activeTemplateBadge" style="font-size: 11px;">
+                    Assigned: Template {{ $userTemplateId ?? '1' }}
+                </span>
+            </div>
+            <div class="card-body p-4">
+                <input type="hidden" name="template_id" id="selectedUserTemplate" value="{{ $userTemplateId ?? '1' }}">
+
+                <div class="row g-3">
+                    @php
+                        $templates = [
+                            [
+                                'id' => '1',
+                                'name' => 'Classic Marketplace',
+                                'tagline' => 'High Density & Categorized',
+                                'badge' => 'Default Marketplace',
+                                'badge_color' => '#ea580c',
+                                'color' => '#ea580c',
+                                'desc' => 'Multi-tier side menu, featured banners, high-density product grid, and category pill carousels.',
+                                'icon' => 'fas fa-store'
+                            ],
+                            [
+                                'id' => '2',
+                                'name' => 'Modern Minimal',
+                                'tagline' => 'Brand Showcase & Clean',
+                                'badge' => 'Minimal Aesthetic',
+                                'badge_color' => '#0284c7',
+                                'color' => '#0284c7',
+                                'desc' => 'Spacious layouts, curated lookbooks, dynamic side promos, and elegant card styling.',
+                                'icon' => 'fas fa-palette'
+                            ],
+                            [
+                                'id' => '3',
+                                'name' => 'Electronic & Tech Hub',
+                                'tagline' => 'Dark Cyber & Gadget Matrix',
+                                'badge' => 'Dark Tech Theme',
+                                'badge_color' => '#38bdf8',
+                                'color' => '#38bdf8',
+                                'desc' => 'Dark-mode luxury aesthetic with glowing neon cyan accents, tech specs, and side deals.',
+                                'icon' => 'fas fa-microchip'
+                            ],
+                            [
+                                'id' => '4',
+                                'name' => 'Flash Sale & Multi-Category',
+                                'tagline' => 'Urgency & High Volume',
+                                'badge' => 'High Conversion',
+                                'badge_color' => '#d97706',
+                                'color' => '#d97706',
+                                'desc' => 'Vibrant urgency countdowns, deal of the day ribbons, category pills, and quick cart drawers.',
+                                'icon' => 'fas fa-bolt'
+                            ],
+                            [
+                                'id' => '5',
+                                'name' => 'Grocery & Fresh Express',
+                                'tagline' => 'Organic & Supermarket',
+                                'badge' => 'Eco-Friendly Grocery',
+                                'badge_color' => '#16a34a',
+                                'color' => '#16a34a',
+                                'desc' => 'Fresh green organic theme with circular category navigation, trust badges, and horizontal sliders.',
+                                'icon' => 'fas fa-basket-shopping'
+                            ],
+                        ];
+                    @endphp
+
+                    @foreach($templates as $tpl)
+                        @php
+                            $isTplActive = ((string)($userTemplateId ?? '1')) === $tpl['id'];
+                        @endphp
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="template-choice-card p-3 rounded-4 border-2 position-relative h-100 d-flex flex-direction-column justify-content-between {{ $isTplActive ? 'selected-template' : '' }}" 
+                                 onclick="selectUserTemplate('{{ $tpl['id'] }}', this)"
+                                 style="border: 2px solid {{ $isTplActive ? '#2563eb' : '#e2e8f0' }}; background: {{ $isTplActive ? '#f8faff' : '#ffffff' }}; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                                
+                                <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: {{ $tpl['color'] }}15; color: {{ $tpl['color'] }};">
+                                            <i class="{{ $tpl['icon'] }} fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 font-weight-bold text-dark" style="font-size: 13.5px;">Template {{ $tpl['id'] }}: {{ $tpl['name'] }}</h6>
+                                            <small class="text-muted" style="font-size: 11px;">{{ $tpl['tagline'] }}</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge rounded-pill text-white flex-shrink-0" style="background: {{ $tpl['badge_color'] }}; font-size: 9.5px; padding: 3px 8px;">
+                                        {{ $tpl['badge'] }}
+                                    </span>
+                                </div>
+
+                                <p class="text-muted mb-3 small" style="font-size: 11.5px; line-height: 1.45;">
+                                    {{ $tpl['desc'] }}
+                                </p>
+
+                                <div class="d-flex align-items-center justify-content-between pt-2 border-top gap-2">
+                                    <a href="{{ url('/') }}?preview_template={{ $tpl['id'] }}" target="_blank" class="btn btn-xs btn-outline-secondary rounded-pill px-2.5 py-1" onclick="event.stopPropagation();" style="font-size: 11px;" title="Preview this template in a new window">
+                                        <i class="fas fa-arrow-up-right-from-square me-1"></i> Live Preview
+                                    </a>
+                                    <div class="template-radio-indicator d-flex align-items-center gap-1.5" style="font-size: 11.5px; font-weight: 700; color: {{ $isTplActive ? '#2563eb' : '#94a3b8' }};">
+                                        <i class="{{ $isTplActive ? 'fas fa-circle-check text-primary' : 'far fa-circle text-muted' }} fs-6"></i>
+                                        <span class="indicator-text">{{ $isTplActive ? 'Selected' : 'Select' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Action Footer Bar -->
         <div class="card border-0 shadow-lg rounded-4 mt-4 bg-white p-3">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -369,7 +485,7 @@
                     <i class="fas fa-times me-1"></i> Cancel
                 </a>
                 <button type="submit" class="btn btn-primary rounded-pill px-5 shadow font-weight-bold py-2">
-                    <i class="fas fa-save me-2"></i> Update Member Profile
+                    <i class="fas fa-save me-2"></i> Update Member Profile & Template
                 </button>
             </div>
         </div>
@@ -419,6 +535,40 @@
         } else {
             bar.style.width = '100%';
             bar.style.backgroundColor = '#10b981';
+        }
+    }
+
+    function selectUserTemplate(templateId, cardEl) {
+        const hiddenInput = document.getElementById('selectedUserTemplate');
+        if (hiddenInput) {
+            hiddenInput.value = templateId;
+        }
+
+        const badge = document.getElementById('activeTemplateBadge');
+        if (badge) {
+            badge.innerText = 'Assigned: Template ' + templateId;
+        }
+
+        document.querySelectorAll('.template-choice-card').forEach(card => {
+            card.classList.remove('selected-template');
+            card.style.borderColor = '#e2e8f0';
+            card.style.background = '#ffffff';
+            const ind = card.querySelector('.template-radio-indicator');
+            if (ind) {
+                ind.style.color = '#94a3b8';
+                ind.innerHTML = '<i class="far fa-circle text-muted fs-6"></i> <span class="indicator-text">Select</span>';
+            }
+        });
+
+        if (cardEl) {
+            cardEl.classList.add('selected-template');
+            cardEl.style.borderColor = '#2563eb';
+            cardEl.style.background = '#f8faff';
+            const ind = cardEl.querySelector('.template-radio-indicator');
+            if (ind) {
+                ind.style.color = '#2563eb';
+                ind.innerHTML = '<i class="fas fa-circle-check text-primary fs-6"></i> <span class="indicator-text">Selected</span>';
+            }
         }
     }
 </script>

@@ -33,7 +33,7 @@
     @endif
 
     <div class="product-image">
-        <div class="product-image position-relative">
+        <div class="position-relative w-100 h-100" style="overflow: hidden; border-radius: 7px;">
             <div class="image-preloader"
                 style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(248,249,250,0.9);z-index:2;transition:opacity 0.3s ease;">
                 <div class="spinner"
@@ -45,7 +45,7 @@
             </div>
             <img src="{{ asset('storage/' . $product->thumb_image) }}" alt="{{ $product->title }}" loading="lazy"
                 class="product-image-loaded" data-product-id="{{ $product->id }}"
-                style="display:block;width:100%;height:100%;object-fit:cover;transition:opacity 0.3s ease;opacity:0;">
+                style="opacity:0;">
         </div>
     </div>
 

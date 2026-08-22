@@ -310,28 +310,31 @@
 
 .t5-arrow {
     position: absolute;
-    top: 45%;
+    top: 48%;
     transform: translateY(-50%);
-    width: 38px; height: 38px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: #ffffff;
-    border: 1.5px solid #86efac;
-    color: #15803d;
+    border: 2px solid #22c55e;
+    color: #16a34a;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 5;
-    box-shadow: 0 4px 12px rgba(22, 101, 52, 0.1);
-    transition: all 0.2s;
+    z-index: 15;
+    box-shadow: 0 6px 18px rgba(22, 101, 52, 0.22);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .t5-arrow:hover {
     background: #16a34a;
     color: #ffffff;
-    border-color: #16a34a;
+    border-color: #15803d;
+    box-shadow: 0 8px 24px rgba(22, 101, 52, 0.4);
+    transform: translateY(-50%) scale(1.1);
 }
-.t5-arrow-prev { left: -16px; }
-.t5-arrow-next { right: -16px; }
+.t5-arrow-prev { left: -18px; }
+.t5-arrow-next { right: -18px; }
 
 /* ── OVERRIDE PRODUCT CARDS FOR T5 ── */
 .t5-page .product-card {
@@ -499,8 +502,8 @@
                     <a href="{{ route('shop') }}" style="color:#16a34a; font-weight:700; text-decoration:none;">Explore All &rarr;</a>
                 </div>
                 <div class="t5-prod-slider-wrap">
-                    <button class="t5-arrow t5-arrow-prev" data-target="t5-row-{{ $secKey }}">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                    <button class="t5-arrow t5-arrow-prev" data-target="t5-row-{{ $secKey }}" aria-label="Scroll Left">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                     </button>
                     <div class="t5-prod-row" id="t5-row-{{ $secKey }}">
                         @foreach($featuredSections[$secKey] as $product)
@@ -509,8 +512,8 @@
                             </div>
                         @endforeach
                     </div>
-                    <button class="t5-arrow t5-arrow-next" data-target="t5-row-{{ $secKey }}">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                    <button class="t5-arrow t5-arrow-next" data-target="t5-row-{{ $secKey }}" aria-label="Scroll Right">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </div>
             </section>
@@ -571,6 +574,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     t5StartTimer();
 
+    // T5 Product Row Arrow Scrolling
+    document.querySelectorAll('.t5-arrow').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.dataset.target;
+            const row = document.getElementById(targetId);
+            if (!row) return;
+            const isPrev = this.classList.contains('t5-arrow-prev');
+            const scrollAmount = row.clientWidth * 0.75 || 320;
+            row.scrollBy({
+                left: isPrev ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        });
     });
 });
 </script>

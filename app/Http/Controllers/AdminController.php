@@ -789,7 +789,40 @@ class AdminController extends Controller
                 return !str_contains($r, 'super') && !str_contains($r, 'admin');
             });
         }
-        return view('admin.users.edit', compact('user', 'allRoles', 'isSuperAdmin'));
+
+        // Get user's current assigned template
+        $userTemplateId = $user->template_id;
+        if (empty($userTemplateId)) {
+            $userTemplateId = \App\Models\SiteSetting::get('vendor_' . $user->id . '_homepage', 'template_id');
+        }
+        if (empty($userTemplateId)) {
+            // Check if user is associated with a tenant
+            $subdomain = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', (string)$user->name)));
+            $tenant = \App\Models\SaaSTenant::where('subdomain', $subdomain)->orWhere('name', $user->name)->first();
+            if ($tenant) {
+                $tDbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+                try {
+                    config(['database.connections.tenant_tpl_temp' => array_merge(
+                        config('database.connections.mysql'),
+                        ['database' => $tDbName]
+                    )]);
+                    \Illuminate\Support\Facades\DB::purge('tenant_tpl_temp');
+                    $tTpl = \Illuminate\Support\Facades\DB::connection('tenant_tpl_temp')
+                        ->table('site_settings')
+                        ->where('group', 'homepage')
+                        ->where('key', 'template_id')
+                        ->value('value');
+                    if ($tTpl) {
+                        $userTemplateId = $tTpl;
+                    }
+                } catch (\Throwable $ex) {}
+            }
+        }
+        if (empty($userTemplateId)) {
+            $userTemplateId = setting('homepage', 'template_id', '1');
+        }
+
+        return view('admin.users.edit', compact('user', 'allRoles', 'isSuperAdmin', 'userTemplateId'));
     }
 
     // Update User
@@ -812,6 +845,7 @@ class AdminController extends Controller
             'upazila' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
             'otp_verified' => 'nullable|boolean',
+            'template_id' => 'nullable|string|in:1,2,3,4,5',
             'roles' => 'nullable|array',
             'roles.*' => 'string|exists:roles,name',
             'role' => 'nullable|string|exists:roles,name',
@@ -839,12 +873,50 @@ class AdminController extends Controller
             'otp_verified' => $request->has('otp_verified') ? 1 : 0,
         ];
 
+        if ($isSuperAdmin && $request->filled('template_id')) {
+            $userData['template_id'] = (string)$request->template_id;
+        }
+
         // Only update password if provided
         if ($request->filled('password')) {
             $userData['password'] = Hash::make($request->password);
         }
 
         $user->update($userData);
+
+        // Sync template to vendor and tenant DB if super admin modified it
+        if ($isSuperAdmin && $request->filled('template_id')) {
+            $tplId = (string)$request->template_id;
+            \App\Models\SiteSetting::set('vendor_' . $user->id . '_homepage', 'template_id', $tplId);
+
+            if ($user->id === 1 || $user->isSuperAdmin()) {
+                \App\Models\SiteSetting::set('homepage', 'template_id', $tplId);
+            }
+
+            // Sync with tenant DB if exists
+            $subdomain = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', (string)$user->name)));
+            $tenant = \App\Models\SaaSTenant::where('subdomain', $subdomain)->orWhere('name', $user->name)->first();
+            if ($tenant) {
+                $tDbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+                try {
+                    config(['database.connections.tenant_tpl_temp' => array_merge(
+                        config('database.connections.mysql'),
+                        ['database' => $tDbName]
+                    )]);
+                    \Illuminate\Support\Facades\DB::purge('tenant_tpl_temp');
+                    \Illuminate\Support\Facades\DB::connection('tenant_tpl_temp')
+                        ->table('site_settings')
+                        ->updateOrInsert(
+                            ['group' => 'homepage', 'key' => 'template_id'],
+                            ['value' => $tplId, 'updated_at' => now()]
+                        );
+                } catch (\Throwable $ex) {
+                    \Log::warning("Failed to update tenant DB template: " . $ex->getMessage());
+                }
+            }
+
+            \App\Services\SettingsService::clearCache();
+        }
 
         if (method_exists($user, 'syncRoles')) {
             try {
@@ -879,7 +951,7 @@ class AdminController extends Controller
         }
 
         return redirect()->route('admin.users')
-            ->with('success', 'User updated successfully!');
+            ->with('success', 'User profile & website template updated successfully!');
     }
 
     public function show($id)
