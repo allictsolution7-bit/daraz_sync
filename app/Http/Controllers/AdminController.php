@@ -937,4 +937,19 @@ class AdminController extends Controller
 
         return response()->json(['exists' => false]);
     }
+
+    public function markNotificationsRead(Request $request)
+    {
+        $userId = auth()->id();
+        if ($userId) {
+            \Illuminate\Support\Facades\Cache::forever("admin_notif_last_read_{$userId}", now());
+            \Illuminate\Support\Facades\Cache::forget("admin_layout_stats_v3_{$userId}_sa");
+            \Illuminate\Support\Facades\Cache::forget("admin_layout_stats_v3_{$userId}_admin");
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'All notifications marked as read.'
+        ]);
+    }
 }

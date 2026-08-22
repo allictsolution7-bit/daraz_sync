@@ -30,7 +30,9 @@ class AdminLayoutComposer
         $cacheKey = "admin_layout_stats_v3_{$userId}_" . ($isSuperAdmin ? 'sa' : 'admin');
 
         // Cache for 20 seconds to make page navigation instant while keeping badge counts fresh
-        $stats = Cache::remember($cacheKey, 20, function () use ($user, $isSuperAdmin) {
+        $stats = Cache::remember($cacheKey, 20, function () use ($user, $userId, $isSuperAdmin) {
+            $lastReadAt = Cache::get("admin_notif_last_read_{$userId}");
+
             // 1. Unread chat count
             $unreadChatCount = \App\Models\ChatMessage::where('is_read', false)
                 ->where('sender_id', '!=', $user->id)
@@ -42,45 +44,33 @@ class AdminLayoutComposer
 
             // 2. Pending recharge requests
             if ($isSuperAdmin) {
-                $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')
-                    ->where('type', 'recharge_request')
-                    ->count();
-                $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
-                    ->where('status', 'pending')
-                    ->where('type', 'recharge_request')
-                    ->latest()->limit(5)->get();
+                $headerPendingPaymentsQuery = \App\Models\VendorWalletTransaction::where('status', 'pending')
+                    ->where('type', 'recharge_request');
             } else {
                 $adminVendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
-                $headerPendingCount = \App\Models\VendorWalletTransaction::where('status', 'pending')
+                $headerPendingPaymentsQuery = \App\Models\VendorWalletTransaction::where('status', 'pending')
                     ->where('type', 'recharge_request')
-                    ->whereIn('vendor_id', $adminVendorIds)
-                    ->count();
-                $headerPendingPayments = \App\Models\VendorWalletTransaction::with('vendor')
-                    ->where('status', 'pending')
-                    ->where('type', 'recharge_request')
-                    ->whereIn('vendor_id', $adminVendorIds)
-                    ->latest()->limit(5)->get();
+                    ->whereIn('vendor_id', $adminVendorIds);
             }
+            $headerPendingPayments = (clone $headerPendingPaymentsQuery)->with('vendor')->latest()->limit(5)->get();
+            $headerPendingCount = $lastReadAt 
+                ? (clone $headerPendingPaymentsQuery)->where('created_at', '>', $lastReadAt)->count()
+                : (clone $headerPendingPaymentsQuery)->count();
+            $totalPendingPaymentsCount = (clone $headerPendingPaymentsQuery)->count();
 
             // 3. Pending products
             if ($isSuperAdmin) {
-                $headerPendingProducts = \App\Models\Product::with('vendor')
-                    ->whereNotNull('vendor_id')
-                    ->where('approval_status', 'pending')
-                    ->latest()->limit(5)->get();
-                $headerPendingProdCount = \App\Models\Product::whereNotNull('vendor_id')
-                    ->where('approval_status', 'pending')
-                    ->count();
+                $headerPendingProductsQuery = \App\Models\Product::whereNotNull('vendor_id')
+                    ->where('approval_status', 'pending');
             } else {
                 $adminVendorIds = $adminVendorIds ?? \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
-                $headerPendingProducts = \App\Models\Product::with('vendor')
-                    ->whereIn('vendor_id', $adminVendorIds)
-                    ->where('approval_status', 'pending')
-                    ->latest()->limit(5)->get();
-                $headerPendingProdCount = \App\Models\Product::whereIn('vendor_id', $adminVendorIds)
-                    ->where('approval_status', 'pending')
-                    ->count();
+                $headerPendingProductsQuery = \App\Models\Product::whereIn('vendor_id', $adminVendorIds)
+                    ->where('approval_status', 'pending');
             }
+            $headerPendingProducts = (clone $headerPendingProductsQuery)->with('vendor')->latest()->limit(5)->get();
+            $headerPendingProdCount = $lastReadAt
+                ? (clone $headerPendingProductsQuery)->where('created_at', '>', $lastReadAt)->count()
+                : (clone $headerPendingProductsQuery)->count();
 
             // 4. Pending vendor & customer orders
             if ($isSuperAdmin) {
@@ -115,8 +105,11 @@ class AdminLayoutComposer
                     });
             }
 
-            $headerVendorOrders = $headerVendorOrdersQuery->latest()->limit(5)->get();
-            $headerVendorOrderCount = $headerVendorOrdersQuery->count();
+            $headerVendorOrders = (clone $headerVendorOrdersQuery)->latest()->limit(5)->get();
+            $headerVendorOrderCount = $lastReadAt
+                ? (clone $headerVendorOrdersQuery)->where('created_at', '>', $lastReadAt)->count()
+                : (clone $headerVendorOrdersQuery)->count();
+            $totalVendorOrderCount = (clone $headerVendorOrdersQuery)->count();
 
             // 5. B2B Wholesale Order Notifications
             $headerWholesaleQuery = \App\Models\WholesalePurchaseOrder::query();
@@ -131,8 +124,11 @@ class AdminLayoutComposer
                           ->orWhere('seller_admin_name', 'like', "%{$user->name}%");
                     });
             }
-            $headerWholesaleOrders = $headerWholesaleQuery->latest()->limit(5)->get();
-            $headerWholesaleCount = $headerWholesaleQuery->count();
+            $headerWholesaleOrders = (clone $headerWholesaleQuery)->latest()->limit(5)->get();
+            $headerWholesaleCount = $lastReadAt
+                ? (clone $headerWholesaleQuery)->where('created_at', '>', $lastReadAt)->count()
+                : (clone $headerWholesaleQuery)->count();
+            $totalWholesaleCount = (clone $headerWholesaleQuery)->count();
 
             // 6. Cross-Database Notification Aggregation for Super Admin (Across All Tenant DBs)
             if ($isSuperAdmin) {
@@ -168,10 +164,13 @@ class AdminLayoutComposer
                                 });
                             if ($tWholesale->isNotEmpty()) {
                                 $headerWholesaleOrders = $headerWholesaleOrders->concat($tWholesale);
-                                $headerWholesaleCount += \Illuminate\Support\Facades\DB::connection('tenant_noti_temp')
+                                $tWholesaleCount = \Illuminate\Support\Facades\DB::connection('tenant_noti_temp')
                                     ->table('wholesale_purchase_orders')
-                                    ->where('payment_status', 'pending')
-                                    ->count();
+                                    ->where('payment_status', 'pending');
+                                $totalWholesaleCount += (clone $tWholesaleCount)->count();
+                                $headerWholesaleCount += $lastReadAt
+                                    ? (clone $tWholesaleCount)->where('created_at', '>', $lastReadAt)->count()
+                                    : (clone $tWholesaleCount)->count();
                             }
 
                             // Pending Store Orders from tenant DB
@@ -189,10 +188,13 @@ class AdminLayoutComposer
                                 });
                             if ($tOrders->isNotEmpty()) {
                                 $headerVendorOrders = $headerVendorOrders->concat($tOrders);
-                                $headerVendorOrderCount += \Illuminate\Support\Facades\DB::connection('tenant_noti_temp')
+                                $tOrdersCount = \Illuminate\Support\Facades\DB::connection('tenant_noti_temp')
                                     ->table('orders')
-                                    ->where('status', 'pending')
-                                    ->count();
+                                    ->where('status', 'pending');
+                                $totalVendorOrderCount += (clone $tOrdersCount)->count();
+                                $headerVendorOrderCount += $lastReadAt
+                                    ? (clone $tOrdersCount)->where('created_at', '>', $lastReadAt)->count()
+                                    : (clone $tOrdersCount)->count();
                             }
 
                             // Pending Products from tenant DB
@@ -210,10 +212,12 @@ class AdminLayoutComposer
                                 });
                             if ($tProducts->isNotEmpty()) {
                                 $headerPendingProducts = $headerPendingProducts->concat($tProducts);
-                                $headerPendingProdCount += \Illuminate\Support\Facades\DB::connection('tenant_noti_temp')
+                                $tProductsCount = \Illuminate\Support\Facades\DB::connection('tenant_noti_temp')
                                     ->table('products')
-                                    ->where('approval_status', 'pending')
-                                    ->count();
+                                    ->where('approval_status', 'pending');
+                                $headerPendingProdCount += $lastReadAt
+                                    ? (clone $tProductsCount)->where('created_at', '>', $lastReadAt)->count()
+                                    : (clone $tProductsCount)->count();
                             }
 
                             // Pending Recharge Requests from tenant DB
@@ -232,11 +236,14 @@ class AdminLayoutComposer
                                 });
                             if ($tRecharges->isNotEmpty()) {
                                 $headerPendingPayments = $headerPendingPayments->concat($tRecharges);
-                                $headerPendingCount += \Illuminate\Support\Facades\DB::connection('tenant_noti_temp')
+                                $tRechargesCount = \Illuminate\Support\Facades\DB::connection('tenant_noti_temp')
                                     ->table('vendor_wallet_transactions')
                                     ->where('status', 'pending')
-                                    ->where('type', 'recharge_request')
-                                    ->count();
+                                    ->where('type', 'recharge_request');
+                                $totalPendingPaymentsCount += (clone $tRechargesCount)->count();
+                                $headerPendingCount += $lastReadAt
+                                    ? (clone $tRechargesCount)->where('created_at', '>', $lastReadAt)->count()
+                                    : (clone $tRechargesCount)->count();
                             }
                         } catch (\Throwable $tenantDbEx) {
                             // Silently ignore unreachable tenant database
@@ -272,6 +279,9 @@ class AdminLayoutComposer
                 'headerPendingProdCount' => $headerPendingProdCount,
                 'headerVendorOrders' => $headerVendorOrders,
                 'headerVendorOrderCount' => $headerVendorOrderCount,
+                'totalVendorOrderCount' => $totalVendorOrderCount ?? $headerVendorOrderCount,
+                'totalPendingPaymentsCount' => $totalPendingPaymentsCount ?? $headerPendingCount,
+                'totalWholesaleCount' => $totalWholesaleCount ?? $headerWholesaleCount,
                 'headerWholesaleOrders' => $headerWholesaleOrders,
                 'headerWholesaleCount' => $headerWholesaleCount,
                 'headerTotalCount' => $headerTotalCount,

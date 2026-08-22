@@ -830,14 +830,17 @@
                         <a href="#" class="nav-link user position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
                             <i class="fa-regular fa-bell" style="font-size: 20px; color: #ffaa00;"></i>
                             @if(($headerTotalCount ?? 0) > 0)
-                                <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" style="font-size: 0.65rem;">{{ $headerTotalCount }}</span>
+                                <span id="adminBellBadge" class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" style="font-size: 0.65rem;">{{ $headerTotalCount }}</span>
                             @endif
                         </a>
 
-                        <div class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 p-0" style="min-width: 340px;">
+                        <div class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 p-0" style="min-width: 350px;">
                             <div class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between">
                                 <h6 class="fw-bold mb-0 text-dark small"><i class="fas fa-bell text-warning me-1"></i> Admin Notifications</h6>
-                                <span class="badge bg-warning text-dark rounded-pill">{{ $headerTotalCount }} Pending</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span id="headerPendingBadge" class="badge bg-warning text-dark rounded-pill">{{ $headerTotalCount ?? 0 }} New</span>
+                                    <button type="button" id="markAllNotifReadBtn" class="btn btn-xs btn-outline-secondary py-0 px-2 rounded-pill" style="font-size: 0.68rem;" title="Mark all notifications as read">Mark as read</button>
+                                </div>
                             </div>
                             <div class="list-group list-group-flush" style="max-height: 320px; overflow-y: auto;">
                                 <!-- Product Approvals -->
@@ -929,7 +932,7 @@
                                     @endforeach
                                 @endif
 
-                                @if($headerTotalCount === 0)
+                                @if($headerPendingProducts->isEmpty() && $headerPendingPayments->isEmpty() && $headerVendorOrders->isEmpty() && (empty($headerWholesaleOrders) || $headerWholesaleOrders->isEmpty()))
                                     <div class="p-4 text-center text-muted small">
                                         <i class="fas fa-bell-slash fs-4 d-block mb-1 opacity-50"></i>
                                         No pending approval, payment, or order requests.
@@ -937,9 +940,9 @@
                                 @endif
                             </div>
                             <div class="p-2 text-center bg-light border-top d-flex justify-content-around flex-wrap gap-1">
-                                <a href="{{ route('admin.wholesale-orders.index') }}" class="text-indigo fw-bold text-decoration-none" style="color: #4f46e5; font-size: 0.75rem;"><i class="fas fa-boxes-stacked me-1"></i> Wholesale ({{ $headerWholesaleCount ?? 0 }}) &rarr;</a>
-                                <a href="{{ route('admin.vendor-orders.index') }}" class="text-success fw-bold text-decoration-none" style="font-size: 0.75rem;">Orders ({{ $headerVendorOrderCount }}) &rarr;</a>
-                                <a href="{{ route('admin.vendor-payments.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">Payments ({{ $headerPendingCount }}) &rarr;</a>
+                                <a href="{{ route('admin.wholesale-orders.index') }}" class="text-indigo fw-bold text-decoration-none" style="color: #4f46e5; font-size: 0.75rem;"><i class="fas fa-boxes-stacked me-1"></i> Wholesale ({{ $totalWholesaleCount ?? ($headerWholesaleCount ?? 0) }}) &rarr;</a>
+                                <a href="{{ route('admin.vendor-orders.index') }}" class="text-success fw-bold text-decoration-none" style="font-size: 0.75rem;">Orders ({{ $totalVendorOrderCount ?? ($headerVendorOrderCount ?? 0) }}) &rarr;</a>
+                                <a href="{{ route('admin.vendor-payments.index') }}" class="text-primary fw-bold text-decoration-none" style="font-size: 0.75rem;">Payments ({{ $totalPendingPaymentsCount ?? ($headerPendingCount ?? 0) }}) &rarr;</a>
                             </div>
                         </div>
                     </li>
@@ -3152,12 +3155,49 @@
             }
         });
         
-        // Hide when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!searchContainer.contains(e.target)) {
-                searchDropdown.style.display = 'none';
-            }
-        });
+        // Mark notifications as read handler
+        const markNotifBtn = document.getElementById('markAllNotifReadBtn');
+        if (markNotifBtn) {
+            markNotifBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const originalText = markNotifBtn.innerText;
+                markNotifBtn.innerText = 'Updating...';
+                markNotifBtn.disabled = true;
+
+                fetch("{{ route('admin.notifications.mark-read') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const bellBadge = document.getElementById('adminBellBadge');
+                        if (bellBadge) {
+                            bellBadge.remove();
+                        }
+                        const pendingBadge = document.getElementById('headerPendingBadge');
+                        if (pendingBadge) {
+                            pendingBadge.innerText = '0 New';
+                            pendingBadge.className = 'badge bg-secondary text-white rounded-pill';
+                        }
+                        markNotifBtn.innerText = '✓ Read';
+                        markNotifBtn.className = 'btn btn-xs btn-success py-0 px-2 rounded-pill text-white';
+                    } else {
+                        markNotifBtn.innerText = originalText;
+                        markNotifBtn.disabled = false;
+                    }
+                })
+                .catch(() => {
+                    markNotifBtn.innerText = originalText;
+                    markNotifBtn.disabled = false;
+                });
+            });
+        }
     });
     </script>
     <!-- Instant.page: Preload links on hover/touch for instant page transitions -->

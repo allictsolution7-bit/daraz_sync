@@ -318,6 +318,7 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
     // Dashboard Routes
     Route::get('/dashboard', [AdminController::class, 'admin'])->name('dashboard');
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
+    Route::post('/notifications/mark-read', [AdminController::class, 'markNotificationsRead'])->name('notifications.mark-read');
 
     // SaaS Tenant Management Routes
     Route::get('/saas-tenants', [\App\Http\Controllers\Admin\SaaSTenantController::class, 'index'])->name('saas-tenants.index');
