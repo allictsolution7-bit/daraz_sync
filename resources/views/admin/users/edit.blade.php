@@ -102,6 +102,28 @@
         background: #e2e8f0;
         transition: all 0.3s ease;
     }
+    .template-choice-card {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        background: #ffffff;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        min-height: 175px;
+    }
+    .template-choice-card:hover {
+        border-color: #93c5fd !important;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.09);
+    }
+    .template-choice-card.selected-template {
+        border-color: #2563eb !important;
+        background: #f8faff !important;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.14) !important;
+    }
 </style>
 @endsection
 
@@ -377,102 +399,334 @@
             <div class="card-body p-4">
                 <input type="hidden" name="template_id" id="selectedUserTemplate" value="{{ $userTemplateId ?? '1' }}">
 
-                <div class="row g-3">
-                    @php
-                        $templates = [
-                            [
-                                'id' => '1',
-                                'name' => 'Classic Marketplace',
-                                'tagline' => 'High Density & Categorized',
-                                'badge' => 'Default Marketplace',
-                                'badge_color' => '#ea580c',
-                                'color' => '#ea580c',
-                                'desc' => 'Multi-tier side menu, featured banners, high-density product grid, and category pill carousels.',
-                                'icon' => 'fas fa-store'
-                            ],
-                            [
-                                'id' => '2',
-                                'name' => 'Modern Minimal',
-                                'tagline' => 'Brand Showcase & Clean',
-                                'badge' => 'Minimal Aesthetic',
-                                'badge_color' => '#0284c7',
-                                'color' => '#0284c7',
-                                'desc' => 'Spacious layouts, curated lookbooks, dynamic side promos, and elegant card styling.',
-                                'icon' => 'fas fa-palette'
-                            ],
-                            [
-                                'id' => '3',
-                                'name' => 'Electronic & Tech Hub',
-                                'tagline' => 'Dark Cyber & Gadget Matrix',
-                                'badge' => 'Dark Tech Theme',
-                                'badge_color' => '#38bdf8',
-                                'color' => '#38bdf8',
-                                'desc' => 'Dark-mode luxury aesthetic with glowing neon cyan accents, tech specs, and side deals.',
-                                'icon' => 'fas fa-microchip'
-                            ],
-                            [
-                                'id' => '4',
-                                'name' => 'Flash Sale & Multi-Category',
-                                'tagline' => 'Urgency & High Volume',
-                                'badge' => 'High Conversion',
-                                'badge_color' => '#d97706',
-                                'color' => '#d97706',
-                                'desc' => 'Vibrant urgency countdowns, deal of the day ribbons, category pills, and quick cart drawers.',
-                                'icon' => 'fas fa-bolt'
-                            ],
-                            [
-                                'id' => '5',
-                                'name' => 'Grocery & Fresh Express',
-                                'tagline' => 'Organic & Supermarket',
-                                'badge' => 'Eco-Friendly Grocery',
-                                'badge_color' => '#16a34a',
-                                'color' => '#16a34a',
-                                'desc' => 'Fresh green organic theme with circular category navigation, trust badges, and horizontal sliders.',
-                                'icon' => 'fas fa-basket-shopping'
-                            ],
-                        ];
-                    @endphp
+                <style>
+                    .user-template-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 16px;
+                    }
+                    @media (max-width: 768px) {
+                        .user-template-grid {
+                            grid-template-columns: 1fr;
+                        }
+                    }
+                    .user-template-card {
+                        background: #ffffff;
+                        border-radius: 14px;
+                        border: 2px solid #e2e8f0;
+                        padding: 14px 16px;
+                        cursor: pointer;
+                        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                        position: relative;
+                        display: flex;
+                        flex-direction: column;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+                    }
+                    .user-template-card:hover {
+                        transform: translateY(-2px);
+                        border-color: #93c5fd;
+                        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.1);
+                    }
+                    .user-template-card.active-template-card {
+                        border-color: #2563eb !important;
+                        background: #ffffff;
+                        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.16) !important;
+                    }
+                    .user-template-card.active-template-card::before {
+                        content: 'ACTIVE';
+                        position: absolute;
+                        top: -9px;
+                        right: 14px;
+                        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                        color: #ffffff;
+                        font-size: 8px;
+                        font-weight: 800;
+                        letter-spacing: 0.8px;
+                        padding: 2px 8px;
+                        border-radius: 20px;
+                        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+                    }
+                    .tpl-preview-box {
+                        height: 95px;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        position: relative;
+                        margin-bottom: 10px;
+                        border: 1px solid #e2e8f0;
+                        box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        padding: 6px;
+                    }
+                </style>
 
-                    @foreach($templates as $tpl)
-                        @php
-                            $isTplActive = ((string)($userTemplateId ?? '1')) === $tpl['id'];
-                        @endphp
-                        <div class="col-lg-4 col-md-6 col-12">
-                            <div class="template-choice-card p-3 rounded-4 border-2 position-relative h-100 d-flex flex-direction-column justify-content-between {{ $isTplActive ? 'selected-template' : '' }}" 
-                                 onclick="selectUserTemplate('{{ $tpl['id'] }}', this)"
-                                 style="border: 2px solid {{ $isTplActive ? '#2563eb' : '#e2e8f0' }}; background: {{ $isTplActive ? '#f8faff' : '#ffffff' }}; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
-                                
-                                <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: {{ $tpl['color'] }}15; color: {{ $tpl['color'] }};">
-                                            <i class="{{ $tpl['icon'] }} fs-5"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0 font-weight-bold text-dark" style="font-size: 13.5px;">Template {{ $tpl['id'] }}: {{ $tpl['name'] }}</h6>
-                                            <small class="text-muted" style="font-size: 11px;">{{ $tpl['tagline'] }}</small>
-                                        </div>
-                                    </div>
-                                    <span class="badge rounded-pill text-white flex-shrink-0" style="background: {{ $tpl['badge_color'] }}; font-size: 9.5px; padding: 3px 8px;">
-                                        {{ $tpl['badge'] }}
-                                    </span>
+                <div class="user-template-grid">
+                    <!-- Template 1 -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '1' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('1', this)">
+                        <div class="tpl-preview-box" style="background: #f8fafc; border-color: #fed7aa;">
+                            <div style="height: 10px; background: #ea580c; border-radius: 3px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                <div style="width: 18px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                <div style="display: flex; gap: 3px;">
+                                    <div style="width: 14px; height: 3px; background: rgba(255,255,255,0.8); border-radius: 1px;"></div>
+                                    <div style="width: 14px; height: 3px; background: rgba(255,255,255,0.8); border-radius: 1px;"></div>
                                 </div>
-
-                                <p class="text-muted mb-3 small" style="font-size: 11.5px; line-height: 1.45;">
-                                    {{ $tpl['desc'] }}
-                                </p>
-
-                                <div class="d-flex align-items-center justify-content-between pt-2 border-top gap-2">
-                                    <a href="{{ url('/') }}?preview_template={{ $tpl['id'] }}" target="_blank" class="btn btn-xs btn-outline-secondary rounded-pill px-2.5 py-1" onclick="event.stopPropagation();" style="font-size: 11px;" title="Preview this template in a new window">
-                                        <i class="fas fa-arrow-up-right-from-square me-1"></i> Live Preview
-                                    </a>
-                                    <div class="template-radio-indicator d-flex align-items-center gap-1.5" style="font-size: 11.5px; font-weight: 700; color: {{ $isTplActive ? '#2563eb' : '#94a3b8' }};">
-                                        <i class="{{ $isTplActive ? 'fas fa-circle-check text-primary' : 'far fa-circle text-muted' }} fs-6"></i>
-                                        <span class="indicator-text">{{ $isTplActive ? 'Selected' : 'Select' }}</span>
-                                    </div>
+                            </div>
+                            <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
+                                <div style="width: 26%; background: #ffffff; border: 1px solid #fed7aa; border-radius: 4px; padding: 2px; display: flex; flex-direction: column; justify-content: space-around;">
+                                    <div style="height: 3px; background: #fdba74; border-radius: 1px;"></div>
+                                    <div style="height: 3px; background: #e2e8f0; border-radius: 1px;"></div>
+                                    <div style="height: 3px; background: #e2e8f0; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; background: linear-gradient(135deg, #ea580c, #f97316); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; padding: 2px;">
+                                    <span style="font-size: 7.5px; font-weight: 800; letter-spacing: 0.3px;">MARKETPLACE</span>
+                                    <span style="font-size: 6px; opacity: 0.9;">Drawer + Slider</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #fed7aa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #ffedd5; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #fed7aa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #ffedd5; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #fed7aa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #ffedd5; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 1: Classic Marketplace</h6>
+                            <span class="badge bg-warning text-dark font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px;">Default</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            Daraz-style multi-category architecture with category menu drawer & wide carousel.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '1' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '1' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=1" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-primary px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Template 2 -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '2' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('2', this)">
+                        <div class="tpl-preview-box" style="background: #0a0a0a; border-color: #d4af37;">
+                            <div style="height: 10px; background: #171717; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; border-bottom: 1px solid rgba(212,175,55,0.4);">
+                                <div style="width: 18px; height: 3px; background: #d4af37; border-radius: 1px;"></div>
+                                <div style="display: flex; gap: 3px;">
+                                    <div style="width: 10px; height: 2px; background: rgba(255,255,255,0.6); border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                            <div style="flex: 1; background: linear-gradient(135deg, #1e1b18, #2a2012); border-radius: 4px; margin: 4px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #d4af37; border: 1px solid rgba(212,175,55,0.35);">
+                                <span style="font-size: 7.5px; font-weight: 800; letter-spacing: 0.8px;">MODERN BOUTIQUE</span>
+                                <span style="font-size: 6px; color: rgba(255,255,255,0.7);">Full-Width Canvas • Top Trust Bar</span>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <div style="flex: 1; height: 20px; background: #141414; border: 1px solid rgba(212,175,55,0.25); border-radius: 3px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 5.5px; color: #d4af37;">🚚 Free Delivery</span>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #141414; border: 1px solid rgba(212,175,55,0.25); border-radius: 3px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 5.5px; color: #d4af37;">🔒 Secure</span>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #141414; border: 1px solid rgba(212,175,55,0.25); border-radius: 3px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 5.5px; color: #d4af37;">⭐ Premium</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 2: Modern Minimal</h6>
+                            <span class="badge bg-dark text-warning font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px; border: 1px solid #d4af37;">Luxury</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            High-end boutique look with gold accents, edge-to-edge slider & top trust strip.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '2' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '2' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=2" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-dark px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Template 3 -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '3' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('3', this)">
+                        <div class="tpl-preview-box" style="background: #080c14; border-color: #38bdf8;">
+                            <div style="height: 10px; background: #0d1322; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; border-bottom: 1px solid rgba(56, 189, 248, 0.4);">
+                                <div style="width: 18px; height: 3px; background: #38bdf8; border-radius: 1px;"></div>
+                                <div style="display: flex; gap: 3px;">
+                                    <div style="width: 10px; height: 2px; background: #64748b; border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
+                                <div style="flex: 2; background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #38bdf8;">
+                                    <span style="color: #38bdf8; font-size: 7.5px; font-weight: 800;">⚡ TECH HUB</span>
+                                    <span style="color: #94a3b8; font-size: 5.5px;">Gadget Spec Grids</span>
+                                </div>
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="flex: 1; background: #0d1322; border-radius: 2px; border: 1px solid rgba(56,189,248,0.3); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 5px; color: #38bdf8;">Side 1</span>
+                                    </div>
+                                    <div style="flex: 1; background: #0d1322; border-radius: 2px; border: 1px solid rgba(56,189,248,0.3); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 5px; color: #38bdf8;">Side 2</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <div style="flex: 1; height: 20px; background: #0d1322; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #1e293b; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #38bdf8; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #0d1322; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #1e293b; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #38bdf8; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #0d1322; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #1e293b; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #38bdf8; border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 3: Electronic & Tech Hub</h6>
+                            <span class="badge bg-info text-white font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px; background: #0284c7 !important;">Cyber Tech</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            Cyberpunk dark theme, cyan glow, 2.5:1 hero with 2-row rotating promo deals.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '3' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '3' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=3" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-info px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Template 4 -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '4' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('4', this)">
+                        <div class="tpl-preview-box" style="background: #0f1115; border-color: #e11d48;">
+                            <div style="height: 10px; background: #1e1117; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; border-bottom: 1px solid rgba(225, 29, 72, 0.4);">
+                                <div style="width: 20px; height: 3px; background: #e11d48; border-radius: 1px;"></div>
+                                <div style="display: flex; gap: 2px;">
+                                    <div style="padding: 1px 3px; background: #e11d48; color: #fff; font-size: 5px; border-radius: 1px; font-weight: 800;">SALE</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
+                                <div style="flex: 2; background: linear-gradient(135deg, #881337, #be123c); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; border: 1px solid #f43f5e;">
+                                    <span style="font-size: 7.5px; font-weight: 900;">🔥 FLASH SALE</span>
+                                    <span style="font-size: 5.5px; color: #fecdd3;">Live Deal Timers</span>
+                                </div>
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="flex: 1; background: #1e1117; border-radius: 2px; border: 1px solid rgba(244,63,94,0.3); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 5px; color: #fb7185;">Deal 1</span>
+                                    </div>
+                                    <div style="flex: 1; background: #1e1117; border-radius: 2px; border: 1px solid rgba(244,63,94,0.3); display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 5px; color: #fb7185;">Deal 2</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <div style="flex: 1; height: 20px; background: #1e1117; border: 1px solid rgba(225, 29, 72, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #33131d; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #e11d48; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #1e1117; border: 1px solid rgba(225, 29, 72, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #33131d; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #e11d48; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #1e1117; border: 1px solid rgba(225, 29, 72, 0.25); border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #33131d; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #e11d48; border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 4: Flash Sale</h6>
+                            <span class="badge bg-danger text-white font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px;">Conversion</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            High-conversion urgency architecture with animated sale marquee & flash deal rows.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '4' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '4' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=4" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-danger px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Template 5 -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '5' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('5', this)">
+                        <div class="tpl-preview-box" style="background: #f0fdf4; border-color: #86efac;">
+                            <div style="height: 10px; background: #15803d; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                <div style="width: 18px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                <div style="display: flex; gap: 3px;">
+                                    <div style="width: 10px; height: 2px; background: rgba(255,255,255,0.7); border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 3px; margin: 3px 0;">
+                                <div style="flex: 1; height: 9px; background: #dcfce7; border-radius: 6px; border: 1px solid #86efac; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 4.5px; color: #15803d; font-weight: 700;">Organic</span>
+                                </div>
+                                <div style="flex: 1; height: 9px; background: #dcfce7; border-radius: 6px; border: 1px solid #86efac; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 4.5px; color: #15803d; font-weight: 700;">Fruits</span>
+                                </div>
+                                <div style="flex: 1; height: 9px; background: #dcfce7; border-radius: 6px; border: 1px solid #86efac; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-size: 4.5px; color: #15803d; font-weight: 700;">Dairy</span>
+                                </div>
+                            </div>
+                            <div style="flex: 1; background: linear-gradient(135deg, #16a34a, #15803d); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; margin-bottom: 3px;">
+                                <span style="font-size: 7.5px; font-weight: 800;">🌿 FRESH GROCERY</span>
+                                <span style="font-size: 5.5px; opacity: 0.9;">Farm Fresh Produce</span>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #86efac; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #dcfce7; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #86efac; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #dcfce7; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 20px; background: #fff; border: 1px solid #86efac; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 8px; background: #dcfce7; border-radius: 1px;"></div>
+                                    <div style="height: 3px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 5: Grocery & Fresh Express</h6>
+                            <span class="badge bg-success text-white font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px;">Organic</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            Fresh eco-friendly grocery layout with category pill tabs & full-width carousel.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '5' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '5' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=5" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-success px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -549,25 +803,21 @@
             badge.innerText = 'Assigned: Template ' + templateId;
         }
 
-        document.querySelectorAll('.template-choice-card').forEach(card => {
-            card.classList.remove('selected-template');
-            card.style.borderColor = '#e2e8f0';
-            card.style.background = '#ffffff';
-            const ind = card.querySelector('.template-radio-indicator');
-            if (ind) {
-                ind.style.color = '#94a3b8';
-                ind.innerHTML = '<i class="far fa-circle text-muted fs-6"></i> <span class="indicator-text">Select</span>';
+        document.querySelectorAll('.user-template-card').forEach(card => {
+            card.classList.remove('active-template-card');
+            const statusBtn = card.querySelector('.template-status-btn');
+            if (statusBtn) {
+                statusBtn.className = 'btn btn-sm btn-light text-secondary border px-2.5 py-1 rounded-pill template-status-btn';
+                statusBtn.innerText = 'Select Template';
             }
         });
 
         if (cardEl) {
-            cardEl.classList.add('selected-template');
-            cardEl.style.borderColor = '#2563eb';
-            cardEl.style.background = '#f8faff';
-            const ind = cardEl.querySelector('.template-radio-indicator');
-            if (ind) {
-                ind.style.color = '#2563eb';
-                ind.innerHTML = '<i class="fas fa-circle-check text-primary fs-6"></i> <span class="indicator-text">Selected</span>';
+            cardEl.classList.add('active-template-card');
+            const statusBtn = cardEl.querySelector('.template-status-btn');
+            if (statusBtn) {
+                statusBtn.className = 'btn btn-sm btn-success text-white px-2.5 py-1 rounded-pill template-status-btn';
+                statusBtn.innerText = '✓ Currently Active';
             }
         }
     }

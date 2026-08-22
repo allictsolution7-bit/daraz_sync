@@ -2382,18 +2382,32 @@
 
                     <!-- Homepage Template Selection Card -->
                     @php
-                        $selectedTemplate = setting('homepage', 'template_id', '1');
+                        $isSuperAdmin = auth()->check() && auth()->user()->isSuperAdmin();
+                        $currentUser = auth()->user();
+                        $selectedTemplate = $currentUser && !empty($currentUser->template_id) 
+                            ? (string)$currentUser->template_id 
+                            : setting('homepage', 'template_id', '1');
                     @endphp
                     <div class="card mb-4 border-0 shadow-sm" style="border-radius: 14px; overflow: hidden;">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #edf2f7;">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom: 1px solid #edf2f7;">
                             <div>
                                 <h5 class="card-title mb-1 font-weight-bold" style="color: #1e293b; font-size: 17px;">
                                     <i class="fas fa-layer-group text-primary mr-2"></i> Homepage Template & Layout
                                 </h5>
-                                <p class="text-muted mb-0 small">Select a pre-designed homepage theme architecture for your store or subdomain.</p>
+                                <p class="text-muted mb-0 small">
+                                    @if($isSuperAdmin)
+                                        Select a pre-designed homepage theme architecture for your store or subdomain.
+                                    @else
+                                        Your assigned homepage website theme architecture (configured by Super Administrator).
+                                    @endif
+                                </p>
                             </div>
-                            <span class="badge badge-primary px-3 py-2" style="border-radius: 20px; font-weight: 600; letter-spacing: 0.5px;">
-                                Active: Template {{ $selectedTemplate }}
+                            <span class="badge {{ $isSuperAdmin ? 'badge-primary' : 'badge-success' }} px-3 py-2" style="border-radius: 20px; font-weight: 600; letter-spacing: 0.5px;">
+                                @if($isSuperAdmin)
+                                    Active: Template {{ $selectedTemplate }}
+                                @else
+                                    <i class="fas fa-shield-alt mr-1"></i> Assigned: Template {{ $selectedTemplate }}
+                                @endif
                             </span>
                         </div>
                         <div class="card-body bg-light-50 p-4">
@@ -2461,7 +2475,8 @@
                                 }
                             </style>
 
-                            <div class="template-selector-grid">
+                            <div class="template-selector-grid" style="{{ !$isSuperAdmin ? 'grid-template-columns: 1fr; max-width: 540px;' : '' }}">
+                                @if($isSuperAdmin || $selectedTemplate == '1')
                                 <!-- Template 1 -->
                                 <div class="template-card {{ $selectedTemplate == '1' ? 'active-template-card' : '' }}" data-template="1">
                                     <div class="tpl-preview-box" style="background: #f8fafc; border-color: #fed7aa;">
@@ -2515,7 +2530,9 @@
                                         </a>
                                     </div>
                                 </div>
+                                @endif
 
+                                @if($isSuperAdmin || $selectedTemplate == '2')
                                 <!-- Template 2 -->
                                 <div class="template-card {{ $selectedTemplate == '2' ? 'active-template-card' : '' }}" data-template="2">
                                     <div class="tpl-preview-box" style="background: #0a0a0a; border-color: #d4af37;">
@@ -2558,7 +2575,9 @@
                                         </a>
                                     </div>
                                 </div>
+                                @endif
 
+                                @if($isSuperAdmin || $selectedTemplate == '3')
                                 <!-- Template 3 -->
                                 <div class="template-card {{ $selectedTemplate == '3' ? 'active-template-card' : '' }}" data-template="3">
                                     <div class="tpl-preview-box" style="background: #080c14; border-color: #38bdf8;">
@@ -2614,7 +2633,9 @@
                                         </a>
                                     </div>
                                 </div>
+                                @endif
 
+                                @if($isSuperAdmin || $selectedTemplate == '4')
                                 <!-- Template 4 -->
                                 <div class="template-card {{ $selectedTemplate == '4' ? 'active-template-card' : '' }}" data-template="4">
                                     <div class="tpl-preview-box" style="background: #0f1115; border-color: #e11d48;">
@@ -2670,13 +2691,15 @@
                                         </a>
                                     </div>
                                 </div>
+                                @endif
 
+                                @if($isSuperAdmin || $selectedTemplate == '5')
                                 <!-- Template 5 -->
                                 <div class="template-card {{ $selectedTemplate == '5' ? 'active-template-card' : '' }}" data-template="5">
                                     <div class="tpl-preview-box" style="background: #f0fdf4; border-color: #86efac;">
                                         <div style="height: 10px; background: #15803d; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
                                             <div style="width: 18px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
-                                            <div style="display: flex; gap: 3px;">
+                                            <div style="display: gap: 3px;">
                                                 <div style="width: 10px; height: 2px; background: rgba(255,255,255,0.7); border-radius: 1px;"></div>
                                             </div>
                                         </div>
@@ -2727,6 +2750,7 @@
                                         </a>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </div>
