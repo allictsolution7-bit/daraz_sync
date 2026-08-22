@@ -2438,9 +2438,10 @@
                                             <span class="badge badge-pill {{ $selectedTemplate == '1' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
                                                 {{ $selectedTemplate == '1' ? '✓ Currently Applied' : 'Click to Apply' }}
                                             </span>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(1, 'Classic Marketplace')">
-                                                <i class="fas fa-eye"></i> Details
-                                            </button>
+                                            <a href="{{ url('/') }}?preview_template=1" target="_blank"
+                                               class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 11px;">
+                                                <i class="fas fa-external-link-alt"></i> Live Preview
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -2478,9 +2479,10 @@
                                             <span class="badge badge-pill {{ $selectedTemplate == '2' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
                                                 {{ $selectedTemplate == '2' ? '✓ Currently Applied' : 'Click to Apply' }}
                                             </span>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(2, 'Modern Minimal')">
-                                                <i class="fas fa-eye"></i> Details
-                                            </button>
+                                            <a href="{{ url('/') }}?preview_template=2" target="_blank"
+                                               class="btn btn-sm btn-outline-info py-0 px-2" style="font-size: 11px;">
+                                                <i class="fas fa-external-link-alt"></i> Live Preview
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -2522,9 +2524,10 @@
                                             <span class="badge badge-pill {{ $selectedTemplate == '3' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
                                                 {{ $selectedTemplate == '3' ? '✓ Currently Applied' : 'Click to Apply' }}
                                             </span>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(3, 'Electronic & Tech Hub')">
-                                                <i class="fas fa-eye"></i> Details
-                                            </button>
+                                            <div class="d-flex gap-1">
+                                                <a href="{{ url('/') }}?preview_template=3" target="_blank" class="btn btn-sm btn-outline-dark py-0 px-2" style="font-size: 11px;">Preview</a>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(3, 'Electronic & Tech Hub')">Details</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2566,9 +2569,10 @@
                                             <span class="badge badge-pill {{ $selectedTemplate == '4' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
                                                 {{ $selectedTemplate == '4' ? '✓ Currently Applied' : 'Click to Apply' }}
                                             </span>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(4, 'Flash Sale Theme')">
-                                                <i class="fas fa-eye"></i> Details
-                                            </button>
+                                            <div class="d-flex gap-1">
+                                                <a href="{{ url('/') }}?preview_template=4" target="_blank" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size: 11px;">Preview</a>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(4, 'High-Conversion Flash Sale')">Details</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2609,9 +2613,10 @@
                                             <span class="badge badge-pill {{ $selectedTemplate == '5' ? 'badge-success' : 'badge-secondary' }} px-2 py-1 template-status-badge">
                                                 {{ $selectedTemplate == '5' ? '✓ Currently Applied' : 'Click to Apply' }}
                                             </span>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(5, 'Grocery & Fresh Express')">
-                                                <i class="fas fa-eye"></i> Details
-                                            </button>
+                                            <div class="d-flex gap-1">
+                                                <a href="{{ url('/') }}?preview_template=5" target="_blank" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size: 11px;">Preview</a>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="showTemplateModal(5, 'Grocery & Fresh Express')">Details</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

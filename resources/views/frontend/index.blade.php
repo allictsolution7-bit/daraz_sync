@@ -3,13 +3,107 @@
 
 @php
     $currentTemplateId = setting('homepage', 'template_id', '1');
+
+    // Allow admins to preview any template via ?preview_template=X
+    // Only applies to authenticated admins — never exposed to regular visitors
+    $isAdminPreview = request()->has('preview_template') &&
+        auth()->check() &&
+        auth()->user()->isAdmin();
+    if ($isAdminPreview) {
+        $previewId = (string) request()->query('preview_template');
+        if (in_array($previewId, ['1', '2', '3', '4', '5'], true)) {
+            $currentTemplateId = $previewId;
+        }
+    }
 @endphp
 
+{{-- Apply template data attribute to body for global CSS reach --}}
+<script>
+    (function() {
+        document.documentElement.setAttribute('data-hp-template', '{{ $currentTemplateId }}');
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.setAttribute('data-hp-template', '{{ $currentTemplateId }}');
+        });
+    })();
+</script>
+
+@if ($isAdminPreview ?? false)
+{{-- Preview Mode Banner --}}
+<div id="template-preview-banner" style="
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: #fff; padding: 10px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    border-bottom: 2px solid #38bdf8;
+">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <span style="background:#38bdf8; color:#0f172a; font-weight:800; font-size:11px; padding:3px 10px; border-radius:20px; letter-spacing:0.5px;">
+            👁 PREVIEW MODE
+        </span>
+        <span style="font-size:13px; font-weight:600; color:#e2e8f0;">
+            Template {{ $currentTemplateId }} —
+            @php $tplNames = ['1'=>'Classic Marketplace','2'=>'Modern Minimal','3'=>'Electronic & Tech Hub','4'=>'Flash Sale','5'=>'Grocery & Fresh Express']; @endphp
+            {{ $tplNames[$currentTemplateId] ?? 'Unknown' }}
+        </span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+        @foreach(['1','2','3','4','5'] as $tId)
+        <a href="{{ url('/') }}?preview_template={{ $tId }}"
+           style="
+               padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+               text-decoration: none; border: 1.5px solid;
+               {{ $tId == $currentTemplateId ? 'background:#38bdf8; color:#0f172a; border-color:#38bdf8;' : 'background:transparent; color:#94a3b8; border-color:#334155;' }}
+               transition: all 0.2s;
+           ">T{{ $tId }}</a>
+        @endforeach
+        <span style="width:1px; height:22px; background:#334155; margin:0 4px;"></span>
+        <a href="{{ url('/admin/config?tab=homepage') }}"
+           style="padding:5px 14px; border-radius:20px; font-size:12px; font-weight:700; background:linear-gradient(135deg,#38bdf8,#6366f1); color:#fff; text-decoration:none; border:none;">
+            ← Back to Admin
+        </a>
+        <button onclick="document.getElementById('template-preview-banner').style.display='none'"
+                style="background:transparent; border:none; color:#64748b; font-size:18px; cursor:pointer; padding:0 4px; line-height:1;">✕</button>
+    </div>
+</div>
+<div style="height: 48px;"></div>
+@endif
+
 <div class="homepage-template-wrapper template-{{ $currentTemplateId }}">
+
     <style>
+        /* =============================================================
+           GLOBAL TEMPLATE VARS — applied via body[data-hp-template]
+           ============================================================= */
+
+        /* =========================================================
+           TEMPLATE 1: CLASSIC MARKETPLACE (DEFAULT — no overrides needed)
+           ========================================================= */
+
         /* =========================================================
            TEMPLATE 2: MODERN MINIMAL / BOUTIQUE SHOWCASE
            ========================================================= */
+        body[data-hp-template="2"] {
+            background-color: #f8fafc !important;
+        }
+        body[data-hp-template="2"] .best-selling-section,
+        body[data-hp-template="2"] .editors_pick-section,
+        body[data-hp-template="2"] .trending-section,
+        body[data-hp-template="2"] .products-by-category,
+        body[data-hp-template="2"] .category-scrollbar-section,
+        body[data-hp-template="2"] .featured-images-section {
+            background-color: #f8fafc !important;
+        }
+        body[data-hp-template="2"] .products-by-category::before {
+            display: none;
+        }
+        body[data-hp-template="2"] .category-showcase {
+            background-color: #ffffff !important;
+            border-radius: 20px !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05) !important;
+        }
         .template-2 {
             background-color: #f8fafc;
         }
@@ -27,17 +121,17 @@
             border: 1px solid rgba(226, 232, 240, 0.8);
         }
         .template-2 .product-card {
-            background: #ffffff;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
-            padding: 8px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: #ffffff !important;
+            border-radius: 16px !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+            padding: 8px !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
         .template-2 .product-card:hover {
-            transform: translateY(-5px);
-            border-color: #38bdf8;
-            box-shadow: 0 16px 36px rgba(56, 189, 248, 0.14), 0 4px 12px rgba(99, 102, 241, 0.06);
+            transform: translateY(-5px) !important;
+            border-color: #38bdf8 !important;
+            box-shadow: 0 16px 36px rgba(56, 189, 248, 0.14), 0 4px 12px rgba(99, 102, 241, 0.06) !important;
         }
         .template-2 .product-card .product-image {
             border-radius: 12px;
@@ -46,42 +140,42 @@
         .template-2 .product-card .product-title {
             font-weight: 600;
             font-size: 14.5px;
-            color: #0f172a;
+            color: #0f172a !important;
         }
         .template-2 .product-card .current-price {
             font-weight: 700;
-            color: #2563eb;
+            color: #2563eb !important;
             font-size: 16.5px;
         }
         .template-2 .product-card .add-to-cart-btn,
         .template-2 .product-card .buy-now-btn {
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 13px;
-            background: linear-gradient(135deg, #0ea5e9, #6366f1);
-            color: #ffffff;
-            border: none;
-            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.28);
-            transition: all 0.25s ease;
+            border-radius: 25px !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+            color: #ffffff !important;
+            border: none !important;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.28) !important;
+            transition: all 0.25s ease !important;
         }
         .template-2 .product-card .add-to-cart-btn:hover,
         .template-2 .product-card .buy-now-btn:hover {
-            background: linear-gradient(135deg, #0284c7, #4f46e5);
-            color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+            background: linear-gradient(135deg, #0284c7, #4f46e5) !important;
+            color: #ffffff !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35) !important;
         }
         .template-2 .product-card .item-cart-icon {
-            border-radius: 50%;
-            border-color: #e2e8f0;
-            background: #f0f9ff;
-            color: #0ea5e9;
-            transition: all 0.2s ease;
+            border-radius: 50% !important;
+            border-color: #e2e8f0 !important;
+            background: #f0f9ff !important;
+            color: #0ea5e9 !important;
+            transition: all 0.2s ease !important;
         }
         .template-2 .product-card .item-cart-icon:hover {
-            background: linear-gradient(135deg, #0ea5e9, #6366f1);
-            border-color: transparent;
-            color: #ffffff;
+            background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+            border-color: transparent !important;
+            color: #ffffff !important;
         }
         .template-2 .section-header,
         .template-2 .section-heading {
@@ -90,58 +184,119 @@
         }
         .template-2 .section-header h2,
         .template-2 .section-heading h2 {
-            font-weight: 800;
-            letter-spacing: -0.3px;
-            color: #0f172a;
-            font-size: 20px;
+            font-weight: 800 !important;
+            letter-spacing: -0.3px !important;
+            color: #0f172a !important;
+            font-size: 20px !important;
         }
         .template-2 .heading-underline {
             background: linear-gradient(90deg, #38bdf8, #6366f1) !important;
-            height: 3px;
-            border-radius: 2px;
+            height: 3px !important;
+            border-radius: 2px !important;
         }
         .template-2 .categories-section {
             background: #ffffff !important;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #e2e8f0 !important;
             border-radius: 20px !important;
-            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05);
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05) !important;
         }
         .template-2 .categories-section .category-card {
-            border-radius: 16px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
-            background: #ffffff;
-            transition: all 0.3s ease;
+            border-radius: 16px !important;
+            border: 1px solid #f1f5f9 !important;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03) !important;
+            background: #ffffff !important;
+            transition: all 0.3s ease !important;
         }
         .template-2 .categories-section .category-card:hover {
-            transform: translateY(-4px);
-            border-color: #38bdf8;
-            box-shadow: 0 14px 28px rgba(56, 189, 248, 0.12);
+            transform: translateY(-4px) !important;
+            border-color: #38bdf8 !important;
+            box-shadow: 0 14px 28px rgba(56, 189, 248, 0.12) !important;
         }
         .template-2 .cat-btn {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            color: #0f172a;
-            font-weight: 600;
-            border-radius: 25px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            transition: all 0.2s ease;
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
+            font-weight: 600 !important;
+            border-radius: 25px !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02) !important;
+            transition: all 0.2s ease !important;
         }
         .template-2 .cat-btn:hover {
-            background: linear-gradient(135deg, #0ea5e9, #6366f1);
-            color: #ffffff;
-            border-color: transparent;
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+            background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+            color: #ffffff !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25) !important;
         }
         .template-2 .category-showcase {
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05);
+            border-radius: 20px !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05) !important;
+        }
+        .template-2 .view-all {
+            color: #2563eb !important;
+            border-color: #bfdbfe !important;
+        }
+        .template-2 .view-all:hover {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+            color: #fff !important;
+            border-color: transparent !important;
+        }
+        .template-2 .slider-arrow,
+        .template-2 .cat-scroll-arrow,
+        .template-2 .category-carousel-arrow {
+            background: #f0f9ff !important;
+            border: 1px solid #bae6fd !important;
+            color: #0ea5e9 !important;
+        }
+        .template-2 .slider-arrow:hover,
+        .template-2 .cat-scroll-arrow:hover,
+        .template-2 .category-carousel-arrow:hover {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+            color: #fff !important;
+            border-color: transparent !important;
         }
 
         /* =========================================================
-           TEMPLATE 3: HIGH TECH / ELECTRONIC HUB
+           TEMPLATE 3: HIGH TECH / ELECTRONIC HUB (FULL DARK MODE)
            ========================================================= */
+        body[data-hp-template="3"] {
+            background-color: #0b0f19 !important;
+            color: #f1f5f9 !important;
+        }
+        body[data-hp-template="3"] .best-selling-section,
+        body[data-hp-template="3"] .editors_pick-section,
+        body[data-hp-template="3"] .trending-section,
+        body[data-hp-template="3"] .category-scrollbar-section,
+        body[data-hp-template="3"] .featured-images-section {
+            background-color: #0b0f19 !important;
+        }
+        body[data-hp-template="3"] .products-by-category {
+            background-color: #080c14 !important;
+        }
+        body[data-hp-template="3"] .products-by-category::before {
+            display: none;
+        }
+        body[data-hp-template="3"] .category-showcase {
+            background-color: #111827 !important;
+            border: 1px solid #1e293b !important;
+            border-radius: 14px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+        body[data-hp-template="3"] .category-showcase-sidebar {
+            background-color: #1e293b !important;
+            border-right: 1px solid #334155 !important;
+        }
+        body[data-hp-template="3"] .category-showcase-sidebar li a {
+            color: #cbd5e1 !important;
+        }
+        body[data-hp-template="3"] .category-showcase-sidebar li a:hover,
+        body[data-hp-template="3"] .category-showcase-sidebar li.active a {
+            background: #1e293b !important;
+            color: #38bdf8 !important;
+        }
+        body[data-hp-template="3"] .category-showcase-products {
+            background-color: #111827 !important;
+        }
         .template-3 {
             background-color: #0b0f19 !important;
             color: #f1f5f9 !important;
@@ -232,20 +387,20 @@
             background: #111827 !important;
             border: 1px solid #1e293b !important;
             color: #f8fafc !important;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            padding: 8px;
-            transition: all 0.25s ease;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+            padding: 8px !important;
+            transition: all 0.25s ease !important;
         }
         .template-3 .product-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-4px) !important;
             border-color: #38bdf8 !important;
             box-shadow: 0 12px 30px rgba(56, 189, 248, 0.25), 0 0 15px rgba(56, 189, 248, 0.15) !important;
         }
         .template-3 .product-card .product-title,
         .template-3 .product-title,
-        .template-3 h2, 
-        .template-3 h3, 
+        .template-3 h2,
+        .template-3 h3,
         .template-3 h4 {
             color: #f8fafc !important;
         }
@@ -254,66 +409,66 @@
         }
         .template-3 .product-card .current-price {
             color: #38bdf8 !important;
-            font-weight: 800;
+            font-weight: 800 !important;
         }
         .template-3 .product-card .add-to-cart-btn,
         .template-3 .product-card .buy-now-btn {
             background: linear-gradient(135deg, #0284c7, #2563eb) !important;
             border: 1px solid #38bdf8 !important;
             color: #ffffff !important;
-            font-weight: 700;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
-            transition: all 0.25s ease;
+            font-weight: 700 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35) !important;
+            transition: all 0.25s ease !important;
         }
         .template-3 .product-card .add-to-cart-btn:hover,
         .template-3 .product-card .buy-now-btn:hover {
             background: linear-gradient(135deg, #38bdf8, #0284c7) !important;
             color: #0b0f19 !important;
-            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5) !important;
         }
         .template-3 .product-card .item-cart-icon {
-            border-radius: 8px;
-            border-color: #334155;
-            background: #1e293b;
-            color: #38bdf8;
+            border-radius: 8px !important;
+            border-color: #334155 !important;
+            background: #1e293b !important;
+            color: #38bdf8 !important;
         }
         .template-3 .product-card .item-cart-icon:hover {
-            background: #38bdf8;
-            border-color: #38bdf8;
-            color: #0b0f19;
+            background: #38bdf8 !important;
+            border-color: #38bdf8 !important;
+            color: #0b0f19 !important;
         }
         .template-3 .section-header,
         .template-3 .section-heading {
             border-bottom: 1px solid #1e293b !important;
-            margin-bottom: 16px;
+            margin-bottom: 16px !important;
         }
         .template-3 .section-header h2,
         .template-3 .section-heading h2 {
             color: #38bdf8 !important;
-            font-weight: 800;
-            letter-spacing: 0.5px;
+            font-weight: 800 !important;
+            letter-spacing: 0.5px !important;
         }
         .template-3 .heading-underline {
             background: linear-gradient(90deg, #38bdf8, #2563eb) !important;
-            height: 3px;
+            height: 3px !important;
         }
         .template-3 .categories-section {
             background: #111827 !important;
             border: 1px solid #1e293b !important;
             border-radius: 16px !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
         }
         .template-3 .categories-section .category-card {
             background: #1e293b !important;
             border: 1px solid #334155 !important;
             color: #f8fafc !important;
-            border-radius: 12px;
+            border-radius: 12px !important;
         }
         .template-3 .categories-section .category-card:hover {
             border-color: #38bdf8 !important;
-            transform: translateY(-4px);
-            box-shadow: 0 10px 24px rgba(56, 189, 248, 0.2);
+            transform: translateY(-4px) !important;
+            box-shadow: 0 10px 24px rgba(56, 189, 248, 0.2) !important;
         }
         .template-3 .categories-section .category-button {
             color: #e2e8f0 !important;
@@ -322,14 +477,14 @@
             background: #111827 !important;
             color: #94a3b8 !important;
             border: 1px solid #1e293b !important;
-            border-radius: 8px;
+            border-radius: 8px !important;
         }
         .template-3 .cat-btn:hover {
             background: #1e293b !important;
             color: #38bdf8 !important;
             border-color: #38bdf8 !important;
-            font-weight: 700;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+            font-weight: 700 !important;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25) !important;
         }
         .template-3 .slider-arrow,
         .template-3 .cat-scroll-arrow,
@@ -347,7 +502,7 @@
         .template-3 .view-all {
             color: #38bdf8 !important;
             border: 1px solid #1e293b !important;
-            border-radius: 6px;
+            border-radius: 6px !important;
             background: #111827 !important;
         }
         .template-3 .view-all:hover {
@@ -357,123 +512,267 @@
         .template-3 .category-showcase {
             background-color: #111827 !important;
             border: 1px solid #1e293b !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+            border-radius: 14px !important;
         }
 
         /* =========================================================
            TEMPLATE 4: HIGH CONVERSION FLASH SALE
            ========================================================= */
+        body[data-hp-template="4"] {
+            background-color: #fff8f8 !important;
+        }
+        body[data-hp-template="4"] .best-selling-section,
+        body[data-hp-template="4"] .editors_pick-section,
+        body[data-hp-template="4"] .trending-section,
+        body[data-hp-template="4"] .category-scrollbar-section,
+        body[data-hp-template="4"] .featured-images-section {
+            background-color: #fff8f8 !important;
+        }
+        body[data-hp-template="4"] .products-by-category {
+            background-color: #fff0f0 !important;
+        }
+        body[data-hp-template="4"] .products-by-category::before {
+            display: none;
+        }
+        body[data-hp-template="4"] .category-showcase {
+            background-color: #fff !important;
+            border: 1.5px solid #fed7d7 !important;
+            border-radius: 14px !important;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.08) !important;
+        }
         .template-4 {
             background-color: #fff8f8;
         }
         .template-4 .product-card {
-            background: #ffffff;
-            border: 1.5px solid #fed7d7;
-            border-radius: 14px;
-            box-shadow: 0 4px 16px rgba(229, 62, 62, 0.06);
-            transition: all 0.25s ease;
+            background: #ffffff !important;
+            border: 1.5px solid #fed7d7 !important;
+            border-radius: 14px !important;
+            box-shadow: 0 4px 16px rgba(229, 62, 62, 0.06) !important;
+            transition: all 0.25s ease !important;
         }
         .template-4 .product-card:hover {
-            transform: translateY(-4px);
-            border-color: #ef4444;
-            box-shadow: 0 12px 28px rgba(239, 68, 68, 0.16);
+            transform: translateY(-4px) !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 12px 28px rgba(239, 68, 68, 0.16) !important;
         }
         .template-4 .section-header h2,
         .template-4 .section-heading h2 {
             color: #dc2626 !important;
-            font-weight: 800;
+            font-weight: 800 !important;
         }
         .template-4 .heading-underline {
             background: linear-gradient(90deg, #ef4444, #f97316) !important;
         }
         .template-4 .product-card .current-price {
-            color: #e11d48;
-            font-weight: 800;
-            font-size: 17px;
+            color: #e11d48 !important;
+            font-weight: 800 !important;
+            font-size: 17px !important;
         }
         .template-4 .product-card .add-to-cart-btn,
         .template-4 .product-card .buy-now-btn {
-            background: linear-gradient(135deg, #ef4444, #f97316);
-            border: none;
-            color: #ffffff;
-            font-weight: 700;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+            background: linear-gradient(135deg, #ef4444, #f97316) !important;
+            border: none !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3) !important;
         }
         .template-4 .product-card .add-to-cart-btn:hover,
         .template-4 .product-card .buy-now-btn:hover {
-            background: linear-gradient(135deg, #dc2626, #ea580c);
-            transform: scale(1.02);
+            background: linear-gradient(135deg, #dc2626, #ea580c) !important;
+            transform: scale(1.02) !important;
         }
         .template-4 .cat-btn {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fca5a5;
-            font-weight: 600;
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+            border: 1px solid #fca5a5 !important;
+            font-weight: 600 !important;
         }
         .template-4 .cat-btn:hover {
-            background: #ef4444;
+            background: #ef4444 !important;
+            color: #fff !important;
+            border-color: #ef4444 !important;
+        }
+        .template-4 .view-all {
+            color: #dc2626 !important;
+            border-color: #fca5a5 !important;
+        }
+        .template-4 .view-all:hover {
+            background: linear-gradient(135deg, #ef4444, #f97316) !important;
+            color: #fff !important;
+            border-color: transparent !important;
+        }
+        .template-4 .slider-arrow,
+        .template-4 .cat-scroll-arrow,
+        .template-4 .category-carousel-arrow {
+            background: #fff5f5 !important;
+            border: 1px solid #fca5a5 !important;
+            color: #dc2626 !important;
+        }
+        .template-4 .slider-arrow:hover,
+        .template-4 .cat-scroll-arrow:hover,
+        .template-4 .category-carousel-arrow:hover {
+            background: #ef4444 !important;
+            color: #fff !important;
+            border-color: #ef4444 !important;
+        }
+        .template-4 .categories-section {
+            background: #fff0f0 !important;
+            border: 1px solid #fed7d7 !important;
+            border-radius: 14px !important;
+        }
+        .template-4 .section-header,
+        .template-4 .section-heading {
+            border-bottom: 2px solid #fca5a5 !important;
+        }
+
+        /* Flash sale badge animation for template 4 */
+        .template-4 .product-card::before {
+            content: '🔥 SALE';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: linear-gradient(135deg, #ef4444, #f97316);
             color: #fff;
-            border-color: #ef4444;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            z-index: 3;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+            animation: flashPulse 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes flashPulse {
+            from { box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); }
+            to   { box-shadow: 0 2px 14px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.3); }
         }
 
         /* =========================================================
            TEMPLATE 5: GROCERY / FRESH EXPRESS
            ========================================================= */
+        body[data-hp-template="5"] {
+            background-color: #f7fee7 !important;
+        }
+        body[data-hp-template="5"] .best-selling-section,
+        body[data-hp-template="5"] .editors_pick-section,
+        body[data-hp-template="5"] .trending-section,
+        body[data-hp-template="5"] .category-scrollbar-section,
+        body[data-hp-template="5"] .featured-images-section {
+            background-color: #f7fee7 !important;
+        }
+        body[data-hp-template="5"] .products-by-category {
+            background-color: #f0fdf4 !important;
+        }
+        body[data-hp-template="5"] .products-by-category::before {
+            display: none;
+        }
+        body[data-hp-template="5"] .category-showcase {
+            background-color: #fff !important;
+            border: 1.5px solid #bbf7d0 !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.08) !important;
+        }
         .template-5 {
             background-color: #f7fee7;
         }
         .template-5 .product-card {
-            background: #ffffff;
-            border-radius: 14px;
-            border: 1.5px solid #bbf7d0;
-            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.05);
-            transition: all 0.25s ease;
+            background: #ffffff !important;
+            border-radius: 14px !important;
+            border: 1.5px solid #bbf7d0 !important;
+            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.05) !important;
+            transition: all 0.25s ease !important;
         }
         .template-5 .product-card:hover {
-            transform: translateY(-4px);
-            border-color: #16a34a;
-            box-shadow: 0 12px 28px rgba(22, 163, 74, 0.14);
+            transform: translateY(-4px) !important;
+            border-color: #16a34a !important;
+            box-shadow: 0 12px 28px rgba(22, 163, 74, 0.14) !important;
         }
         .template-5 .section-header h2,
         .template-5 .section-heading h2 {
             color: #15803d !important;
-            font-weight: 800;
+            font-weight: 800 !important;
         }
         .template-5 .heading-underline {
             background: linear-gradient(90deg, #22c55e, #15803d) !important;
         }
         .template-5 .product-card .current-price {
-            color: #15803d;
-            font-weight: 800;
+            color: #15803d !important;
+            font-weight: 800 !important;
         }
         .template-5 .product-card .add-to-cart-btn,
         .template-5 .product-card .buy-now-btn {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border: none;
-            color: #ffffff;
-            font-weight: 700;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28);
+            background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+            border: none !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            border-radius: 20px !important;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28) !important;
         }
         .template-5 .product-card .add-to-cart-btn:hover,
         .template-5 .product-card .buy-now-btn:hover {
-            background: linear-gradient(135deg, #16a34a, #15803d);
+            background: linear-gradient(135deg, #16a34a, #15803d) !important;
         }
         .template-5 .cat-btn {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #86efac;
-            font-weight: 600;
+            background: #dcfce7 !important;
+            color: #166534 !important;
+            border: 1px solid #86efac !important;
+            font-weight: 600 !important;
         }
         .template-5 .cat-btn:hover {
-            background: #16a34a;
-            color: #fff;
-            border-color: #16a34a;
+            background: #16a34a !important;
+            color: #fff !important;
+            border-color: #16a34a !important;
+        }
+        .template-5 .view-all {
+            color: #15803d !important;
+            border-color: #86efac !important;
+        }
+        .template-5 .view-all:hover {
+            background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+            color: #fff !important;
+            border-color: transparent !important;
+        }
+        .template-5 .slider-arrow,
+        .template-5 .cat-scroll-arrow,
+        .template-5 .category-carousel-arrow {
+            background: #f0fdf4 !important;
+            border: 1px solid #86efac !important;
+            color: #15803d !important;
+        }
+        .template-5 .slider-arrow:hover,
+        .template-5 .cat-scroll-arrow:hover,
+        .template-5 .category-carousel-arrow:hover {
+            background: #16a34a !important;
+            color: #fff !important;
+            border-color: #16a34a !important;
+        }
+        .template-5 .categories-section {
+            background: #f0fdf4 !important;
+            border: 1px solid #bbf7d0 !important;
+            border-radius: 14px !important;
+        }
+        .template-5 .section-header,
+        .template-5 .section-heading {
+            border-bottom: 2px solid #86efac !important;
+        }
+        .template-5 .product-card .item-cart-icon {
+            border-color: #86efac !important;
+            background: #f0fdf4 !important;
+            color: #15803d !important;
+        }
+        .template-5 .product-card .item-cart-icon:hover {
+            background: #16a34a !important;
+            border-color: #16a34a !important;
+            color: #fff !important;
         }
     </style>
 
+    @if ($currentTemplateId === '1')
+    {{-- ===================================================================
+         TEMPLATE 1: CLASSIC MARKETPLACE (DEFAULT)
+         =================================================================== --}}
     @if (!empty($homepage['enable_main_slider_section']) && $homepage['enable_main_slider_section'])
         @php
             $sliderHeight = $homepage['slider_height'] ?? 300;
@@ -664,10 +963,6 @@
             }
             .mega-loading {
                 padding: 12px;
-                text-align: center;
-                color: var(--secondary-color);
-                font-weight: 600;
-            }
                 text-align: center;
                 color: var(--secondary-color);
                 font-weight: 600;
@@ -5594,5 +5889,16 @@
             });
         });
     </script>
+    @elseif ($currentTemplateId === '2')
+        @include('frontend.partials.homepage-template-2')
+    @elseif ($currentTemplateId === '3')
+        @include('frontend.partials.homepage-template-3')
+    @elseif ($currentTemplateId === '4')
+        @include('frontend.partials.homepage-template-4')
+    @elseif ($currentTemplateId === '5')
+        @include('frontend.partials.homepage-template-5')
+    @else
+        @include('frontend.partials.homepage-template-2')
+    @endif
 </div>
 @endsection
