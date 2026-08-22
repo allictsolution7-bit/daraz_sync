@@ -143,74 +143,222 @@
            TEMPLATE 3: HIGH TECH / ELECTRONIC HUB
            ========================================================= */
         .template-3 {
-            background-color: #090d16;
-            color: #f1f5f9;
+            background-color: #0b0f19 !important;
+            color: #f1f5f9 !important;
+        }
+        .template-3 .slider-container {
+            border-radius: 14px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            border: 1px solid #1e293b;
+        }
+        .template-3 .slider-category-menu {
+            background: #111827 !important;
+            border: 1px solid #1e293b !important;
+            border-radius: 14px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+        .template-3 .slider-category-item > a {
+            color: #cbd5e1 !important;
+            border-bottom: 1px solid #1e293b !important;
+        }
+        .template-3 .slider-category-item > a:hover,
+        .template-3 .slider-category-item.active > a {
+            background: #1e293b !important;
+            color: #38bdf8 !important;
+        }
+        .template-3 .slider-category-thumb {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+        }
+        .template-3 .slider-category-item .chevron {
+            color: #38bdf8 !important;
+        }
+        .template-3 .slider-mega-area {
+            background: #111827 !important;
+            border: 1px solid #1e293b !important;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+        .template-3 .slider-mega-col h4 {
+            color: #38bdf8 !important;
+            border-bottom: 1px solid #1e293b !important;
+        }
+        .template-3 .slider-mega-col ul li a {
+            color: #cbd5e1 !important;
+        }
+        .template-3 .slider-mega-col ul li a:hover {
+            color: #38bdf8 !important;
+        }
+        .template-3 .mega-products-header h5 {
+            color: #38bdf8 !important;
+        }
+        .template-3 .mega-products-header .view-all-link {
+            color: #38bdf8 !important;
+            border-color: #1e293b !important;
+        }
+        .template-3 .mega-product-card {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+            border-radius: 10px !important;
+            color: #f8fafc !important;
+        }
+        .template-3 .mega-product-card:hover {
+            border-color: #38bdf8 !important;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2) !important;
+        }
+        .template-3 .mega-product-title {
+            color: #f8fafc !important;
+        }
+        .template-3 .mega-product-price {
+            color: #38bdf8 !important;
+            font-weight: 700 !important;
+        }
+        .template-3 .mega-product-oldprice {
+            color: #64748b !important;
+        }
+        .template-3 .slider-side-image {
+            border: 1px solid #1e293b !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+            border-radius: 14px !important;
+        }
+        .template-3 .best-selling-section,
+        .template-3 .products-by-category,
+        .template-3 .categories-section,
+        .template-3 .base-container {
+            background-color: transparent !important;
         }
         .template-3 .product-card {
-            background: #111827;
-            border: 1px solid #1f293d;
-            color: #fff;
+            background: #111827 !important;
+            border: 1px solid #1e293b !important;
+            color: #f8fafc !important;
             border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            padding: 8px;
             transition: all 0.25s ease;
         }
         .template-3 .product-card:hover {
             transform: translateY(-4px);
-            border-color: #38bdf8;
-            box-shadow: 0 12px 30px rgba(56, 189, 248, 0.18);
+            border-color: #38bdf8 !important;
+            box-shadow: 0 12px 30px rgba(56, 189, 248, 0.25), 0 0 15px rgba(56, 189, 248, 0.15) !important;
         }
+        .template-3 .product-card .product-title,
         .template-3 .product-title,
         .template-3 h2, 
         .template-3 h3, 
         .template-3 h4 {
             color: #f8fafc !important;
         }
+        .template-3 .product-card .original-price {
+            color: #64748b !important;
+        }
         .template-3 .product-card .current-price {
-            color: #38bdf8;
+            color: #38bdf8 !important;
             font-weight: 800;
         }
         .template-3 .product-card .add-to-cart-btn,
         .template-3 .product-card .buy-now-btn {
-            background: linear-gradient(135deg, #0284c7, #2563eb);
-            border: none;
-            color: #fff;
+            background: linear-gradient(135deg, #0284c7, #2563eb) !important;
+            border: 1px solid #38bdf8 !important;
+            color: #ffffff !important;
             font-weight: 700;
             border-radius: 8px;
             box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+            transition: all 0.25s ease;
         }
         .template-3 .product-card .add-to-cart-btn:hover,
         .template-3 .product-card .buy-now-btn:hover {
-            background: linear-gradient(135deg, #38bdf8, #0284c7);
-            color: #fff;
+            background: linear-gradient(135deg, #38bdf8, #0284c7) !important;
+            color: #0b0f19 !important;
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+        }
+        .template-3 .product-card .item-cart-icon {
+            border-radius: 8px;
+            border-color: #334155;
+            background: #1e293b;
+            color: #38bdf8;
+        }
+        .template-3 .product-card .item-cart-icon:hover {
+            background: #38bdf8;
+            border-color: #38bdf8;
+            color: #0b0f19;
+        }
+        .template-3 .section-header,
+        .template-3 .section-heading {
+            border-bottom: 1px solid #1e293b !important;
+            margin-bottom: 16px;
+        }
+        .template-3 .section-header h2,
+        .template-3 .section-heading h2 {
+            color: #38bdf8 !important;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .template-3 .heading-underline {
+            background: linear-gradient(90deg, #38bdf8, #2563eb) !important;
+            height: 3px;
         }
         .template-3 .categories-section {
-            background: #0f172a !important;
+            background: #111827 !important;
             border: 1px solid #1e293b !important;
             border-radius: 16px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         .template-3 .categories-section .category-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            color: #f8fafc;
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
+            border-radius: 12px;
+        }
+        .template-3 .categories-section .category-card:hover {
+            border-color: #38bdf8 !important;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(56, 189, 248, 0.2);
+        }
+        .template-3 .categories-section .category-button {
+            color: #e2e8f0 !important;
         }
         .template-3 .cat-btn {
-            background: #1e293b;
-            color: #94a3b8;
-            border: 1px solid #334155;
+            background: #111827 !important;
+            color: #94a3b8 !important;
+            border: 1px solid #1e293b !important;
+            border-radius: 8px;
         }
         .template-3 .cat-btn:hover {
-            background: #38bdf8;
-            color: #0f172a;
-            border-color: #38bdf8;
+            background: #1e293b !important;
+            color: #38bdf8 !important;
+            border-color: #38bdf8 !important;
             font-weight: 700;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
         }
-        .template-3 .products-by-category {
-            background-color: #090d16;
+        .template-3 .slider-arrow,
+        .template-3 .cat-scroll-arrow,
+        .template-3 .category-carousel-arrow {
+            background: #111827 !important;
+            border: 1px solid #1e293b !important;
+            color: #38bdf8 !important;
+        }
+        .template-3 .slider-arrow:hover,
+        .template-3 .cat-scroll-arrow:hover,
+        .template-3 .category-carousel-arrow:hover {
+            background: #38bdf8 !important;
+            color: #0b0f19 !important;
+        }
+        .template-3 .view-all {
+            color: #38bdf8 !important;
+            border: 1px solid #1e293b !important;
+            border-radius: 6px;
+            background: #111827 !important;
+        }
+        .template-3 .view-all:hover {
+            background: #38bdf8 !important;
+            color: #0b0f19 !important;
         }
         .template-3 .category-showcase {
-            background-color: #0f172a;
-            border: 1px solid #1e293b;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            background-color: #111827 !important;
+            border: 1px solid #1e293b !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 14px;
         }
 
         /* =========================================================
@@ -1075,9 +1223,13 @@
                                 @if ($item->subCategories && $item->subCategories->count())
                                     @foreach ($item->subCategories as $child)
                                         <div class="slider-mega-col">
-                                            <h4>{{ $child->name }}</h4>
-                                            <ul>
-                                                @if ($child->thirdCategories && $child->thirdCategories->count())
+                                            <h4>
+                                                <a href="{{ route('shop', [$item->slug, $child->slug]) }}" style="color: inherit; text-decoration: none;">
+                                                    {{ $child->name }}
+                                                </a>
+                                            </h4>
+                                            @if ($child->thirdCategories && $child->thirdCategories->count())
+                                                <ul>
                                                     @foreach ($child->thirdCategories as $grandChild)
                                                         <li>
                                                             <a href="{{ route('shop', [$item->slug, $child->slug, $grandChild->slug]) }}">
@@ -1085,23 +1237,10 @@
                                                             </a>
                                                         </li>
                                                     @endforeach
-                                                @else
-                                                    <li>
-                                                        <a href="{{ route('shop', [$item->slug, $child->slug]) }}">
-                                                            {{ $child->name }}
-                                                        </a>
-                                                    </li>
-                                                @endif
-                                            </ul>
+                                                </ul>
+                                            @endif
                                         </div>
                                     @endforeach
-                                @else
-                                    <div class="slider-mega-col">
-                                        <h4>{{ $item->name }}</h4>
-                                        <ul>
-                                            <li><a href="{{ route('shop', $item->slug) }}">View</a></li>
-                                        </ul>
-                                    </div>
                                 @endif
 
                                 @if (!empty($sliderCategoryFlags[$item->id]) && $sliderCategoryFlags[$item->id])

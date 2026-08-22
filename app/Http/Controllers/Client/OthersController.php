@@ -163,16 +163,7 @@ class OthersController extends Controller
                         ->limit(6)
                         ->get();
 
-                    if ($products->isEmpty()) {
-                        $products = Product::where('status', 1)
-                            ->forPublicDisplay()
-                            ->select(['id', 'title', 'slug', 'thumb_image', 'old_price', 'offer', 'product_type'])
-                            ->withProductCardData()
-                            ->orderBy('created_at', 'desc')
-                            ->limit(6)
-                            ->get();
-                    }
-
+                    // Do not fallback to random products if category has no products
                     $sliderMegaCategoryProducts[$cat->id] = $products;
                 }
             }
