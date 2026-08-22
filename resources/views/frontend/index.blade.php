@@ -7,51 +7,231 @@
 
 <div class="homepage-template-wrapper template-{{ $currentTemplateId }}">
     <style>
-        /* Base Template Styles */
-        .template-2 .product-card {
-            border-radius: 14px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0,0,0,0.04);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .template-2 .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        /* =========================================================
+           TEMPLATE 2: MODERN MINIMAL / BOUTIQUE SHOWCASE
+           ========================================================= */
+        .template-2 {
+            background-color: #f8fafc;
         }
         .template-2 .slider-layout {
             grid-template-columns: 1fr !important;
         }
+        .template-2 .slider-category-menu,
+        .template-2 .slider-mega-area,
         .template-2 .slider-mega-category-drawer {
             display: none !important;
         }
+        .template-2 .slider-container {
+            border-radius: 18px;
+            box-shadow: 0 16px 40px rgba(56, 189, 248, 0.12), 0 4px 12px rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .template-2 .product-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            padding: 8px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .template-2 .product-card:hover {
+            transform: translateY(-5px);
+            border-color: #38bdf8;
+            box-shadow: 0 16px 36px rgba(56, 189, 248, 0.14), 0 4px 12px rgba(99, 102, 241, 0.06);
+        }
+        .template-2 .product-card .product-image {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .template-2 .product-card .product-title {
+            font-weight: 600;
+            font-size: 14.5px;
+            color: #0f172a;
+        }
+        .template-2 .product-card .current-price {
+            font-weight: 700;
+            color: #2563eb;
+            font-size: 16.5px;
+        }
+        .template-2 .product-card .add-to-cart-btn,
+        .template-2 .product-card .buy-now-btn {
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 13px;
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.28);
+            transition: all 0.25s ease;
+        }
+        .template-2 .product-card .add-to-cart-btn:hover,
+        .template-2 .product-card .buy-now-btn:hover {
+            background: linear-gradient(135deg, #0284c7, #4f46e5);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+        }
+        .template-2 .product-card .item-cart-icon {
+            border-radius: 50%;
+            border-color: #e2e8f0;
+            background: #f0f9ff;
+            color: #0ea5e9;
+            transition: all 0.2s ease;
+        }
+        .template-2 .product-card .item-cart-icon:hover {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            border-color: transparent;
+            color: #ffffff;
+        }
+        .template-2 .section-header,
+        .template-2 .section-heading {
+            border-bottom: none !important;
+            margin-bottom: 16px;
+        }
+        .template-2 .section-header h2,
+        .template-2 .section-heading h2 {
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            color: #0f172a;
+            font-size: 20px;
+        }
+        .template-2 .heading-underline {
+            background: linear-gradient(90deg, #38bdf8, #6366f1) !important;
+            height: 3px;
+            border-radius: 2px;
+        }
+        .template-2 .categories-section {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px !important;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05);
+        }
+        .template-2 .categories-section .category-card {
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
+            background: #ffffff;
+            transition: all 0.3s ease;
+        }
+        .template-2 .categories-section .category-card:hover {
+            transform: translateY(-4px);
+            border-color: #38bdf8;
+            box-shadow: 0 14px 28px rgba(56, 189, 248, 0.12);
+        }
+        .template-2 .cat-btn {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-weight: 600;
+            border-radius: 25px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .template-2 .cat-btn:hover {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+        }
+        .template-2 .category-showcase {
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05);
+        }
 
-        /* Template 3: High Tech / Electronic Hub */
+        /* =========================================================
+           TEMPLATE 3: HIGH TECH / ELECTRONIC HUB
+           ========================================================= */
         .template-3 {
-            background-color: #0b0f19;
+            background-color: #090d16;
             color: #f1f5f9;
         }
         .template-3 .product-card {
-            background: #131b2e;
-            border: 1px solid #1e293b;
+            background: #111827;
+            border: 1px solid #1f293d;
             color: #fff;
-            border-radius: 10px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+            transition: all 0.25s ease;
         }
-        .template-3 .product-title, .template-3 h2, .template-3 h3, .template-3 h4 {
+        .template-3 .product-card:hover {
+            transform: translateY(-4px);
+            border-color: #38bdf8;
+            box-shadow: 0 12px 30px rgba(56, 189, 248, 0.18);
+        }
+        .template-3 .product-title,
+        .template-3 h2, 
+        .template-3 h3, 
+        .template-3 h4 {
             color: #f8fafc !important;
         }
+        .template-3 .product-card .current-price {
+            color: #38bdf8;
+            font-weight: 800;
+        }
+        .template-3 .product-card .add-to-cart-btn,
+        .template-3 .product-card .buy-now-btn {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+        }
+        .template-3 .product-card .add-to-cart-btn:hover,
+        .template-3 .product-card .buy-now-btn:hover {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: #fff;
+        }
         .template-3 .categories-section {
-            background: #111827 !important;
-            border-color: #1f2937 !important;
+            background: #0f172a !important;
+            border: 1px solid #1e293b !important;
+            border-radius: 16px !important;
+        }
+        .template-3 .categories-section .category-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #f8fafc;
+        }
+        .template-3 .cat-btn {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+        }
+        .template-3 .cat-btn:hover {
+            background: #38bdf8;
+            color: #0f172a;
+            border-color: #38bdf8;
+            font-weight: 700;
+        }
+        .template-3 .products-by-category {
+            background-color: #090d16;
+        }
+        .template-3 .category-showcase {
+            background-color: #0f172a;
+            border: 1px solid #1e293b;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
 
-        /* Template 4: High Conversion Flash Sale */
+        /* =========================================================
+           TEMPLATE 4: HIGH CONVERSION FLASH SALE
+           ========================================================= */
+        .template-4 {
+            background-color: #fff8f8;
+        }
         .template-4 .product-card {
-            border: 1.5px solid #fee2e2;
-            position: relative;
+            background: #ffffff;
+            border: 1.5px solid #fed7d7;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(229, 62, 62, 0.06);
+            transition: all 0.25s ease;
         }
         .template-4 .product-card:hover {
+            transform: translateY(-4px);
             border-color: #ef4444;
+            box-shadow: 0 12px 28px rgba(239, 68, 68, 0.16);
         }
+        .template-4 .section-header h2,
         .template-4 .section-heading h2 {
             color: #dc2626 !important;
             font-weight: 800;
@@ -59,17 +239,90 @@
         .template-4 .heading-underline {
             background: linear-gradient(90deg, #ef4444, #f97316) !important;
         }
-
-        /* Template 5: Grocery / Fresh Express */
-        .template-5 .product-card {
-            border-radius: 12px;
-            border: 1px solid #dcfce7;
+        .template-4 .product-card .current-price {
+            color: #e11d48;
+            font-weight: 800;
+            font-size: 17px;
         }
+        .template-4 .product-card .add-to-cart-btn,
+        .template-4 .product-card .buy-now-btn {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            border: none;
+            color: #ffffff;
+            font-weight: 700;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+        }
+        .template-4 .product-card .add-to-cart-btn:hover,
+        .template-4 .product-card .buy-now-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #ea580c);
+            transform: scale(1.02);
+        }
+        .template-4 .cat-btn {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            font-weight: 600;
+        }
+        .template-4 .cat-btn:hover {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
+
+        /* =========================================================
+           TEMPLATE 5: GROCERY / FRESH EXPRESS
+           ========================================================= */
+        .template-5 {
+            background-color: #f7fee7;
+        }
+        .template-5 .product-card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1.5px solid #bbf7d0;
+            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.05);
+            transition: all 0.25s ease;
+        }
+        .template-5 .product-card:hover {
+            transform: translateY(-4px);
+            border-color: #16a34a;
+            box-shadow: 0 12px 28px rgba(22, 163, 74, 0.14);
+        }
+        .template-5 .section-header h2,
         .template-5 .section-heading h2 {
             color: #15803d !important;
+            font-weight: 800;
         }
         .template-5 .heading-underline {
             background: linear-gradient(90deg, #22c55e, #15803d) !important;
+        }
+        .template-5 .product-card .current-price {
+            color: #15803d;
+            font-weight: 800;
+        }
+        .template-5 .product-card .add-to-cart-btn,
+        .template-5 .product-card .buy-now-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            color: #ffffff;
+            font-weight: 700;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28);
+        }
+        .template-5 .product-card .add-to-cart-btn:hover,
+        .template-5 .product-card .buy-now-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+        }
+        .template-5 .cat-btn {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+            font-weight: 600;
+        }
+        .template-5 .cat-btn:hover {
+            background: #16a34a;
+            color: #fff;
+            border-color: #16a34a;
         }
     </style>
 
