@@ -529,6 +529,13 @@
                                 ];
                             }
                         }
+                        if (empty($t4AllImages)) {
+                            $t4AllImages = [
+                                ['image' => 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80', 'link' => route('shop'), 'alt' => 'Promo 1'],
+                                ['image' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80', 'link' => route('shop'), 'alt' => 'Promo 2'],
+                            ];
+                        }
+                        $t4Groups = array_chunk($t4AllImages, 2);
                     @endphp
 
                     @if(count($t4Groups) > 1)

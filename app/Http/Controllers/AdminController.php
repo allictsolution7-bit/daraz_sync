@@ -845,7 +845,7 @@ class AdminController extends Controller
             'upazila' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',
             'otp_verified' => 'nullable|boolean',
-            'template_id' => 'nullable|string|in:1,2,3,4,5',
+            'template_id' => 'nullable|string|in:1,2,3,4,5,6,7,8,9,10',
             'roles' => 'nullable|array',
             'roles.*' => 'string|exists:roles,name',
             'role' => 'nullable|string|exists:roles,name',

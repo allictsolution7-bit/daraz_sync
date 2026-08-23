@@ -727,6 +727,232 @@
                             </a>
                         </div>
                     </div>
+
+                    <!-- Template 6: Fashion & Apparel Studio -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '6' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('6', this)">
+                        <div class="tpl-preview-box" style="background: #fff1f2; border-color: #fecdd3;">
+                            <div style="height: 10px; background: #be123c; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                <div style="width: 22px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                <div style="width: 14px; height: 2px; background: #fde047; border-radius: 1px;"></div>
+                            </div>
+                            <div style="display: flex; gap: 3px; margin: 3px 0;">
+                                <div style="flex: 2; height: 24px; background: linear-gradient(135deg, #e11d48, #9f1239); border-radius: 3px; padding: 2px 4px; display: flex; flex-direction: column; justify-content: center; color: #fff;">
+                                    <span style="font-size: 6px; font-weight: 800;">👗 COUTURE LOOKBOOK</span>
+                                    <span style="font-size: 4px; opacity: 0.85;">Men & Women Atelier</span>
+                                </div>
+                                <div style="flex: 1; height: 24px; display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="flex: 1; background: #ffe4e6; border: 1px solid #fecdd3; border-radius: 2px;"></div>
+                                    <div style="flex: 1; background: #ffe4e6; border: 1px solid #fecdd3; border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 3px;">
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fecdd3; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #ffe4e6; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 50%; background: #be123c; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fecdd3; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #ffe4e6; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 50%; background: #be123c; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fecdd3; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #ffe4e6; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 50%; background: #be123c; border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 6: Fashion & Apparel Studio</h6>
+                            <span class="badge bg-danger text-white font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px; background: #e11d48 !important;">Couture</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            High-fashion clothing lookbook with Men/Women split cards & shoppable Instagram gallery.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '6' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '6' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=6" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-danger px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Template 7: Beauty & Cosmetics Glow -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '7' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('7', this)">
+                        <div class="tpl-preview-box" style="background: #fdf2f8; border-color: #fbcfe8;">
+                            <div style="height: 10px; background: linear-gradient(135deg, #f43f5e, #ec4899); border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                <div style="width: 20px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                <div style="width: 12px; height: 2px; background: #ffffff; border-radius: 1px;"></div>
+                            </div>
+                            <div style="flex: 1; background: #fff; border-radius: 3px; margin: 3px 0; border: 1px solid #fbcfe8; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #be123c;">
+                                <span style="font-size: 6.5px; font-weight: 800;">🌸 GLOW COSMETICS</span>
+                                <span style="font-size: 4.5px; color: #db2777;">Skincare • Vegan Badges</span>
+                            </div>
+                            <div style="display: flex; gap: 3px;">
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fbcfe8; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #fce7f3; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #f43f5e; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fbcfe8; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #fce7f3; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #f43f5e; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fbcfe8; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #fce7f3; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #f43f5e; border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 7: Beauty & Cosmetics</h6>
+                            <span class="badge bg-danger text-white font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px; background: #ec4899 !important;">Glow</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            Pastel luxury cosmetic store with vegan trust badges & skincare category routines.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '7' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '7' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=7" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-danger px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Template 8: Mega Supermarket & Daily Essentials -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '8' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('8', this)">
+                        <div class="tpl-preview-box" style="background: #f0fdf4; border-color: #bbf7d0;">
+                            <div style="height: 10px; background: #15803d; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                <div style="width: 20px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                <div style="width: 12px; height: 2px; background: #fef08a; border-radius: 1px;"></div>
+                            </div>
+                            <div style="flex: 1; background: #fff; border-radius: 3px; margin: 3px 0; border: 1px solid #bbf7d0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #15803d;">
+                                <span style="font-size: 6.5px; font-weight: 800;">🥬 MEGA SUPERMARKET</span>
+                                <span style="font-size: 4.5px; color: #16a34a;">45-Min Fast Delivery • Aisle Pills</span>
+                            </div>
+                            <div style="display: flex; gap: 3px;">
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #bbf7d0; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #dcfce7; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #bbf7d0; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #dcfce7; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #bbf7d0; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #dcfce7; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 8: Mega Supermarket</h6>
+                            <span class="badge bg-success text-white font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px;">Express</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            Comprehensive supermarket & grocery store layout with aisle categories & quick checkout triggers.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '8' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '8' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=8" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-success px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Template 9: Books & Heritage Store -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '9' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('9', this)">
+                        <div class="tpl-preview-box" style="background: #fdfaf4; border-color: #fde68a;">
+                            <div style="height: 10px; background: #0f172a; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                <div style="width: 20px; height: 3px; background: #fbbf24; border-radius: 1px;"></div>
+                                <div style="width: 12px; height: 2px; background: #ffffff; border-radius: 1px;"></div>
+                            </div>
+                            <div style="flex: 1; background: #1e293b; border-radius: 3px; margin: 3px 0; border: 1px solid #fde68a; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fbbf24;">
+                                <span style="font-size: 6.5px; font-weight: 800;">📖 BOOKSTORE & ACADEMY</span>
+                                <span style="font-size: 4.5px; color: #fde68a;">Original Prints • Genre Shelves</span>
+                            </div>
+                            <div style="display: flex; gap: 3px;">
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fde68a; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #fef3c7; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #d97706; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fde68a; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #fef3c7; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #d97706; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fde68a; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #fef3c7; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #d97706; border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 9: Books & Heritage Store</h6>
+                            <span class="badge bg-warning text-dark font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px;">Library</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            Classic bookstore and academic library theme with genre book shelves & protective packaging guarantees.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '9' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '9' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=9" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-warning px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px; color: #d97706; border-color: #d97706;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Template 10: Home Living & Furniture -->
+                    <div class="user-template-card {{ ($userTemplateId ?? '1') == '10' ? 'active-template-card' : '' }}" onclick="selectUserTemplate('10', this)">
+                        <div class="tpl-preview-box" style="background: #fafaf9; border-color: #fed7aa;">
+                            <div style="height: 10px; background: #44403c; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                <div style="width: 20px; height: 3px; background: #fdba74; border-radius: 1px;"></div>
+                                <div style="width: 12px; height: 2px; background: #ffffff; border-radius: 1px;"></div>
+                            </div>
+                            <div style="flex: 1; background: #292524; border-radius: 3px; margin: 3px 0; border: 1px solid #fed7aa; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fdba74;">
+                                <span style="font-size: 6.5px; font-weight: 800;">🛋️ HOME & FURNITURE</span>
+                                <span style="font-size: 4.5px; color: #fed7aa;">Shop by Room • 10-Yr Warranty</span>
+                            </div>
+                            <div style="display: flex; gap: 3px;">
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fed7aa; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #ffedd5; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fed7aa; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #ffedd5; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                </div>
+                                <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fed7aa; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div style="height: 6px; background: #ffedd5; border-radius: 1px;"></div>
+                                    <div style="height: 2px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 10: Home Living & Furniture</h6>
+                            <span class="badge bg-warning text-dark font-weight-bold px-2 py-0.5" style="font-size: 9px; border-radius: 4px; background: #ea580c !important; color: #fff !important;">Living</span>
+                        </div>
+                        <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                            Warm artisan furniture & decor layout with interactive Shop-by-Room grid & material warranty badges.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <button type="button" class="btn btn-sm {{ ($userTemplateId ?? '1') == '10' ? 'btn-success text-white' : 'btn-light text-secondary border' }} px-2.5 py-1 rounded-pill template-status-btn" style="font-size: 11px; font-weight: 600;">
+                                {{ ($userTemplateId ?? '1') == '10' ? '✓ Currently Active' : 'Select Template' }}
+                            </button>
+                            <a href="{{ url('/') }}?preview_template=10" target="_blank" onclick="event.stopPropagation();"
+                               class="btn btn-sm btn-outline-warning px-3 py-1 rounded-pill font-weight-semibold" style="font-size: 11px; color: #ea580c; border-color: #ea580c;">
+                                <i class="fas fa-external-link-alt me-1"></i> Preview
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -15,7 +15,7 @@
         auth()->user()->isAdmin();
     if ($isAdminPreview) {
         $previewId = (string) request()->query('preview_template');
-        if (in_array($previewId, ['1', '2', '3', '4', '5'], true)) {
+        if (in_array($previewId, ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], true)) {
             $currentTemplateId = $previewId;
         }
     }
@@ -41,6 +41,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     box-shadow: 0 4px 20px rgba(0,0,0,0.35);
     border-bottom: 2px solid #38bdf8;
+    flex-wrap: wrap; gap: 8px;
 ">
     <div style="display:flex; align-items:center; gap:10px;">
         <span style="background:#38bdf8; color:#0f172a; font-weight:800; font-size:11px; padding:3px 10px; border-radius:20px; letter-spacing:0.5px;">
@@ -48,15 +49,28 @@
         </span>
         <span style="font-size:13px; font-weight:600; color:#e2e8f0;">
             Template {{ $currentTemplateId }} —
-            @php $tplNames = ['1'=>'Classic Marketplace','2'=>'Modern Minimal','3'=>'Electronic & Tech Hub','4'=>'Flash Sale','5'=>'Grocery & Fresh Express']; @endphp
+            @php 
+                $tplNames = [
+                    '1'=>'Classic Marketplace',
+                    '2'=>'Modern Minimal',
+                    '3'=>'Electronic & Tech Hub',
+                    '4'=>'Flash Sale',
+                    '5'=>'Grocery & Fresh Express',
+                    '6'=>'Fashion & Apparel Studio',
+                    '7'=>'Beauty & Cosmetics Glow',
+                    '8'=>'Mega Supermarket',
+                    '9'=>'Books & Heritage Store',
+                    '10'=>'Home Living & Furniture'
+                ]; 
+            @endphp
             {{ $tplNames[$currentTemplateId] ?? 'Unknown' }}
         </span>
     </div>
-    <div style="display:flex; align-items:center; gap:8px;">
-        @foreach(['1','2','3','4','5'] as $tId)
+    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        @foreach(['1','2','3','4','5','6','7','8','9','10'] as $tId)
         <a href="{{ url('/') }}?preview_template={{ $tId }}"
            style="
-               padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+               padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;
                text-decoration: none; border: 1.5px solid;
                {{ $tId == $currentTemplateId ? 'background:#38bdf8; color:#0f172a; border-color:#38bdf8;' : 'background:transparent; color:#94a3b8; border-color:#334155;' }}
                transition: all 0.2s;
@@ -5359,6 +5373,21 @@
         @include('frontend.partials.customer-reviews-section')
     @elseif ($currentTemplateId === '5')
         @include('frontend.partials.homepage-template-5')
+        @include('frontend.partials.customer-reviews-section')
+    @elseif ($currentTemplateId === '6')
+        @include('frontend.partials.homepage-template-6')
+        @include('frontend.partials.customer-reviews-section')
+    @elseif ($currentTemplateId === '7')
+        @include('frontend.partials.homepage-template-7')
+        @include('frontend.partials.customer-reviews-section')
+    @elseif ($currentTemplateId === '8')
+        @include('frontend.partials.homepage-template-8')
+        @include('frontend.partials.customer-reviews-section')
+    @elseif ($currentTemplateId === '9')
+        @include('frontend.partials.homepage-template-9')
+        @include('frontend.partials.customer-reviews-section')
+    @elseif ($currentTemplateId === '10')
+        @include('frontend.partials.homepage-template-10')
         @include('frontend.partials.customer-reviews-section')
     @else
         @include('frontend.partials.homepage-template-2')

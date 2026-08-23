@@ -75,6 +75,53 @@ class SettingController extends Controller
             // If it's a string, save as-is (hidden input sends JSON string)
             SettingsService::set('homepage', $key, $value);
         }
+
+        // Explicitly handle homepage[template_id] persistence
+        if ($request->has('homepage.template_id') || isset($request->input('homepage')['template_id'])) {
+            $templateId = (string)($request->input('homepage.template_id') ?? $request->input('homepage')['template_id']);
+            if (in_array($templateId, ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], true)) {
+                // 1. Update global SiteSetting default
+                SiteSetting::updateOrCreate(
+                    ['group' => 'homepage', 'key' => 'template_id'],
+                    ['value' => $templateId]
+                );
+
+                if (auth()->check()) {
+                    $user = auth()->user();
+                    // 2. Update User model column
+                    $user->template_id = $templateId;
+                    $user->save();
+
+                    // 3. Update Vendor-specific SiteSetting
+                    SiteSetting::updateOrCreate(
+                        ['group' => 'vendor_' . $user->id . '_homepage', 'key' => 'template_id'],
+                        ['value' => $templateId]
+                    );
+
+                    // 4. Sync with tenant DB if exists
+                    $subdomain = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', (string)$user->name)));
+                    $tenant = \App\Models\SaaSTenant::where('subdomain', $subdomain)->orWhere('name', $user->name)->first();
+                    if ($tenant) {
+                        $tDbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+                        try {
+                            config(['database.connections.tenant_tpl_temp' => array_merge(
+                                config('database.connections.mysql'),
+                                ['database' => $tDbName]
+                            )]);
+                            \Illuminate\Support\Facades\DB::purge('tenant_tpl_temp');
+                            \Illuminate\Support\Facades\DB::connection('tenant_tpl_temp')
+                                ->table('site_settings')
+                                ->updateOrInsert(
+                                    ['group' => 'homepage', 'key' => 'template_id'],
+                                    ['value' => $templateId, 'updated_at' => now()]
+                                );
+                        } catch (\Throwable $ex) {
+                            \Log::warning("Failed to update tenant DB template: " . $ex->getMessage());
+                        }
+                    }
+                }
+            }
+        }
         foreach ($request->input('header', []) as $key => $value) {
             if (is_array($value)) {
                 $value = json_encode($value);

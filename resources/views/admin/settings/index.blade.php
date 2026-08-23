@@ -2751,6 +2751,242 @@
                                     </div>
                                 </div>
                                 @endif
+
+                                @if($isSuperAdmin || $selectedTemplate == '6')
+                                <!-- Template 6: Fashion & Apparel Studio -->
+                                <div class="template-card {{ $selectedTemplate == '6' ? 'active-template-card' : '' }}" data-template="6">
+                                    <div class="tpl-preview-box" style="background: #fff1f2; border-color: #fecdd3;">
+                                        <div style="height: 10px; background: #be123c; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                            <div style="width: 22px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                            <div style="width: 14px; height: 2px; background: #fde047; border-radius: 1px;"></div>
+                                        </div>
+                                        <div style="display: flex; gap: 3px; margin: 3px 0;">
+                                            <div style="flex: 2; height: 24px; background: linear-gradient(135deg, #e11d48, #9f1239); border-radius: 3px; padding: 2px 4px; display: flex; flex-direction: column; justify-content: center; color: #fff;">
+                                                <span style="font-size: 6px; font-weight: 800;">👗 COUTURE LOOKBOOK</span>
+                                                <span style="font-size: 4px; opacity: 0.85;">Men & Women Atelier</span>
+                                            </div>
+                                            <div style="flex: 1; height: 24px; display: flex; flex-direction: column; gap: 2px;">
+                                                <div style="flex: 1; background: #ffe4e6; border: 1px solid #fecdd3; border-radius: 2px;"></div>
+                                                <div style="flex: 1; background: #ffe4e6; border: 1px solid #fecdd3; border-radius: 2px;"></div>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; gap: 3px;">
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fecdd3; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #ffe4e6; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 50%; background: #be123c; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fecdd3; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #ffe4e6; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 50%; background: #be123c; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fecdd3; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #ffe4e6; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 50%; background: #be123c; border-radius: 1px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 6: Fashion & Apparel Studio</h6>
+                                        <span class="badge badge-danger font-weight-bold px-2" style="font-size: 9px; border-radius: 4px; background: #e11d48;">Couture</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        High-fashion clothing lookbook with Men/Women split cards & shoppable Instagram gallery.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '6' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '6' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=6" target="_blank"
+                                           class="btn btn-sm btn-outline-danger px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
+                                    </div>
+                                </div>
+                                @endif
+
+                                @if($isSuperAdmin || $selectedTemplate == '7')
+                                <!-- Template 7: Beauty & Cosmetics Glow -->
+                                <div class="template-card {{ $selectedTemplate == '7' ? 'active-template-card' : '' }}" data-template="7">
+                                    <div class="tpl-preview-box" style="background: #fdf2f8; border-color: #fbcfe8;">
+                                        <div style="height: 10px; background: linear-gradient(135deg, #f43f5e, #ec4899); border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                            <div style="width: 20px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                            <div style="width: 12px; height: 2px; background: #ffffff; border-radius: 1px;"></div>
+                                        </div>
+                                        <div style="flex: 1; background: #fff; border-radius: 3px; margin: 3px 0; border: 1px solid #fbcfe8; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #be123c;">
+                                            <span style="font-size: 6.5px; font-weight: 800;">🌸 GLOW COSMETICS</span>
+                                            <span style="font-size: 4.5px; color: #db2777;">Skincare • Vegan Badges</span>
+                                        </div>
+                                        <div style="display: flex; gap: 3px;">
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fbcfe8; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #fce7f3; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #f43f5e; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fbcfe8; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #fce7f3; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #f43f5e; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fbcfe8; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #fce7f3; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #f43f5e; border-radius: 1px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 7: Beauty & Cosmetics</h6>
+                                        <span class="badge badge-danger font-weight-bold px-2" style="font-size: 9px; border-radius: 4px; background: #ec4899;">Glow</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        Pastel luxury cosmetic store with vegan trust badges & skincare category routines.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '7' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '7' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=7" target="_blank"
+                                           class="btn btn-sm btn-outline-danger px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
+                                    </div>
+                                </div>
+                                @endif
+
+                                @if($isSuperAdmin || $selectedTemplate == '8')
+                                <!-- Template 8: Mega Supermarket & Daily Essentials -->
+                                <div class="template-card {{ $selectedTemplate == '8' ? 'active-template-card' : '' }}" data-template="8">
+                                    <div class="tpl-preview-box" style="background: #f0fdf4; border-color: #bbf7d0;">
+                                        <div style="height: 10px; background: #15803d; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                            <div style="width: 20px; height: 3px; background: #ffffff; border-radius: 1px;"></div>
+                                            <div style="width: 12px; height: 2px; background: #fef08a; border-radius: 1px;"></div>
+                                        </div>
+                                        <div style="flex: 1; background: #fff; border-radius: 3px; margin: 3px 0; border: 1px solid #bbf7d0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #15803d;">
+                                            <span style="font-size: 6.5px; font-weight: 800;">🥬 MEGA SUPERMARKET</span>
+                                            <span style="font-size: 4.5px; color: #16a34a;">45-Min Fast Delivery • Aisle Pills</span>
+                                        </div>
+                                        <div style="display: flex; gap: 3px;">
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #bbf7d0; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #dcfce7; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #bbf7d0; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #dcfce7; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #bbf7d0; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #dcfce7; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #16a34a; border-radius: 1px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 8: Mega Supermarket</h6>
+                                        <span class="badge badge-success font-weight-bold px-2" style="font-size: 9px; border-radius: 4px; background: #16a34a;">Express</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        Comprehensive supermarket & grocery store layout with aisle categories & quick checkout triggers.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '8' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '8' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=8" target="_blank"
+                                           class="btn btn-sm btn-outline-success px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
+                                    </div>
+                                </div>
+                                @endif
+
+                                @if($isSuperAdmin || $selectedTemplate == '9')
+                                <!-- Template 9: Books & Heritage Store -->
+                                <div class="template-card {{ $selectedTemplate == '9' ? 'active-template-card' : '' }}" data-template="9">
+                                    <div class="tpl-preview-box" style="background: #fdfaf4; border-color: #fde68a;">
+                                        <div style="height: 10px; background: #0f172a; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                            <div style="width: 20px; height: 3px; background: #fbbf24; border-radius: 1px;"></div>
+                                            <div style="width: 12px; height: 2px; background: #ffffff; border-radius: 1px;"></div>
+                                        </div>
+                                        <div style="flex: 1; background: #1e293b; border-radius: 3px; margin: 3px 0; border: 1px solid #fde68a; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fbbf24;">
+                                            <span style="font-size: 6.5px; font-weight: 800;">📖 BOOKSTORE & ACADEMY</span>
+                                            <span style="font-size: 4.5px; color: #fde68a;">Original Prints • Genre Shelves</span>
+                                        </div>
+                                        <div style="display: flex; gap: 3px;">
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fde68a; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #fef3c7; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #d97706; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fde68a; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #fef3c7; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #d97706; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fde68a; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #fef3c7; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #d97706; border-radius: 1px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 9: Books & Heritage Store</h6>
+                                        <span class="badge badge-warning font-weight-bold px-2" style="font-size: 9px; border-radius: 4px; background: #d97706; color: #fff;">Library</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        Classic bookstore and academic library theme with genre book shelves & protective packaging guarantees.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '9' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '9' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=9" target="_blank"
+                                           class="btn btn-sm btn-outline-warning px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600; color: #d97706; border-color: #d97706;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
+                                    </div>
+                                </div>
+                                @endif
+
+                                @if($isSuperAdmin || $selectedTemplate == '10')
+                                <!-- Template 10: Home Living & Furniture -->
+                                <div class="template-card {{ $selectedTemplate == '10' ? 'active-template-card' : '' }}" data-template="10">
+                                    <div class="tpl-preview-box" style="background: #fafaf9; border-color: #fed7aa;">
+                                        <div style="height: 10px; background: #44403c; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                                            <div style="width: 20px; height: 3px; background: #fdba74; border-radius: 1px;"></div>
+                                            <div style="width: 12px; height: 2px; background: #ffffff; border-radius: 1px;"></div>
+                                        </div>
+                                        <div style="flex: 1; background: #292524; border-radius: 3px; margin: 3px 0; border: 1px solid #fed7aa; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fdba74;">
+                                            <span style="font-size: 6.5px; font-weight: 800;">🛋️ HOME & FURNITURE</span>
+                                            <span style="font-size: 4.5px; color: #fed7aa;">Shop by Room • 10-Yr Warranty</span>
+                                        </div>
+                                        <div style="display: flex; gap: 3px;">
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fed7aa; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #ffedd5; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fed7aa; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #ffedd5; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                            </div>
+                                            <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fed7aa; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="height: 6px; background: #ffedd5; border-radius: 1px;"></div>
+                                                <div style="height: 2px; width: 60%; background: #ea580c; border-radius: 1px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13px;">Template 10: Home Living & Furniture</h6>
+                                        <span class="badge badge-warning font-weight-bold px-2" style="font-size: 9px; border-radius: 4px; background: #ea580c; color: #fff;">Living</span>
+                                    </div>
+                                    <p class="text-muted mb-2" style="line-height: 1.35; font-size: 11px; flex: 1;">
+                                        Warm artisan furniture & decor layout with interactive Shop-by-Room grid & material warranty badges.
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <span class="badge {{ $selectedTemplate == '10' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
+                                            {{ $selectedTemplate == '10' ? '✓ Currently Active' : 'Select Template' }}
+                                        </span>
+                                        <a href="{{ url('/') }}?preview_template=10" target="_blank"
+                                           class="btn btn-sm btn-outline-warning px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600; color: #ea580c; border-color: #ea580c;">
+                                            <i class="fas fa-external-link-alt mr-1"></i> Preview
+                                        </a>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -5887,6 +6123,61 @@
                     'Compact multi-item cart drawer integration'
                 ],
                 bestFor: 'Grocery stores, organic food suppliers, fresh markets, and instant delivery shops.'
+            },
+            6: {
+                title: 'Template 6: Fashion & Apparel Studio',
+                features: [
+                    'High-fashion editorial lookbook hero with seasonal campaign banners',
+                    'Department split grid (Men\'s Panjabi, Women\'s Couture, Kids & Accessories)',
+                    'Curated round category pills with smooth horizontal swipe',
+                    'Shoppable Instagram lookbook feed with tagged outfit items',
+                    'Size & color swatch indicators for apparel merchandising'
+                ],
+                bestFor: 'Fashion boutiques, clothing brands, Panjabi & ethnic ateliers, shoe & accessory retailers.'
+            },
+            7: {
+                title: 'Template 7: Beauty & Cosmetics Glow',
+                features: [
+                    'Pastel rose-gold & champagne luxury aesthetic with skin routine banners',
+                    'Trust verification badges (100% Organic, Vegan, Cruelty-Free, Dermatologist Tested)',
+                    'Skincare & cosmetic regimen category navigation pills',
+                    'High-density holy-grail product showcases with glow badges',
+                    'Routine bundle builder deals & luxury fragrance spotlight'
+                ],
+                bestFor: 'Cosmetics shops, skincare brands, makeup artists, organic wellness & luxury perfume stores.'
+            },
+            8: {
+                title: 'Template 8: Mega Supermarket & Daily Essentials',
+                features: [
+                    'Supermarket aisle categorization (Produce, Pantry, Dairy, Meat & Bakery)',
+                    'Express 45-minute home delivery countdown & hygiene assurance badges',
+                    'Daily kitchen staples & wholesale savings budget deal rows',
+                    'Farm-fresh produce harvest banners with instant direct add-to-cart',
+                    'Optimized for large supermarket multi-item fast grocery carts'
+                ],
+                bestFor: 'Supermarkets, hypermarkets, organic food shops, daily grocery & fresh meat/fish markets.'
+            },
+            9: {
+                title: 'Template 9: Books, Academy & Heritage Store',
+                features: [
+                    'Classic heritage navy & warm amber library aesthetic',
+                    'Original publisher genuine print guarantee & collector box packaging badges',
+                    'Genre book shelves (Fiction, Academic, Islamic Literature, Self-Growth)',
+                    'National bestseller highlights & new release publication showcases',
+                    'Curated book lover reading experience with free bookmark perks'
+                ],
+                bestFor: 'Bookshops, Islamic libraries, academic institutions, stationery & publication houses.'
+            },
+            10: {
+                title: 'Template 10: Home Living & Furniture',
+                features: [
+                    'Warm terracotta & modern minimalist interior habitat styling',
+                    'Interactive "Shop by Room" cards (Living Room, Bedroom, Dining, Home Office)',
+                    'Solid wood guarantee & 10-year craftsmanship warranty indicators',
+                    'Free in-home assembly & safe freight transit guarantee tags',
+                    'Signature artisan furniture pieces & ambient decor light highlights'
+                ],
+                bestFor: 'Furniture stores, interior decor brands, kitchenware, bedding & lighting boutiques.'
             }
         };
 
