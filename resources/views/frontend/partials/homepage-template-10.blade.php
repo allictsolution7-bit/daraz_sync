@@ -1,81 +1,69 @@
 {{-- 
     Template 10: Home Living, Furniture & Interior Decor
-    Designed specifically for Furniture, Home Appliances, Decor, Lighting & Kitchenware
+    Luxury Interior Studio & Architectural Living Aesthetic (IKEA & Pottery Barn inspired)
 --}}
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700;800&family=DM+Serif+Display:ital@0;1&display=swap');
+
+/* ── SCOPED TEMPLATE 10: LUXURY HOME & LIVING ── */
 .t10-page {
-    background: #fdfcfb;
-    color: #292524;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    padding-bottom: 60px;
+    background: #f7f3ee;
+    color: #201f1a;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    padding-bottom: 70px;
+    overflow-x: hidden;
 }
 
 .t10-container {
-    max-width: 1340px;
+    max-width: 1380px;
     margin: 0 auto;
-    padding: 0 16px;
+    padding: 0 20px;
 }
 
-/* Warm Earthtone Terracotta Top Strip */
-.t10-top-strip {
-    background: #44403c;
-    color: #ffffff;
-    padding: 9px 16px;
-    font-size: 12px;
-    font-weight: 700;
+/* SECTION 1: Interior Design Inspiration Strip */
+.t10-linen-strip {
+    background: #e8ddd0;
+    color: #2d3a2e;
+    padding: 10px 20px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 13.5px;
+    text-align: center;
     letter-spacing: 0.8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
+    border-bottom: 1px solid #d6c7b2;
 }
 
-.t10-top-strip a {
-    color: #fdba74;
-    font-weight: 800;
-    text-decoration: underline;
-}
-
-/* Hero Section */
+/* SECTION 2: Clean Architectural Hero Slider */
 .t10-hero-section {
-    padding: 20px 0 30px;
+    padding: 20px 0;
 }
 
-.t10-hero-layout {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
-}
-
-@media (max-width: 992px) {
-    .t10-hero-layout {
-        grid-template-columns: 1fr;
-    }
+.t10-hero-container {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #d6c7b2;
+    background: #201f1a;
+    box-shadow: 0 14px 36px rgba(45, 58, 46, 0.12);
+    width: 100%;
 }
 
 .t10-hero-slider {
     position: relative;
-    border-radius: 20px;
+    width: 100%;
+    aspect-ratio: 1500 / 600;
+    min-height: 180px;
     overflow: hidden;
-    height: 480px;
-    background: #292524;
-    box-shadow: 0 10px 30px rgba(68, 64, 60, 0.12);
-}
-
-@media (max-width: 768px) {
-    .t10-hero-slider {
-        height: 320px;
-    }
 }
 
 .t10-slide {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.6s ease, visibility 0.6s ease;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     display: block;
     text-decoration: none;
 }
@@ -88,72 +76,52 @@
 .t10-slide-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
+    display: block;
 }
 
-.t10-slide-overlay {
+.t10-slide-caption {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(28, 25, 23, 0.8) 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 36px 40px;
+    bottom: 24px;
+    left: 24px;
+    background: rgba(32, 31, 26, 0.85);
+    border: 1px solid #c96a1e;
+    backdrop-filter: blur(10px);
+    padding: 12px 24px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+@media (max-width: 640px) {
+    .t10-slide-caption {
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        padding: 8px 14px;
+        gap: 8px;
+    }
+}
+
+.t10-caption-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
     color: #ffffff;
 }
 
-.t10-slide-badge {
-    background: #ea580c;
+.t10-caption-btn {
+    background: #c96a1e;
     color: #ffffff;
     font-size: 11px;
     font-weight: 800;
-    letter-spacing: 0.8px;
+    letter-spacing: 1px;
+    padding: 6px 14px;
+    border-radius: 4px;
     text-transform: uppercase;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 10px;
-    width: fit-content;
 }
 
-.t10-slide-title {
-    font-size: 32px;
-    font-weight: 800;
-    color: #ffffff;
-    margin-bottom: 12px;
-    line-height: 1.2;
-}
-
-@media (max-width: 768px) {
-    .t10-slide-title {
-        font-size: 22px;
-    }
-    .t10-slide-overlay {
-        padding: 20px;
-    }
-}
-
-.t10-slide-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #ffffff;
-    color: #ea580c;
-    padding: 10px 22px;
-    border-radius: 30px;
-    font-size: 13px;
-    font-weight: 800;
-    width: fit-content;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    transition: all 0.2s;
-}
-
-.t10-slide-btn:hover {
-    background: #ea580c;
-    color: #ffffff;
-    transform: translateY(-2px);
-}
-
-/* Nav Arrows */
 .t10-hero-arrow {
     position: absolute;
     top: 50%;
@@ -161,323 +129,465 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(4px);
-    border: none;
-    color: #44403c;
+    background: rgba(32, 31, 26, 0.82);
+    border: 1px solid #d6c7b2;
+    color: #f7eedd;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
     z-index: 10;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.t10-hero-prev {
+    left: 20px;
+}
+
+.t10-hero-next {
+    right: 20px;
 }
 
 .t10-hero-arrow:hover {
-    background: #ffffff;
-    transform: translateY(-50%) scale(1.08);
-}
-
-.t10-hero-prev { left: 16px; }
-.t10-hero-next { right: 16px; }
-
-/* Side Banners */
-.t10-side-deals {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    height: 480px;
-}
-
-@media (max-width: 992px) {
-    .t10-side-deals {
-        height: auto;
-        flex-direction: row;
-    }
+    background: #c96a1e;
+    color: #ffffff;
+    border-color: #c96a1e;
+    transform: translateY(-50%) scale(1.1);
 }
 
 @media (max-width: 640px) {
-    .t10-side-deals {
-        flex-direction: column;
+    .t10-hero-arrow {
+        width: 36px;
+        height: 36px;
+    }
+    .t10-hero-prev {
+        left: 10px;
+    }
+    .t10-hero-next {
+        right: 10px;
     }
 }
 
-.t10-side-card {
-    flex: 1;
+/* SECTION 3: Dedicated Interactive Room Hotspot Studio */
+.t10-hotspot-studio {
+    margin: 40px 0;
     position: relative;
     border-radius: 20px;
     overflow: hidden;
-    background: #e7e5e4;
-    display: block;
-    text-decoration: none;
-    box-shadow: 0 8px 24px rgba(68, 64, 60, 0.08);
+    border: 1px solid #d6c7b2;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
 }
 
-.t10-side-card img {
+.t10-studio-bg {
     width: 100%;
-    height: 100%;
+    height: 520px;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    display: block;
+    filter: brightness(0.88);
 }
 
-.t10-side-card:hover img {
-    transform: scale(1.06);
-}
-
-.t10-side-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(28, 25, 23, 0.8) 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 20px;
-    color: #fff;
-}
-
-.t10-side-badge {
-    background: #ea580c;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    width: fit-content;
-}
-
-.t10-side-title {
-    font-size: 17px;
-    font-weight: 800;
-    color: #fff;
-    margin: 0 0 4px;
-}
-
-.t10-side-link {
-    font-size: 12px;
-    color: #fed7aa;
-    font-weight: 700;
-}
-
-/* Home Living Features Bar */
-.t10-features-bar {
-    background: #ffffff;
-    border: 1px solid #fed7aa;
-    border-radius: 16px;
-    padding: 16px 24px;
-    margin-bottom: 35px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    box-shadow: 0 4px 16px rgba(234, 88, 12, 0.04);
-}
-
-@media (max-width: 860px) {
-    .t10-features-bar {
-        grid-template-columns: repeat(2, 1fr);
+@media (max-width: 768px) {
+    .t10-studio-bg {
+        height: 380px;
     }
 }
 
-.t10-feature-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.t10-studio-overlay-head {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    background: rgba(32, 31, 26, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(253, 186, 116, 0.4);
+    max-width: 440px;
 }
 
-.t10-feature-icon {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
+@media (max-width: 600px) {
+    .t10-studio-overlay-head {
+        top: 15px;
+        left: 15px;
+        right: 15px;
+        padding: 12px 16px;
+    }
+}
+
+.t10-studio-tag {
+    color: #fdba74;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.t10-studio-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: #ffffff;
+    margin: 4px 0 2px;
+}
+
+.t10-studio-sub {
+    font-size: 12px;
+    color: #d1d5db;
+}
+
+/* Hotspot Pins */
+.t10-hotspot-item {
+    position: absolute;
+    z-index: 10;
+}
+
+.t10-hotspot-pin {
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
-    background: #ffedd5;
-    color: #ea580c;
+    background: #ffffff;
+    border: 2px solid #c96a1e;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 17px;
+    color: #c96a1e;
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    animation: t10Pulse 2.5s infinite;
+    transition: all 0.3s ease;
 }
 
-.t10-feature-label {
-    font-size: 13.5px;
+.t10-hotspot-pin:hover {
+    transform: scale(1.15);
+    background: #c96a1e;
+    color: #ffffff;
+}
+
+.t10-hotspot-card {
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #ffffff;
+    border: 1px solid #d6c7b2;
+    padding: 10px 16px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+    pointer-events: none;
+}
+
+.t10-hotspot-item:hover .t10-hotspot-card {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.t10-card-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 14px;
+    color: #201f1a;
+    margin-bottom: 2px;
+}
+
+.t10-card-price {
+    font-size: 12px;
     font-weight: 800;
-    color: #44403c;
-    margin: 0;
+    color: #c96a1e;
 }
 
-.t10-feature-desc {
-    font-size: 11px;
-    color: #78716c;
-    margin: 0;
+@keyframes t10Pulse {
+    0% { box-shadow: 0 0 0 0 rgba(201, 106, 30, 0.6); }
+    70% { box-shadow: 0 0 0 14px rgba(201, 106, 30, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(201, 106, 30, 0); }
 }
 
-/* Shop by Room Cards */
-.t10-room-section {
+/* SECTION 4: Shop by Room Interactive Large Cards */
+.t10-section {
+    padding: 40px 0 20px;
+}
+
+.t10-sec-head {
+    text-align: center;
     margin-bottom: 35px;
 }
 
-.t10-room-grid {
+.t10-sec-tag {
+    color: #c96a1e;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.t10-sec-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 3.8vw, 42px);
+    color: #201f1a;
+    margin: 0;
+}
+
+.t10-rooms-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 16px;
 }
 
-@media (max-width: 860px) {
-    .t10-room-grid {
+@media (max-width: 1024px) {
+    .t10-rooms-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .t10-rooms-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 .t10-room-card {
     position: relative;
-    border-radius: 16px;
+    border-radius: 14px;
     overflow: hidden;
-    height: 160px;
-    display: block;
+    aspect-ratio: 1/1;
+    background: #e8ddd0;
     text-decoration: none;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+    display: block;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.t10-room-card img {
+.t10-room-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(45, 58, 46, 0.18);
+}
+
+.t10-room-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
 }
 
-.t10-room-card:hover img {
+.t10-room-card:hover .t10-room-img {
     transform: scale(1.08);
 }
 
-.t10-room-content {
+.t10-room-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(28, 25, 23, 0.75) 100%);
+    background: linear-gradient(180deg, transparent 40%, rgba(32, 31, 26, 0.85) 100%);
+    padding: 16px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 16px;
-    color: #fff;
 }
 
-.t10-room-title {
-    font-size: 16px;
-    font-weight: 800;
-    margin: 0 0 2px;
-    color: #fff;
-}
-
-.t10-room-sub {
-    font-size: 11px;
-    color: #fed7aa;
-    margin: 0;
-}
-
-/* Section Header */
-.t10-sec-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #fed7aa;
-}
-
-.t10-sec-title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.t10-sec-bar {
-    width: 4px;
-    height: 22px;
-    background: #ea580c;
-    border-radius: 2px;
-}
-
-.t10-sec-title {
+.t10-room-name {
+    font-family: 'DM Serif Display', serif;
     font-size: 19px;
-    font-weight: 800;
-    color: #44403c;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0;
+    color: #ffffff;
+    margin: 0 0 2px;
 }
 
-.t10-view-all {
-    font-size: 13px;
+.t10-room-cta {
+    font-size: 11px;
     font-weight: 700;
-    color: #ea580c;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    color: #fdba74;
 }
 
-.t10-view-all:hover {
-    color: #c2410c;
+/* SECTION 5: Material & Craftsmanship Trust Section */
+.t10-craft-section {
+    background: #2d3a2e;
+    color: #ffffff;
+    border-radius: 20px;
+    padding: 55px 40px;
+    margin: 50px 0;
 }
 
-/* Category Pills */
-.t10-cat-scroll {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding: 6px 2px 14px;
+.t10-craft-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 30px;
 }
 
-.t10-cat-scroll::-webkit-scrollbar {
-    display: none;
+@media (max-width: 850px) {
+    .t10-craft-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
-.t10-cat-pill {
-    flex: 0 0 130px;
+.t10-craft-card {
+    text-align: center;
+    padding: 20px;
+}
+
+.t10-craft-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.t10-craft-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: #fdba74;
+    margin: 0 0 8px;
+}
+
+.t10-craft-desc {
+    font-size: 13.5px;
+    color: #d1d5db;
+    line-height: 1.6;
+}
+
+/* SECTION 6: Interior Styling Inspiration Blog Tiles */
+.t10-blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 850px) {
+    .t10-blog-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t10-blog-card {
     background: #ffffff;
     border-radius: 16px;
-    padding: 14px 10px;
-    border: 1px solid #fed7aa;
-    text-align: center;
+    overflow: hidden;
+    border: 1px solid #e8ddd0;
     text-decoration: none;
-    color: #1e293b;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-    transition: all 0.25s ease;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.t10-blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(45, 58, 46, 0.1);
+}
+
+.t10-blog-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.t10-blog-body {
+    padding: 22px;
+}
+
+.t10-blog-tag {
+    font-size: 11px;
+    font-weight: 800;
+    color: #c96a1e;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.t10-blog-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 21px;
+    font-weight: 700;
+    color: #201f1a;
+    margin: 6px 0 8px;
+}
+
+.t10-blog-desc {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+/* SECTION 7: Room Makeover Offer CTA Banner */
+.t10-makeover-banner {
+    margin: 50px 0;
+    border-radius: 20px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    background: #2d3a2e;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 850px) {
+    .t10-makeover-banner {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t10-makeover-content {
+    padding: 55px 45px;
+    color: #ffffff;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    justify-content: center;
 }
 
-.t10-cat-pill:hover {
-    transform: translateY(-4px);
-    border-color: #ea580c;
-    box-shadow: 0 8px 20px rgba(234, 88, 12, 0.12);
-    color: #ea580c;
+.t10-makeover-tag {
+    color: #fdba74;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
 }
 
-.t10-cat-img {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #ffedd5;
-    border: 2px solid #fed7aa;
+.t10-makeover-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 3.5vw, 38px);
+    line-height: 1.15;
+    margin: 0 0 12px;
 }
 
-.t10-cat-name {
-    font-size: 12px;
+.t10-makeover-desc {
+    color: #d1d5db;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.t10-btn-terracotta {
+    background: #c96a1e;
+    color: #ffffff;
+    font-family: 'DM Sans', sans-serif;
     font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 14px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 20px rgba(201, 106, 30, 0.35);
+    display: inline-block;
+}
+
+.t10-btn-terracotta:hover {
+    background: #df7c2e;
+    transform: translateY(-2px);
+}
+
+.t10-makeover-img {
+    min-height: 280px;
+}
+
+.t10-makeover-img img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Product Grid */
-.t10-product-row {
+.t10-product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
     gap: 18px;
@@ -485,7 +595,7 @@
 }
 
 @media (max-width: 768px) {
-    .t10-product-row {
+    .t10-product-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
@@ -494,222 +604,235 @@
 
 <div class="t10-page">
 
-    {{-- Top Announcement Strip --}}
-    <div class="t10-top-strip">
-        <span>🛋️ PREMIUM SOLID WOOD FURNITURE • ARTISAN HOME DECOR & MODERN LIGHTING</span>
-        <span>UP TO 10-YEAR WARRANTY &bull; <a href="{{ route('shop') }}">EXPLORE LIVING &rarr;</a></span>
+    {{-- SECTION 1: Interior Design Inspiration Strip --}}
+    <div class="t10-linen-strip">
+        {{ $homepage['template_10_linen_text'] ?? '🏡 Free Professional Assembly • 100% Solid Seasoned Teak Guarantee • 10-Year Structural Frame Warranty' }}
     </div>
 
-    {{-- Hero Section --}}
+    {{-- SECTION 2: Clean Architectural Hero Slider --}}
     <section class="t10-hero-section">
         <div class="t10-container">
-            <div class="t10-hero-layout">
-                
-                {{-- Big Slider --}}
+            <div class="t10-hero-container">
                 <div class="t10-hero-slider" id="t10HeroSlider">
-                    <button class="t10-hero-arrow t10-hero-prev" id="t10Prev" aria-label="Previous Slide">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                    </button>
-                    <button class="t10-hero-arrow t10-hero-next" id="t10Next" aria-label="Next Slide">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                    </button>
-
                     @forelse($sliders as $idx => $slider)
                         <a href="{{ $slider->button_url ?? route('shop') }}" class="t10-slide {{ $idx === 0 ? 'active' : '' }}">
-                            <img class="t10-slide-img" src="{{ asset($slider->image) }}" alt="{{ $slider->title ?? 'Home & Living' }}">
-                            <div class="t10-slide-overlay">
-                                @if($slider->title)
-                                    <span class="t10-slide-badge">INTERIOR HABITAT</span>
-                                    <h1 class="t10-slide-title">{{ $slider->title }}</h1>
-                                @endif
-                                <span class="t10-slide-btn">
-                                    {{ $slider->button_text ?: 'EXPLORE FURNITURE' }}
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                </span>
-                            </div>
+                            <img class="t10-slide-img" src="{{ asset($slider->image) }}" alt="{{ $slider->title ?? 'Home & Furniture' }}">
+                            @if(!empty($slider->title))
+                                <div class="t10-slide-caption">
+                                    <span class="t10-caption-title">{{ $slider->title }}</span>
+                                    <span class="t10-caption-btn">{{ $slider->button_text ?: 'EXPLORE' }} &rarr;</span>
+                                </div>
+                            @endif
                         </a>
                     @empty
                         <a href="{{ route('shop') }}" class="t10-slide active">
-                            <img class="t10-slide-img" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1400&q=80" alt="Furniture Living">
-                            <div class="t10-slide-overlay">
-                                <span class="t10-slide-badge">LIVING & HABITAT</span>
-                                <h1 class="t10-slide-title">Handcrafted Solid Wood & Modern Living Room Collections</h1>
-                                <span class="t10-slide-btn">SHOP COLLECTION &rarr;</span>
+                            <img class="t10-slide-img" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=80" alt="Luxury Living Room">
+                            <div class="t10-slide-caption">
+                                <span class="t10-caption-title">Nordic Living Room Collection</span>
+                                <span class="t10-caption-btn">SHOP COLLECTION &rarr;</span>
                             </div>
                         </a>
                     @endforelse
                 </div>
-
-                {{-- Side Deals --}}
-                <div class="t10-side-deals">
-                    <a href="{{ $homepage['slider_side_image_one_link'] ?? route('shop') }}" class="t10-side-card">
-                        <img src="{{ !empty($homepage['slider_side_image_one']) ? asset($homepage['slider_side_image_one']) : 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80' }}" alt="Living Room">
-                        <div class="t10-side-overlay">
-                            <span class="t10-side-badge">COMFORT</span>
-                            <h3 class="t10-side-title">Luxury Sofas & Loungers</h3>
-                            <span class="t10-side-link">View Range &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="{{ $homepage['slider_side_image_two_link'] ?? route('shop') }}" class="t10-side-card">
-                        <img src="{{ !empty($homepage['slider_side_image_two']) ? asset($homepage['slider_side_image_two']) : 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&q=80' }}" alt="Dining Decor">
-                        <div class="t10-side-overlay">
-                            <span class="t10-side-badge">DECOR</span>
-                            <h3 class="t10-side-title">Lamps & Dining Sets</h3>
-                            <span class="t10-side-link">Shop Decor &rarr;</span>
-                        </div>
-                    </a>
-                </div>
-
+                {{-- Left & Right Buttons Centered on Both Sides --}}
+                <button class="t10-hero-arrow t10-hero-prev" id="t10Prev" aria-label="Previous Slide">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="t10-hero-arrow t10-hero-next" id="t10Next" aria-label="Next Slide">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
             </div>
         </div>
     </section>
 
-    {{-- Features Strip --}}
+    {{-- SECTION 3: Dedicated Interactive Room Hotspot Studio --}}
     <section class="t10-container">
-        <div class="t10-features-bar">
-            <div class="t10-feature-item">
-                <div class="t10-feature-icon"><i class="fas fa-couch"></i></div>
-                <div>
-                    <h5 class="t10-feature-label">Solid Wood Guarantee</h5>
-                    <p class="t10-feature-desc">100% seasoned teak & oak</p>
+        <div class="t10-hotspot-studio">
+            <img class="t10-studio-bg" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=80" alt="Curated Scandinavian Studio">
+            
+            <div class="t10-studio-overlay-head">
+                <span class="t10-studio-tag">✦ INTERACTIVE ROOM STUDIO</span>
+                <h3 class="t10-studio-title">{{ $homepage['template_10_hotspot_title'] ?? 'Interactive Room Hotspot Studio' }}</h3>
+                <span class="t10-studio-sub">Hover on the (+) pins below to inspect and order featured furnishings</span>
+            </div>
+
+            {{-- Hotspot 1: Sofa --}}
+            <div class="t10-hotspot-item" style="top: 58%; left: 32%;">
+                <div class="t10-hotspot-pin">+</div>
+                <div class="t10-hotspot-card">
+                    <div class="t10-card-name">Nordic 3-Seater Fabric Sofa</div>
+                    <div class="t10-card-price">৳28,500 &bull; In Stock</div>
                 </div>
             </div>
-            <div class="t10-feature-item">
-                <div class="t10-feature-icon"><i class="fas fa-tools"></i></div>
-                <div>
-                    <h5 class="t10-feature-label">Free Room Installation</h5>
-                    <p class="t10-feature-desc">By expert craftsmen</p>
+
+            {{-- Hotspot 2: Coffee Table --}}
+            <div class="t10-hotspot-item" style="top: 75%; left: 55%;">
+                <div class="t10-hotspot-pin">+</div>
+                <div class="t10-hotspot-card">
+                    <div class="t10-card-name">Solid Teak Minimalist Coffee Table</div>
+                    <div class="t10-card-price">৳8,200 &bull; In Stock</div>
                 </div>
             </div>
-            <div class="t10-feature-item">
-                <div class="t10-feature-icon"><i class="fas fa-shield-alt"></i></div>
-                <div>
-                    <h5 class="t10-feature-label">10-Year Warranty</h5>
-                    <p class="t10-feature-desc">Hassle-free coverage</p>
-                </div>
-            </div>
-            <div class="t10-feature-item">
-                <div class="t10-feature-icon"><i class="fas fa-truck-moving"></i></div>
-                <div>
-                    <h5 class="t10-feature-label">Safe Freight Delivery</h5>
-                    <p class="t10-feature-desc">Damage-proof transit</p>
+
+            {{-- Hotspot 3: Floor Lamp --}}
+            <div class="t10-hotspot-item" style="top: 38%; left: 82%;">
+                <div class="t10-hotspot-pin">+</div>
+                <div class="t10-hotspot-card">
+                    <div class="t10-card-name">Arc Brass Floor Reading Lamp</div>
+                    <div class="t10-card-price">৳4,500 &bull; In Stock</div>
                 </div>
             </div>
         </div>
     </section>
 
-    {{-- Shop by Room Grid --}}
-    <section class="t10-container t10-room-section">
-        <div class="t10-sec-header">
-            <div class="t10-sec-title-wrap">
-                <div class="t10-sec-bar"></div>
-                <h2 class="t10-sec-title">Shop by Room</h2>
+    {{-- SECTION 4: Shop by Room Interactive Large Cards --}}
+    <section class="t10-section">
+        <div class="t10-container">
+            <div class="t10-sec-head">
+                <div class="t10-sec-tag">SPATIAL HARMONY</div>
+                <h2 class="t10-sec-title">{{ $homepage['template_10_rooms_title'] ?? 'Shop Curated Living Environments' }}</h2>
             </div>
-            <a href="{{ route('shop') }}" class="t10-view-all">All Rooms &rarr;</a>
-        </div>
-        <div class="t10-room-grid">
-            <a href="{{ route('shop') }}" class="t10-room-card">
-                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80" alt="Living Room">
-                <div class="t10-room-content">
-                    <h4 class="t10-room-title">Living Room</h4>
-                    <p class="t10-room-sub">Sofas, Coffee Tables & TV Units</p>
-                </div>
-            </a>
-            <a href="{{ route('shop') }}" class="t10-room-card">
-                <img src="https://images.unsplash.com/photo-1540518614846-7ede433c4550?w=600&q=80" alt="Bedroom">
-                <div class="t10-room-content">
-                    <h4 class="t10-room-title">Bedroom</h4>
-                    <p class="t10-room-sub">Beds, Wardrobes & Mattresses</p>
-                </div>
-            </a>
-            <a href="{{ route('shop') }}" class="t10-room-card">
-                <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=600&q=80" alt="Kitchen & Dining">
-                <div class="t10-room-content">
-                    <h4 class="t10-room-title">Kitchen & Dining</h4>
-                    <p class="t10-room-sub">Dining Sets, Cookware & Cabinets</p>
-                </div>
-            </a>
-            <a href="{{ route('shop') }}" class="t10-room-card">
-                <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80" alt="Office & Workspace">
-                <div class="t10-room-content">
-                    <h4 class="t10-room-title">Home Office</h4>
-                    <p class="t10-room-sub">Desks, Ergonomic Chairs & Bookshelves</p>
-                </div>
-            </a>
+            <div class="t10-rooms-grid">
+                <a href="{{ route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&q=80" alt="Living Room">
+                    <div class="t10-room-overlay">
+                        <h4 class="t10-room-name">Living Room</h4>
+                        <span class="t10-room-cta">Sofas & Media Consoles &rarr;</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=500&q=80" alt="Bedroom">
+                    <div class="t10-room-overlay">
+                        <h4 class="t10-room-name">Bedroom</h4>
+                        <span class="t10-room-cta">King Beds & Wardrobes &rarr;</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbe?w=500&q=80" alt="Dining Room">
+                    <div class="t10-room-overlay">
+                        <h4 class="t10-room-name">Dining Room</h4>
+                        <span class="t10-room-cta">Solid Wood Dining Sets &rarr;</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=500&q=80" alt="Home Office">
+                    <div class="t10-room-overlay">
+                        <h4 class="t10-room-name">Home Office</h4>
+                        <span class="t10-room-cta">Ergonomic Desks & Bookshelves &rarr;</span>
+                    </div>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&q=80" alt="Kitchen Decor">
+                    <div class="t10-room-overlay">
+                        <h4 class="t10-room-name">Kitchen & Bath</h4>
+                        <span class="t10-room-cta">Shelving & Modern Fixtures &rarr;</span>
+                    </div>
+                </a>
+            </div>
         </div>
     </section>
 
-    {{-- Curated Categories --}}
-    @if(isset($featuredCategories) && $featuredCategories->count() > 0)
-        <section class="t10-container" style="margin-bottom: 35px;">
-            <div class="t10-sec-header">
-                <div class="t10-sec-title-wrap">
-                    <div class="t10-sec-bar"></div>
-                    <h2 class="t10-sec-title">Furniture Categories</h2>
+    {{-- SECTION 5: Teak Wood & Craftsmanship Story --}}
+    <section class="t10-container">
+        <div class="t10-craft-section">
+            <div class="t10-sec-head" style="margin-bottom:0;">
+                <div class="t10-sec-tag" style="color:#fdba74;">SUSTAINABLE ARCHITECTURE</div>
+                <h2 class="t10-sec-title" style="color:#ffffff;">{{ $homepage['template_10_warranty_title'] ?? 'Built to Last Generations' }}</h2>
+            </div>
+            <div class="t10-craft-grid">
+                <div class="t10-craft-card">
+                    <div class="t10-craft-icon">🌲</div>
+                    <h4 class="t10-craft-title">Solid Seasoned Teak</h4>
+                    <p class="t10-craft-desc">Ethically harvested from government-certified forestry reserves and kiln-dried to eliminate moisture warping.</p>
                 </div>
-                <a href="{{ route('shop') }}" class="t10-view-all">All Categories &rarr;</a>
+                <div class="t10-craft-card">
+                    <div class="t10-craft-icon">🔨</div>
+                    <h4 class="t10-craft-title">Master Wood Joinery</h4>
+                    <p class="t10-craft-desc">Traditional mortise and tenon joints built by master carpenters with 35+ years of bench experience.</p>
+                </div>
+                <div class="t10-craft-card">
+                    <div class="t10-craft-icon">🛡️</div>
+                    <h4 class="t10-craft-title">10-Year Frame Warranty</h4>
+                    <p class="t10-craft-desc">Full structural replacement guarantee covering termite resistance, joint integrity, and lacquer durability.</p>
+                </div>
             </div>
-            <div class="t10-cat-scroll">
-                @foreach($featuredCategories as $cat)
-                    <a href="{{ route('shop', $cat->slug) }}" class="t10-cat-pill">
-                        <img class="t10-cat-img" src="{{ asset($cat->image ?? $cat->icon ?? 'clientside/images/product-placeholder.png') }}" alt="{{ $cat->name }}">
-                        <span class="t10-cat-name">{{ $cat->name }}</span>
-                    </a>
-                @endforeach
-            </div>
-        </section>
-    @endif
+        </div>
+    </section>
 
-    {{-- Featured Living Room & Deals --}}
+    {{-- SECTION 6: Interior Styling Inspiration Blog Tiles --}}
+    <section class="t10-section">
+        <div class="t10-container">
+            <div class="t10-sec-head">
+                <div class="t10-sec-tag">DESIGN JOURNAL</div>
+                <h2 class="t10-sec-title">Interior Styling Inspiration</h2>
+            </div>
+            <div class="t10-blog-grid">
+                <a href="{{ route('shop') }}" class="t10-blog-card">
+                    <img class="t10-blog-img" src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80" alt="Minimal Living">
+                    <div class="t10-blog-body">
+                        <span class="t10-blog-tag">LIVING SPACES</span>
+                        <h4 class="t10-blog-title">How to Style a Warm Minimalist Apartment</h4>
+                        <p class="t10-blog-desc">Balancing neutral earth tones, textured bouclé fabrics, and walnut wood accents.</p>
+                    </div>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t10-blog-card">
+                    <img class="t10-blog-img" src="https://images.unsplash.com/photo-1540518614846-7eded433c457?w=600&q=80" alt="Bedroom Guide">
+                    <div class="t10-blog-body">
+                        <span class="t10-blog-tag">BEDROOM COMFORTS</span>
+                        <h4 class="t10-blog-title">Choosing the Right Bed Frame: Wood vs. Upholstered</h4>
+                        <p class="t10-blog-desc">A complete structural analysis on longevity, storage hydraulics, and room acoustics.</p>
+                    </div>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t10-blog-card">
+                    <img class="t10-blog-img" src="https://images.unsplash.com/photo-1449247709967-d4461a6a6103?w=600&q=80" alt="Dining Decor">
+                    <div class="t10-blog-body">
+                        <span class="t10-blog-tag">ENTERTAINING</span>
+                        <h4 class="t10-blog-title">Dining Table Dimensions Guide for Urban Homes</h4>
+                        <p class="t10-blog-desc">Maximize your dining footprint with expandable butterfly leaves and bench seating.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {{-- SECTION 7: Room Makeover Offer CTA Banner --}}
+    <section class="t10-container">
+        <div class="t10-makeover-banner">
+            <div class="t10-makeover-content">
+                <span class="t10-makeover-tag">COMPLETE INTERIOR PACKAGE</span>
+                <h3 class="t10-makeover-title">Full Living Room Makeover Suite</h3>
+                <p class="t10-makeover-desc">
+                    Includes our 3-Seater Nordic Sofa, Solid Walnut Coffee Table, and Floating Media Unit with complimentary installation. Price: {{ $homepage['template_10_package_price'] ?? '৳48,500' }}.
+                </p>
+                <div>
+                    <a href="{{ route('shop') }}" class="t10-btn-terracotta">EXPLORE ROOM PACKAGES &rarr;</a>
+                </div>
+            </div>
+            <div class="t10-makeover-img">
+                <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=700&q=80" alt="Room Suite">
+            </div>
+        </div>
+    </section>
+
+    {{-- SECTION 8: Featured Furniture Products --}}
     @if (!empty($homepage['enable_featured_product_section']) && $homepage['enable_featured_product_section'] && isset($featuredProducts) && $featuredProducts->count() > 0)
-        <section class="t10-container">
-            <div class="t10-sec-header">
-                <div class="t10-sec-title-wrap">
-                    <div class="t10-sec-bar"></div>
-                    <h2 class="t10-sec-title">{{ $homepage['featured_product_section_heading'] ?? 'Signature Furniture Pieces' }}</h2>
+        <section class="t10-section">
+            <div class="t10-container">
+                <div class="t10-sec-head">
+                    <div class="t10-sec-tag">ICONIC PIECES</div>
+                    <h2 class="t10-sec-title">{{ $homepage['featured_product_section_heading'] ?? 'Signature Furniture Creations' }}</h2>
                 </div>
-                <a href="{{ route('shop') }}" class="t10-view-all">View All &rarr;</a>
-            </div>
-            <div class="t10-product-row">
-                @foreach($featuredProducts as $product)
-                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'SOLID WOOD'])
-                @endforeach
-            </div>
-        </section>
-    @endif
-
-    {{-- Best Selling Decor --}}
-    @if (!empty($homepage['enable_best_selling_section']) && $homepage['enable_best_selling_section'] && isset($bestSellingProducts) && $bestSellingProducts->count() > 0)
-        <section class="t10-container">
-            <div class="t10-sec-header">
-                <div class="t10-sec-title-wrap">
-                    <div class="t10-sec-bar"></div>
-                    <h2 class="t10-sec-title">{{ $homepage['best_selling_section_heading'] ?? 'Customer Favorites' }}</h2>
+                <div class="t10-product-grid">
+                    @foreach($featuredProducts as $product)
+                        @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'SOLID WOOD'])
+                    @endforeach
                 </div>
-                <a href="{{ route('shop') }}" class="t10-view-all">View All &rarr;</a>
-            </div>
-            <div class="t10-product-row">
-                @foreach($bestSellingProducts as $product)
-                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'TOP PICK'])
-                @endforeach
-            </div>
-        </section>
-    @endif
-
-    {{-- Latest Arrivals --}}
-    @if (!empty($homepage['enable_latest_products_section']) && $homepage['enable_latest_products_section'] && isset($latestProducts) && $latestProducts->count() > 0)
-        <section class="t10-container">
-            <div class="t10-sec-header">
-                <div class="t10-sec-title-wrap">
-                    <div class="t10-sec-bar"></div>
-                    <h2 class="t10-sec-title">{{ $homepage['latest_products_section_heading'] ?? 'New Living Room Arrivals' }}</h2>
-                </div>
-                <a href="{{ route('shop') }}" class="t10-view-all">View All &rarr;</a>
-            </div>
-            <div class="t10-product-row">
-                @foreach($latestProducts as $product)
-                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'NEW'])
-                @endforeach
             </div>
         </section>
     @endif
@@ -719,38 +842,27 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const slides = document.querySelectorAll('.t10-slide');
-    const prevBtn = document.getElementById('t10Prev');
-    const nextBtn = document.getElementById('t10Next');
-    let idx = 0;
+    const prev = document.getElementById('t10Prev');
+    const next = document.getElementById('t10Next');
+    let cur = 0;
     let timer;
 
-    function showSlide(n) {
+    function show(n) {
         if (!slides.length) return;
-        slides[idx].classList.remove('active');
-        idx = (n + slides.length) % slides.length;
-        slides[idx].classList.add('active');
+        slides[cur].classList.remove('active');
+        cur = (n + slides.length) % slides.length;
+        slides[cur].classList.add('active');
     }
 
-    function startTimer() {
+    function resetTimer() {
         if (slides.length > 1) {
             clearInterval(timer);
-            timer = setInterval(() => showSlide(idx + 1), 5000);
+            timer = setInterval(() => show(cur + 1), 6000);
         }
     }
 
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            showSlide(idx - 1);
-            startTimer();
-        });
-    }
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            showSlide(idx + 1);
-            startTimer();
-        });
-    }
-
-    startTimer();
+    if (prev) prev.addEventListener('click', () => { show(cur - 1); resetTimer(); });
+    if (next) next.addEventListener('click', () => { show(cur + 1); resetTimer(); });
+    resetTimer();
 });
 </script>

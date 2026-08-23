@@ -1,81 +1,70 @@
 {{-- 
     Template 9: Books, Academy & Heritage Store
-    Designed specifically for Books, Islamic Collections, Academic Libraries & Stationery
+    Old-World Library, Academic Publishing & Islamic Bookstore Aesthetic (Rokomari & Oxford style)
 --}}
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* ── SCOPED TEMPLATE 9: BOOKS & HERITAGE STORE ── */
 .t9-page {
-    background: #fdfbf7;
-    color: #1e293b;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    padding-bottom: 60px;
+    background: #fdf8ee;
+    color: #1c1600;
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+    padding-bottom: 70px;
+    overflow-x: hidden;
 }
 
 .t9-container {
-    max-width: 1340px;
+    max-width: 1360px;
     margin: 0 auto;
-    padding: 0 16px;
+    padding: 0 20px;
 }
 
-/* Classic Heritage Navy/Gold Top Strip */
-.t9-top-strip {
+/* SECTION 1: Publisher's Notice Strip */
+.t9-notice-strip {
     background: #0f172a;
-    color: #ffffff;
-    padding: 9px 16px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
+    color: #fde68a;
+    padding: 9px 20px;
+    font-family: 'Libre Baskerville', serif;
+    font-style: italic;
+    font-size: 12.5px;
+    text-align: center;
+    border-bottom: 1px solid #bf8b2e;
+    letter-spacing: 0.5px;
 }
 
-.t9-top-strip a {
-    color: #fbbf24;
-    font-weight: 800;
-    text-decoration: underline;
-}
-
-/* Hero Section */
+/* SECTION 2: Reading Room Hero Slider with Left/Right Controls */
 .t9-hero-section {
-    padding: 20px 0 30px;
+    padding: 20px 0;
 }
 
-.t9-hero-layout {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
-}
-
-@media (max-width: 992px) {
-    .t9-hero-layout {
-        grid-template-columns: 1fr;
-    }
+.t9-hero-container {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 14px 36px rgba(15, 23, 42, 0.15);
+    background: #0f172a;
+    width: 100%;
 }
 
 .t9-hero-slider {
     position: relative;
-    border-radius: 18px;
+    width: 100%;
+    aspect-ratio: 1500 / 600;
+    min-height: 180px;
     overflow: hidden;
-    height: 480px;
-    background: #1e1b18;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 768px) {
-    .t9-hero-slider {
-        height: 320px;
-    }
 }
 
 .t9-slide {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.6s ease, visibility 0.6s ease;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     display: block;
     text-decoration: none;
 }
@@ -88,71 +77,54 @@
 .t9-slide-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
+    display: block;
 }
 
-.t9-slide-overlay {
+/* Slide Caption */
+.t9-slide-caption {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(15, 23, 42, 0.85) 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 36px 40px;
-    color: #ffffff;
+    bottom: 24px;
+    left: 24px;
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid #bf8b2e;
+    backdrop-filter: blur(8px);
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
-.t9-slide-badge {
-    background: #d97706;
+@media (max-width: 640px) {
+    .t9-slide-caption {
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        gap: 8px;
+    }
+}
+
+.t9-caption-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 16px;
     color: #ffffff;
+    font-weight: 700;
+}
+
+.t9-caption-btn {
+    background: #bf8b2e;
+    color: #0f172a;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.8px;
+    padding: 5px 12px;
+    border-radius: 4px;
     text-transform: uppercase;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 10px;
-    width: fit-content;
 }
 
-.t9-slide-title {
-    font-size: 32px;
-    font-weight: 800;
-    color: #ffffff;
-    margin-bottom: 12px;
-    line-height: 1.2;
-}
-
-@media (max-width: 768px) {
-    .t9-slide-title {
-        font-size: 22px;
-    }
-    .t9-slide-overlay {
-        padding: 20px;
-    }
-}
-
-.t9-slide-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #fbbf24;
-    color: #0f172a;
-    padding: 10px 22px;
-    border-radius: 30px;
-    font-size: 13px;
-    font-weight: 800;
-    width: fit-content;
-    box-shadow: 0 4px 14px rgba(251, 191, 36, 0.3);
-    transition: all 0.2s;
-}
-
-.t9-slide-btn:hover {
-    background: #f59e0b;
-    transform: translateY(-2px);
-}
-
-/* Nav Arrows */
 .t9-hero-arrow {
     position: absolute;
     top: 50%;
@@ -160,261 +132,358 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(4px);
-    border: none;
-    color: #0f172a;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid #bf8b2e;
+    color: #fbbf24;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
     z-index: 10;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.t9-hero-prev {
+    left: 20px;
+}
+
+.t9-hero-next {
+    right: 20px;
 }
 
 .t9-hero-arrow:hover {
-    background: #ffffff;
-    transform: translateY(-50%) scale(1.08);
+    background: #bf8b2e;
+    color: #0f172a;
+    transform: translateY(-50%) scale(1.1);
 }
 
-.t9-hero-prev { left: 16px; }
-.t9-hero-next { right: 16px; }
+@media (max-width: 640px) {
+    .t9-hero-arrow {
+        width: 36px;
+        height: 36px;
+    }
+    .t9-hero-prev {
+        left: 10px;
+    }
+    .t9-hero-next {
+        right: 10px;
+    }
+}
 
-/* Side Banners */
-.t9-side-deals {
+/* SECTION 3: Browse by Genre Shelf Tabs */
+.t9-section {
+    padding: 30px 0 15px;
+}
+
+.t9-sec-head {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.t9-sec-tag {
+    color: #bf8b2e;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 900;
+    margin-bottom: 4px;
+}
+
+.t9-sec-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(24px, 3.2vw, 36px);
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.t9-genre-pills {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-    height: 480px;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
 }
 
-@media (max-width: 992px) {
-    .t9-side-deals {
-        height: auto;
-        flex-direction: row;
+.t9-genre-pill {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 12.5px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.t9-genre-pill:hover, .t9-genre-pill.active {
+    background: #0f172a;
+    color: #fbbf24;
+    border-color: #0f172a;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
+}
+
+/* SECTION 4: National Bestsellers (Portrait 3:4 Ratio Book Cards) */
+.t9-bestsellers-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 1024px) {
+    .t9-bestsellers-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (max-width: 640px) {
-    .t9-side-deals {
-        flex-direction: column;
-    }
-}
-
-.t9-side-card {
-    flex: 1;
-    position: relative;
-    border-radius: 18px;
-    overflow: hidden;
-    background: #1e293b;
-    display: block;
-    text-decoration: none;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-}
-
-.t9-side-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.t9-side-card:hover img {
-    transform: scale(1.06);
-}
-
-.t9-side-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 20px;
-    color: #fff;
-}
-
-.t9-side-badge {
-    background: #d97706;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    width: fit-content;
-}
-
-.t9-side-title {
-    font-size: 17px;
-    font-weight: 800;
-    color: #fff;
-    margin: 0 0 4px;
-}
-
-.t9-side-link {
-    font-size: 12px;
-    color: #fde68a;
-    font-weight: 700;
-}
-
-/* Heritage Book Badges Strip */
-.t9-features-bar {
-    background: #ffffff;
-    border: 1px solid #fde68a;
-    border-radius: 16px;
-    padding: 16px 24px;
-    margin-bottom: 35px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    box-shadow: 0 4px 16px rgba(217, 119, 6, 0.04);
-}
-
-@media (max-width: 860px) {
-    .t9-features-bar {
+    .t9-bestsellers-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-.t9-feature-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.t9-feature-icon {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    border-radius: 50%;
-    background: #fef3c7;
-    color: #d97706;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-}
-
-.t9-feature-label {
-    font-size: 13.5px;
-    font-weight: 800;
-    color: #78350f;
-    margin: 0;
-}
-
-.t9-feature-desc {
-    font-size: 11px;
-    color: #64748b;
-    margin: 0;
-}
-
-/* Section Header */
-.t9-sec-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #fde68a;
-}
-
-.t9-sec-title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.t9-sec-bar {
-    width: 4px;
-    height: 22px;
-    background: #d97706;
-    border-radius: 2px;
-}
-
-.t9-sec-title {
-    font-size: 19px;
-    font-weight: 800;
-    color: #78350f;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0;
-}
-
-.t9-view-all {
-    font-size: 13px;
-    font-weight: 700;
-    color: #d97706;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.t9-view-all:hover {
-    color: #b45309;
-}
-
-/* Genre Shelves Pills */
-.t9-cat-scroll {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding: 6px 2px 14px;
-}
-
-.t9-cat-scroll::-webkit-scrollbar {
-    display: none;
-}
-
-.t9-cat-pill {
-    flex: 0 0 130px;
+.t9-book-card {
     background: #ffffff;
-    border-radius: 16px;
-    padding: 14px 10px;
-    border: 1px solid #fde68a;
-    text-align: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px;
     text-decoration: none;
-    color: #1e293b;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-    transition: all 0.25s ease;
+    color: inherit;
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    position: relative;
 }
 
-.t9-cat-pill:hover {
+.t9-book-card:hover {
+    transform: translateY(-6px);
+    border-color: #bf8b2e;
+    box-shadow: 0 12px 24px rgba(191, 139, 46, 0.15);
+}
+
+.t9-rank-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #bf8b2e;
+    color: #0b1329;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 3px;
+    z-index: 2;
+}
+
+.t9-book-img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.t9-book-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+    margin: 0 0 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.t9-book-author {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.t9-book-price {
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    font-weight: 900;
+    color: #92400e;
+    margin-top: auto;
+}
+
+/* SECTION 5: Author Spotlight Editorial Profiles */
+.t9-author-section {
+    background: #0f172a;
+    color: #ffffff;
+    border-radius: 20px;
+    padding: 45px 35px;
+    margin: 40px 0;
+}
+
+.t9-author-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 24px;
+}
+
+@media (max-width: 850px) {
+    .t9-author-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t9-author-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 22px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.t9-author-card:hover {
+    border-color: #fbbf24;
+    background: rgba(255, 255, 255, 0.08);
     transform: translateY(-4px);
-    border-color: #d97706;
-    box-shadow: 0 8px 20px rgba(217, 119, 6, 0.12);
-    color: #d97706;
 }
 
-.t9-cat-img {
-    width: 52px;
-    height: 52px;
+.t9-author-avatar {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
-    background: #fef3c7;
-    border: 2px solid #fde68a;
+    border: 3px solid #bf8b2e;
+    margin: 0 auto 12px;
 }
 
-.t9-cat-name {
+.t9-author-name {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #fbbf24;
+    margin: 0 0 4px;
+}
+
+.t9-author-genre {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-bottom: 10px;
+}
+
+.t9-author-link {
+    font-size: 12px;
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+/* SECTION 6: Guarantee of Originality Trust Band */
+.t9-trust-band {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin: 30px 0;
+}
+
+.t9-trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .t9-trust-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.t9-trust-icon {
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.t9-trust-label {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+
+.t9-trust-sub {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* SECTION 7: Stationery & Islamic Supplies */
+.t9-stationery-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 25px 0;
+}
+
+@media (max-width: 768px) {
+    .t9-stationery-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t9-stationery-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    height: 220px;
+    text-decoration: none;
+    display: block;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.t9-stationery-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.t9-stationery-card:hover img {
+    transform: scale(1.05);
+}
+
+.t9-stationery-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 20%, rgba(15, 23, 42, 0.88) 100%);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.t9-stationery-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 19px;
+    color: #ffffff;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.t9-stationery-sub {
+    color: #fbbf24;
     font-size: 12px;
     font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
 }
 
-/* Product Grid */
-.t9-product-row {
+/* Standard Product Grid */
+.t9-product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
     gap: 18px;
@@ -422,7 +491,7 @@
 }
 
 @media (max-width: 768px) {
-    .t9-product-row {
+    .t9-product-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
@@ -431,181 +500,210 @@
 
 <div class="t9-page">
 
-    {{-- Top Announcement Strip --}}
-    <div class="t9-top-strip">
-        <span>📖 AUTHENTIC ORIGINAL EDITIONS • BESTSELLING AUTHORS & ISLAMIC LITERATURE</span>
-        <span>DELIVERED NATIONWIDE &bull; <a href="{{ route('shop') }}">BROWSE BOOKSTORE &rarr;</a></span>
+    {{-- SECTION 1: Publisher's Notice Strip --}}
+    <div class="t9-notice-strip">
+        {{ $homepage['template_9_notice_text'] ?? '📖 Guaranteed 100% Genuine Publisher Prints • Islamic Scholarly Library & Academic Textbooks Direct to Your Door' }}
     </div>
 
-    {{-- Hero Section --}}
+    {{-- SECTION 2: Reading Room Hero Slider with Left/Right Controls --}}
     <section class="t9-hero-section">
         <div class="t9-container">
-            <div class="t9-hero-layout">
-                
-                {{-- Big Slider --}}
+            <div class="t9-hero-container">
                 <div class="t9-hero-slider" id="t9HeroSlider">
-                    <button class="t9-hero-arrow t9-hero-prev" id="t9Prev" aria-label="Previous Slide">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                    </button>
-                    <button class="t9-hero-arrow t9-hero-next" id="t9Next" aria-label="Next Slide">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                    </button>
-
                     @forelse($sliders as $idx => $slider)
                         <a href="{{ $slider->button_url ?? route('shop') }}" class="t9-slide {{ $idx === 0 ? 'active' : '' }}">
-                            <img class="t9-slide-img" src="{{ asset($slider->image) }}" alt="{{ $slider->title ?? 'Bookstore & Academy' }}">
-                            <div class="t9-slide-overlay">
-                                @if($slider->title)
-                                    <span class="t9-slide-badge">KNOWLEDGE & HERITAGE</span>
-                                    <h1 class="t9-slide-title">{{ $slider->title }}</h1>
-                                @endif
-                                <span class="t9-slide-btn">
-                                    {{ $slider->button_text ?: 'EXPLORE BOOKS' }}
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                </span>
-                            </div>
+                            <img class="t9-slide-img" src="{{ asset($slider->image) }}" alt="{{ $slider->title ?? 'Book Collection' }}">
+                            @if(!empty($slider->title))
+                                <div class="t9-slide-caption">
+                                    <span class="t9-caption-title">{{ $slider->title }}</span>
+                                    <span class="t9-caption-btn">{{ $slider->button_text ?: 'EXPLORE' }} &rarr;</span>
+                                </div>
+                            @endif
                         </a>
                     @empty
                         <a href="{{ route('shop') }}" class="t9-slide active">
-                            <img class="t9-slide-img" src="https://images.unsplash.com/photo-1507842229450-78212e6900f9?w=1400&q=80" alt="Bookstore Library">
-                            <div class="t9-slide-overlay">
-                                <span class="t9-slide-badge">ORIGINAL EDITIONS</span>
-                                <h1 class="t9-slide-title">Bestselling Titles, Novels & Academic Guides</h1>
-                                <span class="t9-slide-btn">READ & EXPLORE &rarr;</span>
+                            <img class="t9-slide-img" src="https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=1600&q=80" alt="Books Collection">
+                            <div class="t9-slide-caption">
+                                <span class="t9-caption-title">Classical Islamic & Academic Library</span>
+                                <span class="t9-caption-btn">BROWSE BOOKS &rarr;</span>
                             </div>
                         </a>
                     @endforelse
                 </div>
-
-                {{-- Side Deals --}}
-                <div class="t9-side-deals">
-                    <a href="{{ $homepage['slider_side_image_one_link'] ?? route('shop') }}" class="t9-side-card">
-                        <img src="{{ !empty($homepage['slider_side_image_one']) ? asset($homepage['slider_side_image_one']) : 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80' }}" alt="Islamic Books">
-                        <div class="t9-side-overlay">
-                            <span class="t9-side-badge">ISLAMIC</span>
-                            <h3 class="t9-side-title">Quran, Hadith & Tafseer</h3>
-                            <span class="t9-side-link">View Collection &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="{{ $homepage['slider_side_image_two_link'] ?? route('shop') }}" class="t9-side-card">
-                        <img src="{{ !empty($homepage['slider_side_image_two']) ? asset($homepage['slider_side_image_two']) : 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&q=80' }}" alt="Stationery">
-                        <div class="t9-side-overlay">
-                            <span class="t9-side-badge">ACADEMY</span>
-                            <h3 class="t9-side-title">Academic & Self Growth</h3>
-                            <span class="t9-side-link">Shop Titles &rarr;</span>
-                        </div>
-                    </a>
-                </div>
-
+                {{-- Left & Right Buttons Centered on Both Sides --}}
+                <button class="t9-hero-arrow t9-hero-prev" id="t9Prev" aria-label="Previous Slide">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="t9-hero-arrow t9-hero-next" id="t9Next" aria-label="Next Slide">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
             </div>
         </div>
     </section>
 
-    {{-- Bookstore Features --}}
+    {{-- SECTION 3: Browse by Genre Shelf Tabs --}}
+    <section class="t9-section">
+        <div class="t9-container">
+            <div class="t9-sec-head">
+                <div class="t9-sec-tag">LITERARY SHELVES</div>
+                <h2 class="t9-sec-title">Explore by Subject & Discipline</h2>
+            </div>
+            <div class="t9-genre-pills">
+                <a href="{{ route('shop') }}" class="t9-genre-pill active">📖 Islamic Studies & Tafseer</a>
+                <a href="{{ route('shop') }}" class="t9-genre-pill">🕌 Hadith & Seerah</a>
+                <a href="{{ route('shop') }}" class="t9-genre-pill">📜 Bengali Classical Literature</a>
+                <a href="{{ route('shop') }}" class="t9-genre-pill">🎓 BCS & Academic Guides</a>
+                <a href="{{ route('shop') }}" class="t9-genre-pill">🧠 Self-Help & Psychology</a>
+                <a href="{{ route('shop') }}" class="t9-genre-pill">🌍 World History & Politics</a>
+            </div>
+        </div>
+    </section>
+
+    {{-- SECTION 4: National Bestsellers (Portrait 3:4 Cards) --}}
+    <section class="t9-section">
+        <div class="t9-container">
+            <div class="t9-sec-head">
+                <div class="t9-sec-tag">TOP CIRCULATION</div>
+                <h2 class="t9-sec-title">{{ $homepage['template_9_bestsellers_title'] ?? 'National Bestselling Titles' }}</h2>
+            </div>
+            <div class="t9-bestsellers-grid">
+                <a href="{{ route('shop') }}" class="t9-book-card">
+                    <span class="t9-rank-badge">#1 BESTSELLER</span>
+                    <img class="t9-book-img" src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&q=80" alt="Book 1">
+                    <h4 class="t9-book-title">Seerat-un-Nabi (Complete Edition)</h4>
+                    <span class="t9-book-author">Allama Shibli Nomani</span>
+                    <span class="t9-book-price">৳650</span>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t9-book-card">
+                    <span class="t9-rank-badge">#2 BESTSELLER</span>
+                    <img class="t9-book-img" src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80" alt="Book 2">
+                    <h4 class="t9-book-title">Tafseer Ibn Kathir (English/Bangla)</h4>
+                    <span class="t9-book-author">Imam Ibn Kathir</span>
+                    <span class="t9-book-price">৳1,400</span>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t9-book-card">
+                    <span class="t9-rank-badge">#3 BESTSELLER</span>
+                    <img class="t9-book-img" src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80" alt="Book 3">
+                    <h4 class="t9-book-title">Atomic Habits (Translated)</h4>
+                    <span class="t9-book-author">James Clear</span>
+                    <span class="t9-book-price">৳320</span>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t9-book-card">
+                    <span class="t9-rank-badge">#4 BESTSELLER</span>
+                    <img class="t9-book-img" src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&q=80" alt="Book 4">
+                    <h4 class="t9-book-title">Paradoxical Sajid</h4>
+                    <span class="t9-book-author">Arif Azad</span>
+                    <span class="t9-book-price">৳280</span>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t9-book-card">
+                    <span class="t9-rank-badge">#5 BESTSELLER</span>
+                    <img class="t9-book-img" src="https://images.unsplash.com/photo-1495640388908-05fa85288e61?w=400&q=80" alt="Book 5">
+                    <h4 class="t9-book-title">Ar-Raheequl Makhtum</h4>
+                    <span class="t9-book-author">Safiur Rahman Mubarakpuri</span>
+                    <span class="t9-book-price">৳480</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {{-- SECTION 5: Author Spotlight Editorial Profiles --}}
     <section class="t9-container">
-        <div class="t9-features-bar">
-            <div class="t9-feature-item">
-                <div class="t9-feature-icon"><i class="fas fa-book"></i></div>
-                <div>
-                    <h5 class="t9-feature-label">100% Genuine Prints</h5>
-                    <p class="t9-feature-desc">Official publisher editions</p>
-                </div>
+        <div class="t9-author-section">
+            <div class="t9-sec-head" style="margin-bottom:0;">
+                <div class="t9-sec-tag" style="color:#fbbf24;">DISTINGUISHED SCHOLARS</div>
+                <h2 class="t9-sec-title" style="color:#ffffff;">{{ $homepage['template_9_author_title'] ?? 'Author Spotlight' }}</h2>
             </div>
-            <div class="t9-feature-item">
-                <div class="t9-feature-icon"><i class="fas fa-feather-alt"></i></div>
-                <div>
-                    <h5 class="t9-feature-label">Author Signatures</h5>
-                    <p class="t9-feature-desc">Exclusive collectible copies</p>
-                </div>
+            <div class="t9-author-grid">
+                <a href="{{ route('shop') }}" class="t9-author-card">
+                    <img class="t9-author-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80" alt="Author 1">
+                    <h4 class="t9-author-name">Dr. Khondokar Abdullah Jahangir</h4>
+                    <div class="t9-author-genre">Islamic Hadith & Comparative Theology</div>
+                    <span class="t9-author-link">18 Titles Available &rarr;</span>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t9-author-card">
+                    <img class="t9-author-avatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80" alt="Author 2">
+                    <h4 class="t9-author-name">Arif Azad</h4>
+                    <div class="t9-author-genre">Youth Awakening & Apologetics</div>
+                    <span class="t9-author-link">12 Titles Available &rarr;</span>
+                </a>
+
+                <a href="{{ route('shop') }}" class="t9-author-card">
+                    <img class="t9-author-avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80" alt="Author 3">
+                    <h4 class="t9-author-name">Humayun Ahmed</h4>
+                    <div class="t9-author-genre">Contemporary Bengali Fiction</div>
+                    <span class="t9-author-link">45 Titles Available &rarr;</span>
+                </a>
             </div>
-            <div class="t9-feature-item">
-                <div class="t9-feature-icon"><i class="fas fa-box"></i></div>
+        </div>
+    </section>
+
+    {{-- SECTION 6: Guarantee of Originality Trust Band --}}
+    <section class="t9-container">
+        <div class="t9-trust-band">
+            <div class="t9-trust-grid">
                 <div>
-                    <h5 class="t9-feature-label">Protective Box Packaging</h5>
-                    <p class="t9-feature-desc">Delivered in mint condition</p>
+                    <div class="t9-trust-icon">📜</div>
+                    <div class="t9-trust-label">{{ $homepage['template_9_trust_1_title'] ?? '100% Genuine Prints' }}</div>
+                    <div class="t9-trust-sub">Direct publisher authorization</div>
                 </div>
-            </div>
-            <div class="t9-feature-item">
-                <div class="t9-feature-icon"><i class="fas fa-bookmark"></i></div>
                 <div>
-                    <h5 class="t9-feature-label">Free Bookmark Gift</h5>
-                    <p class="t9-feature-desc">With every book parcel</p>
+                    <div class="t9-trust-icon">📦</div>
+                    <div class="t9-trust-label">{{ $homepage['template_9_trust_2_title'] ?? 'Publisher Sealed Pack' }}</div>
+                    <div class="t9-trust-sub">Unopened pristine condition</div>
+                </div>
+                <div>
+                    <div class="t9-trust-icon">🚚</div>
+                    <div class="t9-trust-label">Safe Book Delivery</div>
+                    <div class="t9-trust-sub">Bubble-wrapped damage proof</div>
+                </div>
+                <div>
+                    <div class="t9-trust-icon">↩️</div>
+                    <div class="t9-trust-label">Hassle-Free Replacement</div>
+                    <div class="t9-trust-sub">If print defects are found</div>
                 </div>
             </div>
         </div>
     </section>
 
-    {{-- Curated Categories / Genres --}}
-    @if(isset($featuredCategories) && $featuredCategories->count() > 0)
-        <section class="t9-container" style="margin-bottom: 35px;">
-            <div class="t9-sec-header">
-                <div class="t9-sec-title-wrap">
-                    <div class="t9-sec-bar"></div>
-                    <h2 class="t9-sec-title">Explore Book Genres & Shelves</h2>
+    {{-- SECTION 7: Stationery & Islamic Supplies --}}
+    <section class="t9-container">
+        <div class="t9-stationery-grid">
+            <a href="{{ route('shop') }}" class="t9-stationery-card">
+                <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80" alt="Academic Stationery">
+                <div class="t9-stationery-overlay">
+                    <h4 class="t9-stationery-title">Academic & Student Stationery</h4>
+                    <span class="t9-stationery-sub">Leather Diaries, Fountain Pens & Mathematical Sets &rarr;</span>
                 </div>
-                <a href="{{ route('shop') }}" class="t9-view-all">All Genres &rarr;</a>
-            </div>
-            <div class="t9-cat-scroll">
-                @foreach($featuredCategories as $cat)
-                    <a href="{{ route('shop', $cat->slug) }}" class="t9-cat-pill">
-                        <img class="t9-cat-img" src="{{ asset($cat->image ?? $cat->icon ?? 'clientside/images/product-placeholder.png') }}" alt="{{ $cat->name }}">
-                        <span class="t9-cat-name">{{ $cat->name }}</span>
-                    </a>
-                @endforeach
-            </div>
-        </section>
-    @endif
+            </a>
 
-    {{-- Featured Books --}}
+            <a href="{{ route('shop') }}" class="t9-stationery-card">
+                <img src="https://images.unsplash.com/photo-1584281722573-95669b35b2e5?w=600&q=80" alt="Islamic Goods">
+                <div class="t9-stationery-overlay">
+                    <h4 class="t9-stationery-title">Islamic Heritage Collection</h4>
+                    <span class="t9-stationery-sub">Carved Rehal (Quran Stand), Prayer Mats & Attar &rarr;</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    {{-- SECTION 8: Featured Catalog Products --}}
     @if (!empty($homepage['enable_featured_product_section']) && $homepage['enable_featured_product_section'] && isset($featuredProducts) && $featuredProducts->count() > 0)
-        <section class="t9-container">
-            <div class="t9-sec-header">
-                <div class="t9-sec-title-wrap">
-                    <div class="t9-sec-bar"></div>
-                    <h2 class="t9-sec-title">{{ $homepage['featured_product_section_heading'] ?? 'Featured Book Picks' }}</h2>
+        <section class="t9-section">
+            <div class="t9-container">
+                <div class="t9-sec-head">
+                    <div class="t9-sec-tag">CURATED RELEASES</div>
+                    <h2 class="t9-sec-title">{{ $homepage['featured_product_section_heading'] ?? 'Fresh Off The Press' }}</h2>
                 </div>
-                <a href="{{ route('shop') }}" class="t9-view-all">View All &rarr;</a>
-            </div>
-            <div class="t9-product-row">
-                @foreach($featuredProducts as $product)
-                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'FEATURED'])
-                @endforeach
-            </div>
-        </section>
-    @endif
-
-    {{-- Bestsellers --}}
-    @if (!empty($homepage['enable_best_selling_section']) && $homepage['enable_best_selling_section'] && isset($bestSellingProducts) && $bestSellingProducts->count() > 0)
-        <section class="t9-container">
-            <div class="t9-sec-header">
-                <div class="t9-sec-title-wrap">
-                    <div class="t9-sec-bar"></div>
-                    <h2 class="t9-sec-title">{{ $homepage['best_selling_section_heading'] ?? 'National Bestsellers' }}</h2>
+                <div class="t9-product-grid">
+                    @foreach($featuredProducts as $product)
+                        @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'GENUINE'])
+                    @endforeach
                 </div>
-                <a href="{{ route('shop') }}" class="t9-view-all">View All &rarr;</a>
-            </div>
-            <div class="t9-product-row">
-                @foreach($bestSellingProducts as $product)
-                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'BESTSELLER'])
-                @endforeach
-            </div>
-        </section>
-    @endif
-
-    {{-- Latest Arrivals --}}
-    @if (!empty($homepage['enable_latest_products_section']) && $homepage['enable_latest_products_section'] && isset($latestProducts) && $latestProducts->count() > 0)
-        <section class="t9-container">
-            <div class="t9-sec-header">
-                <div class="t9-sec-title-wrap">
-                    <div class="t9-sec-bar"></div>
-                    <h2 class="t9-sec-title">{{ $homepage['latest_products_section_heading'] ?? 'New Release Publications' }}</h2>
-                </div>
-                <a href="{{ route('shop') }}" class="t9-view-all">View All &rarr;</a>
-            </div>
-            <div class="t9-product-row">
-                @foreach($latestProducts as $product)
-                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'NEW'])
-                @endforeach
             </div>
         </section>
     @endif
@@ -615,38 +713,27 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const slides = document.querySelectorAll('.t9-slide');
-    const prevBtn = document.getElementById('t9Prev');
-    const nextBtn = document.getElementById('t9Next');
-    let idx = 0;
+    const prev = document.getElementById('t9Prev');
+    const next = document.getElementById('t9Next');
+    let cur = 0;
     let timer;
 
-    function showSlide(n) {
+    function show(n) {
         if (!slides.length) return;
-        slides[idx].classList.remove('active');
-        idx = (n + slides.length) % slides.length;
-        slides[idx].classList.add('active');
+        slides[cur].classList.remove('active');
+        cur = (n + slides.length) % slides.length;
+        slides[cur].classList.add('active');
     }
 
-    function startTimer() {
+    function resetTimer() {
         if (slides.length > 1) {
             clearInterval(timer);
-            timer = setInterval(() => showSlide(idx + 1), 5000);
+            timer = setInterval(() => show(cur + 1), 6000);
         }
     }
 
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            showSlide(idx - 1);
-            startTimer();
-        });
-    }
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            showSlide(idx + 1);
-            startTimer();
-        });
-    }
-
-    startTimer();
+    if (prev) prev.addEventListener('click', () => { show(cur - 1); resetTimer(); });
+    if (next) next.addEventListener('click', () => { show(cur + 1); resetTimer(); });
+    resetTimer();
 });
 </script>

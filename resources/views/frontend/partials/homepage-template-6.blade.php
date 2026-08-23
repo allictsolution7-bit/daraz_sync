@@ -1,88 +1,87 @@
 {{-- 
-    Template 6: Fashion, Clothing & Luxury Apparel Studio
-    Designed specifically for Fashion, Panjabi, Western Wear, Couture, and Lifestyle Clothing
+    Template 6: Fashion & Apparel Studio
+    High-End Fashion Magazine & Editorial Aesthetics
 --}}
 
 <style>
-/* ── TEMPLATE 6: FASHION & APPAREL STUDIO ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&display=swap');
+
+/* ── SCOPED TEMPLATE 6: LUXURY FASHION STUDIO ── */
 .t6-page {
-    background: #fafafa;
-    color: #1a1a1a;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    padding-bottom: 60px;
+    background: #0d0d0d;
+    color: #f3f4f6;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    padding-bottom: 70px;
+    overflow-x: hidden;
 }
 
 .t6-container {
-    max-width: 1340px;
+    max-width: 1380px;
     margin: 0 auto;
-    padding: 0 16px;
+    padding: 0 20px;
 }
 
-/* Editorial Top Banner */
-.t6-top-strip {
-    background: #111827;
-    color: #ffffff;
-    padding: 10px 16px;
-    font-size: 12px;
+/* SECTION 1: Infinite Marquee Ticker Strip */
+.t6-marquee-wrap {
+    background: #151515;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 10px 0;
+    position: relative;
+}
+
+.t6-marquee-content {
+    display: inline-block;
+    animation: t6Marquee 28s linear infinite;
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
+    color: #c9a84c;
 }
 
-.t6-top-strip a {
-    color: #f59e0b;
-    text-decoration: underline;
-    transition: color 0.2s;
+.t6-marquee-content span {
+    padding: 0 24px;
 }
 
-.t6-top-strip a:hover {
-    color: #fbbf24;
+@keyframes t6Marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
 }
 
-/* Hero Section */
+/* SECTION 2: Clean Fashion Lookbook Hero Slider */
 .t6-hero-section {
-    padding: 20px 0 30px;
+    padding: 20px 0;
 }
 
-.t6-hero-layout {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
-}
-
-@media (max-width: 992px) {
-    .t6-hero-layout {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Big Hero Slider */
-.t6-hero-slider {
+.t6-hero-container {
     position: relative;
     border-radius: 16px;
     overflow: hidden;
-    height: 480px;
-    background: #1e293b;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6);
+    background: #0d0d0d;
+    width: 100%;
 }
 
-@media (max-width: 768px) {
-    .t6-hero-slider {
-        height: 320px;
-    }
+.t6-hero-slider {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1500 / 600;
+    min-height: 180px;
+    overflow: hidden;
 }
 
 .t6-slide {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.6s ease, visibility 0.6s ease;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     display: block;
     text-decoration: none;
 }
@@ -95,72 +94,54 @@
 .t6-slide-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
+    display: block;
 }
 
-.t6-slide-overlay {
+/* Clean minimal bottom caption bar ONLY when title exists */
+.t6-slide-caption {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 36px 40px;
-    color: #ffffff;
+    bottom: 24px;
+    left: 24px;
+    background: rgba(13, 13, 13, 0.85);
+    border: 1px solid rgba(201, 168, 76, 0.5);
+    backdrop-filter: blur(10px);
+    padding: 12px 24px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 
-.t6-slide-tag {
-    display: inline-block;
-    background: #ffffff;
-    color: #0f172a;
+@media (max-width: 640px) {
+    .t6-slide-caption {
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        padding: 8px 14px;
+        gap: 8px;
+    }
+}
+
+.t6-caption-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.t6-caption-btn {
+    background: #c9a84c;
+    color: #0d0d0d;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 1px;
+    padding: 6px 14px;
+    border-radius: 4px;
     text-transform: uppercase;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 10px;
-    width: fit-content;
 }
 
-.t6-slide-title {
-    font-size: 32px;
-    font-weight: 800;
-    color: #ffffff;
-    margin-bottom: 12px;
-    line-height: 1.2;
-}
-
-@media (max-width: 768px) {
-    .t6-slide-title {
-        font-size: 22px;
-    }
-    .t6-slide-overlay {
-        padding: 20px;
-    }
-}
-
-.t6-slide-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #2563eb;
-    color: #ffffff;
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-size: 13px;
-    font-weight: 700;
-    width: fit-content;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-    transition: all 0.2s;
-}
-
-.t6-slide-btn:hover {
-    background: #1d4ed8;
-    transform: translateY(-2px);
-}
-
-/* Slider Nav Arrows */
 .t6-hero-arrow {
     position: absolute;
     top: 50%;
@@ -168,605 +149,1005 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(4px);
-    border: none;
-    color: #0f172a;
+    background: rgba(13, 13, 13, 0.75);
+    border: 1px solid rgba(201, 168, 76, 0.6);
+    color: #c9a84c;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
     z-index: 10;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.t6-hero-prev {
+    left: 20px;
+}
+
+.t6-hero-next {
+    right: 20px;
 }
 
 .t6-hero-arrow:hover {
-    background: #ffffff;
-    transform: translateY(-50%) scale(1.08);
-}
-
-.t6-hero-prev { left: 16px; }
-.t6-hero-next { right: 16px; }
-
-/* Side Editorial Banners */
-.t6-side-deals {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    height: 480px;
-}
-
-@media (max-width: 992px) {
-    .t6-side-deals {
-        height: auto;
-        flex-direction: row;
-    }
+    background: #c9a84c;
+    color: #0d0d0d;
+    transform: translateY(-50%) scale(1.1);
 }
 
 @media (max-width: 640px) {
-    .t6-side-deals {
-        flex-direction: column;
+    .t6-hero-arrow {
+        width: 36px;
+        height: 36px;
+    }
+    .t6-hero-prev {
+        left: 10px;
+    }
+    .t6-hero-next {
+        right: 10px;
     }
 }
 
-.t6-side-card {
-    flex: 1;
-    position: relative;
-    border-radius: 16px;
-    overflow: hidden;
-    background: #0f172a;
-    display: block;
-    text-decoration: none;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-}
-
-.t6-side-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.t6-side-card:hover img {
-    transform: scale(1.06);
-}
-
-.t6-side-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 20px;
-    color: #fff;
-}
-
-.t6-side-badge {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    width: fit-content;
-}
-
-.t6-side-title {
-    font-size: 17px;
-    font-weight: 800;
-    color: #fff;
-    margin: 0 0 4px;
-}
-
-.t6-side-link {
-    font-size: 12px;
-    color: #93c5fd;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-/* Department Split Cards (Men / Women / Essentials) */
-.t6-dept-section {
-    padding: 30px 0;
-}
-
-.t6-dept-grid {
+/* Editorial Highlights Strip */
+.t6-editorial-strip {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 16px;
+    margin-top: 18px;
 }
 
-@media (max-width: 768px) {
-    .t6-dept-grid {
+@media (max-width: 850px) {
+    .t6-editorial-strip {
         grid-template-columns: 1fr;
     }
 }
 
-.t6-dept-card {
-    position: relative;
-    height: 240px;
-    border-radius: 16px;
-    overflow: hidden;
-    display: block;
+.t6-editorial-card {
+    background: #151515;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
     text-decoration: none;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    color: inherit;
+    transition: all 0.3s ease;
 }
 
-.t6-dept-card img {
+.t6-editorial-card:hover {
+    border-color: #c9a84c;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(201, 168, 76, 0.15);
+}
+
+.t6-editorial-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(201, 168, 76, 0.1);
+    border: 1px solid #c9a84c;
+    color: #c9a84c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.t6-editorial-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.t6-editorial-sub {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* SECTION 3: Shop by Look (Portrait Cards with 3D tilt) */
+.t6-section {
+    padding: 50px 0 20px;
+}
+
+.t6-sec-head {
+    text-align: center;
+    margin-bottom: 34px;
+    position: relative;
+}
+
+.t6-sec-subtitle {
+    color: #c9a84c;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.t6-sec-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 3.5vw, 38px);
+    color: #ffffff;
+    font-weight: 700;
+    margin: 0;
+}
+
+.t6-looks-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+@media (max-width: 1024px) {
+    .t6-looks-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .t6-looks-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+}
+
+.t6-look-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 2/3;
+    background: #1a1a1a;
+    display: block;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.t6-look-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: #c9a84c;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(201, 168, 76, 0.2);
+}
+
+.t6-look-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.t6-look-card:hover .t6-look-img {
+    transform: scale(1.08);
+}
+
+.t6-look-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(13,13,13,0.92) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 16px;
+}
+
+.t6-look-tag {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #c9a84c;
+    font-weight: 700;
+}
+
+.t6-look-name {
+    font-family: 'Playfair Display', serif;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 700;
+    margin: 4px 0 2px;
+}
+
+/* SECTION 4: Asymmetric Featured Collection Grid */
+.t6-asym-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    grid-template-rows: 240px 240px;
+    gap: 18px;
+    margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+    .t6-asym-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .t6-asym-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t6-asym-main {
+    grid-row: span 2;
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #1a1a1a;
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    text-decoration: none;
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .t6-asym-main {
+        grid-row: span 1;
+        aspect-ratio: 16/9;
+    }
+}
+
+.t6-asym-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.t6-asym-item:hover, .t6-asym-main:hover {
+    border-color: #c9a84c;
+    box-shadow: 0 10px 30px rgba(201, 168, 76, 0.2);
+}
+
+.t6-asym-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
 }
 
-.t6-dept-card:hover img {
-    transform: scale(1.05);
+.t6-asym-item:hover .t6-asym-img, .t6-asym-main:hover .t6-asym-img {
+    transform: scale(1.06);
 }
 
-.t6-dept-content {
+.t6-asym-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.75) 100%);
+    background: linear-gradient(180deg, transparent 30%, rgba(13,13,13,0.85) 100%);
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 24px;
-    color: #fff;
 }
 
-.t6-dept-title {
-    font-size: 20px;
+.t6-asym-badge {
+    background: #c9a84c;
+    color: #0d0d0d;
+    font-size: 11px;
     font-weight: 800;
-    color: #fff;
-    margin: 0 0 4px;
-}
-
-.t6-dept-sub {
-    font-size: 12px;
-    color: #e2e8f0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    align-self: flex-start;
     margin-bottom: 8px;
 }
 
-.t6-dept-cta {
-    font-size: 12.5px;
+.t6-asym-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #ffffff;
     font-weight: 700;
-    color: #60a5fa;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* Section Header */
-.t6-sec-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.t6-sec-title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.t6-sec-bar {
-    width: 4px;
-    height: 22px;
-    background: #2563eb;
-    border-radius: 2px;
-}
-
-.t6-sec-title {
-    font-size: 19px;
-    font-weight: 800;
-    color: #0f172a;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     margin: 0;
 }
 
-.t6-view-all {
-    font-size: 13px;
-    font-weight: 700;
-    color: #2563eb;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    transition: color 0.2s;
-}
-
-.t6-view-all:hover {
-    color: #1d4ed8;
-}
-
-/* Categories Carousel */
-.t6-cat-scroll {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding: 6px 2px 14px;
-}
-
-.t6-cat-scroll::-webkit-scrollbar {
-    display: none;
-}
-
-.t6-cat-pill {
-    flex: 0 0 130px;
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 14px 10px;
-    border: 1px solid #e2e8f0;
-    text-align: center;
-    text-decoration: none;
-    color: #1e293b;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-    transition: all 0.25s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.t6-cat-pill:hover {
-    transform: translateY(-4px);
-    border-color: #93c5fd;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.1);
-    color: #2563eb;
-}
-
-.t6-cat-img {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #f8fafc;
-    border: 2px solid #f1f5f9;
-}
-
-.t6-cat-name {
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 100%;
-}
-
-/* Product Rows & Grids */
-.t6-product-row {
+/* SECTION 5: Product Row (Dark Grid) */
+.t6-product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
     margin-bottom: 40px;
 }
 
 @media (max-width: 768px) {
-    .t6-product-row {
+    .t6-product-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
 }
 
-/* Lookbook Shoppable Instagram Row */
-.t6-lookbook-section {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 30px;
-    margin: 30px 0 45px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-}
-
-.t6-lookbook-grid {
+/* SECTION 6: Compact Bespoke Spotlight Banner with Multi-Product Cards */
+/* SECTION 6: Bespoke Spotlight Carousel Banner */
+.t6-size-banner {
+    margin: 36px 0;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #181818 0%, #201c15 50%, #2e2615 100%);
+    border: 1.5px solid rgba(201, 168, 76, 0.35);
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    grid-template-columns: 1fr 1.6fr;
+    align-items: center;
+    padding: 34px 36px;
+    gap: 32px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
 }
 
-@media (max-width: 992px) {
-    .t6-lookbook-grid {
-        grid-template-columns: repeat(2, 1fr);
+@media (max-width: 960px) {
+    .t6-size-banner {
+        grid-template-columns: 1fr;
+        padding: 24px;
+        gap: 20px;
     }
 }
 
-.t6-lookbook-tile {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 1/1;
-    display: block;
+.t6-size-content {
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.t6-lookbook-tile img {
+.t6-size-tag {
+    color: #c9a84c;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.t6-size-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 2.8vw, 32px);
+    color: #ffffff;
+    font-weight: 700;
+    margin: 0 0 10px;
+    line-height: 1.25;
+}
+
+.t6-size-desc {
+    color: #9ca3af;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.t6-btn-gold {
+    background: linear-gradient(135deg, #c9a84c, #e0c27b);
+    color: #0d0d0d;
+    font-weight: 800;
+    font-size: 11.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(201, 168, 76, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+}
+
+.t6-btn-gold:hover {
+    background: #ffffff;
+    color: #0d0d0d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+}
+
+.t6-spotlight-wrapper {
+    position: relative;
+    overflow: visible;
+}
+
+.t6-spotlight-products {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 6px 2px;
+}
+
+.t6-spotlight-products::-webkit-scrollbar {
+    display: none;
+}
+
+.t6-spotlight-card {
+    flex: 0 0 190px;
+    background: rgba(15, 15, 15, 0.85);
+    border: 1.5px solid rgba(201, 168, 76, 0.25);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 600px) {
+    .t6-spotlight-card {
+        flex: 0 0 160px;
+    }
+}
+
+.t6-spotlight-card:hover {
+    transform: translateY(-4px);
+    border-color: #c9a84c;
+    box-shadow: 0 10px 24px rgba(201, 168, 76, 0.3);
+}
+
+.t6-spotlight-card img {
     width: 100%;
-    height: 100%;
+    height: 165px;
     object-fit: cover;
     transition: transform 0.4s ease;
 }
 
-.t6-lookbook-tile:hover img {
-    transform: scale(1.08);
+.t6-spotlight-card:hover img {
+    transform: scale(1.06);
 }
 
-.t6-lookbook-tag {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(4px);
-    color: #ffffff;
-    font-size: 11px;
+.t6-spotlight-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: #111111;
+}
+
+.t6-spotlight-name {
+    font-size: 13px;
     font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #f3f4f6;
+}
+
+.t6-spotlight-price {
+    font-size: 14px;
+    font-weight: 800;
+    color: #c9a84c;
+}
+
+.t6-spotlight-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(18, 18, 18, 0.92);
+    border: 1.5px solid rgba(201, 168, 76, 0.7);
+    color: #c9a84c;
     display: flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    z-index: 10;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+}
+
+.t6-spotlight-arrow:hover {
+    background: #c9a84c;
+    color: #0d0d0d;
+    transform: translateY(-50%) scale(1.12);
+    box-shadow: 0 8px 24px rgba(201, 168, 76, 0.45);
+}
+
+.t6-spotlight-arrow.prev {
+    left: -14px;
+}
+
+.t6-spotlight-arrow.next {
+    right: -14px;
+}
+
+/* SECTION 7: Style the Look (Shoppable Outfit Tiles) */
+.t6-outfits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 850px) {
+    .t6-outfits-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t6-outfit-card {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #151515;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    aspect-ratio: 4/5;
+    text-decoration: none;
+    display: block;
+}
+
+.t6-outfit-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.t6-outfit-card:hover .t6-outfit-img {
+    transform: scale(1.05);
+}
+
+.t6-outfit-tag-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(13, 13, 13, 0.85);
+    border: 1px solid #c9a84c;
+    color: #c9a84c;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 30px;
+    backdrop-filter: blur(6px);
+}
+
+.t6-outfit-info {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(13,13,13,0.92) 100%);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.t6-outfit-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #ffffff;
+    margin: 0 0 6px;
+}
+
+.t6-outfit-items {
+    font-size: 12px;
+    color: #c9a84c;
+    font-weight: 500;
+}
+
+/* SECTION 8: Style Community Newsletter */
+.t6-newsletter-wrap {
+    margin-top: 60px;
+    background: #151515;
+    border: 1px solid rgba(201, 168, 76, 0.25);
+    border-radius: 16px;
+    padding: 60px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.t6-newsletter-wrap::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(201, 168, 76, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.t6-news-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 3.5vw, 40px);
+    color: #ffffff;
+    font-weight: 700;
+    margin: 0 0 10px;
+}
+
+.t6-news-desc {
+    color: #9ca3af;
+    font-size: 14px;
+    max-width: 500px;
+    margin: 0 auto 28px;
+}
+
+.t6-news-form {
+    display: flex;
+    max-width: 480px;
+    margin: 0 auto;
+    gap: 8px;
+}
+
+@media (max-width: 540px) {
+    .t6-news-form {
+        flex-direction: column;
+    }
+}
+
+.t6-news-input {
+    flex: 1;
+    background: #0d0d0d;
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    border-radius: 4px;
+    padding: 14px 18px;
+    color: #ffffff;
+    font-size: 14px;
+    outline: none;
+}
+
+.t6-news-input:focus {
+    border-color: #c9a84c;
+    box-shadow: 0 0 12px rgba(201, 168, 76, 0.3);
 }
 </style>
 
 <div class="t6-page">
 
-    {{-- Top Announcement Strip --}}
-    <div class="t6-top-strip">
-        <span>✨ NEW SEASON COLLECTION &bull; 100% ETHICAL FABRICS & PREMIER TAILORING</span>
-        <span>EXPRESS DELIVERY AVAILABLE &bull; <a href="{{ route('shop') }}">SHOP NEW ARRIVALS &rarr;</a></span>
+    {{-- SECTION 1: Infinite Marquee Ticker Strip --}}
+    <div class="t6-marquee-wrap">
+        <div class="t6-marquee-content">
+            @php
+                $t6Ticker = $homepage['template_6_ticker_text'] ?? '✦ NEW SEASON EDITORIAL ✦ PREMIER PANJABI & COUTURE COLLECTION ✦ 100% ETHICAL FABRICS & TAILORING ✦ EXPRESS NATIONWIDE SHIPPING ✦';
+            @endphp
+            <span>{{ $t6Ticker }}</span>
+            <span>{{ $t6Ticker }}</span>
+        </div>
     </div>
 
-    {{-- Hero Section --}}
+    {{-- SECTION 2: Clean Fashion Lookbook Hero Slider --}}
     <section class="t6-hero-section">
         <div class="t6-container">
-            <div class="t6-hero-layout">
-                
-                {{-- Big Slider --}}
+            <div class="t6-hero-container">
                 <div class="t6-hero-slider" id="t6HeroSlider">
-                    <button class="t6-hero-arrow t6-hero-prev" id="t6Prev" aria-label="Previous Slide">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                    </button>
-                    <button class="t6-hero-arrow t6-hero-next" id="t6Next" aria-label="Next Slide">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                    </button>
-
                     @forelse($sliders as $idx => $slider)
                         <a href="{{ $slider->button_url ?? route('shop') }}" class="t6-slide {{ $idx === 0 ? 'active' : '' }}">
                             <img class="t6-slide-img" src="{{ asset($slider->image) }}" alt="{{ $slider->title ?? 'Fashion Lookbook' }}">
-                            <div class="t6-slide-overlay">
-                                @if($slider->title)
-                                    <span class="t6-slide-tag">SEASON LOOKBOOK</span>
-                                    <h1 class="t6-slide-title">{{ $slider->title }}</h1>
-                                @endif
-                                <span class="t6-slide-btn">
-                                    {{ $slider->button_text ?: 'EXPLORE COLLECTION' }}
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                                </span>
-                            </div>
+                            @if(!empty($slider->title))
+                                <div class="t6-slide-caption">
+                                    <span class="t6-caption-title">{{ $slider->title }}</span>
+                                    <span class="t6-caption-btn">{{ $slider->button_text ?: 'EXPLORE' }} &rarr;</span>
+                                </div>
+                            @endif
                         </a>
                     @empty
                         <a href="{{ route('shop') }}" class="t6-slide active">
-                            <img class="t6-slide-img" src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1400&q=80" alt="Fashion Couture">
-                            <div class="t6-slide-overlay">
-                                <span class="t6-slide-tag">PREMIUM APPAREL</span>
-                                <h1 class="t6-slide-title">Autumn & Winter Lookbook Collection</h1>
-                                <span class="t6-slide-btn">SHOP COLLECTION &rarr;</span>
+                            <img class="t6-slide-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80" alt="Fashion Couture">
+                            <div class="t6-slide-caption">
+                                <span class="t6-caption-title">Autumn & Winter Lookbook Collection</span>
+                                <span class="t6-caption-btn">SHOP COLLECTION &rarr;</span>
                             </div>
                         </a>
                     @endforelse
                 </div>
+                {{-- Left & Right Buttons Centered on Both Sides --}}
+                <button class="t6-hero-arrow t6-hero-prev" id="t6Prev" aria-label="Previous Slide">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="t6-hero-arrow t6-hero-next" id="t6Next" aria-label="Next Slide">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+            </div>
 
-                {{-- Side Deals --}}
-                <div class="t6-side-deals">
-                    <a href="{{ $homepage['slider_side_image_one_link'] ?? route('shop') }}" class="t6-side-card">
-                        <img src="{{ !empty($homepage['slider_side_image_one']) ? asset($homepage['slider_side_image_one']) : 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&q=80' }}" alt="Men's Collection">
-                        <div class="t6-side-overlay">
-                            <span class="t6-side-badge">LUXURY WEAR</span>
-                            <h3 class="t6-side-title">Panjabi & Festive Wear</h3>
-                            <span class="t6-side-link">View Range &rarr;</span>
-                        </div>
-                    </a>
-                    <a href="{{ $homepage['slider_side_image_two_link'] ?? route('shop') }}" class="t6-side-card">
-                        <img src="{{ !empty($homepage['slider_side_image_two']) ? asset($homepage['slider_side_image_two']) : 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80' }}" alt="Women's Collection">
-                        <div class="t6-side-overlay">
-                            <span class="t6-side-badge">COUTURE</span>
-                            <h3 class="t6-side-title">Designer Western & Ethnic</h3>
-                            <span class="t6-side-link">Shop Now &rarr;</span>
-                        </div>
-                    </a>
-                </div>
-
+            {{-- Editorial Highlights Strip --}}
+            <div class="t6-editorial-strip">
+                <a href="{{ route('shop') }}" class="t6-editorial-card">
+                    <div class="t6-editorial-icon">👑</div>
+                    <div>
+                        <div class="t6-editorial-label">Festive Panjabi & Sherwani</div>
+                        <div class="t6-editorial-sub">Pure silk with hand zardozi collar embroidery</div>
+                    </div>
+                </a>
+                <a href="{{ route('shop') }}" class="t6-editorial-card">
+                    <div class="t6-editorial-icon">✨</div>
+                    <div>
+                        <div class="t6-editorial-label">Designer Western & Gowns</div>
+                        <div class="t6-editorial-sub">Modern tailoring and contemporary silhouettes</div>
+                    </div>
+                </a>
+                <a href="{{ route('shop') }}" class="t6-editorial-card">
+                    <div class="t6-editorial-icon">💎</div>
+                    <div>
+                        <div class="t6-editorial-label">Handcrafted Leather Footwear</div>
+                        <div class="t6-editorial-sub">Artisanal Nagra, loafers & festive accessories</div>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
 
-    {{-- Shop by Department (Split Cards) --}}
-    <section class="t6-dept-section">
+    {{-- SECTION 3: Shop by Look (Portrait Cards with 3D tilt) --}}
+    <section class="t6-section">
         <div class="t6-container">
-            <div class="t6-dept-grid">
-                <a href="{{ route('shop') }}" class="t6-dept-card">
-                    <img src="https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?w=600&q=80" alt="Men's Wardrobe">
-                    <div class="t6-dept-content">
-                        <h3 class="t6-dept-title">Men's Apparel</h3>
-                        <p class="t6-dept-sub">Suits, Panjabi, Casual Shirts & Footwear</p>
-                        <span class="t6-dept-cta">Shop Men &rarr;</span>
+            <div class="t6-sec-head">
+                <div class="t6-sec-subtitle">Curated Styles</div>
+                <h2 class="t6-sec-title">Shop by Distinct Look</h2>
+            </div>
+            <div class="t6-looks-grid">
+                <a href="{{ route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80" alt="Panjabi Edition">
+                    <div class="t6-look-overlay">
+                        <span class="t6-look-tag">SIGNATURE</span>
+                        <div class="t6-look-name">Panjabi Luxe</div>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-dept-card">
-                    <img src="https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=600&q=80" alt="Women's Wardrobe">
-                    <div class="t6-dept-content">
-                        <h3 class="t6-dept-title">Women's Boutique</h3>
-                        <p class="t6-dept-sub">Dresses, Saree, Kurtis & Handbags</p>
-                        <span class="t6-dept-cta">Shop Women &rarr;</span>
+                <a href="{{ route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1594938298603-c8148c4b2f7a?w=400&q=80" alt="Sherwani">
+                    <div class="t6-look-overlay">
+                        <span class="t6-look-tag">ROYAL</span>
+                        <div class="t6-look-name">Festive Kurta</div>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-dept-card">
-                    <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&q=80" alt="Accessories & Fragrances">
-                    <div class="t6-dept-content">
-                        <h3 class="t6-dept-title">Accessories & Shoes</h3>
-                        <p class="t6-dept-sub">Watches, Belts, Wallets & Footwear</p>
-                        <span class="t6-dept-cta">Shop Accessories &rarr;</span>
+                <a href="{{ route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1520367445093-50dc08a59d9d?w=400&q=80" alt="Women Couture">
+                    <div class="t6-look-overlay">
+                        <span class="t6-look-tag">ETHNIC</span>
+                        <div class="t6-look-name">Silk Saree & Kurtis</div>
+                    </div>
+                </a>
+                <a href="{{ route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&q=80" alt="Western Men">
+                    <div class="t6-look-overlay">
+                        <span class="t6-look-tag">URBAN</span>
+                        <div class="t6-look-name">Suits & Blazers</div>
+                    </div>
+                </a>
+                <a href="{{ route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80" alt="Accessories">
+                    <div class="t6-look-overlay">
+                        <span class="t6-look-tag">LIFESTYLE</span>
+                        <div class="t6-look-name">Luxury Footwear</div>
                     </div>
                 </a>
             </div>
         </div>
     </section>
 
-    {{-- Curated Categories Pills --}}
-    @if(isset($featuredCategories) && $featuredCategories->count() > 0)
-        <section class="t6-container" style="margin-bottom: 35px;">
-            <div class="t6-sec-header">
-                <div class="t6-sec-title-wrap">
-                    <div class="t6-sec-bar"></div>
-                    <h2 class="t6-sec-title">Explore Categories</h2>
-                </div>
-                <a href="{{ route('shop') }}" class="t6-view-all">All Categories &rarr;</a>
+    {{-- SECTION 4: Asymmetric Featured Editorial Grid --}}
+    <section class="t6-section">
+        <div class="t6-container">
+            <div class="t6-sec-head">
+                <div class="t6-sec-subtitle">Editorial Picks</div>
+                <h2 class="t6-sec-title">Handcrafted Department Highlights</h2>
             </div>
-            <div class="t6-cat-scroll">
-                @foreach($featuredCategories as $cat)
-                    <a href="{{ route('shop', $cat->slug) }}" class="t6-cat-pill">
-                        <img class="t6-cat-img" src="{{ asset($cat->image ?? $cat->icon ?? 'clientside/images/product-placeholder.png') }}" alt="{{ $cat->name }}">
-                        <span class="t6-cat-name">{{ $cat->name }}</span>
-                    </a>
-                @endforeach
+            <div class="t6-asym-grid">
+                <a href="{{ route('shop') }}" class="t6-asym-main">
+                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=900&q=80" alt="Royal Panjabi">
+                    <div class="t6-asym-overlay">
+                        <span class="t6-asym-badge">MASTER CRAFT</span>
+                        <h3 class="t6-asym-title">Royal Embroidered Panjabi & Kurtas</h3>
+                        <p style="color:#d1d5db; font-size:13px; margin: 4px 0 0;">Finest raw silk with handcrafted zardozi collar embroidery.</p>
+                    </div>
+                </a>
+                <a href="{{ route('shop') }}" class="t6-asym-item">
+                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80" alt="Western Couture">
+                    <div class="t6-asym-overlay">
+                        <span class="t6-asym-badge">NEW IN</span>
+                        <h4 class="t6-asym-title">Designer Dresses</h4>
+                    </div>
+                </a>
+                <a href="{{ route('shop') }}" class="t6-asym-item">
+                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=600&q=80" alt="Blazers">
+                    <div class="t6-asym-overlay">
+                        <span class="t6-asym-badge">BESPOKE</span>
+                        <h4 class="t6-asym-title">Slim-fit Blazers</h4>
+                    </div>
+                </a>
+                <a href="{{ route('shop') }}" class="t6-asym-item">
+                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&q=80" alt="Footwear">
+                    <div class="t6-asym-overlay">
+                        <span class="t6-asym-badge">HANDMADE</span>
+                        <h4 class="t6-asym-title">Leather Loafers & Nagra</h4>
+                    </div>
+                </a>
+                <a href="{{ route('shop') }}" class="t6-asym-item">
+                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&q=80" alt="Accessories">
+                    <div class="t6-asym-overlay">
+                        <span class="t6-asym-badge">PREMIUM</span>
+                        <h4 class="t6-asym-title">Timepieces & Brooches</h4>
+                    </div>
+                </a>
             </div>
-        </section>
-    @endif
+        </div>
+    </section>
 
-    {{-- Featured & Trending Collection --}}
+    {{-- SECTION 5: Trending Now (Featured Products) --}}
     @if (!empty($homepage['enable_featured_product_section']) && $homepage['enable_featured_product_section'] && isset($featuredProducts) && $featuredProducts->count() > 0)
-        <section class="t6-container">
-            <div class="t6-sec-header">
-                <div class="t6-sec-title-wrap">
-                    <div class="t6-sec-bar"></div>
-                    <h2 class="t6-sec-title">{{ $homepage['featured_product_section_heading'] ?? 'Trending Fashion Picks' }}</h2>
+        <section class="t6-section">
+            <div class="t6-container">
+                <div class="t6-sec-head">
+                    <div class="t6-sec-subtitle">Now Trending</div>
+                    <h2 class="t6-sec-title">{{ $homepage['featured_product_section_heading'] ?? 'Signature Garments' }}</h2>
                 </div>
-                <a href="{{ route('shop') }}" class="t6-view-all">View All &rarr;</a>
-            </div>
-            <div class="t6-product-row">
-                @foreach($featuredProducts as $product)
-                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'TRENDING'])
-                @endforeach
+                <div class="t6-product-grid">
+                    @foreach($featuredProducts as $product)
+                        @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'NEW ARRIVAL'])
+                    @endforeach
+                </div>
             </div>
         </section>
     @endif
 
-    {{-- Best Selling Outfits --}}
-    @if (!empty($homepage['enable_best_selling_section']) && $homepage['enable_best_selling_section'] && isset($bestSellingProducts) && $bestSellingProducts->count() > 0)
-        <section class="t6-container">
-            <div class="t6-sec-header">
-                <div class="t6-sec-title-wrap">
-                    <div class="t6-sec-bar"></div>
-                    <h2 class="t6-sec-title">{{ $homepage['best_selling_section_heading'] ?? 'Most Loved Outfits' }}</h2>
-                </div>
-                <a href="{{ route('shop') }}" class="t6-view-all">View All &rarr;</a>
-            </div>
-            <div class="t6-product-row">
-                @foreach($bestSellingProducts as $product)
-                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'POPULAR'])
-                @endforeach
-            </div>
-        </section>
-    @endif
-
-    {{-- Lookbook / Instagram Shoppable Gallery --}}
+    {{-- SECTION 6: Bespoke Spotlight & Shoppable Luxury Collection --}}
     <section class="t6-container">
-        <div class="t6-lookbook-section">
-            <div class="text-center mb-4">
-                <span class="text-primary font-weight-bold text-uppercase" style="letter-spacing: 1px; font-size: 11px;">#StyleInspiration</span>
-                <h3 class="font-weight-bold text-dark mt-1" style="font-size: 22px;">Shop The Look Gallery</h3>
-                <p class="text-muted small">Curated seasonal outfits styled by top creators & our boutique atelier.</p>
+        <div class="t6-size-banner">
+            <div class="t6-size-content">
+                <div class="t6-size-tag">{{ $homepage['template_6_spotlight_tag'] ?? '✦ ARTISANAL LUXURY & FIT' }}</div>
+                <h3 class="t6-size-title">{{ $homepage['template_6_spotlight_title'] ?? 'Tailored Silhouette & Master Craft' }}</h3>
+                <p class="t6-size-desc">
+                    {{ $homepage['template_6_spotlight_desc'] ?? 'From hand-woven leather accessories to custom-fitted silk ensembles, explore our handcrafted artisanal pieces.' }}
+                </p>
+                <div>
+                    <a href="{{ $homepage['template_6_spotlight_btn_url'] ?? route('shop') }}" class="t6-btn-gold">
+                        {{ $homepage['template_6_spotlight_btn_text'] ?? 'VIEW COLLECTION →' }}
+                    </a>
+                </div>
             </div>
-            <div class="t6-lookbook-grid">
-                <a href="{{ route('shop') }}" class="t6-lookbook-tile">
-                    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80" alt="Spring Look">
-                    <span class="t6-lookbook-tag"><i class="fas fa-shopping-bag"></i> 2 Items Tagged</span>
+            <div class="t6-spotlight-wrapper">
+                <div class="t6-spotlight-products" id="t6SpotlightTrack">
+                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                        <img src="https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=500&q=80" alt="Woven Leather Tote">
+                        <div class="t6-spotlight-info">
+                            <span class="t6-spotlight-name">Woven Leather Bag</span>
+                            <span class="t6-spotlight-price">৳2,450</span>
+                        </div>
+                    </a>
+                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                        <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&q=80" alt="Handmade Leather Loafers">
+                        <div class="t6-spotlight-info">
+                            <span class="t6-spotlight-name">Handmade Loafers</span>
+                            <span class="t6-spotlight-price">৳1,850</span>
+                        </div>
+                    </a>
+                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                        <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500&q=80" alt="Luxury Chronograph Watch">
+                        <div class="t6-spotlight-info">
+                            <span class="t6-spotlight-name">Gold Classic Watch</span>
+                            <span class="t6-spotlight-price">৳3,200</span>
+                        </div>
+                    </a>
+                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                        <img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=500&q=80" alt="Zardozi Silk Stole">
+                        <div class="t6-spotlight-info">
+                            <span class="t6-spotlight-name">Zardozi Silk Stole</span>
+                            <span class="t6-spotlight-price">৳1,650</span>
+                        </div>
+                    </a>
+                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                        <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80" alt="Leather Belt">
+                        <div class="t6-spotlight-info">
+                            <span class="t6-spotlight-name">Hand-stitched Belt</span>
+                            <span class="t6-spotlight-price">৳1,200</span>
+                        </div>
+                    </a>
+                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                        <img src="https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=500&q=80" alt="Cashmere Shawl">
+                        <div class="t6-spotlight-info">
+                            <span class="t6-spotlight-name">Cashmere Royal Shawl</span>
+                            <span class="t6-spotlight-price">৳4,500</span>
+                        </div>
+                    </a>
+                </div>
+                {{-- Carousel Left & Right Side Arrows --}}
+                <button class="t6-spotlight-arrow prev" id="t6SpotPrev" aria-label="Previous Products">‹</button>
+                <button class="t6-spotlight-arrow next" id="t6SpotNext" aria-label="Next Products">›</button>
+            </div>
+        </div>
+    </section>
+
+    {{-- SECTION 7: Style the Look (Shoppable Outfit Tiles) --}}
+    <section class="t6-section">
+        <div class="t6-container">
+            <div class="t6-sec-head">
+                <div class="t6-sec-subtitle">{{ $homepage['template_6_style_look_subtitle'] ?? 'Complete Ensembles' }}</div>
+                <h2 class="t6-sec-title">{{ $homepage['template_6_style_look_title'] ?? 'Style the Full Look' }}</h2>
+            </div>
+            <div class="t6-outfits-grid">
+                <a href="{{ route('shop') }}" class="t6-outfit-card">
+                    <img class="t6-outfit-img" src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&q=80" alt="Evening Panjabi Set">
+                    <span class="t6-outfit-tag-btn">✦ SHOP SET</span>
+                    <div class="t6-outfit-info">
+                        <h4 class="t6-outfit-title">Festive Eid Ensemble</h4>
+                        <span class="t6-outfit-items">Panjabi + Pajama + Shawl + Nagra</span>
+                    </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-lookbook-tile">
-                    <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600&q=80" alt="Urban Streetwear">
-                    <span class="t6-lookbook-tag"><i class="fas fa-shopping-bag"></i> 3 Items Tagged</span>
+                <a href="{{ route('shop') }}" class="t6-outfit-card">
+                    <img class="t6-outfit-img" src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80" alt="Wedding Kurta Ensemble">
+                    <span class="t6-outfit-tag-btn">✦ SHOP SET</span>
+                    <div class="t6-outfit-info">
+                        <h4 class="t6-outfit-title">Groom & Wedding Aura</h4>
+                        <span class="t6-outfit-items">Sherwani + Embroidered Turban + Mojari</span>
+                    </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-lookbook-tile">
-                    <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&q=80" alt="Luxury Formal">
-                    <span class="t6-lookbook-tag"><i class="fas fa-shopping-bag"></i> 1 Item Tagged</span>
-                </a>
-                <a href="{{ route('shop') }}" class="t6-lookbook-tile">
-                    <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80" alt="Classic Festive">
-                    <span class="t6-lookbook-tag"><i class="fas fa-shopping-bag"></i> 2 Items Tagged</span>
+                <a href="{{ route('shop') }}" class="t6-outfit-card">
+                    <img class="t6-outfit-img" src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80" alt="High Fashion Women">
+                    <span class="t6-outfit-tag-btn">✦ SHOP SET</span>
+                    <div class="t6-outfit-info">
+                        <h4 class="t6-outfit-title">Evening Gala Gown</h4>
+                        <span class="t6-outfit-items">Couture Dress + Clutch + Heels</span>
+                    </div>
                 </a>
             </div>
         </div>
     </section>
 
-    {{-- Latest Arrivals --}}
-    @if (!empty($homepage['enable_latest_products_section']) && $homepage['enable_latest_products_section'] && isset($latestProducts) && $latestProducts->count() > 0)
-        <section class="t6-container">
-            <div class="t6-sec-header">
-                <div class="t6-sec-title-wrap">
-                    <div class="t6-sec-bar"></div>
-                    <h2 class="t6-sec-title">{{ $homepage['latest_products_section_heading'] ?? 'New Atelier Arrivals' }}</h2>
-                </div>
-                <a href="{{ route('shop') }}" class="t6-view-all">View All &rarr;</a>
-            </div>
-            <div class="t6-product-row">
-                @foreach($latestProducts as $product)
-                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'NEW'])
-                @endforeach
-            </div>
-        </section>
-    @endif
+    {{-- SECTION 8: Style Community Newsletter --}}
+    <section class="t6-container">
+        <div class="t6-newsletter-wrap">
+            <div class="t6-sec-subtitle">EXCLUSIVE PRIVILEGES</div>
+            <h3 class="t6-news-title">{{ $homepage['template_6_vip_title'] ?? 'Join The Couture Circle' }}</h3>
+            <p class="t6-news-desc">Receive first-access to seasonal lookbooks, bespoke private sales, and fashion masterclasses directly to your inbox.</p>
+            <form class="t6-news-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing to our Couture Circle!');">
+                <input type="email" class="t6-news-input" placeholder="Enter your email address..." required>
+                <button type="submit" class="t6-btn-gold">SUBSCRIBE</button>
+            </form>
+        </div>
+    </section>
 
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Hero Slider
     const slides = document.querySelectorAll('.t6-slide');
-    const prevBtn = document.getElementById('t6Prev');
-    const nextBtn = document.getElementById('t6Next');
-    let idx = 0;
+    const prev = document.getElementById('t6Prev');
+    const next = document.getElementById('t6Next');
+    let cur = 0;
     let timer;
 
-    function showSlide(n) {
+    function show(n) {
         if (!slides.length) return;
-        slides[idx].classList.remove('active');
-        idx = (n + slides.length) % slides.length;
-        slides[idx].classList.add('active');
+        slides[cur].classList.remove('active');
+        cur = (n + slides.length) % slides.length;
+        slides[cur].classList.add('active');
     }
 
-    function startTimer() {
+    function resetTimer() {
         if (slides.length > 1) {
             clearInterval(timer);
-            timer = setInterval(() => showSlide(idx + 1), 5000);
+            timer = setInterval(() => show(cur + 1), 6000);
         }
     }
 
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            showSlide(idx - 1);
-            startTimer();
-        });
-    }
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            showSlide(idx + 1);
-            startTimer();
-        });
-    }
+    if (prev) prev.addEventListener('click', () => { show(cur - 1); resetTimer(); });
+    if (next) next.addEventListener('click', () => { show(cur + 1); resetTimer(); });
+    resetTimer();
 
-    startTimer();
+    // Section 6 Spotlight Carousel Controls
+    const spotTrack = document.getElementById('t6SpotlightTrack');
+    const spotPrev = document.getElementById('t6SpotPrev');
+    const spotNext = document.getElementById('t6SpotNext');
+
+    if (spotTrack && spotPrev && spotNext) {
+        spotPrev.addEventListener('click', () => {
+            spotTrack.scrollBy({ left: -210, behavior: 'smooth' });
+        });
+        spotNext.addEventListener('click', () => {
+            spotTrack.scrollBy({ left: 210, behavior: 'smooth' });
+        });
+    }
 });
 </script>

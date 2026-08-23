@@ -2993,7 +2993,7 @@
 
                     {{-- Template 4 Flash Sale Offer Settings --}}
                     @if($isSuperAdmin || $selectedTemplate == '4')
-                    <div class="card mb-4 border-0 shadow-sm rounded-4" id="template4_settings_card">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template4_settings_card">
                         <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
@@ -3055,1093 +3055,1014 @@
                     </div>
                     @endif
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title">Product Category & Products By Category Sections</h5>
+                    {{-- Template 6: Fashion & Apparel Studio Customization --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template6_settings_card" style="{{ in_array($selectedTemplate, ['6']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-tshirt text-danger mr-2"></i> Template 6: Fashion & Apparel Studio Configuration
+                                </h5>
+                                <small class="text-muted">Customize announcement marquee, bespoke artisanal spotlight, and ensemble styling headings for Template 6.</small>
+                            </div>
+                            <span class="badge badge-danger px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #be123c;">
+                                Template 6 Exclusive
+                            </span>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-4 bg-light-50">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>
-                                            <input type="hidden"
-                                                name="homepage[enable_product_category_section]" value="0">
-                                            <input type="checkbox"
-                                                name="homepage[enable_product_category_section]" value="1"
-                                                {{ isset($homepage['enable_product_category_section']) && $homepage['enable_product_category_section'] ? 'checked' : '' }}>
-                                            Enable Product Category Section
-                                        </label>
-                                    </div>
-                                    @php
-                                    $categoryStyleSelection = setting('homepage', 'category_style', '');
-                                    $validCategoryStyles = ['1', '2', '3', '4', '5', '6'];
-                                    if (!in_array((string) $categoryStyleSelection, $validCategoryStyles, true)) {
-                                        if (setting('homepage', 'category_style_6', '0') == '1') {
-                                            $categoryStyleSelection = '6';
-                                        } elseif (setting('homepage', 'category_style_5', '0') == '1') {
-                                            $categoryStyleSelection = '5';
-                                        } elseif (setting('homepage', 'category_style_4', '1') == '1') {
-                                            $categoryStyleSelection = '4';
-                                        } elseif (setting('homepage', 'category_style_3', '0') == '1') {
-                                            $categoryStyleSelection = '3';
-                                        } elseif (setting('homepage', 'category_style_2', '0') == '1') {
-                                            $categoryStyleSelection = '2';
-                                        } else {
-                                            $categoryStyleSelection = '1';
-                                        }
-                                    }
-                                    @endphp
-                                    <div class="form-group">
-                                        <label>Category Style</label>
-                                        <select name="homepage[category_style]" class="form-control">
-                                            <option value="1" {{ $categoryStyleSelection === '1' ? 'selected' : '' }}>Style 1 (Default)</option>
-                                            <option value="2" {{ $categoryStyleSelection === '2' ? 'selected' : '' }}>Style 2</option>
-                                            <option value="3" {{ $categoryStyleSelection === '3' ? 'selected' : '' }}>Style 3</option>
-                                            <option value="4" {{ $categoryStyleSelection === '4' ? 'selected' : '' }}>Style 4</option>
-                                            <option value="5" {{ $categoryStyleSelection === '5' ? 'selected' : '' }}>Style 5</option>
-                                            <option value="6" {{ $categoryStyleSelection === '6' ? 'selected' : '' }}>Style 6</option>
-                                        </select>
-                                        <small class="form-text text-muted">Choose one layout for the category cards (1-6).</small>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Featured Categories/Subcategories (Select and drag to
-                                            reorder)</label>
-                                        <ul id="homepage-featured-sortable" class="list-group">
-                                            @php
-                                            $selected = isset($homepage['featured_category_order'])
-                                            ? json_decode($homepage['featured_category_order'], true)
-                                            : [];
-                                            $allItems = collect($categories)
-                                            ->map(function ($cat) {
-                                            return [
-                                            'type' => 'category',
-                                            'id' => $cat->id,
-                                            'name' => $cat->name,
-                                            ];
-                                            })
-                                            ->merge(
-                                            collect($subcategories)->map(function ($sub) {
-                                            return [
-                                            'type' => 'subcategory',
-                                            'id' => $sub->id,
-                                            'name' => $sub->name,
-                                            ];
-                                            }),
-                                            );
-                                            // Order selected first, then the rest
-                                            $orderedItems = collect($selected)
-                                            ->map(function ($item) use ($allItems) {
-                                            return $allItems->first(function ($i) use ($item) {
-                                            return $i['type'] . '-' . $i['id'] === $item;
-                                            });
-                                            })
-                                            ->filter();
-                                            $remainingItems = $allItems->filter(function ($i) use (
-                                            $selected,
-                                            ) {
-                                            return !in_array($i['type'] . '-' . $i['id'], $selected);
-                                            });
-                                            $finalItems = $orderedItems->concat($remainingItems);
-                                            @endphp
-                                            @foreach ($finalItems as $item)
-                                            @php $itemKey = $item['type'] . '-' . $item['id']; @endphp
-                                            <li class="list-group-item d-flex align-items-center"
-                                                data-id="{{ $itemKey }}">
-                                                <input type="checkbox" class="mr-2 featured-checkbox"
-                                                    {{ in_array($itemKey, $selected) ? 'checked' : '' }}>
-                                                <span class="flex-grow-1">{{ ucfirst($item['type']) }}:
-                                                    {{ $item['name'] }}</span>
-                                                <span class="handle" style="cursor:move;">&#9776;</span>
-                                            </li>
-                                            @endforeach
-                                        </ul>
-                                        <input type="hidden" name="homepage[featured_category_order]"
-                                            id="homepage-featured-order"
-                                            value='{{ $homepage['featured_category_order'] ?? '[]' }}'>
-                                        <small class="form-text text-muted">Check to show, drag checked items to
-                                            set
-                                            order.</small>
+                                <div class="col-md-12 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-bullhorn text-warning mr-1"></i> Top Animated Marquee Ticker Text
+                                    </label>
+                                    <input type="text" name="homepage[template_6_ticker_text]" class="form-control"
+                                           value="{{ $homepage['template_6_ticker_text'] ?? '✨ EXCLUSIVE COUTURE COLLECTION • HANDCRAFTED PANJABI & SILK ATELIER • COMPLIMENTARY LUXURY GIFT BOX WITH EVERY ORDER • FREE EXPRESS SHIPPING' }}"
+                                           placeholder="Enter announcement ticker text...">
+                                    <small class="form-text text-muted">Continuous animated marquee running across the top header.</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-tag text-primary mr-1"></i> Bespoke Spotlight Badge / Tag
+                                    </label>
+                                    <input type="text" name="homepage[template_6_spotlight_tag]" class="form-control"
+                                           value="{{ $homepage['template_6_spotlight_tag'] ?? '✦ ARTISANAL LUXURY & FIT' }}"
+                                           placeholder="e.g. ✦ ARTISANAL LUXURY & FIT">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-heading text-primary mr-1"></i> Bespoke Spotlight Heading
+                                    </label>
+                                    <input type="text" name="homepage[template_6_spotlight_title]" class="form-control"
+                                           value="{{ $homepage['template_6_spotlight_title'] ?? 'Tailored Silhouette & Master Craft' }}"
+                                           placeholder="e.g. Tailored Silhouette & Master Craft">
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-align-left text-info mr-1"></i> Bespoke Spotlight Description
+                                    </label>
+                                    <textarea name="homepage[template_6_spotlight_desc]" class="form-control" rows="2"
+                                              placeholder="Enter description...">{{ $homepage['template_6_spotlight_desc'] ?? 'From hand-woven leather accessories to custom-fitted silk ensembles, explore our handcrafted artisanal pieces.' }}</textarea>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-link text-success mr-1"></i> Action Button Text
+                                    </label>
+                                    <input type="text" name="homepage[template_6_spotlight_btn_text]" class="form-control"
+                                           value="{{ $homepage['template_6_spotlight_btn_text'] ?? 'VIEW COLLECTION →' }}"
+                                           placeholder="e.g. VIEW COLLECTION →">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-external-link-alt text-secondary mr-1"></i> Action Button URL
+                                    </label>
+                                    <input type="text" name="homepage[template_6_spotlight_btn_url]" class="form-control"
+                                           value="{{ $homepage['template_6_spotlight_btn_url'] ?? route('shop') }}"
+                                           placeholder="e.g. /shop or URL">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-gem text-danger mr-1"></i> Ensembles Section Heading
+                                    </label>
+                                    <input type="text" name="homepage[template_6_style_look_title]" class="form-control"
+                                           value="{{ $homepage['template_6_style_look_title'] ?? 'Style the Full Look' }}"
+                                           placeholder="e.g. Style the Full Look">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-envelope-open text-primary mr-1"></i> VIP Club Title
+                                    </label>
+                                    <input type="text" name="homepage[template_6_vip_title]" class="form-control"
+                                           value="{{ $homepage['template_6_vip_title'] ?? 'Join the Haute Couture Circle' }}"
+                                           placeholder="e.g. Join the Haute Couture Circle">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Template 7: Beauty & Cosmetics Glow Customization --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template7_settings_card" style="{{ in_array($selectedTemplate, ['7']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-spa mr-2" style="color:#db2777;"></i> Template 7: Beauty & Cosmetics Glow Configuration
+                                </h5>
+                                <small class="text-muted">Customize glow announcement ribbon, clean ingredient badges, and beauty gift sets for Template 7.</small>
+                            </div>
+                            <span class="badge badge-pink px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #db2777; color: #fff;">
+                                Template 7 Exclusive
+                            </span>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-sparkles mr-1" style="color:#db2777;"></i> Top Glow Ticker Banner Text
+                                    </label>
+                                    <input type="text" name="homepage[template_7_ticker_text]" class="form-control"
+                                           value="{{ $homepage['template_7_ticker_text'] ?? '💋 FREE LUXURY BEAUTY GIFT ON ORDERS OVER ৳1,500 • 100% DERMATOLOGIST TESTED & HALAL CERTIFIED • EXPRESS DOORSTEP DELIVERY' }}"
+                                           placeholder="Enter glow ticker text...">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-gift text-danger mr-1"></i> Luxury Gift Sets Section Title
+                                    </label>
+                                    <input type="text" name="homepage[template_7_gifts_title]" class="form-control"
+                                           value="{{ $homepage['template_7_gifts_title'] ?? 'Luxury Beauty Gift Sets' }}"
+                                           placeholder="e.g. Luxury Beauty Gift Sets">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-book-open text-info mr-1"></i> Beauty Blog Journal Title
+                                    </label>
+                                    <input type="text" name="homepage[template_7_journal_title]" class="form-control"
+                                           value="{{ $homepage['template_7_journal_title'] ?? 'The Glow Journal' }}"
+                                           placeholder="e.g. The Glow Journal">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-leaf text-success mr-1"></i> Trust Badge 1 Text
+                                    </label>
+                                    <input type="text" name="homepage[template_7_trust_1]" class="form-control"
+                                           value="{{ $homepage['template_7_trust_1'] ?? '100% Non-Toxic • Zero Parabens' }}"
+                                           placeholder="e.g. 100% Non-Toxic • Zero Parabens">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-paw text-warning mr-1"></i> Trust Badge 2 Text
+                                    </label>
+                                    <input type="text" name="homepage[template_7_trust_2]" class="form-control"
+                                           value="{{ $homepage['template_7_trust_2'] ?? 'PETA Cruelty-Free • Not Tested on Animals' }}"
+                                           placeholder="e.g. PETA Cruelty-Free">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-flower text-danger mr-1"></i> Trust Badge 3 Text
+                                    </label>
+                                    <input type="text" name="homepage[template_7_trust_3]" class="form-control"
+                                           value="{{ $homepage['template_7_trust_3'] ?? 'Botanical Actives • Pure Plant Extracts' }}"
+                                           placeholder="e.g. Botanical Actives">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-tint text-primary mr-1"></i> Trust Badge 4 Text
+                                    </label>
+                                    <input type="text" name="homepage[template_7_trust_4]" class="form-control"
+                                           value="{{ $homepage['template_7_trust_4'] ?? 'Clinically Tested • Dermatologist Safe' }}"
+                                           placeholder="e.g. Clinically Tested">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Template 8: Mega Supermarket & Grocery Customization --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template8_settings_card" style="{{ in_array($selectedTemplate, ['8']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-shopping-basket text-success mr-2"></i> Template 8: Mega Supermarket & Grocery Configuration
+                                </h5>
+                                <small class="text-muted">Configure express delivery dispatch timer, promo deals, and grocery combo bundle settings for Template 8.</small>
+                            </div>
+                            <span class="badge badge-success px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #16a34a;">
+                                Template 8 Exclusive
+                            </span>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-truck text-success mr-1"></i> Express Delivery Top Strip Text
+                                    </label>
+                                    <input type="text" name="homepage[template_8_express_text]" class="form-control"
+                                           value="{{ $homepage['template_8_express_text'] ?? '🚴 EXPRESS 45-MIN HOME DELIVERY • ORDER BEFORE CUTOFF' }}"
+                                           placeholder="e.g. EXPRESS 45-MIN HOME DELIVERY">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-percentage text-danger mr-1"></i> Side Promo 1 Tag & Title
+                                    </label>
+                                    <div class="d-flex gap-2">
+                                        <input type="text" name="homepage[template_8_promo_1_tag]" class="form-control mr-2" style="max-width:130px;"
+                                               value="{{ $homepage['template_8_promo_1_tag'] ?? 'FLASH 30% OFF' }}" placeholder="Tag">
+                                        <input type="text" name="homepage[template_8_promo_1_title]" class="form-control"
+                                               value="{{ $homepage['template_8_promo_1_title'] ?? 'Organic Fruits & Greens' }}" placeholder="Title">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>
-                                            <input type="hidden"
-                                                name="homepage[enable_products_by_category_section]" value="0">
-                                            <input type="checkbox"
-                                                name="homepage[enable_products_by_category_section]" value="1"
-                                                {{ !empty($homepage['enable_products_by_category_section']) && $homepage['enable_products_by_category_section'] ? 'checked' : '' }}>
-                                            Enable Products By Category Section
-                                        </label>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-link text-info mr-1"></i> Side Promo 1 Subtitle & URL
+                                    </label>
+                                    <div class="d-flex gap-2">
+                                        <input type="text" name="homepage[template_8_promo_1_sub]" class="form-control mr-2"
+                                               value="{{ $homepage['template_8_promo_1_sub'] ?? 'Direct From Bogura Farms →' }}" placeholder="Subtitle">
+                                        <input type="text" name="homepage[template_8_promo_1_url]" class="form-control"
+                                               value="{{ $homepage['template_8_promo_1_url'] ?? route('shop') }}" placeholder="URL">
                                     </div>
-                                    <div class="form-group">
-                                        <label>Products By Category (Select and drag to reorder)</label>
-                                        <ul id="products-by-category-sortable" class="list-group">
-                                            {{-- Parse the saved order or default to empty array --}}
-                                            @php
-                                            $selectedOrder = !empty($homepage['products_by_category_order'])
-                                            ? json_decode($homepage['products_by_category_order'], true)
-                                            : [];
-                                            $selectedOrder = is_array($selectedOrder) ? $selectedOrder : [];
-                                            // Build a map of selected categories for quick lookup
-                                            $selectedMap = array_flip($selectedOrder);
-                                            @endphp
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-box text-warning mr-1"></i> Side Promo 2 Tag & Title
+                                    </label>
+                                    <div class="d-flex gap-2">
+                                        <input type="text" name="homepage[template_8_promo_2_tag]" class="form-control mr-2" style="max-width:130px;"
+                                               value="{{ $homepage['template_8_promo_2_tag'] ?? 'SAVINGS PACK' }}" placeholder="Tag">
+                                        <input type="text" name="homepage[template_8_promo_2_title]" class="form-control"
+                                               value="{{ $homepage['template_8_promo_2_title'] ?? 'Pantry Starter Bundles' }}" placeholder="Title">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-link text-info mr-1"></i> Side Promo 2 Subtitle & URL
+                                    </label>
+                                    <div class="d-flex gap-2">
+                                        <input type="text" name="homepage[template_8_promo_2_sub]" class="form-control mr-2"
+                                               value="{{ $homepage['template_8_promo_2_sub'] ?? 'Rice, Mustard Oil & Spices from ৳299 →' }}" placeholder="Subtitle">
+                                        <input type="text" name="homepage[template_8_promo_2_url]" class="form-control"
+                                               value="{{ $homepage['template_8_promo_2_url'] ?? route('shop') }}" placeholder="URL">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-tags text-primary mr-1"></i> Clearance Deals Section Title
+                                    </label>
+                                    <input type="text" name="homepage[template_8_deals_title]" class="form-control"
+                                           value="{{ $homepage['template_8_deals_title'] ?? 'Today\'s Fresh Clearance Deals' }}"
+                                           placeholder="e.g. Today's Fresh Clearance Deals">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-utensils text-success mr-1"></i> Kitchen Combo Bundles Title
+                                    </label>
+                                    <input type="text" name="homepage[template_8_bundles_title]" class="form-control"
+                                           value="{{ $homepage['template_8_bundles_title'] ?? 'Family Kitchen Combo Packs' }}"
+                                           placeholder="e.g. Family Kitchen Combo Packs">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                            {{-- First, show selected categories in saved order --}}
-                                            @foreach ($selectedOrder as $catKey)
-                                            @php
-                                            // Extract numeric ID from "category-3"
-                                            $catId = null;
-                                            if (str_starts_with($catKey, 'category-')) {
-                                            $catId = (int) str_replace('category-', '', $catKey);
+                    {{-- Template 9: Books & Heritage Store Customization --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template9_settings_card" style="{{ in_array($selectedTemplate, ['9']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-book text-warning mr-2" style="color:#d97706;"></i> Template 9: Books, Academy & Heritage Store Configuration
+                                </h5>
+                                <small class="text-muted">Configure publisher notice strip, bestsellers circulation heading, and author spotlight for Template 9.</small>
+                            </div>
+                            <span class="badge badge-warning px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #0f172a; color: #fde68a;">
+                                Template 9 Exclusive
+                            </span>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-scroll mr-1" style="color:#d97706;"></i> Publisher's Notice Top Strip Text
+                                    </label>
+                                    <input type="text" name="homepage[template_9_notice_text]" class="form-control"
+                                           value="{{ $homepage['template_9_notice_text'] ?? '📖 Guaranteed 100% Genuine Publisher Prints • Islamic Scholarly Library & Academic Textbooks Direct to Your Door' }}"
+                                           placeholder="Enter publisher notice text...">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-award text-danger mr-1"></i> Bestselling Section Heading
+                                    </label>
+                                    <input type="text" name="homepage[template_9_bestsellers_title]" class="form-control"
+                                           value="{{ $homepage['template_9_bestsellers_title'] ?? 'National Bestselling Titles' }}"
+                                           placeholder="e.g. National Bestselling Titles">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-user-graduate text-primary mr-1"></i> Author Spotlight Heading
+                                    </label>
+                                    <input type="text" name="homepage[template_9_author_title]" class="form-control"
+                                           value="{{ $homepage['template_9_author_title'] ?? 'Author Spotlight' }}"
+                                           placeholder="e.g. Author Spotlight">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-certificate text-success mr-1"></i> Trust Point 1 (Originality)
+                                    </label>
+                                    <input type="text" name="homepage[template_9_trust_1_title]" class="form-control"
+                                           value="{{ $homepage['template_9_trust_1_title'] ?? '100% Genuine Prints' }}"
+                                           placeholder="100% Genuine Prints">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-shield-alt text-info mr-1"></i> Trust Point 2 (Packaging)
+                                    </label>
+                                    <input type="text" name="homepage[template_9_trust_2_title]" class="form-control"
+                                           value="{{ $homepage['template_9_trust_2_title'] ?? 'Publisher Sealed Pack' }}"
+                                           placeholder="Publisher Sealed Pack">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Template 10: Home Living & Furniture Studio Customization --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template10_settings_card" style="{{ in_array($selectedTemplate, ['10']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-couch text-warning mr-2" style="color:#ea580c;"></i> Template 10: Home Living & Furniture Configuration
+                                </h5>
+                                <small class="text-muted">Configure linen inspiration strip, interactive hotspot studio, and 10-year warranty story for Template 10.</small>
+                            </div>
+                            <span class="badge badge-warning px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #ea580c; color: #fff;">
+                                Template 10 Exclusive
+                            </span>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-home mr-1" style="color:#ea580c;"></i> Interior Linen Top Strip Text
+                                    </label>
+                                    <input type="text" name="homepage[template_10_linen_text]" class="form-control"
+                                           value="{{ $homepage['template_10_linen_text'] ?? '🏡 Free Professional Assembly • 100% Solid Seasoned Teak Guarantee • 10-Year Structural Frame Warranty' }}"
+                                           placeholder="Enter linen strip text...">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-crosshairs text-danger mr-1"></i> Interactive Hotspot Studio Title
+                                    </label>
+                                    <input type="text" name="homepage[template_10_hotspot_title]" class="form-control"
+                                           value="{{ $homepage['template_10_hotspot_title'] ?? 'Interactive Room Hotspot Studio' }}"
+                                           placeholder="e.g. Interactive Room Hotspot Studio">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-th-large text-primary mr-1"></i> Shop by Room Section Title
+                                    </label>
+                                    <input type="text" name="homepage[template_10_rooms_title]" class="form-control"
+                                           value="{{ $homepage['template_10_rooms_title'] ?? 'Shop Curated Living Environments' }}"
+                                           placeholder="e.g. Shop Curated Living Environments">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-shield-alt text-success mr-1"></i> 10-Year Warranty Story Heading
+                                    </label>
+                                    <input type="text" name="homepage[template_10_warranty_title]" class="form-control"
+                                           value="{{ $homepage['template_10_warranty_title'] ?? 'Built to Last Generations' }}"
+                                           placeholder="e.g. Built to Last Gener                    {{-- MODULE 1: Product Category & Products By Category Sections --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-th-large text-primary mr-2"></i> Product Category & Navigation Setup
+                                </h5>
+                                <small class="text-muted">Configure category layouts, featured category badges, and category showcase sections.</small>
+                            </div>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="font-weight-bold text-dark mb-0">
+                                                <input type="hidden" name="homepage[enable_product_category_section]" value="0">
+                                                <input type="checkbox" name="homepage[enable_product_category_section]" value="1"
+                                                    {{ isset($homepage['enable_product_category_section']) && $homepage['enable_product_category_section'] ? 'checked' : '' }}>
+                                                Enable Product Category Section
+                                            </label>
+                                            <span class="badge badge-primary px-2 py-1">Top Ribbon</span>
+                                        </div>
+
+                                        @php
+                                        $categoryStyleSelection = setting('homepage', 'category_style', '');
+                                        $validCategoryStyles = ['1', '2', '3', '4', '5', '6'];
+                                        if (!in_array((string) $categoryStyleSelection, $validCategoryStyles, true)) {
+                                            if (setting('homepage', 'category_style_6', '0') == '1') {
+                                                $categoryStyleSelection = '6';
+                                            } elseif (setting('homepage', 'category_style_5', '0') == '1') {
+                                                $categoryStyleSelection = '5';
+                                            } elseif (setting('homepage', 'category_style_4', '1') == '1') {
+                                                $categoryStyleSelection = '4';
+                                            } elseif (setting('homepage', 'category_style_3', '0') == '1') {
+                                                $categoryStyleSelection = '3';
+                                            } elseif (setting('homepage', 'category_style_2', '0') == '1') {
+                                                $categoryStyleSelection = '2';
+                                            } else {
+                                                $categoryStyleSelection = '1';
                                             }
-                                            $cat = $categories->firstWhere('id', $catId);
-                                            @endphp
-                                            @if ($cat)
-                                            <li class="list-group-item" style="display: flex
-;
-    justify-content: space-between;"
-                                                data-id="category-{{ $cat->id }}">
-                                                <div class="d-flex align-items-center">
-                                                    <input type="checkbox"
-                                                        class="mr-2 products-by-category-checkbox"
-                                                        name="homepage[products_by_category_selected][{{ $cat->id }}]"
-                                                        value="1" checked>
-                                                    <span> {{ $cat->name }}</span>
-                                                </div>
-                                                <span class="handle" style="cursor:move;">&#9776;</span>
-                                            </li>
-                                            @endif
-                                            @endforeach
+                                        }
+                                        @endphp
+                                        <div class="form-group mb-3">
+                                            <label class="small text-muted font-weight-bold">Category Card Layout Style</label>
+                                            <select name="homepage[category_style]" class="form-control form-control-sm">
+                                                <option value="1" {{ $categoryStyleSelection === '1' ? 'selected' : '' }}>Style 1 (Default Grid)</option>
+                                                <option value="2" {{ $categoryStyleSelection === '2' ? 'selected' : '' }}>Style 2 (Rounded Cards)</option>
+                                                <option value="3" {{ $categoryStyleSelection === '3' ? 'selected' : '' }}>Style 3 (Compact Pills)</option>
+                                                <option value="4" {{ $categoryStyleSelection === '4' ? 'selected' : '' }}>Style 4 (Icon Floating)</option>
+                                                <option value="5" {{ $categoryStyleSelection === '5' ? 'selected' : '' }}>Style 5 (Minimalist)</option>
+                                                <option value="6" {{ $categoryStyleSelection === '6' ? 'selected' : '' }}>Style 6 (Luxury Atelier)</option>
+                                            </select>
+                                        </div>
 
-                                            {{-- Then, show unselected categories (not in order) --}}
-                                            @foreach ($categories as $cat)
-                                            @php $catKey = 'category-' . $cat->id; @endphp
-                                            @if (!isset($selectedMap[$catKey]))
-                                            <li class="list-group-item not-draggable" style="display: flex
-;
-    justify-content: space-between;"
-                                                data-id="category-{{ $cat->id }}">
-                                                <div class="d-flex align-items-center">
-                                                    <input type="checkbox"
-                                                        class="mr-2 products-by-category-checkbox"
-                                                        name="homepage[products_by_category_selected][{{ $cat->id }}]"
-                                                        value="1">
-                                                    <span> {{ $cat->name }}</span>
-                                                </div>
-                                                <span class="handle" style="cursor:move;">&#9776;</span>
-                                            </li>
-                                            @endif
-                                            @endforeach
-                                        </ul>
-                                        <input type="hidden" name="homepage[products_by_category_order]"
-                                            id="products-by-category-order"
-                                            value='{{ $homepage['products_by_category_order'] ?? '[]' }}'>
-                                        <small class="form-text text-muted">Check to show, drag checked items
-                                            to
-                                            set
-                                            order.</small>
+                                        <div class="form-group mb-0">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <label class="small text-muted font-weight-bold mb-0">Featured Categories (Drag to Reorder)</label>
+                                            </div>
+                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="🔍 Filter categories..." onkeyup="filterAdminSortable(this, 'homepage-featured-sortable')">
+                                            <ul id="homepage-featured-sortable" class="list-group shadow-none" style="max-height: 240px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                                @php
+                                                $selected = isset($homepage['featured_category_order'])
+                                                ? json_decode($homepage['featured_category_order'], true)
+                                                : [];
+                                                $allItems = collect($categories)
+                                                ->map(function ($cat) {
+                                                return [
+                                                'type' => 'category',
+                                                'id' => $cat->id,
+                                                'name' => $cat->name,
+                                                ];
+                                                })
+                                                ->merge(
+                                                collect($subcategories)->map(function ($sub) {
+                                                return [
+                                                'type' => 'subcategory',
+                                                'id' => $sub->id,
+                                                'name' => $sub->name,
+                                                ];
+                                                }),
+                                                );
+                                                $orderedItems = collect($selected)
+                                                ->map(function ($item) use ($allItems) {
+                                                return $allItems->first(function ($i) use ($item) {
+                                                return $i['type'] . '-' . $i['id'] === $item;
+                                                });
+                                                })
+                                                ->filter();
+                                                $remainingItems = $allItems->filter(function ($i) use ($selected) {
+                                                return !in_array($i['type'] . '-' . $i['id'], $selected);
+                                                });
+                                                $finalItems = $orderedItems->concat($remainingItems);
+                                                @endphp
+                                                @foreach ($finalItems as $item)
+                                                @php $itemKey = $item['type'] . '-' . $item['id']; @endphp
+                                                <li class="list-group-item py-2 px-3 d-flex align-items-center justify-content-between" data-id="{{ $itemKey }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <input type="checkbox" class="mr-2 featured-checkbox" {{ in_array($itemKey, $selected) ? 'checked' : '' }}>
+                                                        <span class="small font-weight-bold text-dark">{{ ucfirst($item['type']) }}: {{ $item['name'] }}</span>
+                                                    </div>
+                                                    <span class="handle text-muted" style="cursor:move;">&#9776;</span>
+                                                </li>
+                                                @endforeach
+                                            </ul>
+                                            <input type="hidden" name="homepage[featured_category_order]" id="homepage-featured-order" value='{{ $homepage['featured_category_order'] ?? '[]' }}'>
+                                            <small class="form-text text-muted mt-1">Check to show, drag checked items to set display order.</small>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <label class="font-weight-bold text-dark mb-0">
+                                                <input type="hidden" name="homepage[enable_products_by_category_section]" value="0">
+                                                <input type="checkbox" name="homepage[enable_products_by_category_section]" value="1"
+                                                    {{ !empty($homepage['enable_products_by_category_section']) && $homepage['enable_products_by_category_section'] ? 'checked' : '' }}>
+                                                Enable Products By Category Section
+                                            </label>
+                                            <span class="badge badge-success px-2 py-1">Catalog Rows</span>
+                                        </div>
+
+                                        <div class="form-group mb-0">
+                                            <label class="small text-muted font-weight-bold mb-1">Products By Category (Drag to Reorder)</label>
+                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="🔍 Filter categories..." onkeyup="filterAdminSortable(this, 'products-by-category-sortable')">
+                                            <ul id="products-by-category-sortable" class="list-group shadow-none" style="max-height: 295px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                                @php
+                                                $selectedOrder = !empty($homepage['products_by_category_order'])
+                                                ? json_decode($homepage['products_by_category_order'], true)
+                                                : [];
+                                                $selectedOrder = is_array($selectedOrder) ? $selectedOrder : [];
+                                                $selectedMap = array_flip($selectedOrder);
+                                                @endphp
+
+                                                @foreach ($selectedOrder as $catKey)
+                                                @php
+                                                $catId = null;
+                                                if (str_starts_with($catKey, 'category-')) {
+                                                    $catId = (int) str_replace('category-', '', $catKey);
+                                                }
+                                                $cat = $categories->firstWhere('id', $catId);
+                                                @endphp
+                                                @if ($cat)
+                                                <li class="list-group-item py-2 px-3 d-flex align-items-center justify-content-between" data-id="category-{{ $cat->id }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <input type="checkbox" class="mr-2 products-by-category-checkbox" name="homepage[products_by_category_selected][{{ $cat->id }}]" value="1" checked>
+                                                        <span class="small font-weight-bold text-dark">{{ $cat->name }}</span>
+                                                    </div>
+                                                    <span class="handle text-muted" style="cursor:move;">&#9776;</span>
+                                                </li>
+                                                @endif
+                                                @endforeach
+
+                                                @foreach ($categories as $cat)
+                                                @php $catKey = 'category-' . $cat->id; @endphp
+                                                @if (!isset($selectedMap[$catKey]))
+                                                <li class="list-group-item py-2 px-3 not-draggable d-flex align-items-center justify-content-between" data-id="category-{{ $cat->id }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <input type="checkbox" class="mr-2 products-by-category-checkbox" name="homepage[products_by_category_selected][{{ $cat->id }}]" value="1">
+                                                        <span class="small font-weight-bold text-dark">{{ $cat->name }}</span>
+                                                    </div>
+                                                    <span class="handle text-muted" style="cursor:move;">&#9776;</span>
+                                                </li>
+                                                @endif
+                                                @endforeach
+                                            </ul>
+                                            <input type="hidden" name="homepage[products_by_category_order]" id="products-by-category-order" value='{{ $homepage['products_by_category_order'] ?? '[]' }}'>
+                                            <small class="form-text text-muted mt-1">Check to show, drag checked items to set row order.</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <hr>
-                    <div class="row mt-2">
-                        <!-- Best Selling Products Section Controls -->
-                        @php
-                        $sections = [
-                        'best_selling' => 'Best Selling Products',
-                        'editors_pick' => "Editor's Picks",
-                        'trending' => 'Trending Now',
-                        ];
-                        @endphp
-
-                        @foreach ($sections as $key => $label)
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <input type="hidden"
-                                    name="homepage[enable_{{ $key }}_section]"
-                                    value="0">
-                                <label>
-                                    <input type="checkbox"
-                                        name="homepage[enable_{{ $key }}_section]"
-                                        value="1"
-                                        {{ !empty($homepage['enable_' . $key . '_section']) && $homepage['enable_' . $key . '_section'] ? 'checked' : '' }}>
-                                    Enable {{ $label }} Section
-                                </label>
+                    {{-- MODULE 2: Curated Product Sections (Best Selling, Editor's Picks, Trending Now) --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-star text-warning mr-2"></i> Curated Product Showcases
+                                </h5>
+                                <small class="text-muted">Manage Best Selling, Editor's Picks, and Trending Now product showcases in organized compact panels.</small>
                             </div>
-                            <div class="form-group">
-                                <label>{{ $label }} Heading</label>
-                                <input type="text"
-                                    name="homepage[{{ $key }}_section_heading]"
-                                    class="form-control"
-                                    value="{{ $homepage[$key . '_section_heading'] ?? $label }}">
-                            </div>
-                            <div class="form-group">
-                                <label>{{ $label }} (Select and drag to
-                                    reorder)</label>
-                                <ul id="{{ $key }}-products-sortable"
-                                    class="list-group">
-                                    @php
-                                    $selectedProducts = !empty(
-                                    $homepage[$key . '_products_order']
-                                    )
-                                    ? json_decode(
-                                    $homepage[$key . '_products_order'],
-                                    true,
-                                    )
-                                    : [];
-                                    $selectedProducts = is_array($selectedProducts)
-                                    ? $selectedProducts
-                                    : [];
-                                    $selectedMap = array_flip($selectedProducts);
-                                    @endphp
-
-                                    {{-- Show selected products in saved order --}}
-                                    @foreach ($selectedProducts as $prodId)
-                                    @php $prod = $products->firstWhere('id', $prodId); @endphp
-                                    @if ($prod)
-                                    <li class="list-group-item d-flex align-items-center"
-                                        data-id="{{ $prod->id }}">
-                                        <input type="checkbox"
-                                            name="homepage[{{ $key }}_products_selected][{{ $prod->id }}]"
-                                            value="1" checked class="mr-2">
-                                        <span>{{ $prod->title }}</span>
-                                        <span class="handle ml-auto"
-                                            style="cursor:move;">&#9776;</span>
-                                    </li>
-                                    @endif
-                                    @endforeach
-
-                                    {{-- Show unselected products --}}
-                                    @foreach ($products as $prod)
-                                    @if (!isset($selectedMap[$prod->id]))
-                                    <li class="list-group-item d-flex align-items-center"
-                                        data-id="{{ $prod->id }}">
-                                        <input type="checkbox"
-                                            name="homepage[{{ $key }}_products_selected][{{ $prod->id }}]"
-                                            value="1" class="mr-2">
-                                        <span>{{ $prod->title }}</span>
-                                        <span class="handle ml-auto"
-                                            style="cursor:move;">&#9776;</span>
-                                    </li>
-                                    @endif
-                                    @endforeach
-                                </ul>
-                                <input type="hidden"
-                                    name="homepage[{{ $key }}_products_order]"
-                                    id="{{ $key }}-products-order"
-                                    value='{{ $homepage[$key . '_products_order'] ?? '[]' }}'>
-                                <small class="form-text text-muted">Check to show, drag
-                                    checked
-                                    items
-                                    to set order.</small>
-                            </div>
+                            <span class="badge badge-warning px-3 py-1 text-dark" style="font-weight:700;">3 Featured Modules</span>
                         </div>
-                        @endforeach
-                    </div>
-
-                    <h6 class="text-primary mt-2">Latest Products Section</h6>
-
-                    <div class="form-group">
-                        <input type="hidden" name="homepage[enable_latest_products_section]" value="0">
-                        <label>
-                            <input type="checkbox" name="homepage[enable_latest_products_section]" value="1"
-                                {{ !empty($homepage['enable_latest_products_section']) && $homepage['enable_latest_products_section'] ? 'checked' : '' }}>
-                            Enable Latest Products Section In Home page
-                        </label>
-                    </div>
-
-                    <div class="form-group row mt-2">
-                        <label class="col-md-3 col-form-label">Section Heading</label>
-                        <div class="col-md-9">
-                            <input type="text" name="homepage[latest_products_section_heading]" class="form-control"
-                                value="{{ $homepage['latest_products_section_heading'] ?? 'Latest Products' }}"
-                                placeholder="Latest Products">
-                            <small class="form-text text-muted">Title for the Latest Products section.</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Initial Products Count</label>
-                        <div class="col-md-9">
-                            <input type="number" name="homepage[latest_products_initial_count]" class="form-control"
-                                value="{{ $homepage['latest_products_initial_count'] ?? 12 }}"
-                                min="1" max="50" step="1">
-                            <small class="form-text text-muted">Number of products to show initially (1-50).</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Products Per Page</label>
-                        <div class="col-md-9">
-                            <input type="number" name="homepage[latest_products_per_page]" class="form-control"
-                                value="{{ $homepage['latest_products_per_page'] ?? 12 }}"
-                                min="1" max="50" step="1">
-                            <small class="form-text text-muted">Number of products to load per page when loading more (1-50).</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Load More Type</label>
-                        <div class="col-md-9">
-                            <select name="homepage[latest_products_load_type]" class="form-control">
-                                <option value="button" {{ ($homepage['latest_products_load_type'] ?? 'button') == 'button' ? 'selected' : '' }}>
-                                    Load More Button
-                                </option>
-                                <option value="infinite" {{ ($homepage['latest_products_load_type'] ?? 'button') == 'infinite' ? 'selected' : '' }}>
-                                    Infinite Scroll
-                                </option>
-                            </select>
-                            <small class="form-text text-muted">Choose how users will load more products.</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Load More Button Text</label>
-                        <div class="col-md-9">
-                            <input type="text" name="homepage[latest_products_load_more_text]" class="form-control"
-                                value="{{ $homepage['latest_products_load_more_text'] ?? 'Load More Products' }}"
-                                placeholder="Load More Products">
-                            <small class="form-text text-muted">Text to display on the load more button.</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Loading Text</label>
-                        <div class="col-md-9">
-                            <input type="text" name="homepage[latest_products_loading_text]" class="form-control"
-                                value="{{ $homepage['latest_products_loading_text'] ?? 'Loading...' }}"
-                                placeholder="Loading...">
-                            <small class="form-text text-muted">Text to show while loading more products.</small>
-                        </div>
-                    </div>
-
-                    <hr>
-                    <h6 class="text-primary">Main Slider Section</h6>
-
-                    <div class="form-group">
-                        <input type="hidden" name="homepage[enable_main_slider_section]" value="0">
-                        <label>
-                            <input type="checkbox" name="homepage[enable_main_slider_section]" value="1"
-                                {{ !empty($homepage['enable_main_slider_section']) && $homepage['enable_main_slider_section'] ? 'checked' : '' }}>
-                            Enable Main Slider Section In Home page
-                        </label>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Slider Height (Desktop, px)</label>
-                        <div class="col-md-9">
-                            <input type="number" name="homepage[slider_height]" class="form-control"
-                                value="{{ $homepage['slider_height'] ?? 300 }}" min="100" max="1000" step="1">
-                            <small class="form-text text-muted">Default: 300px. Controls the height of the slider.</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Slider Layout</label>
-                        <div class="col-md-9">
-                            @php
-                                $sliderLayoutSetting = $homepage['slider_layout'] ?? 'category_slider';
-                            @endphp
-                            <select name="homepage[slider_layout]" class="form-control">
-                                <option value="slider_only" {{ $sliderLayoutSetting === 'slider_only' ? 'selected' : '' }}>Only slider</option>
-                                <option value="category_slider" {{ $sliderLayoutSetting === 'category_slider' ? 'selected' : '' }}>Left category + right slider</option>
-                                <option value="slider_with_one_image" {{ $sliderLayoutSetting === 'slider_with_one_image' ? 'selected' : '' }}>Left slider + right single image</option>
-                                <!-- <option value="slider_with_two_images" {{ $sliderLayoutSetting === 'slider_with_two_images' ? 'selected' : '' }}>Left slider + right two images</option> -->
-                            </select>
-                            <small class="form-text text-muted">Choose the main slider template. Current layouts support "Only slider" or "Left category + right slider"; other options are reserved for upcoming layouts.</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Side Image (for "Left slider + right single image")</label>
-                        <div class="col-md-9">
-                            <div class="custom-file mb-2">
-                                <input type="file" name="homepage[slider_side_image]" class="custom-file-input" id="slider_side_image">
-                                <label class="custom-file-label" for="slider_side_image">Choose file</label>
-                            </div>
-                            <small class="form-text text-muted">Optional. Shown only when layout is "Left slider + right single image". Recommended size: matches slider height ratio.</small>
-                            @if (!empty($homepage['slider_side_image']))
-                                <div class="mt-2 p-2 border rounded d-inline-block position-relative">
-                                    <img src="{{ asset($homepage['slider_side_image']) }}" alt="Slider side image" style="max-width: 220px; max-height: 120px; object-fit: cover;">
-                                    <button type="button" class="btn btn-sm btn-danger position-absolute" style="top: 5px; right: 5px;"
-                                        onclick="document.getElementById('slider_side_image_delete').value='1'; this.closest('div').style.display='none';"
-                                        title="Delete side image">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            @endif
-                            <input type="hidden" name="homepage[slider_side_image_delete]" id="slider_side_image_delete" value="0">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Side Image Alt Text</label>
-                        <div class="col-md-9">
-                            <input type="text" name="homepage[slider_side_image_alt]" class="form-control"
-                                value="{{ $homepage['slider_side_image_alt'] ?? '' }}" placeholder="Describe the side image">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Side Image Link</label>
-                        <div class="col-md-9">
-                            <input type="url" name="homepage[slider_side_image_link]" class="form-control"
-                                value="{{ $homepage['slider_side_image_link'] ?? '' }}" placeholder="https://example.com">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Slider Height (Tablet, px)</label>
-                        <input type="number" name="homepage[slider_height_tablet]"
-                            class="form-control"
-                            value="{{ $homepage['slider_height_tablet'] ?? 200 }}"
-                            min="80" max="800" step="1">
-                        <small class="form-text text-muted">Default: 200px. Controls the
-                            height of
-                            the main slider on tablets (993px–768px).</small>
-                    </div>
-                    <div class="form-group">
-                        <label>Slider Height (Mobile, px)</label>
-                        <input type="number" name="homepage[slider_height_mobile]"
-                            class="form-control"
-                            value="{{ $homepage['slider_height_mobile'] ?? 170 }}"
-                            min="50" max="600" step="1">
-                        <small class="form-text text-muted">Default: 170px. Controls the
-                            height of
-                            the main slider on mobile (&lt;=768px).</small>
-                    </div>
-
-                    <hr>
-                    <h6 class="text-primary">Scroll to Top Button</h6>
-
-                    <div class="form-group">
-                        <input type="hidden" name="homepage[enable_scroll_to_top]" value="0">
-                        <label>
-                            <input type="checkbox" name="homepage[enable_scroll_to_top]" value="1"
-                                {{ !empty($homepage['enable_scroll_to_top']) && $homepage['enable_scroll_to_top'] ? 'checked' : '' }}>
-                            Enable "Scroll to Top" Button
-                        </label>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Show on Desktop?</label>
-                        <div class="col-md-9">
-                            <select name="settings[show_scroll_to_top_desktop]" class="form-control">
-                                <option value="1" {{ setting('general', 'show_scroll_to_top_desktop', '1') == '1' ? 'selected' : '' }}>Show</option>
-                                <option value="0" {{ setting('general', 'show_scroll_to_top_desktop', '1') == '0' ? 'selected' : '' }}>Hide</option>
-                            </select>
-                            <small class="form-text text-muted">Show or hide the scroll to top button on desktop devices.</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Show on Mobile?</label>
-                        <div class="col-md-9">
-                            <select name="settings[show_scroll_to_top_mobile]" class="form-control">
-                                <option value="1" {{ setting('general', 'show_scroll_to_top_mobile', '1') == '1' ? 'selected' : '' }}>Show</option>
-                                <option value="0" {{ setting('general', 'show_scroll_to_top_mobile', '1') == '0' ? 'selected' : '' }}>Hide</option>
-                            </select>
-                            <small class="form-text text-muted">Show or hide the scroll to top button on mobile devices.</small>
-                        </div>
-                    </div>
-
-                    <hr>
-                    <h6 class="text-primary">General Page Positioning</h6>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Desktop Position</label>
-                        <div class="col-md-9">
+                        <div class="card-body p-4 bg-light-50">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <label class="form-label">Bottom (px)</label>
-                                    <input type="number" name="settings[scroll_to_top_bottom_desktop]" class="form-control"
-                                        value="{{ setting('general', 'scroll_to_top_bottom_desktop', '20') }}" placeholder="20">
-                                    <small class="form-text text-muted">Distance from bottom on desktop.</small>
+                                @php
+                                $curatedSections = [
+                                    'best_selling' => ['label' => 'Best Selling Products', 'icon' => 'fa-fire text-danger', 'badge' => 'Hot Deals'],
+                                    'editors_pick' => ['label' => "Editor's Picks", 'icon' => 'fa-award text-info', 'badge' => 'Curated'],
+                                    'trending' => ['label' => 'Trending Now', 'icon' => 'fa-bolt text-warning', 'badge' => 'Popular'],
+                                ];
+                                @endphp
+
+                                @foreach ($curatedSections as $key => $secMeta)
+                                <div class="col-lg-4 col-md-6 mb-3">
+                                    <div class="p-3 bg-white rounded-3 border shadow-sm h-100 d-flex flex-direction-column flex-column justify-content-between">
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <label class="font-weight-bold text-dark mb-0 small">
+                                                    <input type="hidden" name="homepage[enable_{{ $key }}_section]" value="0">
+                                                    <input type="checkbox" name="homepage[enable_{{ $key }}_section]" value="1"
+                                                        {{ !empty($homepage['enable_' . $key . '_section']) && $homepage['enable_' . $key . '_section'] ? 'checked' : '' }}>
+                                                    Enable Section
+                                                </label>
+                                                <span class="badge badge-light border text-muted small"><i class="fas {{ $secMeta['icon'] }} mr-1"></i> {{ $secMeta['badge'] }}</span>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label class="small text-muted font-weight-bold mb-1">Section Heading</label>
+                                                <input type="text" name="homepage[{{ $key }}_section_heading]" class="form-control form-control-sm"
+                                                    value="{{ $homepage[$key . '_section_heading'] ?? $secMeta['label'] }}">
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label class="small text-muted font-weight-bold mb-0">Select & Drag Products</label>
+                                                </div>
+                                                <input type="text" class="form-control form-control-sm mb-2" placeholder="🔍 Search products..." onkeyup="filterAdminSortable(this, '{{ $key }}-products-sortable')">
+                                                <ul id="{{ $key }}-products-sortable" class="list-group shadow-none" style="max-height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                                    @php
+                                                    $selectedProducts = !empty($homepage[$key . '_products_order'])
+                                                    ? json_decode($homepage[$key . '_products_order'], true)
+                                                    : [];
+                                                    $selectedProducts = is_array($selectedProducts) ? $selectedProducts : [];
+                                                    $selectedMap = array_flip($selectedProducts);
+                                                    @endphp
+
+                                                    @foreach ($selectedProducts as $prodId)
+                                                    @php $prod = $products->firstWhere('id', $prodId); @endphp
+                                                    @if ($prod)
+                                                    <li class="list-group-item py-1.5 px-2.5 d-flex align-items-center justify-content-between" data-id="{{ $prod->id }}">
+                                                        <div class="d-flex align-items-center" style="overflow:hidden;">
+                                                            <input type="checkbox" name="homepage[{{ $key }}_products_selected][{{ $prod->id }}]" value="1" checked class="mr-2">
+                                                            <span class="small text-truncate font-weight-600" title="{{ $prod->title }}">{{ $prod->title }}</span>
+                                                        </div>
+                                                        <span class="handle text-muted ml-2" style="cursor:move;">&#9776;</span>
+                                                    </li>
+                                                    @endif
+                                                    @endforeach
+
+                                                    @foreach ($products as $prod)
+                                                    @if (!isset($selectedMap[$prod->id]))
+                                                    <li class="list-group-item py-1.5 px-2.5 d-flex align-items-center justify-content-between" data-id="{{ $prod->id }}">
+                                                        <div class="d-flex align-items-center" style="overflow:hidden;">
+                                                            <input type="checkbox" name="homepage[{{ $key }}_products_selected][{{ $prod->id }}]" value="1" class="mr-2">
+                                                            <span class="small text-truncate text-muted" title="{{ $prod->title }}">{{ $prod->title }}</span>
+                                                        </div>
+                                                        <span class="handle text-muted ml-2" style="cursor:move;">&#9776;</span>
+                                                    </li>
+                                                    @endif
+                                                    @endforeach
+                                                </ul>
+                                                <input type="hidden" name="homepage[{{ $key }}_products_order]" id="{{ $key }}-products-order" value='{{ $homepage[$key . '_products_order'] ?? '[]' }}'>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted mt-2">Check to feature on homepage; drag to set order.</small>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Right (px)</label>
-                                    <input type="number" name="settings[scroll_to_top_right_desktop]" class="form-control"
-                                        value="{{ setting('general', 'scroll_to_top_right_desktop', '20') }}" placeholder="20">
-                                    <small class="form-text text-muted">Distance from right on desktop.</small>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- MODULE 3: Latest Products & Pagination Settings --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-boxes text-info mr-2"></i> Latest Products & Infinite Scroll / Pagination
+                                </h5>
+                                <small class="text-muted">Configure the main catalog feed, initial item count, and AJAX load more / infinite scrolling behavior.</small>
+                            </div>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="p-3 bg-white rounded-3 border shadow-sm">
+                                <div class="form-group mb-3">
+                                    <input type="hidden" name="homepage[enable_latest_products_section]" value="0">
+                                    <label class="font-weight-bold text-dark">
+                                        <input type="checkbox" name="homepage[enable_latest_products_section]" value="1"
+                                            {{ !empty($homepage['enable_latest_products_section']) && $homepage['enable_latest_products_section'] ? 'checked' : '' }}>
+                                        Enable Latest Products Section on Homepage
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small text-muted font-weight-bold">Section Heading</label>
+                                        <input type="text" name="homepage[latest_products_section_heading]" class="form-control"
+                                            value="{{ $homepage['latest_products_section_heading'] ?? 'Latest Products' }}" placeholder="Latest Products">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small text-muted font-weight-bold">Initial Products Count</label>
+                                        <input type="number" name="homepage[latest_products_initial_count]" class="form-control"
+                                            value="{{ $homepage['latest_products_initial_count'] ?? 12 }}" min="1" max="50" step="1">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small text-muted font-weight-bold">Products Per Page (Load More)</label>
+                                        <input type="number" name="homepage[latest_products_per_page]" class="form-control"
+                                            value="{{ $homepage['latest_products_per_page'] ?? 12 }}" min="1" max="50" step="1">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small text-muted font-weight-bold">Load More Type</label>
+                                        <select name="homepage[latest_products_load_type]" class="form-control">
+                                            <option value="button" {{ ($homepage['latest_products_load_type'] ?? 'button') == 'button' ? 'selected' : '' }}>Load More Button</option>
+                                            <option value="infinite" {{ ($homepage['latest_products_load_type'] ?? 'button') == 'infinite' ? 'selected' : '' }}>Infinite Scroll</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small text-muted font-weight-bold">Load More Button Text</label>
+                                        <input type="text" name="homepage[latest_products_load_more_text]" class="form-control"
+                                            value="{{ $homepage['latest_products_load_more_text'] ?? 'Load More Products' }}" placeholder="Load More Products">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small text-muted font-weight-bold">Loading Text Indicator</label>
+                                        <input type="text" name="homepage[latest_products_loading_text]" class="form-control"
+                                            value="{{ $homepage['latest_products_loading_text'] ?? 'Loading...' }}" placeholder="Loading...">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Mobile Position</label>
-                        <div class="col-md-9">
+                    {{-- MODULE 4: Main Slider & Hero Configuration --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-sliders-h text-primary mr-2"></i> Main Slider & Hero Banner Layout
+                                </h5>
+                                <small class="text-muted">Control hero slider dimensions across desktop, tablet, and mobile breakpoints alongside side banners.</small>
+                            </div>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="p-3 bg-white rounded-3 border shadow-sm">
+                                <div class="form-group mb-3">
+                                    <input type="hidden" name="homepage[enable_main_slider_section]" value="0">
+                                    <label class="font-weight-bold text-dark">
+                                        <input type="checkbox" name="homepage[enable_main_slider_section]" value="1"
+                                            {{ !empty($homepage['enable_main_slider_section']) && $homepage['enable_main_slider_section'] ? 'checked' : '' }}>
+                                        Enable Main Slider Section on Homepage
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small text-muted font-weight-bold">Slider Layout</label>
+                                        @php $sliderLayoutSetting = $homepage['slider_layout'] ?? 'category_slider'; @endphp
+                                        <select name="homepage[slider_layout]" class="form-control">
+                                            <option value="slider_only" {{ $sliderLayoutSetting === 'slider_only' ? 'selected' : '' }}>Only slider</option>
+                                            <option value="category_slider" {{ $sliderLayoutSetting === 'category_slider' ? 'selected' : '' }}>Left category + right slider</option>
+                                            <option value="slider_with_one_image" {{ $sliderLayoutSetting === 'slider_with_one_image' ? 'selected' : '' }}>Left slider + right single image</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="small text-muted font-weight-bold">Desktop Height (px)</label>
+                                        <input type="number" name="homepage[slider_height]" class="form-control"
+                                            value="{{ $homepage['slider_height'] ?? 300 }}" min="100" max="1000" step="1">
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="small text-muted font-weight-bold">Tablet Height (px)</label>
+                                        <input type="number" name="homepage[slider_height_tablet]" class="form-control"
+                                            value="{{ $homepage['slider_height_tablet'] ?? 200 }}" min="80" max="800" step="1">
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label class="small text-muted font-weight-bold">Mobile Height (px)</label>
+                                        <input type="number" name="homepage[slider_height_mobile]" class="form-control"
+                                            value="{{ $homepage['slider_height_mobile'] ?? 170 }}" min="50" max="600" step="1">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="small text-muted font-weight-bold">Side Banner Image (for "Left slider + right single image")</label>
+                                        <div class="custom-file mb-2">
+                                            <input type="file" name="homepage[slider_side_image]" class="custom-file-input" id="slider_side_image">
+                                            <label class="custom-file-label" for="slider_side_image">Choose file</label>
+                                        </div>
+                                        @if (!empty($homepage['slider_side_image']))
+                                            <div class="mt-2 p-2 border rounded d-inline-block position-relative">
+                                                <img src="{{ asset($homepage['slider_side_image']) }}" alt="Slider side image" style="max-width: 220px; max-height: 100px; object-fit: cover;">
+                                                <button type="button" class="btn btn-sm btn-danger position-absolute" style="top: 5px; right: 5px;"
+                                                    onclick="document.getElementById('slider_side_image_delete').value='1'; this.closest('div').style.display='none';" title="Delete side image">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        @endif
+                                        <input type="hidden" name="homepage[slider_side_image_delete]" id="slider_side_image_delete" value="0">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="small text-muted font-weight-bold">Side Image Alt Text</label>
+                                        <input type="text" name="homepage[slider_side_image_alt]" class="form-control"
+                                            value="{{ $homepage['slider_side_image_alt'] ?? '' }}" placeholder="Describe image...">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="small text-muted font-weight-bold">Side Image Link URL</label>
+                                        <input type="url" name="homepage[slider_side_image_link]" class="form-control"
+                                            value="{{ $homepage['slider_side_image_link'] ?? '' }}" placeholder="https://example.com">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- MODULE 5: Dynamic Featured Banners (1–4 Images) --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-images text-success mr-2"></i> Dynamic Featured Promo Banners (1–4 Images)
+                                </h5>
+                                <small class="text-muted">Display up to 4 high-impact promotional image banners on the homepage with custom links.</small>
+                            </div>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="p-3 bg-white rounded-3 border shadow-sm mb-3">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6 mb-2 mb-md-0">
+                                        <input type="hidden" name="homepage[enable_featured_images_section]" value="0">
+                                        <label class="font-weight-bold text-dark mb-0">
+                                            <input type="checkbox" name="homepage[enable_featured_images_section]" value="1"
+                                                {{ !empty($homepage['enable_featured_images_section']) && $homepage['enable_featured_images_section'] ? 'checked' : '' }}>
+                                            Enable Featured Images Section on Homepage
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-center justify-content-md-end">
+                                        <label class="small text-muted font-weight-bold mr-2 mb-0">Gap Between Banners (px):</label>
+                                        <input type="number" name="homepage[featured_images_gap]" class="form-control form-control-sm" style="width: 80px;"
+                                            value="{{ $homepage['featured_images_gap'] ?? 15 }}" min="0" max="50" step="5">
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
-                                <div class="col-md-6">
-                                    <label class="form-label">Bottom (px)</label>
-                                    <input type="number" name="settings[scroll_to_top_bottom_mobile]" class="form-control"
-                                        value="{{ setting('general', 'scroll_to_top_bottom_mobile', '20') }}" placeholder="20">
-                                    <small class="form-text text-muted">Distance from bottom on mobile.</small>
+                                @for ($imgNum = 1; $imgNum <= 4; $imgNum++)
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="font-weight-bold text-dark mb-0" style="font-size: 13px;">
+                                                <i class="fas fa-image text-muted mr-1"></i> Featured Banner {{ $imgNum }}
+                                            </h6>
+                                            <span class="badge badge-light border">Image {{ $imgNum }}</span>
+                                        </div>
+                                        <div class="custom-file mb-2">
+                                            <input type="file" name="featured_image_{{ $imgNum }}" class="custom-file-input" id="featured_image_{{ $imgNum }}">
+                                            <label class="custom-file-label" for="featured_image_{{ $imgNum }}">Choose file</label>
+                                        </div>
+                                        @if (!empty($homepage['featured_image_' . $imgNum]))
+                                        <div class="mt-2 mb-2 p-2 border rounded d-inline-block position-relative">
+                                            <img src="{{ asset($homepage['featured_image_' . $imgNum]) }}" alt="Banner {{ $imgNum }}" style="max-width: 180px; max-height: 80px; object-fit: cover;">
+                                            <button type="button" class="btn btn-sm btn-danger position-absolute" style="top: 5px; right: 5px;"
+                                                onclick="deleteFeaturedImage({{ $imgNum }}, '{{ $homepage['featured_image_' . $imgNum] }}')" title="Delete">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        @endif
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-1">Alt Text</label>
+                                            <input type="text" name="homepage[featured_image_{{ $imgNum }}_alt]" class="form-control form-control-sm"
+                                                value="{{ $homepage['featured_image_' . $imgNum . '_alt'] ?? '' }}" placeholder="SEO alt description...">
+                                        </div>
+                                        <div class="form-group mb-0">
+                                            <label class="small text-muted font-weight-bold mb-1">Link URL</label>
+                                            <input type="url" name="homepage[featured_image_{{ $imgNum }}_link]" class="form-control form-control-sm"
+                                                value="{{ $homepage['featured_image_' . $imgNum . '_link'] ?? '' }}" placeholder="https://example.com or /shop">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Right (px)</label>
-                                    <input type="number" name="settings[scroll_to_top_right_mobile]" class="form-control"
-                                        value="{{ setting('general', 'scroll_to_top_right_mobile', '20') }}" placeholder="20">
-                                    <small class="form-text text-muted">Distance from right on mobile.</small>
-                                </div>
+                                <input type="hidden" name="homepage[delete_featured_image_{{ $imgNum }}]" id="delete_featured_image_{{ $imgNum }}" value="0">
+                                @endfor
                             </div>
                         </div>
                     </div>
 
-                    <hr>
-                    <h6 class="text-primary">Shop Page Specific Positioning</h6>
+                    {{-- MODULE 6: Products By Category v2 (Locations 1, 2, 3) --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-layer-group text-purple mr-2"></i> Products By Category v2 (Multi-Location Placement)
+                                </h5>
+                                <small class="text-muted">Inject dedicated category showcase grids across 3 separate flexible homepage positions.</small>
+                            </div>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            <div class="p-3 bg-white rounded-3 border shadow-sm mb-3">
+                                <input type="hidden" name="homepage[enable_products_by_category_v2]" value="0">
+                                <label class="font-weight-bold text-dark mb-0">
+                                    <input type="checkbox" name="homepage[enable_products_by_category_v2]" value="1"
+                                        {{ !empty($homepage['enable_products_by_category_v2']) && $homepage['enable_products_by_category_v2'] ? 'checked' : '' }}>
+                                    Enable Products By Category v2 System In Homepage
+                                </label>
+                            </div>
 
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Shop Page Desktop Position</label>
-                        <div class="col-md-9">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <label class="form-label">Bottom (px)</label>
-                                    <input type="number" name="settings[scroll_to_top_shop_bottom_desktop]" class="form-control"
-                                        value="{{ setting('general', 'scroll_to_top_shop_bottom_desktop', '20') }}" placeholder="20">
-                                    <small class="form-text text-muted">Distance from bottom on shop page desktop.</small>
+                                @for ($loc = 1; $loc <= 3; $loc++)
+                                <div class="col-lg-4 col-md-6 mb-3">
+                                    <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="font-weight-bold text-dark mb-0 small">
+                                                <input type="hidden" name="homepage[enable_products_by_category_v2_location{{ $loc }}]" value="0">
+                                                <input type="checkbox" name="homepage[enable_products_by_category_v2_location{{ $loc }}]" value="1"
+                                                    {{ !empty($homepage['enable_products_by_category_v2_location' . $loc]) && $homepage['enable_products_by_category_v2_location' . $loc] ? 'checked' : '' }}>
+                                                Location {{ $loc }} Active
+                                            </label>
+                                            <span class="badge badge-info px-2 py-1">Position {{ $loc }}</span>
+                                        </div>
+
+                                        <div class="form-group mb-2">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <label class="small text-muted font-weight-bold mb-0">Select Categories</label>
+                                            </div>
+                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="🔍 Search categories..." onkeyup="filterAdminSortable(this, 'homepage-category-v2-location{{ $loc }}-sortable')">
+                                            <ul id="homepage-category-v2-location{{ $loc }}-sortable" class="list-group shadow-none" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                                @php
+                                                $selectedLoc = isset($homepage['products_by_category_v2_location' . $loc . '_order'])
+                                                ? json_decode($homepage['products_by_category_v2_location' . $loc . '_order'], true)
+                                                : [];
+                                                $selectedLoc = is_array($selectedLoc) ? $selectedLoc : [];
+                                                $allCats = collect($categories)->map(function ($cat) {
+                                                    return ['type' => 'category', 'id' => $cat->id, 'name' => $cat->name];
+                                                });
+                                                $orderedCats = collect($selectedLoc)->map(function ($item) use ($allCats) {
+                                                    return $allCats->first(function ($i) use ($item) { return $i['type'] . '-' . $i['id'] === $item; });
+                                                })->filter();
+                                                $remainingCats = $allCats->filter(function ($i) use ($selectedLoc) {
+                                                    return !in_array($i['type'] . '-' . $i['id'], $selectedLoc);
+                                                });
+                                                $finalCats = $orderedCats->concat($remainingCats);
+                                                @endphp
+                                                @foreach ($finalCats as $item)
+                                                @php $itemKey = $item['type'] . '-' . $item['id']; @endphp
+                                                <li class="list-group-item py-1.5 px-2.5 d-flex align-items-center justify-content-between" data-id="{{ $itemKey }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <input type="checkbox" class="mr-2 location{{ $loc }}-category-checkbox" {{ in_array($itemKey, $selectedLoc) ? 'checked' : '' }}>
+                                                        <span class="small font-weight-bold text-dark">{{ $item['name'] }}</span>
+                                                    </div>
+                                                    <span class="handle text-muted" style="cursor:move;">&#9776;</span>
+                                                </li>
+                                                @endforeach
+                                            </ul>
+                                            <input type="hidden" name="homepage[products_by_category_v2_location{{ $loc }}_order]" id="homepage-category-v2-location{{ $loc }}-order" value='{{ $homepage['products_by_category_v2_location' . $loc . '_order'] ?? '[]' }}'>
+                                        </div>
+
+                                        <div class="form-group mb-0">
+                                            <label class="small text-muted font-weight-bold mb-1">Products Per Category</label>
+                                            <input type="number" name="homepage[products_by_category_v2_location{{ $loc }}_products_per_category]" class="form-control form-control-sm"
+                                                value="{{ $homepage['products_by_category_v2_location' . $loc . '_products_per_category'] ?? 12 }}" min="1" max="50" step="1">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Right (px)</label>
-                                    <input type="number" name="settings[scroll_to_top_shop_right_desktop]" class="form-control"
-                                        value="{{ setting('general', 'scroll_to_top_shop_right_desktop', '20') }}" placeholder="20">
-                                    <small class="form-text text-muted">Distance from right on shop page desktop.</small>
-                                </div>
+                                @endfor
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Shop Page Mobile Position</label>
-                        <div class="col-md-9">
+                    {{-- MODULE 7: Auxiliary Sections & Floating Controls --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-toggle-on text-success mr-2"></i> Auxiliary Homepage Sections & Floating Controls
+                                </h5>
+                                <small class="text-muted">Configure trust reviews, publisher/author highlights, scroll-to-top button, and global button labels.</small>
+                            </div>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <label class="form-label">Bottom (px)</label>
-                                    <input type="number" name="settings[scroll_to_top_shop_bottom_mobile]" class="form-control"
-                                        value="{{ setting('general', 'scroll_to_top_shop_bottom_mobile', '20') }}" placeholder="20">
-                                    <small class="form-text text-muted">Distance from bottom on shop page mobile.</small>
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                        <h6 class="font-weight-bold text-dark mb-3" style="font-size: 13.5px;">
+                                            <i class="fas fa-check-circle text-primary mr-1"></i> Section Toggle Switches
+                                        </h6>
+                                        <div class="custom-control custom-checkbox mb-2.5">
+                                            <input type="hidden" name="homepage[enable_customer_reviews_section]" value="0">
+                                            <input type="checkbox" class="custom-control-input" id="enable_customer_reviews_section" name="homepage[enable_customer_reviews_section]" value="1"
+                                                {{ !empty($homepage['enable_customer_reviews_section']) && $homepage['enable_customer_reviews_section'] ? 'checked' : '' }}>
+                                            <label class="custom-control-label font-weight-600" for="enable_customer_reviews_section">Customer Reviews Section</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox mb-2.5">
+                                            <input type="hidden" name="homepage[enable_shop_features_section]" value="0">
+                                            <input type="checkbox" class="custom-control-input" id="enable_shop_features_section" name="homepage[enable_shop_features_section]" value="1"
+                                                {{ !empty($homepage['enable_shop_features_section']) && $homepage['enable_shop_features_section'] ? 'checked' : '' }}>
+                                            <label class="custom-control-label font-weight-600" for="enable_shop_features_section">Shop Features / Trust Badges Section</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox mb-2.5">
+                                            <input type="hidden" name="homepage[enable_category_scrollbar]" value="0">
+                                            <input type="checkbox" class="custom-control-input" id="enable_category_scrollbar" name="homepage[enable_category_scrollbar]" value="1"
+                                                {{ !empty($homepage['enable_category_scrollbar']) && $homepage['enable_category_scrollbar'] ? 'checked' : '' }}>
+                                            <label class="custom-control-label font-weight-600" for="enable_category_scrollbar">Category Scrollbar Section</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox mb-2.5">
+                                            <input type="hidden" name="homepage[enable_best_author_section]" value="0">
+                                            <input type="checkbox" class="custom-control-input" id="enable_best_author_section" name="homepage[enable_best_author_section]" value="1"
+                                                {{ !empty($homepage['enable_best_author_section']) && $homepage['enable_best_author_section'] ? 'checked' : '' }}>
+                                            <label class="custom-control-label font-weight-600" for="enable_best_author_section">Best Authors Section</label>
+                                        </div>
+                                        <div class="custom-control custom-checkbox mb-3">
+                                            <input type="hidden" name="homepage[enable_best_publisher_section]" value="0">
+                                            <input type="checkbox" class="custom-control-input" id="enable_best_publisher_section" name="homepage[enable_best_publisher_section]" value="1"
+                                                {{ !empty($homepage['enable_best_publisher_section']) && $homepage['enable_best_publisher_section'] ? 'checked' : '' }}>
+                                            <label class="custom-control-label font-weight-600" for="enable_best_publisher_section">Best Publishers Section</label>
+                                        </div>
+                                        <div class="form-group mb-0">
+                                            <label class="small text-muted font-weight-bold mb-1">Global "View All" Button Text</label>
+                                            <input type="text" name="settings[view_all_button_text]" class="form-control form-control-sm"
+                                                value="{{ setting('general', 'view_all_button_text', 'View All') }}" placeholder="View All">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Right (px)</label>
-                                    <input type="number" name="settings[scroll_to_top_shop_right_mobile]" class="form-control"
-                                        value="{{ setting('general', 'scroll_to_top_shop_right_mobile', '20') }}" placeholder="20">
-                                    <small class="form-text text-muted">Distance from right on shop page mobile.</small>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="font-weight-bold text-dark mb-0" style="font-size: 13.5px;">
+                                                <i class="fas fa-arrow-up text-info mr-1"></i> Scroll to Top Floating Button
+                                            </h6>
+                                            <label class="mb-0 small font-weight-bold">
+                                                <input type="hidden" name="homepage[enable_scroll_to_top]" value="0">
+                                                <input type="checkbox" name="homepage[enable_scroll_to_top]" value="1"
+                                                    {{ !empty($homepage['enable_scroll_to_top']) && $homepage['enable_scroll_to_top'] ? 'checked' : '' }}>
+                                                Enable
+                                            </label>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6 mb-2">
+                                                <label class="small text-muted font-weight-bold">Desktop</label>
+                                                <select name="settings[show_scroll_to_top_desktop]" class="form-control form-control-sm">
+                                                    <option value="1" {{ setting('general', 'show_scroll_to_top_desktop', '1') == '1' ? 'selected' : '' }}>Show</option>
+                                                    <option value="0" {{ setting('general', 'show_scroll_to_top_desktop', '1') == '0' ? 'selected' : '' }}>Hide</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6 mb-2">
+                                                <label class="small text-muted font-weight-bold">Mobile</label>
+                                                <select name="settings[show_scroll_to_top_mobile]" class="form-control form-control-sm">
+                                                    <option value="1" {{ setting('general', 'show_scroll_to_top_mobile', '1') == '1' ? 'selected' : '' }}>Show</option>
+                                                    <option value="0" {{ setting('general', 'show_scroll_to_top_mobile', '1') == '0' ? 'selected' : '' }}>Hide</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6 mb-2">
+                                                <label class="small text-muted font-weight-bold">Desktop Bottom/Right (px)</label>
+                                                <div class="d-flex gap-1">
+                                                    <input type="number" name="settings[scroll_to_top_bottom_desktop]" class="form-control form-control-sm mr-1"
+                                                        value="{{ setting('general', 'scroll_to_top_bottom_desktop', '20') }}" placeholder="Bottom">
+                                                    <input type="number" name="settings[scroll_to_top_right_desktop]" class="form-control form-control-sm"
+                                                        value="{{ setting('general', 'scroll_to_top_right_desktop', '20') }}" placeholder="Right">
+                                                </div>
+                                            </div>
+                                            <div class="col-6 mb-2">
+                                                <label class="small text-muted font-weight-bold">Mobile Bottom/Right (px)</label>
+                                                <div class="d-flex gap-1">
+                                                    <input type="number" name="settings[scroll_to_top_bottom_mobile]" class="form-control form-control-sm mr-1"
+                                                        value="{{ setting('general', 'scroll_to_top_bottom_mobile', '20') }}" placeholder="Bottom">
+                                                    <input type="number" name="settings[scroll_to_top_right_mobile]" class="form-control form-control-sm"
+                                                        value="{{ setting('general', 'scroll_to_top_right_mobile', '20') }}" placeholder="Right">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <hr>
-                    <h6 class="text-primary">Featured Images Section</h6>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Enable Featured Images Section?</label>
-                        <div class="col-md-9">
-                            <input type="hidden" name="homepage[enable_featured_images_section]" value="0">
-                            <label>
-                                <input type="checkbox" name="homepage[enable_featured_images_section]" value="1"
-                                    {{ !empty($homepage['enable_featured_images_section']) && $homepage['enable_featured_images_section'] ? 'checked' : '' }}>
-                                Show Featured Images Section on Homepage
-                            </label>
-                            <small class="form-text text-muted">Display a dynamic image section that can show 1-4 images with responsive layout.</small>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Gap Between Images (px)</label>
-                        <div class="col-md-9">
-                            <input type="number" name="homepage[featured_images_gap]" class="form-control"
-                                value="{{ $homepage['featured_images_gap'] ?? 15 }}" min="0" max="50" step="5">
-                            <small class="form-text text-muted">Space between images in pixels (0-50px). 0 = no gap, 15 = default spacing, 50 = maximum spacing.</small>
-                        </div>
-                    </div>
-
-                    <hr>
-                    <h6 class="text-primary">Image 1</h6>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Featured Image 1</label>
-                        <div class="col-md-9">
-                            <div class="custom-file mb-2">
-                                <input type="file" name="featured_image_1" class="custom-file-input" id="featured_image_1">
-                                <label class="custom-file-label" for="featured_image_1">Choose file</label>
-                            </div>
-                            <small class="form-text text-muted">Recommended size: 800x400px. WebP, PNG, JPG or JPEG format.</small>
-                            @if (!empty($homepage['featured_image_1']))
-                            <div class="mt-2 p-2 border rounded d-inline-block position-relative">
-                                <img src="{{ asset($homepage['featured_image_1']) }}" alt="Featured Image 1" style="max-width: 200px; max-height: 100px; object-fit: cover;">
-                                <button type="button" class="btn btn-sm btn-danger position-absolute" style="top: 5px; right: 5px;"
-                                    onclick="deleteFeaturedImage(1, '{{ $homepage['featured_image_1'] }}')"
-                                    title="Delete Image 1">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Image 1 Alt Text</label>
-                        <div class="col-md-9">
-                            <input type="text" name="homepage[featured_image_1_alt]" class="form-control"
-                                value="{{ $homepage['featured_image_1_alt'] ?? '' }}"
-                                placeholder="Enter descriptive alt text for SEO and accessibility">
-                            <small class="form-text text-muted">Describe the image content for better SEO and screen readers. Example: "Modern smartphone with premium design"</small>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Image 1 Link URL</label>
-                        <div class="col-md-9">
-                            <input type="url" name="homepage[featured_image_1_link]" class="form-control"
-                                value="{{ $homepage['featured_image_1_link'] ?? '' }}"
-                                placeholder="https://example.com or leave empty for no link">
-                            <small class="form-text text-muted">Enter the URL where this image should link to. Leave empty if you don't want the image to be clickable.</small>
-                        </div>
-                    </div>
-
-                    <hr>
-                    <h6 class="text-primary">Image 2</h6>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Featured Image 2</label>
-                        <div class="col-md-9">
-                            <div class="custom-file mb-2">
-                                <input type="file" name="featured_image_2" class="custom-file-input" id="featured_image_2">
-                                <label class="custom-file-label" for="featured_image_2">Choose file</label>
-                            </div>
-                            <small class="form-text text-muted">Recommended size: 800x400px. WebP, PNG, JPG or JPEG format.</small>
-                            @if (!empty($homepage['featured_image_2']))
-                            <div class="mt-2 p-2 border rounded d-inline-block position-relative">
-                                <img src="{{ asset($homepage['featured_image_2']) }}" alt="Featured Image 2" style="max-width: 200px; max-height: 100px; object-fit: cover;">
-                                <button type="button" class="btn btn-sm btn-danger position-absolute" style="top: 5px; right: 5px;"
-                                    onclick="deleteFeaturedImage(2, '{{ $homepage['featured_image_2'] }}')"
-                                    title="Delete Image 2">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Image 2 Alt Text</label>
-                        <div class="col-md-9">
-                            <input type="text" name="homepage[featured_image_2_alt]" class="form-control"
-                                value="{{ $homepage['featured_image_2_alt'] ?? '' }}"
-                                placeholder="Enter descriptive alt text for SEO and accessibility">
-                            <small class="form-text text-muted">Describe the image content for better SEO and screen readers.</small>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Image 2 Link URL</label>
-                        <div class="col-md-9">
-                            <input type="url" name="homepage[featured_image_2_link]" class="form-control"
-                                value="{{ $homepage['featured_image_2_link'] ?? '' }}"
-                                placeholder="https://example.com or leave empty for no link">
-                            <small class="form-text text-muted">Enter the URL where this image should link to. Leave empty if you don't want the image to be clickable.</small>
-                        </div>
-                    </div>
-
-                    <hr>
-                    <h6 class="text-primary">Image 3</h6>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Featured Image 3</label>
-                        <div class="col-md-9">
-                            <div class="custom-file mb-2">
-                                <input type="file" name="featured_image_3" class="custom-file-input" id="featured_image_3">
-                                <label class="custom-file-label" for="featured_image_3">Choose file</label>
-                            </div>
-                            <small class="form-text text-muted">Recommended size: 800x400px. WebP, PNG, JPG or JPEG format.</small>
-                            @if (!empty($homepage['featured_image_3']))
-                            <div class="mt-2 p-2 border rounded d-inline-block position-relative">
-                                <img src="{{ asset($homepage['featured_image_3']) }}" alt="Featured Image 3" style="max-width: 200px; max-height: 100px; object-fit: cover;">
-                                <button type="button" class="btn btn-sm btn-danger position-absolute" style="top: 5px; right: 5px;"
-                                    onclick="deleteFeaturedImage(3, '{{ $homepage['featured_image_3'] }}')"
-                                    title="Delete Image 3">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Image 3 Alt Text</label>
-                        <div class="col-md-9">
-                            <input type="text" name="homepage[featured_image_3_alt]" class="form-control"
-                                value="{{ $homepage['featured_image_3_alt'] ?? '' }}"
-                                placeholder="Enter descriptive alt text for SEO and accessibility">
-                            <small class="form-text text-muted">Describe the image content for better SEO and screen readers.</small>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Image 3 Link URL</label>
-                        <div class="col-md-9">
-                            <input type="url" name="homepage[featured_image_3_link]" class="form-control"
-                                value="{{ $homepage['featured_image_3_link'] ?? '' }}"
-                                placeholder="https://example.com or leave empty for no link">
-                            <small class="form-text text-muted">Enter the URL where this image should link to. Leave empty if you don't want the image to be clickable.</small>
-                        </div>
-                    </div>
-
-                    <hr>
-                    <h6 class="text-primary">Image 4</h6>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Featured Image 4</label>
-                        <div class="col-md-9">
-                            <div class="custom-file mb-2">
-                                <input type="file" name="featured_image_4" class="custom-file-input" id="featured_image_4">
-                                <label class="custom-file-label" for="featured_image_4">Choose file</label>
-                            </div>
-                            <small class="form-text text-muted">Recommended size: 800x400px. WebP, PNG, JPG or JPEG format.</small>
-                            @if (!empty($homepage['featured_image_4']))
-                            <div class="mt-2 p-2 border rounded d-inline-block position-relative">
-                                <img src="{{ asset($homepage['featured_image_4']) }}" alt="Featured Image 4" style="max-width: 200px; max-height: 100px; object-fit: cover;">
-                                <button type="button" class="btn btn-sm btn-danger position-absolute" style="top: 5px; right: 5px;"
-                                    onclick="deleteFeaturedImage(4, '{{ $homepage['featured_image_4'] }}')"
-                                    title="Delete Image 4">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Image 4 Alt Text</label>
-                        <div class="col-md-9">
-                            <input type="text" name="homepage[featured_image_4_alt]" class="form-control"
-                                value="{{ $homepage['featured_image_4_alt'] ?? '' }}"
-                                placeholder="Enter descriptive alt text for SEO and accessibility">
-                            <small class="form-text text-muted">Describe the image content for better SEO and screen readers.</small>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Image 4 Link URL</label>
-                        <div class="col-md-9">
-                            <input type="url" name="homepage[featured_image_4_link]" class="form-control"
-                                value="{{ $homepage['featured_image_4_link'] ?? '' }}"
-                                placeholder="https://example.com or leave empty for no link">
-                            <small class="form-text text-muted">Enter the URL where this image should link to. Leave empty if you don't want the image to be clickable.</small>
-                        </div>
-                    </div>
-
-                    <!-- Hidden fields for image deletion -->
-                    <input type="hidden" name="homepage[delete_featured_image_1]" id="delete_featured_image_1" value="0">
-                    <input type="hidden" name="homepage[delete_featured_image_2]" id="delete_featured_image_2" value="0">
-                    <input type="hidden" name="homepage[delete_featured_image_3]" id="delete_featured_image_3" value="0">
-                    <input type="hidden" name="homepage[delete_featured_image_4]" id="delete_featured_image_4" value="0">
-
-                    <script>
-                        function deleteFeaturedImage(imageNumber, imagePath) {
-                            if (confirm('Are you sure you want to delete Featured Image ' + imageNumber + '? This action cannot be undone.')) {
-                                // Set the delete flag
-                                document.getElementById('delete_featured_image_' + imageNumber).value = '1';
-
-                                // Find and hide the image preview container
-                                const currentFormGroup = event.target.closest('.form-group');
-                                const imagePreviewContainer = currentFormGroup.querySelector('.mt-2.p-2.border.rounded.d-inline-block.position-relative');
-                                if (imagePreviewContainer) {
-                                    imagePreviewContainer.style.display = 'none';
-                                }
-
-                                // Clear the file input
-                                const fileInput = document.getElementById('featured_image_' + imageNumber);
-                                if (fileInput) {
-                                    fileInput.value = '';
-                                    const label = fileInput.nextElementSibling;
-                                    if (label) {
-                                        label.textContent = 'Choose file';
-                                    }
-                                }
-
-                                // Clear alt text and link fields
-                                const altInput = document.querySelector('input[name="homepage[featured_image_' + imageNumber + '_alt]"]');
-                                const linkInput = document.querySelector('input[name="homepage[featured_image_' + imageNumber + '_link]"]');
-                                if (altInput) altInput.value = '';
-                                if (linkInput) linkInput.value = '';
-
-                                // Show success message
-                                showDeleteSuccessMessage(imageNumber);
-                            }
-                        }
-
-                        function showDeleteSuccessMessage(imageNumber) {
-                            // Create a temporary success message
-                            const successDiv = document.createElement('div');
-                            successDiv.className = 'alert alert-success alert-dismissible fade show mt-2';
-                            successDiv.innerHTML = `
-                                    <strong>Success!</strong> Featured Image ${imageNumber} has been marked for deletion. 
-                                    Click "Save Changes" to complete the deletion.
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                `;
-
-                            // Find the form group and insert the message
-                            const currentFormGroup = event.target.closest('.form-group');
-                            currentFormGroup.appendChild(successDiv);
-
-                            // Auto-hide after 5 seconds
-                            setTimeout(() => {
-                                if (successDiv.parentNode) {
-                                    successDiv.remove();
-                                }
-                            }, 5000);
-                        }
-                    </script>
-
-                    <hr>
-                    <h6 class="text-primary">Products By Category v2 - Multiple Locations</h6>
-
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">Enable Products By Category v2 Section?</label>
-                        <div class="col-md-9">
-                            <input type="hidden" name="homepage[enable_products_by_category_v2]" value="0">
-                            <label>
-                                <input type="checkbox" name="homepage[enable_products_by_category_v2]" value="1"
-                                    {{ !empty($homepage['enable_products_by_category_v2']) && $homepage['enable_products_by_category_v2'] ? 'checked' : '' }}>
-                                Enable Products By Category v2 Section In Home page
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <hr>
-                            <div class="form-group">
-                                <input type="hidden" name="homepage[enable_products_by_category_v2_location1]" value="0">
-                                <label>
-                                    <input type="checkbox" name="homepage[enable_products_by_category_v2_location1]" value="1"
-                                        {{ !empty($homepage['enable_products_by_category_v2_location1']) && $homepage['enable_products_by_category_v2_location1'] ? 'checked' : '' }}>
-                                    Enable Products By Category v2 - Location 1
-                                </label>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Location 1 Categories (Select and drag to reorder)</label>
-                                <ul id="homepage-category-v2-location1-sortable" class="list-group">
-                                    @php
-                                    $selected = isset($homepage['products_by_category_v2_location1_order'])
-                                    ? json_decode($homepage['products_by_category_v2_location1_order'], true)
-                                    : [];
-                                    $allItems = collect($categories)->map(function ($cat) {
-                                    return [
-                                    'type' => 'category',
-                                    'id' => $cat->id,
-                                    'name' => $cat->name,
-                                    ];
-                                    });
-                                    // Order selected first, then the rest
-                                    $orderedItems = collect($selected)
-                                    ->map(function ($item) use ($allItems) {
-                                    return $allItems->first(function ($i) use ($item) {
-                                    return $i['type'] . '-' . $i['id'] === $item;
-                                    });
-                                    })
-                                    ->filter();
-                                    $remainingItems = $allItems->filter(function ($i) use ($selected) {
-                                    return !in_array($i['type'] . '-' . $i['id'], $selected);
-                                    });
-                                    $finalItems = $orderedItems->concat($remainingItems);
-                                    @endphp
-                                    @foreach ($finalItems as $item)
-                                    @php $itemKey = $item['type'] . '-' . $item['id']; @endphp
-                                    <li class="list-group-item d-flex align-items-center" data-id="{{ $itemKey }}">
-                                        <input type="checkbox" class="mr-2 location1-category-checkbox"
-                                            {{ in_array($itemKey, $selected) ? 'checked' : '' }}>
-                                        <span class="flex-grow-1">{{ ucfirst($item['type']) }}: {{ $item['name'] }}</span>
-                                        <span class="handle" style="cursor:move;">&#9776;</span>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                                <input type="hidden" name="homepage[products_by_category_v2_location1_order]"
-                                    id="homepage-category-v2-location1-order"
-                                    value='{{ $homepage['products_by_category_v2_location1_order'] ?? '[]' }}'>
-                                <small class="form-text text-muted">Check to show, drag checked items to set order.</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Products per Category (Location 1)</label>
-                                <input type="number" name="homepage[products_by_category_v2_location1_products_per_category]"
-                                    class="form-control"
-                                    value="{{ $homepage['products_by_category_v2_location1_products_per_category'] ?? 12 }}"
-                                    min="1" max="50" step="1">
-                                <small class="form-text text-muted">Number of products to show per category (1-50).</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <hr>
-                            <div class="form-group">
-                                <input type="hidden" name="homepage[enable_products_by_category_v2_location2]" value="0">
-                                <label>
-                                    <input type="checkbox" name="homepage[enable_products_by_category_v2_location2]" value="1"
-                                        {{ !empty($homepage['enable_products_by_category_v2_location2']) && $homepage['enable_products_by_category_v2_location2'] ? 'checked' : '' }}>
-                                    Enable Products By Category v2 - Location 2
-                                </label>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Location 2 Categories (Select and drag to reorder)</label>
-                                <ul id="homepage-category-v2-location2-sortable" class="list-group">
-                                    @php
-                                    $selected = isset($homepage['products_by_category_v2_location2_order'])
-                                    ? json_decode($homepage['products_by_category_v2_location2_order'], true)
-                                    : [];
-                                    $allItems = collect($categories)->map(function ($cat) {
-                                    return [
-                                    'type' => 'category',
-                                    'id' => $cat->id,
-                                    'name' => $cat->name,
-                                    ];
-                                    });
-                                    // Order selected first, then the rest
-                                    $orderedItems = collect($selected)
-                                    ->map(function ($item) use ($allItems) {
-                                    return $allItems->first(function ($i) use ($item) {
-                                    return $i['type'] . '-' . $i['id'] === $item;
-                                    });
-                                    })
-                                    ->filter();
-                                    $remainingItems = $allItems->filter(function ($i) use ($selected) {
-                                    return !in_array($i['type'] . '-' . $i['id'], $selected);
-                                    });
-                                    $finalItems = $orderedItems->concat($remainingItems);
-                                    @endphp
-                                    @foreach ($finalItems as $item)
-                                    @php $itemKey = $item['type'] . '-' . $item['id']; @endphp
-                                    <li class="list-group-item d-flex align-items-center" data-id="{{ $itemKey }}">
-                                        <input type="checkbox" class="mr-2 location2-category-checkbox"
-                                            {{ in_array($itemKey, $selected) ? 'checked' : '' }}>
-                                        <span class="flex-grow-1">{{ ucfirst($item['type']) }}: {{ $item['name'] }}</span>
-                                        <span class="handle" style="cursor:move;">&#9776;</span>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                                <input type="hidden" name="homepage[products_by_category_v2_location2_order]"
-                                    id="homepage-category-v2-location2-order"
-                                    value='{{ $homepage['products_by_category_v2_location2_order'] ?? '[]' }}'>
-                                <small class="form-text text-muted">Check to show, drag checked items to set order.</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Products per Category (Location 2)</label>
-                                <input type="number" name="homepage[products_by_category_v2_location2_products_per_category]"
-                                    class="form-control"
-                                    value="{{ $homepage['products_by_category_v2_location2_products_per_category'] ?? 12 }}"
-                                    min="1" max="50" step="1">
-                                <small class="form-text text-muted">Number of products to show per category (1-50).</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <hr>
-                            <div class="form-group">
-                                <input type="hidden" name="homepage[enable_products_by_category_v2_location3]" value="0">
-                                <label>
-                                    <input type="checkbox" name="homepage[enable_products_by_category_v2_location3]" value="1"
-                                        {{ !empty($homepage['enable_products_by_category_v2_location3']) && $homepage['enable_products_by_category_v2_location3'] ? 'checked' : '' }}>
-                                    Enable Products By Category v2 - Location 3
-                                </label>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Location 3 Categories (Select and drag to reorder)</label>
-                                <ul id="homepage-category-v2-location3-sortable" class="list-group">
-                                    @php
-                                    $selected = isset($homepage['products_by_category_v2_location3_order'])
-                                    ? json_decode($homepage['products_by_category_v2_location3_order'], true)
-                                    : [];
-                                    $allItems = collect($categories)->map(function ($cat) {
-                                    return [
-                                    'type' => 'category',
-                                    'id' => $cat->id,
-                                    'name' => $cat->name,
-                                    ];
-                                    });
-                                    // Order selected first, then the rest
-                                    $orderedItems = collect($selected)
-                                    ->map(function ($item) use ($allItems) {
-                                    return $allItems->first(function ($i) use ($item) {
-                                    return $i['type'] . '-' . $i['id'] === $item;
-                                    });
-                                    })
-                                    ->filter();
-                                    $remainingItems = $allItems->filter(function ($i) use ($selected) {
-                                    return !in_array($i['type'] . '-' . $i['id'], $selected);
-                                    });
-                                    $finalItems = $orderedItems->concat($remainingItems);
-                                    @endphp
-                                    @foreach ($finalItems as $item)
-                                    @php $itemKey = $item['type'] . '-' . $item['id']; @endphp
-                                    <li class="list-group-item d-flex align-items-center" data-id="{{ $itemKey }}">
-                                        <input type="checkbox" class="mr-2 location3-category-checkbox"
-                                            {{ in_array($itemKey, $selected) ? 'checked' : '' }}>
-                                        <span class="flex-grow-1">{{ ucfirst($item['type']) }}: {{ $item['name'] }}</span>
-                                        <span class="handle" style="cursor:move;">&#9776;</span>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                                <input type="hidden" name="homepage[products_by_category_v2_location3_order]"
-                                    id="homepage-category-v2-location3-order"
-                                    value='{{ $homepage['products_by_category_v2_location3_order'] ?? '[]' }}'>
-                                <small class="form-text text-muted">Check to show, drag checked items to set order.</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Products per Category (Location 3)</label>
-                                <input type="number" name="homepage[products_by_category_v2_location3_products_per_category]"
-                                    class="form-control"
-                                    value="{{ $homepage['products_by_category_v2_location3_products_per_category'] ?? 12 }}"
-                                    min="1" max="50" step="1">
-                                <small class="form-text text-muted">Number of products to show per category (1-50).</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <hr>
-                            <div class="form-group">
-                                <label>"View All" Button Text</label>
-                                <input type="text" name="settings[view_all_button_text]" class="form-control"
-                                    value="{{ setting('general', 'view_all_button_text', 'View All') }}">
-                                <small class="form-text text-muted">Text to display on "View All" buttons throughout the site (e.g., "View All", "সব দেখুন", "→").</small>
-                            </div>
-
-                            <hr>
-                            <div class="form-group">
-                                <input type="hidden" name="homepage[enable_customer_reviews_section]" value="0">
-                                <label>
-                                    <input type="checkbox" name="homepage[enable_customer_reviews_section]" value="1"
-                                        {{ !empty($homepage['enable_customer_reviews_section']) && $homepage['enable_customer_reviews_section'] ? 'checked' : '' }}>
-                                    Enable Customer Reviews Section In Home page
-                                </label>
-                            </div>
-
-                            <hr>
-                            <div class="form-group">
-                                <input type="hidden" name="homepage[enable_shop_features_section]" value="0">
-                                <label>
-                                    <input type="checkbox" name="homepage[enable_shop_features_section]" value="1"
-                                        {{ !empty($homepage['enable_shop_features_section']) && $homepage['enable_shop_features_section'] ? 'checked' : '' }}>
-                                    Enable Shop Features Section In Home page
-                                </label>
-                            </div>
-
-                            <hr>
-                            <div class="form-group">
-                                <input type="hidden" name="homepage[enable_category_scrollbar]" value="0">
-                                <label>
-                                    <input type="checkbox" name="homepage[enable_category_scrollbar]" value="1"
-                                        {{ !empty($homepage['enable_customer_reviews_section']) && $homepage['enable_category_scrollbar'] ? 'checked' : '' }}>
-                                    Enable Category Scrollbar Section In Home page
-                                </label>
-                            </div>
-
-                            <hr>
-                            <div class="form-group">
-                                <input type="hidden" name="homepage[enable_best_author_section]" value="0">
-                                <label>
-                                    <input type="checkbox" name="homepage[enable_best_author_section]" value="1"
-                                        {{ !empty($homepage['enable_best_author_section']) && $homepage['enable_best_author_section'] ? 'checked' : '' }}>
-                                    Enable Best Author Section In Home page
+                    </div>hor Section In Home page
                                 </label>
                             </div>
 
@@ -6027,6 +5948,33 @@
             });
         }
 
+        // Live filter helper for sortable product and category lists
+        window.filterAdminSortable = function(input, listId) {
+            const filter = (input.value || '').toLowerCase().trim();
+            const list = document.getElementById(listId);
+            if (!list) return;
+            const items = list.querySelectorAll('li');
+            items.forEach(function(item) {
+                const text = (item.textContent || item.innerText || '').toLowerCase();
+                if (filter === '' || text.indexOf(filter) > -1) {
+                    item.style.setProperty('display', 'flex', 'important');
+                } else {
+                    item.style.setProperty('display', 'none', 'important');
+                }
+            });
+        };
+
+        // Dynamic Template Settings Panels Toggle
+        function updateTemplatePanels(templateId) {
+            document.querySelectorAll('.template-specific-card').forEach(function(el) {
+                el.style.display = 'none';
+            });
+            const target = document.getElementById('template' + templateId + '_settings_card');
+            if (target) {
+                target.style.display = 'block';
+            }
+        }
+
         // Template Card Click Selection
         document.querySelectorAll('.template-card').forEach(function(card) {
             card.addEventListener('click', function(e) {
@@ -6057,6 +6005,9 @@
                     activeBadge.className = 'badge badge-success px-3 py-1 template-status-badge';
                     activeBadge.textContent = '✓ Currently Active';
                 }
+
+                // Show corresponding template configuration panel
+                updateTemplatePanels(templateId);
 
                 // Show subtle toast or notification
                 if (typeof toastr !== 'undefined') {
