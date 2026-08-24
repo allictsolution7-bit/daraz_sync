@@ -7899,24 +7899,9 @@
     </div>
 
     <script>
-        // High-end Add to Cart celebration animation & toast
+        // Add to Cart toast notification (Tata) & Floating Cart bounce
         function showCheck(cartIcon) {
-            // 1. Button transformation animation
-            const btn = cartIcon.closest('.btn-card-add-to-cart') || cartIcon;
-            if (btn) {
-                if (!btn.dataset.origHtml) {
-                    btn.dataset.origHtml = btn.innerHTML;
-                }
-                btn.classList.add('btn-added');
-                btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Added!</span>';
-                
-                setTimeout(() => {
-                    btn.classList.remove('btn-added');
-                    btn.innerHTML = btn.dataset.origHtml;
-                }, 1800);
-            }
-
-            // 2. Floating Cart bounce
+            // 1. Floating Cart bounce
             const floatingCart = document.querySelector('.floating-cart');
             if (floatingCart) {
                 floatingCart.style.animation = 'none';
@@ -7924,7 +7909,7 @@
                 floatingCart.style.animation = 'cartBounce 0.6s ease';
             }
 
-            // 3. Show Glassmorphic Toast Notification (Tata)
+            // 2. Show Glassmorphic Toast Notification (Tata)
             const toast = document.getElementById('cartToastNotification');
             if (toast) {
                 toast.classList.add('show');

@@ -141,65 +141,77 @@
         align-items: flex-start;
         gap: 8px;
         justify-content: space-between;
+        padding-right: 36px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .cart-remove {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 12px;
+        right: 12px;
+        z-index: 2;
     }
 
     .remove-btn {
-        display: inline-block;
-        width: 32px;
-        height: 32px;
-        line-height: 32px;
-        text-align: center;
-        background-color: var(--light-color);
-        color: var(--text-color);
-        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        background-color: #f1f5f9;
+        color: #64748b;
+        border-radius: 50%;
         font-size: 18px;
         font-weight: bold;
         text-decoration: none;
-        transition: all 0.3s;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
 
     .remove-btn:hover {
-        background-color: var(--primary-color);
-        color: white;
+        background-color: #ef4444;
+        color: #ffffff;
+        transform: scale(1.08);
     }
 
     .cart-image {
-        width: 100px;
-        height: 90px;
+        width: 90px;
+        height: 85px;
+        flex-shrink: 0;
     }
 
     .cart-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 5px;
+        border-radius: 8px;
         box-shadow: var(--shadow-sm);
         transition: transform 0.3s ease;
         display: block;
     }
 
     .cart-image img:hover {
-        transform: scale(1.05);
+        transform: scale(1.04);
     }
 
     .cart-product-title {
         width: 100%;
-        line-height: 1.35;
+        line-height: 1.4;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .product-link {
         color: var(--secondary-color);
-        font-weight: 500;
+        font-weight: 600;
         text-decoration: none;
-        font-size: 15px;
-        transition: color 0.3s;
+        font-size: 14.5px;
+        line-height: 1.4;
+        display: block;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        transition: color 0.2s;
     }
 
     .product-link:hover {
