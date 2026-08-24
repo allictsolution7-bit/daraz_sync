@@ -90,6 +90,7 @@ class SaaSTenantController extends Controller
             $updateData = [
                 'is_active' => $request->has('is_active'),
                 'free_promotion' => $request->has('free_promotion'),
+                'template_id' => $request->input('template_id', '1'),
             ];
 
             if ($request->filled('commission_rate')) {
@@ -97,6 +98,18 @@ class SaaSTenantController extends Controller
             }
 
             $tenant->update($updateData);
+
+            // Sync template_id to tenant site_settings
+            try {
+                $dbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+                $this->connectToTenantDatabase($dbName);
+                DB::connection('tenant_temp')->table('site_settings')->updateOrInsert(
+                    ['group' => 'homepage', 'key' => 'template_id'],
+                    ['value' => $tenant->template_id ?: '1', 'updated_at' => now()]
+                );
+            } catch (\Throwable $tplEx) {
+                Log::warning("Could not sync template_id to tenant DB: " . $tplEx->getMessage());
+            }
 
             return redirect()->route('admin.saas-tenants.index')->with('success', 'Tenant database, domain & subdomain created & provisioned successfully!');
         } catch (\Throwable $e) {
@@ -118,9 +131,12 @@ class SaaSTenantController extends Controller
             'custom_domain' => 'nullable|string|max:255|unique:saas_tenants,custom_domain,' . $tenant->id,
             'db_name' => 'nullable|string|max:255',
             'commission_rate' => 'nullable|numeric|min:0|max:100',
+            'template_id' => 'nullable|string|in:1,2,3,4,5,6,7,8,9,10',
         ]);
 
         $customDomain = $request->filled('custom_domain') ? strtolower(trim(preg_replace('#^https?://#i', '', rtrim($request->custom_domain, '/')))) : null;
+
+        $templateId = $request->input('template_id', $tenant->template_id ?: '1');
 
         $tenant->update([
             'name' => $request->name,
@@ -130,7 +146,20 @@ class SaaSTenantController extends Controller
             'is_active' => $request->has('is_active'),
             'free_promotion' => $request->has('free_promotion'),
             'commission_rate' => $request->filled('commission_rate') ? floatval($request->commission_rate) : null,
+            'template_id' => $templateId,
         ]);
+
+        // Sync template_id to tenant site_settings
+        try {
+            $dbName = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+            $this->connectToTenantDatabase($dbName);
+            DB::connection('tenant_temp')->table('site_settings')->updateOrInsert(
+                ['group' => 'homepage', 'key' => 'template_id'],
+                ['value' => $templateId, 'updated_at' => now()]
+            );
+        } catch (\Throwable $tplEx) {
+            Log::warning("Could not sync template_id to tenant DB: " . $tplEx->getMessage());
+        }
 
         return redirect()->route('admin.saas-tenants.index')->with('success', 'Tenant updated successfully!');
     }

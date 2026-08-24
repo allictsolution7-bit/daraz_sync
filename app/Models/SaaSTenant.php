@@ -21,6 +21,7 @@ class SaaSTenant extends Model
         'is_active',
         'free_promotion',
         'commission_rate',
+        'template_id',
     ];
 
     protected $casts = [
