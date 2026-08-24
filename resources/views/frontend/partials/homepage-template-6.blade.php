@@ -8,8 +8,11 @@
 
 /* ── SCOPED TEMPLATE 6: LUXURY FASHION STUDIO ── */
 .t6-page {
-    background: #0d0d0d;
-    color: #f3f4f6;
+    --t6-bg: {{ $homepage['template_6_bg_color'] ?? '#0d0d0d' }};
+    --t6-accent: {{ $homepage['template_6_accent_color'] ?? '#c9a84c' }};
+    --t6-text: {{ $homepage['template_6_text_color'] ?? '#f3f4f6' }};
+    background: var(--t6-bg);
+    color: var(--t6-text);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     padding-bottom: 70px;
     overflow-x: hidden;
@@ -854,25 +857,25 @@
 
             {{-- Editorial Highlights Strip --}}
             <div class="t6-editorial-strip">
-                <a href="{{ route('shop') }}" class="t6-editorial-card">
-                    <div class="t6-editorial-icon">👑</div>
+                <a href="{{ $homepage['template_6_strip1_url'] ?? route('shop') }}" class="t6-editorial-card">
+                    <div class="t6-editorial-icon">{{ $homepage['template_6_strip1_icon'] ?? '👑' }}</div>
                     <div>
-                        <div class="t6-editorial-label">Festive Panjabi & Sherwani</div>
-                        <div class="t6-editorial-sub">Pure silk with hand zardozi collar embroidery</div>
+                        <div class="t6-editorial-label">{{ $homepage['template_6_strip1_label'] ?? 'Festive Panjabi & Sherwani' }}</div>
+                        <div class="t6-editorial-sub">{{ $homepage['template_6_strip1_sub'] ?? 'Pure silk with hand zardozi collar embroidery' }}</div>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-editorial-card">
-                    <div class="t6-editorial-icon">✨</div>
+                <a href="{{ $homepage['template_6_strip2_url'] ?? route('shop') }}" class="t6-editorial-card">
+                    <div class="t6-editorial-icon">{{ $homepage['template_6_strip2_icon'] ?? '✨' }}</div>
                     <div>
-                        <div class="t6-editorial-label">Designer Western & Gowns</div>
-                        <div class="t6-editorial-sub">Modern tailoring and contemporary silhouettes</div>
+                        <div class="t6-editorial-label">{{ $homepage['template_6_strip2_label'] ?? 'Designer Western & Gowns' }}</div>
+                        <div class="t6-editorial-sub">{{ $homepage['template_6_strip2_sub'] ?? 'Modern tailoring and contemporary silhouettes' }}</div>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-editorial-card">
-                    <div class="t6-editorial-icon">💎</div>
+                <a href="{{ $homepage['template_6_strip3_url'] ?? route('shop') }}" class="t6-editorial-card">
+                    <div class="t6-editorial-icon">{{ $homepage['template_6_strip3_icon'] ?? '💎' }}</div>
                     <div>
-                        <div class="t6-editorial-label">Handcrafted Leather Footwear</div>
-                        <div class="t6-editorial-sub">Artisanal Nagra, loafers & festive accessories</div>
+                        <div class="t6-editorial-label">{{ $homepage['template_6_strip3_label'] ?? 'Handcrafted Leather Footwear' }}</div>
+                        <div class="t6-editorial-sub">{{ $homepage['template_6_strip3_sub'] ?? 'Artisanal Nagra, loafers & festive accessories' }}</div>
                     </div>
                 </a>
             </div>
@@ -883,43 +886,43 @@
     <section class="t6-section">
         <div class="t6-container">
             <div class="t6-sec-head">
-                <div class="t6-sec-subtitle">Curated Styles</div>
-                <h2 class="t6-sec-title">Shop by Distinct Look</h2>
+                <div class="t6-sec-subtitle">{{ $homepage['template_6_looks_subtitle'] ?? 'Curated Styles' }}</div>
+                <h2 class="t6-sec-title">{{ $homepage['template_6_looks_title'] ?? 'Shop by Distinct Look' }}</h2>
             </div>
             <div class="t6-looks-grid">
-                <a href="{{ route('shop') }}" class="t6-look-card">
-                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80" alt="Panjabi Edition">
+                <a href="{{ $homepage['template_6_look1_url'] ?? route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="{{ $homepage['template_6_look1_image'] ?? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80' }}" alt="{{ $homepage['template_6_look1_name'] ?? 'Panjabi Edition' }}">
                     <div class="t6-look-overlay">
-                        <span class="t6-look-tag">SIGNATURE</span>
-                        <div class="t6-look-name">Panjabi Luxe</div>
+                        <span class="t6-look-tag">{{ $homepage['template_6_look1_tag'] ?? 'SIGNATURE' }}</span>
+                        <div class="t6-look-name">{{ $homepage['template_6_look1_name'] ?? 'Panjabi Luxe' }}</div>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-look-card">
-                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1594938298603-c8148c4b2f7a?w=400&q=80" alt="Sherwani">
+                <a href="{{ $homepage['template_6_look2_url'] ?? route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="{{ $homepage['template_6_look2_image'] ?? 'https://images.unsplash.com/photo-1594938298603-c8148c4b2f7a?w=400&q=80' }}" alt="{{ $homepage['template_6_look2_name'] ?? 'Sherwani' }}">
                     <div class="t6-look-overlay">
-                        <span class="t6-look-tag">ROYAL</span>
-                        <div class="t6-look-name">Festive Kurta</div>
+                        <span class="t6-look-tag">{{ $homepage['template_6_look2_tag'] ?? 'ROYAL' }}</span>
+                        <div class="t6-look-name">{{ $homepage['template_6_look2_name'] ?? 'Festive Kurta' }}</div>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-look-card">
-                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1520367445093-50dc08a59d9d?w=400&q=80" alt="Women Couture">
+                <a href="{{ $homepage['template_6_look3_url'] ?? route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="{{ $homepage['template_6_look3_image'] ?? 'https://images.unsplash.com/photo-1520367445093-50dc08a59d9d?w=400&q=80' }}" alt="{{ $homepage['template_6_look3_name'] ?? 'Women Couture' }}">
                     <div class="t6-look-overlay">
-                        <span class="t6-look-tag">ETHNIC</span>
-                        <div class="t6-look-name">Silk Saree & Kurtis</div>
+                        <span class="t6-look-tag">{{ $homepage['template_6_look3_tag'] ?? 'ETHNIC' }}</span>
+                        <div class="t6-look-name">{{ $homepage['template_6_look3_name'] ?? 'Silk Saree & Kurtis' }}</div>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-look-card">
-                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&q=80" alt="Western Men">
+                <a href="{{ $homepage['template_6_look4_url'] ?? route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="{{ $homepage['template_6_look4_image'] ?? 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&q=80' }}" alt="{{ $homepage['template_6_look4_name'] ?? 'Western Men' }}">
                     <div class="t6-look-overlay">
-                        <span class="t6-look-tag">URBAN</span>
-                        <div class="t6-look-name">Suits & Blazers</div>
+                        <span class="t6-look-tag">{{ $homepage['template_6_look4_tag'] ?? 'URBAN' }}</span>
+                        <div class="t6-look-name">{{ $homepage['template_6_look4_name'] ?? 'Suits & Blazers' }}</div>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-look-card">
-                    <img class="t6-look-img" src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80" alt="Accessories">
+                <a href="{{ $homepage['template_6_look5_url'] ?? route('shop') }}" class="t6-look-card">
+                    <img class="t6-look-img" src="{{ $homepage['template_6_look5_image'] ?? 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80' }}" alt="{{ $homepage['template_6_look5_name'] ?? 'Accessories' }}">
                     <div class="t6-look-overlay">
-                        <span class="t6-look-tag">LIFESTYLE</span>
-                        <div class="t6-look-name">Luxury Footwear</div>
+                        <span class="t6-look-tag">{{ $homepage['template_6_look5_tag'] ?? 'LIFESTYLE' }}</span>
+                        <div class="t6-look-name">{{ $homepage['template_6_look5_name'] ?? 'Luxury Footwear' }}</div>
                     </div>
                 </a>
             </div>
@@ -930,44 +933,44 @@
     <section class="t6-section">
         <div class="t6-container">
             <div class="t6-sec-head">
-                <div class="t6-sec-subtitle">Editorial Picks</div>
-                <h2 class="t6-sec-title">Handcrafted Department Highlights</h2>
+                <div class="t6-sec-subtitle">{{ $homepage['template_6_grid_subtitle'] ?? 'Editorial Picks' }}</div>
+                <h2 class="t6-sec-title">{{ $homepage['template_6_grid_title'] ?? 'Handcrafted Department Highlights' }}</h2>
             </div>
             <div class="t6-asym-grid">
-                <a href="{{ route('shop') }}" class="t6-asym-main">
-                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=900&q=80" alt="Royal Panjabi">
+                <a href="{{ $homepage['template_6_grid_main_url'] ?? route('shop') }}" class="t6-asym-main">
+                    <img class="t6-asym-img" src="{{ $homepage['template_6_grid_main_image'] ?? 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=900&q=80' }}" alt="{{ $homepage['template_6_grid_main_title'] ?? 'Royal Panjabi' }}">
                     <div class="t6-asym-overlay">
-                        <span class="t6-asym-badge">MASTER CRAFT</span>
-                        <h3 class="t6-asym-title">Royal Embroidered Panjabi & Kurtas</h3>
-                        <p style="color:#d1d5db; font-size:13px; margin: 4px 0 0;">Finest raw silk with handcrafted zardozi collar embroidery.</p>
+                        <span class="t6-asym-badge">{{ $homepage['template_6_grid_main_badge'] ?? 'MASTER CRAFT' }}</span>
+                        <h3 class="t6-asym-title">{{ $homepage['template_6_grid_main_title'] ?? 'Royal Embroidered Panjabi & Kurtas' }}</h3>
+                        <p style="color:#d1d5db; font-size:13px; margin: 4px 0 0;">{{ $homepage['template_6_grid_main_desc'] ?? 'Finest raw silk with handcrafted zardozi collar embroidery.' }}</p>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-asym-item">
-                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80" alt="Western Couture">
+                <a href="{{ $homepage['template_6_grid_item1_url'] ?? route('shop') }}" class="t6-asym-item">
+                    <img class="t6-asym-img" src="{{ $homepage['template_6_grid_item1_image'] ?? 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80' }}" alt="{{ $homepage['template_6_grid_item1_title'] ?? 'Western Couture' }}">
                     <div class="t6-asym-overlay">
-                        <span class="t6-asym-badge">NEW IN</span>
-                        <h4 class="t6-asym-title">Designer Dresses</h4>
+                        <span class="t6-asym-badge">{{ $homepage['template_6_grid_item1_badge'] ?? 'NEW IN' }}</span>
+                        <h4 class="t6-asym-title">{{ $homepage['template_6_grid_item1_title'] ?? 'Designer Dresses' }}</h4>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-asym-item">
-                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=600&q=80" alt="Blazers">
+                <a href="{{ $homepage['template_6_grid_item2_url'] ?? route('shop') }}" class="t6-asym-item">
+                    <img class="t6-asym-img" src="{{ $homepage['template_6_grid_item2_image'] ?? 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=600&q=80' }}" alt="{{ $homepage['template_6_grid_item2_title'] ?? 'Blazers' }}">
                     <div class="t6-asym-overlay">
-                        <span class="t6-asym-badge">BESPOKE</span>
-                        <h4 class="t6-asym-title">Slim-fit Blazers</h4>
+                        <span class="t6-asym-badge">{{ $homepage['template_6_grid_item2_badge'] ?? 'BESPOKE' }}</span>
+                        <h4 class="t6-asym-title">{{ $homepage['template_6_grid_item2_title'] ?? 'Slim-fit Blazers' }}</h4>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-asym-item">
-                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&q=80" alt="Footwear">
+                <a href="{{ $homepage['template_6_grid_item3_url'] ?? route('shop') }}" class="t6-asym-item">
+                    <img class="t6-asym-img" src="{{ $homepage['template_6_grid_item3_image'] ?? 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&q=80' }}" alt="{{ $homepage['template_6_grid_item3_title'] ?? 'Footwear' }}">
                     <div class="t6-asym-overlay">
-                        <span class="t6-asym-badge">HANDMADE</span>
-                        <h4 class="t6-asym-title">Leather Loafers & Nagra</h4>
+                        <span class="t6-asym-badge">{{ $homepage['template_6_grid_item3_badge'] ?? 'HANDMADE' }}</span>
+                        <h4 class="t6-asym-title">{{ $homepage['template_6_grid_item3_title'] ?? 'Leather Loafers & Nagra' }}</h4>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-asym-item">
-                    <img class="t6-asym-img" src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&q=80" alt="Accessories">
+                <a href="{{ $homepage['template_6_grid_item4_url'] ?? route('shop') }}" class="t6-asym-item">
+                    <img class="t6-asym-img" src="{{ $homepage['template_6_grid_item4_image'] ?? 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&q=80' }}" alt="{{ $homepage['template_6_grid_item4_title'] ?? 'Accessories' }}">
                     <div class="t6-asym-overlay">
-                        <span class="t6-asym-badge">PREMIUM</span>
-                        <h4 class="t6-asym-title">Timepieces & Brooches</h4>
+                        <span class="t6-asym-badge">{{ $homepage['template_6_grid_item4_badge'] ?? 'PREMIUM' }}</span>
+                        <h4 class="t6-asym-title">{{ $homepage['template_6_grid_item4_title'] ?? 'Timepieces & Brooches' }}</h4>
                     </div>
                 </a>
             </div>
@@ -1066,28 +1069,28 @@
                 <h2 class="t6-sec-title">{{ $homepage['template_6_style_look_title'] ?? 'Style the Full Look' }}</h2>
             </div>
             <div class="t6-outfits-grid">
-                <a href="{{ route('shop') }}" class="t6-outfit-card">
-                    <img class="t6-outfit-img" src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&q=80" alt="Evening Panjabi Set">
-                    <span class="t6-outfit-tag-btn">✦ SHOP SET</span>
+                <a href="{{ $homepage['template_6_outfit1_url'] ?? route('shop') }}" class="t6-outfit-card">
+                    <img class="t6-outfit-img" src="{{ $homepage['template_6_outfit1_image'] ?? 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&q=80' }}" alt="{{ $homepage['template_6_outfit1_title'] ?? 'Evening Panjabi Set' }}">
+                    <span class="t6-outfit-tag-btn">{{ $homepage['template_6_outfit1_tag'] ?? '✦ SHOP SET' }}</span>
                     <div class="t6-outfit-info">
-                        <h4 class="t6-outfit-title">Festive Eid Ensemble</h4>
-                        <span class="t6-outfit-items">Panjabi + Pajama + Shawl + Nagra</span>
+                        <h4 class="t6-outfit-title">{{ $homepage['template_6_outfit1_title'] ?? 'Festive Eid Ensemble' }}</h4>
+                        <span class="t6-outfit-items">{{ $homepage['template_6_outfit1_items'] ?? 'Panjabi + Pajama + Shawl + Nagra' }}</span>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-outfit-card">
-                    <img class="t6-outfit-img" src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80" alt="Wedding Kurta Ensemble">
-                    <span class="t6-outfit-tag-btn">✦ SHOP SET</span>
+                <a href="{{ $homepage['template_6_outfit2_url'] ?? route('shop') }}" class="t6-outfit-card">
+                    <img class="t6-outfit-img" src="{{ $homepage['template_6_outfit2_image'] ?? 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80' }}" alt="{{ $homepage['template_6_outfit2_title'] ?? 'Wedding Kurta Ensemble' }}">
+                    <span class="t6-outfit-tag-btn">{{ $homepage['template_6_outfit2_tag'] ?? '✦ SHOP SET' }}</span>
                     <div class="t6-outfit-info">
-                        <h4 class="t6-outfit-title">Groom & Wedding Aura</h4>
-                        <span class="t6-outfit-items">Sherwani + Embroidered Turban + Mojari</span>
+                        <h4 class="t6-outfit-title">{{ $homepage['template_6_outfit2_title'] ?? 'Groom & Wedding Aura' }}</h4>
+                        <span class="t6-outfit-items">{{ $homepage['template_6_outfit2_items'] ?? 'Sherwani + Embroidered Turban + Mojari' }}</span>
                     </div>
                 </a>
-                <a href="{{ route('shop') }}" class="t6-outfit-card">
-                    <img class="t6-outfit-img" src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80" alt="High Fashion Women">
-                    <span class="t6-outfit-tag-btn">✦ SHOP SET</span>
+                <a href="{{ $homepage['template_6_outfit3_url'] ?? route('shop') }}" class="t6-outfit-card">
+                    <img class="t6-outfit-img" src="{{ $homepage['template_6_outfit3_image'] ?? 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80' }}" alt="{{ $homepage['template_6_outfit3_title'] ?? 'High Fashion Women' }}">
+                    <span class="t6-outfit-tag-btn">{{ $homepage['template_6_outfit3_tag'] ?? '✦ SHOP SET' }}</span>
                     <div class="t6-outfit-info">
-                        <h4 class="t6-outfit-title">Evening Gala Gown</h4>
-                        <span class="t6-outfit-items">Couture Dress + Clutch + Heels</span>
+                        <h4 class="t6-outfit-title">{{ $homepage['template_6_outfit3_title'] ?? 'Evening Gala Gown' }}</h4>
+                        <span class="t6-outfit-items">{{ $homepage['template_6_outfit3_items'] ?? 'Couture Dress + Clutch + Heels' }}</span>
                     </div>
                 </a>
             </div>
@@ -1097,9 +1100,9 @@
     {{-- SECTION 8: Style Community Newsletter --}}
     <section class="t6-container">
         <div class="t6-newsletter-wrap">
-            <div class="t6-sec-subtitle">EXCLUSIVE PRIVILEGES</div>
+            <div class="t6-sec-subtitle">{{ $homepage['template_6_vip_eyebrow'] ?? 'EXCLUSIVE PRIVILEGES' }}</div>
             <h3 class="t6-news-title">{{ $homepage['template_6_vip_title'] ?? 'Join The Couture Circle' }}</h3>
-            <p class="t6-news-desc">Receive first-access to seasonal lookbooks, bespoke private sales, and fashion masterclasses directly to your inbox.</p>
+            <p class="t6-news-desc">{{ $homepage['template_6_vip_desc'] ?? 'Receive first-access to seasonal lookbooks, bespoke private sales, and fashion masterclasses directly to your inbox.' }}</p>
             <form class="t6-news-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing to our Couture Circle!');">
                 <input type="email" class="t6-news-input" placeholder="Enter your email address..." required>
                 <button type="submit" class="t6-btn-gold">SUBSCRIBE</button>

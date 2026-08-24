@@ -8,8 +8,11 @@
 
 /* ── SCOPED TEMPLATE 7: BEAUTY & COSMETICS GLOW ── */
 .t7-page {
-    background: #fff9f9;
-    color: #27272a;
+    --t7-bg: {{ $homepage['template_7_bg_color'] ?? '#fff9f9' }};
+    --t7-accent: {{ $homepage['template_7_accent_color'] ?? '#db2777' }};
+    --t7-text: {{ $homepage['template_7_text_color'] ?? '#27272a' }};
+    background: var(--t7-bg);
+    color: var(--t7-text);
     font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     padding-bottom: 70px;
     overflow-x: hidden;
@@ -613,51 +616,51 @@
     <section class="t7-section t7-ritual-section">
         <div class="t7-container">
             <div class="t7-sec-head">
-                <div class="t7-sec-tag">DAILY RADIANCE REGIMEN</div>
-                <h2 class="t7-sec-title">The 6-Step Clean Beauty Ritual</h2>
+                <div class="t7-sec-tag">{{ $homepage['template_7_ritual_section_subtitle'] ?? 'DAILY RADIANCE REGIMEN' }}</div>
+                <h2 class="t7-sec-title">{{ $homepage['template_7_ritual_section_title'] ?? 'The 6-Step Clean Beauty Ritual' }}</h2>
             </div>
             <div class="t7-ritual-grid">
-                <a href="{{ route('shop') }}" class="t7-ritual-card">
+                <a href="{{ $homepage['template_7_ritual_1_url'] ?? route('shop') }}" class="t7-ritual-card">
                     <span class="t7-ritual-step-tag">STEP 01</span>
-                    <div class="t7-ritual-icon">🫧</div>
-                    <h4 class="t7-ritual-title">Cleansers</h4>
-                    <p class="t7-ritual-desc">Purify & Refresh Skin</p>
-                    <span class="t7-ritual-action">Explore &rarr;</span>
+                    <div class="t7-ritual-icon">{{ $homepage['template_7_ritual_1_icon'] ?? '🫧' }}</div>
+                    <h4 class="t7-ritual-title">{{ $homepage['template_7_ritual_1_name'] ?? 'Cleansers' }}</h4>
+                    <p class="t7-ritual-desc">{{ $homepage['template_7_ritual_1_desc'] ?? 'Purify & Refresh Skin' }}</p>
+                    <span class="t7-ritual-action">{{ $homepage['template_7_ritual_cta'] ?? 'Explore' }} &rarr;</span>
                 </a>
-                <a href="{{ route('shop') }}" class="t7-ritual-card">
+                <a href="{{ $homepage['template_7_ritual_2_url'] ?? route('shop') }}" class="t7-ritual-card">
                     <span class="t7-ritual-step-tag">STEP 02</span>
-                    <div class="t7-ritual-icon">💧</div>
-                    <h4 class="t7-ritual-title">Toners & Mists</h4>
-                    <p class="t7-ritual-desc">Hydrate & Balance pH</p>
-                    <span class="t7-ritual-action">Explore &rarr;</span>
+                    <div class="t7-ritual-icon">{{ $homepage['template_7_ritual_2_icon'] ?? '💧' }}</div>
+                    <h4 class="t7-ritual-title">{{ $homepage['template_7_ritual_2_name'] ?? 'Toners & Mists' }}</h4>
+                    <p class="t7-ritual-desc">{{ $homepage['template_7_ritual_2_desc'] ?? 'Hydrate & Balance pH' }}</p>
+                    <span class="t7-ritual-action">{{ $homepage['template_7_ritual_cta'] ?? 'Explore' }} &rarr;</span>
                 </a>
-                <a href="{{ route('shop') }}" class="t7-ritual-card">
+                <a href="{{ $homepage['template_7_ritual_3_url'] ?? route('shop') }}" class="t7-ritual-card">
                     <span class="t7-ritual-step-tag">STEP 03</span>
-                    <div class="t7-ritual-icon">🧪</div>
-                    <h4 class="t7-ritual-title">Serums & Actives</h4>
-                    <p class="t7-ritual-desc">Intensive Repair & Glow</p>
-                    <span class="t7-ritual-action">Explore &rarr;</span>
+                    <div class="t7-ritual-icon">{{ $homepage['template_7_ritual_3_icon'] ?? '🧪' }}</div>
+                    <h4 class="t7-ritual-title">{{ $homepage['template_7_ritual_3_name'] ?? 'Serums & Actives' }}</h4>
+                    <p class="t7-ritual-desc">{{ $homepage['template_7_ritual_3_desc'] ?? 'Intensive Repair & Glow' }}</p>
+                    <span class="t7-ritual-action">{{ $homepage['template_7_ritual_cta'] ?? 'Explore' }} &rarr;</span>
                 </a>
-                <a href="{{ route('shop') }}" class="t7-ritual-card">
+                <a href="{{ $homepage['template_7_ritual_4_url'] ?? route('shop') }}" class="t7-ritual-card">
                     <span class="t7-ritual-step-tag">STEP 04</span>
-                    <div class="t7-ritual-icon">🧴</div>
-                    <h4 class="t7-ritual-title">Moisturizers</h4>
-                    <p class="t7-ritual-desc">Lock In Deep Moisture</p>
-                    <span class="t7-ritual-action">Explore &rarr;</span>
+                    <div class="t7-ritual-icon">{{ $homepage['template_7_ritual_4_icon'] ?? '🧴' }}</div>
+                    <h4 class="t7-ritual-title">{{ $homepage['template_7_ritual_4_name'] ?? 'Moisturizers' }}</h4>
+                    <p class="t7-ritual-desc">{{ $homepage['template_7_ritual_4_desc'] ?? 'Lock In Deep Moisture' }}</p>
+                    <span class="t7-ritual-action">{{ $homepage['template_7_ritual_cta'] ?? 'Explore' }} &rarr;</span>
                 </a>
-                <a href="{{ route('shop') }}" class="t7-ritual-card">
+                <a href="{{ $homepage['template_7_ritual_5_url'] ?? route('shop') }}" class="t7-ritual-card">
                     <span class="t7-ritual-step-tag">STEP 05</span>
-                    <div class="t7-ritual-icon">☀️</div>
-                    <h4 class="t7-ritual-title">SPF 50+ Sunscreen</h4>
-                    <p class="t7-ritual-desc">Broad UV Shield</p>
-                    <span class="t7-ritual-action">Explore &rarr;</span>
+                    <div class="t7-ritual-icon">{{ $homepage['template_7_ritual_5_icon'] ?? '☀️' }}</div>
+                    <h4 class="t7-ritual-title">{{ $homepage['template_7_ritual_5_name'] ?? 'SPF 50+ Sunscreen' }}</h4>
+                    <p class="t7-ritual-desc">{{ $homepage['template_7_ritual_5_desc'] ?? 'Broad UV Shield' }}</p>
+                    <span class="t7-ritual-action">{{ $homepage['template_7_ritual_cta'] ?? 'Explore' }} &rarr;</span>
                 </a>
-                <a href="{{ route('shop') }}" class="t7-ritual-card">
+                <a href="{{ $homepage['template_7_ritual_6_url'] ?? route('shop') }}" class="t7-ritual-card">
                     <span class="t7-ritual-step-tag">STEP 06</span>
-                    <div class="t7-ritual-icon">👁️</div>
-                    <h4 class="t7-ritual-title">Lip & Eye Care</h4>
-                    <p class="t7-ritual-desc">Nourish Delicate Areas</p>
-                    <span class="t7-ritual-action">Explore &rarr;</span>
+                    <div class="t7-ritual-icon">{{ $homepage['template_7_ritual_6_icon'] ?? '👁️' }}</div>
+                    <h4 class="t7-ritual-title">{{ $homepage['template_7_ritual_6_name'] ?? 'Lip & Eye Care' }}</h4>
+                    <p class="t7-ritual-desc">{{ $homepage['template_7_ritual_6_desc'] ?? 'Nourish Delicate Areas' }}</p>
+                    <span class="t7-ritual-action">{{ $homepage['template_7_ritual_cta'] ?? 'Explore' }} &rarr;</span>
                 </a>
             </div>
         </div>

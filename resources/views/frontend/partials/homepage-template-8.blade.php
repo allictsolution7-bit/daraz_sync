@@ -8,8 +8,12 @@
 
 /* ── SCOPED TEMPLATE 8: MEGA SUPERMARKET ── */
 .t8-page {
-    background: #f1f8f2;
-    color: #1b2a1d;
+    --t8-bg: {{ $homepage['template_8_bg_color'] ?? '#f1f8f2' }};
+    --t8-accent: {{ $homepage['template_8_accent_color'] ?? '#15803d' }};
+    --t8-accent2: {{ $homepage['template_8_secondary_color'] ?? '#ea580c' }};
+    --t8-text: {{ $homepage['template_8_text_color'] ?? '#1b2a1d' }};
+    background: var(--t8-bg);
+    color: var(--t8-text);
     font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
     padding-bottom: 70px;
     overflow-x: hidden;
@@ -610,7 +614,7 @@
             {{-- 2-Column Side Promos Below Slider --}}
             <div class="t8-promos-grid">
                 <a href="{{ $homepage['template_8_promo_1_url'] ?? route('shop') }}" class="t8-side-promo">
-                    <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=800&q=80" alt="Fresh Fruits">
+                    <img src="{{ $homepage['template_8_promo_1_image'] ?? 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=800&q=80' }}" alt="{{ $homepage['template_8_promo_1_title'] ?? 'Fresh Fruits' }}">
                     <div class="t8-side-promo-overlay">
                         <span class="t8-promo-tag">{{ $homepage['template_8_promo_1_tag'] ?? 'FLASH 30% OFF' }}</span>
                         <h4 class="t8-promo-title">{{ $homepage['template_8_promo_1_title'] ?? 'Organic Fruits & Greens' }}</h4>
@@ -619,7 +623,7 @@
                 </a>
 
                 <a href="{{ $homepage['template_8_promo_2_url'] ?? route('shop') }}" class="t8-side-promo">
-                    <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&q=80" alt="Pantry Essentials">
+                    <img src="{{ $homepage['template_8_promo_2_image'] ?? 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&q=80' }}" alt="{{ $homepage['template_8_promo_2_title'] ?? 'Pantry Essentials' }}">
                     <div class="t8-side-promo-overlay">
                         <span class="t8-promo-tag" style="background:#ea580c;">{{ $homepage['template_8_promo_2_tag'] ?? 'SAVINGS PACK' }}</span>
                         <h4 class="t8-promo-title">{{ $homepage['template_8_promo_2_title'] ?? 'Pantry Starter Bundles' }}</h4>

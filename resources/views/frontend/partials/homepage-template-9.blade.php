@@ -8,8 +8,11 @@
 
 /* ── SCOPED TEMPLATE 9: BOOKS & HERITAGE STORE ── */
 .t9-page {
-    background: #fdf8ee;
-    color: #1c1600;
+    --t9-bg: {{ $homepage['template_9_bg_color'] ?? '#fdf8ee' }};
+    --t9-accent: {{ $homepage['template_9_accent_color'] ?? '#d97706' }};
+    --t9-text: {{ $homepage['template_9_text_color'] ?? '#1c1600' }};
+    background: var(--t9-bg);
+    color: var(--t9-text);
     font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
     padding-bottom: 70px;
     overflow-x: hidden;
@@ -647,24 +650,24 @@
         <div class="t9-trust-band">
             <div class="t9-trust-grid">
                 <div>
-                    <div class="t9-trust-icon">📜</div>
+                    <div class="t9-trust-icon">{{ $homepage['template_9_trust_1_icon'] ?? '📜' }}</div>
                     <div class="t9-trust-label">{{ $homepage['template_9_trust_1_title'] ?? '100% Genuine Prints' }}</div>
-                    <div class="t9-trust-sub">Direct publisher authorization</div>
+                    <div class="t9-trust-sub">{{ $homepage['template_9_trust_1_sub'] ?? 'Direct publisher authorization' }}</div>
                 </div>
                 <div>
-                    <div class="t9-trust-icon">📦</div>
+                    <div class="t9-trust-icon">{{ $homepage['template_9_trust_2_icon'] ?? '📦' }}</div>
                     <div class="t9-trust-label">{{ $homepage['template_9_trust_2_title'] ?? 'Publisher Sealed Pack' }}</div>
-                    <div class="t9-trust-sub">Unopened pristine condition</div>
+                    <div class="t9-trust-sub">{{ $homepage['template_9_trust_2_sub'] ?? 'Unopened pristine condition' }}</div>
                 </div>
                 <div>
-                    <div class="t9-trust-icon">🚚</div>
-                    <div class="t9-trust-label">Safe Book Delivery</div>
-                    <div class="t9-trust-sub">Bubble-wrapped damage proof</div>
+                    <div class="t9-trust-icon">{{ $homepage['template_9_trust_3_icon'] ?? '🚚' }}</div>
+                    <div class="t9-trust-label">{{ $homepage['template_9_trust_3_title'] ?? 'Safe Book Delivery' }}</div>
+                    <div class="t9-trust-sub">{{ $homepage['template_9_trust_3_sub'] ?? 'Bubble-wrapped damage proof' }}</div>
                 </div>
                 <div>
-                    <div class="t9-trust-icon">↩️</div>
-                    <div class="t9-trust-label">Hassle-Free Replacement</div>
-                    <div class="t9-trust-sub">If print defects are found</div>
+                    <div class="t9-trust-icon">{{ $homepage['template_9_trust_4_icon'] ?? '↩️' }}</div>
+                    <div class="t9-trust-label">{{ $homepage['template_9_trust_4_title'] ?? 'Hassle-Free Replacement' }}</div>
+                    <div class="t9-trust-sub">{{ $homepage['template_9_trust_4_sub'] ?? 'If print defects are found' }}</div>
                 </div>
             </div>
         </div>

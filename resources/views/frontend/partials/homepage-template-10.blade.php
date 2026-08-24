@@ -8,8 +8,11 @@
 
 /* ── SCOPED TEMPLATE 10: LUXURY HOME & LIVING ── */
 .t10-page {
-    background: #f7f3ee;
-    color: #201f1a;
+    --t10-bg: {{ $homepage['template_10_bg_color'] ?? '#f7f3ee' }};
+    --t10-accent: {{ $homepage['template_10_accent_color'] ?? '#ea580c' }};
+    --t10-text: {{ $homepage['template_10_text_color'] ?? '#201f1a' }};
+    background: var(--t10-bg);
+    color: var(--t10-text);
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     padding-bottom: 70px;
     overflow-x: hidden;
@@ -648,20 +651,20 @@
     {{-- SECTION 3: Dedicated Interactive Room Hotspot Studio --}}
     <section class="t10-container">
         <div class="t10-hotspot-studio">
-            <img class="t10-studio-bg" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=80" alt="Curated Scandinavian Studio">
+            <img class="t10-studio-bg" src="{{ $homepage['template_10_hotspot_image'] ?? 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=80' }}" alt="{{ $homepage['template_10_hotspot_title'] ?? 'Curated Scandinavian Studio' }}">
             
             <div class="t10-studio-overlay-head">
-                <span class="t10-studio-tag">✦ INTERACTIVE ROOM STUDIO</span>
+                <span class="t10-studio-tag">{{ $homepage['template_10_hotspot_tag'] ?? '✦ INTERACTIVE ROOM STUDIO' }}</span>
                 <h3 class="t10-studio-title">{{ $homepage['template_10_hotspot_title'] ?? 'Interactive Room Hotspot Studio' }}</h3>
-                <span class="t10-studio-sub">Hover on the (+) pins below to inspect and order featured furnishings</span>
+                <span class="t10-studio-sub">{{ $homepage['template_10_hotspot_sub'] ?? 'Hover on the (+) pins below to inspect and order featured furnishings' }}</span>
             </div>
 
             {{-- Hotspot 1: Sofa --}}
             <div class="t10-hotspot-item" style="top: 58%; left: 32%;">
                 <div class="t10-hotspot-pin">+</div>
                 <div class="t10-hotspot-card">
-                    <div class="t10-card-name">Nordic 3-Seater Fabric Sofa</div>
-                    <div class="t10-card-price">৳28,500 &bull; In Stock</div>
+                    <div class="t10-card-name">{{ $homepage['template_10_hotspot1_name'] ?? 'Nordic 3-Seater Fabric Sofa' }}</div>
+                    <div class="t10-card-price">{{ $homepage['template_10_hotspot1_price'] ?? '৳28,500 • In Stock' }}</div>
                 </div>
             </div>
 
@@ -669,8 +672,8 @@
             <div class="t10-hotspot-item" style="top: 75%; left: 55%;">
                 <div class="t10-hotspot-pin">+</div>
                 <div class="t10-hotspot-card">
-                    <div class="t10-card-name">Solid Teak Minimalist Coffee Table</div>
-                    <div class="t10-card-price">৳8,200 &bull; In Stock</div>
+                    <div class="t10-card-name">{{ $homepage['template_10_hotspot2_name'] ?? 'Solid Teak Minimalist Coffee Table' }}</div>
+                    <div class="t10-card-price">{{ $homepage['template_10_hotspot2_price'] ?? '৳8,200 • In Stock' }}</div>
                 </div>
             </div>
 
@@ -678,8 +681,8 @@
             <div class="t10-hotspot-item" style="top: 38%; left: 82%;">
                 <div class="t10-hotspot-pin">+</div>
                 <div class="t10-hotspot-card">
-                    <div class="t10-card-name">Arc Brass Floor Reading Lamp</div>
-                    <div class="t10-card-price">৳4,500 &bull; In Stock</div>
+                    <div class="t10-card-name">{{ $homepage['template_10_hotspot3_name'] ?? 'Arc Brass Floor Reading Lamp' }}</div>
+                    <div class="t10-card-price">{{ $homepage['template_10_hotspot3_price'] ?? '৳4,500 • In Stock' }}</div>
                 </div>
             </div>
         </div>
@@ -689,47 +692,47 @@
     <section class="t10-section">
         <div class="t10-container">
             <div class="t10-sec-head">
-                <div class="t10-sec-tag">SPATIAL HARMONY</div>
+                <div class="t10-sec-tag">{{ $homepage['template_10_rooms_subtitle'] ?? 'SPATIAL HARMONY' }}</div>
                 <h2 class="t10-sec-title">{{ $homepage['template_10_rooms_title'] ?? 'Shop Curated Living Environments' }}</h2>
             </div>
             <div class="t10-rooms-grid">
-                <a href="{{ route('shop') }}" class="t10-room-card">
-                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&q=80" alt="Living Room">
+                <a href="{{ $homepage['template_10_room1_url'] ?? route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="{{ $homepage['template_10_room1_image'] ?? 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&q=80' }}" alt="{{ $homepage['template_10_room1_name'] ?? 'Living Room' }}">
                     <div class="t10-room-overlay">
-                        <h4 class="t10-room-name">Living Room</h4>
-                        <span class="t10-room-cta">Sofas & Media Consoles &rarr;</span>
+                        <h4 class="t10-room-name">{{ $homepage['template_10_room1_name'] ?? 'Living Room' }}</h4>
+                        <span class="t10-room-cta">{{ $homepage['template_10_room1_cta'] ?? 'Sofas & Media Consoles' }} &rarr;</span>
                     </div>
                 </a>
 
-                <a href="{{ route('shop') }}" class="t10-room-card">
-                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=500&q=80" alt="Bedroom">
+                <a href="{{ $homepage['template_10_room2_url'] ?? route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="{{ $homepage['template_10_room2_image'] ?? 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=500&q=80' }}" alt="{{ $homepage['template_10_room2_name'] ?? 'Bedroom' }}">
                     <div class="t10-room-overlay">
-                        <h4 class="t10-room-name">Bedroom</h4>
-                        <span class="t10-room-cta">King Beds & Wardrobes &rarr;</span>
+                        <h4 class="t10-room-name">{{ $homepage['template_10_room2_name'] ?? 'Bedroom' }}</h4>
+                        <span class="t10-room-cta">{{ $homepage['template_10_room2_cta'] ?? 'King Beds & Wardrobes' }} &rarr;</span>
                     </div>
                 </a>
 
-                <a href="{{ route('shop') }}" class="t10-room-card">
-                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbe?w=500&q=80" alt="Dining Room">
+                <a href="{{ $homepage['template_10_room3_url'] ?? route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="{{ $homepage['template_10_room3_image'] ?? 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbe?w=500&q=80' }}" alt="{{ $homepage['template_10_room3_name'] ?? 'Dining Room' }}">
                     <div class="t10-room-overlay">
-                        <h4 class="t10-room-name">Dining Room</h4>
-                        <span class="t10-room-cta">Solid Wood Dining Sets &rarr;</span>
+                        <h4 class="t10-room-name">{{ $homepage['template_10_room3_name'] ?? 'Dining Room' }}</h4>
+                        <span class="t10-room-cta">{{ $homepage['template_10_room3_cta'] ?? 'Solid Wood Dining Sets' }} &rarr;</span>
                     </div>
                 </a>
 
-                <a href="{{ route('shop') }}" class="t10-room-card">
-                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=500&q=80" alt="Home Office">
+                <a href="{{ $homepage['template_10_room4_url'] ?? route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="{{ $homepage['template_10_room4_image'] ?? 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=500&q=80' }}" alt="{{ $homepage['template_10_room4_name'] ?? 'Home Office' }}">
                     <div class="t10-room-overlay">
-                        <h4 class="t10-room-name">Home Office</h4>
-                        <span class="t10-room-cta">Ergonomic Desks & Bookshelves &rarr;</span>
+                        <h4 class="t10-room-name">{{ $homepage['template_10_room4_name'] ?? 'Home Office' }}</h4>
+                        <span class="t10-room-cta">{{ $homepage['template_10_room4_cta'] ?? 'Ergonomic Desks & Bookshelves' }} &rarr;</span>
                     </div>
                 </a>
 
-                <a href="{{ route('shop') }}" class="t10-room-card">
-                    <img class="t10-room-img" src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&q=80" alt="Kitchen Decor">
+                <a href="{{ $homepage['template_10_room5_url'] ?? route('shop') }}" class="t10-room-card">
+                    <img class="t10-room-img" src="{{ $homepage['template_10_room5_image'] ?? 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&q=80' }}" alt="{{ $homepage['template_10_room5_name'] ?? 'Kitchen & Bath' }}">
                     <div class="t10-room-overlay">
-                        <h4 class="t10-room-name">Kitchen & Bath</h4>
-                        <span class="t10-room-cta">Shelving & Modern Fixtures &rarr;</span>
+                        <h4 class="t10-room-name">{{ $homepage['template_10_room5_name'] ?? 'Kitchen & Bath' }}</h4>
+                        <span class="t10-room-cta">{{ $homepage['template_10_room5_cta'] ?? 'Shelving & Modern Fixtures' }} &rarr;</span>
                     </div>
                 </a>
             </div>

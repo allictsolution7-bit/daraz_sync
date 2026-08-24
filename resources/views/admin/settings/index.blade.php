@@ -1,4 +1,4 @@
-@extends('layouts.master')
+﻿@extends('layouts.master')
 
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
@@ -647,7 +647,7 @@
                     <div class="form-group row">
                         <label class="col-md-3 col-form-label">Thank You Message Text</label>
                         <div class="col-md-9">
-                            <textarea name="settings[thankyou_message_text]" class="form-control" rows="6">{{ setting('general', 'thankyou_message_text', "ধন্যবাদ!\nআপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।\n\n:site_name-এ কেনাকাটার জন্য আপনাকে আন্তরিক ধন্যবাদ। আমরা দ্রুততম সময়ে আপনার পণ্য প্রস্তুত ও ডেলিভারি করবো, ইনশাআল্লাহ।\n\nঅর্ডার সংক্রান্ত যেকোনো প্রয়োজনে কল বা ম্যাসেজ করুন :phone_link নাম্বারে।\n\nআপনার অর্ডারটি ট্র্যাক করতে এখানে ক্লিক করুন: :track_link") }}</textarea>
+                            <textarea name="settings[thankyou_message_text]" class="form-control" rows="6">{{ setting('general', 'thankyou_message_text', "Ã Â¦Â§Ã Â¦Â¨Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¬Ã Â¦Â¾Ã Â¦Â¦!\nÃ Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦â€¦Ã Â¦Â°Ã Â§ÂÃ Â¦Â¡Ã Â¦Â¾Ã Â¦Â°Ã Â¦Å¸Ã Â¦Â¿ Ã Â¦Â¸Ã Â¦Â«Ã Â¦Â²Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â¬Ã Â§â€¡ Ã Â¦â€”Ã Â§ÂÃ Â¦Â°Ã Â¦Â¹Ã Â¦Â£ Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¾ Ã Â¦Â¹Ã Â§Å¸Ã Â§â€¡Ã Â¦â€ºÃ Â§â€¡Ã Â¥Â¤\n\n:site_name-Ã Â¦Â Ã Â¦â€¢Ã Â§â€¡Ã Â¦Â¨Ã Â¦Â¾Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦Â° Ã Â¦Å“Ã Â¦Â¨Ã Â§ÂÃ Â¦Â¯ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦â€¢Ã Â§â€¡ Ã Â¦â€ Ã Â¦Â¨Ã Â§ÂÃ Â¦Â¤Ã Â¦Â°Ã Â¦Â¿Ã Â¦â€¢ Ã Â¦Â§Ã Â¦Â¨Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¬Ã Â¦Â¾Ã Â¦Â¦Ã Â¥Â¤ Ã Â¦â€ Ã Â¦Â®Ã Â¦Â°Ã Â¦Â¾ Ã Â¦Â¦Ã Â§ÂÃ Â¦Â°Ã Â§ÂÃ Â¦Â¤Ã Â¦Â¤Ã Â¦Â® Ã Â¦Â¸Ã Â¦Â®Ã Â§Å¸Ã Â§â€¡ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦ÂªÃ Â¦Â£Ã Â§ÂÃ Â¦Â¯ Ã Â¦ÂªÃ Â§ÂÃ Â¦Â°Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¤Ã Â§ÂÃ Â¦Â¤ Ã Â¦â€œ Ã Â¦Â¡Ã Â§â€¡Ã Â¦Â²Ã Â¦Â¿Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â°Ã Â¦Â¿ Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¬Ã Â§â€¹, Ã Â¦â€¡Ã Â¦Â¨Ã Â¦Â¶Ã Â¦Â¾Ã Â¦â€ Ã Â¦Â²Ã Â§ÂÃ Â¦Â²Ã Â¦Â¾Ã Â¦Â¹Ã Â¥Â¤\n\nÃ Â¦â€¦Ã Â¦Â°Ã Â§ÂÃ Â¦Â¡Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â¸Ã Â¦â€šÃ Â¦â€¢Ã Â§ÂÃ Â¦Â°Ã Â¦Â¾Ã Â¦Â¨Ã Â§ÂÃ Â¦Â¤ Ã Â¦Â¯Ã Â§â€¡Ã Â¦â€¢Ã Â§â€¹Ã Â¦Â¨Ã Â§â€¹ Ã Â¦ÂªÃ Â§ÂÃ Â¦Â°Ã Â§Å¸Ã Â§â€¹Ã Â¦Å“Ã Â¦Â¨Ã Â§â€¡ Ã Â¦â€¢Ã Â¦Â² Ã Â¦Â¬Ã Â¦Â¾ Ã Â¦Â®Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Â¸Ã Â§â€¡Ã Â¦Å“ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨ :phone_link Ã Â¦Â¨Ã Â¦Â¾Ã Â¦Â®Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦Â°Ã Â§â€¡Ã Â¥Â¤\n\nÃ Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦â€¦Ã Â¦Â°Ã Â§ÂÃ Â¦Â¡Ã Â¦Â¾Ã Â¦Â°Ã Â¦Å¸Ã Â¦Â¿ Ã Â¦Å¸Ã Â§ÂÃ Â¦Â°Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦â€¢ Ã Â¦â€¢Ã Â¦Â°Ã Â¦Â¤Ã Â§â€¡ Ã Â¦ÂÃ Â¦â€“Ã Â¦Â¾Ã Â¦Â¨Ã Â§â€¡ Ã Â¦â€¢Ã Â§ÂÃ Â¦Â²Ã Â¦Â¿Ã Â¦â€¢ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨: :track_link") }}</textarea>
                             <small class="form-text text-muted">Placeholders: <code>:site_name</code>, <code>:phone</code>, <code>:phone_link</code>, <code>:track_link</code>.</small>
                         </div>
                     </div>
@@ -1200,8 +1200,8 @@
                         <label class="col-md-3 col-form-label">Default Badge Text</label>
                         <div class="col-md-9">
                             <input type="text" name="settings[default_badge_text]" class="form-control"
-                                value="{{ setting('general', 'default_badge_text', '১০% ছাড়') }}"
-                                placeholder="১০% ছাড়">
+                                value="{{ setting('general', 'default_badge_text', 'Ã Â§Â§Ã Â§Â¦% Ã Â¦â€ºÃ Â¦Â¾Ã Â¦Â¡Ã Â¦Â¼') }}"
+                                placeholder="Ã Â§Â§Ã Â§Â¦% Ã Â¦â€ºÃ Â¦Â¾Ã Â¦Â¡Ã Â¦Â¼">
                             <small class="form-text text-muted">Default text to show on badges when no discount is available.</small>
                         </div>
                     </div>
@@ -1331,11 +1331,11 @@
                                 placeholder="Example: border-bottom: 1px solid var(--border-color);">{{ setting('general', 'section_header_custom_border', '') }}</textarea>
                             <small class="form-text text-muted">
                                 Enter custom CSS border properties. Examples:<br>
-                                • <code>border-bottom: 1px solid var(--border-color);</code> - Bottom border<br>
-                                • <code>border: 1px solid #cccccc;</code> - All sides border<br>
-                                • <code>border-top: 2px solid #ff0000;</code> - Red top border<br>
-                                • <code>border-left: 3px double #0000ff;</code> - Blue double left border<br>
-                                • Leave empty for no border
+                                Ã¢â‚¬Â¢ <code>border-bottom: 1px solid var(--border-color);</code> - Bottom border<br>
+                                Ã¢â‚¬Â¢ <code>border: 1px solid #cccccc;</code> - All sides border<br>
+                                Ã¢â‚¬Â¢ <code>border-top: 2px solid #ff0000;</code> - Red top border<br>
+                                Ã¢â‚¬Â¢ <code>border-left: 3px double #0000ff;</code> - Blue double left border<br>
+                                Ã¢â‚¬Â¢ Leave empty for no border
                             </small>
                         </div>
                     </div>
@@ -1419,7 +1419,7 @@
                         </div>
                         <div class="col-md-3">
                             <div id="font_preview" class="p-2 border rounded" style="font-family: {{ $websiteFontPreviewFamily }}, sans-serif;">
-                                AaBbCc ১২৩৪৫৬
+                                AaBbCc Ã Â§Â§Ã Â§Â¨Ã Â§Â©Ã Â§ÂªÃ Â§Â«Ã Â§Â¬
                             </div>
                         </div>
                     </div>
@@ -1736,7 +1736,7 @@
                     <div class="form-group row mt-2" id="top-header-v3-options" style="display: none;">
                         <label class="col-md-3 col-form-label">Marquee Text (v3)</label>
                         <div class="col-md-9">
-                            <textarea name="settings[top_header_bar_marquee_text]" class="form-control" rows="2">{{ setting('general', 'top_header_bar_marquee_text', 'অনলাইন শপে আপনাকে স্বাগতম। অনলাইনে অর্ডারে সারা বাংলাদেশে হোম ডেলিভারি।') }}</textarea>
+                            <textarea name="settings[top_header_bar_marquee_text]" class="form-control" rows="2">{{ setting('general', 'top_header_bar_marquee_text', 'Ã Â¦â€¦Ã Â¦Â¨Ã Â¦Â²Ã Â¦Â¾Ã Â¦â€¡Ã Â¦Â¨ Ã Â¦Â¶Ã Â¦ÂªÃ Â§â€¡ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦â€¢Ã Â§â€¡ Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â¤Ã Â¦Â®Ã Â¥Â¤ Ã Â¦â€¦Ã Â¦Â¨Ã Â¦Â²Ã Â¦Â¾Ã Â¦â€¡Ã Â¦Â¨Ã Â§â€¡ Ã Â¦â€¦Ã Â¦Â°Ã Â§ÂÃ Â¦Â¡Ã Â¦Â¾Ã Â¦Â°Ã Â§â€¡ Ã Â¦Â¸Ã Â¦Â¾Ã Â¦Â°Ã Â¦Â¾ Ã Â¦Â¬Ã Â¦Â¾Ã Â¦â€šÃ Â¦Â²Ã Â¦Â¾Ã Â¦Â¦Ã Â§â€¡Ã Â¦Â¶Ã Â§â€¡ Ã Â¦Â¹Ã Â§â€¹Ã Â¦Â® Ã Â¦Â¡Ã Â§â€¡Ã Â¦Â²Ã Â¦Â¿Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â°Ã Â¦Â¿Ã Â¥Â¤') }}</textarea>
                             <small class="form-text text-muted">Shown in the scrolling text on Top Header v3. Uses the phone number from the contact options for the left side.</small>
                         </div>
                     </div>
@@ -1763,7 +1763,7 @@
                             <label class="col-md-3 col-form-label">Left Content</label>
                             <div class="col-md-9">
                                 <input type="text" name="settings[top_header_bar_left]" class="form-control"
-                                    value="{{ setting('general', 'top_header_bar_left', 'অনলাইন বই দোকানে আপনাকে স্বাগতম!') }}">
+                                    value="{{ setting('general', 'top_header_bar_left', 'Ã Â¦â€¦Ã Â¦Â¨Ã Â¦Â²Ã Â¦Â¾Ã Â¦â€¡Ã Â¦Â¨ Ã Â¦Â¬Ã Â¦â€¡ Ã Â¦Â¦Ã Â§â€¹Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â¨Ã Â§â€¡ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦â€¢Ã Â§â€¡ Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¬Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â¤Ã Â¦Â®!') }}">
                                 <small class="form-text text-muted">Text shown on the left side of the top header bar.</small>
                             </div>
                         </div>
@@ -2146,7 +2146,7 @@
                         <label class="col-md-3 col-form-label">Footer Copyright Text</label>
                         <div class="col-md-9">
                             <input type="text" name="settings[footer_copyright]" class="form-control"
-                                value="{{ setting('general', 'footer_copyright', '© 2025 Thikana . All Rights Reserved. Developed By SOFTEB.COM') }}">
+                                value="{{ setting('general', 'footer_copyright', 'Ã‚Â© 2025 Thikana . All Rights Reserved. Developed By SOFTEB.COM') }}">
                             <small class="form-text text-muted">This text will appear in the footer of your website.</small>
                         </div>
                     </div>
@@ -2522,7 +2522,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '1' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '1' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '1' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=1" target="_blank"
                                            class="btn btn-sm btn-outline-primary px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
@@ -2544,17 +2544,17 @@
                                         </div>
                                         <div style="flex: 1; background: linear-gradient(135deg, #1e1b18, #2a2012); border-radius: 4px; margin: 4px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #d4af37; border: 1px solid rgba(212,175,55,0.35);">
                                             <span style="font-size: 7.5px; font-weight: 800; letter-spacing: 0.8px;">MODERN BOUTIQUE</span>
-                                            <span style="font-size: 6px; color: rgba(255,255,255,0.7);">Full-Width Canvas • Top Trust Bar</span>
+                                            <span style="font-size: 6px; color: rgba(255,255,255,0.7);">Full-Width Canvas Ã¢â‚¬Â¢ Top Trust Bar</span>
                                         </div>
                                         <div style="display: flex; gap: 4px;">
                                             <div style="flex: 1; height: 20px; background: #141414; border: 1px solid rgba(212,175,55,0.25); border-radius: 3px; display: flex; align-items: center; justify-content: center;">
-                                                <span style="font-size: 5.5px; color: #d4af37;">🚚 Free Delivery</span>
+                                                <span style="font-size: 5.5px; color: #d4af37;">Ã°Å¸Å¡Å¡ Free Delivery</span>
                                             </div>
                                             <div style="flex: 1; height: 20px; background: #141414; border: 1px solid rgba(212,175,55,0.25); border-radius: 3px; display: flex; align-items: center; justify-content: center;">
-                                                <span style="font-size: 5.5px; color: #d4af37;">🔒 Secure</span>
+                                                <span style="font-size: 5.5px; color: #d4af37;">Ã°Å¸â€â€™ Secure</span>
                                             </div>
                                             <div style="flex: 1; height: 20px; background: #141414; border: 1px solid rgba(212,175,55,0.25); border-radius: 3px; display: flex; align-items: center; justify-content: center;">
-                                                <span style="font-size: 5.5px; color: #d4af37;">⭐ Premium</span>
+                                                <span style="font-size: 5.5px; color: #d4af37;">Ã¢Â­Â Premium</span>
                                             </div>
                                         </div>
                                     </div>
@@ -2567,7 +2567,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '2' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '2' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '2' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=2" target="_blank"
                                            class="btn btn-sm btn-outline-dark px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
@@ -2589,7 +2589,7 @@
                                         </div>
                                         <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
                                             <div style="flex: 2; background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #38bdf8;">
-                                                <span style="color: #38bdf8; font-size: 7.5px; font-weight: 800;">⚡ TECH HUB</span>
+                                                <span style="color: #38bdf8; font-size: 7.5px; font-weight: 800;">Ã¢Å¡Â¡ TECH HUB</span>
                                                 <span style="color: #94a3b8; font-size: 5.5px;">Gadget Spec Grids</span>
                                             </div>
                                             <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
@@ -2625,7 +2625,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '3' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '3' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '3' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=3" target="_blank"
                                            class="btn btn-sm btn-outline-info px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
@@ -2647,7 +2647,7 @@
                                         </div>
                                         <div style="display: flex; gap: 4px; flex: 1; margin: 4px 0;">
                                             <div style="flex: 2; background: linear-gradient(135deg, #881337, #be123c); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; border: 1px solid #f43f5e;">
-                                                <span style="font-size: 7.5px; font-weight: 900;">🔥 FLASH SALE</span>
+                                                <span style="font-size: 7.5px; font-weight: 900;">Ã°Å¸â€Â¥ FLASH SALE</span>
                                                 <span style="font-size: 5.5px; color: #fecdd3;">Live Deal Timers</span>
                                             </div>
                                             <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
@@ -2683,7 +2683,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '4' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '4' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '4' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=4" target="_blank"
                                            class="btn btn-sm btn-outline-danger px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
@@ -2715,7 +2715,7 @@
                                             </div>
                                         </div>
                                         <div style="flex: 1; background: linear-gradient(135deg, #16a34a, #15803d); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; margin-bottom: 3px;">
-                                            <span style="font-size: 7.5px; font-weight: 800;">🌿 FRESH GROCERY</span>
+                                            <span style="font-size: 7.5px; font-weight: 800;">Ã°Å¸Å’Â¿ FRESH GROCERY</span>
                                             <span style="font-size: 5.5px; opacity: 0.9;">Farm Fresh Produce</span>
                                         </div>
                                         <div style="display: flex; gap: 4px;">
@@ -2742,7 +2742,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '5' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '5' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '5' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=5" target="_blank"
                                            class="btn btn-sm btn-outline-success px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
@@ -2762,7 +2762,7 @@
                                         </div>
                                         <div style="display: flex; gap: 3px; margin: 3px 0;">
                                             <div style="flex: 2; height: 24px; background: linear-gradient(135deg, #e11d48, #9f1239); border-radius: 3px; padding: 2px 4px; display: flex; flex-direction: column; justify-content: center; color: #fff;">
-                                                <span style="font-size: 6px; font-weight: 800;">👗 COUTURE LOOKBOOK</span>
+                                                <span style="font-size: 6px; font-weight: 800;">Ã°Å¸â€˜â€” COUTURE LOOKBOOK</span>
                                                 <span style="font-size: 4px; opacity: 0.85;">Men & Women Atelier</span>
                                             </div>
                                             <div style="flex: 1; height: 24px; display: flex; flex-direction: column; gap: 2px;">
@@ -2794,7 +2794,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '6' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '6' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '6' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=6" target="_blank"
                                            class="btn btn-sm btn-outline-danger px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
@@ -2813,8 +2813,8 @@
                                             <div style="width: 12px; height: 2px; background: #ffffff; border-radius: 1px;"></div>
                                         </div>
                                         <div style="flex: 1; background: #fff; border-radius: 3px; margin: 3px 0; border: 1px solid #fbcfe8; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #be123c;">
-                                            <span style="font-size: 6.5px; font-weight: 800;">🌸 GLOW COSMETICS</span>
-                                            <span style="font-size: 4.5px; color: #db2777;">Skincare • Vegan Badges</span>
+                                            <span style="font-size: 6.5px; font-weight: 800;">Ã°Å¸Å’Â¸ GLOW COSMETICS</span>
+                                            <span style="font-size: 4.5px; color: #db2777;">Skincare Ã¢â‚¬Â¢ Vegan Badges</span>
                                         </div>
                                         <div style="display: flex; gap: 3px;">
                                             <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fbcfe8; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
@@ -2840,7 +2840,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '7' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '7' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '7' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=7" target="_blank"
                                            class="btn btn-sm btn-outline-danger px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
@@ -2859,8 +2859,8 @@
                                             <div style="width: 12px; height: 2px; background: #fef08a; border-radius: 1px;"></div>
                                         </div>
                                         <div style="flex: 1; background: #fff; border-radius: 3px; margin: 3px 0; border: 1px solid #bbf7d0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #15803d;">
-                                            <span style="font-size: 6.5px; font-weight: 800;">🥬 MEGA SUPERMARKET</span>
-                                            <span style="font-size: 4.5px; color: #16a34a;">45-Min Fast Delivery • Aisle Pills</span>
+                                            <span style="font-size: 6.5px; font-weight: 800;">Ã°Å¸Â¥Â¬ MEGA SUPERMARKET</span>
+                                            <span style="font-size: 4.5px; color: #16a34a;">45-Min Fast Delivery Ã¢â‚¬Â¢ Aisle Pills</span>
                                         </div>
                                         <div style="display: flex; gap: 3px;">
                                             <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #bbf7d0; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
@@ -2886,7 +2886,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '8' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '8' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '8' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=8" target="_blank"
                                            class="btn btn-sm btn-outline-success px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600;">
@@ -2905,8 +2905,8 @@
                                             <div style="width: 12px; height: 2px; background: #ffffff; border-radius: 1px;"></div>
                                         </div>
                                         <div style="flex: 1; background: #1e293b; border-radius: 3px; margin: 3px 0; border: 1px solid #fde68a; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fbbf24;">
-                                            <span style="font-size: 6.5px; font-weight: 800;">📖 BOOKSTORE & ACADEMY</span>
-                                            <span style="font-size: 4.5px; color: #fde68a;">Original Prints • Genre Shelves</span>
+                                            <span style="font-size: 6.5px; font-weight: 800;">Ã°Å¸â€œâ€“ BOOKSTORE & ACADEMY</span>
+                                            <span style="font-size: 4.5px; color: #fde68a;">Original Prints Ã¢â‚¬Â¢ Genre Shelves</span>
                                         </div>
                                         <div style="display: flex; gap: 3px;">
                                             <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fde68a; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
@@ -2932,7 +2932,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '9' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '9' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '9' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=9" target="_blank"
                                            class="btn btn-sm btn-outline-warning px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600; color: #d97706; border-color: #d97706;">
@@ -2951,8 +2951,8 @@
                                             <div style="width: 12px; height: 2px; background: #ffffff; border-radius: 1px;"></div>
                                         </div>
                                         <div style="flex: 1; background: #292524; border-radius: 3px; margin: 3px 0; border: 1px solid #fed7aa; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fdba74;">
-                                            <span style="font-size: 6.5px; font-weight: 800;">🛋️ HOME & FURNITURE</span>
-                                            <span style="font-size: 4.5px; color: #fed7aa;">Shop by Room • 10-Yr Warranty</span>
+                                            <span style="font-size: 6.5px; font-weight: 800;">Ã°Å¸â€ºâ€¹Ã¯Â¸Â HOME & FURNITURE</span>
+                                            <span style="font-size: 4.5px; color: #fed7aa;">Shop by Room Ã¢â‚¬Â¢ 10-Yr Warranty</span>
                                         </div>
                                         <div style="display: flex; gap: 3px;">
                                             <div style="flex: 1; height: 16px; background: #fff; border: 1px solid #fed7aa; border-radius: 2px; padding: 2px; display: flex; flex-direction: column; justify-content: space-between;">
@@ -2978,7 +2978,7 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <span class="badge {{ $selectedTemplate == '10' ? 'badge-success' : 'badge-light text-secondary border' }} px-2 py-1 template-status-badge" style="font-size: 10px; border-radius: 12px;">
-                                            {{ $selectedTemplate == '10' ? '✓ Currently Active' : 'Select Template' }}
+                                            {{ $selectedTemplate == '10' ? 'Ã¢Å“â€œ Currently Active' : 'Select Template' }}
                                         </span>
                                         <a href="{{ url('/') }}?preview_template=10" target="_blank"
                                            class="btn btn-sm btn-outline-warning px-2 py-0" style="font-size: 10.5px; border-radius: 12px; font-weight: 600; color: #ea580c; border-color: #ea580c;">
@@ -3030,8 +3030,8 @@
                                         <i class="fas fa-bullhorn text-info mr-1"></i> Banner Headline Text
                                     </label>
                                     <input type="text" name="homepage[template_4_offer_heading]" class="form-control" 
-                                           value="{{ $homepage['template_4_offer_heading'] ?? '✨ EXCLUSIVE CURATED COLLECTION • LIMITED BOUTIQUE EDITIONS' }}" 
-                                           placeholder="e.g. ✨ EXCLUSIVE CURATED COLLECTION • LIMITED BOUTIQUE EDITIONS">
+                                           value="{{ $homepage['template_4_offer_heading'] ?? 'Ã¢Å“Â¨ EXCLUSIVE CURATED COLLECTION Ã¢â‚¬Â¢ LIMITED BOUTIQUE EDITIONS' }}" 
+                                           placeholder="e.g. Ã¢Å“Â¨ EXCLUSIVE CURATED COLLECTION Ã¢â‚¬Â¢ LIMITED BOUTIQUE EDITIONS">
                                     <small class="form-text text-muted">Left-side announcement banner text on the top ribbon.</small>
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -3039,8 +3039,8 @@
                                         <i class="fas fa-link text-success mr-1"></i> Action Button Text
                                     </label>
                                     <input type="text" name="homepage[template_4_offer_btn_text]" class="form-control" 
-                                           value="{{ $homepage['template_4_offer_btn_text'] ?? 'EXPLORE CATALOG →' }}" 
-                                           placeholder="e.g. EXPLORE CATALOG → or SHOP FLASH DEALS →">
+                                           value="{{ $homepage['template_4_offer_btn_text'] ?? 'EXPLORE CATALOG Ã¢â€ â€™' }}" 
+                                           placeholder="e.g. EXPLORE CATALOG Ã¢â€ â€™ or SHOP FLASH DEALS Ã¢â€ â€™">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
@@ -3070,12 +3070,44 @@
                         </div>
                         <div class="card-body p-4 bg-light-50">
                             <div class="row">
+                                {{-- T6 Color Theme Customizer --}}
+                                <div class="col-md-12 mb-3">
+                                    <div class="p-3 bg-white rounded border">
+                                        <label class="font-weight-bold text-dark mb-2" style="font-size: 13px;">
+                                            <i class="fas fa-palette text-warning mr-1"></i> Template 6 Color Palette Customizer
+                                        </label>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Background Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_6_bg_color'] ?? '#0d0d0d' }}" onchange="document.getElementById('t6_bg_text').value = this.value">
+                                                    <input type="text" id="t6_bg_text" name="homepage[template_6_bg_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_6_bg_color'] ?? '#0d0d0d' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Accent / Gold Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_6_accent_color'] ?? '#c9a84c' }}" onchange="document.getElementById('t6_accent_text').value = this.value">
+                                                    <input type="text" id="t6_accent_text" name="homepage[template_6_accent_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_6_accent_color'] ?? '#c9a84c' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Text / Header Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_6_text_color'] ?? '#f3f4f6' }}" onchange="document.getElementById('t6_text_text').value = this.value">
+                                                    <input type="text" id="t6_text_text" name="homepage[template_6_text_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_6_text_color'] ?? '#f3f4f6' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-12 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
                                         <i class="fas fa-bullhorn text-warning mr-1"></i> Top Animated Marquee Ticker Text
                                     </label>
                                     <input type="text" name="homepage[template_6_ticker_text]" class="form-control"
-                                           value="{{ $homepage['template_6_ticker_text'] ?? '✨ EXCLUSIVE COUTURE COLLECTION • HANDCRAFTED PANJABI & SILK ATELIER • COMPLIMENTARY LUXURY GIFT BOX WITH EVERY ORDER • FREE EXPRESS SHIPPING' }}"
+                                           value="{{ $homepage['template_6_ticker_text'] ?? 'âœ¨ EXCLUSIVE COUTURE COLLECTION â€¢ HANDCRAFTED PANJABI & SILK ATELIER â€¢ COMPLIMENTARY LUXURY GIFT BOX WITH EVERY ORDER â€¢ FREE EXPRESS SHIPPING' }}"
                                            placeholder="Enter announcement ticker text...">
                                     <small class="form-text text-muted">Continuous animated marquee running across the top header.</small>
                                 </div>
@@ -3084,8 +3116,8 @@
                                         <i class="fas fa-tag text-primary mr-1"></i> Bespoke Spotlight Badge / Tag
                                     </label>
                                     <input type="text" name="homepage[template_6_spotlight_tag]" class="form-control"
-                                           value="{{ $homepage['template_6_spotlight_tag'] ?? '✦ ARTISANAL LUXURY & FIT' }}"
-                                           placeholder="e.g. ✦ ARTISANAL LUXURY & FIT">
+                                           value="{{ $homepage['template_6_spotlight_tag'] ?? 'Ã¢Å“Â¦ ARTISANAL LUXURY & FIT' }}"
+                                           placeholder="e.g. Ã¢Å“Â¦ ARTISANAL LUXURY & FIT">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
@@ -3107,8 +3139,8 @@
                                         <i class="fas fa-link text-success mr-1"></i> Action Button Text
                                     </label>
                                     <input type="text" name="homepage[template_6_spotlight_btn_text]" class="form-control"
-                                           value="{{ $homepage['template_6_spotlight_btn_text'] ?? 'VIEW COLLECTION →' }}"
-                                           placeholder="e.g. VIEW COLLECTION →">
+                                           value="{{ $homepage['template_6_spotlight_btn_text'] ?? 'VIEW COLLECTION Ã¢â€ â€™' }}"
+                                           placeholder="e.g. VIEW COLLECTION Ã¢â€ â€™">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
@@ -3120,20 +3152,155 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
-                                        <i class="fas fa-gem text-danger mr-1"></i> Ensembles Section Heading
-                                    </label>
-                                    <input type="text" name="homepage[template_6_style_look_title]" class="form-control"
-                                           value="{{ $homepage['template_6_style_look_title'] ?? 'Style the Full Look' }}"
-                                           placeholder="e.g. Style the Full Look">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
                                         <i class="fas fa-envelope-open text-primary mr-1"></i> VIP Club Title
                                     </label>
                                     <input type="text" name="homepage[template_6_vip_title]" class="form-control"
                                            value="{{ $homepage['template_6_vip_title'] ?? 'Join the Haute Couture Circle' }}"
                                            placeholder="e.g. Join the Haute Couture Circle">
                                 </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-tag text-warning mr-1"></i> VIP Eyebrow Label
+                                    </label>
+                                    <input type="text" name="homepage[template_6_vip_eyebrow]" class="form-control"
+                                           value="{{ $homepage['template_6_vip_eyebrow'] ?? 'EXCLUSIVE PRIVILEGES' }}"
+                                           placeholder="e.g. EXCLUSIVE PRIVILEGES">
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-align-left text-secondary mr-1"></i> VIP Description Text
+                                    </label>
+                                    <textarea name="homepage[template_6_vip_desc]" class="form-control" rows="2" placeholder="Enter VIP section description...">{{ $homepage['template_6_vip_desc'] ?? 'Receive first-access to seasonal lookbooks, bespoke private sales, and fashion masterclasses directly to your inbox.' }}</textarea>
+                                </div>
+
+                                {{-- T6 Editorial Strip Items --}}
+                                <div class="col-md-12 mb-2">
+                                    <hr class="my-2">
+                                    <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-star-half-alt mr-1"></i> Below-Hero Editorial Strip (3 Icons)</p>
+                                </div>
+                                @foreach([1,2,3] as $sn)
+                                <div class="col-md-4 mb-3 p-2 bg-white rounded border">
+                                    <p class="small font-weight-bold text-muted mb-2">Strip Item {{ $sn }}</p>
+                                    <input type="text" name="homepage[template_6_strip{{ $sn }}_icon]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_strip'.$sn.'_icon'] ?? '' }}" placeholder="Emoji icon e.g. Ã°Å¸â€˜â€˜">
+                                    <input type="text" name="homepage[template_6_strip{{ $sn }}_label]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_strip'.$sn.'_label'] ?? '' }}" placeholder="Label text">
+                                    <input type="text" name="homepage[template_6_strip{{ $sn }}_sub]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_strip'.$sn.'_sub'] ?? '' }}" placeholder="Subtitle text">
+                                    <input type="text" name="homepage[template_6_strip{{ $sn }}_url]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_6_strip'.$sn.'_url'] ?? '' }}" placeholder="URL">
+                                </div>
+                                @endforeach
+
+                                {{-- T6 Shop by Look Section --}}
+                                <div class="col-md-12 mb-2 mt-2">
+                                    <hr class="my-2">
+                                    <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-th-large mr-1"></i> Shop by Look Section</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" name="homepage[template_6_looks_title]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_6_looks_title'] ?? 'Shop by Distinct Look' }}" placeholder="Section Title">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" name="homepage[template_6_looks_subtitle]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_6_looks_subtitle'] ?? 'Curated Styles' }}" placeholder="Section Subtitle">
+                                </div>
+                                @foreach([1,2,3,4,5] as $ln)
+                                <div class="col-md-12 mb-2 p-2 bg-white rounded border">
+                                    <p class="small font-weight-bold text-muted mb-1">Look Card {{ $ln }}</p>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <input type="text" name="homepage[template_6_look{{ $ln }}_name]" class="form-control form-control-sm mb-1"
+                                                   value="{{ $homepage['template_6_look'.$ln.'_name'] ?? '' }}" placeholder="Card Name">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" name="homepage[template_6_look{{ $ln }}_tag]" class="form-control form-control-sm mb-1"
+                                                   value="{{ $homepage['template_6_look'.$ln.'_tag'] ?? '' }}" placeholder="Badge Tag">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="text" name="homepage[template_6_look{{ $ln }}_image]" class="form-control form-control-sm mb-1"
+                                                   value="{{ $homepage['template_6_look'.$ln.'_image'] ?? '' }}" placeholder="Image URL">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" name="homepage[template_6_look{{ $ln }}_url]" class="form-control form-control-sm mb-1"
+                                                   value="{{ $homepage['template_6_look'.$ln.'_url'] ?? '' }}" placeholder="Link URL">
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+
+                                {{-- T6 Asymmetric Editorial Grid --}}
+                                <div class="col-md-12 mb-2 mt-2">
+                                    <hr class="my-2">
+                                    <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-images mr-1"></i> Asymmetric Editorial Grid</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" name="homepage[template_6_grid_title]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_6_grid_title'] ?? 'Handcrafted Department Highlights' }}" placeholder="Grid Section Title">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" name="homepage[template_6_grid_subtitle]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_6_grid_subtitle'] ?? 'Editorial Picks' }}" placeholder="Grid Subtitle">
+                                </div>
+                                <div class="col-md-12 mb-2 p-2 bg-white rounded border">
+                                    <p class="small font-weight-bold text-muted mb-1">Main Large Feature</p>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <input type="text" name="homepage[template_6_grid_main_badge]" class="form-control form-control-sm mb-1"
+                                                   value="{{ $homepage['template_6_grid_main_badge'] ?? 'MASTER CRAFT' }}" placeholder="Badge">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" name="homepage[template_6_grid_main_title]" class="form-control form-control-sm mb-1"
+                                                   value="{{ $homepage['template_6_grid_main_title'] ?? '' }}" placeholder="Title">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" name="homepage[template_6_grid_main_image]" class="form-control form-control-sm mb-1"
+                                                   value="{{ $homepage['template_6_grid_main_image'] ?? '' }}" placeholder="Image URL">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" name="homepage[template_6_grid_main_url]" class="form-control form-control-sm mb-1"
+                                                   value="{{ $homepage['template_6_grid_main_url'] ?? '' }}" placeholder="Link URL">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <input type="text" name="homepage[template_6_grid_main_desc]" class="form-control form-control-sm"
+                                                   value="{{ $homepage['template_6_grid_main_desc'] ?? '' }}" placeholder="Short description below title">
+                                        </div>
+                                    </div>
+                                </div>
+                                @foreach([1,2,3,4] as $gi)
+                                <div class="col-md-6 mb-2 p-2 bg-white rounded border">
+                                    <p class="small font-weight-bold text-muted mb-1">Grid Item {{ $gi }}</p>
+                                    <input type="text" name="homepage[template_6_grid_item{{ $gi }}_badge]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_grid_item'.$gi.'_badge'] ?? '' }}" placeholder="Badge">
+                                    <input type="text" name="homepage[template_6_grid_item{{ $gi }}_title]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_grid_item'.$gi.'_title'] ?? '' }}" placeholder="Title">
+                                    <input type="text" name="homepage[template_6_grid_item{{ $gi }}_image]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_grid_item'.$gi.'_image'] ?? '' }}" placeholder="Image URL">
+                                    <input type="text" name="homepage[template_6_grid_item{{ $gi }}_url]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_6_grid_item'.$gi.'_url'] ?? '' }}" placeholder="Link URL">
+                                </div>
+                                @endforeach
+
+                                {{-- T6 Style the Look Outfit Cards --}}
+                                <div class="col-md-12 mb-2 mt-2">
+                                    <hr class="my-2">
+                                    <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-tshirt mr-1"></i> Style the Look Outfit Ensembles (3 Cards)</p>
+                                </div>
+                                @foreach([1,2,3] as $on)
+                                <div class="col-md-4 mb-2 p-2 bg-white rounded border">
+                                    <p class="small font-weight-bold text-muted mb-1">Outfit Card {{ $on }}</p>
+                                    <input type="text" name="homepage[template_6_outfit{{ $on }}_title]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_outfit'.$on.'_title'] ?? '' }}" placeholder="Outfit Title">
+                                    <input type="text" name="homepage[template_6_outfit{{ $on }}_items]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_outfit'.$on.'_items'] ?? '' }}" placeholder="Items list (e.g. Panjabi + Pajama + Shawl)">
+                                    <input type="text" name="homepage[template_6_outfit{{ $on }}_tag]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_outfit'.$on.'_tag'] ?? '' }}" placeholder="Button Tag e.g. âœ¦ SHOP SET">
+                                    <input type="text" name="homepage[template_6_outfit{{ $on }}_image]" class="form-control form-control-sm mb-1"
+                                           value="{{ $homepage['template_6_outfit'.$on.'_image'] ?? '' }}" placeholder="Image URL">
+                                    <input type="text" name="homepage[template_6_outfit{{ $on }}_url]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_6_outfit'.$on.'_url'] ?? '' }}" placeholder="Link URL">
+                                </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -3153,12 +3320,44 @@
                         </div>
                         <div class="card-body p-4 bg-light-50">
                             <div class="row">
+                                {{-- T7 Color Theme Customizer --}}
+                                <div class="col-md-12 mb-3">
+                                    <div class="p-3 bg-white rounded border">
+                                        <label class="font-weight-bold text-dark mb-2" style="font-size: 13px;">
+                                            <i class="fas fa-palette text-pink mr-1"></i> Template 7 Color Palette Customizer
+                                        </label>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Background Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_7_bg_color'] ?? '#fff9f9' }}" onchange="document.getElementById('t7_bg_text').value = this.value">
+                                                    <input type="text" id="t7_bg_text" name="homepage[template_7_bg_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_7_bg_color'] ?? '#fff9f9' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Accent / Pink Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_7_accent_color'] ?? '#db2777' }}" onchange="document.getElementById('t7_accent_text').value = this.value">
+                                                    <input type="text" id="t7_accent_text" name="homepage[template_7_accent_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_7_accent_color'] ?? '#db2777' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Text Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_7_text_color'] ?? '#27272a' }}" onchange="document.getElementById('t7_text_text').value = this.value">
+                                                    <input type="text" id="t7_text_text" name="homepage[template_7_text_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_7_text_color'] ?? '#27272a' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-12 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
                                         <i class="fas fa-sparkles mr-1" style="color:#db2777;"></i> Top Glow Ticker Banner Text
                                     </label>
                                     <input type="text" name="homepage[template_7_ticker_text]" class="form-control"
-                                           value="{{ $homepage['template_7_ticker_text'] ?? '💋 FREE LUXURY BEAUTY GIFT ON ORDERS OVER ৳1,500 • 100% DERMATOLOGIST TESTED & HALAL CERTIFIED • EXPRESS DOORSTEP DELIVERY' }}"
+                                           value="{{ $homepage['template_7_ticker_text'] ?? 'ðŸ’‹ FREE LUXURY BEAUTY GIFT ON ORDERS OVER à§³1,500 â€¢ 100% DERMATOLOGIST TESTED & HALAL CERTIFIED â€¢ EXPRESS DOORSTEP DELIVERY' }}"
                                            placeholder="Enter glow ticker text...">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -3182,15 +3381,15 @@
                                         <i class="fas fa-leaf text-success mr-1"></i> Trust Badge 1 Text
                                     </label>
                                     <input type="text" name="homepage[template_7_trust_1]" class="form-control"
-                                           value="{{ $homepage['template_7_trust_1'] ?? '100% Non-Toxic • Zero Parabens' }}"
-                                           placeholder="e.g. 100% Non-Toxic • Zero Parabens">
+                                           value="{{ $homepage['template_7_trust_1'] ?? '100% Non-Toxic Ã¢â‚¬Â¢ Zero Parabens' }}"
+                                           placeholder="e.g. 100% Non-Toxic Ã¢â‚¬Â¢ Zero Parabens">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
                                         <i class="fas fa-paw text-warning mr-1"></i> Trust Badge 2 Text
                                     </label>
                                     <input type="text" name="homepage[template_7_trust_2]" class="form-control"
-                                           value="{{ $homepage['template_7_trust_2'] ?? 'PETA Cruelty-Free • Not Tested on Animals' }}"
+                                           value="{{ $homepage['template_7_trust_2'] ?? 'PETA Cruelty-Free Ã¢â‚¬Â¢ Not Tested on Animals' }}"
                                            placeholder="e.g. PETA Cruelty-Free">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -3198,7 +3397,7 @@
                                         <i class="fas fa-flower text-danger mr-1"></i> Trust Badge 3 Text
                                     </label>
                                     <input type="text" name="homepage[template_7_trust_3]" class="form-control"
-                                           value="{{ $homepage['template_7_trust_3'] ?? 'Botanical Actives • Pure Plant Extracts' }}"
+                                           value="{{ $homepage['template_7_trust_3'] ?? 'Botanical Actives Ã¢â‚¬Â¢ Pure Plant Extracts' }}"
                                            placeholder="e.g. Botanical Actives">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -3206,9 +3405,45 @@
                                         <i class="fas fa-tint text-primary mr-1"></i> Trust Badge 4 Text
                                     </label>
                                     <input type="text" name="homepage[template_7_trust_4]" class="form-control"
-                                           value="{{ $homepage['template_7_trust_4'] ?? 'Clinically Tested • Dermatologist Safe' }}"
+                                           value="{{ $homepage['template_7_trust_4'] ?? 'Clinically Tested Ã¢â‚¬Â¢ Dermatologist Safe' }}"
                                            placeholder="e.g. Clinically Tested">
                                 </div>
+
+                                {{-- T7 Ritual Section --}}
+                                <div class="col-md-12 mb-2 mt-2">
+                                    <hr class="my-2">
+                                    <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-spa mr-1 text-pink"></i> 6-Step Skincare Ritual Section</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="small text-muted font-weight-bold">Ritual Section Title</label>
+                                    <input type="text" name="homepage[template_7_ritual_section_title]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_7_ritual_section_title'] ?? 'The 6-Step Clean Beauty Ritual' }}" placeholder="Section Title">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="small text-muted font-weight-bold">Ritual Section Eyebrow Tag</label>
+                                    <input type="text" name="homepage[template_7_ritual_section_subtitle]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_7_ritual_section_subtitle'] ?? 'DAILY RADIANCE REGIMEN' }}" placeholder="Eyebrow label">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="small text-muted font-weight-bold">Ritual Card CTA Text</label>
+                                    <input type="text" name="homepage[template_7_ritual_cta]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_7_ritual_cta'] ?? 'Explore' }}" placeholder="e.g. Explore">
+                                </div>
+                                @foreach([1,2,3,4,5,6] as $rn)
+                                <div class="col-md-6 mb-2 p-2 bg-white rounded border">
+                                    <p class="small font-weight-bold text-muted mb-1">Step {{ $rn }}</p>
+                                    <div class="d-flex gap-2">
+                                        <input type="text" name="homepage[template_7_ritual_{{ $rn }}_icon]" class="form-control form-control-sm mr-1" style="max-width:65px;"
+                                               value="{{ $homepage['template_7_ritual_'.$rn.'_icon'] ?? '' }}" placeholder="Emoji">
+                                        <input type="text" name="homepage[template_7_ritual_{{ $rn }}_name]" class="form-control form-control-sm mr-1"
+                                               value="{{ $homepage['template_7_ritual_'.$rn.'_name'] ?? '' }}" placeholder="Card Name">
+                                    </div>
+                                    <input type="text" name="homepage[template_7_ritual_{{ $rn }}_desc]" class="form-control form-control-sm mt-1 mb-1"
+                                           value="{{ $homepage['template_7_ritual_'.$rn.'_desc'] ?? '' }}" placeholder="Short description">
+                                    <input type="text" name="homepage[template_7_ritual_{{ $rn }}_url]" class="form-control form-control-sm"
+                                           value="{{ $homepage['template_7_ritual_'.$rn.'_url'] ?? '' }}" placeholder="Link URL (optional)">
+                                </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -3228,12 +3463,51 @@
                         </div>
                         <div class="card-body p-4 bg-light-50">
                             <div class="row">
+                                {{-- T8 Color Theme Customizer --}}
+                                <div class="col-md-12 mb-3">
+                                    <div class="p-3 bg-white rounded border">
+                                        <label class="font-weight-bold text-dark mb-2" style="font-size: 13px;">
+                                            <i class="fas fa-palette text-success mr-1"></i> Template 8 Color Palette Customizer
+                                        </label>
+                                        <div class="row">
+                                            <div class="col-md-3 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Background Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_8_bg_color'] ?? '#f1f8f2' }}" onchange="document.getElementById('t8_bg_text').value = this.value">
+                                                    <input type="text" id="t8_bg_text" name="homepage[template_8_bg_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_8_bg_color'] ?? '#f1f8f2' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Primary Green Accent</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_8_accent_color'] ?? '#15803d' }}" onchange="document.getElementById('t8_accent_text').value = this.value">
+                                                    <input type="text" id="t8_accent_text" name="homepage[template_8_accent_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_8_accent_color'] ?? '#15803d' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Secondary Orange Accent</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_8_secondary_color'] ?? '#ea580c' }}" onchange="document.getElementById('t8_sec_text').value = this.value">
+                                                    <input type="text" id="t8_sec_text" name="homepage[template_8_secondary_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_8_secondary_color'] ?? '#ea580c' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Text Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_8_text_color'] ?? '#1b2a1d' }}" onchange="document.getElementById('t8_text_text').value = this.value">
+                                                    <input type="text" id="t8_text_text" name="homepage[template_8_text_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_8_text_color'] ?? '#1b2a1d' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-12 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
                                         <i class="fas fa-truck text-success mr-1"></i> Express Delivery Top Strip Text
                                     </label>
                                     <input type="text" name="homepage[template_8_express_text]" class="form-control"
-                                           value="{{ $homepage['template_8_express_text'] ?? '🚴 EXPRESS 45-MIN HOME DELIVERY • ORDER BEFORE CUTOFF' }}"
+                                           value="{{ $homepage['template_8_express_text'] ?? 'ðŸš´ EXPRESS 45-MIN HOME DELIVERY â€¢ ORDER BEFORE CUTOFF' }}"
                                            placeholder="e.g. EXPRESS 45-MIN HOME DELIVERY">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -3253,7 +3527,7 @@
                                     </label>
                                     <div class="d-flex gap-2">
                                         <input type="text" name="homepage[template_8_promo_1_sub]" class="form-control mr-2"
-                                               value="{{ $homepage['template_8_promo_1_sub'] ?? 'Direct From Bogura Farms →' }}" placeholder="Subtitle">
+                                               value="{{ $homepage['template_8_promo_1_sub'] ?? 'Direct From Bogura Farms Ã¢â€ â€™' }}" placeholder="Subtitle">
                                         <input type="text" name="homepage[template_8_promo_1_url]" class="form-control"
                                                value="{{ $homepage['template_8_promo_1_url'] ?? route('shop') }}" placeholder="URL">
                                     </div>
@@ -3275,7 +3549,7 @@
                                     </label>
                                     <div class="d-flex gap-2">
                                         <input type="text" name="homepage[template_8_promo_2_sub]" class="form-control mr-2"
-                                               value="{{ $homepage['template_8_promo_2_sub'] ?? 'Rice, Mustard Oil & Spices from ৳299 →' }}" placeholder="Subtitle">
+                                               value="{{ $homepage['template_8_promo_2_sub'] ?? 'Rice, Mustard Oil & Spices from Ã Â§Â³299 Ã¢â€ â€™' }}" placeholder="Subtitle">
                                         <input type="text" name="homepage[template_8_promo_2_url]" class="form-control"
                                                value="{{ $homepage['template_8_promo_2_url'] ?? route('shop') }}" placeholder="URL">
                                     </div>
@@ -3296,6 +3570,28 @@
                                            value="{{ $homepage['template_8_bundles_title'] ?? 'Family Kitchen Combo Packs' }}"
                                            placeholder="e.g. Family Kitchen Combo Packs">
                                 </div>
+
+                                {{-- T8 Promo Images --}}
+                                <div class="col-md-12 mb-2 mt-1">
+                                    <hr class="my-2">
+                                    <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-image mr-1"></i> Promo Banner Images</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-image text-success mr-1"></i> Side Promo 1 Background Image URL
+                                    </label>
+                                    <input type="text" name="homepage[template_8_promo_1_image]" class="form-control"
+                                           value="{{ $homepage['template_8_promo_1_image'] ?? '' }}"
+                                           placeholder="Paste image URL for promo 1 background">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-image text-warning mr-1"></i> Side Promo 2 Background Image URL
+                                    </label>
+                                    <input type="text" name="homepage[template_8_promo_2_image]" class="form-control"
+                                           value="{{ $homepage['template_8_promo_2_image'] ?? '' }}"
+                                           placeholder="Paste image URL for promo 2 background">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3315,12 +3611,44 @@
                         </div>
                         <div class="card-body p-4 bg-light-50">
                             <div class="row">
+                                {{-- T9 Color Theme Customizer --}}
+                                <div class="col-md-12 mb-3">
+                                    <div class="p-3 bg-white rounded border">
+                                        <label class="font-weight-bold text-dark mb-2" style="font-size: 13px;">
+                                            <i class="fas fa-palette text-warning mr-1"></i> Template 9 Color Palette Customizer
+                                        </label>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Background Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_9_bg_color'] ?? '#fdf8ee' }}" onchange="document.getElementById('t9_bg_text').value = this.value">
+                                                    <input type="text" id="t9_bg_text" name="homepage[template_9_bg_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_9_bg_color'] ?? '#fdf8ee' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Amber Accent Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_9_accent_color'] ?? '#d97706' }}" onchange="document.getElementById('t9_accent_text').value = this.value">
+                                                    <input type="text" id="t9_accent_text" name="homepage[template_9_accent_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_9_accent_color'] ?? '#d97706' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Text Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_9_text_color'] ?? '#1c1600' }}" onchange="document.getElementById('t9_text_text').value = this.value">
+                                                    <input type="text" id="t9_text_text" name="homepage[template_9_text_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_9_text_color'] ?? '#1c1600' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-12 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
                                         <i class="fas fa-scroll mr-1" style="color:#d97706;"></i> Publisher's Notice Top Strip Text
                                     </label>
                                     <input type="text" name="homepage[template_9_notice_text]" class="form-control"
-                                           value="{{ $homepage['template_9_notice_text'] ?? '📖 Guaranteed 100% Genuine Publisher Prints • Islamic Scholarly Library & Academic Textbooks Direct to Your Door' }}"
+                                           value="{{ $homepage['template_9_notice_text'] ?? 'ðŸ“– Guaranteed 100% Genuine Publisher Prints â€¢ Islamic Scholarly Library & Academic Textbooks Direct to Your Door' }}"
                                            placeholder="Enter publisher notice text...">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -3355,6 +3683,22 @@
                                            value="{{ $homepage['template_9_trust_2_title'] ?? 'Publisher Sealed Pack' }}"
                                            placeholder="Publisher Sealed Pack">
                                 </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-truck text-success mr-1"></i> Trust Point 3 (Delivery)
+                                    </label>
+                                    <input type="text" name="homepage[template_9_trust_3_title]" class="form-control"
+                                           value="{{ $homepage['template_9_trust_3_title'] ?? 'Safe Book Delivery' }}"
+                                           placeholder="e.g. Safe Book Delivery">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-redo text-warning mr-1"></i> Trust Point 4 (Returns)
+                                    </label>
+                                    <input type="text" name="homepage[template_9_trust_4_title]" class="form-control"
+                                           value="{{ $homepage['template_9_trust_4_title'] ?? 'Hassle-Free Replacement' }}"
+                                           placeholder="e.g. Hassle-Free Replacement">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3378,8 +3722,40 @@
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
                                         <i class="fas fa-home mr-1" style="color:#ea580c;"></i> Interior Linen Top Strip Text
                                     </label>
-                                    <input type="text" name="homepage[template_10_linen_text]" class="form-control"
-                                           value="{{ $homepage['template_10_linen_text'] ?? '🏡 Free Professional Assembly • 100% Solid Seasoned Teak Guarantee • 10-Year Structural Frame Warranty' }}"
+                                    {{-- T10 Color Theme Customizer --}}
+                                <div class="col-md-12 mb-3">
+                                    <div class="p-3 bg-white rounded border">
+                                        <label class="font-weight-bold text-dark mb-2" style="font-size: 13px;">
+                                            <i class="fas fa-palette text-warning mr-1"></i> Template 10 Color Palette Customizer
+                                        </label>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Background Linen Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_10_bg_color'] ?? '#f7f3ee' }}" onchange="document.getElementById('t10_bg_text').value = this.value">
+                                                    <input type="text" id="t10_bg_text" name="homepage[template_10_bg_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_10_bg_color'] ?? '#f7f3ee' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Terracotta / Wood Accent</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_10_accent_color'] ?? '#ea580c' }}" onchange="document.getElementById('t10_accent_text').value = this.value">
+                                                    <input type="text" id="t10_accent_text" name="homepage[template_10_accent_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_10_accent_color'] ?? '#ea580c' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <label class="small text-muted font-weight-bold d-block">Text Color</label>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="mr-2" style="width:38px; height:36px; border:none; cursor:pointer;" value="{{ $homepage['template_10_text_color'] ?? '#201f1a' }}" onchange="document.getElementById('t10_text_text').value = this.value">
+                                                    <input type="text" id="t10_text_text" name="homepage[template_10_text_color]" class="form-control form-control-sm font-weight-bold" value="{{ $homepage['template_10_text_color'] ?? '#201f1a' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <input type="text" name="homepage[template_10_linen_text]" class="form-control"
+                                           value="{{ $homepage['template_10_linen_text'] ?? 'Ã°Å¸ÂÂ¡ Free Professional Assembly Ã¢â‚¬Â¢ 100% Solid Seasoned Teak Guarantee Ã¢â‚¬Â¢ 10-Year Structural Frame Warranty' }}"
                                            placeholder="Enter linen strip text...">
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -3392,19 +3768,89 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
-                                        <i class="fas fa-th-large text-primary mr-1"></i> Shop by Room Section Title
-                                    </label>
-                                    <input type="text" name="homepage[template_10_rooms_title]" class="form-control"
-                                           value="{{ $homepage['template_10_rooms_title'] ?? 'Shop Curated Living Environments' }}"
-                                           placeholder="e.g. Shop Curated Living Environments">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
                                         <i class="fas fa-shield-alt text-success mr-1"></i> 10-Year Warranty Story Heading
                                     </label>
                                     <input type="text" name="homepage[template_10_warranty_title]" class="form-control"
                                            value="{{ $homepage['template_10_warranty_title'] ?? 'Built to Last Generations' }}"
-                                           placeholder="e.g. Built to Last Gener                    {{-- MODULE 1: Product Category & Products By Category Sections --}}
+                                           placeholder="e.g. Built to Last Generations">
+                                 </div>
+
+                                 {{-- T10 Hotspot Studio --}}
+                                 <div class="col-md-12 mb-2 mt-2">
+                                     <hr class="my-2">
+                                     <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-crosshairs mr-1"></i> Interactive Hotspot Studio</p>
+                                 </div>
+                                 <div class="col-md-12 mb-3">
+                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                         <i class="fas fa-image text-secondary mr-1"></i> Studio Background Image URL
+                                     </label>
+                                     <input type="text" name="homepage[template_10_hotspot_image]" class="form-control"
+                                            value="{{ $homepage['template_10_hotspot_image'] ?? '' }}"
+                                            placeholder="Paste full image URL for the room studio background">
+                                 </div>
+                                 <div class="col-md-4 mb-3">
+                                     <label class="small text-muted font-weight-bold">Studio Tag / Eyebrow</label>
+                                     <input type="text" name="homepage[template_10_hotspot_tag]" class="form-control form-control-sm"
+                                            value="{{ $homepage['template_10_hotspot_tag'] ?? 'âœ¦ INTERACTIVE ROOM STUDIO' }}" placeholder="Tag label">
+                                 </div>
+                                 <div class="col-md-8 mb-3">
+                                     <label class="small text-muted font-weight-bold">Studio Subtitle / Instruction</label>
+                                     <input type="text" name="homepage[template_10_hotspot_sub]" class="form-control form-control-sm"
+                                            value="{{ $homepage['template_10_hotspot_sub'] ?? 'Hover on the (+) pins below to inspect and order featured furnishings' }}" placeholder="Subtitle text">
+                                 </div>
+                                 @foreach([1,2,3] as $hn)
+                                 <div class="col-md-4 mb-3 p-2 bg-white rounded border">
+                                     <p class="small font-weight-bold text-muted mb-1">Hotspot Item {{ $hn }}</p>
+                                     <input type="text" name="homepage[template_10_hotspot{{ $hn }}_name]" class="form-control form-control-sm mb-1"
+                                            value="{{ $homepage['template_10_hotspot'.$hn.'_name'] ?? '' }}" placeholder="Product name">
+                                     <input type="text" name="homepage[template_10_hotspot{{ $hn }}_price]" class="form-control form-control-sm"
+                                            value="{{ $homepage['template_10_hotspot'.$hn.'_price'] ?? '' }}" placeholder="e.g. à§³28,500 â€¢ In Stock">
+                                 </div>
+                                 @endforeach
+
+                                 {{-- T10 Room Cards --}}
+                                 <div class="col-md-12 mb-2 mt-2">
+                                     <hr class="my-2">
+                                     <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-door-open mr-1"></i> Shop by Room Cards (5 Rooms)</p>
+                                 </div>
+                                 <div class="col-md-6 mb-3">
+                                     <label class="small text-muted font-weight-bold">Rooms Section Title</label>
+                                     <input type="text" name="homepage[template_10_rooms_title]" class="form-control form-control-sm"
+                                            value="{{ $homepage['template_10_rooms_title'] ?? 'Shop Curated Living Environments' }}" placeholder="Section Title">
+                                 </div>
+                                 <div class="col-md-6 mb-3">
+                                     <label class="small text-muted font-weight-bold">Rooms Section Tag</label>
+                                     <input type="text" name="homepage[template_10_rooms_subtitle]" class="form-control form-control-sm"
+                                            value="{{ $homepage['template_10_rooms_subtitle'] ?? 'SPATIAL HARMONY' }}" placeholder="Tag above section title">
+                                 </div>
+                                 @foreach([1,2,3,4,5] as $rm)
+                                 <div class="col-md-12 mb-2 p-2 bg-white rounded border">
+                                     <p class="small font-weight-bold text-muted mb-1">Room Card {{ $rm }}</p>
+                                     <div class="row">
+                                         <div class="col-md-3">
+                                             <input type="text" name="homepage[template_10_room{{ $rm }}_name]" class="form-control form-control-sm mb-1"
+                                                    value="{{ $homepage['template_10_room'.$rm.'_name'] ?? '' }}" placeholder="Room Name">
+                                         </div>
+                                         <div class="col-md-3">
+                                             <input type="text" name="homepage[template_10_room{{ $rm }}_cta]" class="form-control form-control-sm mb-1"
+                                                    value="{{ $homepage['template_10_room'.$rm.'_cta'] ?? '' }}" placeholder="CTA Text">
+                                         </div>
+                                         <div class="col-md-3">
+                                             <input type="text" name="homepage[template_10_room{{ $rm }}_image]" class="form-control form-control-sm mb-1"
+                                                    value="{{ $homepage['template_10_room'.$rm.'_image'] ?? '' }}" placeholder="Image URL">
+                                         </div>
+                                         <div class="col-md-3">
+                                             <input type="text" name="homepage[template_10_room{{ $rm }}_url]" class="form-control form-control-sm mb-1"
+                                                    value="{{ $homepage['template_10_room'.$rm.'_url'] ?? '' }}" placeholder="Link URL">
+                                         </div>
+                                     </div>
+                                 </div>
+                                 @endforeach
+                             </div>
+                         </div>
+                     </div>
+
+                     {{-- MODULE 1: Product Category & Products By Category Sections --}}
                     <div class="card mb-4 border-0 shadow-sm rounded-4">
                         <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                             <div>
@@ -3463,7 +3909,7 @@
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <label class="small text-muted font-weight-bold mb-0">Featured Categories (Drag to Reorder)</label>
                                             </div>
-                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="🔍 Filter categories..." onkeyup="filterAdminSortable(this, 'homepage-featured-sortable')">
+                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="Ã°Å¸â€Â Filter categories..." onkeyup="filterAdminSortable(this, 'homepage-featured-sortable')">
                                             <ul id="homepage-featured-sortable" class="list-group shadow-none" style="max-height: 240px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
                                                 @php
                                                 $selected = isset($homepage['featured_category_order'])
@@ -3529,7 +3975,7 @@
 
                                         <div class="form-group mb-0">
                                             <label class="small text-muted font-weight-bold mb-1">Products By Category (Drag to Reorder)</label>
-                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="🔍 Filter categories..." onkeyup="filterAdminSortable(this, 'products-by-category-sortable')">
+                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="Ã°Å¸â€Â Filter categories..." onkeyup="filterAdminSortable(this, 'products-by-category-sortable')">
                                             <ul id="products-by-category-sortable" class="list-group shadow-none" style="max-height: 295px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
                                                 @php
                                                 $selectedOrder = !empty($homepage['products_by_category_order'])
@@ -3623,7 +4069,7 @@
                                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                                     <label class="small text-muted font-weight-bold mb-0">Select & Drag Products</label>
                                                 </div>
-                                                <input type="text" class="form-control form-control-sm mb-2" placeholder="🔍 Search products..." onkeyup="filterAdminSortable(this, '{{ $key }}-products-sortable')">
+                                                <input type="text" class="form-control form-control-sm mb-2" placeholder="Ã°Å¸â€Â Search products..." onkeyup="filterAdminSortable(this, '{{ $key }}-products-sortable')">
                                                 <ul id="{{ $key }}-products-sortable" class="list-group shadow-none" style="max-height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
                                                     @php
                                                     $selectedProducts = !empty($homepage[$key . '_products_order'])
@@ -3804,12 +4250,12 @@
                         </div>
                     </div>
 
-                    {{-- MODULE 5: Dynamic Featured Banners (1–4 Images) --}}
+                    {{-- MODULE 5: Dynamic Featured Banners (1Ã¢â‚¬â€œ4 Images) --}}
                     <div class="card mb-4 border-0 shadow-sm rounded-4">
                         <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
-                                    <i class="fas fa-images text-success mr-2"></i> Dynamic Featured Promo Banners (1–4 Images)
+                                    <i class="fas fa-images text-success mr-2"></i> Dynamic Featured Promo Banners (1Ã¢â‚¬â€œ4 Images)
                                 </h5>
                                 <small class="text-muted">Display up to 4 high-impact promotional image banners on the homepage with custom links.</small>
                             </div>
@@ -3912,7 +4358,7 @@
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <label class="small text-muted font-weight-bold mb-0">Select Categories</label>
                                             </div>
-                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="🔍 Search categories..." onkeyup="filterAdminSortable(this, 'homepage-category-v2-location{{ $loc }}-sortable')">
+                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="Ã°Å¸â€Â Search categories..." onkeyup="filterAdminSortable(this, 'homepage-category-v2-location{{ $loc }}-sortable')">
                                             <ul id="homepage-category-v2-location{{ $loc }}-sortable" class="list-group shadow-none" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
                                                 @php
                                                 $selectedLoc = isset($homepage['products_by_category_v2_location' . $loc . '_order'])
@@ -4254,8 +4700,8 @@
                             <div class="form-group mt-3">
                                 <label>Additional Related Products Section Title</label>
                                 <input type="text" name="settings[additional_related_products_section_title]" class="form-control"
-                                    value="{{ setting('general', 'additional_related_products_section_title', 'আরো দেখুন') }}" placeholder="আরো দেখুন">
-                                <small class="form-text text-muted">Title for the additional related products section (e.g., "আরো দেখুন", "See More", "Related Products").</small>
+                                    value="{{ setting('general', 'additional_related_products_section_title', 'Ã Â¦â€ Ã Â¦Â°Ã Â§â€¹ Ã Â¦Â¦Ã Â§â€¡Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨') }}" placeholder="Ã Â¦â€ Ã Â¦Â°Ã Â§â€¹ Ã Â¦Â¦Ã Â§â€¡Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨">
+                                <small class="form-text text-muted">Title for the additional related products section (e.g., "Ã Â¦â€ Ã Â¦Â°Ã Â§â€¹ Ã Â¦Â¦Ã Â§â€¡Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨", "See More", "Related Products").</small>
                             </div>
 
                             <div class="form-group">
@@ -4391,45 +4837,45 @@
                             <div class="form-group mt-3">
                                 <label>Category Label Text</label>
                                 <input type="text" name="settings[category_label_text]" class="form-control"
-                                    value="{{ setting('general', 'category_label_text', 'বিষয়') }}" placeholder="বিষয়">
-                                <small class="form-text text-muted">Text label for the category field (e.g., "বিষয়", "Category", "ক্যাটাগরি").</small>
+                                    value="{{ setting('general', 'category_label_text', 'Ã Â¦Â¬Ã Â¦Â¿Ã Â¦Â·Ã Â¦Â¯Ã Â¦Â¼') }}" placeholder="Ã Â¦Â¬Ã Â¦Â¿Ã Â¦Â·Ã Â¦Â¯Ã Â¦Â¼">
+                                <small class="form-text text-muted">Text label for the category field (e.g., "Ã Â¦Â¬Ã Â¦Â¿Ã Â¦Â·Ã Â¦Â¯Ã Â¦Â¼", "Category", "Ã Â¦â€¢Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â°Ã Â¦Â¿").</small>
                             </div>
 
                             <div class="form-group mt-3">
                                 <label>Writer Label Text</label>
                                 <input type="text" name="settings[writer_label_text]" class="form-control"
-                                    value="{{ setting('general', 'writer_label_text', 'লেখক') }}" placeholder="লেখক">
-                                <small class="form-text text-muted">Text label for the writer field (e.g., "লেখক", "Author", "রাইটার").</small>
+                                    value="{{ setting('general', 'writer_label_text', 'Ã Â¦Â²Ã Â§â€¡Ã Â¦â€“Ã Â¦â€¢') }}" placeholder="Ã Â¦Â²Ã Â§â€¡Ã Â¦â€“Ã Â¦â€¢">
+                                <small class="form-text text-muted">Text label for the writer field (e.g., "Ã Â¦Â²Ã Â§â€¡Ã Â¦â€“Ã Â¦â€¢", "Author", "Ã Â¦Â°Ã Â¦Â¾Ã Â¦â€¡Ã Â¦Å¸Ã Â¦Â¾Ã Â¦Â°").</small>
                             </div>
 
                             <div class="form-group mt-3">
                                 <label>Publisher Label Text</label>
                                 <input type="text" name="settings[publisher_label_text]" class="form-control"
-                                    value="{{ setting('general', 'publisher_label_text', 'প্রকাশক') }}" placeholder="প্রকাশক">
-                                <small class="form-text text-muted">Text label for the publisher field (e.g., "প্রকাশক", "Publisher", "পাবলিশার").</small>
+                                    value="{{ setting('general', 'publisher_label_text', 'Ã Â¦ÂªÃ Â§ÂÃ Â¦Â°Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â¶Ã Â¦â€¢') }}" placeholder="Ã Â¦ÂªÃ Â§ÂÃ Â¦Â°Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â¶Ã Â¦â€¢">
+                                <small class="form-text text-muted">Text label for the publisher field (e.g., "Ã Â¦ÂªÃ Â§ÂÃ Â¦Â°Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â¶Ã Â¦â€¢", "Publisher", "Ã Â¦ÂªÃ Â¦Â¾Ã Â¦Â¬Ã Â¦Â²Ã Â¦Â¿Ã Â¦Â¶Ã Â¦Â¾Ã Â¦Â°").</small>
                             </div>
 
                             <div class="form-group mt-3">
                                 <label>ISBN Label Text</label>
                                 <input type="text" name="settings[isbn_label_text]" class="form-control"
-                                    value="{{ setting('general', 'isbn_label_text', 'আইএসবিএন') }}" placeholder="আইএসবিএন">
-                                <small class="form-text text-muted">Text label for the ISBN field (e.g., "আইএসবিএন", "ISBN").</small>
+                                    value="{{ setting('general', 'isbn_label_text', 'Ã Â¦â€ Ã Â¦â€¡Ã Â¦ÂÃ Â¦Â¸Ã Â¦Â¬Ã Â¦Â¿Ã Â¦ÂÃ Â¦Â¨') }}" placeholder="Ã Â¦â€ Ã Â¦â€¡Ã Â¦ÂÃ Â¦Â¸Ã Â¦Â¬Ã Â¦Â¿Ã Â¦ÂÃ Â¦Â¨">
+                                <small class="form-text text-muted">Text label for the ISBN field (e.g., "Ã Â¦â€ Ã Â¦â€¡Ã Â¦ÂÃ Â¦Â¸Ã Â¦Â¬Ã Â¦Â¿Ã Â¦ÂÃ Â¦Â¨", "ISBN").</small>
                             </div>
 
                             <div class="form-group mt-3">
                                 <label>Pages Label Text</label>
                                 <input type="text" name="settings[pages_label_text]" class="form-control"
-                                    value="{{ setting('general', 'pages_label_text', 'পৃষ্ঠা') }}"
-                                    placeholder="পৃষ্ঠা">
-                                <small class="form-text text-muted">Text label for the pages field (e.g., "পৃষ্ঠা",
-                                    "Pages", "পেজ").</small>
+                                    value="{{ setting('general', 'pages_label_text', 'Ã Â¦ÂªÃ Â§Æ’Ã Â¦Â·Ã Â§ÂÃ Â¦Â Ã Â¦Â¾') }}"
+                                    placeholder="Ã Â¦ÂªÃ Â§Æ’Ã Â¦Â·Ã Â§ÂÃ Â¦Â Ã Â¦Â¾">
+                                <small class="form-text text-muted">Text label for the pages field (e.g., "Ã Â¦ÂªÃ Â§Æ’Ã Â¦Â·Ã Â§ÂÃ Â¦Â Ã Â¦Â¾",
+                                    "Pages", "Ã Â¦ÂªÃ Â§â€¡Ã Â¦Å“").</small>
                             </div>
 
                             <div class="form-group mt-3">
                                 <label>Language Label Text</label>
                                 <input type="text" name="settings[language_label_text]" class="form-control"
-                                    value="{{ setting('general', 'language_label_text', 'ভাষা') }}" placeholder="ভাষা">
-                                <small class="form-text text-muted">Text label for the language field (e.g., "ভাষা", "Language", "ল্যাঙ্গুয়েজ").</small>
+                                    value="{{ setting('general', 'language_label_text', 'Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â·Ã Â¦Â¾') }}" placeholder="Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â·Ã Â¦Â¾">
+                                <small class="form-text text-muted">Text label for the language field (e.g., "Ã Â¦Â­Ã Â¦Â¾Ã Â¦Â·Ã Â¦Â¾", "Language", "Ã Â¦Â²Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦â„¢Ã Â§ÂÃ Â¦â€”Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¼Ã Â§â€¡Ã Â¦Å“").</small>
                             </div>
 
                             <hr>
@@ -4446,8 +4892,8 @@
                             <div class="form-group mt-3">
                                 <label>"Read More" Button Text</label>
                                 <input type="text" name="settings[read_more_button_text]" class="form-control"
-                                    value="{{ setting('general', 'read_more_button_text', 'বিস্তারিত') }}" placeholder="বিস্তারিত">
-                                <small class="form-text text-muted">Text for the "Read More" button (e.g., "বিস্তারিত", "Read More", "আরও দেখুন").</small>
+                                    value="{{ setting('general', 'read_more_button_text', 'Ã Â¦Â¬Ã Â¦Â¿Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¤Ã Â¦Â¾Ã Â¦Â°Ã Â¦Â¿Ã Â¦Â¤') }}" placeholder="Ã Â¦Â¬Ã Â¦Â¿Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¤Ã Â¦Â¾Ã Â¦Â°Ã Â¦Â¿Ã Â¦Â¤">
+                                <small class="form-text text-muted">Text for the "Read More" button (e.g., "Ã Â¦Â¬Ã Â¦Â¿Ã Â¦Â¸Ã Â§ÂÃ Â¦Â¤Ã Â¦Â¾Ã Â¦Â°Ã Â¦Â¿Ã Â¦Â¤", "Read More", "Ã Â¦â€ Ã Â¦Â°Ã Â¦â€œ Ã Â¦Â¦Ã Â§â€¡Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨").</small>
                             </div>
 
                             <hr>
@@ -4483,7 +4929,7 @@
                                 <label>Availability Label Text</label>
                                 <input type="text" name="settings[availability_label_text]" class="form-control"
                                     value="{{ setting('general', 'availability_label_text', 'Availability') }}" placeholder="Availability">
-                                <small class="form-text text-muted">Text label for the availability field (e.g., "Availability", "স্টক", "উপলব্ধতা").</small>
+                                <small class="form-text text-muted">Text label for the availability field (e.g., "Availability", "Ã Â¦Â¸Ã Â§ÂÃ Â¦Å¸Ã Â¦â€¢", "Ã Â¦â€°Ã Â¦ÂªÃ Â¦Â²Ã Â¦Â¬Ã Â§ÂÃ Â¦Â§Ã Â¦Â¤Ã Â¦Â¾").</small>
                             </div>
 
                             <hr>
@@ -4539,14 +4985,14 @@
                             <div class="form-group mt-3">
                                 <label>Review Form Header Title</label>
                                 <input type="text" name="settings[review_form_header_title]" class="form-control"
-                                    value="{{ setting('general', 'review_form_header_title', 'এই পণ্য সম্পর্কে আপনার মূল্যবান মতামত লিখুন') }}" placeholder="এই পণ্য সম্পর্কে আপনার মূল্যবান মতামত লিখুন">
+                                    value="{{ setting('general', 'review_form_header_title', 'Ã Â¦ÂÃ Â¦â€¡ Ã Â¦ÂªÃ Â¦Â£Ã Â§ÂÃ Â¦Â¯ Ã Â¦Â¸Ã Â¦Â®Ã Â§ÂÃ Â¦ÂªÃ Â¦Â°Ã Â§ÂÃ Â¦â€¢Ã Â§â€¡ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â®Ã Â§â€šÃ Â¦Â²Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¬Ã Â¦Â¾Ã Â¦Â¨ Ã Â¦Â®Ã Â¦Â¤Ã Â¦Â¾Ã Â¦Â®Ã Â¦Â¤ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨') }}" placeholder="Ã Â¦ÂÃ Â¦â€¡ Ã Â¦ÂªÃ Â¦Â£Ã Â§ÂÃ Â¦Â¯ Ã Â¦Â¸Ã Â¦Â®Ã Â§ÂÃ Â¦ÂªÃ Â¦Â°Ã Â§ÂÃ Â¦â€¢Ã Â§â€¡ Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â®Ã Â§â€šÃ Â¦Â²Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¬Ã Â¦Â¾Ã Â¦Â¨ Ã Â¦Â®Ã Â¦Â¤Ã Â¦Â¾Ã Â¦Â®Ã Â¦Â¤ Ã Â¦Â²Ã Â¦Â¿Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨">
                                 <small class="form-text text-muted">Header title for the review form section.</small>
                             </div>
 
                             <div class="form-group mt-3">
                                 <label>Review Form Submit Button Text</label>
                                 <input type="text" name="settings[review_form_submit_button_text]" class="form-control"
-                                    value="{{ setting('general', 'review_form_submit_button_text', 'আপনার মতামত সাবমিট করুন') }}" placeholder="আপনার মতামত সাবমিট করুন">
+                                    value="{{ setting('general', 'review_form_submit_button_text', 'Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â®Ã Â¦Â¤Ã Â¦Â¾Ã Â¦Â®Ã Â¦Â¤ Ã Â¦Â¸Ã Â¦Â¾Ã Â¦Â¬Ã Â¦Â®Ã Â¦Â¿Ã Â¦Å¸ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨') }}" placeholder="Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â®Ã Â¦Â¤Ã Â¦Â¾Ã Â¦Â®Ã Â¦Â¤ Ã Â¦Â¸Ã Â¦Â¾Ã Â¦Â¬Ã Â¦Â®Ã Â¦Â¿Ã Â¦Å¸ Ã Â¦â€¢Ã Â¦Â°Ã Â§ÂÃ Â¦Â¨">
                                 <small class="form-text text-muted">Text for the review form submit button.</small>
                             </div>
 
@@ -4560,14 +5006,14 @@
                             <div class="form-group mt-3">
                                 <label>Guest Name Label</label>
                                 <input type="text" name="settings[guest_name_label]" class="form-control"
-                                    value="{{ setting('general', 'guest_name_label', 'আপনার নাম') }}" placeholder="আপনার নাম">
+                                    value="{{ setting('general', 'guest_name_label', 'Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â¨Ã Â¦Â¾Ã Â¦Â®') }}" placeholder="Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦Â¨Ã Â¦Â¾Ã Â¦Â®">
                                 <small class="form-text text-muted">Label for the guest name field in the review form.</small>
                             </div>
 
                             <div class="form-group mt-3">
                                 <label>Guest Email Label</label>
                                 <input type="text" name="settings[guest_email_label]" class="form-control"
-                                    value="{{ setting('general', 'guest_email_label', 'আপনার ইমেইল') }}" placeholder="আপনার ইমেইল">
+                                    value="{{ setting('general', 'guest_email_label', 'Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦â€¡Ã Â¦Â®Ã Â§â€¡Ã Â¦â€¡Ã Â¦Â²') }}" placeholder="Ã Â¦â€ Ã Â¦ÂªÃ Â¦Â¨Ã Â¦Â¾Ã Â¦Â° Ã Â¦â€¡Ã Â¦Â®Ã Â§â€¡Ã Â¦â€¡Ã Â¦Â²">
                                 <small class="form-text text-muted">Label for the guest email field in the review form.</small>
                             </div>
 
@@ -4585,8 +5031,8 @@
                             <div class="form-group mt-3">
                                 <label>Related Products Section Title</label>
                                 <input type="text" name="settings[related_products_section_title]" class="form-control"
-                                    value="{{ setting('general', 'related_products_section_title', 'আরো দেখুন') }}" placeholder="আরো দেখুন">
-                                <small class="form-text text-muted">Title for the related products section (e.g., "আরো দেখুন", "See More", "Related Products").</small>
+                                    value="{{ setting('general', 'related_products_section_title', 'Ã Â¦â€ Ã Â¦Â°Ã Â§â€¹ Ã Â¦Â¦Ã Â§â€¡Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨') }}" placeholder="Ã Â¦â€ Ã Â¦Â°Ã Â§â€¹ Ã Â¦Â¦Ã Â§â€¡Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨">
+                                <small class="form-text text-muted">Title for the related products section (e.g., "Ã Â¦â€ Ã Â¦Â°Ã Â§â€¹ Ã Â¦Â¦Ã Â§â€¡Ã Â¦â€“Ã Â§ÂÃ Â¦Â¨", "See More", "Related Products").</small>
                             </div>
                         </div>
                     </div>
@@ -4726,7 +5172,7 @@
                                                         <div class="form-group mb-2">
                                                             <label class="form-label mb-1">Label</label>
                                                             <input type="text" class="form-control form-control-sm" name="mobile_nav[home_label]"
-                                                                value="{{ setting('mobile_nav', 'home_label', 'হোম') }}" placeholder="হোম">
+                                                                value="{{ setting('mobile_nav', 'home_label', 'Ã Â¦Â¹Ã Â§â€¹Ã Â¦Â®') }}" placeholder="Ã Â¦Â¹Ã Â§â€¹Ã Â¦Â®">
                                                         </div>
                                                         <small class="text-muted">Home page link</small>
                                                     </div>
@@ -4757,7 +5203,7 @@
                                                         <div class="form-group mb-2">
                                                             <label class="form-label mb-1">Label</label>
                                                             <input type="text" class="form-control form-control-sm" name="mobile_nav[cart_label]"
-                                                                value="{{ setting('mobile_nav', 'cart_label', 'কার্ট') }}" placeholder="কার্ট">
+                                                                value="{{ setting('mobile_nav', 'cart_label', 'Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â°Ã Â§ÂÃ Â¦Å¸') }}" placeholder="Ã Â¦â€¢Ã Â¦Â¾Ã Â¦Â°Ã Â§ÂÃ Â¦Å¸">
                                                         </div>
                                                         <small class="text-muted">Shopping cart link</small>
                                                     </div>
@@ -4791,7 +5237,7 @@
                                                         <div class="form-group mb-2">
                                                             <label class="form-label mb-1">Label</label>
                                                             <input type="text" class="form-control form-control-sm" name="mobile_nav[chat_label]"
-                                                                value="{{ setting('mobile_nav', 'chat_label', 'চ্যাট') }}" placeholder="চ্যাট">
+                                                                value="{{ setting('mobile_nav', 'chat_label', 'Ã Â¦Å¡Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸') }}" placeholder="Ã Â¦Å¡Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸">
                                                         </div>
                                                         <small class="text-muted">Chat support link</small>
                                                     </div>
@@ -4823,7 +5269,7 @@
                                                         <div class="form-group mb-2">
                                                             <label class="form-label mb-1">Label</label>
                                                             <input type="text" class="form-control form-control-sm" name="mobile_nav[call_label]"
-                                                                value="{{ setting('mobile_nav', 'call_label', 'কল') }}" placeholder="কল">
+                                                                value="{{ setting('mobile_nav', 'call_label', 'Ã Â¦â€¢Ã Â¦Â²') }}" placeholder="Ã Â¦â€¢Ã Â¦Â²">
                                                         </div>
                                                         <small class="text-muted">Phone call link</small>
                                                     </div>
@@ -4854,7 +5300,7 @@
                                                         <div class="form-group mb-2">
                                                             <label class="form-label mb-1">Label</label>
                                                             <input type="text" class="form-control form-control-sm" name="mobile_nav[profile_label]"
-                                                                value="{{ setting('mobile_nav', 'profile_label', 'প্রোফাইল') }}" placeholder="প্রোফাইল">
+                                                                value="{{ setting('mobile_nav', 'profile_label', 'Ã Â¦ÂªÃ Â§ÂÃ Â¦Â°Ã Â§â€¹Ã Â¦Â«Ã Â¦Â¾Ã Â¦â€¡Ã Â¦Â²') }}" placeholder="Ã Â¦ÂªÃ Â§ÂÃ Â¦Â°Ã Â§â€¹Ã Â¦Â«Ã Â¦Â¾Ã Â¦â€¡Ã Â¦Â²">
                                                         </div>
                                                         <small class="text-muted">User profile link</small>
                                                     </div>
@@ -4885,7 +5331,7 @@
                                                         <div class="form-group mb-2">
                                                             <label class="form-label mb-1">Label</label>
                                                             <input type="text" class="form-control form-control-sm" name="mobile_nav[category_label]"
-                                                                value="{{ setting('mobile_nav', 'category_label', 'ক্যাটাগরি') }}" placeholder="ক্যাটাগরি">
+                                                                value="{{ setting('mobile_nav', 'category_label', 'Ã Â¦â€¢Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â°Ã Â¦Â¿') }}" placeholder="Ã Â¦â€¢Ã Â§ÂÃ Â¦Â¯Ã Â¦Â¾Ã Â¦Å¸Ã Â¦Â¾Ã Â¦â€”Ã Â¦Â°Ã Â¦Â¿">
                                                         </div>
                                                         <small class="text-muted">Category browser popup</small>
                                                     </div>
@@ -6003,7 +6449,7 @@
                 const activeBadge = this.querySelector('.template-status-badge');
                 if (activeBadge) {
                     activeBadge.className = 'badge badge-success px-3 py-1 template-status-badge';
-                    activeBadge.textContent = '✓ Currently Active';
+                    activeBadge.textContent = 'Ã¢Å“â€œ Currently Active';
                 }
 
                 // Show corresponding template configuration panel
@@ -6183,3 +6629,5 @@
     };
 </script>
 @endsection
+
+
