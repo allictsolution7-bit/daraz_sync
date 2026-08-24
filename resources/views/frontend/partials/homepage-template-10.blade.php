@@ -854,6 +854,25 @@
         </section>
     @endif
 
+    {{-- SECTION 9: Curated Product Showcases (Best Selling, Editor's Picks, Trending Now) --}}
+    @foreach(['best_selling' => ($homepage['best_selling_section_heading'] ?? 'Best Selling Furniture'), 'editors_pick' => ($homepage['editors_pick_section_heading'] ?? "Architect's Picks"), 'trending' => ($homepage['trending_section_heading'] ?? 'Trending in Living & Decor')] as $secKey => $secTitle)
+        @if (!empty($homepage['enable_' . $secKey . '_section']) && $homepage['enable_' . $secKey . '_section'] && isset($featuredSections[$secKey]) && $featuredSections[$secKey]->count() > 0)
+            <section class="t10-section">
+                <div class="t10-container">
+                    <div class="t10-sec-head">
+                        <div class="t10-sec-tag">{{ $secKey === 'best_selling' ? '🔥 HOT DEALS' : ($secKey === 'editors_pick' ? '⭐ CURATED' : '⚡ POPULAR') }}</div>
+                        <h2 class="t10-sec-title">{{ $secTitle }}</h2>
+                    </div>
+                    <div class="t10-product-grid">
+                        @foreach($featuredSections[$secKey] as $product)
+                            @include('frontend.partials.product-item', ['product' => $product, 'badge' => strtoupper(str_replace('_', ' ', $secKey))])
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
+    @endforeach
+
 </div>
 
 <script>

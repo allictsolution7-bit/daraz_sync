@@ -723,52 +723,67 @@
         <div class="t7-container">
             <div class="t7-gift-section">
                 <div class="t7-sec-head">
-                    <div class="t7-sec-tag">SIGNATURE BUNDLES</div>
+                    <div class="t7-sec-tag">{{ $homepage['template_7_gifts_tag'] ?? 'SIGNATURE BUNDLES' }}</div>
                     <h2 class="t7-sec-title">{{ $homepage['template_7_gifts_title'] ?? 'Luxury Beauty Gift Sets' }}</h2>
                 </div>
                 <div class="t7-gift-grid">
-                    <a href="{{ route('shop') }}" class="t7-gift-card">
-                        <div class="t7-gift-img-wrap">
-                            <span class="t7-gift-ribbon">BESTSELLER SET</span>
-                            <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&q=80" alt="Rose Water Set">
-                        </div>
-                        <div class="t7-gift-body">
-                            <h4 class="t7-gift-title">Hydration Glow Trio</h4>
-                            <p class="t7-gift-items">Foam Cleanser + Rose Mist + Hyaluronic Serum</p>
-                            <div class="t7-gift-foot">
-                                <span class="t7-gift-price">Special Bundle ৳1,850</span>
-                                <span style="font-size:11.5px; font-weight:800; color:#c2185b;">SHOP SET &rarr;</span>
+                    @php
+                        $defaultGiftPresets = [
+                            1 => [
+                                'tag'   => 'BESTSELLER SET',
+                                'title' => 'Hydration Glow Trio',
+                                'items' => 'Foam Cleanser + Rose Mist + Hyaluronic Serum',
+                                'price' => 'Special Bundle ৳1,850',
+                                'image' => 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&q=80',
+                                'link'  => route('shop'),
+                            ],
+                            2 => [
+                                'tag'   => 'NEW EDITION',
+                                'title' => 'Velvet Matte Lip Vault',
+                                'items' => '3 Long-Wear Nude & Berry Halal Lipsticks',
+                                'price' => 'Special Bundle ৳1,450',
+                                'image' => 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80',
+                                'link'  => route('shop'),
+                            ],
+                            3 => [
+                                'tag'   => 'ORGANIC',
+                                'title' => 'Botanical Night Spa Kit',
+                                'items' => 'Clay Mask + Bakuchiol Night Oil + Jade Roller',
+                                'price' => 'Special Bundle ৳2,200',
+                                'image' => 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80',
+                                'link'  => route('shop'),
+                            ],
+                        ];
+                    @endphp
+
+                    @for($g = 1; $g <= 3; $g++)
+                        @php
+                            $p = $defaultGiftPresets[$g];
+                            $giftTag   = $homepage['template_7_gift_'.$g.'_tag']   ?? $p['tag'];
+                            $giftTitle = $homepage['template_7_gift_'.$g.'_title'] ?? $p['title'];
+                            $giftItems = $homepage['template_7_gift_'.$g.'_items'] ?? $p['items'];
+                            $giftPrice = $homepage['template_7_gift_'.$g.'_price'] ?? $p['price'];
+                            $giftImg   = $homepage['template_7_gift_'.$g.'_image'] ?? $p['image'];
+                            $giftLink  = $homepage['template_7_gift_'.$g.'_link']  ?? $p['link'];
+                            $finalImg  = (str_starts_with($giftImg, 'http') || str_starts_with($giftImg, '//')) ? $giftImg : asset($giftImg);
+                        @endphp
+                        <a href="{{ $giftLink ?: route('shop') }}" class="t7-gift-card">
+                            <div class="t7-gift-img-wrap">
+                                @if(!empty($giftTag))
+                                    <span class="t7-gift-ribbon">{{ $giftTag }}</span>
+                                @endif
+                                <img src="{{ $finalImg }}" alt="{{ $giftTitle }}">
                             </div>
-                        </div>
-                    </a>
-                    <a href="{{ route('shop') }}" class="t7-gift-card">
-                        <div class="t7-gift-img-wrap">
-                            <span class="t7-gift-ribbon">NEW EDITION</span>
-                            <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80" alt="Lip Trio">
-                        </div>
-                        <div class="t7-gift-body">
-                            <h4 class="t7-gift-title">Velvet Matte Lip Vault</h4>
-                            <p class="t7-gift-items">3 Long-Wear Nude & Berry Halal Lipsticks</p>
-                            <div class="t7-gift-foot">
-                                <span class="t7-gift-price">Special Bundle ৳1,450</span>
-                                <span style="font-size:11.5px; font-weight:800; color:#c2185b;">SHOP SET &rarr;</span>
+                            <div class="t7-gift-body">
+                                <h4 class="t7-gift-title">{{ $giftTitle }}</h4>
+                                <p class="t7-gift-items">{{ $giftItems }}</p>
+                                <div class="t7-gift-foot">
+                                    <span class="t7-gift-price">{{ $giftPrice }}</span>
+                                    <span style="font-size:11.5px; font-weight:800; color:#c2185b;">SHOP SET &rarr;</span>
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                    <a href="{{ route('shop') }}" class="t7-gift-card">
-                        <div class="t7-gift-img-wrap">
-                            <span class="t7-gift-ribbon">ORGANIC</span>
-                            <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80" alt="Spa Night Set">
-                        </div>
-                        <div class="t7-gift-body">
-                            <h4 class="t7-gift-title">Botanical Night Spa Kit</h4>
-                            <p class="t7-gift-items">Clay Mask + Bakuchiol Night Oil + Jade Roller</p>
-                            <div class="t7-gift-foot">
-                                <span class="t7-gift-price">Special Bundle ৳2,200</span>
-                                <span style="font-size:11.5px; font-weight:800; color:#c2185b;">SHOP SET &rarr;</span>
-                            </div>
-                        </div>
-                    </a>
+                        </a>
+                    @endfor
                 </div>
             </div>
         </div>
@@ -809,6 +824,25 @@
             </div>
         </div>
     </section>
+
+    {{-- SECTION 8: Curated Product Showcases (Best Selling, Editor's Picks, Trending Now) --}}
+    @foreach(['best_selling' => ($homepage['best_selling_section_heading'] ?? 'Best Selling Beauty'), 'editors_pick' => ($homepage['editors_pick_section_heading'] ?? "Editor's Skincare Picks"), 'trending' => ($homepage['trending_section_heading'] ?? 'Trending in Beauty')] as $secKey => $secTitle)
+        @if (!empty($homepage['enable_' . $secKey . '_section']) && $homepage['enable_' . $secKey . '_section'] && isset($featuredSections[$secKey]) && $featuredSections[$secKey]->count() > 0)
+            <section class="t7-section">
+                <div class="t7-container">
+                    <div class="t7-sec-head">
+                        <div class="t7-sec-tag">{{ $secKey === 'best_selling' ? 'HOT DEALS' : ($secKey === 'editors_pick' ? 'CURATED' : 'POPULAR') }}</div>
+                        <h2 class="t7-sec-title">{{ $secTitle }}</h2>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; margin-bottom: 30px;">
+                        @foreach($featuredSections[$secKey] as $product)
+                            @include('frontend.partials.product-item', ['product' => $product, 'badge' => strtoupper(str_replace('_', ' ', $secKey))])
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
+    @endforeach
 
 </div>
 

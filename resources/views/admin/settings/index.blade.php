@@ -3460,6 +3460,61 @@
                                     <input type="text" name="homepage[template_7_ritual_cta]" class="form-control form-control-sm"
                                            value="{{ $homepage['template_7_ritual_cta'] ?? 'Explore' }}" placeholder="e.g. Explore">
                                 </div>
+
+                                {{-- T7 Luxury Combo Gift Sets Section --}}
+                                <div class="col-md-12 mb-2 mt-3">
+                                    <hr class="my-2">
+                                    <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-gift mr-1 text-danger"></i> Luxury Combo Gift Sets (3 Signature Bundles)</p>
+                                </div>
+
+                                @php
+                                    $t7GiftPresets = [
+                                        1 => ['tag' => 'BESTSELLER SET', 'title' => 'Hydration Glow Trio', 'items' => 'Foam Cleanser + Rose Mist + Hyaluronic Serum', 'price' => 'Special Bundle ৳1,850', 'image' => 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&q=80', 'link' => ''],
+                                        2 => ['tag' => 'NEW EDITION', 'title' => 'Velvet Matte Lip Vault', 'items' => '3 Long-Wear Nude & Berry Halal Lipsticks', 'price' => 'Special Bundle ৳1,450', 'image' => 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80', 'link' => ''],
+                                        3 => ['tag' => 'ORGANIC', 'title' => 'Botanical Night Spa Kit', 'items' => 'Clay Mask + Bakuchiol Night Oil + Jade Roller', 'price' => 'Special Bundle ৳2,200', 'image' => 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80', 'link' => ''],
+                                    ];
+                                @endphp
+
+                                @for($gNum = 1; $gNum <= 3; $gNum++)
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 bg-white rounded border h-100 shadow-sm">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge badge-danger px-2 py-1" style="border-radius: 12px; font-size: 10px;">Gift Bundle {{ $gNum }}</span>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-1">Ribbon Badge</label>
+                                            <input type="text" name="homepage[template_7_gift_{{ $gNum }}_tag]" class="form-control form-control-sm font-weight-bold"
+                                                   value="{{ $homepage['template_7_gift_'.$gNum.'_tag'] ?? $t7GiftPresets[$gNum]['tag'] }}" placeholder="e.g. BESTSELLER SET">
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-1">Bundle Title</label>
+                                            <input type="text" name="homepage[template_7_gift_{{ $gNum }}_title]" class="form-control form-control-sm font-weight-bold"
+                                                   value="{{ $homepage['template_7_gift_'.$gNum.'_title'] ?? $t7GiftPresets[$gNum]['title'] }}" placeholder="e.g. Hydration Glow Trio">
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-1">Included Items</label>
+                                            <input type="text" name="homepage[template_7_gift_{{ $gNum }}_items]" class="form-control form-control-sm"
+                                                   value="{{ $homepage['template_7_gift_'.$gNum.'_items'] ?? $t7GiftPresets[$gNum]['items'] }}" placeholder="Item 1 + Item 2 + Item 3">
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-1">Price Text</label>
+                                            <input type="text" name="homepage[template_7_gift_{{ $gNum }}_price]" class="form-control form-control-sm font-weight-bold text-danger"
+                                                   value="{{ $homepage['template_7_gift_'.$gNum.'_price'] ?? $t7GiftPresets[$gNum]['price'] }}" placeholder="Special Bundle ৳1,850">
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-1">Image URL / Path</label>
+                                            <input type="text" name="homepage[template_7_gift_{{ $gNum }}_image]" class="form-control form-control-sm"
+                                                   value="{{ $homepage['template_7_gift_'.$gNum.'_image'] ?? $t7GiftPresets[$gNum]['image'] }}" placeholder="https://... or images/...">
+                                        </div>
+                                        <div class="form-group mb-0">
+                                            <label class="small text-muted font-weight-bold mb-1">Target Link URL</label>
+                                            <input type="text" name="homepage[template_7_gift_{{ $gNum }}_link]" class="form-control form-control-sm"
+                                                   value="{{ $homepage['template_7_gift_'.$gNum.'_link'] ?? $t7GiftPresets[$gNum]['link'] }}" placeholder="{{ route('shop') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                @endfor
+
                                 @php
                                 $t7RitualDefaults = [
                                     1 => ['icon' => '🫧', 'name' => 'Deep Cleansing', 'desc' => 'Gentle amino-acid foaming cleanser that purifies pores without stripping moisture.', 'url' => route('shop')],

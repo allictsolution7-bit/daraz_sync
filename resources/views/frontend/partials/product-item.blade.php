@@ -255,9 +255,10 @@
         position: relative !important;
         display: flex !important;
         flex-direction: column !important;
-        border-radius: 12px !important;
+        border-radius: 14px !important;
         background: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
+        border: 1.5px solid #e2e8f0 !important;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
         padding-bottom: 22px !important;
         margin-bottom: 22px !important;
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease !important;
@@ -287,26 +288,26 @@
     }
 
     /* Template 2 (Sky Blue & White — Light) */
-    .template-2 .product-card {
+    .template-2 .product-card, .t2-page .product-card {
         background: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
+        border: 1.5px solid #cbd5e1 !important;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.07), 0 1px 4px rgba(56, 189, 248, 0.08) !important;
     }
-    .template-2 .product-card:hover {
-        background: #f0f9ff !important;
+    .template-2 .product-card:hover, .t2-page .product-card:hover {
+        background: #ffffff !important;
         border-color: #38bdf8 !important;
-        box-shadow: 0 14px 34px rgba(56, 189, 248, 0.18) !important;
+        box-shadow: 0 14px 34px rgba(56, 189, 248, 0.22), 0 4px 12px rgba(99, 102, 241, 0.10) !important;
     }
-    .template-2 .product-card .product-title {
+    .template-2 .product-card .product-title, .t2-page .product-card .product-title {
         color: #0f172a !important;
     }
-    .template-2 .product-card .current-price {
+    .template-2 .product-card .current-price, .t2-page .product-card .current-price {
         color: #2563eb !important;
     }
-    .template-2 .product-card .original-price {
+    .template-2 .product-card .original-price, .t2-page .product-card .original-price {
         color: #94a3b8 !important;
     }
-    .template-2 .product-card .product-card-rating .rating-text {
+    .template-2 .product-card .product-card-rating .rating-text, .t2-page .product-card .product-card-rating .rating-text {
         color: #64748b !important;
     }
 
@@ -418,7 +419,7 @@
     }
 
     /* Template 2 Add to Cart — Blue Sky gradient */
-    .template-2 .btn-card-add-to-cart {
+    .template-2 .btn-card-add-to-cart, .t2-page .btn-card-add-to-cart {
         background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
         color: #ffffff !important;
         box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4) !important;

@@ -43,11 +43,17 @@ class AdminLayoutComposer
                 ->count();
 
             // 2. Pending recharge requests
+            $hasUsersCreatedBy = \Illuminate\Support\Facades\Schema::hasColumn('users', 'created_by');
+            $hasProductsCreatedBy = \Illuminate\Support\Facades\Schema::hasColumn('products', 'created_by');
+            $hasProductsApprovalStatus = \Illuminate\Support\Facades\Schema::hasColumn('products', 'approval_status');
+
             if ($isSuperAdmin) {
                 $headerPendingPaymentsQuery = \App\Models\VendorWalletTransaction::where('status', 'pending')
                     ->where('type', 'recharge_request');
             } else {
-                $adminVendorIds = \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
+                $adminVendorIds = $hasUsersCreatedBy 
+                    ? \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray() 
+                    : [];
                 $headerPendingPaymentsQuery = \App\Models\VendorWalletTransaction::where('status', 'pending')
                     ->where('type', 'recharge_request')
                     ->whereIn('vendor_id', $adminVendorIds);
@@ -60,12 +66,16 @@ class AdminLayoutComposer
 
             // 3. Pending products
             if ($isSuperAdmin) {
-                $headerPendingProductsQuery = \App\Models\Product::whereNotNull('vendor_id')
-                    ->where('approval_status', 'pending');
+                $headerPendingProductsQuery = \App\Models\Product::whereNotNull('vendor_id');
+                if ($hasProductsApprovalStatus) {
+                    $headerPendingProductsQuery->where('approval_status', 'pending');
+                }
             } else {
-                $adminVendorIds = $adminVendorIds ?? \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
-                $headerPendingProductsQuery = \App\Models\Product::whereIn('vendor_id', $adminVendorIds)
-                    ->where('approval_status', 'pending');
+                $adminVendorIds = $adminVendorIds ?? ($hasUsersCreatedBy ? \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray() : []);
+                $headerPendingProductsQuery = \App\Models\Product::whereIn('vendor_id', $adminVendorIds);
+                if ($hasProductsApprovalStatus) {
+                    $headerPendingProductsQuery->where('approval_status', 'pending');
+                }
             }
             $headerPendingProducts = (clone $headerPendingProductsQuery)->with('vendor')->latest()->limit(5)->get();
             $headerPendingProdCount = $lastReadAt
@@ -76,8 +86,8 @@ class AdminLayoutComposer
             if ($isSuperAdmin) {
                 $headerVendorOrdersQuery = \App\Models\order::where('status', 'pending');
             } else {
-                $adminVendorIds = $adminVendorIds ?? \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray();
-                $adminProductIds = \App\Models\Product::where('created_by', $user->id)->pluck('id')->toArray();
+                $adminVendorIds = $adminVendorIds ?? ($hasUsersCreatedBy ? \App\Models\User::where('created_by', $user->id)->pluck('id')->toArray() : []);
+                $adminProductIds = $hasProductsCreatedBy ? \App\Models\Product::where('created_by', $user->id)->pluck('id')->toArray() : [];
 
                 $headerVendorOrdersQuery = \App\Models\order::where('status', 'pending')
                     ->whereHas('orderItems', function ($q) use ($adminVendorIds, $adminProductIds) {

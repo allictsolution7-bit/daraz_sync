@@ -242,15 +242,22 @@ class TenantProvisioningService
             if (!empty($email)) {
                 $existingUser = DB::connection('tenant_temp')->table('users')->where('email', $email)->first();
                 if (!$existingUser) {
-                    $userId = DB::connection('tenant_temp')->table('users')->insertGetId([
+                    $userData = [
                         'name' => $userName,
                         'email' => $email,
                         'phone' => $phone,
                         'password' => $password,
-                        'otp_verified' => 1,
                         'created_at' => $now,
                         'updated_at' => $now,
-                    ]);
+                    ];
+                    if (\Illuminate\Support\Facades\Schema::connection('tenant_temp')->hasColumn('users', 'otp_verified')) {
+                        $userData['otp_verified'] = 1;
+                    }
+                    if (\Illuminate\Support\Facades\Schema::connection('tenant_temp')->hasColumn('users', 'is_admin')) {
+                        $userData['is_admin'] = 1;
+                    }
+
+                    $userId = DB::connection('tenant_temp')->table('users')->insertGetId($userData);
 
                     // Assign super_admin / admin role in tenant_temp
                     $adminRole = DB::connection('tenant_temp')->table('roles')->where('name', 'super_admin')->first()

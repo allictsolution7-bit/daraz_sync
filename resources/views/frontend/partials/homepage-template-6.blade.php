@@ -1218,7 +1218,26 @@
         </div>
     </section>
 
-    {{-- SECTION 8: Style Community Newsletter --}}
+    {{-- SECTION 8: Curated Product Showcases (Best Selling, Editor's Picks, Trending Now) --}}
+    @foreach(['best_selling' => ($homepage['best_selling_section_heading'] ?? 'Best Selling Collections'), 'editors_pick' => ($homepage['editors_pick_section_heading'] ?? "Editor's Curation"), 'trending' => ($homepage['trending_section_heading'] ?? 'Trending Now')] as $secKey => $secTitle)
+        @if (!empty($homepage['enable_' . $secKey . '_section']) && $homepage['enable_' . $secKey . '_section'] && isset($featuredSections[$secKey]) && $featuredSections[$secKey]->count() > 0)
+            <section class="t6-section">
+                <div class="t6-container">
+                    <div class="t6-sec-head">
+                        <div class="t6-sec-subtitle">{{ $secKey === 'best_selling' ? 'Hot Deals' : ($secKey === 'editors_pick' ? 'Curated' : 'Popular') }}</div>
+                        <h2 class="t6-sec-title">{{ $secTitle }}</h2>
+                    </div>
+                    <div class="t6-product-grid">
+                        @foreach($featuredSections[$secKey] as $product)
+                            @include('frontend.partials.product-item', ['product' => $product, 'badge' => strtoupper(str_replace('_', ' ', $secKey))])
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
+    @endforeach
+
+    {{-- SECTION 9: Style Community Newsletter --}}
     <section class="t6-container">
         <div class="t6-newsletter-wrap">
             <div class="t6-sec-subtitle">{{ $homepage['template_6_vip_eyebrow'] ?? 'EXCLUSIVE PRIVILEGES' }}</div>
