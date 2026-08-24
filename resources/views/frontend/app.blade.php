@@ -197,14 +197,22 @@
         }
 
         .product-card .product-title {
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 13.5px;
+            font-weight: 600;
             color: var(--secondary-color);
             margin-bottom: 2px;
-            margin-top: 7px;
-            white-space: nowrap;
+            margin-top: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.35;
+            min-height: 2.7em;
+        }
+
+        /* Template 2: light card — ensure dark title text */
+        .template-2 .product-card .product-title {
+            color: #0f172a !important;
         }
 
         .product-meta {

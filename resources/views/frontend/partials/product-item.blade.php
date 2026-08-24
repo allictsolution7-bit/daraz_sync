@@ -286,6 +286,30 @@
         border-color: #2563eb !important;
     }
 
+    /* Template 2 (Sky Blue & White — Light) */
+    .template-2 .product-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
+    }
+    .template-2 .product-card:hover {
+        background: #f0f9ff !important;
+        border-color: #38bdf8 !important;
+        box-shadow: 0 14px 34px rgba(56, 189, 248, 0.18) !important;
+    }
+    .template-2 .product-card .product-title {
+        color: #0f172a !important;
+    }
+    .template-2 .product-card .current-price {
+        color: #2563eb !important;
+    }
+    .template-2 .product-card .original-price {
+        color: #94a3b8 !important;
+    }
+    .template-2 .product-card .product-card-rating .rating-text {
+        color: #64748b !important;
+    }
+
     /* Template 3 (Neon Tech) */
     .template-3 .product-card, .t3-page .product-card {
         background: #0d1322 !important;
@@ -297,12 +321,12 @@
         box-shadow: 0 14px 36px rgba(56, 189, 248, 0.3) !important;
     }
 
-    /* Template 2 & 4 (Gold Luxury) */
-    .template-2 .product-card, .template-4 .product-card, .t4-page .product-card {
+    /* Template 4 (Dark Gold Luxury) */
+    .template-4 .product-card, .t4-page .product-card {
         background: #171a21 !important;
         border: 1px solid rgba(212, 175, 55, 0.3) !important;
     }
-    .template-2 .product-card:hover, .template-4 .product-card:hover, .t4-page .product-card:hover {
+    .template-4 .product-card:hover, .t4-page .product-card:hover {
         background: #1e222b !important;
         border-color: #d4af37 !important;
         box-shadow: 0 14px 36px rgba(212, 175, 55, 0.3) !important;
@@ -393,7 +417,14 @@
         box-shadow: 0 0 16px rgba(56, 189, 248, 0.5) !important;
     }
 
-    .template-2 .btn-card-add-to-cart, .template-4 .btn-card-add-to-cart, .t4-page .btn-card-add-to-cart, .template-6 .btn-card-add-to-cart {
+    /* Template 2 Add to Cart — Blue Sky gradient */
+    .template-2 .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4) !important;
+    }
+
+    .template-4 .btn-card-add-to-cart, .t4-page .btn-card-add-to-cart, .template-6 .btn-card-add-to-cart {
         background: linear-gradient(135deg, #d4af37, #b8860b) !important;
         color: #0f1115 !important;
         box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4) !important;
