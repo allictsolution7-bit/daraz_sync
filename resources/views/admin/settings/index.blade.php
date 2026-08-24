@@ -1,4 +1,4 @@
-﻿@extends('layouts.master')
+@extends('layouts.master')
 
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
@@ -3178,17 +3178,24 @@
                                     <hr class="my-2">
                                     <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-star-half-alt mr-1"></i> Below-Hero Editorial Strip (3 Icons)</p>
                                 </div>
+                                @php
+                                $t6StripDefaults = [
+                                    1 => ['icon' => '👑', 'label' => 'Festive Panjabi & Sherwani', 'sub' => 'Pure silk with hand zardozi collar embroidery', 'url' => route('shop')],
+                                    2 => ['icon' => '✨', 'label' => 'Designer Western & Gowns', 'sub' => 'Modern tailoring and contemporary silhouettes', 'url' => route('shop')],
+                                    3 => ['icon' => '💎', 'label' => 'Handcrafted Leather Footwear', 'sub' => 'Artisanal Nagra, loafers & festive accessories', 'url' => route('shop')],
+                                ];
+                                @endphp
                                 @foreach([1,2,3] as $sn)
                                 <div class="col-md-4 mb-3 p-2 bg-white rounded border">
                                     <p class="small font-weight-bold text-muted mb-2">Strip Item {{ $sn }}</p>
                                     <input type="text" name="homepage[template_6_strip{{ $sn }}_icon]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_strip'.$sn.'_icon'] ?? '' }}" placeholder="Emoji icon e.g. Ã°Å¸â€˜â€˜">
+                                           value="{{ !empty($homepage['template_6_strip'.$sn.'_icon']) ? $homepage['template_6_strip'.$sn.'_icon'] : $t6StripDefaults[$sn]['icon'] }}" placeholder="Emoji icon e.g. 👑">
                                     <input type="text" name="homepage[template_6_strip{{ $sn }}_label]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_strip'.$sn.'_label'] ?? '' }}" placeholder="Label text">
+                                           value="{{ !empty($homepage['template_6_strip'.$sn.'_label']) ? $homepage['template_6_strip'.$sn.'_label'] : $t6StripDefaults[$sn]['label'] }}" placeholder="Label text">
                                     <input type="text" name="homepage[template_6_strip{{ $sn }}_sub]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_strip'.$sn.'_sub'] ?? '' }}" placeholder="Subtitle text">
+                                           value="{{ !empty($homepage['template_6_strip'.$sn.'_sub']) ? $homepage['template_6_strip'.$sn.'_sub'] : $t6StripDefaults[$sn]['sub'] }}" placeholder="Subtitle text">
                                     <input type="text" name="homepage[template_6_strip{{ $sn }}_url]" class="form-control form-control-sm"
-                                           value="{{ $homepage['template_6_strip'.$sn.'_url'] ?? '' }}" placeholder="URL">
+                                           value="{{ !empty($homepage['template_6_strip'.$sn.'_url']) ? $homepage['template_6_strip'.$sn.'_url'] : $t6StripDefaults[$sn]['url'] }}" placeholder="URL">
                                 </div>
                                 @endforeach
 
@@ -3199,31 +3206,40 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input type="text" name="homepage[template_6_looks_title]" class="form-control form-control-sm"
-                                           value="{{ $homepage['template_6_looks_title'] ?? 'Shop by Distinct Look' }}" placeholder="Section Title">
+                                           value="{{ !empty($homepage['template_6_looks_title']) ? $homepage['template_6_looks_title'] : 'Shop by Distinct Look' }}" placeholder="Section Title">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input type="text" name="homepage[template_6_looks_subtitle]" class="form-control form-control-sm"
-                                           value="{{ $homepage['template_6_looks_subtitle'] ?? 'Curated Styles' }}" placeholder="Section Subtitle">
+                                           value="{{ !empty($homepage['template_6_looks_subtitle']) ? $homepage['template_6_looks_subtitle'] : 'Curated Styles' }}" placeholder="Section Subtitle">
                                 </div>
+                                @php
+                                $t6LookDefaults = [
+                                    1 => ['name' => 'Panjabi Luxe', 'tag' => 'SIGNATURE', 'image' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80', 'url' => route('shop')],
+                                    2 => ['name' => 'Festive Kurta', 'tag' => 'ROYAL', 'image' => 'https://images.unsplash.com/photo-1594938298603-c8148c4b2f7a?w=400&q=80', 'url' => route('shop')],
+                                    3 => ['name' => 'Silk Saree & Kurtis', 'tag' => 'ETHNIC', 'image' => 'https://images.unsplash.com/photo-1520367445093-50dc08a59d9d?w=400&q=80', 'url' => route('shop')],
+                                    4 => ['name' => 'Suits & Blazers', 'tag' => 'URBAN', 'image' => 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&q=80', 'url' => route('shop')],
+                                    5 => ['name' => 'Luxury Footwear', 'tag' => 'LIFESTYLE', 'image' => 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80', 'url' => route('shop')],
+                                ];
+                                @endphp
                                 @foreach([1,2,3,4,5] as $ln)
                                 <div class="col-md-12 mb-2 p-2 bg-white rounded border">
                                     <p class="small font-weight-bold text-muted mb-1">Look Card {{ $ln }}</p>
                                     <div class="row">
                                         <div class="col-md-3">
                                             <input type="text" name="homepage[template_6_look{{ $ln }}_name]" class="form-control form-control-sm mb-1"
-                                                   value="{{ $homepage['template_6_look'.$ln.'_name'] ?? '' }}" placeholder="Card Name">
+                                                   value="{{ !empty($homepage['template_6_look'.$ln.'_name']) ? $homepage['template_6_look'.$ln.'_name'] : $t6LookDefaults[$ln]['name'] }}" placeholder="Card Name">
                                         </div>
                                         <div class="col-md-2">
                                             <input type="text" name="homepage[template_6_look{{ $ln }}_tag]" class="form-control form-control-sm mb-1"
-                                                   value="{{ $homepage['template_6_look'.$ln.'_tag'] ?? '' }}" placeholder="Badge Tag">
+                                                   value="{{ !empty($homepage['template_6_look'.$ln.'_tag']) ? $homepage['template_6_look'.$ln.'_tag'] : $t6LookDefaults[$ln]['tag'] }}" placeholder="Badge Tag">
                                         </div>
                                         <div class="col-md-4">
                                             <input type="text" name="homepage[template_6_look{{ $ln }}_image]" class="form-control form-control-sm mb-1"
-                                                   value="{{ $homepage['template_6_look'.$ln.'_image'] ?? '' }}" placeholder="Image URL">
+                                                   value="{{ !empty($homepage['template_6_look'.$ln.'_image']) ? $homepage['template_6_look'.$ln.'_image'] : $t6LookDefaults[$ln]['image'] }}" placeholder="Image URL">
                                         </div>
                                         <div class="col-md-3">
                                             <input type="text" name="homepage[template_6_look{{ $ln }}_url]" class="form-control form-control-sm mb-1"
-                                                   value="{{ $homepage['template_6_look'.$ln.'_url'] ?? '' }}" placeholder="Link URL">
+                                                   value="{{ !empty($homepage['template_6_look'.$ln.'_url']) ? $homepage['template_6_look'.$ln.'_url'] : $t6LookDefaults[$ln]['url'] }}" placeholder="Link URL">
                                         </div>
                                     </div>
                                 </div>
@@ -3236,48 +3252,56 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input type="text" name="homepage[template_6_grid_title]" class="form-control form-control-sm"
-                                           value="{{ $homepage['template_6_grid_title'] ?? 'Handcrafted Department Highlights' }}" placeholder="Grid Section Title">
+                                           value="{{ !empty($homepage['template_6_grid_title']) ? $homepage['template_6_grid_title'] : 'Handcrafted Department Highlights' }}" placeholder="Grid Section Title">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input type="text" name="homepage[template_6_grid_subtitle]" class="form-control form-control-sm"
-                                           value="{{ $homepage['template_6_grid_subtitle'] ?? 'Editorial Picks' }}" placeholder="Grid Subtitle">
+                                           value="{{ !empty($homepage['template_6_grid_subtitle']) ? $homepage['template_6_grid_subtitle'] : 'Editorial Picks' }}" placeholder="Grid Subtitle">
                                 </div>
                                 <div class="col-md-12 mb-2 p-2 bg-white rounded border">
                                     <p class="small font-weight-bold text-muted mb-1">Main Large Feature</p>
                                     <div class="row">
                                         <div class="col-md-3">
                                             <input type="text" name="homepage[template_6_grid_main_badge]" class="form-control form-control-sm mb-1"
-                                                   value="{{ $homepage['template_6_grid_main_badge'] ?? 'MASTER CRAFT' }}" placeholder="Badge">
+                                                   value="{{ !empty($homepage['template_6_grid_main_badge']) ? $homepage['template_6_grid_main_badge'] : 'MASTER CRAFT' }}" placeholder="Badge">
                                         </div>
                                         <div class="col-md-3">
                                             <input type="text" name="homepage[template_6_grid_main_title]" class="form-control form-control-sm mb-1"
-                                                   value="{{ $homepage['template_6_grid_main_title'] ?? '' }}" placeholder="Title">
+                                                   value="{{ !empty($homepage['template_6_grid_main_title']) ? $homepage['template_6_grid_main_title'] : 'Royal Embroidered Panjabi & Kurtas' }}" placeholder="Title">
                                         </div>
                                         <div class="col-md-3">
                                             <input type="text" name="homepage[template_6_grid_main_image]" class="form-control form-control-sm mb-1"
-                                                   value="{{ $homepage['template_6_grid_main_image'] ?? '' }}" placeholder="Image URL">
+                                                   value="{{ !empty($homepage['template_6_grid_main_image']) ? $homepage['template_6_grid_main_image'] : 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=900&q=80' }}" placeholder="Image URL">
                                         </div>
                                         <div class="col-md-3">
                                             <input type="text" name="homepage[template_6_grid_main_url]" class="form-control form-control-sm mb-1"
-                                                   value="{{ $homepage['template_6_grid_main_url'] ?? '' }}" placeholder="Link URL">
+                                                   value="{{ !empty($homepage['template_6_grid_main_url']) ? $homepage['template_6_grid_main_url'] : route('shop') }}" placeholder="Link URL">
                                         </div>
                                         <div class="col-md-12">
                                             <input type="text" name="homepage[template_6_grid_main_desc]" class="form-control form-control-sm"
-                                                   value="{{ $homepage['template_6_grid_main_desc'] ?? '' }}" placeholder="Short description below title">
+                                                   value="{{ !empty($homepage['template_6_grid_main_desc']) ? $homepage['template_6_grid_main_desc'] : 'Finest raw silk with handcrafted zardozi collar embroidery.' }}" placeholder="Short description below title">
                                         </div>
                                     </div>
                                 </div>
+                                @php
+                                $t6GridItemDefaults = [
+                                    1 => ['badge' => 'NEW IN', 'title' => 'Designer Dresses', 'image' => 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80', 'url' => route('shop')],
+                                    2 => ['badge' => 'BESPOKE', 'title' => 'Slim-fit Blazers', 'image' => 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=600&q=80', 'url' => route('shop')],
+                                    3 => ['badge' => 'HANDMADE', 'title' => 'Leather Loafers & Nagra', 'image' => 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&q=80', 'url' => route('shop')],
+                                    4 => ['badge' => 'PREMIUM', 'title' => 'Timepieces & Brooches', 'image' => 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&q=80', 'url' => route('shop')],
+                                ];
+                                @endphp
                                 @foreach([1,2,3,4] as $gi)
                                 <div class="col-md-6 mb-2 p-2 bg-white rounded border">
                                     <p class="small font-weight-bold text-muted mb-1">Grid Item {{ $gi }}</p>
                                     <input type="text" name="homepage[template_6_grid_item{{ $gi }}_badge]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_grid_item'.$gi.'_badge'] ?? '' }}" placeholder="Badge">
+                                           value="{{ !empty($homepage['template_6_grid_item'.$gi.'_badge']) ? $homepage['template_6_grid_item'.$gi.'_badge'] : $t6GridItemDefaults[$gi]['badge'] }}" placeholder="Badge">
                                     <input type="text" name="homepage[template_6_grid_item{{ $gi }}_title]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_grid_item'.$gi.'_title'] ?? '' }}" placeholder="Title">
+                                           value="{{ !empty($homepage['template_6_grid_item'.$gi.'_title']) ? $homepage['template_6_grid_item'.$gi.'_title'] : $t6GridItemDefaults[$gi]['title'] }}" placeholder="Title">
                                     <input type="text" name="homepage[template_6_grid_item{{ $gi }}_image]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_grid_item'.$gi.'_image'] ?? '' }}" placeholder="Image URL">
+                                           value="{{ !empty($homepage['template_6_grid_item'.$gi.'_image']) ? $homepage['template_6_grid_item'.$gi.'_image'] : $t6GridItemDefaults[$gi]['image'] }}" placeholder="Image URL">
                                     <input type="text" name="homepage[template_6_grid_item{{ $gi }}_url]" class="form-control form-control-sm"
-                                           value="{{ $homepage['template_6_grid_item'.$gi.'_url'] ?? '' }}" placeholder="Link URL">
+                                           value="{{ !empty($homepage['template_6_grid_item'.$gi.'_url']) ? $homepage['template_6_grid_item'.$gi.'_url'] : $t6GridItemDefaults[$gi]['url'] }}" placeholder="Link URL">
                                 </div>
                                 @endforeach
 
@@ -3286,19 +3310,26 @@
                                     <hr class="my-2">
                                     <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-tshirt mr-1"></i> Style the Look Outfit Ensembles (3 Cards)</p>
                                 </div>
+                                @php
+                                $t6OutfitDefaults = [
+                                    1 => ['title' => 'Festive Eid Ensemble', 'items' => 'Panjabi + Pajama + Shawl + Nagra', 'tag' => '✦ SHOP SET', 'image' => 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&q=80', 'url' => route('shop')],
+                                    2 => ['title' => 'Groom & Wedding Aura', 'items' => 'Sherwani + Embroidered Turban + Mojari', 'tag' => '✦ SHOP SET', 'image' => 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=600&q=80', 'url' => route('shop')],
+                                    3 => ['title' => 'Evening Gala Gown', 'items' => 'Couture Dress + Clutch + Heels', 'tag' => '✦ SHOP SET', 'image' => 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80', 'url' => route('shop')],
+                                ];
+                                @endphp
                                 @foreach([1,2,3] as $on)
                                 <div class="col-md-4 mb-2 p-2 bg-white rounded border">
                                     <p class="small font-weight-bold text-muted mb-1">Outfit Card {{ $on }}</p>
                                     <input type="text" name="homepage[template_6_outfit{{ $on }}_title]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_outfit'.$on.'_title'] ?? '' }}" placeholder="Outfit Title">
+                                           value="{{ !empty($homepage['template_6_outfit'.$on.'_title']) ? $homepage['template_6_outfit'.$on.'_title'] : $t6OutfitDefaults[$on]['title'] }}" placeholder="Outfit Title">
                                     <input type="text" name="homepage[template_6_outfit{{ $on }}_items]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_outfit'.$on.'_items'] ?? '' }}" placeholder="Items list (e.g. Panjabi + Pajama + Shawl)">
+                                           value="{{ !empty($homepage['template_6_outfit'.$on.'_items']) ? $homepage['template_6_outfit'.$on.'_items'] : $t6OutfitDefaults[$on]['items'] }}" placeholder="Items list (e.g. Panjabi + Pajama + Shawl)">
                                     <input type="text" name="homepage[template_6_outfit{{ $on }}_tag]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_outfit'.$on.'_tag'] ?? '' }}" placeholder="Button Tag e.g. âœ¦ SHOP SET">
+                                           value="{{ !empty($homepage['template_6_outfit'.$on.'_tag']) ? $homepage['template_6_outfit'.$on.'_tag'] : $t6OutfitDefaults[$on]['tag'] }}" placeholder="Button Tag e.g. ✦ SHOP SET">
                                     <input type="text" name="homepage[template_6_outfit{{ $on }}_image]" class="form-control form-control-sm mb-1"
-                                           value="{{ $homepage['template_6_outfit'.$on.'_image'] ?? '' }}" placeholder="Image URL">
+                                           value="{{ !empty($homepage['template_6_outfit'.$on.'_image']) ? $homepage['template_6_outfit'.$on.'_image'] : $t6OutfitDefaults[$on]['image'] }}" placeholder="Image URL">
                                     <input type="text" name="homepage[template_6_outfit{{ $on }}_url]" class="form-control form-control-sm"
-                                           value="{{ $homepage['template_6_outfit'.$on.'_url'] ?? '' }}" placeholder="Link URL">
+                                           value="{{ !empty($homepage['template_6_outfit'.$on.'_url']) ? $homepage['template_6_outfit'.$on.'_url'] : $t6OutfitDefaults[$on]['url'] }}" placeholder="Link URL">
                                 </div>
                                 @endforeach
                             </div>
@@ -3429,19 +3460,29 @@
                                     <input type="text" name="homepage[template_7_ritual_cta]" class="form-control form-control-sm"
                                            value="{{ $homepage['template_7_ritual_cta'] ?? 'Explore' }}" placeholder="e.g. Explore">
                                 </div>
+                                @php
+                                $t7RitualDefaults = [
+                                    1 => ['icon' => '🫧', 'name' => 'Deep Cleansing', 'desc' => 'Gentle amino-acid foaming cleanser that purifies pores without stripping moisture.', 'url' => route('shop')],
+                                    2 => ['icon' => '🌸', 'name' => 'Hydrating Mist', 'desc' => 'Organic damask rosewater spray that balances skin pH and revitalizes dullness.', 'url' => route('shop')],
+                                    3 => ['icon' => '✨', 'name' => 'Brightening Serum', 'desc' => '10% stabilized Vitamin C and Niacinamide elixir for radiant, glowing skin.', 'url' => route('shop')],
+                                    4 => ['icon' => '💧', 'name' => 'Ceramide Moisture', 'desc' => 'Deep-barrier repair cream packed with 5 essential skin ceramides and squalane.', 'url' => route('shop')],
+                                    5 => ['icon' => '☀️', 'name' => 'Invisible Shield', 'desc' => 'Ultra-lightweight SPF 50+ PA++++ broad spectrum sun essence with zero white cast.', 'url' => route('shop')],
+                                    6 => ['icon' => '🌙', 'name' => 'Midnight Recovery', 'desc' => 'Overnight peptide oil infusion that repairs and regenerates while you sleep.', 'url' => route('shop')],
+                                ];
+                                @endphp
                                 @foreach([1,2,3,4,5,6] as $rn)
                                 <div class="col-md-6 mb-2 p-2 bg-white rounded border">
                                     <p class="small font-weight-bold text-muted mb-1">Step {{ $rn }}</p>
                                     <div class="d-flex gap-2">
                                         <input type="text" name="homepage[template_7_ritual_{{ $rn }}_icon]" class="form-control form-control-sm mr-1" style="max-width:65px;"
-                                               value="{{ $homepage['template_7_ritual_'.$rn.'_icon'] ?? '' }}" placeholder="Emoji">
+                                               value="{{ !empty($homepage['template_7_ritual_'.$rn.'_icon']) ? $homepage['template_7_ritual_'.$rn.'_icon'] : $t7RitualDefaults[$rn]['icon'] }}" placeholder="Emoji">
                                         <input type="text" name="homepage[template_7_ritual_{{ $rn }}_name]" class="form-control form-control-sm mr-1"
-                                               value="{{ $homepage['template_7_ritual_'.$rn.'_name'] ?? '' }}" placeholder="Card Name">
+                                               value="{{ !empty($homepage['template_7_ritual_'.$rn.'_name']) ? $homepage['template_7_ritual_'.$rn.'_name'] : $t7RitualDefaults[$rn]['name'] }}" placeholder="Card Name">
                                     </div>
                                     <input type="text" name="homepage[template_7_ritual_{{ $rn }}_desc]" class="form-control form-control-sm mt-1 mb-1"
-                                           value="{{ $homepage['template_7_ritual_'.$rn.'_desc'] ?? '' }}" placeholder="Short description">
+                                           value="{{ !empty($homepage['template_7_ritual_'.$rn.'_desc']) ? $homepage['template_7_ritual_'.$rn.'_desc'] : $t7RitualDefaults[$rn]['desc'] }}" placeholder="Short description">
                                     <input type="text" name="homepage[template_7_ritual_{{ $rn }}_url]" class="form-control form-control-sm"
-                                           value="{{ $homepage['template_7_ritual_'.$rn.'_url'] ?? '' }}" placeholder="Link URL (optional)">
+                                           value="{{ !empty($homepage['template_7_ritual_'.$rn.'_url']) ? $homepage['template_7_ritual_'.$rn.'_url'] : $t7RitualDefaults[$rn]['url'] }}" placeholder="Link URL (optional)">
                                 </div>
                                 @endforeach
                             </div>
@@ -3791,22 +3832,29 @@
                                  <div class="col-md-4 mb-3">
                                      <label class="small text-muted font-weight-bold">Studio Tag / Eyebrow</label>
                                      <input type="text" name="homepage[template_10_hotspot_tag]" class="form-control form-control-sm"
-                                            value="{{ $homepage['template_10_hotspot_tag'] ?? 'âœ¦ INTERACTIVE ROOM STUDIO' }}" placeholder="Tag label">
+                                            value="{{ $homepage['template_10_hotspot_tag'] ?? '✦ INTERACTIVE ROOM STUDIO' }}" placeholder="Tag label">
                                  </div>
                                  <div class="col-md-8 mb-3">
                                      <label class="small text-muted font-weight-bold">Studio Subtitle / Instruction</label>
                                      <input type="text" name="homepage[template_10_hotspot_sub]" class="form-control form-control-sm"
                                             value="{{ $homepage['template_10_hotspot_sub'] ?? 'Hover on the (+) pins below to inspect and order featured furnishings' }}" placeholder="Subtitle text">
                                  </div>
-                                 @foreach([1,2,3] as $hn)
-                                 <div class="col-md-4 mb-3 p-2 bg-white rounded border">
-                                     <p class="small font-weight-bold text-muted mb-1">Hotspot Item {{ $hn }}</p>
-                                     <input type="text" name="homepage[template_10_hotspot{{ $hn }}_name]" class="form-control form-control-sm mb-1"
-                                            value="{{ $homepage['template_10_hotspot'.$hn.'_name'] ?? '' }}" placeholder="Product name">
-                                     <input type="text" name="homepage[template_10_hotspot{{ $hn }}_price]" class="form-control form-control-sm"
-                                            value="{{ $homepage['template_10_hotspot'.$hn.'_price'] ?? '' }}" placeholder="e.g. à§³28,500 â€¢ In Stock">
-                                 </div>
-                                 @endforeach
+                                 @php
+                                  $t10HotspotDefaults = [
+                                      1 => ['name' => 'Scandinavian Teak Lounge Chair', 'price' => '৳18,500 • In Stock'],
+                                      2 => ['name' => 'Minimalist Ceramic Arch Floor Lamp', 'price' => '৳6,200 • In Stock'],
+                                      3 => ['name' => 'Solid Walnut Modular Lowboard', 'price' => '৳28,000 • In Stock'],
+                                  ];
+                                  @endphp
+                                  @foreach([1,2,3] as $hn)
+                                  <div class="col-md-4 mb-3 p-2 bg-white rounded border">
+                                      <p class="small font-weight-bold text-muted mb-1">Hotspot Item {{ $hn }}</p>
+                                      <input type="text" name="homepage[template_10_hotspot{{ $hn }}_name]" class="form-control form-control-sm mb-1"
+                                             value="{{ !empty($homepage['template_10_hotspot'.$hn.'_name']) ? $homepage['template_10_hotspot'.$hn.'_name'] : $t10HotspotDefaults[$hn]['name'] }}" placeholder="Product name">
+                                      <input type="text" name="homepage[template_10_hotspot{{ $hn }}_price]" class="form-control form-control-sm"
+                                             value="{{ !empty($homepage['template_10_hotspot'.$hn.'_price']) ? $homepage['template_10_hotspot'.$hn.'_price'] : $t10HotspotDefaults[$hn]['price'] }}" placeholder="e.g. ৳28,500 • In Stock">
+                                  </div>
+                                  @endforeach
 
                                  {{-- T10 Room Cards --}}
                                  <div class="col-md-12 mb-2 mt-2">
@@ -3816,36 +3864,80 @@
                                  <div class="col-md-6 mb-3">
                                      <label class="small text-muted font-weight-bold">Rooms Section Title</label>
                                      <input type="text" name="homepage[template_10_rooms_title]" class="form-control form-control-sm"
-                                            value="{{ $homepage['template_10_rooms_title'] ?? 'Shop Curated Living Environments' }}" placeholder="Section Title">
+                                            value="{{ !empty($homepage['template_10_rooms_title']) ? $homepage['template_10_rooms_title'] : 'Shop Curated Living Environments' }}" placeholder="Section Title">
                                  </div>
                                  <div class="col-md-6 mb-3">
                                      <label class="small text-muted font-weight-bold">Rooms Section Tag</label>
                                      <input type="text" name="homepage[template_10_rooms_subtitle]" class="form-control form-control-sm"
-                                            value="{{ $homepage['template_10_rooms_subtitle'] ?? 'SPATIAL HARMONY' }}" placeholder="Tag above section title">
+                                            value="{{ !empty($homepage['template_10_rooms_subtitle']) ? $homepage['template_10_rooms_subtitle'] : 'SPATIAL HARMONY' }}" placeholder="Tag above section title">
                                  </div>
+                                 @php
+                                  $t10RoomDefaults = [
+                                      1 => ['name' => 'Living Room Suites', 'cta' => 'Explore 140+ Items →', 'image' => 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80', 'url' => '#'],
+                                      2 => ['name' => 'Master Bedroom', 'cta' => 'Explore 85+ Items →', 'image' => 'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=600&q=80', 'url' => '#'],
+                                      3 => ['name' => 'Dining & Hosting', 'cta' => 'Explore 62+ Items →', 'image' => 'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=600&q=80', 'url' => '#'],
+                                      4 => ['name' => 'Ergonomic Home Office', 'cta' => 'Explore 45+ Items →', 'image' => 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80', 'url' => '#'],
+                                      5 => ['name' => 'Entryway & Accent Decor', 'cta' => 'Explore 90+ Items →', 'image' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&q=80', 'url' => '#'],
+                                  ];
+                                  @endphp
                                  @foreach([1,2,3,4,5] as $rm)
                                  <div class="col-md-12 mb-2 p-2 bg-white rounded border">
                                      <p class="small font-weight-bold text-muted mb-1">Room Card {{ $rm }}</p>
                                      <div class="row">
                                          <div class="col-md-3">
                                              <input type="text" name="homepage[template_10_room{{ $rm }}_name]" class="form-control form-control-sm mb-1"
-                                                    value="{{ $homepage['template_10_room'.$rm.'_name'] ?? '' }}" placeholder="Room Name">
+                                                    value="{{ !empty($homepage['template_10_room'.$rm.'_name']) ? $homepage['template_10_room'.$rm.'_name'] : $t10RoomDefaults[$rm]['name'] }}" placeholder="Room Name">
                                          </div>
                                          <div class="col-md-3">
                                              <input type="text" name="homepage[template_10_room{{ $rm }}_cta]" class="form-control form-control-sm mb-1"
-                                                    value="{{ $homepage['template_10_room'.$rm.'_cta'] ?? '' }}" placeholder="CTA Text">
+                                                    value="{{ !empty($homepage['template_10_room'.$rm.'_cta']) ? $homepage['template_10_room'.$rm.'_cta'] : $t10RoomDefaults[$rm]['cta'] }}" placeholder="CTA Text">
                                          </div>
                                          <div class="col-md-3">
                                              <input type="text" name="homepage[template_10_room{{ $rm }}_image]" class="form-control form-control-sm mb-1"
-                                                    value="{{ $homepage['template_10_room'.$rm.'_image'] ?? '' }}" placeholder="Image URL">
+                                                    value="{{ !empty($homepage['template_10_room'.$rm.'_image']) ? $homepage['template_10_room'.$rm.'_image'] : $t10RoomDefaults[$rm]['image'] }}" placeholder="Image URL">
                                          </div>
                                          <div class="col-md-3">
                                              <input type="text" name="homepage[template_10_room{{ $rm }}_url]" class="form-control form-control-sm mb-1"
-                                                    value="{{ $homepage['template_10_room'.$rm.'_url'] ?? '' }}" placeholder="Link URL">
+                                                    value="{{ !empty($homepage['template_10_room'.$rm.'_url']) ? $homepage['template_10_room'.$rm.'_url'] : $t10RoomDefaults[$rm]['url'] }}" placeholder="Link URL">
                                          </div>
                                      </div>
                                  </div>
                                  @endforeach
+
+                                 {{-- T10 Room Makeover Offer CTA Banner --}}
+                                 <div class="col-md-12 mb-2 mt-2">
+                                     <hr class="my-2">
+                                     <p class="font-weight-bold text-muted mb-2" style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-gem mr-1"></i> Room Makeover Offer Banner</p>
+                                 </div>
+                                 <div class="col-md-4 mb-3">
+                                     <label class="small text-muted font-weight-bold">Banner Tag</label>
+                                     <input type="text" name="homepage[template_10_makeover_tag]" class="form-control form-control-sm"
+                                            value="{{ !empty($homepage['template_10_makeover_tag']) ? $homepage['template_10_makeover_tag'] : 'COMPLETE INTERIOR PACKAGE' }}" placeholder="e.g. COMPLETE INTERIOR PACKAGE">
+                                 </div>
+                                 <div class="col-md-8 mb-3">
+                                     <label class="small text-muted font-weight-bold">Banner Title</label>
+                                     <input type="text" name="homepage[template_10_makeover_title]" class="form-control form-control-sm"
+                                            value="{{ !empty($homepage['template_10_makeover_title']) ? $homepage['template_10_makeover_title'] : 'Full Living Room Makeover Suite' }}" placeholder="Banner Title">
+                                 </div>
+                                 <div class="col-md-12 mb-3">
+                                     <label class="small text-muted font-weight-bold">Banner Description</label>
+                                     <textarea name="homepage[template_10_makeover_desc]" class="form-control form-control-sm" rows="2" placeholder="Banner Description...">{{ $homepage['template_10_makeover_desc'] ?? 'Includes our 3-Seater Nordic Sofa, Solid Walnut Coffee Table, and Floating Media Unit with complimentary installation. Price: ৳48,500.' }}</textarea>
+                                 </div>
+                                 <div class="col-md-4 mb-3">
+                                     <label class="small text-muted font-weight-bold">Button Text</label>
+                                     <input type="text" name="homepage[template_10_makeover_btn_text]" class="form-control form-control-sm"
+                                            value="{{ $homepage['template_10_makeover_btn_text'] ?? 'EXPLORE ROOM PACKAGES →' }}" placeholder="e.g. EXPLORE ROOM PACKAGES →">
+                                 </div>
+                                 <div class="col-md-4 mb-3">
+                                     <label class="small text-muted font-weight-bold">Button URL</label>
+                                     <input type="text" name="homepage[template_10_makeover_btn_url]" class="form-control form-control-sm"
+                                            value="{{ $homepage['template_10_makeover_btn_url'] ?? '' }}" placeholder="Link URL">
+                                 </div>
+                                 <div class="col-md-4 mb-3">
+                                     <label class="small text-muted font-weight-bold">Banner Photo URL</label>
+                                     <input type="text" name="homepage[template_10_makeover_image]" class="form-control form-control-sm"
+                                            value="{{ $homepage['template_10_makeover_image'] ?? '' }}" placeholder="Paste photo URL">
+                                 </div>
                              </div>
                          </div>
                      </div>

@@ -946,15 +946,17 @@
                     .top-header-bar {
                         flex-direction: column;
                         font-size: 11px;
-                        padding: 8px 10px;
+                        padding: 6px 8px;
                         text-align: center;
-                        gap: 8px;
+                        gap: 6px;
                     }
 
                     .top-header-bar .left,
                     .top-header-bar .right {
                         margin: 0;
-                        gap: 12px;
+                        gap: 8px 12px;
+                        flex-wrap: wrap;
+                        justify-content: center;
                     }
 
                     .top-header-bar .left {

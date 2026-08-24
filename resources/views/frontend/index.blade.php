@@ -33,22 +33,45 @@
 
 @if ($isAdminPreview ?? false)
 {{-- Preview Mode Banner --}}
-<div id="template-preview-banner" style="
-    position: relative; width: 100%; z-index: 99999;
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    color: #fff; padding: 8px 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-    border-bottom: 2px solid #38bdf8;
-    flex-wrap: wrap; gap: 8px;
-">
-    <div style="display:flex; align-items:center; gap:10px;">
-        <span style="background:#38bdf8; color:#0f172a; font-weight:800; font-size:11px; padding:3px 10px; border-radius:20px; letter-spacing:0.5px;">
-            👁 PREVIEW MODE
+<style>
+    #template-preview-banner {
+        position: relative; width: 100%; z-index: 99999;
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        color: #fff; padding: 8px 16px;
+        display: flex; align-items: center; justify-content: space-between;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+        border-bottom: 2px solid #38bdf8;
+        flex-wrap: wrap; gap: 8px;
+        box-sizing: border-box;
+    }
+    @media (max-width: 768px) {
+        #template-preview-banner {
+            padding: 6px 10px;
+            gap: 6px;
+        }
+        .t-preview-left {
+            width: 100%;
+            justify-content: space-between;
+        }
+        .t-preview-nav {
+            width: 100%;
+            justify-content: center;
+            gap: 4px !important;
+        }
+        .t-preview-nav a {
+            padding: 2px 6px !important;
+            font-size: 10px !important;
+        }
+    }
+</style>
+<div id="template-preview-banner">
+    <div class="t-preview-left" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span style="background:#38bdf8; color:#0f172a; font-weight:800; font-size:10.5px; padding:3px 8px; border-radius:20px; letter-spacing:0.5px;">
+            👁 PREVIEW
         </span>
-        <span style="font-size:13px; font-weight:600; color:#e2e8f0;">
-            Template {{ $currentTemplateId }} —
+        <span style="font-size:12.5px; font-weight:600; color:#e2e8f0;">
+            T{{ $currentTemplateId }} —
             @php 
                 $tplNames = [
                     '1'=>'Classic Marketplace',
@@ -66,23 +89,22 @@
             {{ $tplNames[$currentTemplateId] ?? 'Unknown' }}
         </span>
     </div>
-    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+    <div class="t-preview-nav" style="display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
         @foreach(['1','2','3','4','5','6','7','8','9','10'] as $tId)
         <a href="{{ url('/') }}?preview_template={{ $tId }}"
            style="
-               padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;
+               padding: 2px 7px; border-radius: 20px; font-size: 10.5px; font-weight: 700;
                text-decoration: none; border: 1.5px solid;
                {{ $tId == $currentTemplateId ? 'background:#38bdf8; color:#0f172a; border-color:#38bdf8;' : 'background:transparent; color:#94a3b8; border-color:#334155;' }}
                transition: all 0.2s;
            ">T{{ $tId }}</a>
         @endforeach
-        <span style="width:1px; height:22px; background:#334155; margin:0 4px;"></span>
         <a href="{{ url('/admin/config?tab=homepage') }}"
-           style="padding:5px 14px; border-radius:20px; font-size:12px; font-weight:700; background:linear-gradient(135deg,#38bdf8,#6366f1); color:#fff; text-decoration:none; border:none;">
-            ← Back to Admin
+           style="padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; background:linear-gradient(135deg,#38bdf8,#6366f1); color:#fff; text-decoration:none; border:none; margin-left:2px;">
+            ← Admin
         </a>
         <button onclick="document.getElementById('template-preview-banner').style.display='none'"
-                style="background:transparent; border:none; color:#64748b; font-size:18px; cursor:pointer; padding:0 4px; line-height:1;">✕</button>
+                style="background:transparent; border:none; color:#64748b; font-size:16px; cursor:pointer; padding:0 2px; line-height:1;">✕</button>
     </div>
 </div>
 @endif
@@ -5122,9 +5144,6 @@
         <!-- End Latest Products Section -->
     @endif
 
-    {{-- Customer Reviews Section for Template 1 --}}
-    @include('frontend.partials.customer-reviews-section')
-
     @if (!empty($homepage['enable_shop_features_section']) && $homepage['enable_shop_features_section'])
         <!-- Start Shop Features -->
         <style>
@@ -5364,34 +5383,24 @@
     </script>
     @elseif ($currentTemplateId === '2')
         @include('frontend.partials.homepage-template-2')
-        @include('frontend.partials.customer-reviews-section')
     @elseif ($currentTemplateId === '3')
         @include('frontend.partials.homepage-template-3')
-        @include('frontend.partials.customer-reviews-section')
     @elseif ($currentTemplateId === '4')
         @include('frontend.partials.homepage-template-4')
-        @include('frontend.partials.customer-reviews-section')
     @elseif ($currentTemplateId === '5')
         @include('frontend.partials.homepage-template-5')
-        @include('frontend.partials.customer-reviews-section')
     @elseif ($currentTemplateId === '6')
         @include('frontend.partials.homepage-template-6')
-        @include('frontend.partials.customer-reviews-section')
     @elseif ($currentTemplateId === '7')
         @include('frontend.partials.homepage-template-7')
-        @include('frontend.partials.customer-reviews-section')
     @elseif ($currentTemplateId === '8')
         @include('frontend.partials.homepage-template-8')
-        @include('frontend.partials.customer-reviews-section')
     @elseif ($currentTemplateId === '9')
         @include('frontend.partials.homepage-template-9')
-        @include('frontend.partials.customer-reviews-section')
     @elseif ($currentTemplateId === '10')
         @include('frontend.partials.homepage-template-10')
-        @include('frontend.partials.customer-reviews-section')
     @else
         @include('frontend.partials.homepage-template-2')
-        @include('frontend.partials.customer-reviews-section')
     @endif
 </div>
 @endsection

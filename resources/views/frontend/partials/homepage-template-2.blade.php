@@ -137,6 +137,22 @@
 .t2-hero-nav-prev { left: 20px; }
 .t2-hero-nav-next { right: 20px; }
 
+@media (max-width: 640px) {
+    .t2-hero-slider {
+        height: clamp(160px, 45vw, 360px);
+    }
+    .t2-hero-nav-arrow {
+        width: 26px;
+        height: 26px;
+    }
+    .t2-hero-nav-arrow svg {
+        width: 14px;
+        height: 14px;
+    }
+    .t2-hero-nav-prev { left: 6px; }
+    .t2-hero-nav-next { right: 6px; }
+}
+
 .t2-hero-dots {
     position: absolute;
     bottom: 20px;

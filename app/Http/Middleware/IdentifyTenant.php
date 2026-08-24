@@ -21,6 +21,11 @@ class IdentifyTenant
     {
         $host = strtolower($request->getHost());
 
+        // Fast-path bypass for local development
+        if (in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+            return $next($request);
+        }
+
         try {
             $tenant = null;
 

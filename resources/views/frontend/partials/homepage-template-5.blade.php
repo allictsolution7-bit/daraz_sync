@@ -30,19 +30,29 @@
 
 .t5-slider-box {
     background: #ffffff;
-    border-radius: 24px;
+    border-radius: 20px;
     overflow: hidden;
     position: relative;
-    height: clamp(260px, 30.5vw, 410px);
+    aspect-ratio: 16 / 7.5;
+    min-height: 180px;
     box-shadow: 0 10px 30px rgba(22, 101, 52, 0.08);
     border: 2px solid #dcfce7;
 }
+
+@media (max-width: 640px) {
+    .t5-slider-box {
+        aspect-ratio: 16 / 9;
+        min-height: 140px;
+        border-radius: 12px;
+    }
+}
+
 .t5-hero-nav-arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.9);
     border: 2px solid #86efac;
@@ -55,14 +65,29 @@
     box-shadow: 0 4px 14px rgba(22, 101, 52, 0.2);
     transition: all 0.2s ease;
 }
+
 .t5-hero-nav-arrow:hover {
     background: #16a34a;
     color: #ffffff;
     border-color: #16a34a;
     transform: translateY(-50%) scale(1.08);
 }
-.t5-hero-nav-prev { left: 16px; }
-.t5-hero-nav-next { right: 16px; }
+
+.t5-hero-nav-prev { left: 12px; }
+.t5-hero-nav-next { right: 12px; }
+
+@media (max-width: 640px) {
+    .t5-hero-nav-arrow {
+        width: 26px;
+        height: 26px;
+    }
+    .t5-hero-nav-arrow svg {
+        width: 14px;
+        height: 14px;
+    }
+    .t5-hero-nav-prev { left: 6px; }
+    .t5-hero-nav-next { right: 6px; }
+}
 
 .t5-slide {
     position: absolute;
@@ -74,30 +99,42 @@
     text-decoration: none;
     color: inherit;
 }
+
 .t5-slide.t5-active {
     opacity: 1;
     z-index: 1;
 }
+
 .t5-slide-img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
     object-position: center;
+    display: block;
 }
+
 .t5-slide-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.4) 100%);
     pointer-events: none;
 }
+
 .t5-slide-content {
     position: relative;
     z-index: 2;
-    padding: 26px 32px;
+    padding: 20px 24px;
     width: 100%;
 }
+
+@media (max-width: 640px) {
+    .t5-slide-content {
+        padding: 10px 12px;
+    }
+}
+
 .t5-eco-badge {
     display: inline-flex;
     align-items: center;
@@ -108,9 +145,10 @@
     font-weight: 800;
     letter-spacing: 1px;
     text-transform: uppercase;
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 30px;
 }
+
 .t5-fresh-btn {
     display: inline-flex;
     align-items: center;
@@ -118,13 +156,14 @@
     background: #22c55e;
     color: #ffffff;
     font-weight: 700;
-    font-size: 14px;
-    padding: 9px 24px;
+    font-size: 12px;
+    padding: 7px 18px;
     border-radius: 30px;
     text-decoration: none;
     box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
     transition: all 0.25s ease;
 }
+
 .t5-fresh-btn:hover {
     background: #16a34a;
     transform: translateY(-2px);
@@ -133,26 +172,31 @@
     text-decoration: none;
 }
 
-/* Bottom Promo Showcase (4 Cards Horizontal Row) */
+/* Bottom Promo Showcase */
 .t5-promo-strip-4col {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: 14px;
 }
+
 @media (max-width: 900px) {
     .t5-promo-strip-4col {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
 }
-@media (max-width: 500px) {
+
+@media (max-width: 480px) {
     .t5-promo-strip-4col {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
 }
+
 .t5-promo-strip-card {
     background: #ffffff;
     border: 1.5px solid #dcfce7;
-    border-radius: 18px;
+    border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 6px 18px rgba(22, 101, 52, 0.05);
     display: flex;
@@ -160,9 +204,17 @@
     justify-content: center;
     text-decoration: none;
     position: relative;
-    height: 160px;
-    padding: 8px;
+    height: 140px;
+    padding: 6px;
     transition: all 0.25s ease;
+}
+
+@media (max-width: 480px) {
+    .t5-promo-strip-card {
+        height: 105px;
+        border-radius: 10px;
+        padding: 4px;
+    }
 }
 .t5-promo-strip-card:hover {
     transform: translateY(-4px);

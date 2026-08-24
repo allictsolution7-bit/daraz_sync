@@ -163,15 +163,20 @@
 }
 
 @media (max-width: 640px) {
+    .t9-hero-slider {
+        aspect-ratio: 16 / 9;
+        min-height: 140px;
+    }
     .t9-hero-arrow {
-        width: 36px;
-        height: 36px;
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
     }
     .t9-hero-prev {
-        left: 10px;
+        left: 6px;
     }
     .t9-hero-next {
-        right: 10px;
+        right: 6px;
     }
 }
 

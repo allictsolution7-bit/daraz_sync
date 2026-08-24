@@ -22,6 +22,20 @@
     max-width: 1380px;
     margin: 0 auto;
     padding: 0 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+    .t6-container {
+        padding: 0 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .t6-container {
+        padding: 0 8px;
+    }
 }
 
 /* SECTION 1: Infinite Marquee Ticker Strip */
@@ -32,6 +46,17 @@
     white-space: nowrap;
     padding: 10px 0;
     position: relative;
+    width: 100%;
+}
+
+@media (max-width: 640px) {
+    .t6-marquee-wrap {
+        padding: 7px 0;
+    }
+    .t6-marquee-content {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+    }
 }
 
 .t6-marquee-content {
@@ -494,6 +519,15 @@
     }
 }
 
+@media (max-width: 480px) {
+    .t6-size-banner {
+        padding: 16px 14px;
+        gap: 14px;
+        margin: 20px 0;
+        border-radius: 12px;
+    }
+}
+
 .t6-size-content {
     padding: 8px 0;
     display: flex;
@@ -512,7 +546,7 @@
 
 .t6-size-title {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(22px, 2.8vw, 32px);
+    font-size: clamp(20px, 2.8vw, 32px);
     color: #ffffff;
     font-weight: 700;
     margin: 0 0 10px;
@@ -524,6 +558,14 @@
     font-size: 13.5px;
     line-height: 1.6;
     margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+    .t6-size-desc {
+        font-size: 12px;
+        margin-bottom: 14px;
+        line-height: 1.45;
+    }
 }
 
 .t6-btn-gold {
@@ -542,6 +584,13 @@
     align-items: center;
     gap: 6px;
     align-self: flex-start;
+}
+
+@media (max-width: 480px) {
+    .t6-btn-gold {
+        padding: 8px 16px;
+        font-size: 10.5px;
+    }
 }
 
 .t6-btn-gold:hover {
@@ -569,6 +618,13 @@
     display: none;
 }
 
+@media (max-width: 480px) {
+    .t6-spotlight-products {
+        gap: 10px;
+        padding: 4px 1px;
+    }
+}
+
 .t6-spotlight-card {
     flex: 0 0 190px;
     background: rgba(15, 15, 15, 0.85);
@@ -585,7 +641,14 @@
 
 @media (max-width: 600px) {
     .t6-spotlight-card {
-        flex: 0 0 160px;
+        flex: 0 0 145px;
+        border-radius: 9px;
+    }
+}
+
+@media (max-width: 360px) {
+    .t6-spotlight-card {
+        flex: 0 0 130px;
     }
 }
 
@@ -602,6 +665,12 @@
     transition: transform 0.4s ease;
 }
 
+@media (max-width: 600px) {
+    .t6-spotlight-card img {
+        height: 130px;
+    }
+}
+
 .t6-spotlight-card:hover img {
     transform: scale(1.06);
 }
@@ -614,6 +683,12 @@
     background: #111111;
 }
 
+@media (max-width: 600px) {
+    .t6-spotlight-info {
+        padding: 8px 10px;
+    }
+}
+
 .t6-spotlight-name {
     font-size: 13px;
     font-weight: 700;
@@ -623,10 +698,22 @@
     color: #f3f4f6;
 }
 
+@media (max-width: 600px) {
+    .t6-spotlight-name {
+        font-size: 12px;
+    }
+}
+
 .t6-spotlight-price {
     font-size: 14px;
     font-weight: 800;
     color: #c9a84c;
+}
+
+@media (max-width: 600px) {
+    .t6-spotlight-price {
+        font-size: 12.5px;
+    }
 }
 
 .t6-spotlight-arrow {
@@ -652,6 +739,14 @@
     backdrop-filter: blur(6px);
 }
 
+@media (max-width: 600px) {
+    .t6-spotlight-arrow {
+        width: 28px;
+        height: 28px;
+        font-size: 15px;
+    }
+}
+
 .t6-spotlight-arrow:hover {
     background: #c9a84c;
     color: #0d0d0d;
@@ -665,6 +760,15 @@
 
 .t6-spotlight-arrow.next {
     right: -14px;
+}
+
+@media (max-width: 600px) {
+    .t6-spotlight-arrow.prev {
+        left: -8px;
+    }
+    .t6-spotlight-arrow.next {
+        right: -8px;
+    }
 }
 
 /* SECTION 7: Style the Look (Shoppable Outfit Tiles) */
@@ -995,6 +1099,17 @@
     @endif
 
     {{-- SECTION 6: Bespoke Spotlight & Shoppable Luxury Collection --}}
+    @php
+        $spotlightList = collect();
+        if (isset($latestProducts) && $latestProducts->count() > 0) {
+            $spotlightList = $latestProducts->take(8);
+        } elseif (isset($products) && $products->count() > 0) {
+            $spotlightList = $products->take(8);
+        } elseif (isset($features_products) && $features_products->count() > 0) {
+            $spotlightList = $features_products->take(8);
+        }
+    @endphp
+
     <section class="t6-container">
         <div class="t6-size-banner">
             <div class="t6-size-content">
@@ -1011,48 +1126,54 @@
             </div>
             <div class="t6-spotlight-wrapper">
                 <div class="t6-spotlight-products" id="t6SpotlightTrack">
-                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
-                        <img src="https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=500&q=80" alt="Woven Leather Tote">
-                        <div class="t6-spotlight-info">
-                            <span class="t6-spotlight-name">Woven Leather Bag</span>
-                            <span class="t6-spotlight-price">৳2,450</span>
-                        </div>
-                    </a>
-                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
-                        <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&q=80" alt="Handmade Leather Loafers">
-                        <div class="t6-spotlight-info">
-                            <span class="t6-spotlight-name">Handmade Loafers</span>
-                            <span class="t6-spotlight-price">৳1,850</span>
-                        </div>
-                    </a>
-                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
-                        <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500&q=80" alt="Luxury Chronograph Watch">
-                        <div class="t6-spotlight-info">
-                            <span class="t6-spotlight-name">Gold Classic Watch</span>
-                            <span class="t6-spotlight-price">৳3,200</span>
-                        </div>
-                    </a>
-                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
-                        <img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=500&q=80" alt="Zardozi Silk Stole">
-                        <div class="t6-spotlight-info">
-                            <span class="t6-spotlight-name">Zardozi Silk Stole</span>
-                            <span class="t6-spotlight-price">৳1,650</span>
-                        </div>
-                    </a>
-                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
-                        <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80" alt="Leather Belt">
-                        <div class="t6-spotlight-info">
-                            <span class="t6-spotlight-name">Hand-stitched Belt</span>
-                            <span class="t6-spotlight-price">৳1,200</span>
-                        </div>
-                    </a>
-                    <a href="{{ route('shop') }}" class="t6-spotlight-card">
-                        <img src="https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=500&q=80" alt="Cashmere Shawl">
-                        <div class="t6-spotlight-info">
-                            <span class="t6-spotlight-name">Cashmere Royal Shawl</span>
-                            <span class="t6-spotlight-price">৳4,500</span>
-                        </div>
-                    </a>
+                    @if($spotlightList->count() > 0)
+                        @foreach($spotlightList as $spotItem)
+                            @php
+                                $spotSlug = $spotItem->slug ?: $spotItem->id;
+                                $spotUrl = route('product.single', ['slug' => $spotSlug, 'id' => $spotItem->id]);
+                                $spotImg = !empty($spotItem->thumb_image) 
+                                    ? (str_starts_with($spotItem->thumb_image, 'http') ? $spotItem->thumb_image : asset('storage/' . $spotItem->thumb_image)) 
+                                    : 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=500&q=80';
+                                $spotPrice = $spotItem->offer ? $spotItem->offer : ($spotItem->old_price ?? 0);
+                            @endphp
+                            <a href="{{ $spotUrl }}" class="t6-spotlight-card">
+                                <img src="{{ $spotImg }}" alt="{{ $spotItem->title }}" onerror="this.src='https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=500&q=80'">
+                                <div class="t6-spotlight-info">
+                                    <span class="t6-spotlight-name" title="{{ $spotItem->title }}">{{ Str::limit($spotItem->title, 24) }}</span>
+                                    <span class="t6-spotlight-price">৳{{ number_format((float)$spotPrice) }}</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    @else
+                        <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                            <img src="https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=500&q=80" alt="Woven Leather Tote">
+                            <div class="t6-spotlight-info">
+                                <span class="t6-spotlight-name">Woven Leather Bag</span>
+                                <span class="t6-spotlight-price">৳2,450</span>
+                            </div>
+                        </a>
+                        <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                            <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&q=80" alt="Handmade Leather Loafers">
+                            <div class="t6-spotlight-info">
+                                <span class="t6-spotlight-name">Handmade Loafers</span>
+                                <span class="t6-spotlight-price">৳1,850</span>
+                            </div>
+                        </a>
+                        <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                            <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500&q=80" alt="Luxury Chronograph Watch">
+                            <div class="t6-spotlight-info">
+                                <span class="t6-spotlight-name">Gold Classic Watch</span>
+                                <span class="t6-spotlight-price">৳3,200</span>
+                            </div>
+                        </a>
+                        <a href="{{ route('shop') }}" class="t6-spotlight-card">
+                            <img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=500&q=80" alt="Zardozi Silk Stole">
+                            <div class="t6-spotlight-info">
+                                <span class="t6-spotlight-name">Zardozi Silk Stole</span>
+                                <span class="t6-spotlight-price">৳1,650</span>
+                            </div>
+                        </a>
+                    @endif
                 </div>
                 {{-- Carousel Left & Right Side Arrows --}}
                 <button class="t6-spotlight-arrow prev" id="t6SpotPrev" aria-label="Previous Products">‹</button>

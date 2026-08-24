@@ -161,15 +161,20 @@
 }
 
 @media (max-width: 640px) {
+    .t10-hero-slider {
+        aspect-ratio: 16 / 9;
+        min-height: 140px;
+    }
     .t10-hero-arrow {
-        width: 36px;
-        height: 36px;
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
     }
     .t10-hero-prev {
-        left: 10px;
+        left: 6px;
     }
     .t10-hero-next {
-        right: 10px;
+        right: 6px;
     }
 }
 
@@ -512,13 +517,15 @@
 
 /* SECTION 7: Room Makeover Offer CTA Banner */
 .t10-makeover-banner {
-    margin: 50px 0;
-    border-radius: 20px;
+    margin: 28px 0;
+    border-radius: 16px;
     overflow: hidden;
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
+    grid-template-columns: minmax(320px, 380px) 1fr;
     background: #2d3a2e;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    align-items: stretch;
+    min-height: 250px;
 }
 
 @media (max-width: 850px) {
@@ -528,7 +535,7 @@
 }
 
 .t10-makeover-content {
-    padding: 55px 45px;
+    padding: 28px 32px;
     color: #ffffff;
     display: flex;
     flex-direction: column;
@@ -539,23 +546,24 @@
     color: #fdba74;
     font-size: 11px;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .t10-makeover-title {
+    color: #ffffff;
     font-family: 'DM Serif Display', serif;
-    font-size: clamp(26px, 3.5vw, 38px);
-    line-height: 1.15;
-    margin: 0 0 12px;
+    font-size: clamp(20px, 2.2vw, 26px);
+    line-height: 1.25;
+    margin: 0 0 8px;
 }
 
 .t10-makeover-desc {
-    color: #d1d5db;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 24px;
+    color: #e2e8f0;
+    font-size: 13px;
+    line-height: 1.55;
+    margin-bottom: 16px;
 }
 
 .t10-btn-terracotta {
@@ -563,30 +571,36 @@
     color: #ffffff;
     font-family: 'DM Sans', sans-serif;
     font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 1px;
+    font-size: 12px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
-    padding: 14px 32px;
+    padding: 9px 20px;
     border-radius: 4px;
     text-decoration: none;
     transition: all 0.25s ease;
-    box-shadow: 0 6px 20px rgba(201, 106, 30, 0.35);
+    box-shadow: 0 4px 14px rgba(201, 106, 30, 0.35);
     display: inline-block;
 }
 
 .t10-btn-terracotta:hover {
     background: #df7c2e;
     transform: translateY(-2px);
+    color: #ffffff;
 }
 
 .t10-makeover-img {
-    min-height: 280px;
+    height: 100%;
+    min-height: 250px;
+    overflow: hidden;
+    background: #1e293b;
 }
 
 .t10-makeover-img img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
+    display: block;
 }
 
 /* Product Grid */
@@ -808,17 +822,17 @@
     <section class="t10-container">
         <div class="t10-makeover-banner">
             <div class="t10-makeover-content">
-                <span class="t10-makeover-tag">COMPLETE INTERIOR PACKAGE</span>
-                <h3 class="t10-makeover-title">Full Living Room Makeover Suite</h3>
+                <span class="t10-makeover-tag">{{ !empty($homepage['template_10_makeover_tag']) ? $homepage['template_10_makeover_tag'] : 'COMPLETE INTERIOR PACKAGE' }}</span>
+                <h3 class="t10-makeover-title">{{ !empty($homepage['template_10_makeover_title']) ? $homepage['template_10_makeover_title'] : 'Full Living Room Makeover Suite' }}</h3>
                 <p class="t10-makeover-desc">
-                    Includes our 3-Seater Nordic Sofa, Solid Walnut Coffee Table, and Floating Media Unit with complimentary installation. Price: {{ $homepage['template_10_package_price'] ?? '৳48,500' }}.
+                    {{ !empty($homepage['template_10_makeover_desc']) ? $homepage['template_10_makeover_desc'] : 'Includes our 3-Seater Nordic Sofa, Solid Walnut Coffee Table, and Floating Media Unit with complimentary installation. Price: ৳48,500.' }}
                 </p>
                 <div>
-                    <a href="{{ route('shop') }}" class="t10-btn-terracotta">EXPLORE ROOM PACKAGES &rarr;</a>
+                    <a href="{{ !empty($homepage['template_10_makeover_btn_url']) ? $homepage['template_10_makeover_btn_url'] : route('shop') }}" class="t10-btn-terracotta">{{ !empty($homepage['template_10_makeover_btn_text']) ? $homepage['template_10_makeover_btn_text'] : 'EXPLORE ROOM PACKAGES →' }}</a>
                 </div>
             </div>
             <div class="t10-makeover-img">
-                <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=700&q=80" alt="Room Suite">
+                <img src="{{ !empty($homepage['template_10_makeover_image']) ? $homepage['template_10_makeover_image'] : 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1000&q=80' }}" alt="{{ !empty($homepage['template_10_makeover_title']) ? $homepage['template_10_makeover_title'] : 'Room Suite' }}">
             </div>
         </div>
     </section>

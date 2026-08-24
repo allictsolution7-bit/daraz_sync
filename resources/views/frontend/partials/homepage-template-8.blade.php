@@ -146,15 +146,20 @@
 }
 
 @media (max-width: 640px) {
+    .t8-hero-slider {
+        aspect-ratio: 16 / 9;
+        min-height: 140px;
+    }
     .t8-hero-arrow {
-        width: 36px;
-        height: 36px;
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
     }
     .t8-hero-prev {
-        left: 10px;
+        left: 6px;
     }
     .t8-hero-next {
-        right: 10px;
+        right: 6px;
     }
 }
 
