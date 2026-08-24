@@ -85,6 +85,7 @@
                         <th class="ps-4 py-3">Tenant Name</th>
                         <th class="py-3">Domain / Subdomain</th>
                         <th class="py-3">Database Connection</th>
+                        <th class="py-3 text-center">Assigned Theme</th>
                         <th class="py-3 text-center">Commission (%)</th>
                         <th class="py-3 text-center">Free Promotion</th>
                         <th class="py-3">Status</th>
@@ -144,49 +145,46 @@
                                 </div>
                             </td>
                             <td class="text-center">
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 rounded-pill font-semibold" style="font-size: 11px;">
+                                    <i class="fas fa-layer-group me-1"></i> Template {{ $tenant->template_id ?: '1' }}
+                                </span>
+                            </td>
+                            <td class="text-center">
                                 @if($tenant->commission_rate !== null && $tenant->commission_rate !== '')
                                     <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #ecfdf5; color: #047857; font-weight: 600; font-size: 11px;" title="Custom rate set for this tenant store">
                                         <i class="fas fa-user-tag me-1"></i> {{ number_format($tenant->commission_rate, 2) }}% (Custom)
                                     </span>
                                 @else
-                                    <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #f1f5f9; color: #475569; font-weight: 600; font-size: 11px;" title="Inheriting default global platform commission">
+                                    <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #f1f5f9; color: #475569; font-weight: 600; font-size: 11px;" title="Using global commission rate">
                                         <i class="fas fa-globe me-1"></i> {{ number_format($globalCommission, 2) }}% (Global)
                                     </span>
                                 @endif
                             </td>
                             <td class="text-center">
-                                <div class="d-flex flex-column align-items-center justify-content-center">
-                                    <div class="form-check form-switch m-0">
-                                        <input class="form-check-input free-promotion-toggle" 
-                                               type="checkbox" 
-                                               role="switch" 
-                                               data-tenant-id="{{ $tenant->id }}" 
-                                               data-url="{{ route('admin.saas-tenants.toggle-free-promotion', $tenant->id) }}"
-                                               id="freePromoSwitch{{ $tenant->id }}" 
-                                               {{ $tenant->free_promotion ? 'checked' : '' }}
-                                               style="cursor: pointer; width: 2.4rem; height: 1.25rem;">
-                                    </div>
-                                    <span class="badge mt-1 status-badge-{{ $tenant->id }} {{ $tenant->free_promotion ? 'bg-success-light text-success' : 'bg-light text-muted' }}" 
-                                          style="font-size: 10px; font-weight: 600; {{ $tenant->free_promotion ? 'background-color: #ecfdf5; color: #047857;' : 'background-color: #f1f5f9; color: #64748b;' }}">
-                                        {{ $tenant->free_promotion ? 'Enabled' : 'Disabled' }}
+                                <div class="form-check form-switch d-inline-block">
+                                    <input class="form-check-input free-promotion-toggle" 
+                                           type="checkbox" 
+                                           data-tenant-id="{{ $tenant->id }}"
+                                           data-url="{{ route('admin.saas-tenants.toggle-free-promotion', $tenant->id) }}"
+                                           id="freePromoToggle{{ $tenant->id }}"
+                                           {{ $tenant->free_promotion ? 'checked' : '' }}
+                                           style="cursor: pointer;">
+                                </div>
+                                <div>
+                                    <span class="badge status-badge-{{ $tenant->id }} {{ $tenant->free_promotion ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-muted border' }}" style="font-size: 10px;">
+                                        {{ $tenant->free_promotion ? 'Free Enabled' : 'Disabled' }}
                                     </span>
                                 </div>
                             </td>
                             <td>
                                 @if($tenant->is_active)
-                                    <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #ecfdf5; color: #047857; font-weight: 600; font-size: 11px;">Active</span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill font-semibold">Active</span>
                                 @else
-                                    <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #fef2f2; color: #b91c1c; font-weight: 600; font-size: 11px;">Inactive</span>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill font-semibold">Inactive</span>
                                 @endif
                             </td>
                             <td class="text-end pe-4">
-                                <form action="{{ route('admin.saas-tenants.reprovision', $tenant->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Synchronize and provision all database tables and settings for this tenant?');">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-light border-0 me-1 rounded-3" style="background-color: #e0f2fe; color: #0369a1;" title="Sync & Provision Database Tables">
-                                        <i class="fas fa-database me-1"></i> Sync DB
-                                    </button>
-                                </form>
-                                <a href="{{ route('admin.saas-tenants.wholesale-products', ['tenant_id' => $tenant->id]) }}" class="btn btn-sm btn-light border-0 me-1 rounded-3" style="background-color: #e0e7ff; color: #3730a3;" title="View Products">
+                                <a href="{{ route('admin.saas-tenants.wholesale-products', ['tenant_id' => $tenant->id]) }}" class="btn btn-sm btn-outline-primary me-1 rounded-3 font-semibold" style="font-size: 12px;">
                                     <i class="fas fa-boxes me-1"></i> Products
                                 </a>
                                 <button type="button" class="btn btn-sm btn-light border-0 me-1 rounded-3" data-bs-toggle="modal" data-bs-target="#editTenantModal{{ $tenant->id }}" style="background-color: #f1f5f9; color: #475569;" title="Edit Subdomain">
@@ -217,6 +215,24 @@
                                             <div class="mb-3">
                                                 <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Tenant Name</label>
                                                 <input type="text" name="name" class="form-control rounded-3" value="{{ $tenant->name }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label font-semibold small text-muted" style="font-weight: 600;">
+                                                    <i class="fas fa-layer-group text-primary me-1"></i> Assigned Homepage Theme
+                                                </label>
+                                                <select name="template_id" class="form-select rounded-3 font-semibold">
+                                                    <option value="1" {{ ($tenant->template_id ?? '1') == '1' ? 'selected' : '' }}>Template 1: Classic Marketplace (Daraz Style)</option>
+                                                    <option value="2" {{ ($tenant->template_id ?? '') == '2' ? 'selected' : '' }}>Template 2: Modern Minimal / Luxury Boutique</option>
+                                                    <option value="3" {{ ($tenant->template_id ?? '') == '3' ? 'selected' : '' }}>Template 3: Electronic & Tech Hub (Cyber Tech)</option>
+                                                    <option value="4" {{ ($tenant->template_id ?? '') == '4' ? 'selected' : '' }}>Template 4: High-Conversion Flash Sale</option>
+                                                    <option value="5" {{ ($tenant->template_id ?? '') == '5' ? 'selected' : '' }}>Template 5: Grocery & Fresh Express</option>
+                                                    <option value="6" {{ ($tenant->template_id ?? '') == '6' ? 'selected' : '' }}>Template 6: Fashion & Apparel Studio</option>
+                                                    <option value="7" {{ ($tenant->template_id ?? '') == '7' ? 'selected' : '' }}>Template 7: Beauty & Cosmetics Glow</option>
+                                                    <option value="8" {{ ($tenant->template_id ?? '') == '8' ? 'selected' : '' }}>Template 8: Mega Supermarket & Daily Essentials</option>
+                                                    <option value="9" {{ ($tenant->template_id ?? '') == '9' ? 'selected' : '' }}>Template 9: Books, Academy & Heritage Store</option>
+                                                    <option value="10" {{ ($tenant->template_id ?? '') == '10' ? 'selected' : '' }}>Template 10: Home Living & Furniture</option>
+                                                </select>
+                                                <div class="form-text text-muted small">Only Super Admin can assign this template. The tenant admin will only see and use this assigned theme.</div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label font-semibold small text-muted" style="font-weight: 600;">
@@ -305,6 +321,24 @@
                     <div class="mb-3">
                         <label class="form-label font-semibold small text-muted" style="font-weight: 600;">Tenant Name <span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Dhaka Branch Wholesellers" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label font-semibold small text-muted" style="font-weight: 600;">
+                            <i class="fas fa-layer-group text-primary me-1"></i> Assigned Homepage Theme
+                        </label>
+                        <select name="template_id" class="form-select rounded-3 font-semibold">
+                            <option value="1" selected>Template 1: Classic Marketplace (Daraz Style)</option>
+                            <option value="2">Template 2: Modern Minimal / Luxury Boutique</option>
+                            <option value="3">Template 3: Electronic & Tech Hub (Cyber Tech)</option>
+                            <option value="4">Template 4: High-Conversion Flash Sale</option>
+                            <option value="5">Template 5: Grocery & Fresh Express</option>
+                            <option value="6">Template 6: Fashion & Apparel Studio</option>
+                            <option value="7">Template 7: Beauty & Cosmetics Glow</option>
+                            <option value="8">Template 8: Mega Supermarket & Daily Essentials</option>
+                            <option value="9">Template 9: Books, Academy & Heritage Store</option>
+                            <option value="10">Template 10: Home Living & Furniture</option>
+                        </select>
+                        <div class="form-text text-muted small">Only Super Admin can assign this template. The tenant admin will only see and use this assigned theme.</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label font-semibold small text-muted" style="font-weight: 600;">

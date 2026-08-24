@@ -2382,11 +2382,15 @@
 
                     <!-- Homepage Template Selection Card -->
                     @php
-                        $isSuperAdmin = auth()->check() && auth()->user()->isSuperAdmin();
+                        $isTenantContext = (bool)request()->attributes->get('tenant') || !empty(view()->shared('currentTenant')) || !in_array(request()->getHost(), ['localhost', '127.0.0.1', '::1'], true);
+                        $isSuperAdmin = auth()->check() && auth()->user()->isSuperAdmin() && !$isTenantContext;
                         $currentUser = auth()->user();
-                        $selectedTemplate = $currentUser && !empty($currentUser->template_id) 
-                            ? (string)$currentUser->template_id 
-                            : setting('homepage', 'template_id', '1');
+                        $tenantModel = request()->attributes->get('tenant') ?: view()->shared('currentTenant');
+                        $selectedTemplate = !empty($tenantModel->template_id)
+                            ? (string)$tenantModel->template_id
+                            : ($currentUser && !empty($currentUser->template_id) 
+                                ? (string)$currentUser->template_id 
+                                : setting('homepage', 'template_id', '1'));
                     @endphp
                     <div class="card mb-4 border-0 shadow-sm" style="border-radius: 14px; overflow: hidden;">
                         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom: 1px solid #edf2f7;">
@@ -2398,7 +2402,7 @@
                                     @if($isSuperAdmin)
                                         Select a pre-designed homepage theme architecture for your store or subdomain.
                                     @else
-                                        Your assigned homepage website theme architecture (configured by Super Administrator).
+                                        Your assigned homepage website theme architecture (managed by Super Administrator).
                                     @endif
                                 </p>
                             </div>
@@ -2412,6 +2416,21 @@
                         </div>
                         <div class="card-body bg-light-50 p-4">
                             <input type="hidden" name="homepage[template_id]" id="selected_homepage_template" value="{{ $selectedTemplate }}">
+
+                            @if(!$isSuperAdmin)
+                            <div class="alert alert-info border-0 rounded-3 mb-3 d-flex align-items-center justify-content-between p-3" style="background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6 !important;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fas fa-info-circle fs-5 mr-2"></i>
+                                    <div>
+                                        <strong>Assigned Storefront Theme: Template {{ $selectedTemplate }}</strong>
+                                        <div class="small opacity-80">This theme architecture is designated to your store. You can customize all banners, colors, and content below.</div>
+                                    </div>
+                                </div>
+                                <a href="{{ url('/') }}?preview_template={{ $selectedTemplate }}" target="_blank" class="btn btn-sm btn-primary rounded-pill px-3 py-1 font-weight-bold shadow-sm" style="white-space: nowrap;">
+                                    <i class="fas fa-external-link-alt mr-1"></i> Live Storefront
+                                </a>
+                            </div>
+                            @endif
 
                             <style>
                                 .template-selector-grid {
