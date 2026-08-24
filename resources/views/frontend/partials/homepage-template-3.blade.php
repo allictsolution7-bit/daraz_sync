@@ -88,8 +88,8 @@
 
 @media (max-width: 960px) {
     .t3-slider-wrap {
-        aspect-ratio: 16 / 9;
-        min-height: 140px;
+        aspect-ratio: 1500 / 620;
+        min-height: 120px;
         border-radius: 10px;
     }
 }
@@ -125,16 +125,17 @@
 
 @media (max-width: 640px) {
     .t3-hero-nav-arrow {
-        width: 26px;
-        height: 26px;
-        box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+        width: 24px;
+        height: 24px;
+        background: rgba(13, 19, 34, 0.65);
+        border-width: 1px;
     }
     .t3-hero-nav-arrow svg {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
     }
-    .t3-hero-nav-prev { left: 6px; }
-    .t3-hero-nav-next { right: 6px; }
+    .t3-hero-nav-prev { left: 4px; }
+    .t3-hero-nav-next { right: 4px; }
 }
 
 .t3-slides-container {
@@ -186,7 +187,7 @@
 
 @media (max-width: 640px) {
     .t3-slide-content {
-        padding: 10px 12px;
+        padding: 8px 10px;
     }
 }
 
@@ -251,16 +252,21 @@
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    height: auto;
-    aspect-ratio: 16 / 7.5;
+    height: 100%;
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
 }
 
 @media (max-width: 960px) {
     .t3-hero-side-promos {
         display: block !important;
-        aspect-ratio: 16 / 7;
-        min-height: 110px;
-        border-radius: 10px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        height: auto;
+        min-height: 0;
+        border-radius: 0;
     }
 }
 
@@ -279,9 +285,17 @@
 
 @media (max-width: 960px) {
     .t3-side-group {
+        position: relative;
+        inset: auto;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: none !important;
         flex-direction: row;
-        gap: 6px;
-        padding: 6px;
+        gap: 8px;
+        padding: 0;
+    }
+    .t3-side-group:not(.active) {
+        display: none;
     }
 }
 
@@ -304,6 +318,15 @@
     justify-content: center;
     text-decoration: none;
     transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+@media (max-width: 960px) {
+    .t3-side-card {
+        flex: 1 1 50%;
+        aspect-ratio: 16 / 9;
+        border-radius: 8px;
+        border-color: rgba(56, 189, 248, 0.25);
+    }
 }
 
 .t3-side-card:hover {
@@ -348,17 +371,10 @@
 .t3-side-prev { left: 8px; }
 .t3-side-next { right: 8px; }
 
-@media (max-width: 640px) {
+@media (max-width: 960px) {
     .t3-side-nav-btn {
-        width: 24px;
-        height: 24px;
+        display: none !important;
     }
-    .t3-side-nav-btn svg {
-        width: 12px;
-        height: 12px;
-    }
-    .t3-side-prev { left: 4px; }
-    .t3-side-next { right: 4px; }
 }
 
 /* ── T3 TECH TICKER ── */
@@ -374,7 +390,7 @@
 @media (max-width: 640px) {
     .t3-ticker-bar {
         padding: 8px 0;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
     }
 }
 
@@ -388,8 +404,10 @@
 
 @media (max-width: 640px) {
     .t3-ticker-flex {
-        gap: 8px 12px;
-        justify-content: center;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px 10px !important;
+        justify-content: start !important;
     }
 }
 
@@ -404,8 +422,16 @@
 
 @media (max-width: 640px) {
     .t3-ticker-item {
-        font-size: 11px;
-        gap: 6px;
+        font-size: 10.5px;
+        gap: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .t3-ticker-item svg {
+        width: 13px !important;
+        height: 13px !important;
+        flex-shrink: 0;
     }
 }
 .t3-ticker-flex {

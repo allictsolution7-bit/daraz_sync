@@ -509,6 +509,16 @@
 
             .mobile-filter-btn {
                 display: flex;
+                bottom: 168px !important;
+                right: 14px !important;
+                width: 40px !important;
+                height: 40px !important;
+                z-index: 998 !important;
+            }
+
+            .mobile-filter-btn svg {
+                width: 18px !important;
+                height: 18px !important;
             }
 
             .filter-sidebar {

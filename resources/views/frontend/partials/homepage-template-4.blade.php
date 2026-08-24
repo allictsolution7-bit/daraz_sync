@@ -248,14 +248,17 @@
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    height: auto;
-    aspect-ratio: 16 / 7.5;
+    height: 100%;
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
 }
 
 @media (max-width: 900px) {
     .t4-side-deals {
         display: block !important;
         aspect-ratio: 16 / 7;
+        height: auto;
         min-height: 110px;
         border-radius: 10px;
     }

@@ -5776,10 +5776,22 @@
 
         @media (max-width:768px) {
             .floating-cart {
-                width: 50px;
-                height: 50px;
-                bottom: {{ setting('general', 'floating_cart_bottom_mobile', '55') }}px;
-                right: {{ setting('general', 'floating_cart_right_mobile', '20') }}px;
+                width: 42px !important;
+                height: 42px !important;
+                bottom: 68px !important;
+                right: 14px !important;
+                z-index: 999 !important;
+            }
+            .floating-cart .cc4 svg {
+                width: 24px !important;
+                height: 24px !important;
+            }
+            .cart-items {
+                width: 18px !important;
+                height: 18px !important;
+                font-size: 10px !important;
+                top: -3px !important;
+                right: -3px !important;
             }
         }
 
@@ -6755,9 +6767,16 @@
 
             @media (max-width: 768px) {
                 #scrollToTopBtn {
-                    bottom: 25px !important;
-                    left: 20px !important;
+                    bottom: 68px !important;
+                    left: 14px !important;
                     right: auto !important;
+                    width: 38px !important;
+                    height: 38px !important;
+                    z-index: 999 !important;
+                }
+                #scrollToTopBtn svg {
+                    width: 18px !important;
+                    height: 18px !important;
                 }
             }
 
@@ -6810,8 +6829,11 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding-bottom: 65px;
+            }
             .footer-bottom {
-                margin-bottom: 50px !important;
+                margin-bottom: 75px !important;
             }
             .mobileflotnav-section {
                 display: block;
@@ -6820,20 +6842,20 @@
                 left: 0;
                 right: 0;
                 z-index: 1000;
-                background: white;
-                padding: 15px 20px;
-                border-radius: 20px 20px 0 0;
-                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                border-top: 1px solid rgba(0, 0, 0, 0.1);
+                background: #ffffff;
+                padding: 6px 12px;
+                border-radius: 14px 14px 0 0;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                border-top: 1px solid rgba(0, 0, 0, 0.08);
             }
 
             .mobileflotnav-container {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                gap: 10px;
-                max-width: 500px;
+                gap: 6px;
+                max-width: 480px;
                 margin: 0 auto;
             }
 
@@ -6842,31 +6864,31 @@
                 flex-direction: column;
                 align-items: center;
                 text-decoration: none;
-                color: #333;
-                transition: all 0.3s ease;
-                padding: 5px 4px;
-                border-radius: 12px;
+                color: #475569;
+                transition: all 0.2s ease;
+                padding: 3px 2px;
+                border-radius: 8px;
                 flex: 1;
                 cursor: pointer;
             }
 
             .mobileflotnav-item:hover {
-                background-color: #f8f9fa;
-                transform: translateY(-3px);
-            }
-
-            .mobileflotnav-item:active {
-                transform: translateY(0);
+                background-color: #f8fafc;
             }
 
             .mobileflotnav-icon {
-                width: 32px;
-                height: 32px;
-                margin-bottom: 0px;
+                width: 22px;
+                height: 22px;
+                margin-bottom: 2px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                transition: all 0.3s ease;
+                transition: all 0.2s ease;
+            }
+
+            .mobileflotnav-icon svg {
+                width: 20px;
+                height: 20px;
             }
 
             .mobileflotnav-item:first-child .mobileflotnav-icon svg {
@@ -6890,49 +6912,37 @@
             }
 
             .mobileflotnav-text {
-                font-size: 12px;
-                font-weight: 500;
-                color: #2c3e50;
+                font-size: 10.5px;
+                font-weight: 600;
+                color: #334155;
                 text-align: center;
-                line-height: 1.2;
+                line-height: 1.1;
             }
             .mobileflotnav-item:hover .mobileflotnav-text {
-                color: #3498db;
+                color: #3b82f6;
             }
         }
 
         @media (max-width: 480px) {
             .mobileflotnav-section {
-                padding: 0px 5px;
+                padding: 5px 8px;
             }
-
-            .mobileflotnav-container {
-                gap: 5px;
-            }
-
-            .mobileflotnav-item {
-                padding: 5px 4px;
-            }
-
-            .mobileflotnav-icon {
-                width: 28px;
-                height: 28px;
-                margin-bottom: 0px;
-            }
-
             .mobileflotnav-text {
-                font-size: 11px;
+                font-size: 10px;
             }
         }
 
         @media (max-width: 320px) {
             .mobileflotnav-text {
-                font-size: 10px;
+                font-size: 9.5px;
             }
-
             .mobileflotnav-icon {
-                width: 24px;
-                height: 24px;
+                width: 20px;
+                height: 20px;
+            }
+            .mobileflotnav-icon svg {
+                width: 18px;
+                height: 18px;
             }
         }
 
@@ -7757,44 +7767,174 @@
         .item-cart-icon.active svg path {
             fill: #fff;
         }
-        .item-cart-icon.active .simple-check {
-            color: var(--secondary-color);
+        /* Glassmorphism Cart Toast Notification (Tata / Toast) */
+        .cart-toast-notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            padding: 12px 18px;
+            border-radius: 14px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.2);
+            color: #ffffff;
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 90vw;
         }
-        .item-cart-icon.active .item-cart-icon {
-            background: var(--primary-color);
+
+        .cart-toast-notification.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
         }
-        .simple-check { 
-            display:none;
-            position:absolute;
-            top:50%;
-            left:50%;
-            transform:translate(-50%,-50%);
-            color:var(--primary-color);
-            font-size:24px;
-            font-weight:bold;
-            animation:pop 0.5s ease;
+
+        .cart-toast-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            flex-shrink: 0;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+            animation: toastPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        @keyframes pop { from{transform:translate(-50%,-50%) scale(0);} to{transform:translate(-50%,-50%) scale(1);} }
+
+        .cart-toast-body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-toast-title {
+            font-size: 13px;
+            font-weight: 800;
+            margin: 0;
+            color: #f8fafc;
+            letter-spacing: 0.3px;
+        }
+
+        .cart-toast-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            margin: 2px 0 0;
+            line-height: 1.2;
+        }
+
+        .cart-toast-btn {
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            border: 1px solid #38bdf8;
+            border-radius: 20px;
+            color: #ffffff !important;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            margin-left: 6px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .cart-toast-btn:hover {
+            background: #38bdf8;
+            color: #080c14 !important;
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        @keyframes toastPop {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes cartBounce {
+            0%, 100% { transform: scale(1); }
+            30% { transform: scale(1.3) rotate(-8deg); }
+            60% { transform: scale(1.15) rotate(8deg); }
+        }
+
+        .btn-card-add-to-cart.btn-added {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            border-color: #34d399 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.6) !important;
+            transform: scale(1.06) !important;
+        }
+
+        @media (max-width: 640px) {
+            .cart-toast-notification {
+                top: 14px;
+                right: 12px;
+                left: 12px;
+                padding: 10px 14px;
+                gap: 8px;
+            }
+            .cart-toast-title { font-size: 12px; }
+            .cart-toast-desc { font-size: 10.5px; }
+            .cart-toast-btn { font-size: 10.5px; padding: 5px 10px; }
+        }
     </style>
 
+    <div id="cartToastNotification" class="cart-toast-notification">
+        <div class="cart-toast-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="cart-toast-body">
+            <h4 class="cart-toast-title">Added to Cart!</h4>
+            <p class="cart-toast-desc">Item successfully added to shopping cart.</p>
+        </div>
+        <a href="{{ route('cart.index') }}" class="cart-toast-btn">View Cart &rarr;</a>
+    </div>
+
     <script>
-        // Simple checkmark animation
+        // High-end Add to Cart celebration animation & toast
         function showCheck(cartIcon) {
-            const check = cartIcon.querySelector('.simple-check');
-            if (check) {
-                // Add active class for green background
-                cartIcon.classList.add('active');
+            // 1. Button transformation animation
+            const btn = cartIcon.closest('.btn-card-add-to-cart') || cartIcon;
+            if (btn) {
+                if (!btn.dataset.origHtml) {
+                    btn.dataset.origHtml = btn.innerHTML;
+                }
+                btn.classList.add('btn-added');
+                btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Added!</span>';
                 
-                // Show checkmark
-                check.style.display = 'flex';
                 setTimeout(() => {
-                    check.style.display = 'none';
-                    cartIcon.classList.remove('active');
-                }, 1500);
+                    btn.classList.remove('btn-added');
+                    btn.innerHTML = btn.dataset.origHtml;
+                }, 1800);
+            }
+
+            // 2. Floating Cart bounce
+            const floatingCart = document.querySelector('.floating-cart');
+            if (floatingCart) {
+                floatingCart.style.animation = 'none';
+                void floatingCart.offsetWidth; // trigger reflow
+                floatingCart.style.animation = 'cartBounce 0.6s ease';
+            }
+
+            // 3. Show Glassmorphic Toast Notification (Tata)
+            const toast = document.getElementById('cartToastNotification');
+            if (toast) {
+                toast.classList.add('show');
+                clearTimeout(window.cartToastTimer);
+                window.cartToastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2800);
             }
         }
         window.showCheck = showCheck;
-        
     </script>
 
     <!-- Whatsapp fixed button for chat -->
@@ -7924,23 +8064,25 @@
 
         @media (max-width: 768px) {
             .scroll-to-top-container {
-                bottom: 25px;
-                left: 15px;
+                bottom: 68px !important;
+                left: 14px !important;
             }
 
             .whatsapp-button-container {
-                bottom: 25px;
-                right: 75px;
+                bottom: 118px !important;
+                right: 14px !important;
+                left: auto !important;
+                z-index: 999 !important;
             }
 
-            .whatsapp-button, .scroll-to-top-btn {
-                width: 40px;
-                height: 40px;
+            .whatsapp-button {
+                width: 40px !important;
+                height: 40px !important;
             }
 
             .whatsapp-icon {
-                width: 20px;
-                height: 20px;
+                width: 20px !important;
+                height: 20px !important;
             }
         }
 
