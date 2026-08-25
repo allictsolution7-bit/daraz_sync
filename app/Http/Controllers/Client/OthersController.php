@@ -139,7 +139,7 @@ class OthersController extends Controller
 
                     $products = Product::where('status', 1)
                         ->forPublicDisplay()
-                        ->select(['id', 'title', 'slug', 'thumb_image', 'old_price', 'offer', 'product_type'])
+                        ->select(['id', 'title', 'slug', 'thumb_image', 'old_price', 'offer', 'product_type', 'sub_category_id'])
                         ->withProductCardData()
                         ->where(function ($q) use ($cat, $subIds, $thirdIds) {
                             $q->inCategory($cat->id);
@@ -163,8 +163,29 @@ class OthersController extends Controller
                         ->limit(6)
                         ->get();
 
-                    // Do not fallback to random products if category has no products
-                    $sliderMegaCategoryProducts[$cat->id] = $products;
+                    $catProductGroups = [
+                        'all' => $products,
+                    ];
+
+                    foreach ($cat->subCategories as $sub) {
+                        $subProducts = Product::where('status', 1)
+                            ->forPublicDisplay()
+                            ->select(['id', 'title', 'slug', 'thumb_image', 'old_price', 'offer', 'product_type', 'sub_category_id'])
+                            ->withProductCardData()
+                            ->where(function ($q) use ($sub) {
+                                $q->where('sub_category_id', $sub->id)
+                                    ->orWhereHas('additionalSubCategories', function ($addSubQ) use ($sub) {
+                                        $addSubQ->where('sub_categories.id', $sub->id);
+                                    });
+                            })
+                            ->orderBy('created_at', 'desc')
+                            ->limit(6)
+                            ->get();
+
+                        $catProductGroups[$sub->id] = $subProducts;
+                    }
+
+                    $sliderMegaCategoryProducts[$cat->id] = $catProductGroups;
                 }
             }
         }

@@ -35,10 +35,10 @@ class SettingController extends Controller
         $registration = SettingsService::group('registration');
         $mobile_nav = SettingsService::group('mobile_nav');
 
-        // For category/subcategory selection, fetch all categories/subcategories
-        $categories = \App\Models\ProductCategory::all();
-        $subcategories = \App\Models\SubCategory::all();
-        $products = \App\Models\Product::where('status', 1)->get();
+        // For category/subcategory selection, fetch lean models
+        $categories = \App\Models\ProductCategory::select(['id', 'name', 'slug'])->get();
+        $subcategories = \App\Models\SubCategory::select(['id', 'name', 'slug', 'product_category_id'])->get();
+        $products = \App\Models\Product::where('status', 1)->select(['id', 'title', 'slug', 'offer', 'old_price'])->limit(300)->get();
 
         return view('admin.settings.index', compact('settings', 'homepage', 'header', 'footer', 'seo', 'single_product', 'registration', 'mobile_nav', 'categories', 'subcategories', 'products'));
     }
@@ -61,20 +61,22 @@ class SettingController extends Controller
             'homepage.slider_side_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp,avif|max:2048',
         ]);
 
-        // Save general settings (legacy)
-        foreach ($request->input('settings', []) as $key => $value) {
-            SettingsService::set('general', $key, $value);
-        }
+        // Bulk batch save all submitted settings groups in a single ultra-fast query
+        $batchSettings = [
+            'general' => $request->input('settings', []),
+            'homepage' => $request->input('homepage', []),
+            'header' => $request->input('header', []),
+            'footer' => $request->input('footer', []),
+            'seo' => $request->input('seo', []),
+            'ecommerce' => $request->input('ecommerce', []),
+            'single_product' => $request->input('single_product', []),
+            'registration' => $request->input('registration', []),
+            'mobile_nav' => $request->input('mobile_nav', []),
+            'navigation' => $request->input('navigation', []),
+            'layout' => $request->input('layout', []),
+        ];
 
-        // Save grouped settings (homepage, header, footer, etc.)
-        foreach ($request->input('homepage', []) as $key => $value) {
-            // Extra safe: If it's an array, encode as JSON
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            // If it's a string, save as-is (hidden input sends JSON string)
-            SettingsService::set('homepage', $key, $value);
-        }
+        SettingsService::setMany($batchSettings);
 
         // Explicitly handle homepage[template_id] persistence
         if ($request->has('homepage.template_id') || isset($request->input('homepage')['template_id'])) {
@@ -121,70 +123,6 @@ class SettingController extends Controller
                     }
                 }
             }
-        }
-        foreach ($request->input('header', []) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            SettingsService::set('header', $key, $value);
-        }
-        foreach ($request->input('footer', []) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            SettingsService::set('footer', $key, $value);
-        }
-        // Save SEO settings
-        foreach ($request->input('seo', []) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            SettingsService::set('seo', $key, $value);
-        }
-        // Save ecommerce settings
-        foreach ($request->input('ecommerce', []) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            SettingsService::set('ecommerce', $key, $value);
-        }
-        // Save single product settings
-        foreach ($request->input('single_product', []) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            SettingsService::set('single_product', $key, $value);
-        }
-        // Save registration settings
-        foreach ($request->input('registration', []) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            SettingsService::set('registration', $key, $value);
-        }
-        
-        // Save mobile navigation settings
-        foreach ($request->input('mobile_nav', []) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            SettingsService::set('mobile_nav', $key, $value);
-        }
-
-        // Save navigation settings (mega menu, etc.)
-        foreach ($request->input('navigation', []) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            SettingsService::set('navigation', $key, $value);
-        }
-
-        // Save layout settings (container width, etc.)
-        foreach ($request->input('layout', []) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            }
-            SettingsService::set('layout', $key, $value);
         }
 
         // Handle Logo Upload

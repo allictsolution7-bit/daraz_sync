@@ -13,6 +13,40 @@
         && \App\Services\SettingsService::isMegaMenuEnabled();
 
     $megaMenuMenus = $hasMegaMenu ? $item->getMegaMenuMenus() : [];
+
+    // Auto-detect if this menu item links to a ProductCategory with subcategories
+    $categoryData = null;
+    if (!$hasChildren && !$hasMegaMenu && $level === 1) {
+        $slug = null;
+        if ($item->url) {
+            if (preg_match('/[?&]category=([^&#]+)/', $item->url, $matches)) {
+                $slug = $matches[1];
+            } elseif (preg_match('/shop\/([^\/?#]+)/', $item->url, $matches)) {
+                $slug = $matches[1];
+            }
+        }
+
+        $categoryData = \App\Models\ProductCategory::where(function ($q) use ($item, $slug) {
+                if ($slug) {
+                    $q->where('slug', $slug);
+                } else {
+                    $q->where('name', $item->title)
+                      ->orWhere('slug', \Illuminate\Support\Str::slug($item->title));
+                }
+            })
+            ->where(function ($q) {
+                $q->where('status', '1')->orWhere('status', 'active');
+            })
+            ->with(['subCategories' => function ($sq) {
+                $sq->where(function ($q) {
+                    $q->where('status', '1')->orWhere('status', 'active');
+                })->with(['thirdCategories' => function ($tq) {
+                    $tq->where('status', '1')->orWhere('status', 'active');
+                }]);
+            }])
+            ->first();
+    }
+    $hasCategorySubcategories = $categoryData && $categoryData->subCategories && $categoryData->subCategories->count() > 0;
 @endphp
 
 @if ($hasMegaMenu && !empty($megaMenuMenus))
@@ -69,7 +103,7 @@
     </div>
 
 @elseif ($hasChildren)
-    {{-- Standard Dropdown --}}
+    {{-- Standard Dropdown with MenuItem Children --}}
     <div class="dropdown-parent menu-level-{{ $level }}" data-level="{{ $level }}" data-item-id="{{ $item->id }}">
         <a href="{{ $item->url ?: '#' }}"
            class="{{ $isActive ? 'active' : '' }} has-dropdown"
@@ -103,6 +137,49 @@
             @endforeach
         </div>
     </div>
+
+@elseif ($hasCategorySubcategories)
+    {{-- Auto Category Subcategories Dropdown --}}
+    <div class="dropdown-parent menu-level-1" data-level="1" data-category-id="{{ $categoryData->id }}">
+        <a href="{{ $item->url ?: route('shop', $categoryData->slug) }}"
+           class="{{ $isActive ? 'active' : '' }} has-dropdown"
+           target="{{ $item->target ?? '_self' }}"
+           data-title="{{ $item->title }}">
+            @if ($item->icon_class)
+                <i class="{{ $item->icon_class }}"></i>
+            @endif
+            <span>{{ $item->title }}</span>
+            <svg class="dropdown-icon" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+        <div class="dropdown-menu submenu-level-1" data-level="1">
+            @foreach ($categoryData->subCategories as $subCat)
+                @if ($subCat->thirdCategories && $subCat->thirdCategories->count() > 0)
+                    <div class="dropdown-parent menu-level-2" data-level="2">
+                        <a href="{{ route('shop', [$categoryData->slug, $subCat->slug]) }}" class="has-dropdown">
+                            <span>{{ $subCat->name }}</span>
+                            <svg class="submenu-arrow" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3.5 2L6.5 5L3.5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                        <div class="dropdown-menu submenu-level-2" data-level="2">
+                            @foreach ($subCat->thirdCategories as $thirdCat)
+                                <a href="{{ route('shop', [$categoryData->slug, $subCat->slug, $thirdCat->slug]) }}" class="menu-item-level-3">
+                                    <span>{{ $thirdCat->name }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ route('shop', [$categoryData->slug, $subCat->slug]) }}" class="menu-item-level-2">
+                        <span>{{ $subCat->name }}</span>
+                    </a>
+                @endif
+            @endforeach
+        </div>
+    </div>
+
 @else
     {{-- Simple Link --}}
     <a href="{{ $item->url ?: '#' }}"

@@ -4080,7 +4080,7 @@
             padding: 0;
             background: transparent;
             position: relative;
-            z-index: 50;
+            z-index: 99999 !important;
         }
         .mainnav-section {
             background: #1e293b;
@@ -4088,7 +4088,7 @@
             margin-top: -3px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             position: relative;
-            z-index: 1010;
+            z-index: 99999 !important;
         }
 
         @media (min-width: 993px) {
@@ -4113,6 +4113,7 @@
         .mainnav-section .dropdown-parent {
             position: relative;
             display: inline-block;
+            z-index: 99999 !important;
         }
         .mainnav-section .dropdown-menu {
             position: absolute;
@@ -4124,13 +4125,14 @@
             box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16) !important;
             min-width: 210px !important;
             padding: 6px 0 !important;
-            z-index: 99999 !important;
+            z-index: 1000000 !important;
             white-space: nowrap !important;
         }
         .mainnav-section .dropdown-menu .dropdown-parent > .dropdown-menu {
             top: -6px !important;
             left: 100% !important;
             right: auto !important;
+            z-index: 1000001 !important;
         }
         .mainnav-section .dropdown-menu a {
             display: flex !important;
@@ -4224,14 +4226,17 @@
             }
         }
 
-        /* Navigation Links */
-        .navigation a {
+        /* Navigation Top-Level Links */
+        .navigation > a,
+        .navigation > .dropdown-parent > a,
+        .mainnav-section .navigation > a,
+        .mainnav-section .navigation > .dropdown-parent > a {
             display: flex;
             align-items: center;
             gap: 8px;
             padding: 14px 20px;
             text-decoration: none;
-            color: {{ setting('general', 'main_nav_text_color', '#fff') }};
+            color: #ffffff !important;
             font-weight: 600;
             font-size: 14px;
             text-transform: uppercase;
@@ -4242,21 +4247,97 @@
             border-right: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        .mainnav-section .navigation a {
-            color: #ffffff !important;
-        }
-
         /* Active state */
-        .navigation a.active {
+        .navigation > a.active,
+        .navigation > .dropdown-parent > a.active {
             color: #fff !important;
             background: rgba(0, 0, 0, 0.15);
         }
 
         /* Hover effects */
-        .navigation a:hover {
+        .navigation > a:hover,
+        .navigation > .dropdown-parent:hover > a {
             color: #fff !important;
             background: rgba(255, 255, 255, 0.12);
             transform: translateY(-1px);
+        }
+
+        /* Mega Menu Dropdown Styles */
+        .mega-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.15) !important;
+            padding: 20px 24px !important;
+            z-index: 99999 !important;
+            min-width: 580px;
+            max-width: 900px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dropdown-parent:hover > .mega-menu-dropdown,
+        .has-mega-menu:hover > .mega-menu-dropdown {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            display: block !important;
+        }
+
+        .mega-menu-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 20px;
+        }
+
+        .mega-menu-column-header {
+            margin: 0 0 10px 0 !important;
+            font-size: 13.5px !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            border-bottom: 1.5px solid #f1f5f9 !important;
+            padding-bottom: 6px !important;
+        }
+
+        .mega-menu-links {
+            list-style: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+        }
+
+        .mega-menu-links li a,
+        .mega-menu-links a {
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            padding: 6px 8px !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            color: #334155 !important;
+            text-transform: none !important;
+            letter-spacing: 0 !important;
+            border-radius: 6px !important;
+            border: none !important;
+            background: transparent !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .mega-menu-links li a:hover,
+        .mega-menu-links a:hover {
+            background: #f8fafc !important;
+            color: var(--primary-color, #2563eb) !important;
+            padding-left: 12px !important;
         }
 
         /* Bottom border animation */
@@ -8330,16 +8411,20 @@
                 }
                 
                 function hideNav() {
+                    clearTimeout(hoverTimeout);
                     hoverTimeout = setTimeout(function() {
                         mainnav.classList.remove('active');
                         trigger.classList.remove('active');
-                    }, 250);
+                    }, 350);
                 }
 
                 trigger.addEventListener('mouseenter', showNav);
                 trigger.addEventListener('mouseleave', hideNav);
                 mainnav.addEventListener('mouseenter', showNav);
                 mainnav.addEventListener('mouseleave', hideNav);
+
+                // Ensure hovering over any dropdown keeps the navbar active
+                mainnav.addEventListener('mouseover', showNav);
             }
         })();
     </script>

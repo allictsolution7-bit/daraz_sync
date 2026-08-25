@@ -35,7 +35,7 @@
 {{-- Preview Mode Banner --}}
 <style>
     #template-preview-banner {
-        position: relative; width: 100%; z-index: 99999;
+        position: relative; width: 100%; z-index: 90;
         background: linear-gradient(135deg, #1e293b, #0f172a);
         color: #fff; padding: 8px 16px;
         display: flex; align-items: center; justify-content: space-between;
@@ -933,24 +933,32 @@
                 display: inline-flex;
                 align-items: center;
                 gap: 6px;
-                padding: 5px 12px;
-                background: #ffffff;
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
-                font-size: 13px;
-                font-weight: 600;
+                padding: 6px 14px;
+                background: #f8fafc;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12.5px;
+                font-weight: 700;
                 color: #334155;
                 text-decoration: none;
+                cursor: pointer;
                 transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
             }
 
             .mega-subcat-pill:hover {
-                background: #f8fafc;
+                background: #ffffff;
                 border-color: var(--primary-color, #2563eb);
                 color: var(--primary-color, #2563eb);
                 transform: translateY(-1.5px);
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            }
+
+            .mega-subcat-pill.active {
+                background: linear-gradient(135deg, #ff5e3a 0%, #ff2a54 100%) !important;
+                border-color: transparent !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 14px rgba(255, 42, 84, 0.38) !important;
             }
 
             .mega-subcat-pill .pill-dot {
@@ -961,9 +969,18 @@
                 opacity: 0.7;
             }
 
+            .mega-subcat-pill.active .pill-dot {
+                background: #ffffff !important;
+                opacity: 1 !important;
+            }
+
             .mega-subcat-pill .pill-arrow {
                 color: #94a3b8;
                 transition: transform 0.2s ease;
+            }
+
+            .mega-subcat-pill.active .pill-arrow {
+                color: #ffffff !important;
             }
 
             .mega-subcat-pill:hover .pill-arrow {
@@ -1701,14 +1718,28 @@
                                 @if ($item->subCategories && $item->subCategories->count())
                                     <div class="mega-subcats-section">
                                         <div class="mega-subcats-bar">
-                                            <span class="mega-section-pill-tag">Subcategories</span>
+                                            <span class="mega-section-pill-tag">Categories</span>
                                             <div class="mega-subcat-pills-wrap">
+                                                <button type="button" 
+                                                    class="mega-subcat-pill active" 
+                                                    data-mega-cat-id="{{ $item->id }}" 
+                                                    data-sub-target="all" 
+                                                    data-title="Featured in {{ $item->name }}" 
+                                                    data-url="{{ route('shop', $item->slug) }}">
+                                                    <span class="pill-dot"></span>
+                                                    <span class="pill-text">All {{ $item->name }}</span>
+                                                </button>
                                                 @foreach ($item->subCategories as $child)
-                                                    <a href="{{ route('shop', [$item->slug, $child->slug]) }}" class="mega-subcat-pill">
+                                                    <button type="button" 
+                                                        class="mega-subcat-pill" 
+                                                        data-mega-cat-id="{{ $item->id }}" 
+                                                        data-sub-target="{{ $child->id }}" 
+                                                        data-title="Featured in {{ $child->name }}" 
+                                                        data-url="{{ route('shop', [$item->slug, $child->slug]) }}">
                                                         <span class="pill-dot"></span>
                                                         <span class="pill-text">{{ $child->name }}</span>
                                                         <svg class="pill-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                                                    </a>
+                                                    </button>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -1748,19 +1779,33 @@
                                         <div class="mega-products-header">
                                             <div class="mega-header-title-wrap">
                                                 <span class="mega-header-sparkle">✨</span>
-                                                <h5>Featured in {{ $item->name }}</h5>
+                                                <h5 class="mega-header-title" id="mega-title-{{ $item->id }}">Featured in {{ $item->name }}</h5>
                                             </div>
-                                            <a href="{{ route('shop', $item->slug) }}" class="mega-view-all-pill">
+                                            <a href="{{ route('shop', $item->slug) }}" class="mega-view-all-pill" id="mega-view-all-{{ $item->id }}">
                                                 <span>{{ \App\Services\SettingsService::getViewAllButtonText() }}</span>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                                             </a>
                                         </div>
-                                        <div class="mega-products-grid" data-mega-products-grid="{{ $item->id }}"></div>
-                                        <template data-mega-products-template="{{ $item->id }}">
-                                            @include('frontend.partials.mega-products-grid', [
-                                                'products' => $sliderCategoryProducts[$item->id] ?? collect(),
-                                            ])
-                                        </template>
+                                        <div class="mega-products-container" id="mega-products-container-{{ $item->id }}">
+                                            <div class="mega-products-grid active" data-sub-grid="all">
+                                                @include('frontend.partials.mega-products-grid', [
+                                                    'products' => is_array($sliderCategoryProducts[$item->id] ?? null) 
+                                                        ? ($sliderCategoryProducts[$item->id]['all'] ?? collect()) 
+                                                        : ($sliderCategoryProducts[$item->id] ?? collect()),
+                                                ])
+                                            </div>
+                                            @if ($item->subCategories && $item->subCategories->count())
+                                                @foreach ($item->subCategories as $child)
+                                                    <div class="mega-products-grid" data-sub-grid="{{ $child->id }}" style="display: none;">
+                                                        @include('frontend.partials.mega-products-grid', [
+                                                            'products' => is_array($sliderCategoryProducts[$item->id] ?? null) 
+                                                                ? ($sliderCategoryProducts[$item->id][$child->id] ?? collect()) 
+                                                                : collect(),
+                                                        ])
+                                                    </div>
+                                                @endforeach
+                                            @endif
+                                        </div>
                                     </div>
                                 @endif
                             </div>
@@ -1857,26 +1902,12 @@
                         megaArea.classList.add('active');
                         panels.forEach(panel => {
                             if (panel.dataset.menuPanel === String(id)) {
-                                panel.style.display = 'grid';
+                                panel.style.display = 'flex';
                             } else {
                                 panel.style.display = 'none';
                             }
                         });
                         catItems.forEach(item => item.classList.toggle('active', item.dataset.menuId === String(id)));
-
-                        // Inject pre-rendered products for this panel on first open
-                        const productBlock = megaArea.querySelector(`[data-mega-products="${id}"]`);
-                        const targetGrid = productBlock?.querySelector(`[data-mega-products-grid="${id}"]`);
-                        const tpl = megaArea.querySelector(`[data-mega-products-template="${id}"]`);
-                        if (productBlock && targetGrid && tpl && !productBlock.dataset.loaded) {
-                            const content = tpl.content ? tpl.content.cloneNode(true) : null;
-                            if (content) {
-                                targetGrid.replaceWith(content);
-                                productBlock.dataset.loaded = '1';
-                            } else {
-                                productBlock.dataset.loaded = 'error';
-                            }
-                        }
                     }
 
                     function hidePanel() {
@@ -1903,6 +1934,49 @@
                     megaArea.addEventListener('mouseenter', () => clearTimeout(hideTimer));
                     megaArea.addEventListener('mouseleave', () => {
                         hideTimer = setTimeout(hidePanel, 120);
+                    });
+
+                    // Subcategory tab switcher on hover and click
+                    document.querySelectorAll('.mega-subcat-pill').forEach(btn => {
+                        function switchSubcategoryTab() {
+                            const catId = btn.dataset.megaCatId;
+                            const subId = btn.dataset.subTarget;
+                            const title = btn.dataset.title;
+                            const url = btn.dataset.url;
+
+                            const parentBar = btn.closest('.mega-subcat-pills-wrap');
+                            if (parentBar) {
+                                parentBar.querySelectorAll('.mega-subcat-pill').forEach(p => p.classList.remove('active'));
+                                btn.classList.add('active');
+                            }
+
+                            const titleEl = document.getElementById(`mega-title-${catId}`);
+                            const viewAllEl = document.getElementById(`mega-view-all-${catId}`);
+                            if (titleEl && title) titleEl.textContent = title;
+                            if (viewAllEl && url) viewAllEl.setAttribute('href', url);
+
+                            const container = document.getElementById(`mega-products-container-${catId}`);
+                            if (container) {
+                                container.querySelectorAll('[data-sub-grid]').forEach(grid => {
+                                    if (grid.dataset.subGrid === subId) {
+                                        grid.style.display = 'grid';
+                                        grid.classList.add('active');
+                                    } else {
+                                        grid.style.display = 'none';
+                                        grid.classList.remove('active');
+                                    }
+                                });
+                            }
+                        }
+
+                        btn.addEventListener('mouseenter', switchSubcategoryTab);
+                        btn.addEventListener('click', function(e) {
+                            switchSubcategoryTab();
+                            const url = btn.dataset.url;
+                            if (url && url !== '#' && !btn.classList.contains('active')) {
+                                window.location.href = url;
+                            }
+                        });
                     });
                 }
 

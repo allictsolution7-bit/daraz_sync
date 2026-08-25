@@ -95,6 +95,57 @@ class SettingsService
     }
 
     /**
+     * Batch save multiple settings across groups with a single fast upsert
+     */
+    public static function setMany(array $groupedData)
+    {
+        $userId = auth()->id();
+        $recordsToUpsert = [];
+        $now = now();
+
+        foreach ($groupedData as $group => $items) {
+            if (!is_array($items) || empty($items)) {
+                continue;
+            }
+
+            $dbGroup = $group;
+            if ($userId && strpos($group, 'vendor_') !== 0) {
+                $dbGroup = 'vendor_' . $userId . '_' . $group;
+            }
+
+            foreach ($items as $key => $value) {
+                if (is_array($value)) {
+                    $value = json_encode($value);
+                }
+                $recordsToUpsert[] = [
+                    'group' => $dbGroup,
+                    'key' => (string) $key,
+                    'value' => is_null($value) ? null : (string) $value,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+
+                // Update in-memory cache
+                if (self::$initialized) {
+                    self::$settings[$group][$key] = $value;
+                }
+            }
+        }
+
+        if (!empty($recordsToUpsert)) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($recordsToUpsert) {
+                foreach (array_chunk($recordsToUpsert, 200) as $chunk) {
+                    SiteSetting::upsert(
+                        $chunk,
+                        ['group', 'key'],
+                        ['value', 'updated_at']
+                    );
+                }
+            });
+        }
+    }
+
+    /**
      * Clear the settings cache (useful after updates)
      */
     public static function clearCache()
