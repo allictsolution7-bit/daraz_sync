@@ -356,7 +356,8 @@
         .category-products-grid .product-badge {
             position: absolute;
             top: 8px;
-            left: 8px;
+            right: 8px;
+            left: auto !important;
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: #ffffff;
             font-size: 11px;

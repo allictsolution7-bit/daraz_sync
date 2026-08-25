@@ -15,6 +15,7 @@
             // Price calculation (simple + variable)
             $displayPrice = '';
             $displayOldPrice = '';
+            $discountPct = 0;
 
             if ($product->product_type === 'variable' && $product->variationCombinations && $product->variationCombinations->isNotEmpty()) {
                 $offerPrices = [];
@@ -42,6 +43,7 @@
                         $maxRegularPrice = max($regularPrices);
                         if ($minRegularPrice > $minOfferPrice) {
                             $displayOldPrice = $minRegularPrice === $maxRegularPrice ? number_format($minRegularPrice) : number_format($minRegularPrice) . ' - ' . number_format($maxRegularPrice);
+                            $discountPct = round((($minRegularPrice - $minOfferPrice) / $minRegularPrice) * 100);
                         }
                     }
                 }
@@ -50,6 +52,7 @@
                     $displayPrice = number_format($product->offer);
                     if ($product->old_price && $product->old_price > $product->offer) {
                         $displayOldPrice = number_format($product->old_price);
+                        $discountPct = round((($product->old_price - $product->offer) / $product->old_price) * 100);
                     }
                 } elseif ($product->old_price && $product->old_price > 0) {
                     $displayPrice = number_format($product->old_price);
@@ -60,9 +63,12 @@
             class="mega-product-card">
             <div class="mega-product-img">
                 <img src="{{ $thumbUrl }}" alt="{{ $product->title }}" loading="lazy">
+                @if($discountPct > 0)
+                    <span class="mega-card-discount-badge">-{{ $discountPct }}%</span>
+                @endif
             </div>
             <div class="mega-product-info">
-                <div class="mega-product-title">{{ $product->title }}</div>
+                <div class="mega-product-title" title="{{ $product->title }}">{{ $product->title }}</div>
                 <div class="mega-product-price-row">
                     @if ($displayPrice)
                         <span class="mega-product-price">৳{{ $displayPrice }}</span>
@@ -76,6 +82,6 @@
             </div>
         </a>
     @empty
-        <div class="mega-loading">No products found.</div>
+        <div class="mega-loading">No products found in this category.</div>
     @endforelse
 </div>

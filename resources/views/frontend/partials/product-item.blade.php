@@ -390,80 +390,278 @@
         justify-content: center !important;
         gap: 6px !important;
         width: 100% !important;
-        padding: 7px 14px !important;
-        background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
+        padding: 7.5px 15px !important;
+        background: linear-gradient(135deg, #ff3366 0%, #ff6b35 100%) !important;
         color: #ffffff !important;
         border: none !important;
-        border-radius: 20px !important;
+        border-radius: 24px !important;
         font-size: 11.5px !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
         cursor: pointer !important;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45) !important;
-        transition: all 0.2s ease !important;
+        box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4), 0 2px 6px rgba(255, 107, 53, 0.25) !important;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
+        letter-spacing: 0.6px !important;
         text-decoration: none !important;
+        position: relative !important;
+        overflow: hidden !important;
     }
 
     .btn-card-add-to-cart:hover {
-        background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-        transform: scale(1.03) !important;
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.65) !important;
+        background: linear-gradient(135deg, #ff0844 0%, #ff4b2b 100%) !important;
+        transform: translateY(-2px) scale(1.02) !important;
+        box-shadow: 0 6px 22px rgba(255, 8, 68, 0.55), 0 3px 10px rgba(255, 75, 43, 0.4) !important;
         color: #ffffff !important;
     }
 
-    .template-3 .btn-card-add-to-cart, .t3-page .btn-card-add-to-cart {
-        background: linear-gradient(135deg, #0284c7, #2563eb) !important;
-        border: 1px solid #38bdf8 !important;
-        box-shadow: 0 0 16px rgba(56, 189, 248, 0.5) !important;
+    .btn-card-add-to-cart:active {
+        transform: translateY(0) scale(0.98) !important;
     }
 
-    /* Template 2 Add to Cart — Blue Sky gradient */
-    .template-2 .btn-card-add-to-cart, .t2-page .btn-card-add-to-cart {
-        background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+    /* =========================================================
+       TEMPLATE-SPECIFIC ADD TO CART BUTTONS (VIBRANT & GLOWING)
+       ========================================================= */
+
+    /* Template 1: Classic Marketplace — Royal Sapphire to Indigo Glow */
+    .template-1 .btn-card-add-to-cart, body[data-hp-template="1"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%) !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4) !important;
+        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.5), 0 0 10px rgba(79, 70, 229, 0.35) !important;
+    }
+    .template-1 .btn-card-add-to-cart:hover, body[data-hp-template="1"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%) !important;
+        box-shadow: 0 6px 24px rgba(37, 99, 235, 0.75), 0 0 16px rgba(79, 70, 229, 0.5) !important;
     }
 
-    .template-4 .btn-card-add-to-cart, .t4-page .btn-card-add-to-cart, .template-6 .btn-card-add-to-cart {
-        background: linear-gradient(135deg, #d4af37, #b8860b) !important;
-        color: #0f1115 !important;
-        box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4) !important;
+    /* Template 2: Modern Minimal / Sky — Cyber Sky Blue & Electric Indigo Glow */
+    .template-2 .btn-card-add-to-cart, .t2-page .btn-card-add-to-cart, body[data-hp-template="2"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 4px 18px rgba(14, 165, 233, 0.5), 0 0 12px rgba(99, 102, 241, 0.35) !important;
+    }
+    .template-2 .btn-card-add-to-cart:hover, .t2-page .btn-card-add-to-cart:hover, body[data-hp-template="2"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%) !important;
+        box-shadow: 0 6px 24px rgba(14, 165, 233, 0.75), 0 0 18px rgba(99, 102, 241, 0.5) !important;
     }
 
-    .template-5 .btn-card-add-to-cart, .template-8 .btn-card-add-to-cart, .t5-page .btn-card-add-to-cart {
-        background: linear-gradient(135deg, #16a34a, #15803d) !important;
-        box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4) !important;
+    /* Template 3: Tech & Cyber Hub — Neon Cyan & Electric Azure Neon Glow */
+    .template-3 .btn-card-add-to-cart, .t3-page .btn-card-add-to-cart, body[data-hp-template="3"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%) !important;
+        color: #071026 !important;
+        font-weight: 900 !important;
+        border: 1px solid rgba(0, 242, 254, 0.7) !important;
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.65), 0 4px 14px rgba(79, 172, 254, 0.45) !important;
+    }
+    .template-3 .btn-card-add-to-cart:hover, .t3-page .btn-card-add-to-cart:hover, body[data-hp-template="3"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 28px rgba(0, 242, 254, 0.9), 0 4px 18px rgba(0, 114, 255, 0.6) !important;
     }
 
-    .template-7 .btn-card-add-to-cart {
-        background: linear-gradient(135deg, #db2777, #be185d) !important;
-        box-shadow: 0 4px 14px rgba(219, 39, 119, 0.4) !important;
+    /* Template 4: Flash Sale & Hot Deals — Fiery Crimson & Sunset Flame Glow */
+    .template-4 .btn-card-add-to-cart, .t4-page .btn-card-add-to-cart, body[data-hp-template="4"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #ff2a54 0%, #ff6200 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 4px 20px rgba(255, 42, 84, 0.6), 0 0 14px rgba(255, 98, 0, 0.45) !important;
+    }
+    .template-4 .btn-card-add-to-cart:hover, .t4-page .btn-card-add-to-cart:hover, body[data-hp-template="4"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #ff0844 0%, #ff4500 100%) !important;
+        box-shadow: 0 6px 28px rgba(255, 8, 68, 0.8), 0 0 20px rgba(255, 69, 0, 0.6) !important;
     }
 
-    /* On mobile / touch screens: always visible and cleanly positioned */
+    /* Template 5: Grocery & Fresh Express — Vivid Lime & Electric Emerald Glow */
+    .template-5 .btn-card-add-to-cart, .t5-page .btn-card-add-to-cart, body[data-hp-template="5"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 4px 18px rgba(16, 185, 129, 0.55), 0 0 12px rgba(52, 211, 153, 0.4) !important;
+    }
+    .template-5 .btn-card-add-to-cart:hover, .t5-page .btn-card-add-to-cart:hover, body[data-hp-template="5"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+        box-shadow: 0 6px 24px rgba(16, 185, 129, 0.75), 0 0 18px rgba(52, 211, 153, 0.6) !important;
+    }
+
+    /* Template 6: Fashion & Apparel Studio — Electric Magenta & Cosmic Violet Glow */
+    .template-6 .btn-card-add-to-cart, .t6-page .btn-card-add-to-cart, body[data-hp-template="6"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 4px 20px rgba(236, 72, 153, 0.55), 0 0 14px rgba(139, 92, 246, 0.4) !important;
+    }
+    .template-6 .btn-card-add-to-cart:hover, .t6-page .btn-card-add-to-cart:hover, body[data-hp-template="6"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #db2777 0%, #7c3aed 100%) !important;
+        box-shadow: 0 6px 26px rgba(236, 72, 153, 0.8), 0 0 20px rgba(139, 92, 246, 0.6) !important;
+    }
+
+    /* Template 7: Beauty & Cosmetics Glow — Radiant Rose Gold & Passion Pink Glow */
+    .template-7 .btn-card-add-to-cart, .t7-page .btn-card-add-to-cart, body[data-hp-template="7"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 4px 18px rgba(244, 63, 94, 0.55), 0 0 14px rgba(251, 113, 133, 0.45) !important;
+    }
+    .template-7 .btn-card-add-to-cart:hover, .t7-page .btn-card-add-to-cart:hover, body[data-hp-template="7"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%) !important;
+        box-shadow: 0 6px 26px rgba(244, 63, 94, 0.8), 0 0 20px rgba(251, 113, 133, 0.65) !important;
+    }
+
+    /* Template 8: Mega Supermarket — Electric Amber Gold & Vivid Tangerine Glow */
+    .template-8 .btn-card-add-to-cart, .t8-page .btn-card-add-to-cart, body[data-hp-template="8"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 4px 18px rgba(245, 158, 11, 0.55), 0 0 12px rgba(234, 88, 12, 0.4) !important;
+    }
+    .template-8 .btn-card-add-to-cart:hover, .t8-page .btn-card-add-to-cart:hover, body[data-hp-template="8"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #d97706 0%, #c2410c 100%) !important;
+        box-shadow: 0 6px 26px rgba(245, 158, 11, 0.8), 0 0 18px rgba(234, 88, 12, 0.6) !important;
+    }
+
+    /* Template 9: Books & Heritage Store — Royal Deep Teal & Gilded Amber Glow */
+    .template-9 .btn-card-add-to-cart, .t9-page .btn-card-add-to-cart, body[data-hp-template="9"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(212, 175, 55, 0.4) !important;
+        box-shadow: 0 4px 18px rgba(13, 148, 136, 0.5), 0 0 12px rgba(8, 145, 178, 0.35) !important;
+    }
+    .template-9 .btn-card-add-to-cart:hover, .t9-page .btn-card-add-to-cart:hover, body[data-hp-template="9"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #0f766e 0%, #0e7490 100%) !important;
+        box-shadow: 0 6px 24px rgba(13, 148, 136, 0.75), 0 0 18px rgba(212, 175, 55, 0.5) !important;
+    }
+
+    /* Template 10: Home Living & Furniture — Polished Warm Amber Bronze & Gold Glow */
+    .template-10 .btn-card-add-to-cart, .t10-page .btn-card-add-to-cart, body[data-hp-template="10"] .btn-card-add-to-cart {
+        background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(212, 175, 55, 0.35) !important;
+        box-shadow: 0 4px 18px rgba(217, 119, 6, 0.55), 0 0 14px rgba(180, 83, 9, 0.35) !important;
+    }
+    .template-10 .btn-card-add-to-cart:hover, .t10-page .btn-card-add-to-cart:hover, body[data-hp-template="10"] .btn-card-add-to-cart:hover {
+        background: linear-gradient(135deg, #b45309 0%, #92400e 100%) !important;
+        box-shadow: 0 6px 26px rgba(217, 119, 6, 0.8), 0 0 20px rgba(212, 175, 55, 0.55) !important;
+    }
+
+    /* On mobile / touch screens: always visible, cleanly positioned, and compact text sizes */
     @media (max-width: 900px) {
         .product-card {
-            margin-bottom: 26px !important;
-            padding-bottom: 24px !important;
+            margin-bottom: 24px !important;
+            padding-bottom: 22px !important;
+        }
+        .product-info {
+            padding: 5px 6px !important;
+        }
+        .product-card .product-title {
+            font-size: 12px !important;
+            line-height: 1.3 !important;
+            min-height: 2.6em !important;
+            margin-top: 3px !important;
+            margin-bottom: 2px !important;
+        }
+        .product-card .current-price {
+            font-size: 13.5px !important;
+        }
+        .product-card .original-price {
+            font-size: 11px !important;
+        }
+        .product-card .product-card-rating {
+            gap: 3px !important;
+            margin: 3px 0 !important;
+        }
+        .product-card .product-card-rating .rating-text {
+            font-size: 10px !important;
+        }
+        .product-card .product-card-rating .rating-stars svg {
+            width: 11px !important;
+            height: 11px !important;
+        }
+        .product-card .loop-writers {
+            font-size: 10.5px !important;
         }
         .product-hover-action {
             opacity: 1 !important;
             transform: translateY(0) !important;
             pointer-events: auto !important;
-            bottom: -13px !important;
-            left: 8px !important;
-            right: 8px !important;
+            bottom: -12px !important;
+            left: 6px !important;
+            right: 6px !important;
         }
         .btn-card-add-to-cart {
-            padding: 5px 10px !important;
-            font-size: 10px !important;
+            padding: 5px 8px !important;
+            font-size: 9.5px !important;
             border-radius: 16px !important;
-            gap: 4px !important;
+            gap: 3px !important;
         }
         .btn-card-add-to-cart svg {
-            width: 12px !important;
-            height: 12px !important;
+            width: 11px !important;
+            height: 11px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .product-card {
+            margin-bottom: 20px !important;
+            padding-bottom: 20px !important;
+            border-radius: 10px !important;
+        }
+        .product-info {
+            padding: 4px 5px !important;
+        }
+        .product-card .product-title {
+            font-size: 11px !important;
+            line-height: 1.25 !important;
+            min-height: 2.5em !important;
+        }
+        .product-card .current-price {
+            font-size: 12.5px !important;
+            font-weight: 700 !important;
+        }
+        .product-card .original-price {
+            font-size: 10px !important;
+        }
+        .product-card .product-card-rating {
+            margin: 2px 0 !important;
+            gap: 2px !important;
+        }
+        .product-card .product-card-rating .rating-text {
+            font-size: 9px !important;
+        }
+        .product-card .product-card-rating .rating-stars svg {
+            width: 9.5px !important;
+            height: 9.5px !important;
+        }
+        .product-hover-action {
+            bottom: -11px !important;
+            left: 4px !important;
+            right: 4px !important;
+        }
+        .btn-card-add-to-cart {
+            padding: 4px 6px !important;
+            font-size: 8.5px !important;
+            letter-spacing: 0.2px !important;
+            border-radius: 14px !important;
+        }
+        .btn-card-add-to-cart svg {
+            width: 10px !important;
+            height: 10px !important;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .product-card .product-title {
+            font-size: 10px !important;
+            min-height: 2.4em !important;
+        }
+        .product-card .current-price {
+            font-size: 11.5px !important;
+        }
+        .product-card .original-price {
+            font-size: 9.5px !important;
+        }
+        .btn-card-add-to-cart {
+            font-size: 8px !important;
+            padding: 3.5px 5px !important;
         }
     }
 </style>

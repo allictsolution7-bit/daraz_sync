@@ -254,13 +254,64 @@
     flex-direction: column;
 }
 
+.t4-side-desktop-wrap {
+    position: absolute;
+    inset: 0;
+    display: block;
+}
+
+.t4-side-mobile-wrap {
+    display: none;
+}
+
 @media (max-width: 900px) {
     .t4-side-deals {
         display: block !important;
-        aspect-ratio: 16 / 7;
+        aspect-ratio: 16 / 8;
         height: auto;
-        min-height: 110px;
+        min-height: 120px;
         border-radius: 10px;
+    }
+    .t4-side-desktop-wrap {
+        display: none !important;
+    }
+    .t4-side-mobile-wrap {
+        display: block !important;
+        position: absolute;
+        inset: 0;
+    }
+    .t4-side-slide-mobile {
+        position: absolute;
+        inset: 0;
+        padding: 5px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.45s ease, transform 0.45s ease;
+        transform: scale(0.98);
+        display: flex;
+    }
+    .t4-side-slide-mobile.active {
+        opacity: 1;
+        pointer-events: auto;
+        z-index: 1;
+        transform: scale(1);
+    }
+    .t4-side-card-mobile {
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #0f1115;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        display: block;
+        text-decoration: none;
+    }
+    .t4-side-card-mobile img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+        object-position: center;
+        display: block;
     }
 }
 
@@ -275,14 +326,6 @@
     pointer-events: none;
     transition: opacity 0.45s ease, transform 0.45s ease;
     transform: scale(0.98);
-}
-
-@media (max-width: 900px) {
-    .t4-side-group {
-        flex-direction: row;
-        gap: 6px;
-        padding: 6px;
-    }
 }
 
 .t4-side-group.active {
@@ -520,8 +563,32 @@
 }
 .t4-page .product-card .current-price {
     color: #d4af37 !important;
-    font-size: 17px !important;
+    font-size: 16px !important;
     font-weight: 800 !important;
+}
+@media (max-width: 900px) {
+    .t4-page .product-card .product-title {
+        font-size: 12px !important;
+    }
+    .t4-page .product-card .current-price {
+        font-size: 13.5px !important;
+    }
+}
+@media (max-width: 480px) {
+    .t4-page .product-card .product-title {
+        font-size: 11px !important;
+    }
+    .t4-page .product-card .current-price {
+        font-size: 12.5px !important;
+    }
+}
+@media (max-width: 360px) {
+    .t4-page .product-card .product-title {
+        font-size: 10px !important;
+    }
+    .t4-page .product-card .current-price {
+        font-size: 11.5px !important;
+    }
 }
 .t4-page .product-card .add-to-cart-btn,
 .t4-page .product-card .buy-now-btn {
@@ -626,30 +693,44 @@
                         $t4Groups = array_chunk($t4AllImages, 2);
                     @endphp
 
-                    @if(count($t4Groups) > 1)
-                        <button class="t4-side-nav-btn t4-side-prev" data-dir="-1" aria-label="Previous Promo Pair">
+                    @if(count($t4AllImages) > 1)
+                        <button class="t4-side-nav-btn t4-side-prev" data-dir="-1" aria-label="Previous Promo">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                         </button>
-                        <button class="t4-side-nav-btn t4-side-next" data-dir="1" aria-label="Next Promo Pair">
+                        <button class="t4-side-nav-btn t4-side-next" data-dir="1" aria-label="Next Promo">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                         </button>
                     @endif
 
-                    @foreach($t4Groups as $gIdx => $group)
-                        <div class="t4-side-group {{ $gIdx === 0 ? 'active' : '' }}">
-                            @foreach($group as $item)
-                                <a href="{{ $item['link'] }}" class="t4-side-card">
-                                    <img src="{{ str_starts_with($item['image'], 'http') ? $item['image'] : asset($item['image']) }}" alt="{{ $item['alt'] }}" loading="lazy">
+                    {{-- Desktop view: pairs (2 cards stacked vertically) --}}
+                    <div class="t4-side-desktop-wrap">
+                        @foreach($t4Groups as $gIdx => $group)
+                            <div class="t4-side-group {{ $gIdx === 0 ? 'active' : '' }}">
+                                @foreach($group as $item)
+                                    <a href="{{ $item['link'] }}" class="t4-side-card">
+                                        <img src="{{ str_starts_with($item['image'], 'http') ? $item['image'] : asset($item['image']) }}" alt="{{ $item['alt'] }}" loading="lazy">
+                                    </a>
+                                @endforeach
+                                @if(count($group) === 1 && count($t4AllImages) > 1)
+                                    {{-- Fill 2nd slot with first image if odd number --}}
+                                    <a href="{{ $t4AllImages[0]['link'] }}" class="t4-side-card">
+                                        <img src="{{ str_starts_with($t4AllImages[0]['image'], 'http') ? $t4AllImages[0]['image'] : asset($t4AllImages[0]['image']) }}" alt="{{ $t4AllImages[0]['alt'] }}" loading="lazy">
+                                    </a>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Mobile view: 1 clean full banner at a time --}}
+                    <div class="t4-side-mobile-wrap">
+                        @foreach($t4AllImages as $mIdx => $mItem)
+                            <div class="t4-side-slide-mobile {{ $mIdx === 0 ? 'active' : '' }}">
+                                <a href="{{ $mItem['link'] }}" class="t4-side-card-mobile">
+                                    <img src="{{ str_starts_with($mItem['image'], 'http') ? $mItem['image'] : asset($mItem['image']) }}" alt="{{ $mItem['alt'] }}" loading="lazy">
                                 </a>
-                            @endforeach
-                            @if(count($group) === 1 && count($t4AllImages) > 1)
-                                {{-- Fill 2nd slot with first image if odd number --}}
-                                <a href="{{ $t4AllImages[0]['link'] }}" class="t4-side-card">
-                                    <img src="{{ str_starts_with($t4AllImages[0]['image'], 'http') ? $t4AllImages[0]['image'] : asset($t4AllImages[0]['image']) }}" alt="{{ $t4AllImages[0]['alt'] }}" loading="lazy">
-                                </a>
-                            @endif
-                        </div>
-                    @endforeach
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
             </div>
@@ -705,6 +786,161 @@
         @endif
     @endforeach
 
+    {{-- ── DYNAMIC FEATURED PROMO BANNERS ── --}}
+    @php
+        $t4BannerCount = (int)($homepage['featured_banner_count'] ?? 0);
+        $t4Banners = [];
+        for ($b = 1; $b <= $t4BannerCount; $b++) {
+            if (!empty($homepage['featured_banner_image_' . $b])) {
+                $t4Banners[] = [
+                    'image' => $homepage['featured_banner_image_' . $b],
+                    'url' => $homepage['featured_banner_url_' . $b] ?? '#'
+                ];
+            }
+        }
+    @endphp
+    @if(count($t4Banners) > 0)
+        <div class="t4-container" style="margin-bottom: 35px;">
+            <div style="display: grid; grid-template-columns: repeat({{ count($t4Banners) }}, 1fr); gap: 14px;">
+                @foreach($t4Banners as $t4b)
+                    <a href="{{ $t4b['url'] }}" style="display: block; border-radius: 12px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.2); box-shadow: 0 4px 18px rgba(0,0,0,0.3); transition: transform 0.3s ease, border-color 0.3s ease;">
+                        <img src="{{ asset($t4b['image']) }}" alt="Promo Banner" style="width: 100%; height: auto; display: block; object-fit: cover;">
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    {{-- ── PRODUCTS BY CATEGORY (V1: BANNER + PRODUCTS) ── --}}
+    @if (!empty($homepage['enable_products_by_category_section']) && $homepage['enable_products_by_category_section'] && !empty($productsByCategoryItems))
+        <section class="t4-container" style="margin-bottom: 40px;">
+            <div class="t4-sec-header">
+                <h2 class="t4-sec-title">
+                    {{ $homepage['products_by_category_section_heading'] ?? '👑 Curated Category Collections' }}
+                </h2>
+                <a href="{{ route('shop') }}" class="t4-view-all">All Categories &rarr;</a>
+            </div>
+            @foreach ($productsByCategoryItems as $item)
+                @php
+                    $pbcProducts = $item->type === 'category'
+                        ? $item->products()->where('status', 1)->forPublicDisplay()->withProductCardData()->take(5)->get()
+                        : $item->products()->where('status', 1)->forPublicDisplay()->withProductCardData()->take(5)->get();
+                @endphp
+                @if($pbcProducts->count())
+                    <div style="background: #14171f; border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 14px; padding: 14px; margin-bottom: 22px; display: flex; gap: 14px; flex-wrap: wrap; box-shadow: 0 8px 24px rgba(0,0,0,0.25);">
+                        {{-- Category Left Hero Card --}}
+                        @if(!empty($item->image))
+                        <div style="flex: 0 0 240px; min-height: 220px; border-radius: 10px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.06);">
+                            <img src="{{ asset($item->image) }}" alt="{{ $item->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(10,12,16,0.92) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 14px;">
+                                <h3 style="font-family: 'Cinzel', serif; color: #fff; font-size: 16px; margin: 0 0 8px 0; font-weight: 700;">
+                                    {{ $item->type === 'category' ? $item->name : ($item->product_category->name ?? '') }}
+                                </h3>
+                                <a href="{{ $item->type === 'category' ? route('shop', $item->slug) : route('shop', [$item->product_category->slug, $item->slug]) }}" 
+                                   style="display: inline-block; padding: 6px 14px; background: linear-gradient(135deg, #d4af37, #aa820a); color: #0a0c10; font-size: 11px; font-weight: 800; border-radius: 6px; text-decoration: none; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    {{ \App\Services\SettingsService::getViewAllButtonText() }} &rarr;
+                                </a>
+                            </div>
+                        </div>
+                        @endif
+
+                        {{-- Category Products Grid --}}
+                        <div style="flex: 1; min-width: 280px; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; align-items: stretch;">
+                            @foreach ($pbcProducts as $product)
+                                @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'HOT'])
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @endforeach
+        </section>
+    @endif
+
+    {{-- ── PRODUCTS BY CATEGORY V2 (LOCATION 1) ── --}}
+    @if (setting('homepage', 'enable_products_by_category_v2_location1', '0') == '1' && !empty($sliderCategories1))
+        @foreach ($sliderCategories1 as $i => $catData)
+            @if (!empty($catData['products']) && count($catData['products']) > 0)
+                <section class="t4-container t4-prod-slider-wrap" style="margin-bottom: 35px;">
+                    <div class="t4-sec-header">
+                        <h2 class="t4-sec-title">
+                            💎 {{ $catData['category']->name }}
+                        </h2>
+                        <a href="{{ route('shop', $catData['category']->slug) }}" class="t4-view-all">
+                            {{ \App\Services\SettingsService::getViewAllButtonText() }} &rarr;
+                        </a>
+                    </div>
+                    <div style="position: relative;">
+                        <button class="t4-arrow t4-arrow-prev" data-target="t4-cat1-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <div class="t4-prod-row" id="t4-cat1-{{ $i }}">
+                            @foreach ($catData['products'] as $product)
+                                <div class="t4-col-item">
+                                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'TOP'])
+                                </div>
+                            @endforeach
+                        </div>
+                        <button class="t4-arrow t4-arrow-next" data-target="t4-cat1-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                </section>
+            @endif
+        @endforeach
+    @endif
+
+    {{-- ── BEST AUTHORS / WRITERS SECTION ── --}}
+    @if (setting('homepage', 'enable_best_author_section', '1') == '1' && isset($writers) && count($writers) > 0)
+        <section class="t4-container" style="margin-bottom: 40px;">
+            <div class="t4-sec-header">
+                <h2 class="t4-sec-title">✒️ Renowned Authors & Masters</h2>
+            </div>
+            <div style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin;">
+                @foreach($writers as $writer)
+                    <a href="{{ route('shop', ['writer' => $writer->id]) }}" style="flex: 0 0 120px; text-align: center; text-decoration: none; display: flex; flex-direction: column; align-items: center; group">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; border: 2px solid #d4af37; overflow: hidden; padding: 2px; background: #14171f; box-shadow: 0 4px 12px rgba(212,175,55,0.25); transition: transform 0.3s ease;">
+                            <img src="{{ !empty($writer->image) ? asset($writer->image) : asset('frontend/img/author-default.png') }}" alt="{{ $writer->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        </div>
+                        <span style="color: #e2e8f0; font-size: 12px; font-weight: 600; margin-top: 8px; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">{{ $writer->name }}</span>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    {{-- ── PRODUCTS BY CATEGORY V2 (LOCATION 2) ── --}}
+    @if (setting('homepage', 'enable_products_by_category_v2_location2', '0') == '1' && !empty($sliderCategories2))
+        @foreach ($sliderCategories2 as $i => $catData)
+            @if (!empty($catData['products']) && count($catData['products']) > 0)
+                <section class="t4-container t4-prod-slider-wrap" style="margin-bottom: 35px;">
+                    <div class="t4-sec-header">
+                        <h2 class="t4-sec-title">
+                            ✨ {{ $catData['category']->name }}
+                        </h2>
+                        <a href="{{ route('shop', $catData['category']->slug) }}" class="t4-view-all">
+                            {{ \App\Services\SettingsService::getViewAllButtonText() }} &rarr;
+                        </a>
+                    </div>
+                    <div style="position: relative;">
+                        <button class="t4-arrow t4-arrow-prev" data-target="t4-cat2-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <div class="t4-prod-row" id="t4-cat2-{{ $i }}">
+                            @foreach ($catData['products'] as $product)
+                                <div class="t4-col-item">
+                                    @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'PREMIUM'])
+                                </div>
+                            @endforeach
+                        </div>
+                        <button class="t4-arrow t4-arrow-next" data-target="t4-cat2-{{ $i }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                </section>
+            @endif
+        @endforeach
+    @endif
+
     {{-- ── LATEST ARRIVALS ── --}}
     @if (!empty($homepage['enable_latest_products_section']) && $homepage['enable_latest_products_section'] && isset($latestProducts) && $latestProducts->count() > 0)
         <section class="t4-container" style="margin-bottom: 50px;">
@@ -712,9 +948,29 @@
                 <h2 class="t4-sec-title">{{ $homepage['latest_products_section_heading'] ?? '💎 New Boutique Arrivals' }}</h2>
                 <a href="{{ route('shop') }}" class="t4-view-all">View All &rarr;</a>
             </div>
-            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px;">
                 @foreach($latestProducts as $product)
                     @include('frontend.partials.product-item', ['product' => $product, 'badge' => 'DEAL'])
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    {{-- ── BRAND PARTNERS / PUBLISHERS ── --}}
+    @if (isset($publishers) && count($publishers) > 0)
+        <section class="t4-container" style="margin-bottom: 50px;">
+            <div class="t4-sec-header">
+                <h2 class="t4-sec-title">🏛️ Prestigious Houses & Brands</h2>
+            </div>
+            <div style="display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin;">
+                @foreach($publishers as $pub)
+                    <div style="flex: 0 0 140px; height: 75px; background: #14171f; border: 1px solid rgba(212,175,55,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+                        @if(!empty($pub->logo))
+                            <img src="{{ asset($pub->logo) }}" alt="{{ $pub->name }}" style="max-height: 48px; max-width: 100%; object-fit: contain; filter: brightness(0.95);">
+                        @else
+                            <span style="color: #d4af37; font-size: 11px; font-weight: 700; text-align: center;">{{ $pub->name }}</span>
+                        @endif
+                    </div>
                 @endforeach
             </div>
         </section>
@@ -799,36 +1055,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     t4StartTimer();
 
-    // T4 Side Groups (2-row pair rotation with 1 Left/Right button)
+    // T4 Side Groups (Desktop 2-row pair rotation & Mobile 1-banner single rotation)
     const sideDealsContainer = document.querySelector('.t4-side-deals');
     if (sideDealsContainer) {
-        const groups = sideDealsContainer.querySelectorAll('.t4-side-group');
-        if (groups.length > 1) {
-            let gIdx = 0;
-            let gTimer;
+        const desktopGroups = sideDealsContainer.querySelectorAll('.t4-side-group');
+        const mobileSlides = sideDealsContainer.querySelectorAll('.t4-side-slide-mobile');
+        let dIdx = 0;
+        let mIdx = 0;
+        let sideTimer;
 
-            function showSideGroup(n) {
-                groups[gIdx].classList.remove('active');
-                gIdx = (n + groups.length) % groups.length;
-                groups[gIdx].classList.add('active');
+        function showNextSideItem(dir = 1) {
+            const isMobile = window.innerWidth <= 900;
+            if (isMobile && mobileSlides.length > 1) {
+                mobileSlides[mIdx].classList.remove('active');
+                mIdx = (mIdx + dir + mobileSlides.length) % mobileSlides.length;
+                mobileSlides[mIdx].classList.add('active');
+            } else if (!isMobile && desktopGroups.length > 1) {
+                desktopGroups[dIdx].classList.remove('active');
+                dIdx = (dIdx + dir + desktopGroups.length) % desktopGroups.length;
+                desktopGroups[dIdx].classList.add('active');
             }
-
-            function startSideGroupTimer() {
-                clearInterval(gTimer);
-                gTimer = setInterval(() => showSideGroup(gIdx + 1), 4500);
-            }
-
-            sideDealsContainer.querySelectorAll('.t4-side-nav-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const dir = parseInt(btn.dataset.dir || '1');
-                    showSideGroup(gIdx + dir);
-                    startSideGroupTimer();
-                });
-            });
-
-            startSideGroupTimer();
         }
+
+        function startSideTimer() {
+            clearInterval(sideTimer);
+            sideTimer = setInterval(() => showNextSideItem(1), 4500);
+        }
+
+        sideDealsContainer.querySelectorAll('.t4-side-nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const dir = parseInt(btn.dataset.dir || '1');
+                showNextSideItem(dir);
+                startSideTimer();
+            });
+        });
+
+        startSideTimer();
     }
 
     // T4 Product Row Arrow Scrolling

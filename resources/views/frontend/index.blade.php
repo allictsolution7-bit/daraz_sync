@@ -896,67 +896,176 @@
                 display: block;
             }
 
+            .mega-subcats-section {
+                margin-bottom: 12px;
+            }
+
+            .mega-subcats-bar {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #f1f5f9;
+            }
+
+            .mega-section-pill-tag {
+                font-size: 10px;
+                font-weight: 800;
+                color: #64748b;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                padding: 3px 8px;
+                border-radius: 20px;
+                letter-spacing: 0.8px;
+                text-transform: uppercase;
+            }
+
+            .mega-subcat-pills-wrap {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                flex: 1;
+            }
+
+            .mega-subcat-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 5px 12px;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #334155;
+                text-decoration: none;
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            }
+
+            .mega-subcat-pill:hover {
+                background: #f8fafc;
+                border-color: var(--primary-color, #2563eb);
+                color: var(--primary-color, #2563eb);
+                transform: translateY(-1.5px);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+            }
+
+            .mega-subcat-pill .pill-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: var(--primary-color, #2563eb);
+                opacity: 0.7;
+            }
+
+            .mega-subcat-pill .pill-arrow {
+                color: #94a3b8;
+                transition: transform 0.2s ease;
+            }
+
+            .mega-subcat-pill:hover .pill-arrow {
+                color: var(--primary-color, #2563eb);
+                transform: translateX(2px);
+            }
+
+            .mega-subcats-columns {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 14px;
+                padding: 10px 0;
+            }
+
             .mega-products {
-                margin-top: 14px;
-                padding-top: 10px;
-                border-top: 1px solid color-mix(in srgb, var(--secondary-color) 10%, transparent);
+                margin-top: 10px;
+                padding-top: 4px;
             }
 
             .mega-products-header {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                margin-bottom: 10px;
+                margin-bottom: 12px;
             }
 
-            .mega-products-header h5 {
+            .mega-header-title-wrap {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .mega-header-title-wrap h5 {
                 margin: 0;
                 font-size: 15px;
-                font-weight: 700;
-                color: var(--secondary-color);
+                font-weight: 800;
+                color: #0f172a;
+                letter-spacing: -0.2px;
             }
 
-            .mega-products-header .view-all-link {
-                font-size: 13px;
-                font-weight: 600;
-                color: var(--primary-color);
+            .mega-view-all-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 12px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 700;
+                color: var(--primary-color, #2563eb);
                 text-decoration: none;
+                transition: all 0.2s ease;
+            }
+
+            .mega-view-all-pill:hover {
+                background: var(--primary-color, #2563eb);
+                border-color: var(--primary-color, #2563eb);
+                color: #ffffff;
+                transform: translateY(-1px);
+                box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
             }
 
             .mega-products-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
                 gap: 12px;
             }
 
             .mega-product-card {
                 display: flex;
-                gap: 10px;
+                align-items: center;
+                gap: 12px;
                 text-decoration: none;
                 color: inherit;
-                background: #fff;
-                border: 1px solid #eef2f5;
-                border-radius: 10px;
-                padding: 8px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-                transition: transform 0.15s ease, box-shadow 0.15s ease;
+                background: #ffffff;
+                border: 1px solid #f1f5f9;
+                border-radius: 12px;
+                padding: 8px 10px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                position: relative;
             }
 
             .mega-product-card:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+                border-color: #cbd5e1;
+                box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
             }
 
             .mega-product-img {
-                width: 70px;
-                height: 90px;
-                border-radius: 8px;
+                width: 68px;
+                height: 68px;
+                border-radius: 9px;
                 overflow: hidden;
                 flex-shrink: 0;
-                background: #f7f8fb;
+                background: #f8fafc;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                position: relative;
+                border: 1px solid #f1f5f9;
             }
 
             .mega-product-img img {
@@ -964,47 +1073,74 @@
                 height: 100%;
                 object-fit: cover;
                 display: block;
+                transition: transform 0.3s ease;
+            }
+
+            .mega-product-card:hover .mega-product-img img {
+                transform: scale(1.06);
+            }
+
+            .mega-card-discount-badge {
+                position: absolute;
+                top: 3px;
+                right: 3px;
+                background: linear-gradient(135deg, #ef4444, #f97316);
+                color: #ffffff;
+                font-size: 8.5px;
+                font-weight: 800;
+                padding: 1px 4px;
+                border-radius: 4px;
+                line-height: 1.1;
+                box-shadow: 0 1px 4px rgba(239, 68, 68, 0.3);
             }
 
             .mega-product-info {
                 display: flex;
                 flex-direction: column;
-                gap: 6px;
+                gap: 4px;
                 min-width: 0;
+                flex: 1;
             }
 
             .mega-product-title {
-                font-size: 14px;
+                font-size: 12.5px;
                 font-weight: 600;
-                color: var(--secondary-color);
-                line-height: 1.3;
-                max-height: 36px;
+                color: #1e293b;
+                line-height: 1.35;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
                 overflow: hidden;
-            }
-
-            .mega-product-price {
-                font-size: 14px;
-                font-weight: 700;
-                color: var(--primary-color);
+                text-overflow: ellipsis;
             }
 
             .mega-product-price-row {
                 display: flex;
-                align-items: center;
+                align-items: baseline;
                 gap: 6px;
                 flex-wrap: wrap;
+                margin-top: 2px;
+            }
+
+            .mega-product-price {
+                font-size: 13.5px;
+                font-weight: 800;
+                color: #ea580c;
             }
 
             .mega-product-oldprice {
-                font-size: 13px;
-                color: #8b94a7;
+                font-size: 11px;
+                color: #94a3b8;
                 text-decoration: line-through;
             }
+
             .mega-loading {
-                padding: 12px;
+                padding: 18px;
                 text-align: center;
-                color: var(--secondary-color);
+                color: #64748b;
+                font-size: 13px;
                 font-weight: 600;
+                grid-column: 1 / -1;
             }
 
             @media (max-width: 992px) {
@@ -1187,14 +1323,19 @@
                 left: calc(260px + 12px);
                 right: 0;
                 min-height: {{ $sliderHeight }}px;
-                background: var(--light-color);
-                /* border: 1px solid color-mix(in srgb, var(--secondary-color) 10%, transparent); */
-                border: 1px solid var(--primary-color);
-                border-radius: 7px;
-                box-shadow: 0 16px 38px rgba(0, 0, 0, 0.08);
-                padding: 16px 18px;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12), 0 0 1px rgba(0, 0, 0, 0.06);
+                padding: 16px 20px;
                 display: none;
                 z-index: 50;
+                animation: megaFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @keyframes megaFadeIn {
+                from { opacity: 0; transform: translateY(4px); }
+                to { opacity: 1; transform: translateY(0); }
             }
 
             .slider-mega-area.active {
@@ -1202,24 +1343,26 @@
             }
 
             .slider-mega-panel {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                gap: 16px 20px;
-                align-items: start;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
                 pointer-events: auto;
             }
 
-            .slider-mega-panel .mega-products {
-                grid-column: 1 / -1;
+            .slider-mega-col {
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 10px 14px;
             }
 
             .slider-mega-col h4 {
-                margin: 0 0 8px;
-                font-size: 16px;
+                margin: 0 0 6px;
+                font-size: 13.5px;
                 font-weight: 700;
-                color: var(--secondary-color);
-                border-bottom: 1px solid color-mix(in srgb, var(--secondary-color) 12%, transparent);
-                padding-bottom: 6px;
+                color: #0f172a;
+                border-bottom: 1px solid #e2e8f0;
+                padding-bottom: 4px;
             }
 
             .slider-mega-col ul {
@@ -1228,19 +1371,20 @@
                 margin: 0;
                 display: flex;
                 flex-direction: column;
-                gap: 6px;
+                gap: 4px;
             }
 
             .slider-mega-col ul li a {
                 text-decoration: none;
-                color: var(--secondary-color);
-                font-weight: 600;
-                font-size: 14px;
+                color: #475569;
+                font-weight: 500;
+                font-size: 12.5px;
                 line-height: 1.35;
+                transition: color 0.15s ease;
             }
 
             .slider-mega-col ul li a:hover {
-                color: var(--primary-color);
+                color: var(--primary-color, #2563eb);
             }
 
             .slider-category-item.active>a {
@@ -1555,33 +1699,61 @@
                         @foreach ($sliderCategoriesList as $item)
                             <div class="slider-mega-panel" data-menu-panel="{{ $item->id }}">
                                 @if ($item->subCategories && $item->subCategories->count())
-                                    @foreach ($item->subCategories as $child)
-                                        <div class="slider-mega-col">
-                                            <h4>
-                                                <a href="{{ route('shop', [$item->slug, $child->slug]) }}" style="color: inherit; text-decoration: none;">
-                                                    {{ $child->name }}
-                                                </a>
-                                            </h4>
-                                            @if ($child->thirdCategories && $child->thirdCategories->count())
-                                                <ul>
-                                                    @foreach ($child->thirdCategories as $grandChild)
-                                                        <li>
-                                                            <a href="{{ route('shop', [$item->slug, $child->slug, $grandChild->slug]) }}">
-                                                                {{ $grandChild->name }}
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            @endif
+                                    <div class="mega-subcats-section">
+                                        <div class="mega-subcats-bar">
+                                            <span class="mega-section-pill-tag">Subcategories</span>
+                                            <div class="mega-subcat-pills-wrap">
+                                                @foreach ($item->subCategories as $child)
+                                                    <a href="{{ route('shop', [$item->slug, $child->slug]) }}" class="mega-subcat-pill">
+                                                        <span class="pill-dot"></span>
+                                                        <span class="pill-text">{{ $child->name }}</span>
+                                                        <svg class="pill-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                                                    </a>
+                                                @endforeach
+                                            </div>
                                         </div>
-                                    @endforeach
+
+                                        @php
+                                            $hasThirdLevel = $item->subCategories->contains(fn($c) => $c->thirdCategories && $c->thirdCategories->count() > 0);
+                                        @endphp
+                                        @if($hasThirdLevel)
+                                            <div class="mega-subcats-columns">
+                                                @foreach ($item->subCategories as $child)
+                                                    @if ($child->thirdCategories && $child->thirdCategories->count())
+                                                        <div class="slider-mega-col">
+                                                            <h4>
+                                                                <a href="{{ route('shop', [$item->slug, $child->slug]) }}" style="color: inherit; text-decoration: none;">
+                                                                    {{ $child->name }}
+                                                                </a>
+                                                            </h4>
+                                                            <ul>
+                                                                @foreach ($child->thirdCategories as $grandChild)
+                                                                    <li>
+                                                                        <a href="{{ route('shop', [$item->slug, $child->slug, $grandChild->slug]) }}">
+                                                                            {{ $grandChild->name }}
+                                                                        </a>
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
                                 @endif
 
                                 @if (!empty($sliderCategoryFlags[$item->id]) && $sliderCategoryFlags[$item->id])
                                     <div class="mega-products" data-mega-products="{{ $item->id }}">
                                         <div class="mega-products-header">
-                                            <h5>Latest in {{ $item->name }}</h5>
-                                            <a href="{{ route('shop', $item->slug) }}" class="view-all-link">{{ \App\Services\SettingsService::getViewAllButtonText() }}</a>
+                                            <div class="mega-header-title-wrap">
+                                                <span class="mega-header-sparkle">✨</span>
+                                                <h5>Featured in {{ $item->name }}</h5>
+                                            </div>
+                                            <a href="{{ route('shop', $item->slug) }}" class="mega-view-all-pill">
+                                                <span>{{ \App\Services\SettingsService::getViewAllButtonText() }}</span>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                            </a>
                                         </div>
                                         <div class="mega-products-grid" data-mega-products-grid="{{ $item->id }}"></div>
                                         <template data-mega-products-template="{{ $item->id }}">

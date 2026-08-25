@@ -130,16 +130,25 @@
             letter-spacing: 1px;
         } */
 
+        .product-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            left: auto !important;
+            z-index: 5;
+        }
+
         .starburst-badge {
             position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 48px;
-            height: 48px;
+            top: 4px;
+            right: 4px;
+            left: auto !important;
+            width: 44px;
+            height: 44px;
             background: url(/star.svg) no-repeat center center;
             background-size: contain;
             color: #fff;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -155,16 +164,19 @@
 
         .simple-badge {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            background-color: var(--primary-color);
-            color: var(--light-color);
+            top: 8px;
+            right: 8px;
+            left: auto !important;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: #ffffff;
             font-size: 11px;
-            font-weight: 600;
-            padding: 5px 10px;
-            border-radius: 3px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
             z-index: 5;
-            letter-spacing: 1px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+            line-height: 1.2;
         }
 
         .product-image {
@@ -4088,9 +4100,66 @@
                 border-bottom: 3px solid var(--primary-color, #ff6925);
             }
             .mainnav-section.active {
-                max-height: 200px;
+                max-height: none !important;
+                overflow: visible !important;
                 opacity: 1;
             }
+        }
+
+        /* 3rd Navbar Category Dropdown Menus */
+        .mainnav-section .navigation {
+            overflow: visible !important;
+        }
+        .mainnav-section .dropdown-parent {
+            position: relative;
+            display: inline-block;
+        }
+        .mainnav-section .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 10px !important;
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16) !important;
+            min-width: 210px !important;
+            padding: 6px 0 !important;
+            z-index: 99999 !important;
+            white-space: nowrap !important;
+        }
+        .mainnav-section .dropdown-menu .dropdown-parent > .dropdown-menu {
+            top: -6px !important;
+            left: 100% !important;
+            right: auto !important;
+        }
+        .mainnav-section .dropdown-menu a {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 9px 16px !important;
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
+            color: #1e293b !important;
+            text-transform: none !important;
+            letter-spacing: 0 !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            border-right: none !important;
+            background: transparent !important;
+            transition: all 0.15s ease !important;
+        }
+        .mainnav-section .dropdown-menu a:hover {
+            background: #f8fafc !important;
+            color: var(--primary-color, #2563eb) !important;
+            padding-left: 20px !important;
+        }
+        .mainnav-section .dropdown-menu a:last-child {
+            border-bottom: none !important;
+        }
+        .mainnav-section .dropdown-parent:hover > .dropdown-menu {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            display: block !important;
         }
 
         .category-trigger-wrapper {
@@ -4754,9 +4823,19 @@
 	            $topCategories = \App\Models\ProductCategory::where(function($q) {
 	                    $q->where('status', '1')->orWhere('status', 'active');
 	                })
+	                ->with([
+	                    'subCategories' => function ($sq) {
+	                        $sq->where(function($q) { $q->where('status', '1')->orWhere('status', 'active'); })
+	                           ->with([
+	                               'thirdCategories' => function ($tq) {
+	                                   $tq->where('status', '1')->orWhere('status', 'active');
+	                               }
+	                           ]);
+	                    }
+	                ])
 	                ->withCount('products')
 	                ->orderByDesc('products_count')
-	                ->take(6)
+	                ->take(8)
 	                ->get();
 	        @endphp
 
@@ -4773,16 +4852,88 @@
 	            @endphp
 	            @foreach ($topCategories as $cat)
 	                @if (!in_array(strtolower($cat->name), $menuItemTitles))
-	                    <a href="{{ url('/shop?category=' . $cat->slug) }}" class="menu-item-level-1">
-	                        <span>{{ $cat->name }}</span>
-	                    </a>
+	                    @if ($cat->subCategories && $cat->subCategories->count() > 0)
+	                        <div class="dropdown-parent menu-level-1" data-level="1">
+	                            <a href="{{ route('shop', $cat->slug) }}" class="has-dropdown">
+	                                <span>{{ $cat->name }}</span>
+	                                <svg class="dropdown-icon" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+	                                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+	                                </svg>
+	                            </a>
+	                            <div class="dropdown-menu submenu-level-1" data-level="1">
+	                                @foreach ($cat->subCategories as $subCat)
+	                                    @if ($subCat->thirdCategories && $subCat->thirdCategories->count() > 0)
+	                                        <div class="dropdown-parent menu-level-2" data-level="2">
+	                                            <a href="{{ route('shop', [$cat->slug, $subCat->slug]) }}" class="has-dropdown">
+	                                                <span>{{ $subCat->name }}</span>
+	                                                <svg class="submenu-arrow" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+	                                                    <path d="M3.5 2L6.5 5L3.5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+	                                                </svg>
+	                                            </a>
+	                                            <div class="dropdown-menu submenu-level-2" data-level="2">
+	                                                @foreach ($subCat->thirdCategories as $thirdCat)
+	                                                    <a href="{{ route('shop', [$cat->slug, $subCat->slug, $thirdCat->slug]) }}" class="menu-item-level-3">
+	                                                        <span>{{ $thirdCat->name }}</span>
+	                                                    </a>
+	                                                @endforeach
+	                                            </div>
+	                                        </div>
+	                                    @else
+	                                        <a href="{{ route('shop', [$cat->slug, $subCat->slug]) }}" class="menu-item-level-2">
+	                                            <span>{{ $subCat->name }}</span>
+	                                        </a>
+	                                    @endif
+	                                @endforeach
+	                            </div>
+	                        </div>
+	                    @else
+	                        <a href="{{ route('shop', $cat->slug) }}" class="menu-item-level-1">
+	                            <span>{{ $cat->name }}</span>
+	                        </a>
+	                    @endif
 	                @endif
 	            @endforeach
 	        @elseif ($topCategories->count() > 0)
 	            @foreach ($topCategories as $cat)
-	                <a href="{{ url('/shop?category=' . $cat->slug) }}" class="menu-item-level-1">
-	                    <span>{{ $cat->name }}</span>
-	                </a>
+	                @if ($cat->subCategories && $cat->subCategories->count() > 0)
+	                    <div class="dropdown-parent menu-level-1" data-level="1">
+	                        <a href="{{ route('shop', $cat->slug) }}" class="has-dropdown">
+	                            <span>{{ $cat->name }}</span>
+	                            <svg class="dropdown-icon" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+	                                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+	                            </svg>
+	                        </a>
+	                        <div class="dropdown-menu submenu-level-1" data-level="1">
+	                            @foreach ($cat->subCategories as $subCat)
+	                                @if ($subCat->thirdCategories && $subCat->thirdCategories->count() > 0)
+	                                    <div class="dropdown-parent menu-level-2" data-level="2">
+	                                        <a href="{{ route('shop', [$cat->slug, $subCat->slug]) }}" class="has-dropdown">
+	                                            <span>{{ $subCat->name }}</span>
+	                                            <svg class="submenu-arrow" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+	                                                <path d="M3.5 2L6.5 5L3.5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+	                                            </svg>
+	                                        </a>
+	                                        <div class="dropdown-menu submenu-level-2" data-level="2">
+	                                            @foreach ($subCat->thirdCategories as $thirdCat)
+	                                                <a href="{{ route('shop', [$cat->slug, $subCat->slug, $thirdCat->slug]) }}" class="menu-item-level-3">
+	                                                    <span>{{ $thirdCat->name }}</span>
+	                                                </a>
+	                                            @endforeach
+	                                        </div>
+	                                    </div>
+	                                @else
+	                                    <a href="{{ route('shop', [$cat->slug, $subCat->slug]) }}" class="menu-item-level-2">
+	                                        <span>{{ $subCat->name }}</span>
+	                                    </a>
+	                                @endif
+	                            @endforeach
+	                        </div>
+	                    </div>
+	                @else
+	                    <a href="{{ route('shop', $cat->slug) }}" class="menu-item-level-1">
+	                        <span>{{ $cat->name }}</span>
+	                    </a>
+	                @endif
 	            @endforeach
 	        @else
 	            <a href="{{ url('/') }}" class="menu-item-level-1">
