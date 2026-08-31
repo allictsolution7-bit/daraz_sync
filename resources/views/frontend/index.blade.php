@@ -1197,8 +1197,9 @@
                 border-radius: 10px;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
                 overflow: visible;
-                min-height: {{ $sliderHeight }}px;
+                min-height: auto;
                 max-height: {{ $sliderHeight }}px;
+                height: fit-content;
                 display: flex;
                 flex-direction: column;
                 position: relative;
@@ -1207,11 +1208,11 @@
 
             .slider-category-heading {
                 display: none;
-                padding: 12px 14px;
+                padding: 8px 12px;
                 background: var(--secondary-color);
                 color: var(--light-color);
                 font-weight: 700;
-                font-size: 14px;
+                font-size: 13px;
                 letter-spacing: 0.2px;
             }
 
@@ -1229,15 +1230,16 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                padding: 10px 12px;
+                padding: 5px 10px;
+                min-height: 36px;
                 text-decoration: none;
                 color: var(--secondary-color);
                 font-weight: 600;
-                font-size: 14px;
+                font-size: 13px;
                 border-bottom: 1px solid #f1f5f9;
                 border-bottom: 1px solid color-mix(in srgb, var(--secondary-color) 10%, transparent);
                 transition: all 0.2s ease;
-                gap: 10px;
+                gap: 8px;
             }
 
             .slider-category-item>a:hover {
@@ -1248,14 +1250,16 @@
 
             .slider-category-item .chevron {
                 color: var(--primary-color);
-                margin-left: 8px;
+                margin-left: 6px;
+                font-size: 16px;
+                line-height: 1;
                 flex-shrink: 0;
             }
 
             .slider-category-thumb {
-                width: 28px;
-                height: 28px;
-                border-radius: 6px;
+                width: 22px;
+                height: 22px;
+                border-radius: 4px;
                 overflow: hidden;
                 background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
                 display: inline-flex;
@@ -1278,12 +1282,12 @@
             .slider-category-sub {
                 list-style: none;
                 margin: 0;
-                padding: 8px 0;
+                padding: 6px 0;
                 background: color-mix(in srgb, var(--secondary-color) 6%, var(--light-color));
                 position: absolute;
                 top: -1px;
                 left: calc(100% - 2px);
-                width: 260px;
+                width: 240px;
                 min-height: calc(100% + 2px);
                 box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
                 border: 1px solid color-mix(in srgb, var(--secondary-color) 10%, transparent);
@@ -1296,13 +1300,13 @@
                 background: color-mix(in srgb, var(--secondary-color) 8%, var(--light-color));
                 left: 100%;
                 top: -1px;
-                width: 240px;
+                width: 220px;
             }
 
             .slider-category-sub li>a {
                 font-weight: 500;
-                font-size: 13px;
-                padding: 9px 12px;
+                font-size: 12px;
+                padding: 6px 10px;
                 color: var(--secondary-color);
                 display: flex;
                 align-items: center;
