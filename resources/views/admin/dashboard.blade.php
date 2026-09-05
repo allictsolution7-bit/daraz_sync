@@ -770,8 +770,21 @@
             </div>
 
             <!-- Section: Status Sparklines -->
-            <div class="status-matrix-title">
-                <i class="fas fa-grip text-indigo-500"></i> Order Status Tracking
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 mt-4">
+                <div class="status-matrix-title mb-0">
+                    <i class="fas fa-grip text-indigo-500"></i> Order Status Tracking
+                </div>
+                <div class="status-filter-pills d-inline-flex align-items-center bg-white p-1 rounded-3 border shadow-sm" style="gap: 3px;">
+                    <button type="button" class="btn btn-sm status-range-btn {{ ($statusRange ?? '1m') === '1w' ? 'btn-primary text-white shadow-xs' : 'btn-light text-muted' }} fw-bold px-3 py-1" data-status-range="1w" style="font-size: 0.75rem; border-radius: 6px; transition: all 0.2s;">
+                        1W <span class="d-none d-sm-inline font-normal opacity-75">(7 Days)</span>
+                    </button>
+                    <button type="button" class="btn btn-sm status-range-btn {{ ($statusRange ?? '1m') === '1m' ? 'btn-primary text-white shadow-xs' : 'btn-light text-muted' }} fw-bold px-3 py-1" data-status-range="1m" style="font-size: 0.75rem; border-radius: 6px; transition: all 0.2s;">
+                        1M <span class="d-none d-sm-inline font-normal opacity-75">(30 Days)</span>
+                    </button>
+                    <button type="button" class="btn btn-sm status-range-btn {{ ($statusRange ?? '1m') === 'all' ? 'btn-primary text-white shadow-xs' : 'btn-light text-muted' }} fw-bold px-3 py-1" data-status-range="all" style="font-size: 0.75rem; border-radius: 6px; transition: all 0.2s;">
+                        All Time
+                    </button>
+                </div>
             </div>
 
             <div class="status-matrix-grid">
@@ -780,7 +793,7 @@
                         $counts = $orderStatusMonthlyCounts[$status] ?? [0];
                         $trends = $orderStatusMonthlyTrends[$status] ?? [0];
                         $currentTrend = $trends[count($trends) - 1] ?? 0;
-                        $currentCount = $counts[count($counts) - 1] ?? 0;
+                        $currentCount = $statusCounts[$status] ?? ($counts[count($counts) - 1] ?? 0);
                         $maxCount = max($counts) ?: 1;
 
                         $statusConfig = [
@@ -814,7 +827,7 @@
                             </div>
                         </div>
                         <div class="matrix-right">
-                            <div class="matrix-value">
+                            <div class="matrix-value" data-status="{{ $status }}">
                                 {{ $currentCount }}
                             </div>
                             <div class="matrix-label">
@@ -965,10 +978,39 @@
         let deptPerformanceChart = null;
         let currentDateRange = '{{ $selectedDateRange ?? "last_30_days" }}';
 
+        const statusBreakdowns = @json($statusBreakdowns ?? []);
+        let currentStatusRange = '{{ $statusRange ?? "1m" }}';
+
         $(document).ready(function() {
             initializeDateFilters();
+            initializeStatusRangeFilters();
             initializePortalCharts();
         });
+
+        function initializeStatusRangeFilters() {
+            $('.status-range-btn').on('click', function(e) {
+                e.preventDefault();
+                const range = $(this).data('status-range');
+                if (!range) return;
+
+                $('.status-range-btn').removeClass('btn-primary text-white shadow-xs').addClass('btn-light text-muted');
+                $(this).removeClass('btn-light text-muted').addClass('btn-primary text-white shadow-xs');
+
+                currentStatusRange = range;
+
+                if (statusBreakdowns && statusBreakdowns[range]) {
+                    Object.entries(statusBreakdowns[range]).forEach(([st, val]) => {
+                        $(`.matrix-value[data-status="${st}"]`).text(val);
+                    });
+                }
+
+                try {
+                    const url = new URL(window.location);
+                    url.searchParams.set('status_range', range);
+                    window.history.replaceState({}, '', url);
+                } catch (e) {}
+            });
+        }
 
         function initializeDateFilters() {
             // Set active class

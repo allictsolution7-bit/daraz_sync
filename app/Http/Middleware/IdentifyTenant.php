@@ -19,23 +19,33 @@ class IdentifyTenant
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $host = strtolower($request->getHost());
+        $rawHost = strtolower($request->header('Host') ?: $request->getHost());
+        // Strip any port number (e.g. sabbir.localhost:8000 -> sabbir.localhost)
+        $host = preg_replace('/:\d+$/', '', $rawHost);
 
-        // Fast-path bypass for local development
-        if (in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+        // Fast-path bypass for bare localhost / 127.0.0.1 without subdomain
+        if (in_array($host, ['localhost', '127.0.0.1', '::1'], true) && !$request->has('subdomain')) {
             return $next($request);
         }
 
         try {
             $tenant = null;
 
+            // 0. Check explicit subdomain query parameter or header if provided (e.g. ?subdomain=sabbir)
+            $explicitSubdomain = $request->query('subdomain') ?: $request->header('X-Tenant-Subdomain');
+            if ($explicitSubdomain) {
+                $tenant = SaaSTenant::where('subdomain', strtolower($explicitSubdomain))->where('is_active', true)->first();
+            }
+
             // 1. Try finding by custom domain first (e.g. mystore.com, shop.customdomain.com)
-            $cleanHost = preg_replace('/^www\./i', '', $host);
-            $tenant = SaaSTenant::where(function($q) use ($host, $cleanHost) {
-                $q->where('custom_domain', $host)
-                  ->orWhere('custom_domain', $cleanHost)
-                  ->orWhere('custom_domain', 'www.' . $cleanHost);
-            })->where('is_active', true)->first();
+            if (!$tenant) {
+                $cleanHost = preg_replace('/^www\./i', '', $host);
+                $tenant = SaaSTenant::where(function($q) use ($host, $cleanHost) {
+                    $q->where('custom_domain', $host)
+                      ->orWhere('custom_domain', $cleanHost)
+                      ->orWhere('custom_domain', 'www.' . $cleanHost);
+                })->where('is_active', true)->first();
+            }
 
             // 2. If not matched, extract and check by subdomain (e.g. sabbir.localhost or sabbir.purnobd.com)
             if (!$tenant) {

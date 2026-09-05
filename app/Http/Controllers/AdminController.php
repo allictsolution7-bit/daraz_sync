@@ -152,6 +152,38 @@ class AdminController extends Controller
                 $orderStatusMonthlyTrends[$status] = $trends;
             }
 
+            // Calculate status breakdown for 1w (7 days), 1m (30 days), and all-time
+            $rawCounts1W = Order::where('created_at', '>=', now()->subDays(6)->startOfDay())
+                ->selectRaw('status, count(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+
+            $rawCounts1M = Order::where('created_at', '>=', now()->subDays(29)->startOfDay())
+                ->selectRaw('status, count(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+
+            $rawCountsAll = Order::selectRaw('status, count(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+
+            $statusBreakdowns = [
+                '1w' => [],
+                '1m' => [],
+                'all' => [],
+            ];
+            foreach ($statuses as $s) {
+                $statusBreakdowns['1w'][$s] = (int) ($rawCounts1W[$s] ?? 0);
+                $statusBreakdowns['1m'][$s] = (int) ($rawCounts1M[$s] ?? 0);
+                $statusBreakdowns['all'][$s] = (int) ($rawCountsAll[$s] ?? 0);
+            }
+
+            $statusRange = request()->get('status_range', '1m');
+            $statusCounts = $statusBreakdowns[$statusRange] ?? $statusBreakdowns['1m'];
+
             $monthLabels = collect($periods)->map(function ($period) use ($dateRange) {
                 return $this->getPeriodLabel($period, $dateRange);
             })->toArray();
@@ -230,12 +262,47 @@ class AdminController extends Controller
                 'categoryCounts',
                 'responseTimeText',
                 'retentionRate',
-                'lowStockCount'
+                'lowStockCount',
+                'statusBreakdowns',
+                'statusCounts',
+                'statusRange'
             );
         });
 
         extract($dashboardData);
         $selectedDateRange = $dateRange;
+
+        if (!isset($statusBreakdowns) || empty($statusBreakdowns)) {
+            $rawCounts1W = Order::where('created_at', '>=', now()->subDays(6)->startOfDay())
+                ->selectRaw('status, count(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+
+            $rawCounts1M = Order::where('created_at', '>=', now()->subDays(29)->startOfDay())
+                ->selectRaw('status, count(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+
+            $rawCountsAll = Order::selectRaw('status, count(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+
+            $statusBreakdowns = [
+                '1w' => [],
+                '1m' => [],
+                'all' => [],
+            ];
+            foreach ($statuses as $s) {
+                $statusBreakdowns['1w'][$s] = (int) ($rawCounts1W[$s] ?? 0);
+                $statusBreakdowns['1m'][$s] = (int) ($rawCounts1M[$s] ?? 0);
+                $statusBreakdowns['all'][$s] = (int) ($rawCountsAll[$s] ?? 0);
+            }
+        }
+        $statusRange = $request->get('status_range', $statusRange ?? '1m');
+        $statusCounts = $statusBreakdowns[$statusRange] ?? ($statusBreakdowns['1m'] ?? []);
 
         // If this is an AJAX request, return JSON data
         if ($request->ajax()) {
@@ -278,7 +345,10 @@ class AdminController extends Controller
             'categoryCounts',
             'responseTimeText',
             'retentionRate',
-            'lowStockCount'
+            'lowStockCount',
+            'statusBreakdowns',
+            'statusCounts',
+            'statusRange'
         ));
     }
 

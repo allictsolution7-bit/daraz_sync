@@ -328,17 +328,13 @@ Route::post('/google-sheets/webhook', function (Request $request, \App\Services\
 | AGentFlow / Daraz Sync Secure External Bridge APIs
 |--------------------------------------------------------------------------
 | Protected endpoint for fetching live store inventory, orders, and stats.
-| Only accessible with a valid X-API-Key or Bearer token header.
+| Resolves multi-tenant databases dynamically according to the request Host.
 */
-Route::prefix('external')->group(function () {
+Route::prefix('external')->middleware([\App\Http\Middleware\IdentifyTenant::class])->group(function () {
     // 1. Connection Test Ping
     Route::get('/test-connection', function (Request $request) {
         $apiKey = $request->header('X-API-Key') ?: $request->bearerToken();
         $configuredKey = env('AGENTFLOW_SYNC_SECRET', env('APP_KEY'));
-
-        if (!empty($configuredKey) && $apiKey !== $configuredKey && !empty($apiKey)) {
-            // Check if key matches license or configured key
-        }
 
         return response()->json([
             'success' => true,
@@ -351,6 +347,51 @@ Route::prefix('external')->group(function () {
 
     // 2. Real-time Store Statistics & Multi-Role User Dataset Endpoint
     Route::match(['get', 'post'], '/user-sync-info', function (Request $request) {
+        // Resolve dynamic tenant database if requesting a subdomain/domain (e.g. sabbir.localhost:8000)
+        $rawHost = strtolower($request->header('Host') ?: $request->getHost());
+        $cleanHost = preg_replace('/:\d+$/', '', $rawHost);
+        $subdomainParam = $request->query('subdomain') ?: $request->header('X-Tenant-Subdomain');
+
+        if (!$subdomainParam) {
+            $parts = explode('.', $cleanHost);
+            if (count($parts) === 2 && $parts[1] === 'localhost' && !in_array($parts[0], ['www', 'admin', 'api', 'central'])) {
+                $subdomainParam = $parts[0];
+            } elseif (count($parts) >= 3 && !in_array($parts[0], ['www', 'admin', 'api', 'central'])) {
+                $subdomainParam = $parts[0];
+            }
+        }
+
+        $activeTenant = null;
+        $resolvedDb = config('database.connections.mysql.database');
+
+        if ($subdomainParam && !in_array(strtolower($subdomainParam), ['localhost', '127', 'www', 'admin', 'api', 'central', 'purnobd'])) {
+            try {
+                $tenant = \App\Models\SaaSTenant::on('central')->where('subdomain', strtolower($subdomainParam))->first();
+                if (!$tenant) {
+                    $tenant = \App\Models\SaaSTenant::where('subdomain', strtolower($subdomainParam))->first();
+                }
+                if ($tenant) {
+                    $activeTenant = $tenant;
+                    $resolvedDb = $tenant->db_name ?: 'purnobd_' . $tenant->subdomain;
+                    \Illuminate\Support\Facades\Config::set('database.connections.mysql.database', $resolvedDb);
+                    \Illuminate\Support\Facades\DB::purge('mysql');
+                    \Illuminate\Support\Facades\DB::reconnect('mysql');
+                    \Illuminate\Support\Facades\DB::setDefaultConnection('mysql');
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'Tenant subdomain "' . $subdomainParam . '" was not found in the SaaS network.',
+                    ], 404);
+                }
+            } catch (\Throwable $te) {
+                \Log::warning("External API tenant resolution error: " . $te->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Failed to connect to tenant database: ' . $te->getMessage(),
+                ], 500);
+            }
+        }
+
         $loginIdentifier = $request->input('username') ?: $request->input('email') ?: $request->header('X-Agent-Email') ?: $request->query('email') ?: $request->query('username');
         $password = $request->input('password') ?: $request->header('X-Agent-Password') ?: $request->query('password');
         $apiKey = $request->header('X-API-Key') ?: $request->bearerToken() ?: $request->input('api_key') ?: $request->query('api_key');
@@ -365,20 +406,39 @@ Route::prefix('external')->group(function () {
                 ->orWhere('name', $loginIdentifier)
                 ->first();
 
-            if (!$user || !\Illuminate\Support\Facades\Hash::check($password, $user->password)) {
+            if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'Authentication failed: Invalid username/email or password.',
+                    'error' => 'Authentication failed: User "' . $loginIdentifier . '" was not found in this database.',
+                ], 401);
+            }
+
+            if (!\Illuminate\Support\Facades\Hash::check($password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Authentication failed: Incorrect password for user "' . $loginIdentifier . '".',
                 ], 401);
             }
 
             $authenticatedUser = $user;
         } elseif (!empty($loginIdentifier)) {
-            // Find user by identifier if password not provided but valid API key or local environment
-            $authenticatedUser = \App\Models\User::where('email', $loginIdentifier)
+            // Find user by identifier if only username is passed
+            $user = \App\Models\User::where('email', $loginIdentifier)
                 ->orWhere('phone', $loginIdentifier)
                 ->orWhere('name', $loginIdentifier)
                 ->first();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Authentication failed: User account "' . $loginIdentifier . '" does not exist.',
+                ], 401);
+            }
+
+            $authenticatedUser = $user;
+        } else {
+            // Fallback to first admin user only if absolutely no identifier was provided
+            $authenticatedUser = \App\Models\User::first();
         }
 
         // 2. Determine Role & Context
@@ -390,44 +450,94 @@ Route::prefix('external')->group(function () {
             } elseif ($authenticatedUser->id === 1) {
                 $roleName = 'ADMIN';
             } else {
-                $roleName = 'MERCHANT';
+                $roleName = 'VENDOR';
             }
         }
 
         try {
-            // 3. Role-Based Dataset Queries
-            $userId = $authenticatedUser ? $authenticatedUser->id : null;
-            $isAdmin = in_array($roleName, ['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN']);
+            // 3. Date Range Handling (Default to last 30 days matching Admin Dashboard)
+            $dateRange = $request->input('date_range', 'last_30_days');
+            $startDate = now()->subDays(29)->startOfDay();
+            $endDate = now()->endOfDay();
 
-            // Product metrics & Low Stock Alerts
-            $productQuery = \App\Models\Product::query();
-            if (!$isAdmin && $userId && \Schema::hasColumn('products', 'user_id')) {
-                $productQuery->where('user_id', $userId);
+            if ($dateRange === 'today') {
+                $startDate = now()->startOfDay();
+                $endDate = now()->endOfDay();
+            } elseif ($dateRange === 'yesterday') {
+                $startDate = now()->subDay()->startOfDay();
+                $endDate = now()->subDay()->endOfDay();
+            } elseif ($dateRange === '7_days' || $dateRange === '1w' || $dateRange === 'week') {
+                $startDate = now()->subDays(6)->startOfDay();
+                $endDate = now()->endOfDay();
+            } elseif ($dateRange === '15_days') {
+                $startDate = now()->subDays(14)->startOfDay();
+                $endDate = now()->endOfDay();
+            } elseif ($dateRange === 'all_time' || $dateRange === 'all') {
+                $startDate = now()->subYears(10)->startOfDay();
+                $endDate = now()->endOfDay();
             }
+
+            // 4. Role-Based Dataset Queries using User ID
+            $userId = $authenticatedUser ? $authenticatedUser->id : null;
+            $isAdmin = in_array($roleName, ['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'SUPER ADMIN']);
+            $isVendor = in_array($roleName, ['VENDOR', 'SELLER', 'MERCHANT']);
+            $isReseller = in_array($roleName, ['RESELLER', 'WHOLESALER', 'RETAILER']);
+
+            // Product Query
+            $productQuery = \App\Models\Product::query();
+            if ($isVendor && $userId) {
+                $productQuery->where(function ($q) use ($userId) {
+                    $q->where('vendor_id', $userId)
+                      ->orWhere('user_id', $userId);
+                });
+            } elseif ($isReseller && $userId) {
+                $adminId = $authenticatedUser->created_by;
+                $productQuery->where(function ($q) use ($adminId) {
+                    if ($adminId) {
+                        $q->where('created_by', $adminId)
+                          ->orWhere('vendor_id', $adminId)
+                          ->orWhereNull('vendor_id');
+                    } else {
+                        $q->whereNull('vendor_id');
+                    }
+                });
+            }
+
             $totalProducts = (clone $productQuery)->count();
             $inStockProducts = (clone $productQuery)->where(function ($q) {
                 $q->where('stock_status', 'in_stock')->orWhere('quantity', '>', 0);
             })->count();
             $outOfStock = max(0, $totalProducts - $inStockProducts);
-            $lowStockAlerts = (clone $productQuery)->where(function ($q) {
-                $q->where('quantity', '<=', 5)->where('quantity', '>', 0);
-            })->count();
-
-            // Order metrics
-            $orderQuery = \App\Models\order::query();
-            if (!$isAdmin && $userId) {
-                if (\Schema::hasColumn('orders', 'vendor_id')) {
-                    $orderQuery->where('vendor_id', $userId);
-                } elseif (\Schema::hasColumn('orders', 'user_id')) {
-                    $orderQuery->where('user_id', $userId);
-                }
+            
+            // Low stock matching Admin dashboard logic
+            $lowStockAlerts = (clone $productQuery)
+                ->where('manage_stock', true)
+                ->whereRaw('quantity <= low_stock_threshold')
+                ->where('stock_status', 'in_stock')
+                ->count();
+            if ($lowStockAlerts === 0) {
+                $lowStockAlerts = (clone $productQuery)->where('quantity', '<=', 5)->where('quantity', '>', 0)->count();
             }
+
+            // Order Query (Scoped by Date Range & User ID)
+            $orderQuery = \App\Models\order::whereBetween('created_at', [$startDate, $endDate]);
+            if ($isVendor && $userId) {
+                $orderQuery->where(function ($q) use ($userId) {
+                    $q->where('vendor_id', $userId)
+                      ->orWhere('user_id', $userId);
+                });
+            } elseif ($isReseller && $userId) {
+                $orderQuery->where('reseller_id', $userId);
+            }
+
             $totalOrders = (clone $orderQuery)->count();
             $pendingOrders = (clone $orderQuery)->where('status', 'pending')->count();
-            $totalRevenue = (float) (clone $orderQuery)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
+            $totalRevenue = (float) (clone $orderQuery)->sum('total');
 
-            // Store Customers
-            $storeCustomers = \App\Models\User::count();
+            // Store Customers (Total users in this period)
+            $storeCustomers = $isAdmin 
+                ? \App\Models\User::whereBetween('created_at', [$startDate, $endDate])->count() 
+                : (clone $orderQuery)->distinct('phone')->count('phone');
 
             // SMS Balance
             $smsApiKey = function_exists('setting') ? setting('sms', 'api_key', '000000000000000') : env('SMS_API_KEY', '0.00');
@@ -498,6 +608,8 @@ Route::prefix('external')->group(function () {
                     'sellerId' => $sellerIdGen,
                     'role' => $roleName,
                     'region' => 'Bangladesh (Daraz.com.bd)',
+                    'tenantSubdomain' => $activeTenant ? $activeTenant->subdomain : 'central (main)',
+                    'database' => $resolvedDb,
                     'status' => 'ACTIVE',
                     'lastSyncAt' => now()->toISOString(),
                     'tokenExpiresAt' => now()->addDays(90)->toISOString(),
