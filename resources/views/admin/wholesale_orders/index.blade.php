@@ -178,11 +178,11 @@
             </div>
         </div>
 
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-outline-primary btn-sm rounded-3 px-2.5 py-1.5 btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" style="font-size: 12px; font-weight: 600;">
-                <i class="fas fa-camera me-1"></i> Search by Image
+        <div class="d-flex align-items-center gap-1.5">
+            <button type="button" class="btn btn-outline-primary btn-sm rounded-2 px-2.5 py-1.5 d-inline-flex align-items-center gap-1.5" onclick="event.preventDefault(); window.openImageSearchModal();" style="font-size: 12px; font-weight: 600;">
+                <i class="fas fa-camera text-primary"></i> Search by Image
             </button>
-            <a href="{{ route('admin.global-products.index') }}" class="btn btn-primary btn-sm rounded-3 px-2.5 py-1.5" style="font-size: 12px; font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;">
+            <a href="{{ route('admin.global-products.index') }}" class="btn btn-primary btn-sm rounded-2 px-2.5 py-1.5" style="font-size: 12px; font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;">
                 <i class="fas fa-globe me-1"></i> Global Wholesale Products
             </a>
         </div>
@@ -264,11 +264,11 @@
                 <!-- Search & Filters -->
                 <form action="{{ route('admin.wholesale-orders.index') }}" method="GET" class="d-flex flex-wrap align-items-center gap-1.5 m-0">
                     <input type="hidden" name="tab" value="{{ $tab ?? 'purchases' }}">
-                    <div class="input-group input-group-sm" style="width: 260px;">
+                    <div class="input-group input-group-sm" style="width: 250px;">
                         <span class="input-group-text bg-light border-end-0 py-1"><i class="fas fa-search text-muted" style="font-size: 11px;"></i></span>
-                        <input type="text" name="search" class="form-control border-start-0 py-1" style="font-size: 12px;" placeholder="Search order #, TrxID..." value="{{ request('search') }}">
-                        <button type="button" class="btn btn-outline-primary py-1 btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" title="Search Product by Image or Camera">
-                            <i class="fas fa-camera"></i>
+                        <input type="text" name="search" class="form-control border-start-0 border-end-0 py-1" style="font-size: 12px;" placeholder="Search order #, TrxID..." value="{{ request('search') }}">
+                        <button type="button" class="btn btn-outline-secondary bg-white border-start-0 py-1 px-2.5" onclick="event.preventDefault(); window.openImageSearchModal();" title="Search Product by Image or Camera">
+                            <i class="fas fa-camera text-primary" style="font-size: 12px;"></i>
                         </button>
                     </div>
 

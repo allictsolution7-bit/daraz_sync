@@ -264,7 +264,7 @@
     </div>
 
     <div class="d-flex align-items-center gap-2">
-        <button type="button" class="btn btn-outline-primary px-3 py-2 btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" title="Search Product by Image or Camera">
+        <button type="button" class="btn btn-outline-primary px-3 py-2" onclick="event.preventDefault(); window.openImageSearchModal();" title="Search Product by Image or Camera">
             <i class="fas fa-camera me-1.5"></i> Search by Image
         </button>
         @can('vendor.products.create')

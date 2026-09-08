@@ -663,7 +663,7 @@
                 <a href="{{route ('admin.items.create')}}" class="btn-modern btn-modern-primary">
                     <i class="fas fa-plus"></i> Add Product
                 </a>
-                <button type="button" class="btn-modern btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);">
+                <button type="button" class="btn-modern" onclick="event.preventDefault(); window.openImageSearchModal();" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);">
                     <i class="fas fa-camera"></i> Visual Image Search
                 </button>
                 <a href="{{ route('admin.global-products.index') }}" class="btn-modern" style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: #ffffff; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);">

@@ -3,7 +3,7 @@
    =================================================== */
 
 /* Camera / Lens Button inside Search Bars */
-.btn-image-search-trigger {
+.btn-image-search-trigger:not(.btn):not(.btn-modern) {
     background: transparent;
     border: none;
     cursor: pointer;
@@ -20,19 +20,19 @@
     z-index: 5;
 }
 
-.btn-image-search-trigger:hover {
+.btn-image-search-trigger:not(.btn):not(.btn-modern):hover {
     color: var(--primary-color, #2563eb);
     background: rgba(37, 99, 235, 0.08);
     transform: scale(1.1);
 }
 
-.btn-image-search-trigger svg {
+.btn-image-search-trigger:not(.btn):not(.btn-modern) svg {
     width: 20px;
     height: 20px;
     transition: transform 0.2s ease;
 }
 
-.btn-image-search-trigger:hover svg {
+.btn-image-search-trigger:not(.btn):not(.btn-modern):hover svg {
     transform: rotate(-8deg);
 }
 

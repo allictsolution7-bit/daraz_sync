@@ -5,25 +5,25 @@
     .global-header-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 1.25rem 1.5rem;
-        margin-bottom: 1.25rem;
+        border-radius: 12px;
+        padding: 0.85rem 1.25rem;
+        margin-bottom: 1rem;
         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
     }
 
     .nav-tabs-modern {
         background: #f1f5f9;
-        padding: 4px;
-        border-radius: 12px;
+        padding: 3px;
+        border-radius: 8px;
         border: none;
         display: inline-flex;
     }
 
     .nav-tabs-modern .nav-link {
-        border-radius: 8px;
-        padding: 8px 18px;
+        border-radius: 6px;
+        padding: 5px 12px;
         font-weight: 600;
-        font-size: 0.875rem;
+        font-size: 12px;
         color: #64748b;
         border: none;
         transition: all 0.2s ease;
@@ -32,7 +32,7 @@
     .nav-tabs-modern .nav-link.active {
         background: #4f46e5;
         color: #ffffff;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
     }
 
     .table-modern {
@@ -277,32 +277,32 @@
 @endphp
 <div class="container-fluid py-4" style="max-width: 1600px;">
     <!-- Header Block -->
-    <div class="global-header-card d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="global-header-card d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div>
             <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge rounded-pill px-2.5 py-1" style="background-color: #e0e7ff; color: #4338ca; font-weight: 700; font-size: 11px;">
+                <span class="badge rounded-pill px-2 py-0.5" style="background-color: #e0e7ff; color: #4338ca; font-weight: 700; font-size: 10px;">
                     <i class="fas fa-globe me-1"></i> GLOBAL NETWORK
                 </span>
                 <span class="text-muted small">&bull;</span>
-                <span class="text-muted small">SaaS Multi-Store Wholesale Network</span>
+                <span class="text-muted small" style="font-size: 11.5px;">SaaS Multi-Store Wholesale Network</span>
             </div>
-            <h1 class="h3 mb-0 text-slate-800 font-bold" style="font-weight: 700; color: #1e293b;">
+            <h1 class="h5 mb-0 text-slate-800 font-bold" style="font-weight: 700; color: #1e293b;">
                 Global Wholesale Products
             </h1>
-            <p class="text-muted mb-0 small mt-1">
+            <p class="text-muted mb-0 small mt-0.5" style="font-size: 12px;">
                 Browse and copy all products from the global SaaS platform network directly into your store's inventory catalog.
             </p>
         </div>
 
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-primary btn-sm rounded-3 px-3 py-2 btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" style="font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;">
-                <i class="fas fa-camera me-1.5"></i> Search by Image
+        <div class="d-flex align-items-center gap-1.5">
+            <button type="button" class="btn btn-outline-primary btn-sm rounded-2 px-2.5 py-1.5 d-inline-flex align-items-center gap-1.5" onclick="event.preventDefault(); window.openImageSearchModal();" style="font-weight: 600; font-size: 12px;">
+                <i class="fas fa-camera text-primary"></i> Search by Image
             </button>
-            <a href="{{ route('admin.wholesale-orders.index') }}" class="btn btn-outline-primary btn-sm rounded-3 px-3 py-2" style="font-weight: 600;">
-                <i class="fas fa-receipt me-1.5"></i> My Wholesale Orders
+            <a href="{{ route('admin.wholesale-orders.index') }}" class="btn btn-outline-primary btn-sm rounded-2 px-2.5 py-1.5" style="font-weight: 600; font-size: 12px;">
+                <i class="fas fa-receipt me-1"></i> My Wholesale Orders
             </a>
-            <a href="{{ route('admin.items.index') }}" class="btn btn-outline-secondary btn-sm rounded-3 px-3 py-2" style="font-weight: 600;">
-                <i class="fas fa-arrow-left me-1.5"></i> Back to Store Inventory
+            <a href="{{ route('admin.items.index') }}" class="btn btn-outline-secondary btn-sm rounded-2 px-2.5 py-1.5" style="font-weight: 600; font-size: 12px;">
+                <i class="fas fa-arrow-left me-1"></i> Back to Store Inventory
             </a>
         </div>
     </div>
@@ -318,15 +318,15 @@
     @endif
 
     <!-- Tabs & Filter Bar -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-body p-3">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="card border-0 shadow-sm rounded-3 mb-3">
+        <div class="card-body p-2 px-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <!-- Navigation Header / Tab -->
                 <ul class="nav nav-tabs-modern" role="tablist">
                     <li class="nav-item" role="presentation">
                         <span class="nav-link active">
-                            <i class="fas fa-user-shield me-1.5"></i> Tenant Admin Products
-                            <span class="badge ms-1.5 bg-white text-primary" style="font-size: 11px;">
+                            <i class="fas fa-user-shield me-1"></i> Tenant Admin Products
+                            <span class="badge ms-1 bg-white text-primary" style="font-size: 10px;">
                                 {{ $totalAdminCount }}
                             </span>
                         </span>
@@ -337,17 +337,17 @@
                 <form action="{{ route('admin.global-products.index') }}" method="GET" class="d-flex flex-wrap align-items-center gap-2 m-0">
                     <input type="hidden" name="tab" value="{{ $currentTab }}">
                     
-                    <div class="input-group input-group-sm" style="width: 280px;">
-                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" name="search" class="form-control border-start-0" placeholder="Search products..." value="{{ request('search') }}">
-                        <button type="button" class="btn btn-outline-primary btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" title="Search by Product Image or Camera">
-                            <i class="fas fa-camera"></i>
+                    <div class="input-group input-group-sm" style="width: 220px;">
+                        <span class="input-group-text bg-light border-end-0 py-1"><i class="fas fa-search text-muted" style="font-size: 11px;"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0 border-end-0 py-1" style="font-size: 12px;" placeholder="Search products..." value="{{ request('search') }}">
+                        <button type="button" class="btn btn-outline-secondary bg-white border-start-0 py-1 px-2.5" onclick="event.preventDefault(); window.openImageSearchModal();" title="Search by image or camera">
+                            <i class="fas fa-camera text-primary" style="font-size: 12px;"></i>
                         </button>
                     </div>
 
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-1.5">
                         @if($isSuperAdmin)
-                        <select name="tenant_id" class="form-select form-select-sm rounded-3" style="min-width: 200px;" onchange="this.form.submit()">
+                        <select name="tenant_id" class="form-select form-select-sm rounded-2 py-1" style="min-width: 170px; font-size: 12px;" onchange="this.form.submit()">
                             <option value="">All SaaS Tenants</option>
                             @foreach($tenants as $tenant)
                                 <option value="{{ $tenant->id }}" {{ $selectedTenantId == $tenant->id ? 'selected' : '' }}>
@@ -357,10 +357,10 @@
                         </select>
                         @endif
                         
-                        <button type="submit" class="btn btn-sm btn-primary rounded-3 text-nowrap">
+                        <button type="submit" class="btn btn-sm btn-primary rounded-2 py-1 px-2.5 text-nowrap" style="font-size: 12px;">
                             <i class="fas fa-filter me-1"></i> Filter
                         </button>
-                        <a href="{{ route('admin.global-products.index', ['tab' => $currentTab]) }}" class="btn btn-sm btn-light rounded-3 text-nowrap" style="background-color: #f1f5f9; color: #475569; border: none;">
+                        <a href="{{ route('admin.global-products.index', ['tab' => $currentTab]) }}" class="btn btn-sm btn-light rounded-2 py-1 px-2.5 text-nowrap" style="background-color: #f1f5f9; color: #475569; border: none; font-size: 12px;">
                             <i class="fas fa-redo me-1"></i> Reset
                         </a>
                     </div>
@@ -372,20 +372,20 @@
     <!-- Bulk Action & Status Bar -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 px-1">
         <div class="d-flex align-items-center gap-2">
-            <button type="button" id="btn-bulk-import" class="btn btn-sm btn-light border rounded-3 px-3.5 py-2 shadow-sm font-semibold d-inline-flex align-items-center gap-2" style="font-weight: 600; background-color: #f5f3ff; border-color: #ddd6fe !important; color: #4f46e5 !important;" disabled onclick="openBulkImportModal()">
+            <button type="button" id="btn-bulk-import" class="btn btn-sm btn-light border rounded-2 px-2.5 py-1 shadow-sm font-semibold d-inline-flex align-items-center gap-1.5" style="font-size: 12px; font-weight: 600; background-color: #f5f3ff; border-color: #ddd6fe !important; color: #4f46e5 !important;" disabled onclick="openBulkImportModal()">
                 <i class="fas fa-file-import"></i> Import Selected (<span id="selected-import-count">0</span>)
             </button>
-            <button type="button" id="btn-bulk-purchase" class="btn btn-primary btn-sm rounded-3 px-3.5 py-2 shadow-sm font-semibold d-inline-flex align-items-center gap-2" style="font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;" disabled onclick="openBulkPurchaseModal()">
+            <button type="button" id="btn-bulk-purchase" class="btn btn-primary btn-sm rounded-2 px-2.5 py-1 shadow-sm font-semibold d-inline-flex align-items-center gap-1.5" style="font-size: 12px; font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;" disabled onclick="openBulkPurchaseModal()">
                 <i class="fas fa-cart-shopping"></i> Purchase Selected (<span id="selected-purchase-count">0</span>)
             </button>
-            <span class="text-muted small ms-2">
+            <span class="text-muted small ms-2" style="font-size: 12px;">
                 Showing {{ $paginatedProducts->firstItem() ?? 0 }} - {{ $paginatedProducts->lastItem() ?? 0 }} of {{ $paginatedProducts->total() }} global products
             </span>
         </div>
 
         <div>
             @if($globalCommission > 0)
-                <span class="badge px-3 py-2 rounded-3" style="background-color: rgba(16, 185, 129, 0.1); color: #047857; font-weight: 600;">
+                <span class="badge px-2.5 py-1.5 rounded-2" style="background-color: rgba(16, 185, 129, 0.1); color: #047857; font-weight: 600; font-size: 11px;">
                     <i class="fas fa-percent me-1"></i> Platform Wholesale Commission: <strong>{{ $globalCommission }}%</strong>
                 </span>
             @endif
