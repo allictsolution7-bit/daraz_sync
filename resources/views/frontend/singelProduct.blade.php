@@ -2056,10 +2056,17 @@ if ($product->product_type === 'variable') {
                         {{ $percentOff }}%<br>ছাড়
                     </div>
                 @endif
-                    <figure class="zoom w-full h-full" onmousemove="zoom(event)"
+                    <figure class="zoom w-full h-full relative" onmousemove="zoom(event)"
                         style="background-image: url('{{ asset('storage/' . $product->thumb_image) }}')">
                         <img id="main-product-image" class="w-full h-full object-cover" src="{{ asset('storage/' . $product->thumb_image) }}"
                             alt="{{ $product->title }}">
+                        <button type="button" class="btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" style="position: absolute; bottom: 12px; right: 12px; background: rgba(255,255,255,0.92); backdrop-filter: blur(4px); border-radius: 20px; padding: 6px 12px; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #1e293b; box-shadow: 0 4px 12px rgba(0,0,0,0.12); z-index: 10; border: 1px solid rgba(0,0,0,0.06); cursor: pointer;" title="Find Similar Products by Image">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            <span>Find Similar</span>
+                        </button>
                     </figure>
             </div>
 

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/responsive.css') }}">
     <link rel="stylesheet" href="{{ asset('css/combo-offer.css') }}">
+    <link rel="stylesheet" href="{{ asset('new/image-search.css') }}">
 
     <!-- Push styles section -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -3200,8 +3201,8 @@
         }
     });
     </script>
-    <!-- Instant.page: Preload links on hover/touch for instant page transitions -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.2.0/instantpage.min.js" type="module" defer></script>
+    @include('frontend.partials.image-search-modal')
+    <script src="{{ asset('new/image-search.js') }}"></script>
 </body>
 
 </html>

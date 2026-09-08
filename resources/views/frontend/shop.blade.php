@@ -1023,6 +1023,13 @@
                         </svg>
                         Clear All Filters
                     </button>
+                    <button type="button" class="btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 13px; font-weight: 600; color: #1e293b; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" title="Search by Image or Camera">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        <span>Search by Image</span>
+                    </button>
                     <select name="sort" id="sort" class="sort-select">
                         <option value="latest" @if ($sort_value === 'latest') selected @endif>Latest</option>
                         <option value="price_desc" @if ($sort_value === 'price_desc') selected @endif>Price High to Low</option>

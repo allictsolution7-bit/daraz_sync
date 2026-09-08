@@ -567,6 +567,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="{{ setting('general', 'site_name', 'Best Shop') }}">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
+    <link rel="stylesheet" href="{{ asset('new/image-search.css') }}">
     {{-- <link rel="stylesheet" href="{{ asset('new/style.css') }}"> --}}
     {{-- Main Root css --}}
     <style>
@@ -1609,6 +1610,12 @@
 
                 <div class="search-bar">
                     <input type="text" id="header-v1-search-input" placeholder="What are you looking for?">
+                    <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </button>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="search-icon">
                         <path
                             d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
@@ -1985,6 +1992,12 @@
 
                 <div class="search-bar">
                     <input type="text" id="search-input" placeholder="Search Your Product Here...">
+                    <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </button>
                     <button type="button" class="search-btn">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="10"
@@ -2123,6 +2136,12 @@
         </style>
         <div class="search-bar-mobile">
             <input type="text" id="mobile-search-input-1" placeholder="Search Your Product Here...">
+            <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+            </button>
             <button type="button" class="search-btn">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10"
@@ -2478,6 +2497,12 @@
                     </select>
                     <input type="text" id="main-search-input" placeholder="Search for Products"
                         style="border: none; outline: none; background: transparent; padding: 13px 15px; font-size: 14px; color: #666; width: 100%; border-radius: 0;">
+                    <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </button>
                     <button type="button" class="search-btn"
                         style="border: none; outline: none; background: var(--primary-color); border-radius: 50%; width: 56px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-right: 2px; margin-left: 0;">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -2587,6 +2612,12 @@
         </style>
         <div class="search-bar-mobile">
             <input type="text" id="mobile-search-input-1" placeholder="Search Your Product Here...">
+            <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+            </button>
             <button type="button" class="search-btn">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10"
@@ -3331,6 +3362,12 @@
                 <div class="search-bar">
                     <input type="text" id="header-search-input"
                         placeholder="Search Your Product Here...">
+                    <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </button>
                     <button type="button" class="search-btn" style="background: #1e293b;">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="10"
@@ -3559,6 +3596,12 @@
 	        <div class="search-bar-mobile">
 	            <input type="text" id="mobile-search-input-1"
 	                placeholder="Search Your Product Here...">
+            <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+            </button>
             <button type="button" class="search-btn">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10"
@@ -3928,6 +3971,12 @@
 	                        <div class="search-bar">
 	                            <input type="text" id="header-search-input"
 	                                placeholder="Search Your Product Here...">
+	                            <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+	                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+	                                    <circle cx="12" cy="13" r="4"></circle>
+	                                </svg>
+	                            </button>
 	                            <button type="button" class="search-btn" aria-label="Search">
 	                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
 	                                    <circle cx="12" cy="12" r="10"
@@ -4044,6 +4093,12 @@
 	        <div class="search-bar-mobile">
 	            <input type="text" id="mobile-search-input-1"
 	                placeholder="Search Your Product Here...">
+	            <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+	                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+	                    <circle cx="12" cy="13" r="4"></circle>
+	                </svg>
+	            </button>
 	            <button type="button" class="search-btn">
 	                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
 	                    <circle cx="12" cy="12" r="10"
@@ -5352,6 +5407,12 @@
 
         <div class="mobile-search">
             <input type="text" placeholder="Search here..." id="mobile-search-input">
+            <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+            </button>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="search-icon">
                 <path
                     d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
@@ -8464,6 +8525,8 @@
     </script>
     @endif
 
+    @include('frontend.partials.image-search-modal')
+    <script src="{{ asset('new/image-search.js') }}"></script>
 </body>
 
 </html>

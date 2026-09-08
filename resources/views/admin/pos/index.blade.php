@@ -988,6 +988,9 @@
                             </span>
                             <input type="text" class="form-control" id="productSearch" 
                                    placeholder="Search products by title, SKU, or barcode...">
+                            <button type="button" class="btn btn-outline-primary btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" title="Search Product by Image or Camera">
+                                <i class="fas fa-camera"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="col-md-5 col-12 text-end d-flex align-items-center justify-content-end gap-1">

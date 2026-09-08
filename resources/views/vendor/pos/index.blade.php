@@ -392,6 +392,9 @@
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="fas fa-search text-muted"></i></span>
                             <input type="text" class="form-control" id="productSearch" placeholder="Search admin catalog products...">
+                            <button type="button" class="btn btn-outline-primary btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" title="Search Product by Image or Camera">
+                                <i class="fas fa-camera"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="col-md-3 col-4">

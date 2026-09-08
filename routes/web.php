@@ -153,6 +153,8 @@ Route::get('/order/{order}/print-steadfast-invoice', [App\Http\Controllers\Order
 Route::post('/shop/filter', [OthersController::class, 'shopFilter'])->name("shop.filter");
 Route::get('/product/{id}/{slug}', [ProductController::class, 'index'])->name('product.single');
 Route::get('/search/ajax', [SearchController::class, 'ajaxSearch'])->name('search.ajax');
+Route::post('/search/image', [\App\Http\Controllers\ImageSearchController::class, 'search'])->name('search.image');
+Route::get('/search/image/rebuild', [\App\Http\Controllers\ImageSearchController::class, 'rebuildHashes'])->name('search.image.rebuild');
 Route::post('/ajax/load-latest-products', [OthersController::class, 'loadLatestProducts'])->name('ajax.load-latest-products');
 Route::match(['get', 'post'], '/ajax/mega-category-products', [OthersController::class, 'loadMegaCategoryProducts'])->name('ajax.mega-category-products');
 Route::post('/api/products/{product}/view', [App\Http\Controllers\Client\ProductController::class, 'trackView'])->name('products.view');

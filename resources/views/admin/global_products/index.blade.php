@@ -295,6 +295,9 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-primary btn-sm rounded-3 px-3 py-2 btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" style="font-weight: 600; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;">
+                <i class="fas fa-camera me-1.5"></i> Search by Image
+            </button>
             <a href="{{ route('admin.wholesale-orders.index') }}" class="btn btn-outline-primary btn-sm rounded-3 px-3 py-2" style="font-weight: 600;">
                 <i class="fas fa-receipt me-1.5"></i> My Wholesale Orders
             </a>
@@ -334,9 +337,12 @@
                 <form action="{{ route('admin.global-products.index') }}" method="GET" class="d-flex flex-wrap align-items-center gap-2 m-0">
                     <input type="hidden" name="tab" value="{{ $currentTab }}">
                     
-                    <div class="input-group input-group-sm" style="width: 240px;">
+                    <div class="input-group input-group-sm" style="width: 280px;">
                         <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
                         <input type="text" name="search" class="form-control border-start-0" placeholder="Search products..." value="{{ request('search') }}">
+                        <button type="button" class="btn btn-outline-primary btn-image-search-trigger" onclick="event.preventDefault(); window.openImageSearchModal();" title="Search by Product Image or Camera">
+                            <i class="fas fa-camera"></i>
+                        </button>
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
