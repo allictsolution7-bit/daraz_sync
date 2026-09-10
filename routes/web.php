@@ -751,6 +751,13 @@ Route::prefix('admin')->middleware(['auth', 'license', 'authorize.by_route', 'Tr
         Route::post('/test', [\App\Http\Controllers\Admin\TelegramSettingController::class, 'test'])->name('test');
     });
 
+    // SMS Gateway & Event Notification Settings
+    Route::prefix('sms-settings')->name('sms-settings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\SmsSettingController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\SmsSettingController::class, 'update'])->name('update');
+        Route::post('/test', [\App\Http\Controllers\Admin\SmsSettingController::class, 'test'])->name('test');
+    });
+
     // Delayed Purchase Events Settings
     Route::prefix('event-queue')->name('delayed-events.')->group(function () {
         Route::get('/settings', [\App\Http\Controllers\DelayedEventSettingController::class, 'index'])->name('settings');

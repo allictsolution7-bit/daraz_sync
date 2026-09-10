@@ -31,6 +31,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('backup:cleanup')
                  ->dailyAt('02:00')
                  ->onOneServer();
+
+        // Check Admin subscription/license expiration and dispatch SMS alert
+        $schedule->command('sms:check-admin-expiry')
+                 ->dailyAt('09:00')
+                 ->withoutOverlapping();
     }
 
     /**

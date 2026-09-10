@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\order;
 use App\Services\VendorService;
+use App\Services\SMSService;
 use Illuminate\Support\Facades\Log;
 
 class OrderObserver
@@ -28,6 +29,9 @@ class OrderObserver
         // Try to assign vendor data if items exist
         // This will gracefully return if no items are found
         $this->assignVendorDataToOrderItems($order);
+
+        // Send Product Sold SMS notification to customer if enabled in settings
+        $this->sendOrderSmsNotifications($order);
     }
     
     /**
@@ -67,6 +71,23 @@ class OrderObserver
         } elseif (!$isCurrentlyEligible && $wasEligible) {
             // Transitioned away from eligible -> Reverse earnings
             $this->reverseVendorEarnings($order);
+        }
+
+        // Send Order Status Update SMS if status changed and option is enabled in settings
+        if ($statusChanged && !empty($order->phone)) {
+            try {
+                $smsService = app(SMSService::class);
+                $smsService->sendEventSMS('order_status', $order->phone, [
+                    'customer_name' => $order->name,
+                    'order_id' => $order->id,
+                    'status' => ucfirst($order->status),
+                ]);
+            } catch (\Throwable $e) {
+                Log::error("OrderObserver: Failed to dispatch order status SMS", [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
 
@@ -192,6 +213,39 @@ class OrderObserver
             ]);
         } catch (\Exception $e) {
             Log::error("Failed to reverse vendor earnings for order", [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Send Product Sold SMS notification to customer if enabled in settings
+     */
+    protected function sendOrderSmsNotifications(order $order): void
+    {
+        try {
+            if (empty($order->phone)) {
+                return;
+            }
+
+            // Determine if order belongs to a specific vendor/portal
+            $senderUserId = null;
+            if ($order->relationLoaded('orderItems') && $order->orderItems && $order->orderItems->isNotEmpty()) {
+                $vendorId = $order->orderItems->first()->product?->vendor_id;
+                if ($vendorId) {
+                    $senderUserId = $vendorId;
+                }
+            }
+
+            $smsService = app(SMSService::class);
+            $smsService->sendEventSMS('product_sold', $order->phone, [
+                'customer_name' => $order->name,
+                'order_id' => $order->id,
+                'total_amount' => $order->total_with_charge ?: $order->total,
+            ], $senderUserId);
+        } catch (\Throwable $e) {
+            Log::error("OrderObserver: Failed to send product sold SMS", [
                 'order_id' => $order->id,
                 'error' => $e->getMessage(),
             ]);

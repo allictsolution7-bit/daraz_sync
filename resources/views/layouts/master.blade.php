@@ -1082,7 +1082,7 @@
         $ordersSalesActive = request()->is('admin/transactions*') || request()->is('admin/my-assignments*') || request()->is('admin/vendor-orders*') || request()->is('admin/reseller-orders*') || request()->is('admin/pending-queue*') || request()->is('admin/pos*') || request()->is('admin/customers*');
         $shippingDeliveryActive = request()->is('admin/shipping-basics*') || request()->is('admin/delivery-zones/rules*') || request()->is('admin/courier-connect*');
         $reportsAnalyticsActive = request()->routeIs('admin.orders.reports*') || request()->routeIs('admin.customers.reports*');
-        $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/import-woo*') || request()->routeIs('admin.telegram-settings.*') || request()->is('admin/event-queue*');
+        $integrationsSyncActive = request()->is('admin/daraz*') || request()->is('admin/import-woo*') || request()->routeIs('admin.telegram-settings.*') || request()->routeIs('admin.sms-settings.*') || request()->is('admin/event-queue*');
         $securityTrustActive = request()->is('admin/trust-scanner*') || request()->is('admin/trust-shield*') || request()->is('admin/snapshots*');
         $contentPagesActive = request()->is('admin/hero-banners*') || request()->is('admin/site-pages*') || request()->is('admin/nav-builder*') || request()->is('admin/articles*') || request()->is('admin/article-topics*') || request()->is('admin/article-subtopics*') || request()->is('admin/comments*');
         $vendorsActive = request()->is('admin/vendors*') || request()->is('admin/vendor-products*') || request()->is('admin/vendor-withdrawals*') || request()->is('admin/vendor-payments*') || request()->is('admin/vendor-settings*') || request()->is('admin/partners*') || request()->is('admin/partner-items*') || request()->is('admin/partner-payouts*') || request()->is('admin/partner-config*') || request()->is('admin/partner-earnings*');
@@ -1941,6 +1941,17 @@
                                     </a>
                                 </li>
                                 @endcan
+
+                                @if(auth()->user() && (auth()->user()->isAdmin() || auth()->user()->isVendor() || auth()->user()->can('settings.view')))
+                                <li class="{{ request()->routeIs('admin.sms-settings.*') ? 'active' : '' }}">
+                                    <a href="{{ route('admin.sms-settings.index') }}">
+                                        <span class="menu-content">
+                                            <i class="fas fa-comment-sms text-primary"></i>
+                                            SMS Gateway & Alerts
+                                        </span>
+                                    </a>
+                                </li>
+                                @endif
 
                                 <li class="{{ request()->routeIs('admin.google-sheets.*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.google-sheets.index') }}">
