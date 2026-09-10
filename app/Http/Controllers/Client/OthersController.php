@@ -160,7 +160,7 @@ class OthersController extends Controller
                             }
                         })
                         ->orderBy('created_at', 'desc')
-                        ->limit(6)
+                        ->limit(12)
                         ->get();
 
                     $catProductGroups = [
@@ -179,7 +179,7 @@ class OthersController extends Controller
                                     });
                             })
                             ->orderBy('created_at', 'desc')
-                            ->limit(6)
+                            ->limit(12)
                             ->get();
 
                         $catProductGroups[$sub->id] = $subProducts;

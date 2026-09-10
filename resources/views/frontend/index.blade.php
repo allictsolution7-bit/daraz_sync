@@ -996,15 +996,21 @@
             }
 
             .mega-products {
-                margin-top: 10px;
-                padding-top: 4px;
+                flex: 1;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                margin-top: 6px;
+                padding-top: 2px;
             }
 
             .mega-products-header {
+                flex-shrink: 0;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                margin-bottom: 12px;
+                margin-bottom: 10px;
             }
 
             .mega-header-title-wrap {
@@ -1044,10 +1050,45 @@
                 box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
             }
 
+            .mega-products-container {
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 6px;
+                padding-bottom: 10px;
+                scrollbar-width: thin;
+                scrollbar-color: #cbd5e1 #f8fafc;
+            }
+
+            .mega-products-container::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .mega-products-container::-webkit-scrollbar-track {
+                background: #f8fafc;
+                border-radius: 6px;
+            }
+
+            .mega-products-container::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 6px;
+            }
+
+            .mega-products-container::-webkit-scrollbar-thumb:hover {
+                background: var(--primary-color, #2563eb);
+            }
+
             .mega-products-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-                gap: 12px;
+                grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+                gap: 10px;
+                align-content: start;
+                width: 100%;
+            }
+
+            .mega-products-grid > .mega-products-grid {
+                display: contents !important;
             }
 
             .mega-product-card {
@@ -1343,6 +1384,8 @@
                 top: 0;
                 left: calc(260px + 12px);
                 right: 0;
+                height: 100%;
+                max-height: {{ $sliderHeight }}px;
                 min-height: {{ $sliderHeight }}px;
                 background: #ffffff;
                 border: 1px solid #e2e8f0;
@@ -1352,6 +1395,8 @@
                 display: none;
                 z-index: 50;
                 animation: megaFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                box-sizing: border-box;
+                overflow: hidden;
             }
 
             @keyframes megaFadeIn {
@@ -1364,10 +1409,13 @@
             }
 
             .slider-mega-panel {
-                display: flex;
+                display: none;
                 flex-direction: column;
+                height: 100%;
+                max-height: 100%;
                 gap: 10px;
                 pointer-events: auto;
+                overflow: hidden;
             }
 
             .slider-mega-col {
@@ -1970,6 +2018,7 @@
                                         grid.classList.remove('active');
                                     }
                                 });
+                                container.scrollTop = 0;
                             }
                         }
 
