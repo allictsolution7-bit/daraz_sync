@@ -66,13 +66,13 @@
                                 <svg class="star-icon filled" viewBox="0 0 24 24" width="14" height="14">
                                     <path
                                         d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                                        fill="#1e3a8a" />
+                                        fill="#f59e0b" />
                                 </svg>
                             @elseif($i <= $averageRating + 0.5 && $averageRating > 0)
                                 <svg class="star-icon half-filled" viewBox="0 0 24 24" width="14" height="14">
                                     <defs>
                                         <linearGradient id="halfStarCard{{ $product->id }}{{ $i }}">
-                                            <stop offset="50%" stop-color="#1e3a8a" />
+                                            <stop offset="50%" stop-color="#f59e0b" />
                                             <stop offset="50%" stop-color="#e5e7eb" />
                                         </linearGradient>
                                     </defs>
@@ -250,17 +250,17 @@
 </script>
 
 <style>
-    /* Card Container & Permanent Template Borders */
+    /* Card Container & Refined Template Borders */
     .product-card {
         position: relative !important;
         display: flex !important;
         flex-direction: column !important;
         border-radius: 14px !important;
         background: #ffffff !important;
-        border: 1.5px solid #e2e8f0 !important;
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-        padding-bottom: 22px !important;
-        margin-bottom: 22px !important;
+        border: 1px solid #e5e7eb !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 20px !important;
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease !important;
         text-decoration: none !important;
         overflow: visible !important;
@@ -282,9 +282,112 @@
     }
     
     .product-card:hover {
-        transform: translateY(-6px) !important;
-        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12) !important;
-        border-color: #2563eb !important;
+        transform: translateY(-4px) !important;
+        box-shadow: 0 10px 28px rgba(11, 77, 60, 0.12) !important;
+        border-color: #0b4d3c !important;
+    }
+
+    .product-card .product-image {
+        position: relative !important;
+        width: 100% !important;
+        aspect-ratio: 1 / 1 !important;
+        height: auto !important;
+        min-height: 220px !important;
+        background: #ffffff !important;
+        border-radius: 12px 12px 0 0 !important;
+        overflow: hidden !important;
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        flex-shrink: 0 !important;
+    }
+
+    .product-card .product-image .position-relative {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        overflow: hidden !important;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .product-card .product-image img,
+    .product-card .product-image .product-image-loaded {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: cover !important;
+        object-position: center !important;
+        display: block !important;
+        border-radius: 12px 12px 0 0 !important;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .product-card:hover .product-image img,
+    .product-card:hover .product-image .product-image-loaded {
+        transform: scale(1.06) !important;
+    }
+
+    .product-card .product-info {
+        padding: 6px 10px 4px !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important;
+    }
+
+    .product-card .product-title {
+        color: #1e293b !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        line-height: 1.35 !important;
+        margin-top: 2px !important;
+        margin-bottom: 3px !important;
+        min-height: 2.7em !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+    .product-card .current-price {
+        color: #0b4d3c !important;
+        font-weight: 700 !important;
+        font-size: 15.5px !important;
+    }
+    .product-card .original-price {
+        color: #94a3b8 !important;
+        font-size: 12px !important;
+        text-decoration: line-through !important;
+    }
+    .product-card .product-card-rating {
+        display: flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        margin: 2px 0 4px 0 !important;
+    }
+    .product-card .product-card-rating .rating-text {
+        color: #64748b !important;
+        font-size: 11.5px !important;
+    }
+    .product-card .star-icon.filled {
+        fill: #f59e0b !important;
+    }
+
+    @media (max-width: 768px) {
+        .product-card .product-image {
+            aspect-ratio: 1 / 1 !important;
+            height: auto !important;
+            min-height: 160px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .product-card .product-image {
+            aspect-ratio: 1 / 1 !important;
+            height: auto !important;
+            min-height: 140px !important;
+        }
     }
 
     /* Template 1 (Default: Classic Marketplace) — Forest Green Theme */
@@ -293,8 +396,8 @@
         border: 1px solid #e5e7eb !important;
         border-radius: 14px !important;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
-        padding-bottom: 18px !important;
-        margin-bottom: 18px !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 20px !important;
     }
     .template-1 .product-card:hover, body[data-hp-template="1"] .product-card:hover {
         background: #ffffff !important;
@@ -303,14 +406,14 @@
         transform: translateY(-4px) !important;
     }
     .template-1 .product-card .product-title, body[data-hp-template="1"] .product-card .product-title {
-        color: #0f172a !important;
+        color: #1e293b !important;
         font-weight: 600 !important;
         font-size: 13.5px !important;
     }
     .template-1 .product-card .current-price, body[data-hp-template="1"] .product-card .current-price {
         color: #0b4d3c !important;
         font-weight: 700 !important;
-        font-size: 15px !important;
+        font-size: 15.5px !important;
     }
     .template-1 .product-card .original-price, body[data-hp-template="1"] .product-card .original-price {
         color: #94a3b8 !important;
@@ -427,27 +530,27 @@
         justify-content: center !important;
         gap: 6px !important;
         width: 100% !important;
-        padding: 7.5px 15px !important;
-        background: linear-gradient(135deg, #ff3366 0%, #ff6b35 100%) !important;
+        padding: 8px 14px !important;
+        background: #0b4d3c !important;
         color: #ffffff !important;
         border: none !important;
-        border-radius: 24px !important;
-        font-size: 11.5px !important;
-        font-weight: 800 !important;
+        border-radius: 8px !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
         cursor: pointer !important;
-        box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4), 0 2px 6px rgba(255, 107, 53, 0.25) !important;
+        box-shadow: 0 4px 14px rgba(11, 77, 60, 0.28) !important;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.6px !important;
+        letter-spacing: 0.4px !important;
         text-decoration: none !important;
         position: relative !important;
         overflow: hidden !important;
     }
 
     .btn-card-add-to-cart:hover {
-        background: linear-gradient(135deg, #ff0844 0%, #ff4b2b 100%) !important;
-        transform: translateY(-2px) scale(1.02) !important;
-        box-shadow: 0 6px 22px rgba(255, 8, 68, 0.55), 0 3px 10px rgba(255, 75, 43, 0.4) !important;
+        background: #07392c !important;
+        transform: translateY(-2px) scale(1.01) !important;
+        box-shadow: 0 6px 20px rgba(11, 77, 60, 0.45) !important;
         color: #ffffff !important;
     }
 

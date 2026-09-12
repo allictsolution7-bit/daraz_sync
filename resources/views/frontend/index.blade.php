@@ -974,9 +974,16 @@
                 opacity: 1 !important;
             }
 
+            .mega-subcat-pill-wrapper {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+            }
+
             .mega-subcat-pill .pill-arrow {
                 color: #94a3b8;
                 transition: transform 0.2s ease;
+                margin-left: 1px;
             }
 
             .mega-subcat-pill.active .pill-arrow {
@@ -985,7 +992,167 @@
 
             .mega-subcat-pill:hover .pill-arrow {
                 color: var(--primary-color, #2563eb);
-                transform: translateX(2px);
+                transform: translateY(1px);
+            }
+
+            /* Floating Subcategory Dropdown */
+            .mega-subcat-dropdown {
+                position: absolute;
+                top: calc(100% + 6px);
+                left: 0;
+                min-width: 190px;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15), 0 2px 6px rgba(0, 0, 0, 0.05);
+                padding: 8px;
+                z-index: 999;
+                display: none;
+                opacity: 0;
+                transform: translateY(-4px);
+                transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                pointer-events: auto;
+            }
+
+            .mega-subcat-pill-wrapper:hover .mega-subcat-dropdown {
+                display: block;
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .mega-subcat-dropdown-title {
+                font-size: 10px;
+                font-weight: 800;
+                color: #94a3b8;
+                text-transform: uppercase;
+                letter-spacing: 0.6px;
+                padding: 4px 8px 6px;
+                border-bottom: 1px solid #f1f5f9;
+                margin-bottom: 4px;
+            }
+
+            .mega-subcat-dropdown-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .mega-dropdown-link {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 6px 10px;
+                border-radius: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #334155;
+                text-decoration: none;
+                transition: all 0.15s ease;
+            }
+
+            .mega-dropdown-link:hover {
+                background: #f1f5f9;
+                color: var(--primary-color, #2563eb);
+                padding-left: 13px;
+                text-decoration: none;
+            }
+
+            .dropdown-link-bullet {
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background: var(--primary-color, #2563eb);
+                opacity: 0.6;
+                margin-right: 8px;
+                flex-shrink: 0;
+            }
+
+            .mega-dropdown-all-link {
+                display: block;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--primary-color, #2563eb);
+                text-decoration: none;
+                padding: 6px 10px 4px;
+                border-top: 1px solid #f1f5f9;
+                margin-top: 4px;
+                text-align: right;
+            }
+
+            .mega-dropdown-all-link:hover {
+                text-decoration: underline;
+            }
+
+            /* Contextual Subcategories Bar */
+            .mega-third-cats-bar {
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px dashed #e2e8f0;
+            }
+
+            .mega-third-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .mega-third-tag {
+                font-size: 9.5px;
+                font-weight: 800;
+                color: #64748b;
+                background: #f1f5f9;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 2px 7px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                white-space: nowrap;
+            }
+
+            .mega-third-chips {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+
+            .mega-third-chip {
+                font-size: 11.5px;
+                font-weight: 600;
+                color: #475569;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 3px 10px;
+                text-decoration: none;
+                transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+                white-space: nowrap;
+            }
+
+            .mega-third-chip:hover {
+                border-color: var(--primary-color, #2563eb);
+                color: var(--primary-color, #2563eb);
+                background: #f8fafc;
+                transform: translateY(-1px);
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+                text-decoration: none;
+            }
+
+            .mega-third-chip.active-chip {
+                background: #f1f5f9;
+                font-weight: 700;
+                color: #0f172a;
+            }
+
+            .mega-third-chip .chip-parent {
+                color: #94a3b8;
+                font-size: 10.5px;
+                margin-right: 2px;
             }
 
             .mega-subcats-columns {
@@ -1396,7 +1563,7 @@
                 z-index: 50;
                 animation: megaFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
                 box-sizing: border-box;
-                overflow: hidden;
+                overflow: visible;
             }
 
             @keyframes megaFadeIn {
@@ -1415,7 +1582,7 @@
                 max-height: 100%;
                 gap: 10px;
                 pointer-events: auto;
-                overflow: hidden;
+                overflow: visible;
             }
 
             .slider-mega-col {
@@ -1661,71 +1828,122 @@
                 display: grid;
                 grid-template-columns: 260px 1fr;
                 gap: 16px;
-                align-items: start;
+                align-items: stretch;
+            }
+
+            .t1-side-promo-column {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+                width: 260px;
+                flex-shrink: 0;
+                height: 100%;
             }
 
             .t1-side-promo {
-                background: linear-gradient(150deg, #0b4d3c 0%, #064030 50%, #042e22 100%);
-                border-radius: 18px;
-                padding: 28px 22px;
+                flex: 1;
+                border-radius: 16px;
+                padding: 16px 16px 14px 16px;
                 color: #ffffff;
                 position: relative;
                 overflow: hidden;
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
-                box-shadow: 0 10px 28px rgba(11, 77, 60, 0.18);
+                justify-content: space-between;
+                min-height: 0;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+            }
+
+            .t1-side-promo:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
             }
 
             .t1-side-promo-badge {
                 background: rgba(255, 255, 255, 0.16);
                 border: 1px solid rgba(255, 255, 255, 0.25);
                 backdrop-filter: blur(8px);
-                padding: 4px 12px;
+                padding: 2.5px 9px;
                 border-radius: 20px;
-                font-size: 11px;
+                font-size: 10px;
                 font-weight: 700;
-                letter-spacing: 0.4px;
-                margin-bottom: 18px;
+                letter-spacing: 0.3px;
+                margin-bottom: 5px;
+                display: inline-block;
             }
 
             .t1-side-promo-title {
-                font-size: 22px;
+                font-size: 15.5px;
                 font-weight: 800;
-                line-height: 1.35;
-                margin-bottom: 10px;
+                line-height: 1.25;
+                margin-top: 0;
+                margin-bottom: 2px;
                 color: #ffffff;
             }
 
             .t1-side-promo-sub {
-                font-size: 12px;
-                color: #a7f3d0;
-                margin-bottom: 24px;
+                font-size: 11px;
+                color: rgba(255, 255, 255, 0.88);
+                margin-top: 0;
+                margin-bottom: 4px;
+                line-height: 1.35;
+            }
+
+            .t1-side-promo-tags {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                flex-wrap: wrap;
+                margin-top: 5px;
+                margin-bottom: 4px;
+            }
+
+            .t1-promo-tag {
+                background: rgba(255, 255, 255, 0.16);
+                border: 1px solid rgba(255, 255, 255, 0.22);
+                border-radius: 12px;
+                font-size: 9.5px;
+                font-weight: 600;
+                padding: 1.5px 7px;
+                color: rgba(255, 255, 255, 0.95);
+                display: inline-flex;
+                align-items: center;
+                letter-spacing: 0.2px;
             }
 
             .t1-side-promo-btn {
                 background: #ffffff;
                 color: #0b4d3c !important;
                 font-weight: 800;
-                font-size: 13px;
-                padding: 11px 22px;
+                font-size: 11.5px;
+                padding: 6px 16px;
                 border-radius: 50px;
                 text-decoration: none;
-                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
                 transition: all 0.25s ease;
                 z-index: 2;
+                display: inline-block;
+                margin-top: 6px;
             }
 
+            .t1-side-promo-card-1 .t1-side-promo-btn { color: #0b4d3c !important; }
+            .t1-side-promo-card-2 .t1-side-promo-btn { color: #0f172a !important; }
+            .t1-side-promo-card-3 .t1-side-promo-btn { color: #78350f !important; }
+            .t1-side-promo-card-4 .t1-side-promo-btn { color: #312e81 !important; }
+
             .t1-side-promo-btn:hover {
-                background: #f0fdf4;
+                background: #f8fafc;
                 transform: translateY(-2px);
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+                text-decoration: none;
             }
 
             .t1-side-promo-bag {
                 position: absolute;
-                bottom: -15px;
-                right: -15px;
+                bottom: -10px;
+                right: -10px;
                 color: #ffffff;
                 pointer-events: none;
             }
@@ -1784,7 +2002,8 @@
                 .t1-showcase-grid {
                     grid-template-columns: 1fr;
                 }
-                .t1-side-promo {
+                .t1-side-promo,
+                .t1-side-promo-column {
                     display: none;
                 }
                 .t1-product-card-grid {
@@ -2120,16 +2339,47 @@
                                                     <span class="pill-text">All {{ $item->name }}</span>
                                                 </button>
                                                 @foreach ($item->subCategories as $child)
-                                                    <button type="button" 
-                                                        class="mega-subcat-pill" 
-                                                        data-mega-cat-id="{{ $item->id }}" 
-                                                        data-sub-target="{{ $child->id }}" 
-                                                        data-title="Featured in {{ $child->name }}" 
-                                                        data-url="{{ route('shop', [$item->slug, $child->slug]) }}">
-                                                        <span class="pill-dot"></span>
-                                                        <span class="pill-text">{{ $child->name }}</span>
-                                                        <svg class="pill-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                                                    </button>
+                                                    @php
+                                                        $childThirdCats = $child->thirdCategories ?? collect();
+                                                        $hasChildThird = $childThirdCats->count() > 0;
+                                                    @endphp
+                                                    <div class="mega-subcat-pill-wrapper {{ $hasChildThird ? 'has-third-cats' : '' }}">
+                                                        <button type="button" 
+                                                            class="mega-subcat-pill" 
+                                                            data-mega-cat-id="{{ $item->id }}" 
+                                                            data-sub-target="{{ $child->id }}" 
+                                                            data-title="Featured in {{ $child->name }}" 
+                                                            data-url="{{ route('shop', [$item->slug, $child->slug]) }}">
+                                                            <span class="pill-dot"></span>
+                                                            <span class="pill-text">{{ $child->name }}</span>
+                                                            @if ($hasChildThird)
+                                                                <svg class="pill-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                                                            @endif
+                                                        </button>
+                                                        @if ($hasChildThird)
+                                                            <div class="mega-subcat-dropdown">
+                                                                <div class="mega-subcat-dropdown-title">
+                                                                    <span>{{ $child->name }} Subcategories</span>
+                                                                </div>
+                                                                <ul class="mega-subcat-dropdown-list">
+                                                                    @foreach ($childThirdCats as $grandChild)
+                                                                        <li>
+                                                                            <a href="{{ route('shop', [$item->slug, $child->slug, $grandChild->slug]) }}" class="mega-dropdown-link">
+                                                                                <span style="display: inline-flex; align-items: center;">
+                                                                                    <span class="dropdown-link-bullet"></span>
+                                                                                    <span class="dropdown-link-text">{{ $grandChild->name }}</span>
+                                                                                </span>
+                                                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                                                                            </a>
+                                                                        </li>
+                                                                    @endforeach
+                                                                </ul>
+                                                                <a href="{{ route('shop', [$item->slug, $child->slug]) }}" class="mega-dropdown-all-link">
+                                                                    All {{ $child->name }} &rarr;
+                                                                </a>
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -2138,24 +2388,38 @@
                                             $hasThirdLevel = $item->subCategories->contains(fn($c) => $c->thirdCategories && $c->thirdCategories->count() > 0);
                                         @endphp
                                         @if($hasThirdLevel)
-                                            <div class="mega-subcats-columns">
+                                            <div class="mega-third-cats-bar" id="mega-third-bar-{{ $item->id }}">
+                                                {{-- Contextual third-level categories for "all" --}}
+                                                <div class="mega-third-group active" data-sub-group="all">
+                                                    <span class="mega-third-tag">Subcategories</span>
+                                                    <div class="mega-third-chips">
+                                                        @foreach ($item->subCategories as $child)
+                                                            @if ($child->thirdCategories && $child->thirdCategories->count())
+                                                                @foreach ($child->thirdCategories as $grandChild)
+                                                                    <a href="{{ route('shop', [$item->slug, $child->slug, $grandChild->slug]) }}" class="mega-third-chip">
+                                                                        <span class="chip-parent">{{ $child->name }}:</span> {{ $grandChild->name }}
+                                                                    </a>
+                                                                @endforeach
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+
+                                                {{-- Contextual third-level categories per child subcategory --}}
                                                 @foreach ($item->subCategories as $child)
                                                     @if ($child->thirdCategories && $child->thirdCategories->count())
-                                                        <div class="slider-mega-col">
-                                                            <h4>
-                                                                <a href="{{ route('shop', [$item->slug, $child->slug]) }}" style="color: inherit; text-decoration: none;">
-                                                                    {{ $child->name }}
+                                                        <div class="mega-third-group" data-sub-group="{{ $child->id }}" style="display: none;">
+                                                            <span class="mega-third-tag">{{ $child->name }} Subcategories</span>
+                                                            <div class="mega-third-chips">
+                                                                <a href="{{ route('shop', [$item->slug, $child->slug]) }}" class="mega-third-chip active-chip">
+                                                                    All {{ $child->name }}
                                                                 </a>
-                                                            </h4>
-                                                            <ul>
                                                                 @foreach ($child->thirdCategories as $grandChild)
-                                                                    <li>
-                                                                        <a href="{{ route('shop', [$item->slug, $child->slug, $grandChild->slug]) }}">
-                                                                            {{ $grandChild->name }}
-                                                                        </a>
-                                                                    </li>
+                                                                    <a href="{{ route('shop', [$item->slug, $child->slug, $grandChild->slug]) }}" class="mega-third-chip">
+                                                                        {{ $grandChild->name }}
+                                                                    </a>
                                                                 @endforeach
-                                                            </ul>
+                                                            </div>
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -2341,6 +2605,14 @@
                         panels.forEach(panel => {
                             if (panel.dataset.menuPanel === String(id)) {
                                 panel.style.display = 'flex';
+                                const activePill = panel.querySelector('.mega-subcat-pill.active');
+                                const activeSub = activePill ? activePill.dataset.subTarget : 'all';
+                                const thirdBar = document.getElementById(`mega-third-bar-${id}`);
+                                if (thirdBar) {
+                                    thirdBar.querySelectorAll('[data-sub-group]').forEach(group => {
+                                        group.style.display = (group.dataset.subGroup === activeSub) ? 'flex' : 'none';
+                                    });
+                                }
                             } else {
                                 panel.style.display = 'none';
                             }
@@ -2392,6 +2664,24 @@
                             const viewAllEl = document.getElementById(`mega-view-all-${catId}`);
                             if (titleEl && title) titleEl.textContent = title;
                             if (viewAllEl && url) viewAllEl.setAttribute('href', url);
+
+                            // Switch contextual third-level subcategory chips bar
+                            const thirdBar = document.getElementById(`mega-third-bar-${catId}`);
+                            if (thirdBar) {
+                                let matched = false;
+                                thirdBar.querySelectorAll('[data-sub-group]').forEach(group => {
+                                    if (group.dataset.subGroup === subId) {
+                                        group.style.display = 'flex';
+                                        matched = true;
+                                    } else {
+                                        group.style.display = 'none';
+                                    }
+                                });
+                                if (!matched && subId !== 'all') {
+                                    const allGroup = thirdBar.querySelector('[data-sub-group="all"]');
+                                    if (allGroup) allGroup.style.display = 'flex';
+                                }
+                            }
 
                             const container = document.getElementById(`mega-products-container-${catId}`);
                             if (container) {
@@ -2560,21 +2850,102 @@
     {{-- Template 1 Lower Showcase Section (Image 2 Matching) --}}
     <section class="t1-showcase-section">
         <div class="base-container t1-showcase-grid">
-            {{-- Left Side Promo Card --}}
-            <div class="t1-side-promo">
-                <div class="t1-side-promo-badge">🔥 Exclusive Offer</div>
-                <h3 class="t1-side-promo-title">ঘরে বসেই পছন্দের পণ্য কিনুন এখনই</h3>
-                <p class="t1-side-promo-sub">Order Now & Get Fast Delivery</p>
-                <a href="{{ route('shop') }}" class="t1-side-promo-btn">
-                    Shop Now 🛍️
-                </a>
-                <div class="t1-side-promo-bag">
-                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.15;">
-                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <path d="M16 10a4 4 0 0 1-8 0"></path>
-                    </svg>
-                </div>
+            {{-- Left Side Promo Column with Multiple Admin Configurable Cards --}}
+            <div class="t1-side-promo-column">
+                @php
+                    $t1PromoCards = [
+                        1 => [
+                            'enable' => $homepage['t1_promo_card_1_enable'] ?? '1',
+                            'badge' => $homepage['t1_promo_card_1_badge'] ?? '🔥 Exclusive Offer',
+                            'title' => $homepage['t1_promo_card_1_title'] ?? 'ঘরে বসেই পছন্দের পণ্য কিনুন এখনই',
+                            'sub' => $homepage['t1_promo_card_1_sub'] ?? 'Order Now & Get Fast Delivery',
+                            'tags' => ['⚡ দ্রুত ডেলিভারি', '✓ ক্যাশ অন ডেলিভারি'],
+                            'btn_text' => $homepage['t1_promo_card_1_btn_text'] ?? 'Shop Now 🛍️',
+                            'btn_url' => $homepage['t1_promo_card_1_btn_url'] ?? route('shop'),
+                            'bg_start' => $homepage['t1_promo_card_1_bg_start'] ?? '#0b4d3c',
+                            'bg_end' => $homepage['t1_promo_card_1_bg_end'] ?? '#042e22',
+                            'bg_image' => $homepage['t1_promo_card_1_bg_image'] ?? '',
+                            'icon' => 'bag',
+                        ],
+                        2 => [
+                            'enable' => $homepage['t1_promo_card_2_enable'] ?? '1',
+                            'badge' => $homepage['t1_promo_card_2_badge'] ?? '⭐ Special Collection',
+                            'title' => $homepage['t1_promo_card_2_title'] ?? 'সেরা অফার ও আকর্ষণীয় ডিসকাউন্ট',
+                            'sub' => $homepage['t1_promo_card_2_sub'] ?? 'Limited Time Deals on Top Brands',
+                            'tags' => ['⭐ টপ ব্র্যান্ডস', '🎁 আকর্ষণীয় অফার'],
+                            'btn_text' => $homepage['t1_promo_card_2_btn_text'] ?? 'Explore Deals 🎁',
+                            'btn_url' => $homepage['t1_promo_card_2_btn_url'] ?? route('shop'),
+                            'bg_start' => $homepage['t1_promo_card_2_bg_start'] ?? '#0f172a',
+                            'bg_end' => $homepage['t1_promo_card_2_bg_end'] ?? '#1e293b',
+                            'bg_image' => $homepage['t1_promo_card_2_bg_image'] ?? '',
+                            'icon' => 'star',
+                        ],
+                        3 => [
+                            'enable' => $homepage['t1_promo_card_3_enable'] ?? '1',
+                            'badge' => $homepage['t1_promo_card_3_badge'] ?? '⚡ Mega Savings',
+                            'title' => $homepage['t1_promo_card_3_title'] ?? 'প্রিমিয়াম কোয়ালিটি নিশ্চিত প্রোডাক্টস',
+                            'sub' => $homepage['t1_promo_card_3_sub'] ?? 'Best Price Guarantee All Week',
+                            'tags' => ['✓ সেরা মান নিশ্চিত', '💯 ১০০% জেনুইন'],
+                            'btn_text' => $homepage['t1_promo_card_3_btn_text'] ?? 'View Offers 🚀',
+                            'btn_url' => $homepage['t1_promo_card_3_btn_url'] ?? route('shop'),
+                            'bg_start' => $homepage['t1_promo_card_3_bg_start'] ?? '#78350f',
+                            'bg_end' => $homepage['t1_promo_card_3_bg_end'] ?? '#451a03',
+                            'bg_image' => $homepage['t1_promo_card_3_bg_image'] ?? '',
+                            'icon' => 'zap',
+                        ],
+                        4 => [
+                            'enable' => $homepage['t1_promo_card_4_enable'] ?? '0',
+                            'badge' => $homepage['t1_promo_card_4_badge'] ?? '✨ New Arrival',
+                            'title' => $homepage['t1_promo_card_4_title'] ?? 'নতুন ট্রেন্ডি পণ্য এখনই অর্ডার করুন',
+                            'sub' => $homepage['t1_promo_card_4_sub'] ?? 'Fresh Stock Just Added',
+                            'tags' => ['✨ নতুন কালেকশন', '🔥 সীমিত স্টক'],
+                            'btn_text' => $homepage['t1_promo_card_4_btn_text'] ?? 'Shop New In ✨',
+                            'btn_url' => $homepage['t1_promo_card_4_btn_url'] ?? route('shop'),
+                            'bg_start' => $homepage['t1_promo_card_4_bg_start'] ?? '#312e81',
+                            'bg_end' => $homepage['t1_promo_card_4_bg_end'] ?? '#1e1b4b',
+                            'bg_image' => $homepage['t1_promo_card_4_bg_image'] ?? '',
+                            'icon' => 'sparkle',
+                        ],
+                    ];
+                @endphp
+
+                @foreach($t1PromoCards as $pIndex => $pCard)
+                    @if(($pCard['enable'] ?? '0') == '1')
+                        @php
+                            $bgStyle = !empty($pCard['bg_image'])
+                                ? 'background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.75)), url(' . asset($pCard['bg_image']) . ') center/cover no-repeat;'
+                                : 'background: linear-gradient(150deg, ' . $pCard['bg_start'] . ' 0%, ' . $pCard['bg_end'] . ' 100%);';
+                        @endphp
+                        <div class="t1-side-promo t1-side-promo-card-{{ $pIndex }}" style="{!! $bgStyle !!}">
+                            <div class="t1-side-promo-top">
+                                <div class="t1-side-promo-badge">{{ $pCard['badge'] }}</div>
+                                <h3 class="t1-side-promo-title">{{ $pCard['title'] }}</h3>
+                                <p class="t1-side-promo-sub">{{ $pCard['sub'] }}</p>
+                                @if(!empty($pCard['tags']))
+                                    <div class="t1-side-promo-tags">
+                                        @foreach($pCard['tags'] as $tag)
+                                            <span class="t1-promo-tag">{{ $tag }}</span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                            <a href="{{ $pCard['btn_url'] }}" class="t1-side-promo-btn">
+                                {{ $pCard['btn_text'] }}
+                            </a>
+                            <div class="t1-side-promo-bag">
+                                @if(($pCard['icon'] ?? 'bag') === 'star')
+                                    <svg width="95" height="95" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                @elseif(($pCard['icon'] ?? 'bag') === 'zap')
+                                    <svg width="95" height="95" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                @elseif(($pCard['icon'] ?? 'bag') === 'sparkle')
+                                    <svg width="95" height="95" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                                @else
+                                    <svg width="95" height="95" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.15;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
             </div>
 
             {{-- Right Side Deals & Products --}}
@@ -4259,97 +4630,98 @@
             position: relative;
             display: flex;
             align-items: center;
-            padding: 0 5px;
+            padding: 0;
+            width: 100%;
         }
 
         .slider-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            z-index: 2;
-            background: rgba(255, 255, 255, 0.8);
-            border: none;
+            z-index: 10;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: background 0.2s;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+            transition: all 0.25s ease;
+            color: #0b4d3c;
         }
 
-        .slider-arrow:hover,
-        .slider-arrow:focus {
-            background: #f0f4fa;
+        .slider-arrow:hover {
+            background: #0b4d3c;
+            color: #ffffff;
+            border-color: #0b4d3c;
+            box-shadow: 0 6px 18px rgba(11, 77, 60, 0.35);
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .slider-arrow svg path {
+            stroke: currentColor !important;
+            transition: stroke 0.2s ease;
         }
 
         .slider-arrow.prev-arrow {
-            left: 10px;
+            left: -14px;
         }
 
         .slider-arrow.next-arrow {
-            right: 10px;
-        }
-
-        .prev-arrow {
-            margin-right: 15px;
-        }
-
-        .next-arrow {
-            margin-left: 15px;
+            right: -14px;
         }
 
         .products-container {
             display: flex;
-            gap: 10px;
+            gap: 14px;
             overflow-x: auto;
             scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
             scrollbar-width: none;
-            /* Firefox */
             -ms-overflow-style: none;
-            /* IE and Edge */
-            padding: 10px 0px 10px 0;
-            /* Added bottom padding for arrows */
-            margin-bottom: 0px;
+            padding: 6px 2px 18px 2px;
+            margin: 0;
+            width: 100%;
         }
 
-        products-container::-webkit-scrollbar {
+        .products-container::-webkit-scrollbar {
             display: none;
-            /* Chrome, Safari, Opera */
         }
 
-        .view-all-btn {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            border: 2px solid var(--primary-color);
-            transform: translateY(20px);
-            opacity: 0;
-            animation: fadeInUp 0.8s forwards 0.6s;
+        /* Responsive Full-Card Layout: Both sides always show full cards with zero cut-off */
+        .products-slider .product-card {
+            flex: 0 0 calc((100% - (14px * 4)) / 5) !important;
+            max-width: calc((100% - (14px * 4)) / 5) !important;
+            width: calc((100% - (14px * 4)) / 5) !important;
+            scroll-snap-align: start;
+            box-sizing: border-box;
+            margin-bottom: 0 !important;
         }
 
-        @media(max-width:992px) {
+        @media(max-width: 1200px) {
+            .products-slider .product-card {
+                flex: 0 0 calc((100% - (14px * 3)) / 4) !important;
+                max-width: calc((100% - (14px * 3)) / 4) !important;
+                width: calc((100% - (14px * 3)) / 4) !important;
+            }
+        }
+
+        @media(max-width: 992px) {
             .best-selling-section {
                 padding: 5px 0px;
             }
 
             .section-header h2 {
-                font-size: 15px;
+                font-size: 16px;
             }
 
             .best-selling-section .section-header h2,
             .customer-reviews .section-header h2,
-            .customer-reviews .section-header h2,
             .products-by-category .section-header h2 {
-                font-size: 15px !important;
+                font-size: 16px !important;
             }
 
             .section-header {
@@ -4359,17 +4731,40 @@
                 margin-right: 5px;
             }
 
-            .products-slider {
-                padding: 0px 0px;
+            .products-slider .product-card {
+                flex: 0 0 calc((100% - (12px * 2)) / 3) !important;
+                max-width: calc((100% - (12px * 2)) / 3) !important;
+                width: calc((100% - (12px * 2)) / 3) !important;
             }
 
             .products-container {
-                gap: 5px;
-                padding: 10px 0 10px 0;
+                gap: 12px;
+                padding: 6px 2px 14px 2px;
+            }
+
+            .slider-arrow.prev-arrow {
+                left: 2px;
+            }
+
+            .slider-arrow.next-arrow {
+                right: 2px;
+            }
+        }
+
+        @media(max-width: 640px) {
+            .products-slider .product-card {
+                flex: 0 0 calc((100% - 10px) / 2) !important;
+                max-width: calc((100% - 10px) / 2) !important;
+                width: calc((100% - 10px) / 2) !important;
+            }
+
+            .products-container {
+                gap: 10px;
             }
 
             .slider-arrow {
-                display: none;
+                width: 32px;
+                height: 32px;
             }
         }
     </style>
@@ -4422,113 +4817,66 @@
                 const productsContainer = slider.querySelector('.products-container');
                 const prevArrow = slider.querySelector('.prev-arrow');
                 const nextArrow = slider.querySelector('.next-arrow');
-                const productCards = productsContainer.querySelectorAll('.product-card');
 
-                if (productsContainer && productCards.length > 0) {
-                    // Only enable infinite scrolling if we have 4 or more products
-                    const enableInfiniteScroll = productCards.length >= 4;
+                if (!productsContainer) return;
 
-                    if (enableInfiniteScroll) {
-                        // Clone the product cards for infinite scrolling
-                        productCards.forEach(card => {
-                            const clone = card.cloneNode(true);
-                            productsContainer.appendChild(clone);
-                        });
+                function getScrollStep() {
+                    const firstCard = productsContainer.querySelector('.product-card');
+                    if (!firstCard) return 240;
+                    const style = window.getComputedStyle(productsContainer);
+                    const gap = parseFloat(style.gap) || 14;
+                    return firstCard.offsetWidth + gap;
+                }
 
-                        // Set the amount to scroll by (width of one product card + gap)
-                        const scrollAmount = 270; // Adjust as needed
-
-                        // Auto-sliding functionality
-                        let autoSlideInterval;
-                        let currentPosition = 0;
-                        const totalWidth = productCards.length * scrollAmount;
-
-                        function infiniteScroll() {
-                            if (currentPosition >= totalWidth) {
-                                productsContainer.scrollTo({
-                                    left: 0,
-                                    behavior: 'auto'
-                                });
-                                currentPosition = 0;
-                            }
-                            currentPosition += scrollAmount;
-                            productsContainer.scrollTo({
-                                left: currentPosition,
-                                behavior: 'smooth'
-                            });
-                        }
-
-                        function startAutoSlide() {
-                            autoSlideInterval = setInterval(infiniteScroll, 3000);
-                        }
-
-                        function stopAutoSlide() {
-                            clearInterval(autoSlideInterval);
-                        }
-
-                        startAutoSlide();
-
-                        productsContainer.addEventListener('mouseenter', stopAutoSlide);
-                        productsContainer.addEventListener('touchstart', stopAutoSlide);
-                        productsContainer.addEventListener('mouseleave', startAutoSlide);
-                        productsContainer.addEventListener('touchend', startAutoSlide);
-
-                        if (nextArrow) {
-                            nextArrow.addEventListener('click', () => {
-                                infiniteScroll();
-                                stopAutoSlide();
-                                startAutoSlide();
-                            });
-                        }
-
-                        if (prevArrow) {
-                            prevArrow.addEventListener('click', () => {
-                                currentPosition -= scrollAmount;
-                                if (currentPosition < 0) {
-                                    currentPosition = totalWidth - scrollAmount;
-                                    productsContainer.scrollTo({
-                                        left: currentPosition,
-                                        behavior: 'auto'
-                                    });
-                                } else {
-                                    productsContainer.scrollTo({
-                                        left: currentPosition,
-                                        behavior: 'smooth'
-                                    });
-                                }
-                                stopAutoSlide();
-                                startAutoSlide();
-                            });
-                        }
+                function scrollNext() {
+                    const step = getScrollStep();
+                    const maxScroll = productsContainer.scrollWidth - productsContainer.clientWidth;
+                    if (productsContainer.scrollLeft + step >= maxScroll - 5) {
+                        productsContainer.scrollTo({ left: 0, behavior: 'smooth' });
                     } else {
-                        // Simple scrolling for fewer than 4 products
-                        const scrollAmount = 270;
-
-                        if (nextArrow) {
-                            nextArrow.addEventListener('click', () => {
-                                const maxScrollLeft = productsContainer.scrollWidth -
-                                    productsContainer.clientWidth;
-                                const newPosition = Math.min(productsContainer.scrollLeft +
-                                    scrollAmount, maxScrollLeft);
-                                productsContainer.scrollTo({
-                                    left: newPosition,
-                                    behavior: 'smooth'
-                                });
-                            });
-                        }
-
-                        if (prevArrow) {
-                            prevArrow.addEventListener('click', () => {
-                                const newPosition = Math.max(productsContainer.scrollLeft -
-                                    scrollAmount, 0);
-                                productsContainer.scrollTo({
-                                    left: newPosition,
-                                    behavior: 'smooth'
-                                });
-                            });
-                        }
+                        productsContainer.scrollBy({ left: step, behavior: 'smooth' });
                     }
                 }
+
+                function scrollPrev() {
+                    const step = getScrollStep();
+                    if (productsContainer.scrollLeft - step <= 5) {
+                        const maxScroll = productsContainer.scrollWidth - productsContainer.clientWidth;
+                        productsContainer.scrollTo({ left: maxScroll, behavior: 'smooth' });
+                    } else {
+                        productsContainer.scrollBy({ left: -step, behavior: 'smooth' });
+                    }
+                }
+
+                if (nextArrow) {
+                    nextArrow.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        scrollNext();
+                    });
+                }
+
+                if (prevArrow) {
+                    prevArrow.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        scrollPrev();
+                    });
+                }
+
+                // Subtle auto-sliding that advances by 1 full card and pauses on user interaction
+                let autoTimer = null;
+                function startAuto() {
+                    if (autoTimer) clearInterval(autoTimer);
+                    autoTimer = setInterval(scrollNext, 4500);
+                }
+                function stopAuto() {
+                    if (autoTimer) clearInterval(autoTimer);
+                }
+
+                startAuto();
+                slider.addEventListener('mouseenter', stopAuto);
+                slider.addEventListener('mouseleave', startAuto);
+                slider.addEventListener('touchstart', stopAuto, { passive: true });
+                slider.addEventListener('touchend', startAuto, { passive: true });
             });
         });
     </script>
@@ -5668,8 +6016,10 @@
 
             /* Latest Products Image Heights - Using Admin Settings */
             .latest-products-section .product-image {
-                height: {{ setting('general', 'product_image_height', '240px') }} !important;
-                padding: {{ setting('general', 'product_image_padding', '5px') }} !important;
+                aspect-ratio: 1 / 1 !important;
+                height: auto !important;
+                min-height: 200px !important;
+                padding: 0 !important;
             }
 
             .load-more-container {

@@ -3010,6 +3010,169 @@
                         </div>
                     </div>
 
+                    {{-- Template 1 Left Showcase Promo Cards Settings --}}
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template1_settings_card" style="{{ in_array($selectedTemplate, ['1']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
+                                    <i class="fas fa-th-large text-success mr-2"></i> Template 1: Left Showcase Promo Cards Configuration
+                                </h5>
+                                <small class="text-muted">Manage the promotional banner cards displayed on the left column alongside Featured Deals and Best Selling Products.</small>
+                            </div>
+                            <span class="badge badge-success px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #0b4d3c;">
+                                Template 1 Exclusive
+                            </span>
+                        </div>
+                        <div class="card-body p-4 bg-light-50">
+                            {{-- Helpful Guidance Banner --}}
+                            <div class="alert alert-light border rounded-3 p-3 mb-4 d-flex align-items-center" style="background: #f8fafc; border-left: 4px solid #0b4d3c !important;">
+                                <i class="fas fa-layer-group fa-2x mr-3" style="color: #0b4d3c;"></i>
+                                <div style="font-size: 12.5px; color: #334155;">
+                                    <strong>Left Column Cards:</strong>
+                                    The left showcase column sits alongside the <strong>Featured Deals</strong> and <strong>Best Selling Products</strong> rows. 
+                                    <strong>Card 1</strong> aligns with Featured Deals, and <strong>Card 2</strong> fills the space next to Best Selling Products. You can edit their text, links, background gradients, or add custom banner images below. Enable Cards 3 or 4 if you want even more cards stacked on the left!
+                                </div>
+                            </div>
+
+                            {{-- Navigation Tabs for Cards 1 to 4 --}}
+                            <ul class="nav nav-pills mb-3" id="t1PromoCardsTabs" role="tablist">
+                                <li class="nav-item mr-2">
+                                    <a class="nav-link active font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-1-tab" data-toggle="pill" href="#t1-card-1" role="tab" style="font-size: 12px;">
+                                        <i class="fas fa-star text-warning mr-1"></i> Card 1 (Top / Featured Deals)
+                                    </a>
+                                </li>
+                                <li class="nav-item mr-2">
+                                    <a class="nav-link font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-2-tab" data-toggle="pill" href="#t1-card-2" role="tab" style="font-size: 12px;">
+                                        <i class="fas fa-fire text-danger mr-1"></i> Card 2 (Next / Best Selling)
+                                    </a>
+                                </li>
+                                <li class="nav-item mr-2">
+                                    <a class="nav-link font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-3-tab" data-toggle="pill" href="#t1-card-3" role="tab" style="font-size: 12px;">
+                                        <i class="fas fa-bolt text-primary mr-1"></i> Card 3 (Optional)
+                                    </a>
+                                </li>
+                                <li class="nav-item mr-2">
+                                    <a class="nav-link font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-4-tab" data-toggle="pill" href="#t1-card-4" role="tab" style="font-size: 12px;">
+                                        <i class="fas fa-sparkles text-info mr-1"></i> Card 4 (Optional)
+                                    </a>
+                                </li>
+                            </ul>
+
+                            @php
+                                $t1DefaultCards = [
+                                    1 => [
+                                        'badge' => '🔥 Exclusive Offer',
+                                        'title' => 'ঘরে বসেই পছন্দের পণ্য কিনুন এখনই',
+                                        'sub' => 'Order Now & Get Fast Delivery',
+                                        'tags' => '⚡ দ্রুত ডেলিভারি, ✓ ক্যাশ অন ডেলিভারি',
+                                        'btn_text' => 'Shop Now 🛍️',
+                                        'bg_start' => '#0b4d3c',
+                                        'bg_end' => '#042e22',
+                                        'enabled' => '1',
+                                    ],
+                                    2 => [
+                                        'badge' => '⭐ Special Collection',
+                                        'title' => 'সেরা অফার ও আকর্ষণীয় ডিসকাউন্ট',
+                                        'sub' => 'Limited Time Deals on Top Brands',
+                                        'tags' => '⭐ টপ ব্র্যান্ডস, 🎁 আকর্ষণীয় অফার',
+                                        'btn_text' => 'Explore Deals 🎁',
+                                        'bg_start' => '#0f172a',
+                                        'bg_end' => '#1e293b',
+                                        'enabled' => '1',
+                                    ],
+                                    3 => [
+                                        'badge' => '⚡ Mega Savings',
+                                        'title' => 'প্রিমিয়াম কোয়ালিটি নিশ্চিত প্রোডাক্টস',
+                                        'sub' => 'Best Price Guarantee All Week',
+                                        'tags' => '✓ সেরা মান নিশ্চিত, 💯 ১০০% জেনুইন',
+                                        'btn_text' => 'View Offers 🚀',
+                                        'bg_start' => '#78350f',
+                                        'bg_end' => '#451a03',
+                                        'enabled' => '1',
+                                    ],
+                                    4 => [
+                                        'badge' => '✨ New Arrival',
+                                        'title' => 'নতুন ট্রেন্ডি পণ্য এখনই অর্ডার করুন',
+                                        'sub' => 'Fresh Stock Just Added',
+                                        'tags' => '✨ নতুন কালেকশন, 🔥 সীমিত স্টক',
+                                        'btn_text' => 'Shop New In ✨',
+                                        'bg_start' => '#312e81',
+                                        'bg_end' => '#1e1b4b',
+                                        'enabled' => '0',
+                                    ],
+                                ];
+                            @endphp
+
+                            <div class="tab-content" id="t1PromoCardsTabContent">
+                                @for($i = 1; $i <= 4; $i++)
+                                <div class="tab-pane fade {{ $i == 1 ? 'show active' : '' }}" id="t1-card-{{ $i }}" role="tabpanel">
+                                    <div class="p-3 bg-white rounded-3 border shadow-sm">
+                                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                            <div>
+                                                <h6 class="font-weight-bold mb-0 text-dark" style="font-size: 13.5px;">
+                                                    <i class="fas fa-id-card text-success mr-1"></i> Card {{ $i }} Configuration
+                                                </h6>
+                                                <small class="text-muted">{{ $i == 1 ? 'Displayed beside the Featured Deals row' : ($i == 2 ? 'Displayed beside the Best Selling Products row' : 'Additional stacked card on the left column') }}</small>
+                                            </div>
+                                            <div class="custom-control custom-switch">
+                                                <input type="hidden" name="homepage[t1_promo_card_{{ $i }}_enable]" value="0">
+                                                <input type="checkbox" class="custom-control-input" id="t1_promo_card_{{ $i }}_enable" name="homepage[t1_promo_card_{{ $i }}_enable]" value="1" {{ ($homepage['t1_promo_card_' . $i . '_enable'] ?? $t1DefaultCards[$i]['enabled']) == '1' ? 'checked' : '' }}>
+                                                <label class="custom-control-label font-weight-bold text-dark" for="t1_promo_card_{{ $i }}_enable" style="font-size: 12px; cursor: pointer;">Enable Card {{ $i }}</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="font-weight-bold text-dark" style="font-size: 12px;">Top Badge Text</label>
+                                                <input type="text" name="homepage[t1_promo_card_{{ $i }}_badge]" class="form-control form-control-sm" value="{{ $homepage['t1_promo_card_' . $i . '_badge'] ?? $t1DefaultCards[$i]['badge'] }}" placeholder="e.g. 🔥 Exclusive Offer">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="font-weight-bold text-dark" style="font-size: 12px;">Headline Title</label>
+                                                <input type="text" name="homepage[t1_promo_card_{{ $i }}_title]" class="form-control form-control-sm" value="{{ $homepage['t1_promo_card_' . $i . '_title'] ?? $t1DefaultCards[$i]['title'] }}" placeholder="e.g. ঘরে বসেই পছন্দের পণ্য কিনুন">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="font-weight-bold text-dark" style="font-size: 12px;">Subtitle / Tagline</label>
+                                                <input type="text" name="homepage[t1_promo_card_{{ $i }}_sub]" class="form-control form-control-sm" value="{{ $homepage['t1_promo_card_' . $i . '_sub'] ?? $t1DefaultCards[$i]['sub'] }}" placeholder="e.g. Order Now & Get Fast Delivery">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="font-weight-bold text-dark" style="font-size: 12px;">Feature Tags / Highlights (Comma separated)</label>
+                                                <input type="text" name="homepage[t1_promo_card_{{ $i }}_tags]" class="form-control form-control-sm" value="{{ $homepage['t1_promo_card_' . $i . '_tags'] ?? $t1DefaultCards[$i]['tags'] }}" placeholder="e.g. ⚡ দ্রুত ডেলিভারি, ✓ ক্যাশ অন ডেলিভারি">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="font-weight-bold text-dark" style="font-size: 12px;">Button Text</label>
+                                                <input type="text" name="homepage[t1_promo_card_{{ $i }}_btn_text]" class="form-control form-control-sm" value="{{ $homepage['t1_promo_card_' . $i . '_btn_text'] ?? $t1DefaultCards[$i]['btn_text'] }}" placeholder="e.g. Shop Now 🛍️">
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="font-weight-bold text-dark" style="font-size: 12px;">Button URL</label>
+                                                <input type="text" name="homepage[t1_promo_card_{{ $i }}_btn_url]" class="form-control form-control-sm" value="{{ $homepage['t1_promo_card_' . $i . '_btn_url'] ?? route('shop') }}" placeholder="e.g. /shop">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="font-weight-bold text-dark" style="font-size: 12px;">Background Gradient (From & To Colors)</label>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="d-flex align-items-center mr-2">
+                                                        <input type="color" class="mr-1" style="width:34px; height:32px; border:none; cursor:pointer;" value="{{ $homepage['t1_promo_card_' . $i . '_bg_start'] ?? $t1DefaultCards[$i]['bg_start'] }}" onchange="document.getElementById('t1_card_{{ $i }}_bg_start_text').value = this.value">
+                                                        <input type="text" id="t1_card_{{ $i }}_bg_start_text" name="homepage[t1_promo_card_{{ $i }}_bg_start]" class="form-control form-control-sm font-weight-bold" style="width: 90px;" value="{{ $homepage['t1_promo_card_' . $i . '_bg_start'] ?? $t1DefaultCards[$i]['bg_start'] }}">
+                                                    </div>
+                                                    <span class="text-muted small mx-1">to</span>
+                                                    <div class="d-flex align-items-center ml-2">
+                                                        <input type="color" class="mr-1" style="width:34px; height:32px; border:none; cursor:pointer;" value="{{ $homepage['t1_promo_card_' . $i . '_bg_end'] ?? $t1DefaultCards[$i]['bg_end'] }}" onchange="document.getElementById('t1_card_{{ $i }}_bg_end_text').value = this.value">
+                                                        <input type="text" id="t1_card_{{ $i }}_bg_end_text" name="homepage[t1_promo_card_{{ $i }}_bg_end]" class="form-control form-control-sm font-weight-bold" style="width: 90px;" value="{{ $homepage['t1_promo_card_' . $i . '_bg_end'] ?? $t1DefaultCards[$i]['bg_end'] }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="font-weight-bold text-dark" style="font-size: 12px;">Optional Banner Image URL or Path</label>
+                                                <input type="text" name="homepage[t1_promo_card_{{ $i }}_bg_image]" class="form-control form-control-sm" value="{{ $homepage['t1_promo_card_' . $i . '_bg_image'] ?? '' }}" placeholder="e.g. storage/banners/card{{ $i }}.jpg (leave blank for gradient)">
+                                                <small class="text-muted">If provided, image will fill the card with a semi-transparent dark overlay.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endfor
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Template 4 Flash Sale Offer Settings --}}
                     @if($isSuperAdmin || $selectedTemplate == '4')
                     <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template4_settings_card">

@@ -107,8 +107,7 @@
         }
 
         .products-slider .product-card {
-            width: 240px;
-            /* width: 300px; */
+            box-sizing: border-box;
         }
 
         .product-card:hover {
@@ -334,16 +333,7 @@
             }
 
             .products-slider .product-card {
-                /* width: 260px; */
-                width: 160px;
-            }
-
-            .product-image {
-                height: {{ setting('general', 'product_image_height_tablet', '200px') }};
-            }
-
-            .products-slider .product-image {
-                height: {{ setting('general', 'product_image_height_mobile', 'auto') }};
+                box-sizing: border-box;
             }
 
             .product-card .product-title {
@@ -698,8 +688,19 @@
         {!! setting('general', 'custom_header_code', '') !!}
     @endif
 </head>
-
-<body>
+@php
+    $appTemplateId = $currentTemplateId ?? setting('homepage', 'template_id', '1');
+    if (auth()->check() && !empty(auth()->user()->template_id)) {
+        $appTemplateId = (string) auth()->user()->template_id;
+    }
+    if (request()->has('preview_template') && auth()->check() && auth()->user()->isAdmin()) {
+        $previewId = (string) request()->query('preview_template');
+        if (in_array($previewId, ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], true)) {
+            $appTemplateId = $previewId;
+        }
+    }
+@endphp
+<body data-hp-template="{{ $appTemplateId }}" class="template-{{ $appTemplateId }}">
 
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}" height="0" width="0"
@@ -978,6 +979,14 @@
                 top: 0;
                 left: 0;
                 z-index: 1001;
+            }
+            .top-header-section.t1-top-header.show-topbar,
+            .t1-top-header.show-topbar {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                z-index: 10 !important;
+                box-shadow: none !important;
             }
 
             .top-header-bar {
@@ -6701,6 +6710,43 @@
             transform: translateY(1px);
         }
 
+        /* Template 1 Theme Overrides for Cart & Floating Cart */
+        body[data-hp-template="1"] .cart-drawer-actions .drawer-btn.primary,
+        .template-1 .cart-drawer-actions .drawer-btn.primary {
+            background: #0b4d3c !important;
+            box-shadow: 0 8px 18px rgba(11, 77, 60, 0.35) !important;
+        }
+
+        body[data-hp-template="1"] .cart-drawer-actions .drawer-btn.primary:hover,
+        .template-1 .cart-drawer-actions .drawer-btn.primary:hover {
+            background: #07392c !important;
+            box-shadow: 0 12px 22px rgba(11, 77, 60, 0.45) !important;
+        }
+
+        body[data-hp-template="1"] .cart-drawer-total-value,
+        .template-1 .cart-drawer-total-value,
+        body[data-hp-template="1"] .cart-sidebar-line-total,
+        .template-1 .cart-sidebar-line-total {
+            color: #0b4d3c !important;
+        }
+
+        body[data-hp-template="1"] .cart-sidebar-item,
+        .template-1 .cart-sidebar-item {
+            border: 1px solid #e5e7eb !important;
+        }
+
+        body[data-hp-template="1"] .floating-cart,
+        .template-1 .floating-cart {
+            background: #0b4d3c !important;
+            background-color: #0b4d3c !important;
+            box-shadow: 0 4px 15px rgba(11, 77, 60, 0.4) !important;
+        }
+
+        body[data-hp-template="1"] .floating-cart .cart-items,
+        .template-1 .floating-cart .cart-items {
+            background-color: #ea580c !important;
+        }
+
         .cart-sidebar-empty {
             text-align: center;
             padding: 40px 0;
@@ -8687,7 +8733,7 @@
         // Scroll topbar detection script
         (function() {
             const topbar = document.getElementById('topHeaderSection');
-            if (topbar) {
+            if (topbar && !topbar.classList.contains('t1-top-header')) {
                 let lastScrollTop = 0;
                 
                 function checkPosition() {
