@@ -110,8 +110,32 @@ class SMSService
         }
 
         // Default placeholders
-        if (!isset($placeholders['store_name'])) {
-            $placeholders['store_name'] = SiteSetting::get('general', 'site_name', config('app.name', 'Thikana Shop'));
+        if (empty($placeholders['store_name'])) {
+            $storeName = null;
+
+            // 1. Check vendor-specific setting if senderUserId is provided
+            if ($senderUserId) {
+                $storeName = SiteSetting::where('group', 'vendor_' . $senderUserId . '_general')
+                    ->where('key', 'site_name')
+                    ->value('value');
+
+                if (!$storeName) {
+                    $vendor = \App\Models\User::find($senderUserId);
+                    $storeName = $vendor?->shop_name ?: $vendor?->name;
+                }
+            }
+
+            // 2. Check current site/tenant setting via global setting() helper or SettingsService
+            if (!$storeName && function_exists('setting')) {
+                $storeName = setting('general', 'site_name');
+            }
+
+            // 3. Fallback to SiteSetting model or config
+            if (!$storeName) {
+                $storeName = SiteSetting::get('general', 'site_name');
+            }
+
+            $placeholders['store_name'] = $storeName ?: config('app.name', 'My Website');
         }
 
         $renderedMessage = $this->renderTemplate($template, $placeholders);

@@ -76,12 +76,17 @@ class OrderObserver
         // Send Order Status Update SMS if status changed and option is enabled in settings
         if ($statusChanged && !empty($order->phone)) {
             try {
+                $senderUserId = null;
+                if ($order->orderItems && $order->orderItems->isNotEmpty()) {
+                    $senderUserId = $order->orderItems->first()->product?->vendor_id;
+                }
+
                 $smsService = app(SMSService::class);
                 $smsService->sendEventSMS('order_status', $order->phone, [
                     'customer_name' => $order->name,
                     'order_id' => $order->id,
                     'status' => ucfirst($order->status),
-                ]);
+                ], $senderUserId);
             } catch (\Throwable $e) {
                 Log::error("OrderObserver: Failed to dispatch order status SMS", [
                     'order_id' => $order->id,
