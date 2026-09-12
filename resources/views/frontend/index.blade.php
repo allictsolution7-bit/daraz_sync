@@ -1232,15 +1232,13 @@
 
             .slider-category-menu {
                 background: #ffffff;
-                /* background: var(--light-color); */
-                /* border: 1px solid color-mix(in srgb, var(--secondary-color) 12%, transparent); */
-                border: 1px solid var(--primary-color);
-                border-radius: 10px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-                overflow: visible;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+                overflow: hidden;
                 min-height: auto;
-                max-height: {{ $sliderHeight }}px;
-                height: fit-content;
+                max-height: {{ $sliderHeight + 65 }}px;
+                height: 100%;
                 display: flex;
                 flex-direction: column;
                 position: relative;
@@ -1248,18 +1246,21 @@
             }
 
             .slider-category-heading {
-                display: none;
-                padding: 8px 12px;
-                background: var(--secondary-color);
-                color: var(--light-color);
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                padding: 13px 16px;
+                background: #0b4d3c !important;
+                color: #ffffff !important;
                 font-weight: 700;
-                font-size: 13px;
-                letter-spacing: 0.2px;
+                font-size: 14px;
+                letter-spacing: 0.3px;
+                border-radius: 13px 13px 0 0;
             }
 
             .slider-category-list {
                 list-style: none;
-                padding: 0;
+                padding: 4px 0;
                 margin: 0;
                 overflow-y: auto;
                 flex: 1;
@@ -1271,22 +1272,21 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                padding: 5px 10px;
-                min-height: 36px;
+                padding: 8px 14px;
+                min-height: 38px;
                 text-decoration: none;
-                color: var(--secondary-color);
+                color: #334155;
                 font-weight: 600;
                 font-size: 13px;
                 border-bottom: 1px solid #f1f5f9;
-                border-bottom: 1px solid color-mix(in srgb, var(--secondary-color) 10%, transparent);
                 transition: all 0.2s ease;
                 gap: 8px;
             }
 
             .slider-category-item>a:hover {
-                background: #f8fafc;
-                background: color-mix(in srgb, var(--primary-color) 12%, var(--light-color));
-                color: var(--primary-color);
+                background: #f0fdf4;
+                color: #0b4d3c;
+                padding-left: 17px;
             }
 
             .slider-category-item .chevron {
@@ -1481,7 +1481,339 @@
             .slider-container {
                 position: relative;
                 overflow: hidden;
-                border-radius: 8px;
+                border-radius: 20px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            }
+
+            /* Template 1 Hero Banner */
+            .t1-hero-slide {
+                background: linear-gradient(135deg, #fff3ec 0%, #fde7dd 45%, #fed7c7 100%) !important;
+                min-height: {{ $sliderHeight }}px;
+                height: 100%;
+                display: flex !important;
+                align-items: center;
+                text-decoration: none;
+                color: inherit;
+            }
+
+            .t1-hero-banner-inner {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                padding: 28px 36px;
+                gap: 20px;
+            }
+
+            .t1-hero-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: #ffffff;
+                padding: 4px 14px;
+                border-radius: 30px;
+                font-size: 12px;
+                font-weight: 700;
+                color: #ea580c;
+                box-shadow: 0 3px 10px rgba(234, 88, 12, 0.12);
+                margin-bottom: 12px;
+            }
+
+            .t1-hero-heading {
+                font-size: clamp(20px, 2.6vw, 32px);
+                font-weight: 800;
+                color: #1e293b;
+                line-height: 1.25;
+                margin-bottom: 6px;
+                letter-spacing: -0.3px;
+            }
+
+            .t1-hero-bengali {
+                font-size: 13.5px;
+                color: #64748b;
+                margin-bottom: 16px;
+                font-weight: 500;
+            }
+
+            .t1-hero-bullets {
+                display: flex;
+                flex-direction: column;
+                gap: 7px;
+                margin-bottom: 22px;
+            }
+
+            .t1-hero-bullet {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 12.5px;
+                font-weight: 600;
+                color: #334155;
+            }
+
+            .t1-bullet-tick {
+                color: #ea580c;
+                font-weight: 800;
+                font-size: 13px;
+            }
+
+            .t1-hero-btn {
+                display: inline-flex;
+                align-items: center;
+                background: #ff5722;
+                color: #ffffff !important;
+                font-weight: 700;
+                font-size: 13.5px;
+                padding: 10px 26px;
+                border-radius: 50px;
+                text-decoration: none;
+                transition: all 0.25s ease;
+                box-shadow: 0 6px 16px rgba(255, 87, 34, 0.35);
+                width: fit-content;
+            }
+
+            .t1-hero-btn:hover {
+                background: #e64a19;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 22px rgba(255, 87, 34, 0.45);
+            }
+
+            .t1-hero-image-col {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .t1-hero-img-main {
+                max-width: 250px;
+                max-height: 230px;
+                object-fit: contain;
+                filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.12));
+                border-radius: 14px;
+                transition: transform 0.4s ease;
+            }
+
+            .t1-hero-img-main:hover {
+                transform: scale(1.04) rotate(1deg);
+            }
+
+            /* Template 1 Trust Grid */
+            .t1-trust-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+                margin-top: 14px;
+            }
+
+            .t1-trust-item {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 12px 14px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+                transition: all 0.2s ease;
+            }
+
+            .t1-trust-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+                border-color: #cbd5e1;
+            }
+
+            .t1-trust-icon {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                flex-shrink: 0;
+            }
+
+            .t1-trust-info strong {
+                display: block;
+                font-size: 12.5px;
+                font-weight: 700;
+                color: #1e293b;
+                line-height: 1.2;
+            }
+
+            .t1-trust-info span {
+                display: block;
+                font-size: 11px;
+                color: #64748b;
+                margin-top: 2px;
+            }
+
+            /* Template 1 Lower Showcase Section */
+            .t1-showcase-section {
+                padding: 24px 0 36px;
+                background: #f8fafc;
+            }
+
+            .t1-showcase-grid {
+                display: grid;
+                grid-template-columns: 260px 1fr;
+                gap: 16px;
+                align-items: start;
+            }
+
+            .t1-side-promo {
+                background: linear-gradient(150deg, #0b4d3c 0%, #064030 50%, #042e22 100%);
+                border-radius: 18px;
+                padding: 28px 22px;
+                color: #ffffff;
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                box-shadow: 0 10px 28px rgba(11, 77, 60, 0.18);
+            }
+
+            .t1-side-promo-badge {
+                background: rgba(255, 255, 255, 0.16);
+                border: 1px solid rgba(255, 255, 255, 0.25);
+                backdrop-filter: blur(8px);
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.4px;
+                margin-bottom: 18px;
+            }
+
+            .t1-side-promo-title {
+                font-size: 22px;
+                font-weight: 800;
+                line-height: 1.35;
+                margin-bottom: 10px;
+                color: #ffffff;
+            }
+
+            .t1-side-promo-sub {
+                font-size: 12px;
+                color: #a7f3d0;
+                margin-bottom: 24px;
+            }
+
+            .t1-side-promo-btn {
+                background: #ffffff;
+                color: #0b4d3c !important;
+                font-weight: 800;
+                font-size: 13px;
+                padding: 11px 22px;
+                border-radius: 50px;
+                text-decoration: none;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+                transition: all 0.25s ease;
+                z-index: 2;
+            }
+
+            .t1-side-promo-btn:hover {
+                background: #f0fdf4;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            }
+
+            .t1-side-promo-bag {
+                position: absolute;
+                bottom: -15px;
+                right: -15px;
+                color: #ffffff;
+                pointer-events: none;
+            }
+
+            .t1-block-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 16px;
+                padding-bottom: 8px;
+                border-bottom: 2px solid #e2e8f0;
+            }
+
+            .t1-block-title {
+                font-size: 18px;
+                font-weight: 800;
+                color: #1e293b;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .t1-block-view-all {
+                font-size: 13px;
+                font-weight: 700;
+                color: #0b4d3c;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                transition: all 0.2s ease;
+            }
+
+            .t1-block-view-all:hover {
+                color: #073a2d;
+                transform: translateX(3px);
+            }
+
+            .t1-product-card-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 14px;
+            }
+
+            @media (max-width: 1200px) {
+                .t1-product-card-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+            }
+
+            @media (max-width: 992px) {
+                .t1-trust-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                .t1-showcase-grid {
+                    grid-template-columns: 1fr;
+                }
+                .t1-side-promo {
+                    display: none;
+                }
+                .t1-product-card-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (max-width: 576px) {
+                .t1-trust-grid {
+                    grid-template-columns: 1fr;
+                }
+                .t1-hero-banner-inner {
+                    padding: 20px 16px;
+                    flex-direction: column;
+                    text-align: center;
+                }
+                .t1-hero-bullets {
+                    align-items: center;
+                }
+                .t1-hero-btn {
+                    margin: 0 auto;
+                }
+                .t1-hero-img-main {
+                    max-width: 180px;
+                }
+                .t1-product-card-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 8px;
+                }
             }
 
             .slider-wrapper {
@@ -1743,7 +2075,13 @@
             <div class="base-container {{ ($showCategoryMega && $sliderCategoriesList->count() > 0) ? 'slider-layout' : ($sliderLayout === 'slider_with_one_image' ? 'slider-one-image-layout' : '') }}">
                 @if ($showCategoryMega && $sliderCategoriesList->count() > 0)
                     <aside class="slider-category-menu">
-                        <div class="slider-category-heading">Categories</div>
+                        <div class="slider-category-heading">
+                            <span style="display:inline-flex; align-items:center; gap:8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                                All Categories
+                            </span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
                         <ul class="slider-category-list level-1">
                             @foreach ($sliderCategoriesList as $item)
                                 <li class="slider-category-item" data-menu-id="{{ $item->id }}">
@@ -1891,18 +2229,26 @@
                                     </div>
                                 </a>
                             @empty
-                                {{-- Fallback slide if no sliders are available --}}
-                                <div class="slide">
-                                    <div class="slide-image">
-                                        <img src="{{ asset('sliders/vVV0cwK97XSfpTwKjDFLWK47JN1ug2JCzrVnnJeE.webp') }}" alt="Welcome to Our Store"
-                                            loading="eager" width="1340" height="550">
-                                        <div class="slide-overlay"></div>
-                                        <div class="slide-content">
-                                            <h2 class="slide-title">Welcome to Our Store</h2>
-                                            <p class="slide-description">Discover our exclusive range of high-quality products
-                                                designed
-                                                for your comfort and style.</p>
-                                            <span class="slide-button">Shop Now</span>
+                                {{-- Fallback slide matching Image 2 --}}
+                                <div class="slide active t1-hero-slide">
+                                    <div class="t1-hero-banner-inner">
+                                        <div class="t1-hero-text-col">
+                                            <div class="t1-hero-badge">
+                                                <span class="t1-hero-fire">🔥</span> Top Picks
+                                            </div>
+                                            <h2 class="t1-hero-heading">Smart Gadgets for a Better Life</h2>
+                                            <p class="t1-hero-bengali">আপনার প্রতিদিনের জীবনকে আরও সহজ করতে সেরা গ্যাজেট</p>
+                                            <div class="t1-hero-bullets">
+                                                <div class="t1-hero-bullet"><span class="t1-bullet-tick">✓</span> 100% Original Products</div>
+                                                <div class="t1-hero-bullet"><span class="t1-bullet-tick">✓</span> Official Warranty Included</div>
+                                                <div class="t1-hero-bullet"><span class="t1-bullet-tick">✓</span> Best Price in Bangladesh</div>
+                                            </div>
+                                            <a href="{{ route('shop') }}" class="t1-hero-btn">
+                                                Shop Now <i class="fas fa-arrow-right" style="margin-left: 6px;"></i>
+                                            </a>
+                                        </div>
+                                        <div class="t1-hero-image-col">
+                                            <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&auto=format&fit=crop&q=80" alt="Smart Gadgets" class="t1-hero-img-main">
                                         </div>
                                     </div>
                                 </div>
@@ -1925,6 +2271,46 @@
 
                         <!-- Dots/Indicators -->
                         <div class="slider-dots"></div>
+                    </div>
+
+                    {{-- 4-item Trust / Benefits Bar --}}
+                    <div class="t1-trust-grid">
+                        <div class="t1-trust-item">
+                            <div class="t1-trust-icon" style="background:#eef2ff; color:#4f46e5;">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                            <div class="t1-trust-info">
+                                <strong>Special Discounts</strong>
+                                <span>Up to 40% Off</span>
+                            </div>
+                        </div>
+                        <div class="t1-trust-item">
+                            <div class="t1-trust-icon" style="background:#ecfdf5; color:#059669;">
+                                <i class="fas fa-truck-fast"></i>
+                            </div>
+                            <div class="t1-trust-info">
+                                <strong>Nationwide Delivery</strong>
+                                <span>Inside Dhaka 24-48h</span>
+                            </div>
+                        </div>
+                        <div class="t1-trust-item">
+                            <div class="t1-trust-icon" style="background:#fef3c7; color:#d97706;">
+                                <i class="fas fa-shield-halved"></i>
+                            </div>
+                            <div class="t1-trust-info">
+                                <strong>Secure Payment</strong>
+                                <span>100% Secure Checkout</span>
+                            </div>
+                        </div>
+                        <div class="t1-trust-item">
+                            <div class="t1-trust-icon" style="background:#eff6ff; color:#2563eb;">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="t1-trust-info">
+                                <strong>24/7 Support</strong>
+                                <span>Dedicated Assistance</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2170,6 +2556,69 @@
         {{-- End Slider --}}
     @endif
     <!-- Main Slider End-->
+
+    {{-- Template 1 Lower Showcase Section (Image 2 Matching) --}}
+    <section class="t1-showcase-section">
+        <div class="base-container t1-showcase-grid">
+            {{-- Left Side Promo Card --}}
+            <div class="t1-side-promo">
+                <div class="t1-side-promo-badge">🔥 Exclusive Offer</div>
+                <h3 class="t1-side-promo-title">ঘরে বসেই পছন্দের পণ্য কিনুন এখনই</h3>
+                <p class="t1-side-promo-sub">Order Now & Get Fast Delivery</p>
+                <a href="{{ route('shop') }}" class="t1-side-promo-btn">
+                    Shop Now 🛍️
+                </a>
+                <div class="t1-side-promo-bag">
+                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.15;">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                </div>
+            </div>
+
+            {{-- Right Side Deals & Products --}}
+            <div class="t1-showcase-products">
+                {{-- 🔥 Featured Deals --}}
+                <div class="t1-products-block">
+                    <div class="t1-block-header">
+                        <h2 class="t1-block-title">🔥 Featured Deals</h2>
+                        <a href="{{ route('shop') }}" class="t1-block-view-all">View All <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="t1-product-card-grid">
+                        @php
+                            $t1Deals = ($features_products && $features_products->count()) ? $features_products->take(4) : ($products ? $products->take(4) : collect());
+                        @endphp
+                        @foreach($t1Deals as $product)
+                            @include('frontend.partials.product-item', [
+                                'product' => $product,
+                                'badge' => 'Special!',
+                            ])
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- ⭐ Best Selling Products --}}
+                <div class="t1-products-block" style="margin-top: 32px;">
+                    <div class="t1-block-header">
+                        <h2 class="t1-block-title">⭐ Best Selling Products</h2>
+                        <a href="{{ route('shop') }}" class="t1-block-view-all">View All <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="t1-product-card-grid">
+                        @php
+                            $t1Best = ($products && $products->count() > 4) ? $products->skip(4)->take(4) : ($latestProducts ? $latestProducts->take(4) : ($products ? $products->take(4) : collect()));
+                        @endphp
+                        @foreach($t1Best as $product)
+                            @include('frontend.partials.product-item', [
+                                'product' => $product,
+                                'badge' => 'Popular',
+                            ])
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!--- Start Featured Images section -->
     @if (!empty($homepage['enable_featured_images_section']) && $homepage['enable_featured_images_section'])

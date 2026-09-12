@@ -287,6 +287,43 @@
         border-color: #2563eb !important;
     }
 
+    /* Template 1 (Default: Classic Marketplace) — Forest Green Theme */
+    .template-1 .product-card, body[data-hp-template="1"] .product-card {
+        background: #ffffff !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 14px !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+        padding-bottom: 18px !important;
+        margin-bottom: 18px !important;
+    }
+    .template-1 .product-card:hover, body[data-hp-template="1"] .product-card:hover {
+        background: #ffffff !important;
+        border-color: #0b4d3c !important;
+        box-shadow: 0 10px 28px rgba(11, 77, 60, 0.12) !important;
+        transform: translateY(-4px) !important;
+    }
+    .template-1 .product-card .product-title, body[data-hp-template="1"] .product-card .product-title {
+        color: #0f172a !important;
+        font-weight: 600 !important;
+        font-size: 13.5px !important;
+    }
+    .template-1 .product-card .current-price, body[data-hp-template="1"] .product-card .current-price {
+        color: #0b4d3c !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+    }
+    .template-1 .product-card .original-price, body[data-hp-template="1"] .product-card .original-price {
+        color: #94a3b8 !important;
+        font-size: 12px !important;
+    }
+    .template-1 .product-card .product-card-rating .rating-text, body[data-hp-template="1"] .product-card .product-card-rating .rating-text {
+        color: #64748b !important;
+        font-size: 11.5px !important;
+    }
+    .template-1 .product-card .star-icon.filled, body[data-hp-template="1"] .product-card .star-icon.filled {
+        fill: #f59e0b !important;
+    }
+
     /* Template 2 (Sky Blue & White — Light) */
     .template-2 .product-card, .t2-page .product-card {
         background: #ffffff !important;
@@ -422,15 +459,21 @@
        TEMPLATE-SPECIFIC ADD TO CART BUTTONS (VIBRANT & GLOWING)
        ========================================================= */
 
-    /* Template 1: Classic Marketplace — Royal Sapphire to Indigo Glow */
+    /* Template 1: Classic Marketplace — Forest Green */
     .template-1 .btn-card-add-to-cart, body[data-hp-template="1"] .btn-card-add-to-cart {
-        background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%) !important;
+        background: #0b4d3c !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.5), 0 0 10px rgba(79, 70, 229, 0.35) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        padding: 7px 14px !important;
+        box-shadow: 0 4px 14px rgba(11, 77, 60, 0.3) !important;
     }
     .template-1 .btn-card-add-to-cart:hover, body[data-hp-template="1"] .btn-card-add-to-cart:hover {
-        background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%) !important;
-        box-shadow: 0 6px 24px rgba(37, 99, 235, 0.75), 0 0 16px rgba(79, 70, 229, 0.5) !important;
+        background: #07392c !important;
+        box-shadow: 0 6px 18px rgba(11, 77, 60, 0.45) !important;
+        transform: translateY(-2px) !important;
     }
 
     /* Template 2: Modern Minimal / Sky — Cyber Sky Blue & Electric Indigo Glow */

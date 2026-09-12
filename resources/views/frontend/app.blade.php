@@ -897,6 +897,17 @@
         if ($topHeaderV2RightMenuId) {
             $topHeaderV2RightMenu = \App\Models\Menu::where('id', $topHeaderV2RightMenuId)->where('status', true)->first();
         }
+
+        $currentHpTemplateId = setting('homepage', 'template_id', '1');
+        if (auth()->check() && !empty(auth()->user()->template_id)) {
+            $currentHpTemplateId = (string) auth()->user()->template_id;
+        }
+        if (request()->has('preview_template') && auth()->check() && auth()->user()->isAdmin()) {
+            $previewId = (string) request()->query('preview_template');
+            if (in_array($previewId, ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], true)) {
+                $currentHpTemplateId = $previewId;
+            }
+        }
     @endphp
 
     @if ($showTopHeader == '1' && $topHeaderVersion == 'v1')
@@ -912,6 +923,55 @@
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
                 position: relative;
                 z-index: 1000;
+            }
+            .top-header-section.t1-top-header {
+                background: #f8fafc !important;
+                color: #475569 !important;
+                font-size: 12px !important;
+                font-weight: 500 !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+            }
+            .t1-top-header-bar {
+                padding: 7px 15px !important;
+            }
+            .t1-top-left {
+                display: flex !important;
+                align-items: center !important;
+                gap: 16px !important;
+                color: #334155 !important;
+            }
+            .t1-top-item {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 7px !important;
+                color: #334155 !important;
+                font-size: 12px !important;
+                font-weight: 500 !important;
+            }
+            .t1-top-item i {
+                color: #0b4d3c !important;
+                font-size: 13px !important;
+            }
+            .t1-top-divider {
+                color: #cbd5e1 !important;
+                font-size: 12px !important;
+                font-weight: 300 !important;
+            }
+            .t1-track-link {
+                color: #334155 !important;
+                font-size: 12px !important;
+                font-weight: 500 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                text-decoration: none !important;
+                transition: color 0.2s ease !important;
+            }
+            .t1-track-link i {
+                color: #0b4d3c !important;
+            }
+            .t1-track-link:hover {
+                color: #0b4d3c !important;
             }
             .top-header-section.show-topbar {
                 position: fixed;
@@ -986,11 +1046,52 @@
                 @endif
             }
         </style>
-        <section id="topHeaderSection" class="top-header-section">
+        <section id="topHeaderSection" class="top-header-section {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-top-header' : '' }}">
             <div class="base-container">
-                <div class="top-header-bar">
-                <div class="left">
-                    {{ $topHeaderLeft }}
+                @if (($currentHpTemplateId ?? '1') === '1')
+                    <div class="top-header-bar t1-top-header-bar">
+                        <div class="left t1-top-left">
+                            <span class="t1-top-item">
+                                <i class="fas fa-truck-fast"></i> Free Shipping on Order Above ৳ 1500
+                            </span>
+                            <span class="t1-top-divider">|</span>
+                            <span class="t1-top-item">
+                                <i class="fas fa-rotate-left"></i> Easy Return Policy
+                            </span>
+                            <span class="t1-top-divider">|</span>
+                            <span class="t1-top-item">
+                                <i class="fas fa-shield-halved"></i> 100% Genuine Products
+                            </span>
+                            <span class="t1-top-divider">|</span>
+                            <span class="t1-top-item">
+                                <i class="fas fa-credit-card"></i> Secure Payment
+                            </span>
+                        </div>
+                        <div class="right">
+                            <span>
+                                <a href="{{ route('order.track') }}" class="t1-track-link">
+                                    <i class="fas fa-location-dot"></i> Track Your Order
+                                </a>
+                            </span>
+                            @auth
+                                @php
+                                    $u = auth()->user();
+                                    $isAdminUser = ($u->isAdmin() || $u->hasRole('admin') || $u->hasRole('super_admin') || $u->hasRole('super admin') || $u->hasRole('manager') || $u->can('access admin') || $u->id == 1 || (isset($u->role) && in_array($u->role, ['admin', 'super_admin', 'manager'])));
+                                @endphp
+                                @if($isAdminUser)
+                                    <span>
+                                        <a href="{{ url('/admin') }}" style="color:#ffffff !important; background: #0b4d3c; padding: 2px 8px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+                                            <i class="fas fa-gauge-high" style="font-size: 11px; color:#fff;"></i> Admin
+                                        </a>
+                                    </span>
+                                @endif
+                            @endauth
+                        </div>
+                    </div>
+                @else
+                    <div class="top-header-bar">
+                    <div class="left">
+                        {{ $topHeaderLeft }}
                     @if ($showEmail == '1')
                         <span>
                             <!-- Envelope SVG -->
@@ -1060,19 +1161,9 @@
                             </span>
                         @endif
                     @endauth
-                    {{-- <span>
-                        <!-- Truck SVG -->
-                        <svg width="24" height="24" viewBox="0 0 24 24">
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M9 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
-                            <circle cx="17" cy="8" r="3"></circle>
-                            <path d="M17 13c-1.11 0-2.41.35-3.83.86 1.92.71 3.22 1.9 3.83 3.14h6v-2c0-2.66-3.33-2-6-2z">
-                            </path>
-                        </svg>
-                        <a href="{{ route('account.show') }}" style="color:#fff;">Become an Uddokta</a>
-                    </span> --}}
                 </div>
                 </div>
+                @endif
             </div>
         </section>
         <!-- End Top Header Bar -->
@@ -3337,18 +3428,167 @@
                     margin-left: 15px;
                 }
             }
-        </style>
-        <section id="mainHeaderSection" class="main-header-section">
-            <header class="base-container header">
 
-                <a href="{{ route('index') }}" class="logo">
+            /* Template 1 Header Styles (Matching Image 2) */
+            .t1-main-header-section {
+                background-color: #ffffff !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+            }
+            .t1-main-header {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 12px 15px !important;
+                gap: 20px !important;
+            }
+            .t1-logo {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                text-decoration: none !important;
+            }
+            .t1-logo-tagline {
+                font-size: 12px !important;
+                font-weight: 600 !important;
+                color: #0b4d3c !important;
+                margin-top: 2px !important;
+                letter-spacing: -0.2px !important;
+                line-height: 1.2 !important;
+            }
+            .t1-search-bar {
+                flex: 1 !important;
+                max-width: 520px !important;
+                border-radius: 50px !important;
+                border: 1.5px solid #d1d5db !important;
+                background: #ffffff !important;
+                padding: 3px 4px 3px 18px !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                transition: all 0.2s ease !important;
+            }
+            .t1-search-bar:focus-within {
+                border-color: #0b4d3c !important;
+                box-shadow: 0 0 0 3px rgba(11, 77, 60, 0.12) !important;
+            }
+            .t1-search-bar input {
+                border: none !important;
+                outline: none !important;
+                width: 100% !important;
+                font-size: 13.5px !important;
+                color: #334155 !important;
+                background: transparent !important;
+                padding: 8px 10px !important;
+            }
+            .t1-search-bar .search-btn {
+                background: #0b4d3c !important;
+                border-radius: 50% !important;
+                width: 38px !important;
+                height: 38px !important;
+                min-width: 38px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                border: none !important;
+                padding: 0 !important;
+                transition: background 0.2s ease !important;
+            }
+            .t1-search-bar .search-btn:hover {
+                background: #073a2d !important;
+            }
+            .t1-nav-icons {
+                display: flex !important;
+                align-items: center !important;
+                gap: 18px !important;
+            }
+            .t1-track-box, .t1-call-box {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                text-decoration: none !important;
+                transition: all 0.2s ease !important;
+            }
+            .t1-track-box .track-icon, .t1-call-box .call-icon {
+                color: #0b4d3c !important;
+                width: 22px !important;
+                height: 22px !important;
+            }
+            .t1-track-box .track-text strong, .t1-call-box .call-text strong {
+                font-size: 12.5px !important;
+                color: #0f172a !important;
+                font-weight: 700 !important;
+            }
+            .t1-track-box .track-text span, .t1-call-box .call-text span {
+                font-size: 11px !important;
+                color: #64748b !important;
+            }
+            .t1-wishlist-link, .t1-cart-link {
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                text-decoration: none !important;
+                color: #1e293b !important;
+                font-size: 13px !important;
+                font-weight: 600 !important;
+                transition: color 0.2s ease !important;
+            }
+            .t1-wishlist-link:hover, .t1-cart-link:hover {
+                color: #0b4d3c !important;
+            }
+            .t1-cart-badge {
+                position: absolute !important;
+                top: -7px !important;
+                right: -8px !important;
+                background-color: #f97316 !important;
+                color: white !important;
+                border-radius: 50% !important;
+                width: 16px !important;
+                height: 16px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 9px !important;
+                font-weight: 800 !important;
+                border: 2px solid #fff !important;
+            }
+            .t1-account-pill-btn {
+                background: #0b4d3c !important;
+                color: #ffffff !important;
+                border-radius: 50px !important;
+                font-size: 13px !important;
+                font-weight: 600 !important;
+                padding: 8px 18px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 7px !important;
+                text-decoration: none !important;
+                transition: background 0.2s ease, transform 0.2s ease !important;
+                box-shadow: 0 2px 8px rgba(11, 77, 60, 0.2) !important;
+            }
+            .t1-account-pill-btn:hover {
+                background: #073a2d !important;
+                color: #ffffff !important;
+                transform: translateY(-1px) !important;
+            }
+        </style>
+        <section id="mainHeaderSection" class="main-header-section {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-main-header-section' : '' }}">
+            <header class="base-container header {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-main-header' : '' }}">
+
+                <a href="{{ route('index') }}" class="logo {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-logo' : '' }}">
                     @if (setting('general', 'logo'))
                         <img src="{{ \App\Services\SettingsService::getLogo() }}" alt="Thikana Logo">
                     @else
-                        <img src="{{ asset('new/thikana.png') }}" alt="Thikana Logo" style="140px">
+                        <img src="{{ asset('new/thikana.png') }}" alt="Thikana Logo" style="width: 140px">
+                    @endif
+                    @if (($currentHpTemplateId ?? '1') === '1')
+                        <div class="t1-logo-tagline">বিশ্বাসে কিনুন, নিশ্চিত থাকুন</div>
                     @endif
                 </a>
 
+                @if (($currentHpTemplateId ?? '1') !== '1')
                 <div class="category-trigger-wrapper">
                     <a href="#" class="category-trigger-btn" id="categoryTriggerBtn">
                         <i class="fas fa-list"></i>
@@ -3358,20 +3598,21 @@
                         </svg>
                     </a>
                 </div>
+                @endif
     
-                <div class="search-bar">
+                <div class="search-bar {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-search-bar' : '' }}">
                     <input type="text" id="header-search-input"
-                        placeholder="Search Your Product Here...">
+                        placeholder="{{ ($currentHpTemplateId ?? '1') === '1' ? 'Search for products, brands and more...' : 'Search Your Product Here...' }}">
                     <button type="button" class="btn-image-search-trigger" title="Search by Image / Camera" aria-label="Search by image">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                             <circle cx="12" cy="13" r="4"></circle>
                         </svg>
                     </button>
-                    <button type="button" class="search-btn" style="background: #1e293b;">
+                    <button type="button" class="search-btn" style="background: {{ ($currentHpTemplateId ?? '1') === '1' ? '#0b4d3c' : '#1e293b' }};">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="10"
-                                fill="#1e293b" />
+                                fill="{{ ($currentHpTemplateId ?? '1') === '1' ? '#0b4d3c' : '#1e293b' }}" />
                             <path
                                 d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
                                 fill="#ffffff" />
@@ -3380,7 +3621,7 @@
                     <div id="search-results" class="search-results-container"></div>
                 </div>
     
-                <div class="nav-icons">
+                <div class="nav-icons {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-nav-icons' : '' }}">
                     <style>
                         .track-box {
                             display: flex;
@@ -3422,13 +3663,13 @@
                             stroke: #1e293b;
                         }
                         </style>
-                        <a href="{{ route('order.track') }}" class="track-box">
+                        <a href="{{ route('order.track') }}" class="track-box {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-track-box' : '' }}">
                             <svg class="track-icon web-primary-color" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5 0.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5 0.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H17V9h2.5l2 3.5H19.5z"/>
                             </svg>
                             <div class="track-text">
-                                <span>Shipping</span>
-                                <strong>Track Order</strong>
+                                <span>Fast Shipping</span>
+                                <strong>Track Your Order</strong>
                             </div>
                         </a>
 
@@ -3472,32 +3713,38 @@
                       }
                     }
                     </style>
-                    <a href="tel:{{ setting('general', 'phone_number', '01821772211') }}" class="call-box">
+                    <a href="tel:{{ setting('general', 'phone_number', '01568-324268') }}" class="call-box {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-call-box' : '' }}">
                         <svg class="call-icon web-primary-color" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1c-9.39 0-17-7.61-17-17a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"/>
                         </svg>
                         <div class="call-text">
                             <span>Call Us Now</span>
-                            <strong>{{ setting('general', 'phone_number', '01821772211') }}</strong>
+                            <strong>{{ setting('general', 'phone_number', '01568-324268') }}</strong>
                         </div>
                     </a>
                     
-                    <a href="#" title="Wishlist" style="transition: all 0.2s ease;">
+                    <a href="{{ route('account.show') }}" title="Wishlist" class="{{ ($currentHpTemplateId ?? '1') === '1' ? 't1-wishlist-link' : '' }}" style="transition: all 0.2s ease;">
                         <div class="wishlist-icon">
                             <svg class="web-primary-stroke" width="22" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                             </svg>
                         </div>
+                        @if (($currentHpTemplateId ?? '1') === '1')
+                            <span>Wishlist</span>
+                        @endif
                     </a>
     
-                    <a href="{{ route('cart.index') }}" title="Shopping Cart" class="cart-drawer-trigger" style="transition: all 0.2s ease;">
+                    <a href="{{ route('cart.index') }}" title="Shopping Cart" class="cart-drawer-trigger {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-cart-link' : '' }}" style="transition: all 0.2s ease;">
                         <div class="cart-icon" style="position: relative;">
                             <svg class="web-primary-stroke" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                             </svg>
-                            <span class="cart-count" style="position: absolute; top: -6px; right: -8px; background-color: #1e293b; color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; border: 2px solid #fff;">{{ $cartCount }}</span>
+                            <span class="cart-count {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-cart-badge' : '' }}" style="{{ ($currentHpTemplateId ?? '1') === '1' ? '' : 'position: absolute; top: -6px; right: -8px; background-color: #1e293b; color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; border: 2px solid #fff;' }}">{{ $cartCount }}</span>
                         </div>
+                        @if (($currentHpTemplateId ?? '1') === '1')
+                            <span>Cart</span>
+                        @endif
                     </a>
                     
                     <a href="{{ route('account.show') }}" title="My Account" class="profile-icon-area" style="transition: all 0.2s ease;">
@@ -3507,7 +3754,15 @@
                             </svg>
                         </div>
                     </a>
-                    @if (auth()->check())
+                    @if (($currentHpTemplateId ?? '1') === '1')
+                        <a href="{{ route('account.show') }}" class="t1-account-pill-btn">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            <span>My Account</span>
+                            <i class="fas fa-chevron-down" style="font-size: 9px; margin-left: 2px;"></i>
+                        </a>
+                    @elseif (auth()->check())
                         <a href="{{ route('account.show') }}" class="register-btn" style="background: #1e293b; border-radius: 50px; font-size: 13px; font-weight: 600; padding: 10px 20px; transition: all 0.2s ease;">
                             <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2" style="margin-right:6px;" viewBox="0 0 24 24">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
