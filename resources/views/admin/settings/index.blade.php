@@ -3034,26 +3034,36 @@
                                 </div>
                             </div>
 
-                            {{-- Navigation Tabs for Cards 1 to 4 --}}
+                            {{-- Navigation Tabs for Cards 1 to 6 --}}
                             <ul class="nav nav-pills mb-3" id="t1PromoCardsTabs" role="tablist">
                                 <li class="nav-item mr-2">
                                     <a class="nav-link active font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-1-tab" data-toggle="pill" href="#t1-card-1" role="tab" style="font-size: 12px;">
-                                        <i class="fas fa-star text-warning mr-1"></i> Card 1 (Top / Featured Deals)
+                                        <i class="fas fa-star text-warning mr-1"></i> Card 1
                                     </a>
                                 </li>
                                 <li class="nav-item mr-2">
                                     <a class="nav-link font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-2-tab" data-toggle="pill" href="#t1-card-2" role="tab" style="font-size: 12px;">
-                                        <i class="fas fa-fire text-danger mr-1"></i> Card 2 (Next / Best Selling)
+                                        <i class="fas fa-fire text-danger mr-1"></i> Card 2
                                     </a>
                                 </li>
                                 <li class="nav-item mr-2">
                                     <a class="nav-link font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-3-tab" data-toggle="pill" href="#t1-card-3" role="tab" style="font-size: 12px;">
-                                        <i class="fas fa-bolt text-primary mr-1"></i> Card 3 (Optional)
+                                        <i class="fas fa-bolt text-primary mr-1"></i> Card 3
                                     </a>
                                 </li>
                                 <li class="nav-item mr-2">
                                     <a class="nav-link font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-4-tab" data-toggle="pill" href="#t1-card-4" role="tab" style="font-size: 12px;">
-                                        <i class="fas fa-sparkles text-info mr-1"></i> Card 4 (Optional)
+                                        <i class="fas fa-sparkles text-info mr-1"></i> Card 4
+                                    </a>
+                                </li>
+                                <li class="nav-item mr-2">
+                                    <a class="nav-link font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-5-tab" data-toggle="pill" href="#t1-card-5" role="tab" style="font-size: 12px;">
+                                        <i class="fas fa-tag text-purple mr-1"></i> Card 5
+                                    </a>
+                                </li>
+                                <li class="nav-item mr-2">
+                                    <a class="nav-link font-weight-bold rounded-pill px-3 py-1.5" id="t1-card-6-tab" data-toggle="pill" href="#t1-card-6" role="tab" style="font-size: 12px;">
+                                        <i class="fas fa-gem text-success mr-1"></i> Card 6
                                     </a>
                                 </li>
                             </ul>
@@ -3100,11 +3110,31 @@
                                         'bg_end' => '#1e1b4b',
                                         'enabled' => '0',
                                     ],
+                                    5 => [
+                                        'badge' => '⚡ Flash Discount',
+                                        'title' => 'সীমিত সময়ের জন্য বিশেষ ছাড়',
+                                        'sub' => 'Grab Your Favorite Items Fast',
+                                        'tags' => '⚡ সুপার ডিল, 🔥 সেরা মূল্য',
+                                        'btn_text' => 'Order Now 🛒',
+                                        'bg_start' => '#831843',
+                                        'bg_end' => '#500724',
+                                        'enabled' => '0',
+                                    ],
+                                    6 => [
+                                        'badge' => '🌟 Exclusive Picks',
+                                        'title' => 'জনপ্রিয় পণ্যসমূহ এখন আরও সাশ্রয়ে',
+                                        'sub' => 'Top Rated by Customers',
+                                        'tags' => '🌟 টপ রেটেড, 📦 দ্রুত ডেলিভারি',
+                                        'btn_text' => 'Explore More 🌟',
+                                        'bg_start' => '#134e4a',
+                                        'bg_end' => '#042f2e',
+                                        'enabled' => '0',
+                                    ],
                                 ];
                             @endphp
 
                             <div class="tab-content" id="t1PromoCardsTabContent">
-                                @for($i = 1; $i <= 4; $i++)
+                                @for($i = 1; $i <= 6; $i++)
                                 <div class="tab-pane fade {{ $i == 1 ? 'show active' : '' }}" id="t1-card-{{ $i }}" role="tabpanel">
                                     <div class="p-3 bg-white rounded-3 border shadow-sm">
                                         <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">

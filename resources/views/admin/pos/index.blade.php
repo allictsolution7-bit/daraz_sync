@@ -1233,9 +1233,14 @@
                 </div>
                 <div class="customer-form">
                     <div class="mb-3 position-relative">
-                        <input type="text" class="form-control" id="customerSearch" 
-                               placeholder="Search existing customer..." autocomplete="off">
-                        <div id="customerSuggestions" class="position-absolute w-100 mt-1 shadow-lg bg-white rounded-3" style="z-index: 1050; max-height: 250px; overflow-y: auto; display: none; border: 1px solid rgba(0,0,0,0.1);"></div>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="customerSearch" 
+                                   placeholder="Search or select existing customer..." autocomplete="off">
+                            <button class="btn btn-outline-secondary" type="button" id="customerDropdownToggle" title="Browse existing customers">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div id="customerSuggestions" class="position-absolute w-100 mt-1 shadow-lg bg-white rounded-3" style="z-index: 1050; max-height: 280px; overflow-y: auto; display: none; border: 1px solid rgba(0,0,0,0.12);"></div>
                     </div>
                     <div class="row g-2">
                         <div class="col-md-6">
@@ -1429,15 +1434,24 @@ function setupEventListeners() {
         }
     });
     
-    // Customer search
-    $('#customerSearch').on('input', debounce(searchCustomers, 300));
-    $('#customerSearch').on('focus', function() {
-        if ($('#customerSuggestions').children().length > 0) {
-            $('#customerSuggestions').show();
+    // Customer search & dropdown
+    $('#customerSearch').on('input', debounce(function() {
+        searchCustomers(false);
+    }, 300));
+    $('#customerSearch').on('focus click', function() {
+        searchCustomers(true);
+    });
+    $('#customerDropdownToggle').on('click', function(e) {
+        e.stopPropagation();
+        if ($('#customerSuggestions').is(':visible')) {
+            $('#customerSuggestions').hide();
+        } else {
+            searchCustomers(true);
+            $('#customerSearch').focus();
         }
     });
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('#customerSearch, #customerSuggestions').length) {
+        if (!$(e.target).closest('#customerSearch, #customerSuggestions, #customerDropdownToggle').length) {
             $('#customerSuggestions').hide();
         }
     });
@@ -1500,7 +1514,7 @@ function loadSubcategories(categoryId) {
     setSubcategoryOptions(null, 'Loading...', true);
     setThirdCategoryOptions(null, 'Select a subcategory first', true);
 
-    const url = '{{ route("admin.get-product-subcategories", ":id") }}'.replace('%3Aid', categoryId).replace(':id', categoryId);
+    const url = '{{ route("admin.get-product-subcategories", ":id", false) }}'.replace('%3Aid', categoryId).replace(':id', categoryId);
 
     fetch(url)
         .then(response => response.json())
@@ -1524,7 +1538,7 @@ function loadThirdCategories(subcategoryId) {
 
     setThirdCategoryOptions(null, 'Loading...', true);
 
-    fetch('{{ route('admin.third-categories.by-subcategories') }}', {
+    fetch('{{ route('admin.third-categories.by-subcategories', [], false) }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -1617,7 +1631,7 @@ function searchProducts(page = 1) {
     }
     grid.html(skeletonHtml);
     
-    $.get('{{ route("admin.pos.search-products") }}', {
+    $.get('{{ route("admin.pos.search-products", [], false) }}', {
         search: search,
         primary_category_id: primaryCategoryId,
         subcategory_id: subCategoryId,
@@ -2032,39 +2046,107 @@ function clearCart() {
     }
 }
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Customer management
-function searchCustomers() {
-    const search = $('#customerSearch').val();
-    if (search.length < 2) {
+function searchCustomers(forceShow = false) {
+    const search = $('#customerSearch').val().trim();
+    
+    // If not forceShow and search is empty, hide suggestions
+    if (!forceShow && search.length === 0) {
         $('#customerSuggestions').empty().hide();
         return;
     }
     
-    $.get('{{ route("admin.pos.search-customers") }}', { search: search })
+    // Show spinner if empty
+    if (forceShow && $('#customerSuggestions').children().length === 0) {
+        $('#customerSuggestions').html(`
+            <div class="p-3 text-center text-muted small">
+                <i class="fas fa-spinner fa-spin me-1"></i> Loading customers...
+            </div>
+        `).show();
+    }
+    
+    $.get('{{ route("admin.pos.search-customers", [], false) }}', { search: search })
     .done(function(response) {
         displayCustomerSuggestions(response.customers);
+    })
+    .fail(function(xhr) {
+        let errText = 'Failed to load customers';
+        if (xhr.responseJSON && xhr.responseJSON.message) {
+            errText = xhr.responseJSON.message;
+        } else if (xhr.statusText && xhr.statusText !== 'error') {
+            errText += ` (${xhr.status}: ${xhr.statusText})`;
+        }
+        $('#customerSuggestions').html(`
+            <div class="p-3 text-center text-danger small">
+                <i class="fas fa-exclamation-circle me-1"></i> ${escapeHtml(errText)}
+            </div>
+        `).show();
     });
 }
 
 function displayCustomerSuggestions(customers) {
     const suggestions = $('#customerSuggestions');
     
-    if (customers.length === 0) {
-        suggestions.empty().hide();
+    if (!customers || customers.length === 0) {
+        suggestions.html(`
+            <div class="p-3 text-center text-muted small">
+                <i class="fas fa-user-slash me-1"></i> No matching customers found
+            </div>
+        `).show();
         return;
     }
     
     let html = '<div class="list-group list-group-flush m-0">';
     customers.forEach(customer => {
+        let creatorBadge = '';
+        if (customer.created_by_name) {
+            creatorBadge = `<span class="badge bg-light text-dark border me-1" style="font-size: 10px;" title="Created from POS / Staff"><i class="fas fa-user-edit me-1 text-primary"></i>${escapeHtml(customer.created_by_name)} <span class="text-muted">(${escapeHtml(customer.created_by_role)})</span></span>`;
+        } else {
+            creatorBadge = `<span class="badge bg-light text-secondary border me-1" style="font-size: 10px;" title="Self-Registered Website Customer"><i class="fas fa-globe me-1 text-muted"></i>Self-Registered</span>`;
+        }
+
+        let portalBadge = '';
+        if (customer.portal) {
+            portalBadge = `<span class="badge bg-info-subtle text-info border border-info-subtle me-1" style="font-size: 10px;" title="Portal / Store"><i class="fas fa-store me-1"></i>${escapeHtml(customer.portal)}</span>`;
+        }
+
+        const safeName = escapeHtml(customer.name);
+        const safePhone = escapeHtml(customer.phone);
+        const safeEmail = escapeHtml(customer.email || '');
+        const safeAddress = escapeHtml(customer.address || '');
+        const safeCity = escapeHtml(customer.city || '');
+        
         html += `
-            <button type="button" class="list-group-item list-group-item-action border-0 py-2 px-3" 
-                    onclick="selectCustomer(${customer.id}, '${customer.name}', '${customer.phone}', '${customer.email || ''}', '${customer.address || ''}', '${customer.city || ''}')">
-                <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="list-group-item list-group-item-action border-0 py-2 px-3 customer-select-btn" 
+                    data-id="${customer.id}"
+                    data-name="${safeName}"
+                    data-phone="${safePhone}"
+                    data-email="${safeEmail}"
+                    data-address="${safeAddress}"
+                    data-city="${safeCity}">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="fw-bold text-dark">${customer.name}</div>
-                        <small class="text-muted"><i class="fas fa-phone-alt me-1 text-secondary" style="font-size:10px;"></i>${customer.phone}</small>
+                        <div class="fw-bold text-dark" style="font-size: 13.5px;">${safeName}</div>
+                        <div class="text-muted small">
+                            <i class="fas fa-phone-alt me-1 text-secondary" style="font-size: 10px;"></i>${safePhone}
+                            ${customer.email ? `<span class="ms-2 text-muted"><i class="fas fa-envelope me-1" style="font-size: 10px;"></i>${safeEmail}</span>` : ''}
+                        </div>
+                        <div class="mt-1 d-flex flex-wrap gap-1 align-items-center">
+                            ${creatorBadge}
+                            ${portalBadge}
+                        </div>
                     </div>
-                    <span class="badge bg-light text-secondary border px-2 py-1">${customer.city || 'No City'}</span>
+                    <span class="badge bg-light text-secondary border px-2 py-1" style="font-size: 11px;">${customer.city || 'No City'}</span>
                 </div>
             </button>
         `;
@@ -2073,6 +2155,18 @@ function displayCustomerSuggestions(customers) {
     
     suggestions.html(html).show();
 }
+
+$(document).on('click', '.customer-select-btn', function() {
+    const btn = $(this);
+    selectCustomer(
+        btn.data('id'),
+        btn.data('name'),
+        btn.data('phone'),
+        btn.data('email'),
+        btn.data('address'),
+        btn.data('city')
+    );
+});
 
 function selectCustomer(id, name, phone, email, address, city) {
     selectedCustomer = { id, name, phone, email, address, city };
@@ -2414,7 +2508,7 @@ function placeOrder() {
     const originalFooter = modal.find('.modal-footer').html();
     modal.find('.modal-footer').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Placing order...</div>');
     
-    $.post('{{ route("admin.pos.create-order") }}', pendingOrder)
+    $.post('{{ route("admin.pos.create-order", [], false) }}', pendingOrder)
     .done(function(response) {
         if (response.success) {
             toastr.success('Order #' + response.order.id + ' placed successfully!');
@@ -2587,7 +2681,7 @@ function stopScanner() {
 
 // Stats loading
 function loadStats() {
-    $.get('{{ route("admin.pos.stats") }}')
+    $.get('{{ route("admin.pos.stats", [], false) }}')
     .done(function(response) {
         $('#todayOrders').text(response.today.orders);
         $('#todayRevenue').text('৳' + response.today.revenue);

@@ -220,25 +220,250 @@ class POSController extends Controller
     }
 
     /**
-     * Search customers for POS (AJAX)
+     * Search customers for POS (AJAX) with role-based visibility:
+     * - Superadmin: Sees all customers across current DB and all tenant databases/portals, with creator and portal info.
+     * - Admin: Sees all customers in current database/portal, with creator info and self-registered status.
+     * - Other roles with POS permission (staff/cashier/reseller): ONLY sees customers they created (created_by == auth()->id()).
      */
     public function searchCustomers(Request $request)
     {
-        $query = User::query();
+        try {
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['customers' => []]);
+            }
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('phone', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%");
+            $isSuperAdmin = (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin())
+                || (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['super_admin', 'super admin', 'Super Admin']))
+                || ($user->role ?? '') === 'super_admin' 
+                || in_array($user->type ?? '', ['super_admin', 'super admin']);
+
+            $isAdmin = (method_exists($user, 'isAdmin') && $user->isAdmin())
+                || (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['admin', 'super_admin', 'super admin', 'Admin', 'Super Admin']))
+                || in_array($user->role ?? '', ['admin', 'super_admin'])
+                || in_array($user->type ?? '', ['admin', 'super_admin']);
+
+            $search = trim($request->input('search', ''));
+
+            $excludedRoles = ['super_admin', 'super admin', 'admin', 'vendor', 'reseller', 'vendor_staff', 'paid_vendor', 'wholeseller'];
+
+            // Case 1: Super Admin -> Can see all customers across all databases & portals
+            if ($isSuperAdmin) {
+                $currentPortal = 'Main Store';
+                if ($tenant = $request->attributes->get('tenant')) {
+                    $currentPortal = $tenant->name ?: $tenant->subdomain;
+                }
+
+                $currentQuery = User::query()
+                    ->whereDoesntHave('roles', function ($q) use ($excludedRoles) {
+                        $q->whereIn('name', $excludedRoles);
+                    })
+                    ->with(['creator.roles']);
+
+                if (!empty($search)) {
+                    $currentQuery->where(function($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%")
+                          ->orWhere('phone', 'LIKE', "%{$search}%")
+                          ->orWhere('email', 'LIKE', "%{$search}%");
+                    });
+                }
+
+                $customers = $currentQuery->latest('id')->limit(30)->get()->map(function($c) use ($currentPortal) {
+                    return $this->formatCustomerForPos($c, $currentPortal);
+                });
+
+                // Also check other tenant databases if SaaS tenants exist
+                try {
+                    $tenants = \App\Models\SaaSTenant::where('is_active', true)->get();
+                    $currentTenantId = $request->attributes->get('tenant')?->id;
+
+                    foreach ($tenants as $tenant) {
+                        if ($currentTenantId && $tenant->id == $currentTenantId) {
+                            continue;
+                        }
+
+                        $dbName = $tenant->db_name ?: ('purnobd_' . $tenant->subdomain);
+                        try {
+                            $defaultConfig = config('database.connections.mysql');
+                            $defaultConfig['database'] = $dbName;
+                            config(['database.connections.tenant_temp' => $defaultConfig]);
+                            DB::purge('tenant_temp');
+
+                            $tQuery = DB::connection('tenant_temp')->table('users')
+                                ->whereNotExists(function($sub) use ($excludedRoles) {
+                                    $sub->select(DB::raw(1))
+                                        ->from('model_has_roles')
+                                        ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                                        ->whereColumn('model_has_roles.model_id', 'users.id')
+                                        ->where('model_has_roles.model_type', User::class)
+                                        ->whereIn('roles.name', $excludedRoles);
+                                })
+                                ->select('id', 'name', 'phone', 'email', 'address', 'city', 'created_by');
+
+                            if (!empty($search)) {
+                                $tQuery->where(function($q) use ($search) {
+                                    $q->where('name', 'LIKE', "%{$search}%")
+                                      ->orWhere('phone', 'LIKE', "%{$search}%")
+                                      ->orWhere('email', 'LIKE', "%{$search}%");
+                                });
+                            }
+
+                            $tCustomers = $tQuery->orderBy('id', 'desc')->limit(10)->get();
+                            $creatorIds = $tCustomers->pluck('created_by')->filter()->unique();
+                            $creators = [];
+                            if ($creatorIds->isNotEmpty()) {
+                                $creators = DB::connection('tenant_temp')->table('users')
+                                    ->whereIn('id', $creatorIds)
+                                    ->get()
+                                    ->keyBy('id');
+                            }
+
+                            foreach ($tCustomers as $tc) {
+                                $creatorObj = isset($creators[$tc->created_by]) ? $creators[$tc->created_by] : null;
+                                $customers->push([
+                                    'id' => $tc->id,
+                                    'name' => $tc->name,
+                                    'phone' => $tc->phone,
+                                    'email' => $tc->email,
+                                    'address' => $tc->address,
+                                    'city' => $tc->city,
+                                    'portal' => $tenant->name ?: $tenant->subdomain,
+                                    'created_by_name' => $creatorObj ? $creatorObj->name : null,
+                                    'created_by_role' => $creatorObj ? 'Staff' : 'Self-Registered',
+                                    'is_external_tenant' => true,
+                                ]);
+                            }
+                        } catch (\Throwable $e) {
+                            // Skip if tenant DB is not reachable
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // Ignore tenant query failure
+                }
+
+                return response()->json([
+                    'customers' => $customers->values()
+                ]);
+            }
+
+            // Case 2: Admin -> Sees all customers in current database/portal
+            if ($isAdmin) {
+                $query = User::query()
+                    ->whereDoesntHave('roles', function ($q) use ($excludedRoles) {
+                        $q->whereIn('name', $excludedRoles);
+                    })
+                    ->with(['creator.roles']);
+
+                if (!empty($search)) {
+                    $query->where(function($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%")
+                          ->orWhere('phone', 'LIKE', "%{$search}%")
+                          ->orWhere('email', 'LIKE', "%{$search}%");
+                    });
+                }
+
+                $customers = $query->latest('id')->limit(40)->get()->map(function($c) {
+                    return $this->formatCustomerForPos($c);
+                });
+
+                return response()->json([
+                    'customers' => $customers
+                ]);
+            }
+
+            // Case 3: Other roles with POS permission (staff, cashier, reseller, vendor staff)
+            // ONLY see customers they created when processing POS orders
+            $query = User::query()
+                ->where('created_by', $user->id)
+                ->whereDoesntHave('roles', function ($q) use ($excludedRoles) {
+                    $q->whereIn('name', $excludedRoles);
+                })
+                ->with(['creator.roles']);
+
+            if (!empty($search)) {
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('phone', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            }
+
+            $customers = $query->latest('id')->limit(40)->get()->map(function($c) {
+                return $this->formatCustomerForPos($c);
             });
+
+            return response()->json([
+                'customers' => $customers
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('POS searchCustomers error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage(),
+                'customers' => []
+            ], 500);
+        }
+    }
+
+    /**
+     * Format customer data for POS suggestions
+     */
+    private function formatCustomerForPos($customer, $portalName = null)
+    {
+        $creatorName = null;
+        $creatorRole = 'Self-Registered';
+
+        if ($customer->creator) {
+            $creatorName = $customer->creator->name;
+            $creatorRole = $customer->creator->roles->isNotEmpty()
+                ? $customer->creator->roles->pluck('name')->implode(', ')
+                : ($customer->creator->role ?? 'Staff');
         }
 
-        $customers = $query->limit(10)->get(['id', 'name', 'phone', 'email', 'address', 'city']);
+        return [
+            'id' => $customer->id,
+            'name' => $customer->name,
+            'phone' => $customer->phone,
+            'email' => $customer->email,
+            'address' => $customer->address,
+            'city' => $customer->city,
+            'portal' => $portalName,
+            'created_by_name' => $creatorName,
+            'created_by_role' => $creatorRole,
+            'is_external_tenant' => false,
+        ];
+    }
+
+    /**
+     * Create customer from POS (AJAX)
+     */
+    public function createCustomer(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|unique:users,email',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string',
+        ]);
+
+        $customer = User::create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'email' => $request->email ?: User::generateUniqueEmail($request->name, 'pos_customer'),
+            'address' => $request->address ?? '',
+            'city' => $request->city ?? '',
+            'upazila' => '',
+            'password' => bcrypt('password'),
+            'otp_verified' => true,
+            'created_by' => auth()->id(),
+        ]);
 
         return response()->json([
-            'customers' => $customers
+            'success' => true,
+            'customer' => $this->formatCustomerForPos($customer)
         ]);
     }
 
@@ -291,17 +516,22 @@ class POSController extends Controller
                 if ($request->customer_id) {
                     $customer = User::find($request->customer_id);
                 } else {
-                    // Create new customer
-                    $customer = User::create([
-                        'name' => $request->customer_name,
-                        'phone' => $request->customer_phone,
-                        'email' => $request->customer_email ?: User::generateUniqueEmail($request->customer_name, 'pos_customer'),
-                        'address' => $request->customer_address ?? '',
-                        'city' => $request->customer_city ?? '',
-                        'upazila' => '', // Required field for users table
-                        'password' => bcrypt('password'), // Default password
-                        'otp_verified' => true // Skip OTP for POS orders
-                    ]);
+                    // Check if customer with phone already exists
+                    $customer = User::where('phone', $request->customer_phone)->first();
+                    if (!$customer) {
+                        // Create new customer with creator attribution
+                        $customer = User::create([
+                            'name' => $request->customer_name,
+                            'phone' => $request->customer_phone,
+                            'email' => $request->customer_email ?: User::generateUniqueEmail($request->customer_name, 'pos_customer'),
+                            'address' => $request->customer_address ?? '',
+                            'city' => $request->customer_city ?? '',
+                            'upazila' => '', // Required field for users table
+                            'password' => bcrypt('password'), // Default password
+                            'otp_verified' => true, // Skip OTP for POS orders
+                            'created_by' => auth()->id(), // Track who created this customer from POS
+                        ]);
+                    }
                 }
 
                 // Validate stock availability for all items

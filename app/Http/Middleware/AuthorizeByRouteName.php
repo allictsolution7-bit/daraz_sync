@@ -89,6 +89,21 @@ class AuthorizeByRouteName
             abort(403, 'Permission required: (customers.view). Please ask an administrator to grant this permission.');
         }
 
+        // Direct mapping for POS customer search and create
+        if ($name === 'admin.pos.search-customers' || $name === 'admin.pos.create-customer') {
+            if (
+                $user->can('pos.view') || 
+                $user->can('pos.access') || 
+                $user->can('pos.index') || 
+                $user->can('pos.create') || 
+                $user->can('customers.view') || 
+                (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))
+            ) {
+                return $next($request);
+            }
+            abort(403, 'Permission required: (pos.view). Please ask an administrator to grant this permission.');
+        }
+
         // Direct mapping for basic shipping settings route
         if (str_starts_with($name, 'admin.basic.shipping.settings') || str_starts_with($name, 'basic.shipping.settings')) {
             if ($user->can('shipping.basic.view') || $user->can('shipping.basic.update') || $user->can('basic_shipping.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {
@@ -235,7 +250,14 @@ class AuthorizeByRouteName
             'courierStatus' => 'status',
             'balance' => 'balance',
             'search-products' => 'view',
+            'search-customers' => 'view',
+            'create-customer' => 'create',
             'create-order' => 'create',
+            'stats' => 'view',
+            'print-receipt' => 'view',
+            'print-invoice' => 'view',
+            'download-receipt' => 'view',
+            'download-invoice' => 'view',
         ];
 
         $suffix = $map[$action] ?? null;

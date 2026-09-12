@@ -3508,79 +3508,131 @@
             .t1-search-bar .search-btn:hover {
                 background: #073a2d !important;
             }
-            .t1-nav-icons {
+            .t1-nav-icons, .nav-icons.header-action-group {
                 display: flex !important;
                 align-items: center !important;
-                gap: 18px !important;
+                gap: 12px !important;
+                overflow: visible !important;
             }
-            .t1-track-box, .t1-call-box {
-                display: flex !important;
+            .header-action-btn {
+                position: relative;
+                display: inline-flex !important;
                 align-items: center !important;
-                gap: 8px !important;
-                text-decoration: none !important;
-                transition: all 0.2s ease !important;
-            }
-            .t1-track-box .track-icon, .t1-call-box .call-icon {
-                color: #0b4d3c !important;
-                width: 22px !important;
-                height: 22px !important;
-            }
-            .t1-track-box .track-text strong, .t1-call-box .call-text strong {
-                font-size: 12.5px !important;
-                color: #0f172a !important;
-                font-weight: 700 !important;
-            }
-            .t1-track-box .track-text span, .t1-call-box .call-text span {
-                font-size: 11px !important;
-                color: #64748b !important;
-            }
-            .t1-wishlist-link, .t1-cart-link {
-                display: flex !important;
-                align-items: center !important;
-                gap: 6px !important;
-                text-decoration: none !important;
-                color: #1e293b !important;
-                font-size: 13px !important;
-                font-weight: 600 !important;
-                transition: color 0.2s ease !important;
-            }
-            .t1-wishlist-link:hover, .t1-cart-link:hover {
-                color: #0b4d3c !important;
-            }
-            .t1-cart-badge {
-                position: absolute !important;
-                top: -7px !important;
-                right: -8px !important;
-                background-color: #f97316 !important;
-                color: white !important;
+                justify-content: center !important;
+                width: 40px !important;
+                height: 40px !important;
                 border-radius: 50% !important;
-                width: 16px !important;
-                height: 16px !important;
+                background: #f8fafc !important;
+                border: 1px solid #e2e8f0 !important;
+                color: #1e293b !important;
+                text-decoration: none !important;
+                transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+            .header-action-btn svg {
+                width: 19px !important;
+                height: 19px !important;
+                stroke: currentColor !important;
+                stroke-width: 2 !important;
+                fill: none !important;
+                transition: transform 0.2s ease, stroke 0.2s ease !important;
+            }
+            .header-action-btn:hover {
+                background: #0b4d3c !important;
+                border-color: #0b4d3c !important;
+                color: #ffffff !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 4px 14px rgba(11, 77, 60, 0.25) !important;
+            }
+            .header-action-btn:hover svg {
+                stroke: #ffffff !important;
+                transform: scale(1.08) !important;
+            }
+            .header-action-btn.btn-account {
+                background: #f0fdf4 !important;
+                border-color: #bbf7d0 !important;
+                color: #0b4d3c !important;
+            }
+            .header-action-btn.btn-account:hover {
+                background: #0b4d3c !important;
+                border-color: #0b4d3c !important;
+                color: #ffffff !important;
+            }
+            .header-action-tooltip {
+                position: absolute;
+                bottom: -32px;
+                left: 50%;
+                transform: translateX(-50%) translateY(4px);
+                background: #0f172a;
+                color: #ffffff;
+                font-size: 11.5px;
+                font-weight: 600;
+                line-height: 1;
+                padding: 6px 10px;
+                border-radius: 6px;
+                white-space: nowrap;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: all 0.18s ease;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                z-index: 9999;
+            }
+            .header-action-tooltip::before {
+                content: '';
+                position: absolute;
+                top: -4px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-width: 0 4px 4px 4px;
+                border-style: solid;
+                border-color: transparent transparent #0f172a transparent;
+            }
+            .header-action-btn:hover .header-action-tooltip {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(-50%) translateY(0);
+            }
+            .header-cart-badge {
+                position: absolute !important;
+                top: -3px !important;
+                right: -3px !important;
+                min-width: 18px !important;
+                height: 18px !important;
+                padding: 0 4px !important;
+                background: #f97316 !important;
+                color: #ffffff !important;
+                border-radius: 9999px !important;
+                font-size: 10px !important;
+                font-weight: 700 !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                font-size: 9px !important;
-                font-weight: 800 !important;
-                border: 2px solid #fff !important;
+                border: 2px solid #ffffff !important;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+                line-height: 1 !important;
             }
-            .t1-account-pill-btn {
-                background: #0b4d3c !important;
-                color: #ffffff !important;
-                border-radius: 50px !important;
-                font-size: 13px !important;
-                font-weight: 600 !important;
-                padding: 8px 18px !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                gap: 7px !important;
-                text-decoration: none !important;
-                transition: background 0.2s ease, transform 0.2s ease !important;
-                box-shadow: 0 2px 8px rgba(11, 77, 60, 0.2) !important;
+            @media (max-width: 992px) {
+                .header-action-btn.hide-on-tablet {
+                    display: none !important;
+                }
             }
-            .t1-account-pill-btn:hover {
-                background: #073a2d !important;
-                color: #ffffff !important;
-                transform: translateY(-1px) !important;
+            @media (max-width: 768px) {
+                .header-action-tooltip {
+                    display: none !important;
+                }
+                .t1-nav-icons, .nav-icons.header-action-group {
+                    gap: 8px !important;
+                }
+                .header-action-btn {
+                    width: 36px !important;
+                    height: 36px !important;
+                }
+                .header-action-btn svg {
+                    width: 17px !important;
+                    height: 17px !important;
+                }
             }
         </style>
         <section id="mainHeaderSection" class="main-header-section {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-main-header-section' : '' }}">
@@ -3630,153 +3682,61 @@
                     <div id="search-results" class="search-results-container"></div>
                 </div>
     
-                <div class="nav-icons {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-nav-icons' : '' }}">
-                    <style>
-                        .track-box {
-                            display: flex;
-                            align-items: center;
-                            gap: 8px;
-                            font-family: 'Inter', sans-serif;
-                            text-decoration: none;
-                            transition: all 0.2s ease;
-                        }
-                        .track-box:hover {
-                            opacity: 0.85;
-                            transform: translateY(-1px);
-                        }
-                        
-                        .track-icon {
-                            width: 22px;
-                            height: 22px;
-                            flex-shrink: 0;
-                        }
-                        
-                        .track-text span {
-                            display: block;
-                            font-size: 11px;
-                            color: #64748b;
-                            font-weight: 500;
-                        }
-                        
-                        .track-text strong {
-                            display: block;
-                            font-size: 13px;
-                            font-weight: 700;
-                            color: #1e293b;
-                        }
-                        
-                        .web-primary-color {
-                            fill: #1e293b;
-                        }
-                        .web-primary-stroke {
-                            stroke: #1e293b;
-                        }
-                        </style>
-                        <a href="{{ route('order.track') }}" class="track-box {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-track-box' : '' }}">
-                            <svg class="track-icon web-primary-color" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5 0.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5 0.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H17V9h2.5l2 3.5H19.5z"/>
-                            </svg>
-                            <div class="track-text">
-                                <span>Fast Shipping</span>
-                                <strong>Track Your Order</strong>
-                            </div>
-                        </a>
-
-                    <style>
-                    .call-box {
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        font-family: 'Inter', sans-serif;
-                        text-decoration: none;
-                        transition: all 0.2s ease;
-                    }
-                    .call-box:hover {
-                        opacity: 0.85;
-                        transform: translateY(-1px);
-                    }
-                    
-                    .call-icon {
-                        width: 20px;
-                        height: 20px;
-                        flex-shrink: 0;
-                    }
-                    
-                    .call-text span {
-                        display: block;
-                        font-size: 11px;
-                        color: #64748b;
-                        font-weight: 500;
-                    }
-                    
-                    .call-text strong {
-                        display: block;
-                        font-size: 13px;
-                        font-weight: 700;
-                        color: #1e293b;
-                    }
-                    @media (max-width: 992px) {
-                      .track-box,
-                      .call-box {
-                        display: none !important;
-                      }
-                    }
-                    </style>
-                    <a href="tel:{{ setting('general', 'phone_number', '01568-324268') }}" class="call-box {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-call-box' : '' }}">
-                        <svg class="call-icon web-primary-color" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1c-9.39 0-17-7.61-17-17a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"/>
+                <div class="nav-icons header-action-group {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-nav-icons' : '' }}">
+                    <!-- Track Order -->
+                    <a href="{{ route('order.track') }}" class="header-action-btn hide-on-tablet" aria-label="Track Your Order">
+                        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="3" width="15" height="13"></rect>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
                         </svg>
-                        <div class="call-text">
-                            <span>Call Us Now</span>
-                            <strong>{{ setting('general', 'phone_number', '01568-324268') }}</strong>
-                        </div>
+                        <span class="header-action-tooltip">Track Order</span>
                     </a>
-                    
-                    <a href="{{ route('account.show') }}" title="Wishlist" class="{{ ($currentHpTemplateId ?? '1') === '1' ? 't1-wishlist-link' : '' }}" style="transition: all 0.2s ease;">
-                        <div class="wishlist-icon">
-                            <svg class="web-primary-stroke" width="22" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                            </svg>
-                        </div>
-                        @if (($currentHpTemplateId ?? '1') === '1')
-                            <span>Wishlist</span>
-                        @endif
+
+                    <!-- Call Us -->
+                    <a href="tel:{{ setting('general', 'phone_number', '01568-324268') }}" class="header-action-btn hide-on-tablet" aria-label="Call Us Now">
+                        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                        <span class="header-action-tooltip">Call: {{ setting('general', 'phone_number', '01568-324268') }}</span>
                     </a>
-    
-                    <a href="{{ route('cart.index') }}" title="Shopping Cart" class="cart-drawer-trigger {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-cart-link' : '' }}" style="transition: all 0.2s ease;">
-                        <div class="cart-icon" style="position: relative;">
-                            <svg class="web-primary-stroke" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                            </svg>
-                            <span class="cart-count {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-cart-badge' : '' }}" style="{{ ($currentHpTemplateId ?? '1') === '1' ? '' : 'position: absolute; top: -6px; right: -8px; background-color: #1e293b; color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; border: 2px solid #fff;' }}">{{ $cartCount }}</span>
-                        </div>
-                        @if (($currentHpTemplateId ?? '1') === '1')
-                            <span>Cart</span>
-                        @endif
+
+                    <!-- Wishlist -->
+                    <a href="{{ route('account.show') }}" class="header-action-btn" aria-label="Wishlist">
+                        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        <span class="header-action-tooltip">Wishlist</span>
                     </a>
-                    
-                    <a href="{{ route('account.show') }}" title="My Account" class="profile-icon-area" style="transition: all 0.2s ease;">
-                        <div class="profile-icon">
-                            <svg class="web-primary-stroke" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                            </svg>
-                        </div>
+
+                    <!-- Cart -->
+                    <a href="{{ route('cart.index') }}" class="header-action-btn cart-drawer-trigger" aria-label="Shopping Cart">
+                        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <span class="header-cart-badge cart-count">{{ $cartCount }}</span>
+                        <span class="header-action-tooltip">Cart</span>
                     </a>
-                    @if (($currentHpTemplateId ?? '1') === '1')
-                        <a href="{{ route('account.show') }}" class="t1-account-pill-btn">
-                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+
+                    <!-- My Account / Profile -->
+                    @if (auth()->check())
+                        <a href="{{ route('account.show') }}" class="header-action-btn btn-account" aria-label="My Account">
+                            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
                             </svg>
-                            <span>My Account</span>
-                            <i class="fas fa-chevron-down" style="font-size: 9px; margin-left: 2px;"></i>
+                            <span class="header-action-tooltip">My Account</span>
                         </a>
-                    @elseif (auth()->check())
-                        <a href="{{ route('account.show') }}" class="register-btn" style="background: #1e293b; border-radius: 50px; font-size: 13px; font-weight: 600; padding: 10px 20px; transition: all 0.2s ease;">
-                            <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2" style="margin-right:6px;" viewBox="0 0 24 24">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    @elseif (($currentHpTemplateId ?? '1') === '1')
+                        <a href="{{ route('account.show') }}" class="header-action-btn btn-account" aria-label="My Account">
+                            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
                             </svg>
-                            Account
+                            <span class="header-action-tooltip">My Account</span>
                         </a>
                     @else
                         <a href="{{ route('login') }}" class="mainmenulogin" style="margin: 0 10px; font-size: 14px; font-weight: 600; color: #475569; transition: all 0.2s;">Log In</a>
@@ -3787,6 +3747,7 @@
                             Register
                         </a>
                     @endif
+
                     <div class="mobile-menu-toggle">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg" aria-label="Toggle menu">

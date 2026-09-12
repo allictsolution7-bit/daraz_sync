@@ -16,10 +16,12 @@ class AdminCustomerController extends Controller
     {
         $search = $request->input('search');
 
+        $excludedRoles = ['super_admin', 'super admin', 'admin', 'vendor', 'reseller', 'vendor_staff', 'paid_vendor', 'wholeseller'];
+
         // Query all users who are not administrative/vendor roles
         $query = User::query()
-            ->whereDoesntHave('roles', function ($q) {
-                $q->whereIn('name', ['super_admin', 'super admin', 'admin', 'vendor', 'reseller', 'vendor_staff']);
+            ->whereDoesntHave('roles', function ($q) use ($excludedRoles) {
+                $q->whereIn('name', $excludedRoles);
             })
             ->with(['creator.roles'])
             ->withCount(['orders'])
@@ -41,21 +43,21 @@ class AdminCustomerController extends Controller
         $customers = $query->latest('id')->paginate(15);
 
         // Calculate general statistics for summary cards
-        $totalCustomers = User::whereDoesntHave('roles', function ($q) {
-            $q->whereIn('name', ['super_admin', 'super admin', 'admin', 'vendor', 'reseller', 'vendor_staff']);
+        $totalCustomers = User::whereDoesntHave('roles', function ($q) use ($excludedRoles) {
+            $q->whereIn('name', $excludedRoles);
         })->count();
 
         // Total orders placed by customers
         $totalOrders = \App\Models\order::whereIn('user_id', 
-            User::select('id')->whereDoesntHave('roles', function ($sub) {
-                $sub->whereIn('name', ['super_admin', 'super admin', 'admin', 'vendor', 'reseller', 'vendor_staff']);
+            User::select('id')->whereDoesntHave('roles', function ($sub) use ($excludedRoles) {
+                $sub->whereIn('name', $excludedRoles);
             })
         )->count();
 
         // Lifetime revenue from customers
         $totalSpend = \App\Models\order::whereIn('user_id', 
-            User::select('id')->whereDoesntHave('roles', function ($sub) {
-                $sub->whereIn('name', ['super_admin', 'super admin', 'admin', 'vendor', 'reseller', 'vendor_staff']);
+            User::select('id')->whereDoesntHave('roles', function ($sub) use ($excludedRoles) {
+                $sub->whereIn('name', $excludedRoles);
             })
         )
         ->whereNotIn('status', ['cancelled', 'returned'])

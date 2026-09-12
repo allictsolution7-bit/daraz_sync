@@ -1824,54 +1824,54 @@
                 background: #f8fafc;
             }
 
-            .t1-showcase-container {
-                display: flex;
-                flex-direction: column;
-                gap: 32px;
-            }
-
-            .t1-showcase-row {
+            .t1-showcase-grid {
                 display: grid;
                 grid-template-columns: 260px 1fr;
                 gap: 16px;
-                align-items: stretch;
+                align-items: flex-start;
+            }
+
+            .t1-side-promo-column {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
             }
 
             .t1-side-promo {
                 border-radius: 16px;
-                padding: 22px 20px 18px 20px;
+                padding: 16px 18px 16px 18px;
                 color: #ffffff;
                 position: relative;
                 overflow: hidden;
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
-                justify-content: space-between;
-                height: 100%;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+                justify-content: flex-start;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
             }
 
             .t1-side-promo:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
+                transform: translateY(-2px);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
             }
 
             .t1-side-promo-badge {
                 background: rgba(255, 255, 255, 0.16);
                 border: 1px solid rgba(255, 255, 255, 0.25);
                 backdrop-filter: blur(8px);
-                padding: 2.5px 9px;
+                padding: 2px 8px;
                 border-radius: 20px;
-                font-size: 10px;
+                font-size: 9.5px;
                 font-weight: 700;
                 letter-spacing: 0.3px;
-                margin-bottom: 5px;
+                margin-bottom: 4px;
                 display: inline-block;
+                line-height: 1.2;
             }
 
             .t1-side-promo-title {
-                font-size: 15.5px;
+                font-size: 14.5px;
                 font-weight: 800;
                 line-height: 1.25;
                 margin-top: 0;
@@ -1880,54 +1880,57 @@
             }
 
             .t1-side-promo-sub {
-                font-size: 11px;
+                font-size: 10.5px;
                 color: rgba(255, 255, 255, 0.88);
                 margin-top: 0;
-                margin-bottom: 4px;
-                line-height: 1.35;
+                margin-bottom: 3px;
+                line-height: 1.3;
             }
 
             .t1-side-promo-tags {
                 display: flex;
                 align-items: center;
-                gap: 5px;
+                gap: 4px;
                 flex-wrap: wrap;
-                margin-top: 5px;
-                margin-bottom: 4px;
+                margin-top: 3px;
+                margin-bottom: 2px;
             }
 
             .t1-promo-tag {
                 background: rgba(255, 255, 255, 0.16);
                 border: 1px solid rgba(255, 255, 255, 0.22);
-                border-radius: 12px;
-                font-size: 9.5px;
+                border-radius: 10px;
+                font-size: 9px;
                 font-weight: 600;
-                padding: 1.5px 7px;
+                padding: 1.5px 6px;
                 color: rgba(255, 255, 255, 0.95);
                 display: inline-flex;
                 align-items: center;
                 letter-spacing: 0.2px;
+                line-height: 1.2;
             }
 
             .t1-side-promo-btn {
                 background: #ffffff;
                 color: #0b4d3c !important;
                 font-weight: 800;
-                font-size: 11.5px;
-                padding: 6px 16px;
+                font-size: 11px;
+                padding: 5px 14px;
                 border-radius: 50px;
                 text-decoration: none;
                 box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
                 transition: all 0.25s ease;
                 z-index: 2;
                 display: inline-block;
-                margin-top: 6px;
+                margin-top: 10px;
             }
 
             .t1-side-promo-card-1 .t1-side-promo-btn { color: #0b4d3c !important; }
             .t1-side-promo-card-2 .t1-side-promo-btn { color: #0f172a !important; }
             .t1-side-promo-card-3 .t1-side-promo-btn { color: #78350f !important; }
             .t1-side-promo-card-4 .t1-side-promo-btn { color: #312e81 !important; }
+            .t1-side-promo-card-5 .t1-side-promo-btn { color: #831843 !important; }
+            .t1-side-promo-card-6 .t1-side-promo-btn { color: #134e4a !important; }
 
             .t1-side-promo-btn:hover {
                 background: #f8fafc;
@@ -1938,10 +1941,17 @@
 
             .t1-side-promo-bag {
                 position: absolute;
-                bottom: -10px;
-                right: -10px;
+                bottom: -8px;
+                right: -8px;
                 color: #ffffff;
                 pointer-events: none;
+            }
+
+            .t1-showcase-products {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                gap: 24px;
             }
 
             .t1-block-header {
@@ -1995,6 +2005,7 @@
                 .t1-trust-grid {
                     grid-template-columns: repeat(2, 1fr);
                 }
+                .t1-showcase-row,
                 .t1-showcase-grid {
                     grid-template-columns: 1fr;
                 }
@@ -2845,81 +2856,121 @@
 
     {{-- Template 1 Lower Showcase Section (Image 2 Matching) --}}
     <section class="t1-showcase-section">
-        <div class="base-container t1-showcase-grid">
-            {{-- Left Side Promo Column with Multiple Admin Configurable Cards --}}
-            <div class="t1-side-promo-column">
-                @php
-                    $t1PromoCards = [
-                        1 => [
-                            'enable' => $homepage['t1_promo_card_1_enable'] ?? '1',
-                            'badge' => $homepage['t1_promo_card_1_badge'] ?? '🔥 Exclusive Offer',
-                            'title' => $homepage['t1_promo_card_1_title'] ?? 'ঘরে বসেই পছন্দের পণ্য কিনুন এখনই',
-                            'sub' => $homepage['t1_promo_card_1_sub'] ?? 'Order Now & Get Fast Delivery',
-                            'tags' => ['⚡ দ্রুত ডেলিভারি', '✓ ক্যাশ অন ডেলিভারি'],
-                            'btn_text' => $homepage['t1_promo_card_1_btn_text'] ?? 'Shop Now 🛍️',
-                            'btn_url' => $homepage['t1_promo_card_1_btn_url'] ?? route('shop'),
-                            'bg_start' => $homepage['t1_promo_card_1_bg_start'] ?? '#0b4d3c',
-                            'bg_end' => $homepage['t1_promo_card_1_bg_end'] ?? '#042e22',
-                            'bg_image' => $homepage['t1_promo_card_1_bg_image'] ?? '',
-                            'icon' => 'bag',
-                        ],
-                        2 => [
-                            'enable' => $homepage['t1_promo_card_2_enable'] ?? '1',
-                            'badge' => $homepage['t1_promo_card_2_badge'] ?? '⭐ Special Collection',
-                            'title' => $homepage['t1_promo_card_2_title'] ?? 'সেরা অফার ও আকর্ষণীয় ডিসকাউন্ট',
-                            'sub' => $homepage['t1_promo_card_2_sub'] ?? 'Limited Time Deals on Top Brands',
-                            'tags' => ['⭐ টপ ব্র্যান্ডস', '🎁 আকর্ষণীয় অফার'],
-                            'btn_text' => $homepage['t1_promo_card_2_btn_text'] ?? 'Explore Deals 🎁',
-                            'btn_url' => $homepage['t1_promo_card_2_btn_url'] ?? route('shop'),
-                            'bg_start' => $homepage['t1_promo_card_2_bg_start'] ?? '#0f172a',
-                            'bg_end' => $homepage['t1_promo_card_2_bg_end'] ?? '#1e293b',
-                            'bg_image' => $homepage['t1_promo_card_2_bg_image'] ?? '',
-                            'icon' => 'star',
-                        ],
-                        3 => [
-                            'enable' => $homepage['t1_promo_card_3_enable'] ?? '1',
-                            'badge' => $homepage['t1_promo_card_3_badge'] ?? '⚡ Mega Savings',
-                            'title' => $homepage['t1_promo_card_3_title'] ?? 'প্রিমিয়াম কোয়ালিটি নিশ্চিত প্রোডাক্টস',
-                            'sub' => $homepage['t1_promo_card_3_sub'] ?? 'Best Price Guarantee All Week',
-                            'tags' => ['✓ সেরা মান নিশ্চিত', '💯 ১০০% জেনুইন'],
-                            'btn_text' => $homepage['t1_promo_card_3_btn_text'] ?? 'View Offers 🚀',
-                            'btn_url' => $homepage['t1_promo_card_3_btn_url'] ?? route('shop'),
-                            'bg_start' => $homepage['t1_promo_card_3_bg_start'] ?? '#78350f',
-                            'bg_end' => $homepage['t1_promo_card_3_bg_end'] ?? '#451a03',
-                            'bg_image' => $homepage['t1_promo_card_3_bg_image'] ?? '',
-                            'icon' => 'zap',
-                        ],
-                        4 => [
-                            'enable' => $homepage['t1_promo_card_4_enable'] ?? '0',
-                            'badge' => $homepage['t1_promo_card_4_badge'] ?? '✨ New Arrival',
-                            'title' => $homepage['t1_promo_card_4_title'] ?? 'নতুন ট্রেন্ডি পণ্য এখনই অর্ডার করুন',
-                            'sub' => $homepage['t1_promo_card_4_sub'] ?? 'Fresh Stock Just Added',
-                            'tags' => ['✨ নতুন কালেকশন', '🔥 সীমিত স্টক'],
-                            'btn_text' => $homepage['t1_promo_card_4_btn_text'] ?? 'Shop New In ✨',
-                            'btn_url' => $homepage['t1_promo_card_4_btn_url'] ?? route('shop'),
-                            'bg_start' => $homepage['t1_promo_card_4_bg_start'] ?? '#312e81',
-                            'bg_end' => $homepage['t1_promo_card_4_bg_end'] ?? '#1e1b4b',
-                            'bg_image' => $homepage['t1_promo_card_4_bg_image'] ?? '',
-                            'icon' => 'sparkle',
-                        ],
-                    ];
-                @endphp
+        @php
+            $t1PromoCards = [
+                1 => [
+                    'enable' => $homepage['t1_promo_card_1_enable'] ?? '1',
+                    'badge' => $homepage['t1_promo_card_1_badge'] ?? '🔥 Exclusive Offer',
+                    'title' => $homepage['t1_promo_card_1_title'] ?? 'ঘরে বসেই পছন্দের পণ্য কিনুন এখনই',
+                    'sub' => $homepage['t1_promo_card_1_sub'] ?? 'Order Now & Get Fast Delivery',
+                    'tags' => $homepage['t1_promo_card_1_tags'] ?? '⚡ দ্রুত ডেলিভারি, ✓ ক্যাশ অন ডেলিভারি',
+                    'btn_text' => $homepage['t1_promo_card_1_btn_text'] ?? 'Shop Now 🛍️',
+                    'btn_url' => $homepage['t1_promo_card_1_btn_url'] ?? route('shop'),
+                    'bg_start' => $homepage['t1_promo_card_1_bg_start'] ?? '#0b4d3c',
+                    'bg_end' => $homepage['t1_promo_card_1_bg_end'] ?? '#042e22',
+                    'bg_image' => $homepage['t1_promo_card_1_bg_image'] ?? '',
+                    'icon' => 'bag',
+                ],
+                2 => [
+                    'enable' => $homepage['t1_promo_card_2_enable'] ?? '1',
+                    'badge' => $homepage['t1_promo_card_2_badge'] ?? '⭐ Special Collection',
+                    'title' => $homepage['t1_promo_card_2_title'] ?? 'সেরা অফার ও আকর্ষণীয় ডিসকাউন্ট',
+                    'sub' => $homepage['t1_promo_card_2_sub'] ?? 'Limited Time Deals on Top Brands',
+                    'tags' => $homepage['t1_promo_card_2_tags'] ?? '⭐ টপ ব্র্যান্ডস, 🎁 আকর্ষণীয় অফার',
+                    'btn_text' => $homepage['t1_promo_card_2_btn_text'] ?? 'Explore Deals 🎁',
+                    'btn_url' => $homepage['t1_promo_card_2_btn_url'] ?? route('shop'),
+                    'bg_start' => $homepage['t1_promo_card_2_bg_start'] ?? '#0f172a',
+                    'bg_end' => $homepage['t1_promo_card_2_bg_end'] ?? '#1e293b',
+                    'bg_image' => $homepage['t1_promo_card_2_bg_image'] ?? '',
+                    'icon' => 'star',
+                ],
+                3 => [
+                    'enable' => $homepage['t1_promo_card_3_enable'] ?? '1',
+                    'badge' => $homepage['t1_promo_card_3_badge'] ?? '⚡ Mega Savings',
+                    'title' => $homepage['t1_promo_card_3_title'] ?? 'প্রিমিয়াম কোয়ালিটি নিশ্চিত প্রোডাক্টস',
+                    'sub' => $homepage['t1_promo_card_3_sub'] ?? 'Best Price Guarantee All Week',
+                    'tags' => $homepage['t1_promo_card_3_tags'] ?? '✓ সেরা মান নিশ্চিত, 💯 ১০০% জেনুইন',
+                    'btn_text' => $homepage['t1_promo_card_3_btn_text'] ?? 'View Offers 🚀',
+                    'btn_url' => $homepage['t1_promo_card_3_btn_url'] ?? route('shop'),
+                    'bg_start' => $homepage['t1_promo_card_3_bg_start'] ?? '#78350f',
+                    'bg_end' => $homepage['t1_promo_card_3_bg_end'] ?? '#451a03',
+                    'bg_image' => $homepage['t1_promo_card_3_bg_image'] ?? '',
+                    'icon' => 'zap',
+                ],
+                4 => [
+                    'enable' => $homepage['t1_promo_card_4_enable'] ?? '0',
+                    'badge' => $homepage['t1_promo_card_4_badge'] ?? '✨ New Arrival',
+                    'title' => $homepage['t1_promo_card_4_title'] ?? 'নতুন ট্রেন্ডি পণ্য এখনই অর্ডার করুন',
+                    'sub' => $homepage['t1_promo_card_4_sub'] ?? 'Fresh Stock Just Added',
+                    'tags' => $homepage['t1_promo_card_4_tags'] ?? '✨ নতুন কালেকশন, 🔥 সীমিত স্টক',
+                    'btn_text' => $homepage['t1_promo_card_4_btn_text'] ?? 'Shop New In ✨',
+                    'btn_url' => $homepage['t1_promo_card_4_btn_url'] ?? route('shop'),
+                    'bg_start' => $homepage['t1_promo_card_4_bg_start'] ?? '#312e81',
+                    'bg_end' => $homepage['t1_promo_card_4_bg_end'] ?? '#1e1b4b',
+                    'bg_image' => $homepage['t1_promo_card_4_bg_image'] ?? '',
+                    'icon' => 'sparkle',
+                ],
+                5 => [
+                    'enable' => $homepage['t1_promo_card_5_enable'] ?? '0',
+                    'badge' => $homepage['t1_promo_card_5_badge'] ?? '⚡ Flash Discount',
+                    'title' => $homepage['t1_promo_card_5_title'] ?? 'সীমিত সময়ের জন্য বিশেষ ছাড়',
+                    'sub' => $homepage['t1_promo_card_5_sub'] ?? 'Grab Your Favorite Items Fast',
+                    'tags' => $homepage['t1_promo_card_5_tags'] ?? '⚡ সুপার ডিল, 🔥 সেরা মূল্য',
+                    'btn_text' => $homepage['t1_promo_card_5_btn_text'] ?? 'Order Now 🛒',
+                    'btn_url' => $homepage['t1_promo_card_5_btn_url'] ?? route('shop'),
+                    'bg_start' => $homepage['t1_promo_card_5_bg_start'] ?? '#831843',
+                    'bg_end' => $homepage['t1_promo_card_5_bg_end'] ?? '#500724',
+                    'bg_image' => $homepage['t1_promo_card_5_bg_image'] ?? '',
+                    'icon' => 'tag',
+                ],
+                6 => [
+                    'enable' => $homepage['t1_promo_card_6_enable'] ?? '0',
+                    'badge' => $homepage['t1_promo_card_6_badge'] ?? '🌟 Exclusive Picks',
+                    'title' => $homepage['t1_promo_card_6_title'] ?? 'জনপ্রিয় পণ্যসমূহ এখন আরও সাশ্রয়ে',
+                    'sub' => $homepage['t1_promo_card_6_sub'] ?? 'Top Rated by Customers',
+                    'tags' => $homepage['t1_promo_card_6_tags'] ?? '🌟 টপ রেটেড, 📦 দ্রুত ডেলিভারি',
+                    'btn_text' => $homepage['t1_promo_card_6_btn_text'] ?? 'Explore More 🌟',
+                    'btn_url' => $homepage['t1_promo_card_6_btn_url'] ?? route('shop'),
+                    'bg_start' => $homepage['t1_promo_card_6_bg_start'] ?? '#134e4a',
+                    'bg_end' => $homepage['t1_promo_card_6_bg_end'] ?? '#042f2e',
+                    'bg_image' => $homepage['t1_promo_card_6_bg_image'] ?? '',
+                    'icon' => 'star',
+                ],
+            ];
 
-                @foreach($t1PromoCards as $pIndex => $pCard)
-                    @if(($pCard['enable'] ?? '0') == '1')
+            $enabledCards = [];
+            foreach ($t1PromoCards as $idx => $card) {
+                if (($card['enable'] ?? '0') == '1') {
+                    $enabledCards[$idx] = $card;
+                }
+            }
+            $hasPromoCards = count($enabledCards) > 0;
+        @endphp
+
+        <div class="base-container t1-showcase-grid" style="{{ $hasPromoCards ? '' : 'grid-template-columns: 1fr;' }}">
+            {{-- Left Side Dynamic Promo Column: Divides the height evenly among all enabled cards --}}
+            @if($hasPromoCards)
+                <div class="t1-side-promo-column">
+                    @foreach($enabledCards as $pIndex => $pCard)
                         @php
                             $bgStyle = !empty($pCard['bg_image'])
                                 ? 'background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.75)), url(' . asset($pCard['bg_image']) . ') center/cover no-repeat;'
                                 : 'background: linear-gradient(150deg, ' . $pCard['bg_start'] . ' 0%, ' . $pCard['bg_end'] . ' 100%);';
+                            $rawTags = $pCard['tags'] ?? '';
+                            $cardTags = is_array($rawTags) ? $rawTags : array_filter(array_map('trim', explode(',', (string)$rawTags)));
                         @endphp
                         <div class="t1-side-promo t1-side-promo-card-{{ $pIndex }}" style="{!! $bgStyle !!}">
                             <div class="t1-side-promo-top">
-                                <div class="t1-side-promo-badge">{{ $pCard['badge'] }}</div>
+                                @if(!empty($pCard['badge']))
+                                    <div class="t1-side-promo-badge">{{ $pCard['badge'] }}</div>
+                                @endif
                                 <h3 class="t1-side-promo-title">{{ $pCard['title'] }}</h3>
-                                <p class="t1-side-promo-sub">{{ $pCard['sub'] }}</p>
-                                @if(!empty($pCard['tags']))
+                                @if(!empty($pCard['sub']))
+                                    <p class="t1-side-promo-sub">{{ $pCard['sub'] }}</p>
+                                @endif
+                                @if(!empty($cardTags))
                                     <div class="t1-side-promo-tags">
-                                        @foreach($pCard['tags'] as $tag)
+                                        @foreach($cardTags as $tag)
                                             <span class="t1-promo-tag">{{ $tag }}</span>
                                         @endforeach
                                     </div>
@@ -2930,21 +2981,23 @@
                             </a>
                             <div class="t1-side-promo-bag">
                                 @if(($pCard['icon'] ?? 'bag') === 'star')
-                                    <svg width="95" height="95" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                    <svg width="75" height="75" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                                 @elseif(($pCard['icon'] ?? 'bag') === 'zap')
-                                    <svg width="95" height="95" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    <svg width="75" height="75" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                 @elseif(($pCard['icon'] ?? 'bag') === 'sparkle')
-                                    <svg width="95" height="95" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                                    <svg width="75" height="75" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                                @elseif(($pCard['icon'] ?? 'bag') === 'tag')
+                                    <svg width="75" height="75" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.12;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
                                 @else
-                                    <svg width="95" height="95" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.15;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                    <svg width="75" height="75" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.15;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                                 @endif
                             </div>
                         </div>
-                    @endif
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
+            @endif
 
-            {{-- Right Side Deals & Products --}}
+            {{-- Right Side Deals & Products Showcase --}}
             <div class="t1-showcase-products">
                 {{-- 🔥 Featured Deals --}}
                 <div class="t1-products-block">
@@ -2966,7 +3019,7 @@
                 </div>
 
                 {{-- ⭐ Best Selling Products --}}
-                <div class="t1-products-block" style="margin-top: 32px;">
+                <div class="t1-products-block">
                     <div class="t1-block-header">
                         <h2 class="t1-block-title">⭐ Best Selling Products</h2>
                         <a href="{{ route('shop') }}" class="t1-block-view-all">View All <i class="fas fa-arrow-right"></i></a>
