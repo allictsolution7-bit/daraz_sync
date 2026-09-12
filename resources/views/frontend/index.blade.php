@@ -1824,26 +1824,22 @@
                 background: #f8fafc;
             }
 
-            .t1-showcase-grid {
+            .t1-showcase-container {
+                display: flex;
+                flex-direction: column;
+                gap: 32px;
+            }
+
+            .t1-showcase-row {
                 display: grid;
                 grid-template-columns: 260px 1fr;
                 gap: 16px;
                 align-items: stretch;
             }
 
-            .t1-side-promo-column {
-                display: flex;
-                flex-direction: column;
-                gap: 14px;
-                width: 260px;
-                flex-shrink: 0;
-                height: 100%;
-            }
-
             .t1-side-promo {
-                flex: 1;
                 border-radius: 16px;
-                padding: 16px 16px 14px 16px;
+                padding: 22px 20px 18px 20px;
                 color: #ffffff;
                 position: relative;
                 overflow: hidden;
@@ -1851,7 +1847,7 @@
                 flex-direction: column;
                 align-items: flex-start;
                 justify-content: space-between;
-                min-height: 0;
+                height: 100%;
                 box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
             }
