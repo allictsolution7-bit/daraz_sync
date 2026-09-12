@@ -1854,7 +1854,7 @@
                         @endif
  
                         <!-- INTEGRATIONS & SYNC SECTION -->
-                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || (module_enabled('Daraz') && Route::has('admin.daraz.index') && (auth()->user()?->canAny(['daraz.view', 'admin.daraz.view', 'daraz_sync.view', 'daraz.index', 'daraz']) || (auth()->user()?->permissions && auth()->user()?->permissions->pluck('name')->filter(fn($p) => str_contains(strtolower($p), 'daraz'))->count() > 0))) || auth()->user()?->canAny(['woocommerce_migration.view', 'telegram_settings.view', 'delayed_events.view']))
+                        @if(auth()->user()?->hasRole('super_admin') || auth()->user()?->hasRole('super admin') || (method_exists(auth()->user(), 'isAdmin') && auth()->user()?->isAdmin()) || (module_enabled('Daraz') && Route::has('admin.daraz.index') && (auth()->user()?->canAny(['daraz.view', 'admin.daraz.view', 'daraz_sync.view', 'daraz.index', 'daraz']) || (auth()->user()?->permissions && auth()->user()?->permissions->pluck('name')->filter(fn($p) => str_contains(strtolower($p), 'daraz'))->count() > 0))) || auth()->user()?->canAny(['woocommerce_migration.view', 'telegram_settings.view', 'delayed_events.view', 'sms_settings.view', 'settings.view']))
                         <li class="menu-section {{ $integrationsSyncActive ? 'expanded' : 'collapsed' }}">
                             <a class="menu-section-toggle">
                                 <span style="display: inline-flex; align-items: center; gap: 8px;">
@@ -1942,7 +1942,7 @@
                                 </li>
                                 @endcan
 
-                                @if(auth()->user() && (auth()->user()->isAdmin() || auth()->user()->isVendor() || auth()->user()->can('settings.view')))
+                                @if(auth()->user() && (auth()->user()->isAdmin() || auth()->user()->isVendor() || auth()->user()->can('settings.view') || auth()->user()->can('sms_settings.view')))
                                 <li class="{{ request()->routeIs('admin.sms-settings.*') ? 'active' : '' }}">
                                     <a href="{{ route('admin.sms-settings.index') }}">
                                         <span class="menu-content">

@@ -922,6 +922,16 @@
         border-top: 1px solid #e2e8f0;
         padding: 14px 20px;
     }
+
+    /* Smart Auto Fillup Highlight Animation */
+    .pos-autofill-highlight {
+        animation: autoFillFlash 1.6s ease;
+    }
+    @keyframes autoFillFlash {
+        0% { background-color: rgba(79, 70, 229, 0.2); border-color: #4f46e5; }
+        50% { background-color: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+        100% { background-color: #ffffff; }
+    }
 </style>
 @endsection
 
@@ -1228,8 +1238,60 @@
 
             <!-- Customer Section -->
             <div class="pos-right-card mt-3">
-                <div class="pos-section-header">
+                <div class="pos-section-header d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-user me-2"></i> Customer Information</span>
+                    <button type="button" class="btn btn-sm btn-outline-light border-0 py-1 px-2 d-flex align-items-center gap-1 shadow-sm" id="toggleAutoFillBtn" title="Paste & Auto Fill customer details" style="font-size: 11.5px; background: rgba(255,255,255,0.18); border-radius: 8px;">
+                        <i class="fas fa-wand-magic-sparkles text-warning"></i>
+                        <span>Auto Fill</span>
+                    </button>
+                </div>
+
+                <!-- Collapsible Quick Auto-Fill Box -->
+                <div id="quickAutoFillBox" class="p-3 border-bottom" style="display: none; background: #f8fafc;">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small fw-bold text-dark" style="font-size: 11.5px;">
+                            <i class="fas fa-paste text-primary me-1"></i> Paste Raw Text (WhatsApp / Messenger / SMS)
+                        </span>
+                        <button type="button" class="btn-close" id="closeAutoFillBox" style="font-size: 9px;" aria-label="Close"></button>
+                    </div>
+
+                    <!-- 1-Click Try Sample Buttons -->
+                    <div class="d-flex flex-wrap align-items-center gap-1 mb-2">
+                        <span class="text-muted fw-semibold" style="font-size: 10.5px;">Try 1-Click:</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 auto-fill-sample-btn" data-sample="1" style="font-size: 10.5px; border-radius: 12px;" title="Test Messenger format">
+                            ⚡ Messenger
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 auto-fill-sample-btn" data-sample="2" style="font-size: 10.5px; border-radius: 12px;" title="Test Bengali message">
+                            🇧🇩 বাংলা
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 auto-fill-sample-btn" data-sample="3" style="font-size: 10.5px; border-radius: 12px;" title="Test Nagad + TrxID">
+                            💳 Nagad + TrxID
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 auto-fill-sample-btn" data-sample="4" style="font-size: 10.5px; border-radius: 12px;" title="Test short SMS">
+                            📱 Short SMS
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-dark py-0 px-2 auto-fill-sample-btn" data-sample="5" style="font-size: 10.5px; border-radius: 12px;" title="Test Corporate Office Delivery">
+                            🏢 Office (bKash)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info py-0 px-2 auto-fill-sample-btn" data-sample="6" style="font-size: 10.5px; border-radius: 12px;" title="Test Outside Dhaka / Chittagong">
+                            📍 Outside Dhaka
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-warning py-0 px-2 auto-fill-sample-btn" data-sample="7" style="font-size: 10.5px; border-radius: 12px;" title="Test Single-Line format">
+                            💬 Single-Line
+                        </button>
+                    </div>
+
+                    <textarea class="form-control mb-2" id="autoFillRawText" rows="3" 
+                              placeholder="Paste raw text here... (Auto-fills Name, Phone, Email, Address, Notes, Payment on paste)" 
+                              style="font-size: 12px; border: 1.5px dashed #94a3b8; border-radius: 8px; background: #ffffff;"></textarea>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button type="button" class="btn btn-sm btn-light border px-2 py-1 text-secondary" id="clearAutoFillBtn" style="font-size: 11px;">
+                            <i class="fas fa-eraser me-1"></i> Clear
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary px-3 py-1 fw-bold" id="parseAutoFillBtn" style="font-size: 12px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border: none;">
+                            <i class="fas fa-magic me-1"></i> Extract & Auto-Fill
+                        </button>
+                    </div>
                 </div>
                 <div class="customer-form">
                     <div class="mb-3 position-relative">
@@ -1458,6 +1520,103 @@ function setupEventListeners() {
     
     // Customer form validation
     $('#customerName, #customerPhone').on('input', validateForm);
+    
+    // Smart Auto-Fill Handlers
+    $('#toggleAutoFillBtn').on('click', function(e) {
+        e.preventDefault();
+        $('#quickAutoFillBox').slideToggle(200, function() {
+            if ($(this).is(':visible')) {
+                $('#autoFillRawText').focus();
+            }
+        });
+    });
+
+    $('#closeAutoFillBox').on('click', function() {
+        $('#quickAutoFillBox').slideUp(200);
+    });
+
+    $('#parseAutoFillBtn').on('click', function() {
+        parseAndAutoFill();
+    });
+
+    $('#clearAutoFillBtn').on('click', function() {
+        $('#autoFillRawText').val('').focus();
+        toastr.info('Auto-fill input cleared');
+    });
+
+    // Auto-parse directly on paste
+    $('#autoFillRawText').on('paste', function() {
+        setTimeout(function() {
+            parseAndAutoFill();
+        }, 120);
+    });
+
+    // 1-Click Sample Handlers
+    const autoFillSamples = {
+        '1': `Hi, I’d like to place an order.
+
+Tanvir Ahmed
+01712345678
+tanvir@gmail.com
+
+House 12, Road 4, Sector 7, Uttara, Dhaka
+
+Please deliver after 5 PM and call me before coming.
+
+Payment: bKash
+TrxID: 9X29A7B31`,
+
+        '2': `আসসালামু আলাইকুম ভাইয়া, পণ্যটা অর্ডার করতে চাই।
+
+নামঃ মোঃ রফিকুল ইসলাম
+ফোনঃ 01819234567
+ঠিকানাঃ বাসা নং ৪২, রোড ৩, ব্লক বি, মিরপুর ১০, ঢাকা
+ইমেইলঃ rafiqul@yahoo.com
+নোটঃ শুক্রবার ছুটির দিনে ডেলিভারি দিবেন দয়া করে।
+পেমেন্টঃ ক্যাশ অন ডেলিভারি
+সোর্সঃ ফেসবুক`,
+
+        '3': `Customer Name: Mahinur Rahman
+Contact: +8801711998877
+Delivery Address: Holding 15, Station Road, Ishwardi, Pabna
+Special Instructions: Call receiver 30 minutes before arrival
+Order Source: WhatsApp
+Payment Method: Nagad
+TrxID: NG88923KJ1`,
+
+        '4': `Kamrul Hasan
+01611223344
+House 45, Road 3, Sector 11, Uttara, Dhaka
+Call me when you reach Sector 11.`,
+
+        '5': `Arifur Rahman
+01844556677
+arif.rahman@bracnet.net
+Square Centre, 8th Floor, 48 Mohakhali C/A, Dhaka-1212
+Delivery between 10 AM to 4 PM on weekdays only.
+Payment: bKash
+TrxID: 8KL291M4`,
+
+        '6': `আসসালামু আলাইকুম, আমি চট্টগ্রাম থেকে অর্ডার করছি।
+
+নামঃ সাজ্জাদুল ইসলাম
+মোবাইলঃ 01923456789
+ঠিকানাঃ বাসা নং ১৭, লেইন ৪, নাসিরাবাদ হাউজিং সোসাইটি, জিইসি মোড়, চট্টগ্রাম
+নোটঃ সুন্দরবন কুরিয়ারে পাঠালে ভালো হয়।
+পেমেন্টঃ নগদ
+TrxID: 7NM89P12`,
+
+        '7': `Nusrat Jahan | 01798765432 | nusrat.jahan@gmail.com | Flat 5B, Building 14, Road 7, Block D, Mirpur 12, Dhaka | Please call before delivery`
+    };
+
+    $(document).on('click', '.auto-fill-sample-btn', function(e) {
+        e.preventDefault();
+        const sampleKey = $(this).data('sample');
+        if (autoFillSamples[sampleKey]) {
+            $('#autoFillRawText').val(autoFillSamples[sampleKey]);
+            parseAndAutoFill();
+        }
+    });
     
     // Enter key handling
     $('#productSearch').on('keypress', function(e) {
@@ -2191,6 +2350,302 @@ function validateForm() {
     const hasPhone = $('#customerPhone').val().trim() !== '';
     
     $('#checkoutBtn').prop('disabled', !(hasItems && hasName && hasPhone));
+}
+
+// Smart Auto-Fill & Text Parser Engine
+function parseAndAutoFill() {
+    let rawText = $('#autoFillRawText').val().trim();
+    if (!rawText) {
+        toastr.info('Please paste or enter some customer text first.');
+        return;
+    }
+
+    // Convert Bengali numerals to English numerals for consistent parsing
+    rawText = rawText.replace(/[০-৯]/g, d => '০১২৩৪৫৬৭৮৯'.indexOf(d));
+
+    let extracted = {
+        name: '',
+        phone: '',
+        email: '',
+        city: '',
+        address: '',
+        notes: '',
+        source: '',
+        paymentMethod: '',
+        trxId: ''
+    };
+
+    const fullText = rawText;
+
+    // 1. Extract Email
+    const emailMatch = fullText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/i);
+    if (emailMatch) {
+        extracted.email = emailMatch[0].trim();
+    }
+
+    // 2. Extract Phone Number (standard BD formats: 01xxxxxxxxx, +8801xxxxxxxxx, with optional dashes/spaces)
+    const phoneMatch = fullText.match(/(?:(?:\+|00)?880|880)?[\s.-]?(01[3-9][\s.-]?[0-9]{4}[\s.-]?[0-9]{4})\b/);
+    if (phoneMatch) {
+        extracted.phone = phoneMatch[1].replace(/[\s.-]/g, '');
+    } else {
+        const phoneLabelMatch = fullText.match(/(?:phone|mobile|cell|contact|tel|mob|ph|নাম্বার|মোবাইল|ফোন)\s*[:=\-ঃ]?\s*([+0-9\s.-]{10,20})/i);
+        if (phoneLabelMatch) {
+            const digits = phoneLabelMatch[1].replace(/[^0-9]/g, '');
+            if (digits.length >= 11) {
+                extracted.phone = digits.slice(-11);
+            }
+        }
+    }
+
+    // 3. Extract TrxID & Payment Method
+    const trxMatch = fullText.match(/(?:trxid|trx\s*id|trx|txn\s*id|transaction\s*id|ট্রানজেকশন\s*আইডি|ট্রানজেকশন|ট্রাক্স)\s*[:=\-ঃ]?\s*([a-zA-Z0-9]+)/i);
+    if (trxMatch) {
+        extracted.trxId = trxMatch[1].trim();
+    }
+
+    let payText = fullText.toLowerCase();
+    const payLabelMatch = fullText.match(/(?:payment\s*method|payment|pay\s*by|পেমেন্ট)\s*[:=\-ঃ]?\s*([^\n\r]+)/i);
+    if (payLabelMatch) {
+        payText = payLabelMatch[1].toLowerCase();
+    }
+    if (payText.includes('bkash') || payText.includes('বিকাশ')) {
+        extracted.paymentMethod = 'bkash';
+    } else if (payText.includes('nagad') || payText.includes('নগদ')) {
+        extracted.paymentMethod = 'nagad';
+    } else if (payText.includes('rocket') || payText.includes('রকেট')) {
+        extracted.paymentMethod = 'rocket';
+    } else if (payText.includes('cod') || payText.includes('cash on delivery') || payText.includes('ক্যাশ অন ডেলিভারি')) {
+        extracted.paymentMethod = 'cod';
+    } else if (payText.includes('cash') || payText.includes('ক্যাশ')) {
+        extracted.paymentMethod = 'cash';
+    } else if (payText.includes('card') || payText.includes('কার্ড')) {
+        extracted.paymentMethod = 'card';
+    } else if (payText.includes('bank') || payText.includes('ব্যাংক')) {
+        extracted.paymentMethod = 'bank_transfer';
+    }
+
+    // 4. Extract Order Source
+    const sourceLabelMatch = fullText.match(/(?:order\s*source|source|channel|platform|উৎস|সোর্স)\s*[:=\-ঃ]?\s*([^\n\r]+)/i);
+    const sourceText = (sourceLabelMatch ? sourceLabelMatch[1] : fullText).toLowerCase();
+    if (sourceText.includes('facebook') || sourceText.includes('ফেসবুক') || sourceText.includes(' fb ') || sourceText.startsWith('fb') || sourceText.endsWith('fb')) {
+        extracted.source = 'Facebook';
+    } else if (sourceText.includes('whatsapp') || sourceText.includes('হোয়াটসঅ্যাপ') || sourceText.includes('হোয়াটসঅ্যাপ') || sourceText.includes(' wa ') || sourceText.startsWith('wa')) {
+        extracted.source = 'WhatsApp';
+    } else if (sourceText.includes('phone') || sourceText.includes('call') || sourceText.includes('direct call')) {
+        extracted.source = 'Phone Call';
+    } else if (sourceText.includes('website') || sourceText.includes('web') || sourceText.includes('online')) {
+        extracted.source = 'Website';
+    } else if (sourceText.includes('physical') || sourceText.includes('store') || sourceText.includes('outlet') || sourceText.includes('walk-in')) {
+        extracted.source = 'Physical Store';
+    } else if (sourceText.includes('instagram') || sourceText.includes('insta')) {
+        extracted.source = 'Instagram';
+    }
+
+    // 5. Extract City / District
+    const bdCities = [
+        'Dhaka', 'Chattogram', 'Chittagong', 'Rajshahi', 'Khulna', 'Sylhet', 'Barisal', 'Barishal', 
+        'Rangpur', 'Mymensingh', 'Comilla', 'Cumilla', 'Gazipur', 'Narayanganj', 'Savar', 'Ishwardi', 
+        'Bogra', 'Bogura', 'Dinajpur', 'Jessore', 'Jashore', "Cox's Bazar", 'Coxs Bazar', 'Tangail', 
+        'Faridpur', 'Feni', 'Noakhali', 'Brahmanbaria', 'Kushtia', 'Pabna', 'Sirajganj', 'Natore', 
+        'Naogaon', 'Chapainawabganj', 'Narsingdi', 'Manikganj', 'Munshiganj', 'Kishoreganj', 'Netrokona', 
+        'Jamalpur', 'Sherpur', 'Sunamganj', 'Habiganj', 'Moulvibazar', 'Lakshmipur', 'Chandpur', 
+        'Bagerhat', 'Satkhira', 'Jhenaidah', 'Magura', 'Narail', 'Chuadanga', 'Meherpur', 'Patuakhali', 
+        'Bhola', 'Pirojpur', 'Jhalokati', 'Barguna', 'Panchagarh', 'Thakurgaon', 'Nilphamari', 
+        'Lalmonirhat', 'Kurigram', 'Gaibandha', 'Joypurhat', 'Bandarban', 'Khagrachhari', 'Rangamati',
+        'Uttara', 'Mirpur', 'Dhanmondi', 'Gulshan', 'Banani', 'Mohammadpur', 'Badda', 'Motijheel', 'Banasree', 'Mohakhali',
+        'ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'সিলেট', 'বরিশাল', 'রংপুর', 'ময়মনসিংহ', 'কুমিল্লা', 'গাজীপুর', 'নারায়ণগঞ্জ', 'সাভার'
+    ];
+    for (const c of bdCities) {
+        const regex = new RegExp('\\b' + c + '\\b', 'i');
+        if (regex.test(fullText)) {
+            extracted.city = c;
+            break;
+        }
+    }
+
+    // 6. Intelligent Tokenization: Split lines, supporting single-line pipes/semicolons
+    const initialLines = fullText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    const rawLines = [];
+    initialLines.forEach(line => {
+        if (line.includes('|')) {
+            line.split('|').forEach(part => { if (part.trim()) rawLines.push(part.trim()); });
+        } else if (line.includes(';') && !line.includes('&')) {
+            line.split(';').forEach(part => { if (part.trim()) rawLines.push(part.trim()); });
+        } else {
+            rawLines.push(line);
+        }
+    });
+
+    const candidateLines = [];
+
+    for (let line of rawLines) {
+        // Skip pure email line
+        if (extracted.email && line.replace(/[<>()]/g, '').trim() === extracted.email) continue;
+        
+        // Skip pure phone line or label + phone
+        const lineDigits = line.replace(/[^0-9]/g, '');
+        if (extracted.phone && lineDigits.endsWith(extracted.phone) && lineDigits.length <= 13) {
+            continue;
+        }
+        if (/^(?:phone|mobile|cell|contact|tel|mob|ph|নাম্বার|মোবাইল|ফোন)\s*[:=\-ঃ]?\s*[+0-9\s.-]+$/i.test(line)) {
+            continue;
+        }
+
+        // If line has phone alongside name or address, strip out phone
+        if (extracted.phone && line.includes(extracted.phone)) {
+            line = line.replace(new RegExp('(?:\\+?880)?' + extracted.phone, 'g'), '')
+                       .replace(/^(?:phone|mobile|cell|contact|tel|mob|ph|নাম্বার|মোবাইল|ফোন)\s*[:=\-ঃ]?/i, '')
+                       .replace(/^[,|\-\s]+|[,|\-\s]+$/g, '')
+                       .trim();
+            if (!line) continue;
+        }
+
+        // Skip payment / trxid / source headers
+        if (/^(?:payment|trxid|trx|txn|source|channel|উৎস|পেমেন্ট|সোর্স)/i.test(line)) continue;
+        // Skip greetings / conversational openers
+        if (/^(?:hi|hello|hey|assalamu|salam|dear|i['’]d\s*like\s*to\s*place|order\s*please|want\s*to\s*buy|i\s*need|অর্ডার|ভাই|আপু)\b/i.test(line)) continue;
+
+        // Check explicit labels
+        const nameM = line.match(/^(?:customer\s*name|client\s*name|name|customer|client|recipient|নাম|কাস্টমার|গ্রাহক|প্রাপক)\s*[:=\-ঃ]?\s*(.+)$/i);
+        if (nameM) {
+            extracted.name = nameM[1].replace(/[:=ঃ]/g, '').trim();
+            continue;
+        }
+        const addrM = line.match(/^(?:delivery\s*address|shipping\s*address|address|location|destination|ঠিকানা|লোকেশন|এড্রেস)\s*[:=\-ঃ]?\s*(.+)$/i);
+        if (addrM) {
+            extracted.address = addrM[1].replace(/[:=ঃ]/g, '').trim();
+            continue;
+        }
+        const noteM = line.match(/^(?:order\s*notes?|notes?|special\s*instructions?|instructions?|delivery\s*note|remark|নোট|মন্তব্য|নির্দেশনা)\s*[:=\-ঃ]?\s*(.+)$/i);
+        if (noteM) {
+            extracted.notes = noteM[1].replace(/[:=ঃ]/g, '').trim();
+            continue;
+        }
+
+        // Check if instruction / note line
+        if (/(?:deliver\s*after|call\s*(?:me\s*)?before|urgent|deliver\s*(?:tomorrow|today|friday)|weekend|weekday|fragile|pack\s*carefully|carefully|gift|office\s*delivery|ডেলিভারি|ফোন\s*দিবেন|কল\s*দিবেন|ছুটি|শুক্রবার|কুরিয়ার|সুন্দরবন|পাঠাবেন|পাঠাই\s*দেন|parc?el)/i.test(line)) {
+            extracted.notes = extracted.notes ? (extracted.notes + ' | ' + line) : line;
+            continue;
+        }
+
+        candidateLines.push(line);
+    }
+
+    // Classify candidate lines between Address and Name
+    const addressLines = [];
+    const otherLines = [];
+    const addressKeywordRegex = /(?:house|road|sector|sec|block|flat|floor|building|apt|apartment|avenue|ave|lane|gali|basa|bari|holding|village|vill|thana|upazila|district|dist|c\/a|society|housing|plaza|tower|complex|পোস্ট|রোড|রাস্তা|বাসা|বাড়ি|সেক্টর|ব্লক|ফ্ল্যাট|গ্রাম|ডাকঘর|থানা|উপজেলা|জেলা|মোড়|বাজার|মার্কেট|সরণি|গলি|লেইন|মহল্লা|সোসাইটি)/i;
+
+    candidateLines.forEach(cl => {
+        if (addressKeywordRegex.test(cl)) {
+            addressLines.push(cl);
+        } else {
+            otherLines.push(cl);
+        }
+    });
+
+    if (addressLines.length > 0) {
+        extracted.address = addressLines.join(', ');
+    }
+
+    if (!extracted.name && otherLines.length > 0) {
+        extracted.name = otherLines.shift();
+    }
+
+    // Any leftover lines
+    if (otherLines.length > 0) {
+        if (!extracted.address) {
+            extracted.address = otherLines.join(', ');
+        } else {
+            const extra = otherLines.join('; ');
+            extracted.notes = extracted.notes ? (extracted.notes + ' | ' + extra) : extra;
+        }
+    }
+
+    // Apply extracted data to inputs with visual feedback
+    let fieldsCount = 0;
+    const highlightField = ($el) => {
+        $el.addClass('pos-autofill-highlight');
+        setTimeout(() => $el.removeClass('pos-autofill-highlight'), 1600);
+    };
+
+    if (extracted.name) {
+        $('#customerName').val(extracted.name);
+        highlightField($('#customerName'));
+        fieldsCount++;
+    }
+    if (extracted.phone) {
+        $('#customerPhone').val(extracted.phone);
+        highlightField($('#customerPhone'));
+        fieldsCount++;
+    }
+    if (extracted.email) {
+        $('#customerEmail').val(extracted.email);
+        highlightField($('#customerEmail'));
+        fieldsCount++;
+    }
+    if (extracted.city) {
+        $('#customerCity').val(extracted.city);
+        highlightField($('#customerCity'));
+        fieldsCount++;
+    }
+    if (extracted.address) {
+        $('#customerAddress').val(extracted.address);
+        highlightField($('#customerAddress'));
+        fieldsCount++;
+    }
+    if (extracted.notes) {
+        const currentNotes = $('#orderNotes').val().trim();
+        const newNotes = currentNotes ? (currentNotes + ' | ' + extracted.notes) : extracted.notes;
+        $('#orderNotes').val(newNotes);
+        highlightField($('#orderNotes'));
+        fieldsCount++;
+    }
+    if (extracted.source) {
+        $('#orderSource option').each(function() {
+            if ($(this).val().toLowerCase() === extracted.source.toLowerCase() || 
+                $(this).text().toLowerCase().includes(extracted.source.toLowerCase())) {
+                $('#orderSource').val($(this).val()).trigger('change');
+                highlightField($('#orderSource'));
+                fieldsCount++;
+                return false;
+            }
+        });
+    }
+    if (extracted.paymentMethod) {
+        $('#paymentMethod').val(extracted.paymentMethod).trigger('change');
+        if (typeof togglePaymentFields === 'function') {
+            togglePaymentFields();
+        }
+        highlightField($('#paymentMethod'));
+        fieldsCount++;
+
+        if (extracted.trxId) {
+            if (extracted.paymentMethod === 'bkash') $('#bkashTrxId').val(extracted.trxId);
+            if (extracted.paymentMethod === 'nagad') $('#nagadTrxId').val(extracted.trxId);
+            if (extracted.paymentMethod === 'rocket') $('#rocketTrxId').val(extracted.trxId);
+        }
+    }
+
+    validateForm();
+
+    const summaryParts = [];
+    if (extracted.name) summaryParts.push('Name');
+    if (extracted.phone) summaryParts.push('Phone');
+    if (extracted.city) summaryParts.push('City');
+    if (extracted.address) summaryParts.push('Address');
+    if (extracted.notes) summaryParts.push('Notes');
+    if (extracted.source) summaryParts.push('Source');
+    if (extracted.paymentMethod) summaryParts.push('Payment');
+
+    if (fieldsCount > 0) {
+        toastr.success(`Auto-filled: ${summaryParts.join(', ')}`, 'Customer Auto-Filled');
+        setTimeout(() => {
+            $('#quickAutoFillBox').slideUp(200);
+        }, 700);
+    } else {
+        toastr.warning('Could not detect customer fields. Please check the text format.');
+    }
 }
 
 // Order processing - Prepare order for review

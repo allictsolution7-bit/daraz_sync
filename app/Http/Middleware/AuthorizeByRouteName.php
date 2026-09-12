@@ -104,6 +104,20 @@ class AuthorizeByRouteName
             abort(403, 'Permission required: (pos.view). Please ask an administrator to grant this permission.');
         }
 
+        // Direct mapping for SMS Gateway & Notification settings routes
+        if (str_starts_with($name, 'admin.sms-settings') || str_starts_with($name, 'sms-settings')) {
+            if (
+                $user->can('sms_settings.view') || 
+                $user->can('settings.view') || 
+                (method_exists($user, 'isAdmin') && $user->isAdmin()) || 
+                (method_exists($user, 'isVendor') && $user->isVendor()) || 
+                (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin') || $user->hasRole('vendor')))
+            ) {
+                return $next($request);
+            }
+            abort(403, 'Permission required: (sms_settings.view). Please ask an administrator to grant this permission.');
+        }
+
         // Direct mapping for basic shipping settings route
         if (str_starts_with($name, 'admin.basic.shipping.settings') || str_starts_with($name, 'basic.shipping.settings')) {
             if ($user->can('shipping.basic.view') || $user->can('shipping.basic.update') || $user->can('basic_shipping.view') || (method_exists($user, 'hasRole') && ($user->hasRole('super_admin') || $user->hasRole('super admin') || $user->hasRole('admin')))) {

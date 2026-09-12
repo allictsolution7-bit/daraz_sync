@@ -30,9 +30,10 @@ class SmsSettingController extends Controller
             $targetUserId = (int)$request->user_id;
         }
 
-        $settings = SmsSetting::getSettingsForUser($targetUserId);
+        $smsSetting = SmsSetting::getSettingsForUser($targetUserId);
+        $smsSettings = $smsSetting;
 
-        return view('admin.sms-settings.index', compact('settings', 'targetUserId', 'user'));
+        return view('admin.sms-settings.index', compact('smsSetting', 'smsSettings', 'targetUserId', 'user'));
     }
 
     /**
@@ -42,7 +43,7 @@ class SmsSettingController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user || (!$user->isAdmin() && !$user->isVendor() && !$user->can('settings.update'))) {
+        if (!$user || (!$user->isAdmin() && !$user->isVendor() && !$user->can('settings.update') && !$user->can('sms_settings.update'))) {
             abort(403, 'Unauthorized action.');
         }
 

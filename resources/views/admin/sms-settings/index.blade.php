@@ -112,17 +112,99 @@
         accent-color: #0284c7;
     }
 
-    /* Switch toggle */
-    .form-check-input {
-        width: 44px;
-        height: 24px;
+    /* Premium Custom iOS-Style Toggle Switches */
+    .sms-toggle-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
         cursor: pointer;
-        margin-right: 10px;
+        user-select: none;
+        margin-bottom: 0;
+        vertical-align: middle;
     }
 
-    .form-check-input:checked {
-        background-color: #0284c7;
-        border-color: #0284c7;
+    .sms-toggle-wrapper input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        margin: 0;
+        pointer-events: none;
+    }
+
+    .sms-toggle-slider {
+        position: relative;
+        width: 52px;
+        height: 28px;
+        background-color: #cbd5e1;
+        border-radius: 9999px;
+        transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+        flex-shrink: 0;
+        display: inline-block;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .sms-toggle-slider::before {
+        content: '';
+        position: absolute;
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: #ffffff;
+        border-radius: 50%;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22), 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .sms-toggle-wrapper input[type="checkbox"]:checked + .sms-toggle-slider {
+        background-color: #10b981;
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+    }
+
+    .sms-toggle-wrapper input[type="checkbox"]:checked + .sms-toggle-slider::before {
+        transform: translateX(24px);
+    }
+
+    /* Master toggle variation (blue primary) */
+    .sms-toggle-wrapper.master-toggle input[type="checkbox"]:checked + .sms-toggle-slider {
+        background: linear-gradient(135deg, #0284c7, #0369a1);
+        box-shadow: 0 0 16px rgba(2, 132, 199, 0.45);
+    }
+
+    .sms-toggle-wrapper:hover .sms-toggle-slider {
+        filter: brightness(0.97);
+    }
+
+    /* Status badge next to toggle */
+    .sms-toggle-label {
+        font-weight: 700;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+        letter-spacing: 0.2px;
+    }
+
+    .sms-toggle-label.status-active {
+        background-color: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
+    }
+
+    .sms-toggle-label.status-inactive {
+        background-color: #f1f5f9;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+    }
+
+    .sms-toggle-wrapper.master-toggle .sms-toggle-label.status-active {
+        background-color: #f0f9ff;
+        color: #0284c7;
+        border: 1px solid #bae6fd;
     }
 
     .event-switch-row {
@@ -164,6 +246,9 @@
 @endsection
 
 @section('content')
+@php
+    $smsSetting = $smsSettings ?? ($smsSetting ?? ($settings instanceof \App\Models\SmsSetting ? $settings : \App\Models\SmsSetting::getSettingsForUser($targetUserId ?? null)));
+@endphp
 <div class="container-fluid py-4" id="sms-settings-page">
     <div class="row">
         <div class="col-12">
@@ -223,10 +308,14 @@
                                 <small class="text-muted">Master switch to enable or pause all outgoing SMS messages for this portal.</small>
                             </div>
                         </div>
-                        <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" role="switch" name="is_enabled" id="is_enabled" {{ old('is_enabled', $settings->is_enabled) ? 'checked' : '' }}>
-                            <label class="form-check-label fw-bold" for="is_enabled">Active</label>
-                        </div>
+                        <label class="sms-toggle-wrapper master-toggle" for="is_enabled">
+                            <input type="checkbox" name="is_enabled" id="is_enabled" value="1" {{ old('is_enabled', $smsSetting->is_enabled) ? 'checked' : '' }} onchange="updateToggleLabel(this, 'Active', 'Inactive')">
+                            <span class="sms-toggle-slider"></span>
+                            <span class="sms-toggle-label {{ old('is_enabled', $smsSetting->is_enabled) ? 'status-active' : 'status-inactive' }}" id="label_is_enabled">
+                                <i class="fas {{ old('is_enabled', $smsSetting->is_enabled) ? 'fa-check-circle' : 'fa-power-off' }}"></i>
+                                <span>{{ old('is_enabled', $smsSetting->is_enabled) ? 'Active' : 'Inactive' }}</span>
+                            </span>
+                        </label>
                     </div>
                 </div>
 
@@ -244,8 +333,8 @@
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="gateway-option {{ old('default_gateway', $settings->default_gateway) === 'bulksmsbd' ? 'selected' : '' }}" for="gateway_bulksmsbd">
-                                <input type="radio" name="default_gateway" id="gateway_bulksmsbd" value="bulksmsbd" {{ old('default_gateway', $settings->default_gateway) === 'bulksmsbd' ? 'checked' : '' }}>
+                            <label class="gateway-option {{ old('default_gateway', $smsSetting->default_gateway) === 'bulksmsbd' ? 'selected' : '' }}" for="gateway_bulksmsbd">
+                                <input type="radio" name="default_gateway" id="gateway_bulksmsbd" value="bulksmsbd" {{ old('default_gateway', $smsSetting->default_gateway) === 'bulksmsbd' ? 'checked' : '' }}>
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="fw-bold mb-1">BulkSMSBD</h6>
@@ -256,8 +345,8 @@
                             </label>
                         </div>
                         <div class="col-md-6">
-                            <label class="gateway-option {{ old('default_gateway', $settings->default_gateway) === 'awaj' ? 'selected' : '' }}" for="gateway_awaj">
-                                <input type="radio" name="default_gateway" id="gateway_awaj" value="awaj" {{ old('default_gateway', $settings->default_gateway) === 'awaj' ? 'checked' : '' }}>
+                            <label class="gateway-option {{ old('default_gateway', $smsSetting->default_gateway) === 'awaj' ? 'selected' : '' }}" for="gateway_awaj">
+                                <input type="radio" name="default_gateway" id="gateway_awaj" value="awaj" {{ old('default_gateway', $smsSetting->default_gateway) === 'awaj' ? 'checked' : '' }}>
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="fw-bold mb-1">Awaj (Awaaz) SMS</h6>
@@ -287,17 +376,17 @@
 
                             <div class="mb-3">
                                 <label class="form-label" for="bulksmsbd_api_key">API Key</label>
-                                <input type="text" class="form-control" name="bulksmsbd_api_key" id="bulksmsbd_api_key" value="{{ old('bulksmsbd_api_key', $settings->bulksmsbd_api_key) }}" placeholder="e.g. 7X8Y9Z...">
+                                <input type="text" class="form-control" name="bulksmsbd_api_key" id="bulksmsbd_api_key" value="{{ old('bulksmsbd_api_key', $smsSetting->bulksmsbd_api_key) }}" placeholder="e.g. 7X8Y9Z...">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label" for="bulksmsbd_sender_id">Sender ID / Masking Name</label>
-                                <input type="text" class="form-control" name="bulksmsbd_sender_id" id="bulksmsbd_sender_id" value="{{ old('bulksmsbd_sender_id', $settings->bulksmsbd_sender_id) }}" placeholder="e.g. 8809612...">
+                                <input type="text" class="form-control" name="bulksmsbd_sender_id" id="bulksmsbd_sender_id" value="{{ old('bulksmsbd_sender_id', $smsSetting->bulksmsbd_sender_id) }}" placeholder="e.g. 8809612...">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label" for="bulksmsbd_url">API Endpoint URL</label>
-                                <input type="url" class="form-control" name="bulksmsbd_url" id="bulksmsbd_url" value="{{ old('bulksmsbd_url', $settings->bulksmsbd_url ?: 'https://bulksmsbd.net/api/smsapi') }}">
+                                <input type="url" class="form-control" name="bulksmsbd_url" id="bulksmsbd_url" value="{{ old('bulksmsbd_url', $smsSetting->bulksmsbd_url ?: 'https://bulksmsbd.net/api/smsapi') }}">
                             </div>
                         </div>
                     </div>
@@ -318,28 +407,28 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="awaj_api_key">API Key / Token</label>
-                                    <input type="text" class="form-control" name="awaj_api_key" id="awaj_api_key" value="{{ old('awaj_api_key', $settings->awaj_api_key) }}" placeholder="Awaj API Key">
+                                    <input type="text" class="form-control" name="awaj_api_key" id="awaj_api_key" value="{{ old('awaj_api_key', $smsSetting->awaj_api_key) }}" placeholder="Awaj API Key">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="awaj_sender_id">Sender ID</label>
-                                    <input type="text" class="form-control" name="awaj_sender_id" id="awaj_sender_id" value="{{ old('awaj_sender_id', $settings->awaj_sender_id) }}" placeholder="e.g. AWAJ_SMS">
+                                    <input type="text" class="form-control" name="awaj_sender_id" id="awaj_sender_id" value="{{ old('awaj_sender_id', $smsSetting->awaj_sender_id) }}" placeholder="e.g. AWAJ_SMS">
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="awaj_client_id">Client ID (Optional)</label>
-                                    <input type="text" class="form-control" name="awaj_client_id" id="awaj_client_id" value="{{ old('awaj_client_id', $settings->awaj_client_id) }}" placeholder="Client ID">
+                                    <input type="text" class="form-control" name="awaj_client_id" id="awaj_client_id" value="{{ old('awaj_client_id', $smsSetting->awaj_client_id) }}" placeholder="Client ID">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="awaj_secret_key">Secret Key (Optional)</label>
-                                    <input type="password" class="form-control" name="awaj_secret_key" id="awaj_secret_key" value="{{ old('awaj_secret_key', $settings->awaj_secret_key) }}" placeholder="Secret Key">
+                                    <input type="password" class="form-control" name="awaj_secret_key" id="awaj_secret_key" value="{{ old('awaj_secret_key', $smsSetting->awaj_secret_key) }}" placeholder="Secret Key">
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label" for="awaj_url">Endpoint URL</label>
-                                <input type="url" class="form-control" name="awaj_url" id="awaj_url" value="{{ old('awaj_url', $settings->awaj_url ?: 'https://api.awajdigital.com/api') }}">
+                                <input type="url" class="form-control" name="awaj_url" id="awaj_url" value="{{ old('awaj_url', $smsSetting->awaj_url ?: 'https://api.awajdigital.com/api') }}">
                             </div>
                         </div>
                     </div>
@@ -366,15 +455,19 @@
                                 </h6>
                                 <p class="text-muted small mb-0">Send an SMS notification to the customer when they successfully purchase a product.</p>
                             </div>
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" role="switch" name="notify_product_sold" id="notify_product_sold" {{ old('notify_product_sold', $settings->notify_product_sold) ? 'checked' : '' }}>
-                                <label class="form-check-label fw-bold" for="notify_product_sold">Enable</label>
-                            </div>
+                            <label class="sms-toggle-wrapper" for="notify_product_sold">
+                                <input type="checkbox" name="notify_product_sold" id="notify_product_sold" value="1" {{ old('notify_product_sold', $smsSetting->notify_product_sold) ? 'checked' : '' }} onchange="updateToggleLabel(this, 'Enabled', 'Disabled')">
+                                <span class="sms-toggle-slider"></span>
+                                <span class="sms-toggle-label {{ old('notify_product_sold', $smsSetting->notify_product_sold) ? 'status-active' : 'status-inactive' }}" id="label_notify_product_sold">
+                                    <i class="fas {{ old('notify_product_sold', $smsSetting->notify_product_sold) ? 'fa-check' : 'fa-ban' }}"></i>
+                                    <span>{{ old('notify_product_sold', $smsSetting->notify_product_sold) ? 'Enabled' : 'Disabled' }}</span>
+                                </span>
+                            </label>
                         </div>
 
                         <div class="mb-2">
                             <label class="form-label" for="template_product_sold">Customer SMS Template:</label>
-                            <textarea class="form-control" rows="2" name="template_product_sold" id="template_product_sold">{{ old('template_product_sold', $settings->template_product_sold ?: \App\Models\SmsSetting::defaultTemplate('product_sold')) }}</textarea>
+                            <textarea class="form-control" rows="2" name="template_product_sold" id="template_product_sold">{{ old('template_product_sold', $smsSetting->template_product_sold ?: \App\Models\SmsSetting::defaultTemplate('product_sold')) }}</textarea>
                         </div>
                         <div class="small text-muted">
                             <span>Available Placeholders: </span>
@@ -396,17 +489,21 @@
                                     Dispatches SMS reminder to the Admin when their subscription/portal is near expiry (sent via <strong>Super Admin's gateway</strong>).
                                 </p>
                             </div>
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" role="switch" name="notify_admin_expiry" id="notify_admin_expiry" {{ old('notify_admin_expiry', $settings->notify_admin_expiry) ? 'checked' : '' }}>
-                                <label class="form-check-label fw-bold" for="notify_admin_expiry">Enable</label>
-                            </div>
+                            <label class="sms-toggle-wrapper" for="notify_admin_expiry">
+                                <input type="checkbox" name="notify_admin_expiry" id="notify_admin_expiry" value="1" {{ old('notify_admin_expiry', $smsSetting->notify_admin_expiry) ? 'checked' : '' }} onchange="updateToggleLabel(this, 'Enabled', 'Disabled')">
+                                <span class="sms-toggle-slider"></span>
+                                <span class="sms-toggle-label {{ old('notify_admin_expiry', $smsSetting->notify_admin_expiry) ? 'status-active' : 'status-inactive' }}" id="label_notify_admin_expiry">
+                                    <i class="fas {{ old('notify_admin_expiry', $smsSetting->notify_admin_expiry) ? 'fa-check' : 'fa-ban' }}"></i>
+                                    <span>{{ old('notify_admin_expiry', $smsSetting->notify_admin_expiry) ? 'Enabled' : 'Disabled' }}</span>
+                                </span>
+                            </label>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label class="form-label" for="admin_expiry_days_before">Days before expiration to send reminder:</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" name="admin_expiry_days_before" id="admin_expiry_days_before" min="1" max="30" value="{{ old('admin_expiry_days_before', $settings->admin_expiry_days_before ?: 3) }}">
+                                    <input type="number" class="form-control" name="admin_expiry_days_before" id="admin_expiry_days_before" min="1" max="30" value="{{ old('admin_expiry_days_before', $smsSetting->admin_expiry_days_before ?: 3) }}">
                                     <span class="input-group-text">Day(s)</span>
                                 </div>
                             </div>
@@ -414,7 +511,7 @@
 
                         <div class="mb-2">
                             <label class="form-label" for="template_admin_expiry">Admin Expiry SMS Template:</label>
-                            <textarea class="form-control" rows="2" name="template_admin_expiry" id="template_admin_expiry">{{ old('template_admin_expiry', $settings->template_admin_expiry ?: \App\Models\SmsSetting::defaultTemplate('admin_expiry')) }}</textarea>
+                            <textarea class="form-control" rows="2" name="template_admin_expiry" id="template_admin_expiry">{{ old('template_admin_expiry', $smsSetting->template_admin_expiry ?: \App\Models\SmsSetting::defaultTemplate('admin_expiry')) }}</textarea>
                         </div>
                         <div class="small text-muted">
                             <span>Available Placeholders: </span>
@@ -434,15 +531,19 @@
                                 </h6>
                                 <p class="text-muted small mb-0">Send a welcome / account confirmation SMS when a new user signs up or is registered.</p>
                             </div>
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" role="switch" name="notify_user_created" id="notify_user_created" {{ old('notify_user_created', $settings->notify_user_created) ? 'checked' : '' }}>
-                                <label class="form-check-label fw-bold" for="notify_user_created">Enable</label>
-                            </div>
+                            <label class="sms-toggle-wrapper" for="notify_user_created">
+                                <input type="checkbox" name="notify_user_created" id="notify_user_created" value="1" {{ old('notify_user_created', $smsSetting->notify_user_created) ? 'checked' : '' }} onchange="updateToggleLabel(this, 'Enabled', 'Disabled')">
+                                <span class="sms-toggle-slider"></span>
+                                <span class="sms-toggle-label {{ old('notify_user_created', $smsSetting->notify_user_created) ? 'status-active' : 'status-inactive' }}" id="label_notify_user_created">
+                                    <i class="fas {{ old('notify_user_created', $smsSetting->notify_user_created) ? 'fa-check' : 'fa-ban' }}"></i>
+                                    <span>{{ old('notify_user_created', $smsSetting->notify_user_created) ? 'Enabled' : 'Disabled' }}</span>
+                                </span>
+                            </label>
                         </div>
 
                         <div class="mb-2">
                             <label class="form-label" for="template_user_created">Welcome SMS Template:</label>
-                            <textarea class="form-control" rows="2" name="template_user_created" id="template_user_created">{{ old('template_user_created', $settings->template_user_created ?: \App\Models\SmsSetting::defaultTemplate('user_created')) }}</textarea>
+                            <textarea class="form-control" rows="2" name="template_user_created" id="template_user_created">{{ old('template_user_created', $smsSetting->template_user_created ?: \App\Models\SmsSetting::defaultTemplate('user_created')) }}</textarea>
                         </div>
                         <div class="small text-muted">
                             <span>Available Placeholders: </span>
@@ -461,15 +562,19 @@
                                 </h6>
                                 <p class="text-muted small mb-0">Send SMS when order status changes (e.g. Processing, Shipped, Delivered).</p>
                             </div>
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" role="switch" name="notify_order_status_change" id="notify_order_status_change" {{ old('notify_order_status_change', $settings->notify_order_status_change) ? 'checked' : '' }}>
-                                <label class="form-check-label fw-bold" for="notify_order_status_change">Enable</label>
-                            </div>
+                            <label class="sms-toggle-wrapper" for="notify_order_status_change">
+                                <input type="checkbox" name="notify_order_status_change" id="notify_order_status_change" value="1" {{ old('notify_order_status_change', $smsSetting->notify_order_status_change) ? 'checked' : '' }} onchange="updateToggleLabel(this, 'Enabled', 'Disabled')">
+                                <span class="sms-toggle-slider"></span>
+                                <span class="sms-toggle-label {{ old('notify_order_status_change', $smsSetting->notify_order_status_change) ? 'status-active' : 'status-inactive' }}" id="label_notify_order_status_change">
+                                    <i class="fas {{ old('notify_order_status_change', $smsSetting->notify_order_status_change) ? 'fa-check' : 'fa-ban' }}"></i>
+                                    <span>{{ old('notify_order_status_change', $smsSetting->notify_order_status_change) ? 'Enabled' : 'Disabled' }}</span>
+                                </span>
+                            </label>
                         </div>
 
                         <div class="mb-2">
                             <label class="form-label" for="template_order_status">Status Change Template:</label>
-                            <textarea class="form-control" rows="2" name="template_order_status" id="template_order_status">{{ old('template_order_status', $settings->template_order_status ?: \App\Models\SmsSetting::defaultTemplate('order_status')) }}</textarea>
+                            <textarea class="form-control" rows="2" name="template_order_status" id="template_order_status">{{ old('template_order_status', $smsSetting->template_order_status ?: \App\Models\SmsSetting::defaultTemplate('order_status')) }}</textarea>
                         </div>
                         <div class="small text-muted">
                             <span>Available Placeholders: </span>
@@ -536,6 +641,20 @@
 
 @push('scripts')
 <script>
+    // Update custom toggle badge on change
+    function updateToggleLabel(checkbox, activeText, inactiveText) {
+        const label = document.getElementById('label_' + checkbox.id);
+        if (!label) return;
+        const iconClass = checkbox.id === 'is_enabled' ? (checkbox.checked ? 'fa-check-circle' : 'fa-power-off') : (checkbox.checked ? 'fa-check' : 'fa-ban');
+        if (checkbox.checked) {
+            label.className = 'sms-toggle-label status-active';
+            label.innerHTML = '<i class="fas ' + iconClass + '"></i> <span>' + activeText + '</span>';
+        } else {
+            label.className = 'sms-toggle-label status-inactive';
+            label.innerHTML = '<i class="fas ' + iconClass + '"></i> <span>' + inactiveText + '</span>';
+        }
+    }
+
     // Radio selection visual toggle
     document.querySelectorAll('input[name="default_gateway"]').forEach(radio => {
         radio.addEventListener('change', function() {

@@ -78,6 +78,7 @@ class PermissionSeeder extends Seeder
             'blog.view',
             'fraud_protection.view',
             'telegram_settings.view',
+            'sms_settings.view', 'sms_settings.update',
             'delayed_events.view',
             'woocommerce_migration.view',
             'basic_shipping.view',
