@@ -23,114 +23,409 @@
 
     /* Page container styling */
     .container-fluid {
-        padding: 30px;
+        padding: 12px 18px;
         background-color: #f8fafc;
         min-height: 100vh;
     }
 
+    /* Layout Switcher buttons in Header */
+    .layout-toggle-group {
+        display: inline-flex;
+        align-items: center;
+        background: #f1f5f9;
+        padding: 3px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-layout-toggle {
+        padding: 5px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        text-decoration: none !important;
+        outline: none !important;
+    }
+
+    .btn-layout-toggle:hover {
+        color: var(--primary);
+    }
+
+    .btn-layout-toggle.active {
+        background: #ffffff;
+        color: var(--primary);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Common container */
     .settings-container {
+        width: 100%;
+        margin: 10px 0 20px 0;
+        transition: all 0.3s ease;
+    }
+
+    /* =======================================================
+       1. Top Tabs Mode (Full Width Canvas)
+       ======================================================= */
+    .settings-container.mode-top-tabs {
         display: flex;
-        gap: 30px;
-        margin: 20px 0;
-        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+        align-items: stretch;
     }
 
-    /* Modern Premium Sidebar */
-    .settings-sidebar {
-        width: 320px;
-        background: var(--bg-glass);
-        border: 1px solid var(--border-glass);
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: var(--shadow-premium);
+    .settings-container.mode-top-tabs .settings-sidebar {
+        width: 100%;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 8px 12px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
         position: sticky;
-        top: 90px;
-        max-height: calc(100vh - 130px);
-        overflow-y: auto;
-        z-index: 10;
+        top: 70px;
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: hidden;
+        z-index: 99;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 6px;
+        align-items: center;
         scrollbar-width: thin;
-        scrollbar-color: var(--primary) transparent;
+        scrollbar-color: var(--primary) #f1f5f9;
     }
 
-    .settings-sidebar::-webkit-scrollbar {
-        width: 4px;
+    .settings-container.mode-top-tabs .settings-sidebar::-webkit-scrollbar {
+        height: 4px;
     }
 
-    .settings-sidebar::-webkit-scrollbar-thumb {
+    .settings-container.mode-top-tabs .settings-sidebar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    .settings-container.mode-top-tabs .settings-sidebar::-webkit-scrollbar-thumb {
         background-color: var(--primary);
         border-radius: 4px;
     }
 
-    .settings-sidebar h6 {
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 11px;
-        color: var(--text-muted) !important;
-        margin-bottom: 15px !important;
-        padding-left: 5px;
+    .settings-container.mode-top-tabs .sidebar-top-controls,
+    .settings-container.mode-top-tabs .sidebar-category-header {
+        display: none !important;
     }
 
-    /* Navigation tabs */
-    .sidebar-tab {
+    .settings-container.mode-top-tabs .sidebar-tabs-container {
         display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 6px;
         align-items: center;
         width: 100%;
-        padding: 12px 18px;
-        margin: 6px 0;
+    }
+
+    .settings-container.mode-top-tabs .sidebar-tab {
+        display: inline-flex;
+        align-items: center;
+        width: auto;
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 8px 14px;
+        margin: 0;
         text-align: left;
-        background: transparent;
-        border: 1px solid transparent;
-        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
         color: var(--text-main);
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
         text-decoration: none !important;
         transition: var(--transition-smooth);
         cursor: pointer;
     }
 
-    .sidebar-tab i {
-        font-size: 16px;
-        width: 24px;
+    .settings-container.mode-top-tabs .sidebar-tab i {
+        font-size: 14px;
+        width: auto;
+        margin-right: 6px;
         text-align: center;
         transition: var(--transition-smooth);
     }
 
-    .sidebar-tab:hover {
+    .settings-container.mode-top-tabs .sidebar-tab:hover {
         background: var(--primary-light);
         color: var(--primary);
+        border-color: rgba(25, 122, 148, 0.3);
     }
 
-    .sidebar-tab.active {
+    .settings-container.mode-top-tabs .sidebar-tab.active {
         background: var(--primary-gradient);
         color: white;
         border-color: transparent;
-        box-shadow: 0 4px 15px rgba(25, 122, 148, 0.25);
+        box-shadow: 0 4px 12px rgba(25, 122, 148, 0.25);
     }
 
-    .sidebar-tab.active i {
+    .settings-container.mode-top-tabs .sidebar-tab.active i {
         color: white;
     }
 
-    /* Settings Content Panel */
-    .settings-content {
-        flex: 1;
+    .settings-container.mode-top-tabs .settings-content {
+        width: 100%;
+        flex: 1 1 100%;
         background: var(--bg-glass);
         border: 1px solid var(--border-glass);
-        border-radius: 20px;
-        padding: 40px;
+        border-radius: 16px;
+        padding: 24px;
         box-shadow: var(--shadow-premium);
         min-height: 500px;
     }
 
-    .tab-content {
+    /* =======================================================
+       2. Sidebar Mode (with Collapsible Toggle - Compact 1-Column Fit)
+       ======================================================= */
+    .settings-container.mode-sidebar {
+        display: flex;
+        flex-direction: row;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .settings-container.mode-sidebar .settings-sidebar {
+        width: 235px;
+        flex-shrink: 0;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 6px 6px;
+        box-shadow: var(--shadow-premium);
+        position: sticky;
+        top: calc(100vh - 100% - 15px);
+        height: fit-content !important;
+        align-self: flex-start !important;
+        max-height: none !important;
+        overflow: visible !important;
+        overflow-y: visible !important;
+        overflow-x: visible !important;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), padding 0.25s ease, top 0.2s ease-out;
+    }
+
+    .settings-container.mode-sidebar .settings-sidebar::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .settings-container.mode-sidebar .sidebar-top-controls {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2px;
+        padding: 2px 4px 4px 4px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .btn-sidebar-collapse {
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-radius: 5px;
+        padding: 2px 7px;
+        font-size: 10px;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-sidebar-collapse:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .settings-container.mode-sidebar .sidebar-category-header {
+        display: none !important;
+    }
+
+    .settings-container.mode-sidebar .sidebar-tabs-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5px;
+        width: 100%;
+    }
+
+    .settings-container.mode-sidebar .sidebar-tab {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 25px;
+        min-height: 25px;
+        max-height: 25px;
+        padding: 0 8px;
+        margin: 0;
+        border-radius: 6px;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-main);
+        font-size: 11.5px;
+        font-weight: 500;
+        line-height: 1;
+        text-decoration: none !important;
+        transition: var(--transition-smooth);
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-sizing: border-box;
+    }
+
+    .settings-container.mode-sidebar .sidebar-tab i {
+        font-size: 12px;
+        width: 15px;
+        margin-right: 6px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .settings-container.mode-sidebar .sidebar-tab:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-color: rgba(25, 122, 148, 0.25);
+    }
+
+    .settings-container.mode-sidebar .sidebar-tab.active {
+        background: var(--primary-gradient);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 2px 6px rgba(25, 122, 148, 0.2);
+    }
+
+    .settings-container.mode-sidebar .sidebar-tab.active i {
+        color: white;
+    }
+
+    .settings-container.mode-sidebar .settings-content {
+        flex: 1;
+        min-width: 0;
+        background: var(--bg-glass);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--shadow-premium);
+        min-height: 500px;
+    }
+
+    /* Sidebar Mode - Collapsed (Icon-Only) */
+    .settings-container.mode-sidebar .settings-sidebar.is-collapsed {
+        width: 48px !important;
+        padding: 6px 3px !important;
+        align-items: center;
+    }
+
+    .settings-container.mode-sidebar .settings-sidebar.is-collapsed .sidebar-top-controls {
+        justify-content: center;
+        width: 100%;
+        border-bottom: none;
+        margin-bottom: 2px;
+        padding: 0;
+    }
+
+    .settings-container.mode-sidebar .settings-sidebar.is-collapsed .sidebar-heading-text,
+    .settings-container.mode-sidebar .settings-sidebar.is-collapsed .sidebar-category-header {
+        display: none !important;
+    }
+
+    .settings-container.mode-sidebar .settings-sidebar.is-collapsed .btn-sidebar-collapse i {
+        transform: rotate(180deg);
+    }
+
+    .settings-container.mode-sidebar .settings-sidebar.is-collapsed .sidebar-tabs-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .settings-container.mode-sidebar .settings-sidebar.is-collapsed .sidebar-tab {
+        width: 36px;
+        height: 25px;
+        min-height: 25px;
+        max-height: 25px;
+        padding: 0;
+        margin: 0;
+        justify-content: center;
+        border-radius: 6px;
+        position: relative;
+    }
+
+    .settings-container.mode-sidebar .settings-sidebar.is-collapsed .sidebar-tab .tab-text {
+        display: none;
+    }
+
+    .settings-container.mode-sidebar .settings-sidebar.is-collapsed .sidebar-tab i {
+        margin: 0 !important;
+        font-size: 13px;
+    }
+
+    .settings-content > .tab-content {
         display: none;
         animation: fadeIn 0.4s ease-out;
     }
 
-    .tab-content.active {
+    .settings-content > .tab-content.active {
         display: block;
+    }
+
+    /* Keep inner nested pill tab contents visible */
+    #t1PromoCardsTabContent.tab-content,
+    #t1PromoCardsTabContent {
+        display: block !important;
+    }
+
+    /* Collapsible Card Headers & Animations */
+    .card-collapse-header {
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.2s ease, border-radius 0.2s ease;
+    }
+    .card-collapse-header:hover {
+        background-color: #f8fafc !important;
+    }
+    .card-collapse-toggle {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        border-radius: 8px !important;
+        transition: all 0.2s ease;
+    }
+    .card-collapse-toggle:hover {
+        background-color: #f1f5f9 !important;
+        border-color: #cbd5e1;
+    }
+    .toggle-icon {
+        transition: transform 0.25s ease;
+    }
+    .collapsible-card.collapsed .toggle-icon {
+        transform: rotate(180deg);
+    }
+    .collapsible-card.collapsed .card-header {
+        border-bottom: none !important;
+        border-radius: 16px !important;
+    }
+    .collapsible-card.collapsed .card-collapse-body {
+        display: none;
     }
 
     @keyframes fadeIn {
@@ -474,97 +769,116 @@
 @section('content')
 <div class="container-fluid">
     <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Website Settings</h6>
+        <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
+            <div class="d-flex align-items-center flex-wrap" style="gap: 12px;">
+                <h6 class="m-0 font-weight-bold text-primary">Website Settings</h6>
+                <!-- Dual Layout Mode Switcher -->
+                <div class="layout-toggle-group">
+                    <button type="button" class="btn-layout-toggle active" id="btnTopTabsMode" title="Switch to Top Horizontal Tabs">
+                        <i class="fas fa-ellipsis-h mr-1"></i> Top Tabs
+                    </button>
+                    <button type="button" class="btn-layout-toggle" id="btnSidebarMode" title="Switch to Vertical Sidebar">
+                        <i class="fas fa-columns mr-1"></i> Sidebar
+                    </button>
+                </div>
+            </div>
             <button type="submit" form="settingsForm" class="save-button">
                 <i class="fas fa-save"></i> Save Settings
             </button>
         </div>
     </div>
 
-    <form id="settingsForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+    <form id="settingsForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
         @csrf
 
-        <div class="settings-container">
+        <div class="settings-container mode-top-tabs" id="settingsContainer">
             <!-- Sidebar Navigation -->
-            <div class="settings-sidebar">
-                <h6 class="mb-3 text-muted">Settings Categories</h6>
+            <div class="settings-sidebar" id="settingsSidebar">
+                <div class="sidebar-top-controls">
+                    <span class="sidebar-heading-text font-weight-bold" style="font-size: 12px; color: #1e293b;">Navigation</span>
+                    <button type="button" class="btn-sidebar-collapse" id="btnToggleSidebarCollapse" title="Collapse/Expand sidebar">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                </div>
+                <h6 class="sidebar-category-header mb-3 text-muted">Settings Categories</h6>
 
-                <a href="#general" class="sidebar-tab active" data-tab="general">
-                    <i class="fas fa-info-circle mr-2"></i> General Information
-                </a>
+                <div class="sidebar-tabs-container">
+                    <a href="#general" class="sidebar-tab active" data-tab="general" title="General Information">
+                        <i class="fas fa-info-circle mr-2"></i> <span class="tab-text">General Information</span>
+                    </a>
 
-                <a href="#preloader" class="sidebar-tab" data-tab="preloader">
-                    <i class="fas fa-sync-alt mr-2"></i> Preloader Settings
-                </a>
+                    <a href="#preloader" class="sidebar-tab" data-tab="preloader" title="Preloader Settings">
+                        <i class="fas fa-sync-alt mr-2"></i> <span class="tab-text">Preloader Settings</span>
+                    </a>
 
-                <a href="#seo" class="sidebar-tab" data-tab="seo">
-                    <i class="fas fa-chart-line mr-2"></i> SEO Settings
-                </a>
+                    <a href="#seo" class="sidebar-tab" data-tab="seo" title="SEO Settings">
+                        <i class="fas fa-chart-line mr-2"></i> <span class="tab-text">SEO Settings</span>
+                    </a>
 
-                <a href="#sitemap" class="sidebar-tab" data-tab="sitemap">
-                    <i class="fas fa-route mr-2"></i> Sitemap Management
-                </a>
+                    <a href="#sitemap" class="sidebar-tab" data-tab="sitemap" title="Sitemap Management">
+                        <i class="fas fa-route mr-2"></i> <span class="tab-text">Sitemap Management</span>
+                    </a>
 
-                <a href="#product-design" class="sidebar-tab" data-tab="product-design">
-                    <i class="fas fa-cubes mr-2"></i> Product Item Design
-                </a>
+                    <a href="#product-design" class="sidebar-tab" data-tab="product-design" title="Product Item Design">
+                        <i class="fas fa-cubes mr-2"></i> <span class="tab-text">Product Item Design</span>
+                    </a>
 
-                <a href="#section-headings" class="sidebar-tab" data-tab="section-headings">
-                    <i class="fas fa-heading mr-2"></i> Section Heading Styles
-                </a>
+                    <a href="#section-headings" class="sidebar-tab" data-tab="section-headings" title="Section Heading Styles">
+                        <i class="fas fa-heading mr-2"></i> <span class="tab-text">Section Heading Styles</span>
+                    </a>
 
-                <a href="#typography" class="sidebar-tab" data-tab="typography">
-                    <i class="fas fa-text-height mr-2"></i> Typography Settings
-                </a>
+                    <a href="#typography" class="sidebar-tab" data-tab="typography" title="Typography Settings">
+                        <i class="fas fa-text-height mr-2"></i> <span class="tab-text">Typography Settings</span>
+                    </a>
 
-                <a href="#colors" class="sidebar-tab" data-tab="colors">
-                    <i class="fas fa-paint-brush mr-2"></i> Colors Settings
-                </a>
+                    <a href="#colors" class="sidebar-tab" data-tab="colors" title="Colors Settings">
+                        <i class="fas fa-paint-brush mr-2"></i> <span class="tab-text">Colors Settings</span>
+                    </a>
 
-                <a href="#contact" class="sidebar-tab" data-tab="contact">
-                    <i class="fas fa-envelope-open-text mr-2"></i> Contact Information
-                </a>
+                    <a href="#contact" class="sidebar-tab" data-tab="contact" title="Contact Information">
+                        <i class="fas fa-envelope-open-text mr-2"></i> <span class="tab-text">Contact Information</span>
+                    </a>
 
-                <a href="#social" class="sidebar-tab" data-tab="social">
-                    <i class="fas fa-hashtag mr-2"></i> Social Media Links
-                </a>
+                    <a href="#social" class="sidebar-tab" data-tab="social" title="Social Media Links">
+                        <i class="fas fa-hashtag mr-2"></i> <span class="tab-text">Social Media Links</span>
+                    </a>
 
-                <a href="#header" class="sidebar-tab" data-tab="header">
-                    <i class="fas fa-window-maximize mr-2"></i> Header Customization
-                </a>
+                    <a href="#header" class="sidebar-tab" data-tab="header" title="Header Customization">
+                        <i class="fas fa-window-maximize mr-2"></i> <span class="tab-text">Header Customization</span>
+                    </a>
 
-                <a href="#footer" class="sidebar-tab" data-tab="footer">
-                    <i class="fas fa-window-minimize mr-2"></i> Footer Content
-                </a>
+                    <a href="#footer" class="sidebar-tab" data-tab="footer" title="Footer Content">
+                        <i class="fas fa-window-minimize mr-2"></i> <span class="tab-text">Footer Content</span>
+                    </a>
 
-                <a href="#ecommerce" class="sidebar-tab" data-tab="ecommerce">
-                    <i class="fas fa-store mr-2"></i> Ecommerce Settings
-                </a>
+                    <a href="#ecommerce" class="sidebar-tab" data-tab="ecommerce" title="Ecommerce Settings">
+                        <i class="fas fa-store mr-2"></i> <span class="tab-text">Ecommerce Settings</span>
+                    </a>
 
-                <a href="#homepage" class="sidebar-tab" data-tab="homepage">
-                    <i class="fas fa-laptop-code mr-2"></i> Homepage Customization
-                </a>
+                    <a href="#homepage" class="sidebar-tab" data-tab="homepage" title="Homepage Customization">
+                        <i class="fas fa-laptop-code mr-2"></i> <span class="tab-text">Homepage Customization</span>
+                    </a>
 
-                <a href="#single-product" class="sidebar-tab" data-tab="single-product">
-                    <i class="fas fa-box-open mr-2"></i> Advanced Single Product
-                </a>
+                    <a href="#single-product" class="sidebar-tab" data-tab="single-product" title="Advanced Single Product">
+                        <i class="fas fa-box-open mr-2"></i> <span class="tab-text">Advanced Single Product</span>
+                    </a>
 
-                <a href="#registration" class="sidebar-tab" data-tab="registration">
-                    <i class="fas fa-user-shield mr-2"></i> Registration Settings
-                </a>
+                    <a href="#registration" class="sidebar-tab" data-tab="registration" title="Registration Settings">
+                        <i class="fas fa-user-shield mr-2"></i> <span class="tab-text">Registration Settings</span>
+                    </a>
 
-                <a href="#mobile-nav" class="sidebar-tab" data-tab="mobile-nav">
-                    <i class="fas fa-mobile-alt mr-2"></i> Mobile Bottom Navigation
-                </a>
+                    <a href="#mobile-nav" class="sidebar-tab" data-tab="mobile-nav" title="Mobile Bottom Navigation">
+                        <i class="fas fa-mobile-alt mr-2"></i> <span class="tab-text">Mobile Bottom Navigation</span>
+                    </a>
 
-                <a href="#layout" class="sidebar-tab" data-tab="layout">
-                    <i class="fas fa-layer-group mr-2"></i> Layout Settings
-                </a>
+                    <a href="#layout" class="sidebar-tab" data-tab="layout" title="Layout Settings">
+                        <i class="fas fa-layer-group mr-2"></i> <span class="tab-text">Layout Settings</span>
+                    </a>
 
-                <a href="#mega-menu" class="sidebar-tab" data-tab="mega-menu">
-                    <i class="fas fa-th-large mr-2"></i> Mega Menu Settings
-                </a>
+                    <a href="#mega-menu" class="sidebar-tab" data-tab="mega-menu" title="Mega Menu Settings">
+                        <i class="fas fa-th-large mr-2"></i> <span class="tab-text">Mega Menu Settings</span>
+                    </a>
+                </div>
             </div>
 
             <!-- Content Area -->
@@ -2392,8 +2706,8 @@
                                 ? (string)$currentUser->template_id 
                                 : setting('homepage', 'template_id', '1'));
                     @endphp
-                    <div class="card mb-4 border-0 shadow-sm" style="border-radius: 14px; overflow: hidden;">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom: 1px solid #edf2f7;">
+                    <div class="card mb-4 border-0 shadow-sm collapsible-card" style="border-radius: 14px; overflow: hidden;">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2 card-collapse-header" style="border-bottom: 1px solid #edf2f7;">
                             <div>
                                 <h5 class="card-title mb-1 font-weight-bold" style="color: #1e293b; font-size: 17px;">
                                     <i class="fas fa-layer-group text-primary mr-2"></i> Homepage Template & Layout
@@ -2406,15 +2720,20 @@
                                     @endif
                                 </p>
                             </div>
-                            <span class="badge {{ $isSuperAdmin ? 'badge-primary' : 'badge-success' }} px-3 py-2" style="border-radius: 20px; font-weight: 600; letter-spacing: 0.5px;">
-                                @if($isSuperAdmin)
-                                    Active: Template {{ $selectedTemplate }}
-                                @else
-                                    <i class="fas fa-shield-alt mr-1"></i> Assigned: Template {{ $selectedTemplate }}
-                                @endif
-                            </span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge {{ $isSuperAdmin ? 'badge-primary' : 'badge-success' }} px-3 py-2 mr-2" style="border-radius: 20px; font-weight: 600; letter-spacing: 0.5px;">
+                                    @if($isSuperAdmin)
+                                        Active: Template {{ $selectedTemplate }}
+                                    @else
+                                        <i class="fas fa-shield-alt mr-1"></i> Assigned: Template {{ $selectedTemplate }}
+                                    @endif
+                                </span>
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body bg-light-50 p-4">
+                        <div class="card-body bg-light-50 p-4 card-collapse-body">
                             <input type="hidden" name="homepage[template_id]" id="selected_homepage_template" value="{{ $selectedTemplate }}">
 
                             @if(!$isSuperAdmin)
@@ -3010,20 +3329,43 @@
                         </div>
                     </div>
 
+                    {{-- Template Sections Controls Toolbar --}}
+                    <div class="d-flex justify-content-between align-items-center mb-3 mt-1 px-1 flex-wrap gap-2">
+                        <div>
+                            <span class="font-weight-bold text-dark" style="font-size: 13.5px;">
+                                <i class="fas fa-sliders-h text-primary mr-1"></i> Template & Homepage Section Cards
+                            </span>
+                            <small class="text-muted d-block" style="font-size: 11.5px;">Click any card header to expand or minimize its settings.</small>
+                        </div>
+                        <div class="btn-group btn-group-sm shadow-sm" style="border-radius: 8px;">
+                            <button type="button" class="btn btn-white btn-outline-secondary px-3 py-1 font-weight-bold" id="expandAllCardsBtn" style="font-size: 11px; border-radius: 8px 0 0 8px;">
+                                <i class="fas fa-expand-alt mr-1 text-success"></i> Expand All
+                            </button>
+                            <button type="button" class="btn btn-white btn-outline-secondary px-3 py-1 font-weight-bold" id="collapseAllCardsBtn" style="font-size: 11px; border-radius: 0 8px 8px 0;">
+                                <i class="fas fa-compress-alt mr-1 text-danger"></i> Minimize All
+                            </button>
+                        </div>
+                    </div>
+
                     {{-- Template 1 Left Showcase Promo Cards Settings --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template1_settings_card" style="{{ in_array($selectedTemplate, ['1']) || $isSuperAdmin ? '' : 'display:none;' }}">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card collapsible-card" id="template1_settings_card" style="{{ in_array($selectedTemplate, ['1']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-th-large text-success mr-2"></i> Template 1: Left Showcase Promo Cards Configuration
                                 </h5>
                                 <small class="text-muted">Manage the promotional banner cards displayed on the left column alongside Featured Deals and Best Selling Products.</small>
                             </div>
-                            <span class="badge badge-success px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #0b4d3c;">
-                                Template 1 Exclusive
-                            </span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge badge-success px-3 py-1.5 mr-2" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #0b4d3c;">
+                                    Template 1 Exclusive
+                                </span>
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             {{-- Helpful Guidance Banner --}}
                             <div class="alert alert-light border rounded-3 p-3 mb-4 d-flex align-items-center" style="background: #f8fafc; border-left: 4px solid #0b4d3c !important;">
                                 <i class="fas fa-layer-group fa-2x mr-3" style="color: #0b4d3c;"></i>
@@ -3133,7 +3475,7 @@
                                 ];
                             @endphp
 
-                            <div class="tab-content" id="t1PromoCardsTabContent">
+                            <div class="tab-content mt-3" id="t1PromoCardsTabContent" style="display: block !important;">
                                 @for($i = 1; $i <= 6; $i++)
                                 <div class="tab-pane fade {{ $i == 1 ? 'show active' : '' }}" id="t1-card-{{ $i }}" role="tabpanel">
                                     <div class="p-3 bg-white rounded-3 border shadow-sm">
@@ -3205,19 +3547,24 @@
 
                     {{-- Template 4 Flash Sale Offer Settings --}}
                     @if($isSuperAdmin || $selectedTemplate == '4')
-                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template4_settings_card">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card collapsible-card" id="template4_settings_card" style="{{ in_array($selectedTemplate, ['4']) ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-bolt text-danger mr-2"></i> Template 4: Flash Sale Top Ribbon & Countdown Configuration
                                 </h5>
                                 <small class="text-muted">Configure the announcement banner text, countdown closing time, and promotional link for Template 4.</small>
                             </div>
-                            <span class="badge badge-danger px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px;">
-                                Template 4 Exclusive
-                            </span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge badge-danger px-3 py-1.5 mr-2" style="border-radius: 20px; font-weight: 700; font-size: 10px;">
+                                    Template 4 Exclusive
+                                </span>
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="font-weight-bold text-dark" style="font-size: 13px;">
@@ -3268,19 +3615,24 @@
                     @endif
 
                     {{-- Template 6: Fashion & Apparel Studio Customization --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template6_settings_card" style="{{ in_array($selectedTemplate, ['6']) || $isSuperAdmin ? '' : 'display:none;' }}">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card collapsible-card" id="template6_settings_card" style="{{ in_array($selectedTemplate, ['6']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-tshirt text-danger mr-2"></i> Template 6: Fashion & Apparel Studio Configuration
                                 </h5>
                                 <small class="text-muted">Customize announcement marquee, bespoke artisanal spotlight, and ensemble styling headings for Template 6.</small>
                             </div>
-                            <span class="badge badge-danger px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #be123c;">
-                                Template 6 Exclusive
-                            </span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge badge-danger px-3 py-1.5 mr-2" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #be123c;">
+                                    Template 6 Exclusive
+                                </span>
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="row">
                                 {{-- T6 Color Theme Customizer --}}
                                 <div class="col-md-12 mb-3">
@@ -3319,7 +3671,7 @@
                                         <i class="fas fa-bullhorn text-warning mr-1"></i> Top Animated Marquee Ticker Text
                                     </label>
                                     <input type="text" name="homepage[template_6_ticker_text]" class="form-control"
-                                           value="{{ $homepage['template_6_ticker_text'] ?? 'âœ¨ EXCLUSIVE COUTURE COLLECTION • HANDCRAFTED PANJABI & SILK ATELIER • COMPLIMENTARY LUXURY GIFT BOX WITH EVERY ORDER • FREE EXPRESS SHIPPING' }}"
+                                           value="{{ $homepage['template_6_ticker_text'] ?? '✨ EXCLUSIVE COUTURE COLLECTION • HANDCRAFTED PANJABI & SILK ATELIER • COMPLIMENTARY LUXURY GIFT BOX WITH EVERY ORDER • FREE EXPRESS SHIPPING' }}"
                                            placeholder="Enter announcement ticker text...">
                                     <small class="form-text text-muted">Continuous animated marquee running across the top header.</small>
                                 </div>
@@ -3549,19 +3901,24 @@
                     </div>
 
                     {{-- Template 7: Beauty & Cosmetics Glow Customization --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template7_settings_card" style="{{ in_array($selectedTemplate, ['7']) || $isSuperAdmin ? '' : 'display:none;' }}">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card collapsible-card" id="template7_settings_card" style="{{ in_array($selectedTemplate, ['7']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-spa mr-2" style="color:#db2777;"></i> Template 7: Beauty & Cosmetics Glow Configuration
                                 </h5>
                                 <small class="text-muted">Customize glow announcement ribbon, clean ingredient badges, and beauty gift sets for Template 7.</small>
                             </div>
-                            <span class="badge badge-pink px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #db2777; color: #fff;">
-                                Template 7 Exclusive
-                            </span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge badge-pink px-3 py-1.5 mr-2" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #db2777; color: #fff;">
+                                    Template 7 Exclusive
+                                </span>
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="row">
                                 {{-- T7 Color Theme Customizer --}}
                                 <div class="col-md-12 mb-3">
@@ -3757,19 +4114,24 @@
                     </div>
 
                     {{-- Template 8: Mega Supermarket & Grocery Customization --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template8_settings_card" style="{{ in_array($selectedTemplate, ['8']) || $isSuperAdmin ? '' : 'display:none;' }}">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card collapsible-card" id="template8_settings_card" style="{{ in_array($selectedTemplate, ['8']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-shopping-basket text-success mr-2"></i> Template 8: Mega Supermarket & Grocery Configuration
                                 </h5>
                                 <small class="text-muted">Configure express delivery dispatch timer, promo deals, and grocery combo bundle settings for Template 8.</small>
                             </div>
-                            <span class="badge badge-success px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #16a34a;">
-                                Template 8 Exclusive
-                            </span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge badge-success px-3 py-1.5 mr-2" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #16a34a;">
+                                    Template 8 Exclusive
+                                </span>
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="row">
                                 {{-- T8 Color Theme Customizer --}}
                                 <div class="col-md-12 mb-3">
@@ -3905,19 +4267,24 @@
                     </div>
 
                     {{-- Template 9: Books & Heritage Store Customization --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template9_settings_card" style="{{ in_array($selectedTemplate, ['9']) || $isSuperAdmin ? '' : 'display:none;' }}">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card collapsible-card" id="template9_settings_card" style="{{ in_array($selectedTemplate, ['9']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-book text-warning mr-2" style="color:#d97706;"></i> Template 9: Books, Academy & Heritage Store Configuration
                                 </h5>
                                 <small class="text-muted">Configure publisher notice strip, bestsellers circulation heading, and author spotlight for Template 9.</small>
                             </div>
-                            <span class="badge badge-warning px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #0f172a; color: #fde68a;">
-                                Template 9 Exclusive
-                            </span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge badge-warning px-3 py-1.5 mr-2" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #0f172a; color: #fde68a;">
+                                    Template 9 Exclusive
+                                </span>
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="row">
                                 {{-- T9 Color Theme Customizer --}}
                                 <div class="col-md-12 mb-3">
@@ -4012,25 +4379,26 @@
                     </div>
 
                     {{-- Template 10: Home Living & Furniture Studio Customization --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card" id="template10_settings_card" style="{{ in_array($selectedTemplate, ['10']) || $isSuperAdmin ? '' : 'display:none;' }}">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 template-specific-card collapsible-card" id="template10_settings_card" style="{{ in_array($selectedTemplate, ['10']) || $isSuperAdmin ? '' : 'display:none;' }}">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-couch text-warning mr-2" style="color:#ea580c;"></i> Template 10: Home Living & Furniture Configuration
                                 </h5>
                                 <small class="text-muted">Configure linen inspiration strip, interactive hotspot studio, and 10-year warranty story for Template 10.</small>
                             </div>
-                            <span class="badge badge-warning px-3 py-1.5" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #ea580c; color: #fff;">
-                                Template 10 Exclusive
-                            </span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge badge-warning px-3 py-1.5 mr-2" style="border-radius: 20px; font-weight: 700; font-size: 10px; background: #ea580c; color: #fff;">
+                                    Template 10 Exclusive
+                                </span>
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
-                                        <i class="fas fa-home mr-1" style="color:#ea580c;"></i> Interior Linen Top Strip Text
-                                    </label>
-                                    {{-- T10 Color Theme Customizer --}}
+                                {{-- T10 Color Theme Customizer --}}
                                 <div class="col-md-12 mb-3">
                                     <div class="p-3 bg-white rounded border">
                                         <label class="font-weight-bold text-dark mb-2" style="font-size: 13px;">
@@ -4062,7 +4430,11 @@
                                     </div>
                                 </div>
 
-                                           value="{{ $homepage['template_10_linen_text'] ?? '🏡 Free Professional Assembly • 100% Solid Seasoned Teak Guarantee • 10-Year Structural Frame Warranty' }}"
+                                <div class="col-md-12 mb-3">
+                                    <label class="font-weight-bold text-dark" style="font-size: 13px;">
+                                        <i class="fas fa-home mr-1" style="color:#ea580c;"></i> Interior Linen Top Strip Text
+                                    </label>
+                                    <input type="text" name="homepage[template_10_linen_text]" class="form-control"
                                            value="{{ $homepage['template_10_linen_text'] ?? '🏡 Free Professional Assembly • 100% Solid Seasoned Teak Guarantee • 10-Year Structural Frame Warranty' }}"
                                            placeholder="Enter linen strip text...">
                                 </div>
@@ -4210,16 +4582,21 @@
                      </div>
 
                      {{-- MODULE 1: Product Category & Products By Category Sections --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 collapsible-card">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-th-large text-primary mr-2"></i> Product Category & Navigation Setup
                                 </h5>
                                 <small class="text-muted">Configure category layouts, featured category badges, and category showcase sections.</small>
                             </div>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
@@ -4386,17 +4763,22 @@
                     </div>
 
                     {{-- MODULE 2: Curated Product Sections (Best Selling, Editor's Picks, Trending Now) --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 collapsible-card">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-star text-warning mr-2"></i> Curated Product Showcases
                                 </h5>
                                 <small class="text-muted">Manage Best Selling, Editor's Picks, and Trending Now product showcases in organized compact panels.</small>
                             </div>
-                            <span class="badge badge-warning px-3 py-1 text-dark" style="font-weight:700;">3 Featured Modules</span>
+                            <div class="d-flex align-items-center">
+                                <span class="badge badge-warning px-3 py-1 text-dark mr-2" style="font-weight:700;">3 Featured Modules</span>
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="row">
                                 @php
                                 $curatedSections = [
@@ -4475,16 +4857,21 @@
                     </div>
 
                     {{-- MODULE 3: Latest Products & Pagination Settings --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 collapsible-card">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-boxes text-info mr-2"></i> Latest Products & Infinite Scroll / Pagination
                                 </h5>
                                 <small class="text-muted">Configure the main catalog feed, initial item count, and AJAX load more / infinite scrolling behavior.</small>
                             </div>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="p-3 bg-white rounded-3 border shadow-sm">
                                 <div class="form-group mb-3">
                                     <input type="hidden" name="homepage[enable_latest_products_section]" value="0">
@@ -4533,16 +4920,21 @@
                     </div>
 
                     {{-- MODULE 4: Main Slider & Hero Configuration --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 collapsible-card">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-sliders-h text-primary mr-2"></i> Main Slider & Hero Banner Layout
                                 </h5>
                                 <small class="text-muted">Control hero slider dimensions across desktop, tablet, and mobile breakpoints alongside side banners.</small>
                             </div>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="p-3 bg-white rounded-3 border shadow-sm">
                                 <div class="form-group mb-3">
                                     <input type="hidden" name="homepage[enable_main_slider_section]" value="0">
@@ -4610,16 +5002,21 @@
                     </div>
 
                     {{-- MODULE 5: Dynamic Featured Banners (1–4 Images) --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 collapsible-card">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-images text-success mr-2"></i> Dynamic Featured Promo Banners (1–4 Images)
                                 </h5>
                                 <small class="text-muted">Display up to 4 high-impact promotional image banners on the homepage with custom links.</small>
                             </div>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="p-3 bg-white rounded-3 border shadow-sm mb-3">
                                 <div class="row align-items-center">
                                     <div class="col-md-6 mb-2 mb-md-0">
@@ -4680,16 +5077,21 @@
                     </div>
 
                     {{-- MODULE 6: Products By Category v2 (Locations 1, 2, 3) --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 collapsible-card">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-layer-group text-purple mr-2"></i> Products By Category v2 (Multi-Location Placement)
                                 </h5>
                                 <small class="text-muted">Inject dedicated category showcase grids across 3 separate flexible homepage positions.</small>
                             </div>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="p-3 bg-white rounded-3 border shadow-sm mb-3">
                                 <input type="hidden" name="homepage[enable_products_by_category_v2]" value="0">
                                 <label class="font-weight-bold text-dark mb-0">
@@ -4762,16 +5164,21 @@
                     </div>
 
                     {{-- MODULE 7: Auxiliary Sections & Floating Controls --}}
-                    <div class="card mb-4 border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="card mb-4 border-0 shadow-sm rounded-4 collapsible-card">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center card-collapse-header">
                             <div>
                                 <h5 class="card-title mb-0 font-weight-bold text-dark" style="font-size: 15px;">
                                     <i class="fas fa-toggle-on text-success mr-2"></i> Auxiliary Homepage Sections & Floating Controls
                                 </h5>
                                 <small class="text-muted">Configure trust reviews, publisher/author highlights, scroll-to-top button, and global button labels.</small>
                             </div>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-light card-collapse-toggle" title="Expand / Minimize">
+                                    <i class="fas fa-chevron-up toggle-icon text-muted"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="card-body p-4 bg-light-50">
+                        <div class="card-body p-4 bg-light-50 card-collapse-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
@@ -4867,23 +5274,10 @@
                                 </div>
                             </div>
                         </div>
-                    </div>hor Section In Home page
-                                </label>
-                            </div>
-
-                            <hr>
-                            <div class="form-group">
-                                <input type="hidden" name="homepage[enable_best_publisher_section]" value="0">
-                                <label>
-                                    <input type="checkbox" name="homepage[enable_best_publisher_section]" value="1"
-                                        {{ !empty($homepage['enable_best_publisher_section']) && $homepage['enable_best_publisher_section'] ? 'checked' : '' }}>
-                                    Enable Best Publisher Section In Home page
-                                </label>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
+                <!-- Advanced Single Product Tab -->
                 <div id="single-product" class="tab-content">
                     <div class="tab-header">
                         <h2 class="tab-title">Advanced Single Product</h2>
@@ -5930,8 +6324,98 @@
 <script>
     // Simple tab switching functionality with hash support
     document.addEventListener('DOMContentLoaded', function() {
+        // Layout Mode Switching (Top Tabs vs Sidebar) & Collapsing
+        const settingsContainer = document.getElementById('settingsContainer');
+        const settingsSidebar = document.getElementById('settingsSidebar');
+        const btnTopTabsMode = document.getElementById('btnTopTabsMode');
+        const btnSidebarMode = document.getElementById('btnSidebarMode');
+        const btnToggleSidebarCollapse = document.getElementById('btnToggleSidebarCollapse');
+
+        function applyLayoutMode(mode) {
+            if (!settingsContainer) return;
+            if (mode === 'sidebar') {
+                settingsContainer.classList.remove('mode-top-tabs');
+                settingsContainer.classList.add('mode-sidebar');
+                if (btnTopTabsMode) btnTopTabsMode.classList.remove('active');
+                if (btnSidebarMode) btnSidebarMode.classList.add('active');
+                localStorage.setItem('settings_layout_mode', 'sidebar');
+            } else {
+                settingsContainer.classList.remove('mode-sidebar');
+                settingsContainer.classList.add('mode-top-tabs');
+                if (btnSidebarMode) btnSidebarMode.classList.remove('active');
+                if (btnTopTabsMode) btnTopTabsMode.classList.add('active');
+                localStorage.setItem('settings_layout_mode', 'top-tabs');
+            }
+        }
+
+        function toggleSidebarCollapse() {
+            if (!settingsSidebar) return;
+            const isCollapsed = settingsSidebar.classList.toggle('is-collapsed');
+            localStorage.setItem('settings_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+        }
+
+        // Restore saved preference (default to top-tabs)
+        const savedLayout = localStorage.getItem('settings_layout_mode') || 'top-tabs';
+        applyLayoutMode(savedLayout);
+
+        const savedCollapsed = localStorage.getItem('settings_sidebar_collapsed') === 'true';
+        if (savedCollapsed && settingsSidebar) {
+            settingsSidebar.classList.add('is-collapsed');
+        }
+
+        if (btnTopTabsMode) {
+            btnTopTabsMode.addEventListener('click', function(e) {
+                e.preventDefault();
+                applyLayoutMode('top-tabs');
+            });
+        }
+        if (btnSidebarMode) {
+            btnSidebarMode.addEventListener('click', function(e) {
+                e.preventDefault();
+                applyLayoutMode('sidebar');
+            });
+        }
+        if (btnToggleSidebarCollapse) {
+            btnToggleSidebarCollapse.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleSidebarCollapse();
+            });
+        }
+
+        // Smart Sticky Directional Behavior for Sidebar
+        // When scrolling down: sticks so all bottom tabs are in full view on a little bit of scroll
+        // When scrolling up: sticks so top tabs are in full view
+        let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+        function updateSidebarSticky() {
+            if (!settingsContainer || !settingsContainer.classList.contains('mode-sidebar') || !settingsSidebar) return;
+            
+            const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+            const sidebarHeight = settingsSidebar.offsetHeight;
+            const windowHeight = window.innerHeight;
+            const availableHeight = windowHeight - 75;
+
+            if (sidebarHeight > availableHeight) {
+                if (currentScrollY <= 30) {
+                    settingsSidebar.style.top = '65px';
+                } else if (currentScrollY > lastScrollY) {
+                    // Scrolling down: stick bottom so last tabs are visible on a little bit of scroll
+                    settingsSidebar.style.top = (windowHeight - sidebarHeight - 15) + 'px';
+                } else if (currentScrollY < lastScrollY) {
+                    // Scrolling up: stick top so first tabs are visible
+                    settingsSidebar.style.top = '65px';
+                }
+            } else {
+                settingsSidebar.style.top = '65px';
+            }
+            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+        }
+
+        window.addEventListener('scroll', updateSidebarSticky, { passive: true });
+        window.addEventListener('resize', updateSidebarSticky, { passive: true });
+        updateSidebarSticky();
+
         const tabs = document.querySelectorAll('.sidebar-tab');
-        const tabContents = document.querySelectorAll('.tab-content');
+        const tabContents = document.querySelectorAll('.settings-content > .tab-content');
 
         // Function to switch to a specific tab
         function switchToTab(tabId) {
@@ -5958,6 +6442,23 @@
                 }
             }
         }
+
+        // Handle T1 Promo Cards Pill Tabs switching
+        document.querySelectorAll('#t1PromoCardsTabs a').forEach(function(pill) {
+            pill.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetSelector = this.getAttribute('href');
+                document.querySelectorAll('#t1PromoCardsTabs .nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('#t1PromoCardsTabContent .tab-pane').forEach(p => {
+                    p.classList.remove('show', 'active');
+                });
+                this.classList.add('active');
+                const targetPane = document.querySelector(targetSelector);
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+            });
+        });
 
         // Handle tab clicks
         tabs.forEach(tab => {
@@ -6767,6 +7268,47 @@
             });
         };
 
+        // Collapsible Card Headers Toggle
+        $(document).on('click', '.card-collapse-header', function(e) {
+            // Ignore click if user clicked directly on an input, select, textarea, link, or label (except toggle button)
+            if ($(e.target).closest('input, select, textarea, a, label, .custom-control, .custom-switch').length && !$(e.target).closest('.card-collapse-toggle').length) {
+                return;
+            }
+            e.preventDefault();
+            const card = $(this).closest('.collapsible-card');
+            const body = card.find('.card-collapse-body').first();
+
+            if (card.hasClass('collapsed')) {
+                // Expand
+                card.removeClass('collapsed');
+                body.stop(true, true).slideDown(220);
+            } else {
+                // Minimize / Collapse
+                card.addClass('collapsed');
+                body.stop(true, true).slideUp(220);
+            }
+        });
+
+        // Expand All Cards Button
+        $('#expandAllCardsBtn').on('click', function(e) {
+            e.preventDefault();
+            $('#homepage .collapsible-card').each(function() {
+                const card = $(this);
+                card.removeClass('collapsed');
+                card.find('.card-collapse-body').first().stop(true, true).slideDown(200);
+            });
+        });
+
+        // Collapse / Minimize All Cards Button
+        $('#collapseAllCardsBtn').on('click', function(e) {
+            e.preventDefault();
+            $('#homepage .collapsible-card').each(function() {
+                const card = $(this);
+                card.addClass('collapsed');
+                card.find('.card-collapse-body').first().stop(true, true).slideUp(200);
+            });
+        });
+
         // Dynamic Template Settings Panels Toggle
         function updateTemplatePanels(templateId) {
             document.querySelectorAll('.template-specific-card').forEach(function(el) {
@@ -6775,6 +7317,12 @@
             const target = document.getElementById('template' + templateId + '_settings_card');
             if (target) {
                 target.style.display = 'block';
+                // Automatically expand target template card if it was collapsed
+                target.classList.remove('collapsed');
+                const body = target.querySelector('.card-collapse-body');
+                if (body) {
+                    body.style.display = 'block';
+                }
             }
         }
 

@@ -3649,9 +3649,8 @@
                     @endif
                 </a>
 
-                @if (($currentHpTemplateId ?? '1') !== '1')
                 <div class="category-trigger-wrapper">
-                    <a href="#" class="category-trigger-btn" id="categoryTriggerBtn">
+                    <a href="javascript:void(0)" class="category-trigger-btn" id="categoryTriggerBtn" aria-label="Categories">
                         <i class="fas fa-list"></i>
                         <span>Category</span>
                         <svg class="toggle-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 5px; transition: transform 0.2s ease;">
@@ -3659,7 +3658,6 @@
                         </svg>
                     </a>
                 </div>
-                @endif
     
                 <div class="search-bar {{ ($currentHpTemplateId ?? '1') === '1' ? 't1-search-bar' : '' }}">
                     <input type="text" id="header-search-input"
@@ -4363,9 +4361,9 @@
             z-index: 99999 !important;
         }
         .mainnav-section {
-            background: #1e293b;
+            background: {{ ($currentHpTemplateId ?? '1') === '1' ? '#0b4d3c' : setting('general', 'main_nav_background_color', '#1e293b') }};
             color: #ffffff;
-            margin-top: -3px;
+            margin-top: 0;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             position: relative;
             z-index: 99999 !important;
@@ -4375,14 +4373,21 @@
             .mainnav-section {
                 max-height: 0;
                 overflow: hidden;
-                transition: max-height 0.28s ease, opacity 0.28s ease;
+                transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
                 opacity: 0;
-                border-bottom: 3px solid var(--primary-color, #ff6925);
+                border-bottom: 0px solid transparent;
             }
             .mainnav-section.active {
                 max-height: none !important;
                 overflow: visible !important;
-                opacity: 1;
+                opacity: 1 !important;
+                border-bottom: 3px solid {{ ($currentHpTemplateId ?? '1') === '1' ? '#ff6925' : 'var(--primary-color, #ff6925)' }};
+            }
+        }
+
+        @media (max-width: 992px) {
+            .mainnav-section {
+                display: none !important;
             }
         }
 
@@ -4407,6 +4412,10 @@
             padding: 6px 0 !important;
             z-index: 1000000 !important;
             white-space: nowrap !important;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
         .mainnav-section .dropdown-menu .dropdown-parent > .dropdown-menu {
             top: -6px !important;
@@ -4446,25 +4455,27 @@
 
         .category-trigger-wrapper {
             position: relative;
-            display: inline-flex;
+            display: inline-flex !important;
             align-items: center;
             flex-shrink: 0;
+            margin: 0 4px;
         }
 
         .category-trigger-btn {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 7px;
-            background: rgba(30, 41, 59, 0.08);
-            border: 1.5px solid rgba(30, 41, 59, 0.15);
-            padding: 7.5px 16px;
+            background: {{ ($currentHpTemplateId ?? '1') === '1' ? '#f1f5f9' : 'rgba(30, 41, 59, 0.08)' }};
+            border: 1.5px solid {{ ($currentHpTemplateId ?? '1') === '1' ? '#e2e8f0' : 'rgba(30, 41, 59, 0.15)' }};
+            padding: 8px 16px;
             border-radius: 50px;
             font-size: 14px;
             font-weight: 600;
-            color: #1e293b !important;
+            color: {{ ($currentHpTemplateId ?? '1') === '1' ? '#0b4d3c' : '#1e293b' }} !important;
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
+            text-decoration: none !important;
         }
 
         /* If header background color is dark, make button contrast in white */
@@ -4476,9 +4487,9 @@
 
         .category-trigger-btn:hover,
         .category-trigger-btn.active {
-            background: rgba(30, 41, 59, 0.15);
-            border-color: rgba(30, 41, 59, 0.3);
-            color: #1e293b !important;
+            background: {{ ($currentHpTemplateId ?? '1') === '1' ? '#0b4d3c' : 'var(--primary-color, #ff6925)' }} !important;
+            border-color: {{ ($currentHpTemplateId ?? '1') === '1' ? '#0b4d3c' : 'var(--primary-color, #ff6925)' }} !important;
+            color: #ffffff !important;
         }
 
         .header-v5-section .category-trigger-btn:hover,
@@ -8738,7 +8749,7 @@
                     hoverTimeout = setTimeout(function() {
                         mainnav.classList.remove('active');
                         trigger.classList.remove('active');
-                    }, 350);
+                    }, 300);
                 }
 
                 trigger.addEventListener('mouseenter', showNav);

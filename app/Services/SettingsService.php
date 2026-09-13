@@ -17,7 +17,7 @@ class SettingsService
     {
         $userId = auth()->id();
         if (!self::$initialized || self::$initializedUserId !== $userId) {
-            $rawSettings = SiteSetting::all();
+            $rawSettings = SiteSetting::orderByRaw("CASE WHEN `group` LIKE 'vendor_%' THEN 1 ELSE 0 END ASC")->get();
             
             // Map settings into groups, strip the vendor_{id}_ prefix for in-memory access if it matches the current user
             $vendorPrefix = $userId ? 'vendor_' . $userId . '_' : '';
@@ -34,13 +34,106 @@ class SettingsService
                         continue;
                     }
                 }
-                $settingsGrouped[$group][$s->key] = $s->value;
+
+                $cleanedValue = is_string($s->value) ? self::cleanMojibake($s->value) : $s->value;
+                if ($cleanedValue !== $s->value) {
+                    try {
+                        SiteSetting::where('id', $s->id)->update(['value' => $cleanedValue]);
+                    } catch (\Throwable $e) {
+                        // Ignore any DB update failure
+                    }
+                }
+
+                $settingsGrouped[$group][$s->key] = $cleanedValue;
             }
             
             self::$settings = $settingsGrouped;
             self::$initialized = true;
             self::$initializedUserId = $userId;
         }
+    }
+
+    /**
+     * Clean and repair corrupted character encoding (mojibake)
+     */
+    public static function cleanMojibake(?string $str): ?string
+    {
+        if ($str === null || $str === '') {
+            return $str;
+        }
+
+        // Direct replacements for known corrupted characters, bullets, and emojis
+        $replacements = [
+            'Ã¢â‚¬Â¢' => '•',
+            'Ã¢â‚¬â„¢' => "’",
+            'Ã¢â‚¬â€œ' => '–',
+            'Ã¢â‚¬â€”' => '—',
+            'Ã¢â‚¬Å“' => '“',
+            'Ã¢â‚¬Â' => '”',
+            'â‚¬¢' => '•',
+            'â€¢' => '•',
+            'â€“' => '–',
+            'â€”' => '—',
+            'â€™' => "’",
+            'â€˜' => "‘",
+            'â€œ' => '“',
+            'â€ ' => '”',
+            'à§³' => '৳',
+            "ðŸ'‹" => '💋',
+            'ðŸ’‹' => '💋',
+            'ðŸ«§' => '🫧',
+            'ðŸŒ¸' => '🌸',
+            'âœ¨' => '✨',
+            "ðŸ'§" => '💧',
+            'ðŸ’§' => '💧',
+            'ðŸŽ ' => '🎁',
+            'ðŸŽ ' => '🎁',
+            'ðŸ‘' => '👉',
+            'ðŸŽ¯' => '🎯',
+            'ðŸ”¥' => '🔥',
+            'âš¡' => '⚡',
+            'ðŸŒŸ' => '🌟',
+            'â­ ' => '⭐',
+            'âœ”ï¸ ' => '✔️',
+            'ðŸ’¯' => '💯',
+            'ðŸš€' => '🚀',
+            'ðŸ‘ ' => '👍',
+            'ðŸ’°' => '💰',
+            'ðŸ›’' => '🛒',
+            'ðŸ› ' => '🛍️',
+            'ðŸ’' => '💎',
+            'ðŸšš' => '🚚',
+            'ðŸ“¦' => '📦',
+            'ðŸŽ‰' => '🎉',
+            'ðŸŒ' => '🌿',
+            'ðŸ§¡' => '🧡',
+            'ðŸ’™' => '💙',
+            'ðŸ’š' => '💚',
+            'â¤' => '❤️',
+            'ðŸ‘ ' => '👏',
+            'ðŸ’ª' => '💪',
+            'ðŸš' => '🚴',
+            'ðŸ“–' => '📖',
+            'ðŸ ¡' => '🏡',
+            'â˜€ï¸ ' => '☀️',
+            'ðŸŒ™' => '🌙',
+            'Ã©' => 'é',
+            'Ã¨' => 'è',
+            'Ã ' => 'à',
+            'Ã¢' => 'â',
+        ];
+
+        $cleaned = strtr($str, $replacements);
+
+        // Check for any remaining mojibake bullet or Taka symbol
+        if (strpos($cleaned, 'â€¢') !== false) {
+            $cleaned = str_replace('â€¢', '•', $cleaned);
+        }
+        if (strpos($cleaned, 'à§³') !== false) {
+            $cleaned = str_replace('à§³', '৳', $cleaned);
+        }
+
+        return $cleaned;
     }
 
     /**
@@ -77,18 +170,29 @@ class SettingsService
     {
         $userId = auth()->id();
         $dbGroup = $group;
+        $saveGlobalToo = false;
         if ($userId && strpos($group, 'vendor_') !== 0) {
             $dbGroup = 'vendor_' . $userId . '_' . $group;
+            $saveGlobalToo = true;
         }
+
+        $cleanValue = is_string($value) ? self::cleanMojibake($value) : $value;
         
         $setting = SiteSetting::updateOrCreate(
             ['group' => $dbGroup, 'key' => $key],
-            ['value' => $value]
+            ['value' => $cleanValue]
         );
+
+        if ($saveGlobalToo) {
+            SiteSetting::updateOrCreate(
+                ['group' => $group, 'key' => $key],
+                ['value' => $cleanValue]
+            );
+        }
 
         // Update in-memory cache
         if (self::$initialized) {
-            self::$settings[$group][$key] = $value;
+            self::$settings[$group][$key] = $cleanValue;
         }
 
         return $setting;
@@ -109,25 +213,38 @@ class SettingsService
             }
 
             $dbGroup = $group;
+            $saveGlobalToo = false;
             if ($userId && strpos($group, 'vendor_') !== 0) {
                 $dbGroup = 'vendor_' . $userId . '_' . $group;
+                $saveGlobalToo = true;
             }
 
             foreach ($items as $key => $value) {
                 if (is_array($value)) {
                     $value = json_encode($value);
                 }
+                $cleanValue = is_string($value) ? self::cleanMojibake($value) : $value;
                 $recordsToUpsert[] = [
                     'group' => $dbGroup,
                     'key' => (string) $key,
-                    'value' => is_null($value) ? null : (string) $value,
+                    'value' => is_null($cleanValue) ? null : (string) $cleanValue,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
 
+                if ($saveGlobalToo) {
+                    $recordsToUpsert[] = [
+                        'group' => $group,
+                        'key' => (string) $key,
+                        'value' => is_null($cleanValue) ? null : (string) $cleanValue,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
                 // Update in-memory cache
                 if (self::$initialized) {
-                    self::$settings[$group][$key] = $value;
+                    self::$settings[$group][$key] = $cleanValue;
                 }
             }
         }
