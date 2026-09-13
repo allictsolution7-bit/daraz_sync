@@ -198,12 +198,12 @@
     }
 
     .settings-container.mode-sidebar .settings-sidebar {
-        width: 235px;
+        width: 248px;
         flex-shrink: 0;
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 12px;
-        padding: 6px 6px;
+        padding: 8px 6px;
         box-shadow: var(--shadow-premium);
         position: sticky;
         top: calc(100vh - 100% - 15px);
@@ -228,8 +228,8 @@
         display: flex !important;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 2px;
-        padding: 2px 4px 4px 4px;
+        margin-bottom: 4px;
+        padding: 2px 4px 6px 4px;
         border-bottom: 1px solid #f1f5f9;
     }
 
@@ -256,7 +256,7 @@
     .settings-container.mode-sidebar .sidebar-tabs-container {
         display: flex;
         flex-direction: column;
-        gap: 1.5px;
+        gap: 2px;
         width: 100%;
     }
 
@@ -264,17 +264,17 @@
         display: flex;
         align-items: center;
         width: 100%;
-        height: 25px;
-        min-height: 25px;
-        max-height: 25px;
-        padding: 0 8px;
+        height: 32px;
+        min-height: 32px;
+        max-height: 32px;
+        padding: 0 10px;
         margin: 0;
-        border-radius: 6px;
+        border-radius: 7px;
         background: transparent;
         border: 1px solid transparent;
         color: var(--text-main);
-        font-size: 11.5px;
-        font-weight: 500;
+        font-size: 13px;
+        font-weight: 600;
         line-height: 1;
         text-decoration: none !important;
         transition: var(--transition-smooth);
@@ -286,9 +286,9 @@
     }
 
     .settings-container.mode-sidebar .sidebar-tab i {
-        font-size: 12px;
-        width: 15px;
-        margin-right: 6px;
+        font-size: 13.5px;
+        width: 18px;
+        margin-right: 8px;
         text-align: center;
         flex-shrink: 0;
     }
