@@ -124,42 +124,10 @@ return array(
     'auto_render' => true,
 
     'flash_bag' => array(
-        /*
-        |-----------------------------------------------------------------------
-        | Enable flash bag
-        |-----------------------------------------------------------------------
-        | This option controls whether PHPFlasher should automatically convert
-        | Laravel's flash messages to PHPFlasher notifications. This feature is
-        | useful when you want to migrate from a legacy system or another
-        | library that uses similar conventions for flash messages.
-        |
-        | When this option is set to 'true', PHPFlasher will check for flash
-        | messages in the session and convert them to notifications using the
-        | mapping specified in the 'mapping' option. When this option is set
-        | to 'false', PHPFlasher will ignore flash messages in the session.
-        */
-        'enabled' => true,
-
-        /*
-        |-----------------------------------------------------------------------
-        | Flash bag type mapping
-        |-----------------------------------------------------------------------
-        | This option allows you to map or convert session keys to PHPFlasher
-        | notification types. On the left side are the PHPFlasher types.
-        | On the right side are the Laravel session keys that you want to
-        | convert to PHPFlasher types.
-        |
-        | For example, if you want to convert Laravel's 'danger' flash
-        | messages to PHPFlasher's 'error' notifications, you can add
-        | the following entry to the mapping:
-        |     'error' => ['danger'],
-        */
-        'mapping' => array(
-            'success' => array('success'),
-            'error' => array('error', 'danger'),
-            'warning' => array('warning', 'alarm'),
-            'info' => array('info', 'notice', 'alert'),
-        ),
+        'success' => array('success'),
+        'error' => array('error', 'danger'),
+        'warning' => array('warning', 'alarm'),
+        'info' => array('info', 'notice', 'alert'),
     ),
 
     /*
