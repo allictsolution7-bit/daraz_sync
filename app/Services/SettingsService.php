@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\SiteSetting;
+use Illuminate\Support\Facades\Schema;
 
 class SettingsService
 {
@@ -17,6 +18,13 @@ class SettingsService
     {
         $userId = auth()->id();
         if (!self::$initialized || self::$initializedUserId !== $userId) {
+            if (!Schema::hasTable('site_settings')) {
+                self::$settings = [];
+                self::$initialized = true;
+                self::$initializedUserId = $userId;
+                return;
+            }
+
             $rawSettings = SiteSetting::all();
             
             // Map settings into groups, strip the vendor_{id}_ prefix for in-memory access if it matches the current user
